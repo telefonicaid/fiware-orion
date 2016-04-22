@@ -28,7 +28,7 @@
 #include "gmock/gmock.h"
 #include "mongo/client/dbclient.h"
 #include "common/globals.h"
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "mongoBackend/MongoGlobal.h"
 
 using ::testing::_;
@@ -161,19 +161,18 @@ public:
          * actually created/sent */
     }
 
-    MOCK_METHOD6(sendNotifyContextRequest, void(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, NotificationFormat notifyFormat));
+    MOCK_METHOD7(sendNotifyContextRequest, void(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, RenderFormat renderFormat, const std::vector<std::string>&  attrsFilter));
     MOCK_METHOD5(sendNotifyContextAvailabilityRequest, void(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, const std::string& fiwareCorrelator, Format f));
 
     /* Wrappers for parent methods (used in ON_CALL() defaults set in the constructor) */
-    void parent_sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, NotificationFormat notifyFormat)
+    void parent_sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, RenderFormat renderFormat, const std::vector<std::string>&  attrsFilter)
     {
-      return Notifier::sendNotifyContextRequest(ncr, url, tenant, xauthToken, fiwareCorrelator, notifyFormat);
+      Notifier::sendNotifyContextRequest(ncr, url, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsFilter);
     }
     void parent_sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, const std::string& fiwareCorrelator, Format format)
     {
-      return Notifier::sendNotifyContextAvailabilityRequest(ncar, url, tenant, fiwareCorrelator, format);
+      Notifier::sendNotifyContextAvailabilityRequest(ncar, url, tenant, fiwareCorrelator, format);
     }
-
 };
 
 /* ****************************************************************************

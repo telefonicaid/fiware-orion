@@ -476,7 +476,7 @@ TEST(mongoUpdateContextSubscription, subscriptionNotFound)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -517,7 +517,7 @@ TEST(mongoUpdateContextSubscription, updateDuration)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -614,7 +614,7 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);    
 
@@ -692,7 +692,7 @@ TEST(mongoUpdateContextSubscription, clearThrottling)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -772,7 +772,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -856,7 +856,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -940,7 +940,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1032,7 +1032,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1117,7 +1117,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1212,7 +1212,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1301,7 +1301,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1388,7 +1388,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1477,7 +1477,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1574,7 +1574,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1661,7 +1661,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1756,7 +1756,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1857,9 +1857,10 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
-    NotifierMock* notifierMock = new NotifierMock();
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1953,8 +1954,10 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1_JSON)
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2045,8 +2048,10 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1)
     cer.contextElement.contextAttributeVector.push_back(&ca2);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2138,8 +2143,10 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1_disjoint)
     cer.contextElement.contextAttributeVector.push_back(&ca2);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2246,8 +2253,10 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2353,8 +2362,10 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2454,8 +2465,10 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2555,8 +2568,10 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2668,8 +2683,10 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2781,8 +2798,10 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2877,8 +2896,10 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN)
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -2980,8 +3001,10 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3084,8 +3107,10 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CNbis)
     cer.contextElement.contextAttributeVector.push_back(&ca3);    
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3178,8 +3203,10 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_disjoint)
     cer.contextElement.contextAttributeVector.push_back(&ca2);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -3281,8 +3308,10 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial)
     cer.contextElement.contextAttributeVector.push_back(&ca2);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3384,8 +3413,10 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial_disjoint)
     cer.contextElement.contextAttributeVector.push_back(&ca2);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3487,8 +3518,10 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CNbis)
     cer.contextElement.contextAttributeVector.push_back(&ca2);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3585,10 +3618,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
     cer.contextElement.contextAttributeVector.push_back(&ca2);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(2);
     setNotifier(notifierMock);
+
+    attrsFilter.push_back("A1");
+    attrsFilter.push_back("A2");
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860002");
@@ -3700,8 +3738,10 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_C1)
     cer2.contextElement.contextAttributeVector.push_back(&ca5);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3802,8 +3842,10 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_C1)
     cer2.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3910,8 +3952,10 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CN)
     cer2.contextElement.contextAttributeVector.push_back(&ca5);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -4025,8 +4069,10 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CNbis)
     cer2.contextElement.contextAttributeVector.push_back(&ca5);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -4129,8 +4175,10 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
     cer2.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -4240,8 +4288,10 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CNbis)
     cer2.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", "no correlator", NGSI_V1_LEGACY))
+    NotifierMock*                notifierMock = new NotifierMock();
+    std::vector<std::string>     attrsFilter;
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -4332,7 +4382,7 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4418,7 +4468,7 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4481,7 +4531,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
             .WillByDefault(Return(fakeSub));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
