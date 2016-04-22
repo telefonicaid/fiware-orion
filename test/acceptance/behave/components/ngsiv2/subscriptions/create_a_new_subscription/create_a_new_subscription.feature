@@ -39,7 +39,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
   Check: verify mongo is installed successfully
 
   Actions After each Scenario:
- # Setup: delete database in mongo
+  Setup: delete database in mongo
 
   Actions After the Feature:
   Setup: stop ContextBroker
