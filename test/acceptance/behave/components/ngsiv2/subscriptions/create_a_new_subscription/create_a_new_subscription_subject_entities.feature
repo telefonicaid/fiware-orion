@@ -55,13 +55,13 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json  |
     # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | subject_type            | without subject field   |
-      | subject_idPattern       | .*                      |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | subject_type          | without subject field   |
+      | subject_idPattern     | .*                      |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
@@ -80,13 +80,13 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json   |
     # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | subject_type            | without entities field  |
-      | subject_idPattern       | .*                      |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | subject_type          | without entities field  |
+      | subject_idPattern     | .*                      |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
@@ -105,12 +105,12 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json   |
     # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | subject_idPattern       | .*                      |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | subject_idPattern     | .*                      |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Created" http code
     And verify headers in response
@@ -128,12 +128,12 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json   |
     # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | subject_id              | room2                   |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | subject_id            | room2                   |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Created" http code
     And verify headers in response
@@ -142,9 +142,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | content-length | 0                    |
     And verify that the subscription is stored in mongo
 
-  @type.row<row.id>
-  @type
-  Scenario Outline:  create new subscriptions using NGSI v2 with several type values
+  @type_id_pattern
+  Scenario Outline:  create new subscriptions using NGSI v2 with several type values and idPattern
     Given  a definition of headers
       | parameter          | value              |
       | Fiware-Service     | test_entities_type |
@@ -152,13 +151,55 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json   |
     # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | subject_type            | <type>                  |
-      | subject_idPattern       | .*                      |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | subject_type          | <type>                  |
+      | subject_idPattern     | .*                      |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
+    When create a new subscription
+    Then verify that receive a "Created" http code
+    And verify headers in response
+      | parameter      | value                |
+      | location       | /v2/subscriptions/.* |
+      | content-length | 0                    |
+    And verify that the subscription is stored in mongo
+    Examples:
+      | type       |
+      | room       |
+      | 34         |
+      | false      |
+      | true       |
+      | 34.4E-34   |
+      | temp.34    |
+      | temp_34    |
+      | temp-34    |
+      | TEMP34     |
+      | house_flat |
+      | house.flat |
+      | house-flat |
+      | house@flat |
+      | random=10  |
+      | random=100 |
+      | random=256 |
+
+  @type_id
+  Scenario Outline:  create new subscriptions using NGSI v2 with several type values and id
+    Given  a definition of headers
+      | parameter          | value              |
+      | Fiware-Service     | test_entities_type |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
+    # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter             | value                   |
+      | subject_type          | <type>                  |
+      | subject_id            | room45                  |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Created" http code
     And verify headers in response
@@ -194,17 +235,17 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json         |
       # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                                                                              |
-      | description             | "my first subscription"                                                            |
-      | subject_type            | "                   "                                                              |
-      | subject_idPattern       | ".*"                                                                               |
-      | condition_attributes    | "temperature"                                                                      |
-      | condition_expression    | "q">>>"temperature>40"&"georel">>>"near"&"geometry">>>"point"&"coords">>>"40.6391" |
-      | notification_callback   | "http://localhost:1234"                                                            |
-      | notification_attributes | "temperature"                                                                      |
-      | notification_throttling | 5                                                                                  |
-      | expires                 | "2016-04-05T14:00:00.00Z"                                                          |
-      | status                  | "active"                                                                           |
+      | parameter             | value                                                                                               |
+      | description           | "my first subscription"                                                                             |
+      | subject_type          | "                   "                                                                               |
+      | subject_idPattern     | ".*"                                                                                                |
+      | condition_attrs       | "temperature"                                                                                       |
+      | condition_expression  | "q">>>"temperature>40"&"georel">>>"near;MinDistance:1000"&"geometry">>>"point"&"coords">>>"40.6391" |
+      | notification_http_url | "http://localhost:1234"                                                                             |
+      | notification_attrs    | "temperature"                                                                                       |
+      | throttling            | 5                                                                                                   |
+      | expires               | "2016-04-05T14:00:00.00Z"                                                                           |
+      | status                | "active"                                                                                            |
     When create a new subscription in raw mode
     Then verify that receive a "Created" http code
     And verify headers in response
@@ -213,7 +254,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | content-length | 0                    |
     And verify that the subscription is stored in mongo
 
-  @type_not_allowed @BUG_1964 @skip
+  @type_not_plain_ascii @BUG_1964 @skip
   Scenario Outline:  try to create subscriptions using NGSI v2 with not plain ascii type values
     Given  a definition of headers
       | parameter          | value              |
@@ -222,13 +263,13 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json   |
    # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | subject_type            | <type>                  |
-      | subject_idPattern       | .*                      |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | subject_type          | <type>                  |
+      | subject_idPattern     | .*                      |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
@@ -244,26 +285,25 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
   @type_length_minimum @BUG_1985 @skip
   Scenario:  try to create subscription using NGSI v2 with entities type length minimum allowed (1)
     Given  a definition of headers
-      | parameter          | value                                  |
-      | Fiware-Service     | test_condition_attributes_limit_exceed |
-      | Fiware-ServicePath | /test                                  |
-      | Content-Type       | application/json                       |
+      | parameter          | value                             |
+      | Fiware-Service     | test_condition_attrs_limit_exceed |
+      | Fiware-ServicePath | /test                             |
+      | Content-Type       | application/json                  |
      # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | subject_type            |                         |
-      | subject_id              | room                    |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | subject_type          |                         |
+      | subject_id            | room                    |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
       | parameter   | value           |
       | error       | BadRequest      |
       | description | not defined yet |
-
 
   @type_length_exceed @BUG_1965 @skip
   Scenario:  try to create subscriptions using NGSI v2 with type length that exceeds the maximum allowed (256)
@@ -274,13 +314,13 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json          |
    # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | subject_type            | random=257              |
-      | subject_idPattern       | .*                      |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | subject_type          | random=257              |
+      | subject_idPattern     | .*                      |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
@@ -297,13 +337,13 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json       |
    # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | subject_type            | <type>                  |
-      | subject_idPattern       | .*                      |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | subject_type          | <type>                  |
+      | subject_idPattern     | .*                      |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
@@ -333,17 +373,17 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json         |
      # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                                                                              |
-      | description             | "my first subscription"                                                            |
-      | subject_type            | <type>                                                                             |
-      | subject_idPattern       | ".*"                                                                               |
-      | condition_attributes    | "temperature"                                                                      |
-      | condition_expression    | "q">>>"temperature>40"&"georel">>>"near"&"geometry">>>"point"&"coords">>>"40.6391" |
-      | notification_callback   | "http://localhost:1234"                                                            |
-      | notification_attributes | "temperature"                                                                      |
-      | notification_throttling | 5                                                                                  |
-      | expires                 | "2016-04-05T14:00:00.00Z"                                                          |
-      | status                  | "active"                                                                           |
+      | parameter             | value                                                                                               |
+      | description           | "my first subscription"                                                                             |
+      | subject_type          | <type>                                                                                              |
+      | subject_idPattern     | ".*"                                                                                                |
+      | condition_attrs       | "temperature"                                                                                       |
+      | condition_expression  | "q">>>"temperature>40"&"georel">>>"near;MinDistance:1000"&"geometry">>>"point"&"coords">>>"40.6391" |
+      | notification_http_url | "http://localhost:1234"                                                                             |
+      | notification_attrs    | "temperature"                                                                                       |
+      | throttling            | 5                                                                                                   |
+      | expires               | "2016-04-05T14:00:00.00Z"                                                                           |
+      | status                | "active"                                                                                            |
     When create a new subscription in raw mode
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -364,17 +404,17 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json         |
       # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                                                                              |
-      | description             | "my first subscription"                                                            |
-      | subject_type            | <type>                                                                             |
-      | subject_idPattern       | ".*"                                                                               |
-      | condition_attributes    | "temperature"                                                                      |
-      | condition_expression    | "q">>>"temperature>40"&"georel">>>"near"&"geometry">>>"point"&"coords">>>"40.6391" |
-      | notification_callback   | "http://localhost:1234"                                                            |
-      | notification_attributes | "temperature"                                                                      |
-      | notification_throttling | 5                                                                                  |
-      | expires                 | "2016-04-05T14:00:00.00Z"                                                          |
-      | status                  | "active"                                                                           |
+      | parameter             | value                                                                                               |
+      | description           | "my first subscription"                                                                             |
+      | subject_type          | <type>                                                                                              |
+      | subject_idPattern     | ".*"                                                                                                |
+      | condition_attrs       | "temperature"                                                                                       |
+      | condition_expression  | "q">>>"temperature>40"&"georel">>>"near;MinDistance:1000"&"geometry">>>"point"&"coords">>>"40.6391" |
+      | notification_http_url | "http://localhost:1234"                                                                             |
+      | notification_attrs    | "temperature"                                                                                       |
+      | throttling            | 5                                                                                                   |
+      | expires               | "2016-04-05T14:00:00.00Z"                                                                           |
+      | status                | "active"                                                                                            |
     When create a new subscription in raw mode
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -404,9 +444,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | subject_idPattern       | .*                      |
       | subject_entities_number | <number>                |
       | subject_entities_prefix | type                    |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
+      | condition_attrs         | temperature             |
+      | notification_http_url   | http://localhost:1234   |
+      | notification_attrs      | temperature             |
       | expires                 | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Created" http code
@@ -435,11 +475,11 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json |
      # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
@@ -456,13 +496,13 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json |
      # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | subject_id              | room2                   |
-      | subject_idPattern       | .*                      |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | subject_id            | room2                   |
+      | subject_idPattern     | .*                      |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
@@ -480,12 +520,12 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json |
     # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | subject_id              | <id>                    |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | subject_id            | <id>                    |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Created" http code
     And verify headers in response
@@ -521,17 +561,17 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json         |
       # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                                                                              |
-      | description             | "my first subscription"                                                            |
-      | subject_type            | "house"                                                                            |
-      | subject_id              | "                    "                                                             |
-      | condition_attributes    | "temperature"                                                                      |
-      | condition_expression    | "q">>>"temperature>40"&"georel">>>"near"&"geometry">>>"point"&"coords">>>"40.6391" |
-      | notification_callback   | "http://localhost:1234"                                                            |
-      | notification_attributes | "temperature"                                                                      |
-      | notification_throttling | 5                                                                                  |
-      | expires                 | "2016-04-05T14:00:00.00Z"                                                          |
-      | status                  | "active"                                                                           |
+      | parameter             | value                                                                                               |
+      | description           | "my first subscription"                                                                             |
+      | subject_type          | "house"                                                                                             |
+      | subject_id            | "                    "                                                                              |
+      | condition_attrs       | "temperature"                                                                                       |
+      | condition_expression  | "q">>>"temperature>40"&"georel">>>"near;MinDistance:1000"&"geometry">>>"point"&"coords">>>"40.6391" |
+      | notification_http_url | "http://localhost:1234"                                                                             |
+      | notification_attrs    | "temperature"                                                                                       |
+      | throttling            | 5                                                                                                   |
+      | expires               | "2016-04-05T14:00:00.00Z"                                                                           |
+      | status                | "active"                                                                                            |
     When create a new subscription in raw mode
     Then verify that receive a "Created" http code
     And verify headers in response
@@ -549,12 +589,12 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json |
      # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | subject_id              | <id>                    |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | subject_id            | <id>                    |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
@@ -570,18 +610,18 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
   @id_length_minimum @BUG_1984 @skip
   Scenario:  try to create subscription using NGSI v2 with entities id length minimum allowed (1)
     Given  a definition of headers
-      | parameter          | value                                  |
-      | Fiware-Service     | test_condition_attributes_limit_exceed |
-      | Fiware-ServicePath | /test                                  |
-      | Content-Type       | application/json                       |
+      | parameter          | value                             |
+      | Fiware-Service     | test_condition_attrs_limit_exceed |
+      | Fiware-ServicePath | /test                             |
+      | Content-Type       | application/json                  |
      # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | subject_id              |                         |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | subject_id            |                         |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
@@ -598,12 +638,12 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json              |
      # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | subject_id              | random=257              |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | subject_id            | random=257              |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
@@ -620,12 +660,12 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json       |
     # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | subject_id              | <id>                    |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | subject_id            | <id>                    |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
@@ -655,12 +695,12 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json       |
     # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                     |
-      | subject_id              | <id>                      |
-      | condition_attributes    | "temperature"             |
-      | notification_callback   | "http://localhost:1234"   |
-      | notification_attributes | "temperature"             |
-      | expires                 | "2016-04-05T14:00:00.00Z" |
+      | parameter             | value                     |
+      | subject_id            | <id>                      |
+      | condition_attrs       | "temperature"             |
+      | notification_http_url | "http://localhost:1234"   |
+      | notification_attrs    | "temperature"             |
+      | expires               | "2016-04-05T14:00:00.00Z" |
     When create a new subscription in raw mode
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -681,12 +721,12 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json       |
     # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                     |
-      | subject_id              | <id>                      |
-      | condition_attributes    | "temperature"             |
-      | notification_callback   | "http://localhost:1234"   |
-      | notification_attributes | "temperature"             |
-      | expires                 | "2016-04-05T14:00:00.00Z" |
+      | parameter             | value                     |
+      | subject_id            | <id>                      |
+      | condition_attrs       | "temperature"             |
+      | notification_http_url | "http://localhost:1234"   |
+      | notification_attrs    | "temperature"             |
+      | expires               | "2016-04-05T14:00:00.00Z" |
     When create a new subscription in raw mode
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -716,9 +756,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | subject_id              | room2                   |
       | subject_entities_number | <number>                |
       | subject_entities_prefix | id                      |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
+      | condition_attrs         | temperature             |
+      | notification_http_url   | http://localhost:1234   |
+      | notification_attrs      | temperature             |
       | expires                 | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Created" http code
@@ -747,12 +787,12 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json         |
     # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | subject_idPattern       | <id_pattern>            |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | subject_idPattern     | <id_pattern>            |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Created" http code
     And verify headers in response
@@ -802,17 +842,17 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json         |
       # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                                                                              |
-      | description             | "my first subscription"                                                            |
-      | subject_type            | "house"                                                                            |
-      | subject_idPattern       | "                      "                                                           |
-      | condition_attributes    | "temperature"                                                                      |
-      | condition_expression    | "q">>>"temperature>40"&"georel">>>"near"&"geometry">>>"point"&"coords">>>"40.6391" |
-      | notification_callback   | "http://localhost:1234"                                                            |
-      | notification_attributes | "temperature"                                                                      |
-      | notification_throttling | 5                                                                                  |
-      | expires                 | "2016-04-05T14:00:00.00Z"                                                          |
-      | status                  | "active"                                                                           |
+      | parameter             | value                                                                                               |
+      | description           | "my first subscription"                                                                             |
+      | subject_type          | "house"                                                                                             |
+      | subject_idPattern     | "                      "                                                                            |
+      | condition_attrs       | "temperature"                                                                                       |
+      | condition_expression  | "q">>>"temperature>40"&"georel">>>"near;MinDistance:1000"&"geometry">>>"point"&"coords">>>"40.6391" |
+      | notification_http_url | "http://localhost:1234"                                                                             |
+      | notification_attrs    | "temperature"                                                                                       |
+      | throttling            | 5                                                                                                   |
+      | expires               | "2016-04-05T14:00:00.00Z"                                                                           |
+      | status                | "active"                                                                                            |
     When create a new subscription in raw mode
     Then verify that receive a "Created" http code
     And verify headers in response
@@ -830,12 +870,12 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json         |
      # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | subject_idPattern       | <idPattern>             |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | subject_idPattern     | <idPattern>             |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
@@ -851,18 +891,18 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
   @id_pattern_length_minimum @BUG_1986 @skip
   Scenario:  try to create subscription using NGSI v2 with entities idPattern length minimum allowed (1)
     Given  a definition of headers
-      | parameter          | value                                  |
-      | Fiware-Service     | test_condition_attributes_limit_exceed |
-      | Fiware-ServicePath | /test                                  |
-      | Content-Type       | application/json                       |
+      | parameter          | value                             |
+      | Fiware-Service     | test_condition_attrs_limit_exceed |
+      | Fiware-ServicePath | /test                             |
+      | Content-Type       | application/json                  |
      # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | subject_idPattern       |                         |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | subject_idPattern     |                         |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     And verify that the subscription is stored in mongo
     Then verify that receive a "Bad Request" http code
@@ -880,12 +920,12 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json               |
     # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                   |
-      | subject_idPattern       | <id_pattern>            |
-      | condition_attributes    | temperature             |
-      | notification_callback   | http://localhost:1234   |
-      | notification_attributes | temperature             |
-      | expires                 | 2016-04-05T14:00:00.00Z |
+      | parameter             | value                   |
+      | subject_idPattern     | <id_pattern>            |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
@@ -915,12 +955,12 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json               |
     # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                     |
-      | subject_id_pattern      | <id_pattern>              |
-      | condition_attributes    | "temperature"             |
-      | notification_callback   | "http://localhost:1234"   |
-      | notification_attributes | "temperature"             |
-      | expires                 | "2016-04-05T14:00:00.00Z" |
+      | parameter             | value                     |
+      | subject_id_pattern    | <id_pattern>              |
+      | condition_attrs       | "temperature"             |
+      | notification_http_url | "http://localhost:1234"   |
+      | notification_attrs    | "temperature"             |
+      | expires               | "2016-04-05T14:00:00.00Z" |
     When create a new subscription in raw mode
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -941,12 +981,12 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json               |
     # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter               | value                     |
-      | subject_idPattern       | <id_pattern>              |
-      | condition_attributes    | "temperature"             |
-      | notification_callback   | "http://localhost:1234"   |
-      | notification_attributes | "temperature"             |
-      | expires                 | "2016-04-05T14:00:00.00Z" |
+      | parameter             | value                     |
+      | subject_idPattern     | <id_pattern>              |
+      | condition_attrs       | "temperature"             |
+      | notification_http_url | "http://localhost:1234"   |
+      | notification_attrs    | "temperature"             |
+      | expires               | "2016-04-05T14:00:00.00Z" |
     When create a new subscription in raw mode
     Then verify that receive an "Bad Request" http code
     And verify an error response
