@@ -334,11 +334,11 @@ std::string ContextElementResponse::render
 *
 * ContextElementResponse::toJson - 
 */
-std::string ContextElementResponse::toJson(RenderFormat renderFormat)
+std::string ContextElementResponse::toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter)
 {
   std::string out;
 
-  out = contextElement.toJson(renderFormat);
+  out = contextElement.toJson(renderFormat, attrsFilter);
 
   return out;
 }

@@ -27,6 +27,7 @@
 
 #include "logMsg/traceLevels.h"
 #include "common/tag.h"
+#include "common/string.h"
 #include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 #include "parse/forbiddenChars.h"
@@ -83,7 +84,9 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
       out = "[";
       if (attributeVector.size() != 0)
       {
-        out += attributeVector.toJson(true, renderFormat, ciP->uriParam["attrs"]);
+        std::vector<std::string> attrsFilter;
+        stringSplit(ciP->uriParam["attrs"], ',', attrsFilter);
+        out += attributeVector.toJson(true, renderFormat, attrsFilter);
       }
       out += "]";        
     }
@@ -99,8 +102,11 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
 
       if (attributeVector.size() != 0)
       {
+        std::vector<std::string> attrsFilter;
+        stringSplit(ciP->uriParam["attrs"], ',', attrsFilter);
+
         out += ",";
-        out += attributeVector.toJson(true, renderFormat, ciP->uriParam["attrs"]);
+        out += attributeVector.toJson(true, renderFormat, attrsFilter);
       }
 
       out += "}";

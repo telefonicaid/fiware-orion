@@ -61,6 +61,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
   Document                  document;
   SubscribeContextRequest*  destination;
 
+  LM_W(("KZ: Parsing subscription. Payload: %s", ciP->payload));
   document.Parse(ciP->payload);
 
   if (update)
@@ -529,6 +530,11 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
     {
       return r;
     }
+
+    for (unsigned int ix = 0; ix < scrP->attributeList.attributeV.size(); ++ix)
+    {
+      LM_W(("KZ: notification.attributeV:  vec[%d]: '%s'", ix, scrP->attributeList.attributeV[ix].c_str()));
+    }
   }
 
    return "";
@@ -659,9 +665,6 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
 */
 static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::string>* vec, const Value& attributes)
 {
-  std::set<std::string> s;
-
-
   if (!attributes.IsArray())
   {
     alarmMgr.badInput(clientIp, "attrs is not an array");
@@ -679,10 +682,9 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
 
       return oe.render(ciP, "");
     }
-    s.insert(iter->GetString());
+    LM_W(("KZ: inserting '%s' in attribute list %p", iter->GetString(), vec));
+    vec->push_back(iter->GetString());
   }
 
-  vec->resize(s.size());
-  copy(s.begin(), s.end(),vec->begin());
   return "";
 }

@@ -167,9 +167,14 @@ HttpStatusCode mongoSubscribeContext
 
     /* Build conditions array (including side-effect notifications and threads creation) */
     bool notificationDone = false;
+    LM_W(("KZ: Calling processConditionVector. requestP->attributeList.attributeV.size() == %d", requestP->attributeList.attributeV.size()));
+    if (requestP->attributeList.attributeV.size() > 0)
+      LM_W(("KZ: Calling processConditionVector. requestP-attributeList.attributeV[0] == '%s'", requestP->attributeList.attributeV[0].c_str()));
+
     BSONArray conds = processConditionVector(&requestP->notifyConditionVector,
                                              requestP->entityIdVector,
-                                             requestP->attributeList, oid.toString(),
+                                             requestP->attributeList,
+                                             oid.toString(),
                                              requestP->reference.get(),
                                              &notificationDone,
                                              requestP->attrsFormat,
@@ -178,7 +183,8 @@ HttpStatusCode mongoSubscribeContext
                                              servicePathV,
                                              &requestP->restriction,
                                              status,
-                                             fiwareCorrelator);
+                                             fiwareCorrelator,
+                                             requestP->attributeList.attributeV);
 
     sub.append(CSUB_CONDITIONS, conds);
 

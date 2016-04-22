@@ -1768,7 +1768,7 @@ AttributeList subToAttributeList(const BSONObj& sub)
 * is returned. This is used in the caller to know if lastNotification field in the
 * subscription document in csubs collection has to be modified or not.
 */
-bool processOnChangeConditionForSubscription
+static bool processOnChangeConditionForSubscription
 (
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
@@ -1780,7 +1780,8 @@ bool processOnChangeConditionForSubscription
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
   Restriction*                     resP,
-  const std::string&               fiwareCorrelator
+  const std::string&               fiwareCorrelator,
+  const std::vector<std::string>&  attrsFilter
 )
 {
   std::string                   err;
@@ -1828,7 +1829,8 @@ bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
-        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat);
+        LM_W(("KZ: Calling sendNotifyContextRequest II (attrsFilter.size == %d)", attrsFilter.size()));
+        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsFilter);
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
@@ -1839,7 +1841,8 @@ bool processOnChangeConditionForSubscription
     }
     else
     {
-      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat);
+      LM_W(("KZ: Calling sendNotifyContextRequest III"));
+      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsFilter);
       ncr.contextElementResponseVector.release();
 
       return true;
@@ -1871,7 +1874,8 @@ BSONArray processConditionVector
   const std::vector<std::string>&  servicePathV,
   Restriction*                     resP,
   const std::string&               status,
-  const std::string&               fiwareCorrelator
+  const std::string&               fiwareCorrelator,
+  const std::vector<std::string>   attrsFilter
 )
 {
   BSONArrayBuilder conds;
@@ -1896,6 +1900,7 @@ BSONArray processConditionVector
                         CSUB_CONDITIONS_VALUE << condValues.arr()
                         ));
 
+      LM_W(("KZ: Calling processOnChangeConditionForSubscription. attrsFilter.size(): %d", attrsFilter.size()));
       if ((status == STATUS_ACTIVE) &&
           (processOnChangeConditionForSubscription(enV,
                                                    attrL,
@@ -1907,7 +1912,8 @@ BSONArray processConditionVector
                                                    xauthToken,
                                                    servicePathV,
                                                    resP,
-                                                   fiwareCorrelator)))
+                                                   fiwareCorrelator,
+                                                   attrsFilter)))
       {
         *notificationDone = true;
       }

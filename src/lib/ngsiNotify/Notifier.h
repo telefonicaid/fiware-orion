@@ -44,12 +44,13 @@ class Notifier
 public:
   virtual ~Notifier(void);
 
-  virtual void sendNotifyContextRequest(NotifyContextRequest* ncr,
-                                        const std::string&    url,
-                                        const std::string&    tenant,
-                                        const std::string&    xauthToken,
-                                        const std::string&    fiwareCorrelator,
-                                        RenderFormat          renderFormat);
+  virtual void sendNotifyContextRequest(NotifyContextRequest*            ncr,
+                                        const std::string&               url,
+                                        const std::string&               tenant,
+                                        const std::string&               xauthToken,
+                                        const std::string&               fiwareCorrelator,
+                                        RenderFormat                     renderFormat,
+                                        const std::vector<std::string>&  attrsFilter);
 
   virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr,
                                                     const std::string&                url,

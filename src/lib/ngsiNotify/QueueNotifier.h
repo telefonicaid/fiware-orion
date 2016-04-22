@@ -51,12 +51,19 @@ class QueueNotifier : public Notifier
 {
 public:
   QueueNotifier(size_t queueSize, int numThreads);
-  void sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, RenderFormat renderFormat);
+
+  void sendNotifyContextRequest(NotifyContextRequest*            ncr,
+                                const std::string&               url,
+                                const std::string&               tenant,
+                                const std::string&               xauthToken,
+                                const std::string&               fiwareCorrelator,
+                                RenderFormat                     renderFormat,
+                                const std::vector<std::string>&  attrsFilter);
   int start();
 
 private:
- SyncQOverflow<SenderThreadParams*> queue;
- QueueWorkers workers;
+ SyncQOverflow<SenderThreadParams*>  queue;
+ QueueWorkers                        workers;
 
 };
 

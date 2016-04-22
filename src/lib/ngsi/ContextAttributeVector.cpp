@@ -136,8 +136,10 @@ std::string ContextAttributeVector::toJsonTypes()
 * If anybody needs an attribute named 'id' or 'type', then API v1
 * will have to be used to retrieve that information.
 */
-std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat renderFormat, const std::string& attrsFilter)
+std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat renderFormat, const std::vector<std::string>& attrsFilter)
 {
+  LM_W(("KZ: attrsFilter of %d items", attrsFilter.size()));
+
   if (vec.size() == 0)
   {
     return "";
@@ -158,7 +160,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat rend
   //
   int validAttributes = 0;
   std::map<std::string, bool>  uniqueMap;
-  if (attrsFilter == "")
+  if (attrsFilter.size() == 0)
   {
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
@@ -185,9 +187,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat rend
   }
   else
   {
-    std::vector<std::string> attrsV;
-    stringSplit(attrsFilter, ',', attrsV);
-    for (std::vector<std::string>::const_iterator it = attrsV.begin(); it != attrsV.end(); ++it)
+    for (std::vector<std::string>::const_iterator it = attrsFilter.begin(); it != attrsFilter.end(); ++it)
     {
       if (lookup(*it) != NULL)
       {
@@ -204,8 +204,10 @@ std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat rend
 
   uniqueMap.clear();
 
-  if (attrsFilter == "")
+  if (attrsFilter.size() == 0)
   {
+    LM_W(("KZ: attrsFilter is EMPTY - no order in attributes"));
+
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       if ((vec[ix]->name == "id") || (vec[ix]->name == "type"))
@@ -233,10 +235,11 @@ std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat rend
   }
   else
   {
-    std::vector<std::string> attrsV;
+    LM_W(("KZ: using attrsFilter of %d items", attrsFilter.size()));
+    for (unsigned int ix = 0; ix < attrsFilter.size(); ++ix)
+      LM_W(("KZ: attrsFilter item %d: '%s'", ix, attrsFilter[ix].c_str()));
 
-    stringSplit(attrsFilter, ',', attrsV);
-    for (std::vector<std::string>::const_iterator it = attrsV.begin(); it != attrsV.end(); ++it)
+    for (std::vector<std::string>::const_iterator it = attrsFilter.begin(); it != attrsFilter.end(); ++it)
     {
       ContextAttribute* caP = lookup(*it);
       if (caP != NULL)

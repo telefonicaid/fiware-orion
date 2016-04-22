@@ -113,7 +113,7 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
 *
 * ContextElement::toJson - 
 */
-std::string ContextElement::toJson(RenderFormat renderFormat)
+std::string ContextElement::toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter)
 {
   std::string out;
 
@@ -125,9 +125,7 @@ std::string ContextElement::toJson(RenderFormat renderFormat)
 
   if (contextAttributeVector.size() != 0)
   {
-    std::vector<std::string> attrsFilter;
-
-    out += contextAttributeVector.toJson(true, renderFormat);
+    out += contextAttributeVector.toJson(true, renderFormat, attrsFilter);
   }
 
   return out;

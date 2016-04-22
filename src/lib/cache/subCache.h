@@ -100,7 +100,7 @@ struct CachedSubscription
   RenderFormat                renderFormat;
   char*                       reference;
   SubscriptionExpression      expression;
-  
+
   struct CachedSubscription*  next;
 };
 

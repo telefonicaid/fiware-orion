@@ -122,6 +122,7 @@ std::string jsonRequestTreat
     break;
 
   case SubscriptionsRequest:
+    
     answer = parseSubscription(ciP, parseDataP, releaseP);
     if (answer != "OK")
     {

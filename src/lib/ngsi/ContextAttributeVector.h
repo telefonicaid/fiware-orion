@@ -69,9 +69,9 @@ typedef struct ContextAttributeVector
                             bool                omitValue   = false,
                             bool                attrsAsName = false);
 
-  std::string        toJson(bool                isLastElement,
-                            RenderFormat        renderFormat,
-                            const std::string&  attrsFilter  = "");
+  std::string        toJson(bool                             isLastElement,
+                            RenderFormat                     renderFormat,
+                            const std::vector<std::string>&  attrsFilter);
 
   std::string        toJsonTypes();
 

@@ -1333,7 +1333,7 @@ static bool addTriggeredSubscriptions
 *
 * processOnChangeConditionForUpdateContext -
 *
-* This method returns true if the notification was actually send. Otherwise, false
+* This method returns true if the notification was actually sent. Otherwise, false
 * is returned. This is used in the caller to know if lastNotification field in the
 * subscription document in csubs collection has to be modified or not.
 */
@@ -1346,7 +1346,8 @@ static bool processOnChangeConditionForUpdateContext
   RenderFormat                     renderFormat,
   std::string                      tenant,
   const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator
+  const std::string&               fiwareCorrelator,
+  std::vector<std::string>         attributeV
 )
 {
   NotifyContextRequest   ncr;
@@ -1394,7 +1395,7 @@ static bool processOnChangeConditionForUpdateContext
   // FIXME: we use a proper origin name
   ncr.originator.set("localhost");
 
-  getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat);
+  getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attributeV);
   return true;
 }
 
@@ -1457,14 +1458,36 @@ static bool processSubscriptions
 
     /* Send notification */
     LM_T(LmtSubCache, ("NOT ignored: %s", trigs->cacheSubId.c_str()));
-    if (processOnChangeConditionForUpdateContext(notifyCerP,
-                                                 trigs->attrL,
-                                                 mapSubId,
-                                                 trigs->reference,
-                                                 trigs->renderFormat,
-                                                 tenant,
-                                                 xauthToken,
-                                                 fiwareCorrelator))
+
+    CachedSubscription*  cacheP = subCacheItemLookup(tenant.c_str(), trigs->cacheSubId.c_str());
+    bool                 notificationSent;
+
+    if (cacheP)
+    {
+      notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
+                                                                  trigs->attrL,
+                                                                  mapSubId,
+                                                                  trigs->reference,
+                                                                  trigs->renderFormat,
+                                                                  tenant,
+                                                                  xauthToken,
+                                                                  fiwareCorrelator,
+                                                                  cacheP->attributes);
+    }
+    else
+    {
+      notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
+                                                                  trigs->attrL,
+                                                                  mapSubId,
+                                                                  trigs->reference,
+                                                                  trigs->renderFormat,
+                                                                  tenant,
+                                                                  xauthToken,
+                                                                  fiwareCorrelator,
+                                                                  trigs->attrL.attributeV);
+    }
+
+    if (notificationSent)
     {
       long long rightNow = getCurrentTime();
 

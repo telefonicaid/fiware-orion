@@ -56,17 +56,18 @@ Notifier::~Notifier (void)
 */
 void Notifier::sendNotifyContextRequest
 (
-  NotifyContextRequest*  ncr,
-  const std::string&     url,
-  const std::string&     tenant,
-  const std::string&     xauthToken,
-  const std::string&     fiwareCorrelator,
-  RenderFormat           renderFormat
+  NotifyContextRequest*            ncr,
+  const std::string&               url,
+  const std::string&               tenant,
+  const std::string&               xauthToken,
+  const std::string&               fiwareCorrelator,
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter
 )
 {
     ConnectionInfo ci;
 
-    LM_W(("KZ: renderFormat == %d", renderFormat));
+    LM_W(("KZ: renderFormat == '%s'", renderFormatToString(renderFormat)));
 
     //
     // Creating the value of the Fiware-ServicePath HTTP header.
@@ -102,11 +103,15 @@ void Notifier::sendNotifyContextRequest
     std::string payload;
     if (renderFormat == NGSI_V1_LEGACY)
     {
+      LM_W(("KZ: rendering payload, renderFormat is NGSI_V1_LEGACY"));
       payload = ncr->render(&ci, NotifyContext, "");
     }
     else
     {
-      payload = ncr->toJson(&ci, renderFormat);
+      LM_W(("KZ: rendering payload, attrsFilter of %d items", attrsFilter.size()));
+      if (attrsFilter.size() > 0)
+        LM_W(("KZ: rendering payload, attrsFilter[0] == '%s'", attrsFilter[0].c_str()));
+      payload = ncr->toJson(&ci, renderFormat, attrsFilter);
     }
 
     /* Parse URL */

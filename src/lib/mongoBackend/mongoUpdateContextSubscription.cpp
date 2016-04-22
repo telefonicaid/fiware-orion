@@ -334,7 +334,8 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 servicePathV,
                                                 &requestP->restriction,
                                                 status,
-                                                fiwareCorrelator);
+                                                fiwareCorrelator,
+                                                requestP->attributeList.attributeV);
 
 
        newSub.appendArray(CSUB_CONDITIONS, conds);
