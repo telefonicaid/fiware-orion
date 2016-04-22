@@ -237,7 +237,7 @@ echo "============================================="
 payload='{
   "A3": 31
 }'
-orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json
 echo
 echo
 

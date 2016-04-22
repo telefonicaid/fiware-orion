@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Geo query (circle) JSON test
+Geo query (circle) JSON test (based on deprecated location metadata)
 
 --SHELL-INIT--
 dbInit CB
@@ -39,8 +39,15 @@ payload='{
     "attributes": [
     {
       "name": "location",
-      "type": "geo:point",
-      "value": "40.418889, -3.691944"
+      "type": "coords",
+      "value": "40.418889, -3.691944",
+      "metadatas": [
+        {
+          "name": "location",
+          "type": "string",
+          "value": "WGS84"
+        }
+      ]
     }
     ]
   }
@@ -62,8 +69,15 @@ payload='{
     "attributes": [
     {
       "name": "location",
-      "type": "geo:point",
-      "value": "40.533333, -3.633333"
+      "type": "coords",
+      "value": "40.533333, -3.633333",
+      "metadatas": [
+        {
+          "name": "location",
+          "type": "string",
+          "value": "WGS84"
+        }
+      ]
     }
     ]
   }
@@ -86,8 +100,15 @@ payload='{
     "attributes": [
     {
       "name": "location",
-      "type": "geo:point",
-      "value": "40.316667, -3.75"
+      "type": "coords",
+      "value": "40.316667, -3.75",
+      "metadatas": [
+        {
+          "name": "location",
+          "type": "string",
+          "value": "WGS84"
+        }
+      ]
     }
     ]
   }
@@ -185,7 +206,7 @@ orionCurl --url "$url" --payload "$payload" --json
 --REGEXPECT--
 1. Create entity corresponding to Madrid
 HTTP/1.1 200 OK
-Content-Length: 398
+Content-Length: 576
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -196,8 +217,15 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
                         "name": "location",
-                        "type": "geo:point",
+                        "type": "coords",
                         "value": ""
                     }
                 ],
@@ -215,7 +243,7 @@ Date: REGEX(.*)
 
 2. Create entity corresponding to Alcobendas
 HTTP/1.1 200 OK
-Content-Length: 402
+Content-Length: 580
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -226,8 +254,15 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
                         "name": "location",
-                        "type": "geo:point",
+                        "type": "coords",
                         "value": ""
                     }
                 ],
@@ -245,7 +280,7 @@ Date: REGEX(.*)
 
 3. Create entity corresponding to Leganes
 HTTP/1.1 200 OK
-Content-Length: 399
+Content-Length: 577
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -256,8 +291,15 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
                         "name": "location",
-                        "type": "geo:point",
+                        "type": "coords",
                         "value": ""
                     }
                 ],
@@ -274,7 +316,7 @@ Date: REGEX(.*)
 }
 4: ++++++++++ Madrid in 13.5 kms ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 801
+Content-Length: 1157
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -285,8 +327,15 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
                         "name": "location",
-                        "type": "geo:point",
+                        "type": "coords",
                         "value": "40.418889, -3.691944"
                     }
                 ],
@@ -303,8 +352,15 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
                         "name": "location",
-                        "type": "geo:point",
+                        "type": "coords",
                         "value": "40.316667, -3.75"
                     }
                 ],
@@ -321,7 +377,7 @@ Date: REGEX(.*)
 }
 5: +++++++++++ Madrid in 15 kms +++++++++
 HTTP/1.1 200 OK
-Content-Length: 1191
+Content-Length: 1725
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -332,8 +388,15 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
                         "name": "location",
-                        "type": "geo:point",
+                        "type": "coords",
                         "value": "40.418889, -3.691944"
                     }
                 ],
@@ -350,8 +413,15 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
                         "name": "location",
-                        "type": "geo:point",
+                        "type": "coords",
                         "value": "40.533333, -3.633333"
                     }
                 ],
@@ -368,8 +438,15 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
                         "name": "location",
-                        "type": "geo:point",
+                        "type": "coords",
                         "value": "40.316667, -3.75"
                     }
                 ],
@@ -386,7 +463,7 @@ Date: REGEX(.*)
 }
 6: ++++++++++++ Madrid out 13.5 kms ++++++++
 HTTP/1.1 200 OK
-Content-Length: 422
+Content-Length: 600
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -397,8 +474,15 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
                         "name": "location",
-                        "type": "geo:point",
+                        "type": "coords",
                         "value": "40.533333, -3.633333"
                     }
                 ],

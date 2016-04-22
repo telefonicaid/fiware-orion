@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Location - no actual location change
+Location - no actual location change (based on deprecated location metadata)
 
 --SHELL-INIT--
 dbInit CB
@@ -39,8 +39,15 @@ payload='{
     "attributes": [
     {
       "name": "location",
-      "type": "geo:point",
-      "value": "-3.5, 45.20"
+      "type": "centigrade",
+      "value": "-3.5, 45.20",
+      "metadatas": [
+        {
+          "name": "location",
+          "type": "string",
+          "value": "WGS84"
+        }
+      ]
     }
     ]
   }
@@ -61,8 +68,15 @@ payload='{
     "attributes": [
     {
       "name": "location",
-      "type": "geo:point",
-      "value": "-3.6, 48.20"
+      "type": "centigrade",
+      "value": "-3.6, 48.20",
+      "metadatas": [
+        {
+          "name": "location",
+          "type": "string",
+          "value": "WGS84"
+        }
+      ]
     }
     ]
   }
@@ -74,7 +88,7 @@ orionCurl --url "$url" --payload "$payload" --json
 --REGEXPECT--
 0: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 402
+Content-Length: 584
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -85,8 +99,15 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
                         "name": "location",
-                        "type": "geo:point",
+                        "type": "centigrade",
                         "value": ""
                     }
                 ],
@@ -103,7 +124,7 @@ Date: REGEX(.*)
 }
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 402
+Content-Length: 584
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -114,8 +135,15 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
                         "name": "location",
-                        "type": "geo:point",
+                        "type": "centigrade",
                         "value": ""
                     }
                 ],

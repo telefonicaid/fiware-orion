@@ -664,7 +664,7 @@ Date: REGEX(.*)
 08. Query coveredBy box (-5, 0) (6, 11) -> A, E
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 1120
+Content-Length: 758
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -675,13 +675,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "5, 5"
@@ -700,13 +693,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "-4, 10"
@@ -728,7 +714,7 @@ Date: REGEX(.*)
 09. Query coveredBy polygon (0, 0) (24, 0) (0, 20) -> A, B, C
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 1662
+Content-Length: 1119
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -739,13 +725,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "5, 5"
@@ -764,13 +743,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "9, 5"
@@ -789,13 +761,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "15, 5"
@@ -817,7 +782,7 @@ Date: REGEX(.*)
 10. Query intersects point (5, 5) -> A
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 575
+Content-Length: 394
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -828,13 +793,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "5, 5"
@@ -856,7 +814,7 @@ Date: REGEX(.*)
 11. Query intersects line (5, 5) (9, 5) -> A, B
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 1118
+Content-Length: 756
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -867,13 +825,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "5, 5"
@@ -892,13 +843,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "9, 5"
@@ -920,7 +864,7 @@ Date: REGEX(.*)
 12. Query intersects box (-5, 0) (6, 11) -> A, E
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 1120
+Content-Length: 758
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -931,13 +875,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "5, 5"
@@ -956,13 +893,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "-4, 10"
@@ -984,7 +914,7 @@ Date: REGEX(.*)
 13. Query intersects polygon (0, 0) (24, 0) (0, 20) -> A, B, C
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 1662
+Content-Length: 1119
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -995,13 +925,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "5, 5"
@@ -1020,13 +943,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "9, 5"
@@ -1045,13 +961,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "15, 5"
@@ -1073,7 +982,7 @@ Date: REGEX(.*)
 14. Query disjoint point (5, 5) -> B, C, D, E
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 2209
+Content-Length: 1485
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1084,13 +993,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "9, 5"
@@ -1109,13 +1011,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "15, 5"
@@ -1134,13 +1029,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "15, 15"
@@ -1159,13 +1047,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "-4, 10"
@@ -1187,7 +1068,7 @@ Date: REGEX(.*)
 15. Query disjoint line (5, 5) (9, 5) -> C, D, E
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 1666
+Content-Length: 1123
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1198,13 +1079,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "15, 5"
@@ -1223,13 +1097,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "15, 15"
@@ -1248,13 +1115,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "-4, 10"
@@ -1276,7 +1136,7 @@ Date: REGEX(.*)
 16. Query disjoint box (-5, 0) (6, 11) -> B, C, D
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 1664
+Content-Length: 1121
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1287,13 +1147,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "9, 5"
@@ -1312,13 +1165,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "15, 5"
@@ -1337,13 +1183,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "15, 15"
@@ -1365,7 +1204,7 @@ Date: REGEX(.*)
 17. Query disjoint polygon (0, 0) (24, 0) (0, 20) -> D, E
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 1122
+Content-Length: 760
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1376,13 +1215,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "15, 15"
@@ -1401,13 +1233,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "-4, 10"
@@ -1429,7 +1254,7 @@ Date: REGEX(.*)
 18. Query equals point (15, 15) -> D
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 577
+Content-Length: 396
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1440,13 +1265,6 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
                         "type": "geo:point",
                         "value": "15, 15"

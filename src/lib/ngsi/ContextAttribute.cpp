@@ -507,12 +507,20 @@ std::string ContextAttribute::getLocation(const std::string& apiVersion) const
 {
   if (apiVersion == "v1")
   {
+    // Deprecated way, but still supported
     for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
     {
       if (metadataVector[ix]->name == NGSI_MD_LOCATION)
       {
         return metadataVector[ix]->stringValue;
       }
+    }
+
+    // Current way of declaring location in NGSIv1, aligned with NGSIv2 (note that not all NGSIv1 geo:xxxx
+    // are supported, only geo:point)
+    if (type == GEO_POINT)
+    {
+      return LOCATION_WGS84;
     }
   }
   else // v2
