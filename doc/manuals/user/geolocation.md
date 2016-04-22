@@ -1,16 +1,13 @@
 # Geolocation capabilities
 
 Orion Context Broker has several capabilities related to geolocation
-that are described in this section. It is strictly required to use
-MongoDB 2.4 or higher in order to use geolocation features (see
-[requirements section in the installation
-manual](../../../README.md#requirements)).
+that are described in this section.
 
 ## Defining location attribute
 
 Entities can have a location, specified by one of its attributes. In
 order to state which attribute (among all the ones belonging to the
-entity) defines the location, the "location" metadata is used. For
+entity) defines the location, the `geo:point` type is used. For
 example, the following updateContext request creates the entity "Madrid"
 (of type "City") with attribute "position" defined as location.
 
@@ -26,15 +23,8 @@ example, the following updateContext request creates the entity "Madrid"
             "attributes": [
                 {
                     "name": "position",
-                    "type": "coords",
-                    "value": "40.418889, -3.691944",
-                    "metadatas": [
-                        {
-                            "name": "location",
-                            "type": "string",
-                            "value": "WGS84"
-                        }
-                    ]
+                    "type": "geo:point",
+                    "value": "40.418889, -3.691944"
                 }
             ]
         }
@@ -54,11 +44,6 @@ Additional comments:
     entity used for location, first you have to DELETE it, then APPEND
     the new one (check the section about [adding and removing attributes
     dynamically](append_and_delete.md#adding-and-removing-attributes-with-append-and-delete-in-updatecontext)).
--   The value of the location metadata is the coordinates system used.
-    Current version only support
-    [WGS84](http://en.wikipedia.org/wiki/World_Geodetic_System) (which
-    is the one used internally by the MongoDB database) but other
-    systems may be added in future versions.
 -   The value of the location attribute is a string with two numbers
     separated by a comma (","): the first number is the latitude and the
     second is the longitude. Only decimal notation is allowed (e.g.

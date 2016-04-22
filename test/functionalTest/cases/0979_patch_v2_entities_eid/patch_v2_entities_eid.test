@@ -41,7 +41,7 @@ brokerStart CB
 echo "01. Intent to patch a non-existing entity - error, of course"
 echo "============================================================"
 payload='{ "attr1": 1 }'
-orionCurl --url '/v2/entities/E1?options=keyValues' -X PATCH --payload "$payload" --json
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' -X PATCH --payload "$payload" --json
 echo
 echo
 
@@ -64,7 +64,7 @@ echo
 echo "04. PATCH /v2/entities/E1 attr1=4"
 echo "================================="
 payload='{ "attr1": 4 }'
-orionCurl --url '/v2/entities/E1?options=keyValues' -X PATCH --payload "$payload" --json
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' -X PATCH --payload "$payload" --json
 echo
 echo
 
@@ -79,7 +79,7 @@ echo
 echo "06. PATCH /v2/entities/E1 attr3=6, to see the error (attr3 doesn't exist)"
 echo "========================================================================="
 payload='{ "attr3": 6 }'
-orionCurl --url '/v2/entities/E1?options=keyValues' -X PATCH --payload "$payload" --json
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' -X PATCH --payload "$payload" --json
 echo
 echo
 

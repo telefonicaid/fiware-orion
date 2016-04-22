@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Update compound attribute value with dots in keys
+DEL Entity V2 /attrs (invalid method)
 
 --SHELL-INIT--
 dbInit CB
@@ -30,18 +30,32 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create entity
-# 02. Update entitiy attribute value with dots in keys
-# 03. Get entity
+# 01. POST /v2/entities to create 8787GHY entity
+# 02. DELETE /v2/entities/8787GHY/attrs
 #
 
-echo "01. Create entity"
-echo "================="
+echo "01. POST /v2/entities to create 8787GHY entity"
+echo "=============================================="
 payload='{
-  "type": "house",
-  "id": "apartment_3",
-  "temperature_2": {
-    "value": 40
+  "id": "8787GHY",
+  "type": "Car",
+  "brand":{
+    "type": "string",
+    "value": "Mercedes Benz"
+  },
+  "speed":{
+    "type": "number",
+    "value" : "150"
+  },
+  "plateCountry": {
+    "value" : "ES"
+  },
+  "madeInCountry": {
+    "value" : "DE"
+  },
+  "model" : {
+    "type": "myString",
+    "value" : "Klasse C"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
@@ -49,63 +63,32 @@ echo
 echo
 
 
-echo "02. Update entitiy attribute value with dots in keys"
-echo "===================================================="
-payload='{
-  "temperature_2": {
-    "rt.ty": "5678"
-  }
-}'
-orionCurl --url '/v2/entities/apartment_3/attrs?options=keyValues' --payload "$payload" --json
-echo
-echo
-
-echo "03. Get entity"
-echo "=============="
-orionCurl --url /v2/entities/apartment_3  --json
+echo "02. DELETE /v2/entities/8787GHY/attrs"
+echo "====================================="
+orionCurl --url /v2/entities/8787GHY/attrs --json -X DELETE
 echo
 echo
 
 
 --REGEXPECT--
-01. Create entity
-=================
+01. POST /v2/entities to create 8787GHY entity
+==============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/apartment_3?type=house
+Location: /v2/entities/8787GHY?type=Car
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-02. Update entitiy attribute value with dots in keys
-====================================================
-HTTP/1.1 204 No Content
+02. DELETE /v2/entities/8787GHY/attrs
+=====================================
+HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
+Allow: GET, PATCH, POST, PUT
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-
-
-03. Get entity
-==============
-HTTP/1.1 200 OK
-Content-Length: 106
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "id": "apartment_3",
-    "temperature_2": {
-        "metadata": {},
-        "type": "none",
-        "value": {
-            "rt.ty": "5678"
-        }
-    },
-    "type": "house"
-}
 
 
 --TEARDOWN--

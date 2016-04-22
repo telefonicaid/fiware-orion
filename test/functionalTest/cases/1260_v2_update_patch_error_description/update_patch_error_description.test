@@ -52,18 +52,18 @@ echo
 echo
 
 
-echo "03. PATCH /v2/entities/Eno (not found)"
-echo "======================================"
-payload='{ "A1": 1 }'
-orionCurl --url '/v2/entities/Eno?options=keyValues' --payload "$payload" --json -X PATCH
-echo
-echo
-
-
-echo "04. PATCH /v2/entities/E1 (too many results)"
+echo "03. PATCH /v2/entities/Eno/attrs (not found)"
 echo "============================================"
 payload='{ "A1": 1 }'
-orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PATCH
+orionCurl --url '/v2/entities/Eno/attrs?options=keyValues' --payload "$payload" --json -X PATCH
+echo
+echo
+
+
+echo "04. PATCH /v2/entities/E1/attrs (too many results)"
+echo "=================================================="
+payload='{ "A1": 1 }'
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json -X PATCH
 echo
 echo
 
@@ -88,8 +88,8 @@ Date: REGEX(.*)
 
 
 
-03. PATCH /v2/entities/Eno (not found)
-======================================
+03. PATCH /v2/entities/Eno/attrs (not found)
+============================================
 HTTP/1.1 404 Not Found
 Content-Length: 61
 Content-Type: application/json
@@ -102,8 +102,8 @@ Date: REGEX(.*)
 }
 
 
-04. PATCH /v2/entities/E1 (too many results)
-============================================
+04. PATCH /v2/entities/E1/attrs (too many results)
+==================================================
 HTTP/1.1 409 Conflict
 Content-Length: 98
 Content-Type: application/json

@@ -93,6 +93,12 @@ std::string getEntity
   // Render entity response
   Entity       entity;
 
+  // If request was for /entities/<<id>>/attrs, type and id should not be shown
+  if (compV.size() == 4 && compV[3] == "attrs")
+  {
+    entity.hideIdAndType();
+  }
+
   entity.fill(&parseDataP->qcrs.res);
 
   std::string answer;

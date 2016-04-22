@@ -56,7 +56,7 @@ echo
 echo "03. PUT /v2/entities/E1 (too many results)"
 echo "=========================================="
 payload='{ "A1": 1 }'
-orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PUT
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json -X PUT
 echo
 echo
 
@@ -64,7 +64,7 @@ echo
 echo "04. PUT /v2/entities/fgg (entity not found)"
 echo "==========================================="
 payload='{ "A1": 1 }'
-orionCurl --url '/v2/entities/fgg?options=keyValues' --payload "$payload" --json -X PUT
+orionCurl --url '/v2/entities/fgg/attrs?options=keyValues' --payload "$payload" --json -X PUT
 echo
 echo
 

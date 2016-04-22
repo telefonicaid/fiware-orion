@@ -80,7 +80,7 @@ payload='{
     }
   }
 }'
-orionCurl --url /v2/entities/E --payload "$payload" --json
+orionCurl --url /v2/entities/E/attrs --payload "$payload" --json
 echo
 echo
 

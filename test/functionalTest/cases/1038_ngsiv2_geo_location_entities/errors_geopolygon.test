@@ -163,7 +163,7 @@ payload='{
     "type": "geo:polygon"
   }
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" -X PATCH --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH --json
 echo
 echo
 
@@ -183,7 +183,7 @@ payload='{
     "type": "geo:polygon"
   }
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X POST --json
 echo
 echo
 
@@ -217,7 +217,7 @@ payload='{
     "type": "geo:polygon"
   }
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X POST --json
 echo
 echo
 
@@ -237,7 +237,7 @@ payload='{
     "type": "no-geopoint"
   }
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X POST --json
 echo
 echo
 
@@ -257,7 +257,7 @@ payload='{
     "type": "geo:polygon"
   }
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X POST --json
 echo
 echo
 
@@ -277,7 +277,7 @@ payload='{
     "type": "geo:polygon"
   }
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X POST --json
 echo
 echo
 

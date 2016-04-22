@@ -939,7 +939,60 @@ Response:
             }
         }
 
-### Update or append entity attributes [POST /v2/entities/{entityId}{?type,options}]
+### Retrieve entity attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,options}]
+
+This request is similar to retreiving the whole entity, however this one omits `id` and `type` fields.
+
+As the general way of getting a whole entity, this operation must return only one entity element,
+but it may happen that there are more than one entity with the same ID (e.g. entities with same ID but different type). In those cases
+an error mesage is returned, specifying in the description the URL that could be used to get
+the list of conflicting entities, i.e. all the entities with such an ID.
+
+Response:
+
+* Successful operation uses 200 OK
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+
++ Parameters
+    + entityId (required, string) - Entity id to be retrieved
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
+    + attrs: temperature,humidity (optional, string) - Comma-separated list of attribute names which
+    data will be included in the response. The attributes are retrieved in the order specified by this parameter.
+    If this parameter is not included, all the attributes are retrieved in arbitrary order.
+    + options (optional, string) - Options dictionary
+      + Members
+          + keyValues - when used, the response payload uses `keyValues` simplified entity representation. See
+          corresponding section for details.
+          + values - when used, the response payload uses `values` simplified entity representation. See corresponding
+          section for details.
+          + unique - when used, the response payload uses `values` simplified entity representation. And, recurring values are left out.
+          See corresponding section for details.
+
++ Response 200 (application/json)
+
+        {
+            "temperature": {
+                "value": 21.7,
+                "type": "none"
+            },
+            "humidity": {
+                "value": 60,
+                "type": "none"
+            },
+            "location": {
+                "value": "41.3763726, 2.1864475",
+                "type": "geo:point",
+                "metadata": {
+                    "crs": {
+                        "value": "WGS84",
+                        "type": "none"
+                    }
+                }
+            }
+        }
+
+### Update or append entity attributes [POST /v2/entities/{entityId}/attrs{?type,options}]
 
 The request payload is an object representing the attributes to append or update. The object follows
 the JSON entity representation format (described in a section above), except that `id` and `type`
@@ -981,7 +1034,7 @@ Response:
 
 + Response 204
 
-### Update existing entity attributes [PATCH /v2/entities/{entityId}{?type,options}]
+### Update existing entity attributes [PATCH /v2/entities/{entityId}/attrs{?type,options}]
 
 The request payload is an object representing the attributes to update. The object follows
 the JSON entity representation format (described in a section above), except that `id` and `type`
@@ -1017,7 +1070,7 @@ Response:
 
 + Response 204
 
-### Replace all entity attributes [PUT /v2/entities/{entityId}{?type,options}]
+### Replace all entity attributes [PUT /v2/entities/{entityId}/attrs{?type,options}]
 
 The request payload is an object representing the new entity attributes. The object follows
 the JSON entity representation format (described in a section above), except that `id` and `type`
