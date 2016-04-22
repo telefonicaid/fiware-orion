@@ -240,7 +240,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | subject_type          | "                   "                                                                               |
       | subject_idPattern     | ".*"                                                                                                |
       | condition_attrs       | "temperature"                                                                                       |
-      | condition_expression  | "q">>>"temperature>40"&"georel">>>"near;MinDistance:1000"&"geometry">>>"point"&"coords">>>"40.6391" |
+      | condition_expression  | "q">>>"temperature>40"&"georel">>>"near;minDistance:1000"&"geometry">>>"point"&"coords">>>"40,6391" |
       | notification_http_url | "http://localhost:1234"                                                                             |
       | notification_attrs    | "temperature"                                                                                       |
       | throttling            | 5                                                                                                   |
@@ -378,7 +378,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | subject_type          | <type>                                                                                              |
       | subject_idPattern     | ".*"                                                                                                |
       | condition_attrs       | "temperature"                                                                                       |
-      | condition_expression  | "q">>>"temperature>40"&"georel">>>"near;MinDistance:1000"&"geometry">>>"point"&"coords">>>"40.6391" |
+      | condition_expression  | "q">>>"temperature>40"&"georel">>>"near;minDistance:1000"&"geometry">>>"point"&"coords">>>"40,6391" |
       | notification_http_url | "http://localhost:1234"                                                                             |
       | notification_attrs    | "temperature"                                                                                       |
       | throttling            | 5                                                                                                   |
@@ -409,7 +409,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | subject_type          | <type>                                                                                              |
       | subject_idPattern     | ".*"                                                                                                |
       | condition_attrs       | "temperature"                                                                                       |
-      | condition_expression  | "q">>>"temperature>40"&"georel">>>"near;MinDistance:1000"&"geometry">>>"point"&"coords">>>"40.6391" |
+      | condition_expression  | "q">>>"temperature>40"&"georel">>>"near;minDistance:1000"&"geometry">>>"point"&"coords">>>"40,6391" |
       | notification_http_url | "http://localhost:1234"                                                                             |
       | notification_attrs    | "temperature"                                                                                       |
       | throttling            | 5                                                                                                   |
@@ -566,7 +566,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | subject_type          | "house"                                                                                             |
       | subject_id            | "                    "                                                                              |
       | condition_attrs       | "temperature"                                                                                       |
-      | condition_expression  | "q">>>"temperature>40"&"georel">>>"near;MinDistance:1000"&"geometry">>>"point"&"coords">>>"40.6391" |
+      | condition_expression  | "q">>>"temperature>40"&"georel">>>"near;minDistance:1000"&"geometry">>>"point"&"coords">>>"40,6391" |
       | notification_http_url | "http://localhost:1234"                                                                             |
       | notification_attrs    | "temperature"                                                                                       |
       | throttling            | 5                                                                                                   |
@@ -847,7 +847,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | subject_type          | "house"                                                                                             |
       | subject_idPattern     | "                      "                                                                            |
       | condition_attrs       | "temperature"                                                                                       |
-      | condition_expression  | "q">>>"temperature>40"&"georel">>>"near;MinDistance:1000"&"geometry">>>"point"&"coords">>>"40.6391" |
+      | condition_expression  | "q">>>"temperature>40"&"georel">>>"near;minDistance:1000"&"geometry">>>"point"&"coords">>>"40,6391" |
       | notification_http_url | "http://localhost:1234"                                                                             |
       | notification_attrs    | "temperature"                                                                                       |
       | throttling            | 5                                                                                                   |
