@@ -76,7 +76,7 @@ std::string logTraceTreat
     }
 
     lmTraceSub(compV[2].c_str());
-    out = orionReply(ciP, "tracelevels removed", compV[2]);
+    out = orionReply(ciP, "tracelevels_removed", compV[2]);
   }
   else if ((components == 2) && (ciP->method == "GET"))
   {

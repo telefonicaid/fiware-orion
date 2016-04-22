@@ -38,11 +38,9 @@ std::string orionReply(ConnectionInfo* ciP, const std::string& what, const std::
 {
    std::string out = "";
 
-   out += startTag1("",     "orion");
-   out += startTag1("  ",   "log");
-   out += valueTag1("    ",  what, value);
-   out += endTag("  ");
-   out += endTag("");
+   out += '{';
+   out += valueTag1(" ", what, value);
+   out += '}';
 
    ciP->httpStatusCode = SccOk;
    restReply(ciP, out);

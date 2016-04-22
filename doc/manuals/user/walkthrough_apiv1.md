@@ -1014,7 +1014,7 @@ Let's examine in detail the different elements included in the payload:
     when Room1 pressure changes, the Room1 temperature value is notified,
     but not pressure itself. If you want also pressure to be notified,
     the request would need to include
-    &lt;attribute&gt;pressure&lt;/attribute&gt; within the attribute vector
+    "pressure" within the attribute vector
     (or to use an empty attribute vector, which you already know means "all
     the attributes in the entity"). Now, this example here, to be
     notified of the value of *temperature* each time the value of
