@@ -30,7 +30,7 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. GET /v2/types/T1 and get an empty list
+# 01. GET /v2/types/T1 and get Not Found
 # 02. Create E1/T1/A1+A2
 # 03. GET /v2/types/T1 and get a non-empty list
 # 04. Create E2/T1/A1+A3
@@ -40,8 +40,8 @@ brokerStart CB
 # 08. GET /v2/types/T1 and get a list of four attrs and four entities
 #
 
-echo "01. GET /v2/types/T1 and get an empty list"
-echo "=========================================="
+echo "01. GET /v2/types/T1 and get Not Found"
+echo "======================================"
 orionCurl --url /v2/types/T1 --json
 echo
 echo
@@ -122,17 +122,17 @@ echo
 
 
 --REGEXPECT--
-01. GET /v2/types/T1 and get an empty list
-==========================================
-HTTP/1.1 200 OK
-Content-Length: 22
+01. GET /v2/types/T1 and get Not Found
+======================================
+HTTP/1.1 404 Not Found
+Content-Length: 58
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "attrs": {},
-    "count": 0
+    "description": "Entity type not found",
+    "error": "NotFound"
 }
 
 

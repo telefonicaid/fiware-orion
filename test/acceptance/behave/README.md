@@ -287,8 +287,8 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 | update_attribute_value                      |    337       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes       | Yes            |
 |                                                                                                                                                          |
 |**types folder**                                                                                                                                          |
-| retrieve_entity_types                       |     68       | GET     | /v2/types/                                           | No        | Yes            |   
-| retrieve_an_entity_type                     |  (pending)   | GET     | /v2/types/`<entity_type>`                            | No        | No             |   
+| retrieve_entity_types                       |     76       | GET     | /v2/types/                                           | No        | Yes            |   
+| retrieve_an_entity_type                     |     66       | GET     | /v2/types/`<entity_type>`                            | No        | No             |   
 |                                                                                                                                                          |
 |**subscriptions folder**                                                                                                                                  |
 | retrieve_subscriptions                      |  (pending)   | GET     | /v2/subscriptions                                    | No        | Yes            |   

@@ -1,0 +1,502 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Geo query (circle) JSON test (based on deprecated location metadata)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+echo "1. Create entity corresponding to Madrid"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+  {
+    "type": "City",
+    "isPattern": "false",
+    "id": "Madrid",
+    "attributes": [
+    {
+      "name": "location",
+      "type": "coords",
+      "value": "40.418889, -3.691944",
+      "metadatas": [
+        {
+          "name": "location",
+          "type": "string",
+          "value": "WGS84"
+        }
+      ]
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+sleep 1.1
+
+echo "2. Create entity corresponding to Alcobendas"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+  {
+    "type": "City",
+    "isPattern": "false",
+    "id": "Alcobendas",
+    "attributes": [
+    {
+      "name": "location",
+      "type": "coords",
+      "value": "40.533333, -3.633333",
+      "metadatas": [
+        {
+          "name": "location",
+          "type": "string",
+          "value": "WGS84"
+        }
+      ]
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+sleep 1.1
+
+
+echo "3. Create entity corresponding to Leganes"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+  {
+    "type": "City",
+    "isPattern": "false",
+    "id": "Leganes",
+    "attributes": [
+    {
+      "name": "location",
+      "type": "coords",
+      "value": "40.316667, -3.75",
+      "metadatas": [
+        {
+          "name": "location",
+          "type": "string",
+          "value": "WGS84"
+        }
+      ]
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+
+echo "4: ++++++++++ Madrid in 13.5 kms ++++++++++"
+# Query inside 13.5 kms radius from Madrid center
+url="/v1/queryContext"
+payload='{
+    "entities": [
+        {
+            "type": "City",
+            "isPattern": "true",
+            "id": ".*"
+        }
+    ],
+    "restriction": {
+        "scopes": [
+            {
+                "type" : "FIWARE::Location",
+                "value" : {
+                  "circle": {
+                    "centerLatitude": "40.418889",
+                    "centerLongitude": "-3.691944",
+                    "radius": "13500"
+                  }
+                }
+            }
+        ]
+    }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+echo "5: +++++++++++ Madrid in 15 kms +++++++++"
+# Query inside 15 kms radius from Madrid center
+url="/v1/queryContext"
+payload='{
+    "entities": [
+        {
+            "type": "City",
+            "isPattern": "true",
+            "id": ".*"
+        }
+    ],
+    "restriction": {
+        "scopes": [
+            {
+                "type" : "FIWARE::Location",
+                "value" : {
+                  "circle": {
+                    "centerLatitude": "40.418889",
+                    "centerLongitude": "-3.691944",
+                    "radius": "15000"
+                  }
+                }
+            }
+        ]
+    }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+echo "6: ++++++++++++ Madrid out 13.5 kms ++++++++"
+# Query in 13.5 kms radius outside Madrid center
+url="/v1/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "City",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location",
+      "value" : {
+        "circle": {
+          "centerLatitude": "40.418889",
+          "centerLongitude": "-3.691944",
+          "radius": "13500",
+          "inverted": "true"
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+--REGEXPECT--
+1. Create entity corresponding to Madrid
+HTTP/1.1 200 OK
+Content-Length: 576
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": ""
+                    }
+                ],
+                "id": "Madrid",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+2. Create entity corresponding to Alcobendas
+HTTP/1.1 200 OK
+Content-Length: 580
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": ""
+                    }
+                ],
+                "id": "Alcobendas",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+3. Create entity corresponding to Leganes
+HTTP/1.1 200 OK
+Content-Length: 577
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": ""
+                    }
+                ],
+                "id": "Leganes",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+4: ++++++++++ Madrid in 13.5 kms ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1157
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "40.418889, -3.691944"
+                    }
+                ],
+                "id": "Madrid",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "40.316667, -3.75"
+                    }
+                ],
+                "id": "Leganes",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+5: +++++++++++ Madrid in 15 kms +++++++++
+HTTP/1.1 200 OK
+Content-Length: 1725
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "40.418889, -3.691944"
+                    }
+                ],
+                "id": "Madrid",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "40.533333, -3.633333"
+                    }
+                ],
+                "id": "Alcobendas",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "40.316667, -3.75"
+                    }
+                ],
+                "id": "Leganes",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+6: ++++++++++++ Madrid out 13.5 kms ++++++++
+HTTP/1.1 200 OK
+Content-Length: 600
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "40.533333, -3.633333"
+                    }
+                ],
+                "id": "Alcobendas",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

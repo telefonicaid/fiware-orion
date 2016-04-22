@@ -572,10 +572,12 @@ class NGSI:
         headers_list = dict(context.resp.headers)  # headers returned in response
         for h in headers:
             assert h in headers_list, " ERROR, %s header does no exist in headers response\n -- %s" % (h, str(headers_list))
+            __logger__.info("\"%s\" header does exist in headers response" % h)
             prog = re.compile(headers[h])
             result = prog.match(headers_list[h])
-            assert result is not None, " ERROR - %s = %s not matches with headers response: %s" % \
+            assert result is not None, " ERROR - the \"%s\" header value expected (%s) not matches with headers response value: \"%s\"" % \
                                                   (h, headers[h], headers_list[h])
+            __logger__.info("\"%s\" header expected does match with \"%s\" in headers response " % (h, result.group(0)))
 
     @staticmethod
     def __verify_if_is_int_or_str(value):
@@ -815,19 +817,17 @@ class NGSI:
     def verify_entity_types(self, types, resp):
         """
         verify entity types  -- /v2/types
-        :param queries_parameters: queries parameters used in the request
-        :param accumulate_entities_context: accumulate of all entities context. See "entity_context" dict in cb_v2_utils.py
+        :param types: type list to check
         :param resp: http response
         """
         # verify entities types
         type_list = types.split(",")
-        items_dict = convert_str_to_dict(resp.content, JSON)
-        items_list = items_dict.keys()  # list of keys
+        items_list = convert_str_to_dict(resp.content, JSON)
         for item in items_list:
-            __logger__.debug("verified: %s include in %s" % (item, types))
-            assert item in type_list, " ERROR - \"%s\" type does not match with types to verify" % item
+            __logger__.debug("checking: %s include in %s" % (item, types))
+            assert item["type"] in type_list, " ERROR - \"%s\" type does not match with types to verify" % item
 
-    def verify_attributes_types_with_entity_types(self, queries_parameters, accumulate_entities_context, resp):
+    def verify_attributes_types_with_entity_types(self, queries_parameters, accumulate_entities_context, prefixes, resp):
         """
         verify attributes types with entity types  -- /v2/types
         :param queries_parameters: queries parameters used in the request
@@ -838,13 +838,17 @@ class NGSI:
         total = 0
         limit = 20
         offset = 0
-        count_total = 0
 
         for entities_group in accumulate_entities_context:
             temp = remove_quote(entities_group["entities_type"])
             if temp not in types_count:  # avoid types duplicated
-                types_count[temp] = int(entities_group["entities_number"])
-                total += 1
+                if prefixes["type"]:
+                    for i in range(int(entities_group["entities_number"])):
+                        types_count["%s_%s" % (entities_group["entities_type"], str(i))] = 1
+                        total += 1
+                else:
+                     types_count[temp] = int(entities_group["entities_number"])
+                     total += 1
             else:
                 types_count[temp] += int(entities_group["entities_number"])  # entities counter
 
@@ -853,9 +857,6 @@ class NGSI:
         if "offset" in queries_parameters:
             offset = int(queries_parameters["offset"])
         if "options" in queries_parameters:
-            if queries_parameters["options"] == "count":
-                count = int(resp.headers["x-total-count"])
-
             if queries_parameters["options"] == "values":
                 pass  # not implemented (develop team) and not tested yet (pending)
 
@@ -881,37 +882,62 @@ class NGSI:
             __logger__.debug("   %s = %s" % (i, str(types_count[i])))
 
         # verify entities number
-        items_dict = convert_str_to_dict(resp.content, JSON)
-        items_list = items_dict.keys()  # list of keys
+        items_list = convert_str_to_dict(resp.content, JSON)
         assert items == len(items_list), " ERROR - the entities group total: %d is not the expected:%d" % (len(items_list), items)
         for item in items_list:
-            attr_exists = False
-            type_resp = item
-            if item == EMPTY:
-                type_resp = None
+            assert item["type"] in types_count, " ERROR - wrong entity type: %s" % item["type"]  # verify that the entities was created
 
-            assert type_resp in types_count, " ERROR - wrong entity type: %s" % item  # verify that the entities was created
-            count_total += int(items_dict[item]["count"])
-
-            assert types_count[type_resp] == int(items_dict[item]["count"]), \
+            assert types_count[item["type"]] == int(item["count"]), \
                 " ERROR - the entities type counter %s does not match with the expected: %s" % \
-                (items_dict[item]["count"], types_count[type_resp])
+                (item["count"], types_count[item["type"]])
 
-            attr_list = items_dict[item]["attrs"].keys()       # list of attributes in each entities group
+            # list of attributes in each entities group
+            attr_list = item["attrs"].keys()
             for attr in attr_list:
                 for entities_group in accumulate_entities_context:
-                    if (entities_group["entities_type"] == type_resp) and (attr.find(entities_group["attributes_name"]) >= 0):
-                        if entities_group["attributes_type"] == items_dict[item]["attrs"][attr]["type"]:
+                    attr_exists = False
+                    if (item["type"].find(entities_group["entities_type"]) >= 0) and (attr.find(entities_group["attributes_name"]) >= 0):
+                        if entities_group["attributes_type"] in item["attrs"][attr]["types"]:
                             attr_exists = True
                             break
-            assert attr_exists, ' ERROR - the attribute: "%s" with type: "%s" does not exist...' % (attr, items_dict[item]["attrs"][attr]["type"])
+                assert attr_exists, ' ERROR - the attribute: "%s" with type: "%s" does not exist...' % (attr, str(item["attrs"][attr]["types"]))
+            __logger__.info(u'"%s" attribute and its types are verified successfully' % attr)
+            # count field
+            assert "count" in item, "ERROR - the count field does not exist in response"
+            assert item["count"] == types_count[item["type"]], u' ERROR - "count" field in response (%s) does not match with the expected (%s)' \
+                                                                                  % (str(item["count"]), types_count[item["type"]])
+            __logger__.info(u'"count" field is verified successfully')
 
-        # options=count query parameter
-        if "options" in queries_parameters:
-            if queries_parameters["options"] == "count":
-                count = int(resp.headers["x-total-count"])
-                assert count == count_total, " ERROR - the x-total-count header: %d does not match with the expected total: %d" \
-                                             % (count, count_total)
+
+    def verify_attributes_types_by_entity_types(self, entity_type, accumulate_entities_context, resp):
+        """
+        verify attributes types by entity types  -- /v2/types/<entity_type>
+        :param accumulate_entities_context: accumulate of all entities context. See "entity_context" dict in cb_v2_utils.py
+        :param resp: http response
+        """
+        entities_counter = 0
+        for entities_group in accumulate_entities_context:
+            if entities_group["entities_type"] == entity_type:
+                entities_counter += int(entities_group["entities_number"])  # entities counter
+
+        attrs_dict = convert_str_to_dict(resp.content, JSON)
+        # list of attributes
+        attr_list = attrs_dict["attrs"].keys()  # list of attrs names (keys)
+        for attr in attr_list:
+            for entities_group in accumulate_entities_context:
+                attr_exists = False
+                if (attr.find(entities_group["attributes_name"]) >= 0):
+                    if entities_group["attributes_type"] in attrs_dict["attrs"][attr]["types"]:
+                        attr_exists = True
+                        break
+            assert attr_exists, ' ERROR - the attribute: "%s" with type: "%s" does not exist...' % (attr, str(attrs_dict["attrs"][attr]["types"]))
+            __logger__.info(u'"%s" attribute and its types are verified successfully' % attr)
+            # count field
+            assert "count" in attrs_dict, "ERROR - the count field does not exist in response"
+            assert attrs_dict["count"] == entities_counter, u' ERROR - "count" field in response (%s) does not match with the expected (%s)' \
+                                                                                  % (str(attrs_dict["count"]), entities_counter)
+            __logger__.info(u'"count" field is verified successfully')
+
 
     def verify_log(self, context, line):
         """
@@ -968,7 +994,7 @@ class NGSI:
         """
         subs_id = resp.headers["location"].split("subscriptions/")[1]
         curs_list = self.__get_mongo_cursor(mongo_driver, headers, subs_id=subs_id)
-        assert len(curs_list) == 1, " ERROR - the subscription doc from is not the expected: %s" % str(len(curs_list))
+        assert len(curs_list) == 1, " ERROR - the subscription docs number in mongo is not the expected: %s" % str(len(curs_list))
         curs = curs_list[0]
         __logger__.debug("subscription to verify: %s" % str(curs))
         for item in subscription_context:   # used to remove quotes when are using raw mode

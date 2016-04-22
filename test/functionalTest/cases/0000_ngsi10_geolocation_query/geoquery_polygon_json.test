@@ -39,15 +39,8 @@ payload='{
     "attributes": [
     {
       "name": "location",
-      "type": "coords",
-      "value": "3, 2",
-      "metadatas": [
-        {
-          "name": "location",
-          "type": "string",
-          "value": "WGS84"
-        }
-      ]
+      "type": "geo:point",
+      "value": "3, 2"
     }
     ]
   }
@@ -71,15 +64,8 @@ payload='{
     "attributes": [
     {
       "name": "location",
-      "type": "coords",
-      "value": "5, 5",
-      "metadatas": [
-        {
-          "name": "location",
-          "type": "string",
-          "value": "WGS84"
-        }
-      ]
+      "type": "geo:point",
+      "value": "5, 5"
     }
     ]
   }
@@ -103,15 +89,8 @@ payload='{
     "attributes": [
     {
       "name": "location",
-      "type": "coords",
-      "value": "7, 4",
-      "metadatas": [
-        {
-          "name": "location",
-          "type": "string",
-          "value": "WGS84"
-        }
-      ]
+      "type": "geo:point",
+      "value": "7, 4"
     }
     ]
   }
@@ -346,7 +325,7 @@ echo
 --REGEXPECT--
 1: +++++++++ Point A +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 572
+Content-Length: 394
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -357,15 +336,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": ""
                     }
                 ],
@@ -384,7 +356,7 @@ Date: REGEX(.*)
 
 2: +++++++++ Point B +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 572
+Content-Length: 394
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -395,15 +367,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": ""
                     }
                 ],
@@ -422,7 +387,7 @@ Date: REGEX(.*)
 
 3: +++++++++ Point C +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 572
+Content-Length: 394
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -432,16 +397,9 @@ Date: REGEX(.*)
         {
             "contextElement": {
                 "attributes": [
-                    {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
+                    {                    
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": ""
                     }
                 ],
@@ -460,7 +418,7 @@ Date: REGEX(.*)
 
 4: ++++++++++ Rectangle in: A, B ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1120
+Content-Length: 764
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -471,15 +429,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": "3, 2"
                     }
                 ],
@@ -496,15 +447,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": "5, 5"
                     }
                 ],
@@ -523,7 +467,7 @@ Date: REGEX(.*)
 
 5: ++++++++++ Rectangle in: B, C ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1120
+Content-Length: 764
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -534,15 +478,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": "5, 5"
                     }
                 ],
@@ -559,15 +496,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": "7, 4"
                     }
                 ],
@@ -586,7 +516,7 @@ Date: REGEX(.*)
 
 6: ++++++++++ Triangle in: A ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 576
+Content-Length: 398
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -597,15 +527,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": "3, 2"
                     }
                 ],
@@ -624,7 +547,7 @@ Date: REGEX(.*)
 
 7: ++++++++++ Rectangle out: A ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 576
+Content-Length: 398
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -635,15 +558,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": "3, 2"
                     }
                 ],
@@ -662,7 +578,7 @@ Date: REGEX(.*)
 
 8: ++++++++++ Triangle out: B, C ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1120
+Content-Length: 764
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -673,15 +589,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": "5, 5"
                     }
                 ],
@@ -698,15 +607,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": "7, 4"
                     }
                 ],

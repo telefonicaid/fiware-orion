@@ -39,15 +39,8 @@ payload='{
     "attributes": [
     {
       "name": "location",
-      "type": "centigrade",
-      "value": "-3.5, 45.20",
-      "metadatas": [
-        {
-          "name": "location",
-          "type": "string",
-          "value": "WGS84"
-        }
-      ]
+      "type": "geo:point",
+      "value": "-3.5, 45.20"
     }
     ]
   }
@@ -154,7 +147,7 @@ orionCurl --url "$url" --payload "$payload" --json
 --REGEXPECT--
 0: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 584
+Content-Length: 402
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -165,15 +158,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "centigrade",
+                        "type": "geo:point",
                         "value": ""
                     }
                 ],

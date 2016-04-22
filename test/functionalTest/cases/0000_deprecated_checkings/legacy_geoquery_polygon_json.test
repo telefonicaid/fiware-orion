@@ -1,0 +1,728 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Geo query test (polygon) (based on deprecated location metadata)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+echo "1: +++++++++ Point A +++++++++++"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+  {
+    "type": "Point",
+    "isPattern": "false",
+    "id": "A",
+    "attributes": [
+    {
+      "name": "location",
+      "type": "coords",
+      "value": "3, 2",
+      "metadatas": [
+        {
+          "name": "location",
+          "type": "string",
+          "value": "WGS84"
+        }
+      ]
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+sleep 1.1
+echo
+echo
+
+
+echo "2: +++++++++ Point B +++++++++++"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+  {
+    "type": "Point",
+    "isPattern": "false",
+    "id": "B",
+    "attributes": [
+    {
+      "name": "location",
+      "type": "coords",
+      "value": "5, 5",
+      "metadatas": [
+        {
+          "name": "location",
+          "type": "string",
+          "value": "WGS84"
+        }
+      ]
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+sleep 1.1
+echo
+echo
+
+
+echo "3: +++++++++ Point C +++++++++++"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+  {
+    "type": "Point",
+    "isPattern": "false",
+    "id": "C",
+    "attributes": [
+    {
+      "name": "location",
+      "type": "coords",
+      "value": "7, 4",
+      "metadatas": [
+        {
+          "name": "location",
+          "type": "string",
+          "value": "WGS84"
+        }
+      ]
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+sleep 1.1
+echo
+echo
+
+
+echo "4: ++++++++++ Rectangle in: A, B ++++++++++"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "Point",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location",
+      "value" : {
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "0",
+            "longitude": "0"
+          },
+          {
+            "latitude": "0",
+            "longitude": "6"
+          },
+          {
+            "latitude": "6",
+            "longitude": "6"
+          },
+          {
+            "latitude": "6",
+            "longitude": "0"
+          }
+          ]
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "5: ++++++++++ Rectangle in: B, C ++++++++++"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "Point",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location",
+      "value" : {
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "3",
+            "longitude": "3"
+          },
+          {
+            "latitude": "3",
+            "longitude": "8"
+          },
+          {
+            "latitude": "11",
+            "longitude": "8"
+          },
+          {
+            "latitude": "11",
+            "longitude": "3"
+          }
+          ]
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "6: ++++++++++ Triangle in: A ++++++++++"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "Point",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location",
+      "value" : {
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "0",
+            "longitude": "0"
+          },
+          {
+            "latitude": "0",
+            "longitude": "6"
+          },
+          {
+            "latitude": "6",
+            "longitude": "0"
+          }
+          ]
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "7: ++++++++++ Rectangle out: A ++++++++++"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "Point",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location",
+      "value" : {
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "3",
+            "longitude": "3"
+          },
+          {
+            "latitude": "3",
+            "longitude": "8"
+          },
+          {
+            "latitude": "11",
+            "longitude": "8"
+          },
+          {
+            "latitude": "11",
+            "longitude": "3"
+          }
+          ],
+          "inverted": "true"
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "8: ++++++++++ Triangle out: B, C ++++++++++"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "Point",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location",
+      "value" : {
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "0",
+            "longitude": "0"
+          },
+          {
+            "latitude": "0",
+            "longitude": "6"
+          },
+          {
+            "latitude": "6",
+            "longitude": "0"
+          }
+          ],
+          "inverted": "true"
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+--REGEXPECT--
+1: +++++++++ Point A +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 572
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": ""
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+2: +++++++++ Point B +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 572
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": ""
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+3: +++++++++ Point C +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 572
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": ""
+                    }
+                ],
+                "id": "C",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+4: ++++++++++ Rectangle in: A, B ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1120
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "3, 2"
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "5, 5"
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+5: ++++++++++ Rectangle in: B, C ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1120
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "5, 5"
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "7, 4"
+                    }
+                ],
+                "id": "C",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+6: ++++++++++ Triangle in: A ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 576
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "3, 2"
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+7: ++++++++++ Rectangle out: A ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 576
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "3, 2"
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+8: ++++++++++ Triangle out: B, C ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1120
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "5, 5"
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "7, 4"
+                    }
+                ],
+                "id": "C",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

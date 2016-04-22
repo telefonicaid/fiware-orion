@@ -252,8 +252,10 @@ ContextElementResponse::ContextElementResponse
     if (apiVersion == "v1")
     {
       /* Setting location metadata (if found) */
-      if (locAttr == ca.name)
+      if ((locAttr == ca.name) && (ca.type != GEO_POINT))
       {
+        /* Note that if attribute type is geo:point then the user is using the "new way"
+         * of locating entities in NGSIv1, thus location metadata is not rendered */
         Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WGS84);
         caP->metadataVector.push_back(md);
       }

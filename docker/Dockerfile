@@ -75,6 +75,7 @@ RUN \
     rm -rf /opt/libmicrohttpd-0.9.48.tar.gz \
            /usr/local/include/microhttpd.h \
            /usr/local/lib/libmicrohttpd.* \
+           /opt/libmicrohttpd-0.9.48 \
            /opt/legacy-1.0.7.tar.gz \
            /opt/mongo-cxx-driver-legacy-1.0.7 \
            /usr/local/include/mongo \

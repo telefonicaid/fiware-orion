@@ -40,15 +40,8 @@ payload='{
     "attributes": [
     {
       "name": "location",
-      "type": "coords",
-      "value": "200, 100",
-      "metadatas": [
-        {
-          "name": "location",
-          "type": "string",
-          "value": "WGS84"
-        }
-      ]
+      "type": "geo:point",
+      "value": "200, 100"
     }
     ]
   }
@@ -164,7 +157,7 @@ echo
 --REGEXPECT--
 1: +++++++++ Update/Append +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 707
+Content-Length: 529
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -175,15 +168,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": ""
                     }
                 ],

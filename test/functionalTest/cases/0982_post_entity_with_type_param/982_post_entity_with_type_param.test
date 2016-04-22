@@ -71,14 +71,14 @@ echo
 echo
 
 
-echo "03. POST /v2/entities/E1 T1 (update attribute A1)"
-echo "================================================="
+echo "03. POST /v2/entities/E1/attrs T1 (update attribute A1)"
+echo "======================================================="
 payload='{
     "A1":{
          "value": "CHANGED A1 E1/T2"
     }
 }'
-orionCurl --url "/v2/entities/E1?type=T1" --payload "$payload" --json
+orionCurl --url "/v2/entities/E1/attrs?type=T1" --payload "$payload" --json
 echo
 echo
 
@@ -89,14 +89,14 @@ echo
 echo
 
 
-echo "05. POST/v2/entities/E1 T2 (append attribute A3)"
-echo "================================================"
+echo "05. POST/v2/entities/E1/attrs T2 (append attribute A3)"
+echo "======================================================"
 payload='{
     "A3":{
          "value": "ADDED A3 E1/T2"
     }
 }'
-orionCurl --url "/v2/entities/E1?type=T2&options=append" --payload "$payload" --json
+orionCurl --url "/v2/entities/E1/attrs?type=T2&options=append" --payload "$payload" --json
 echo
 echo
 
@@ -108,14 +108,14 @@ echo
 echo
 
 
-echo "07. POST/v2/entities/E1 T2 (append attribute A3, error already exists)"
-echo "======================================================================"
+echo "07. POST/v2/entities/E1/attrs T2 (append attribute A3, error already exists)"
+echo "============================================================================"
 payload='{
     "A3":{
          "value": "ADDED A3 E1/T2"
     }
 }'
-orionCurl --url "/v2/entities/E1?type=T2&options=append" --payload "$payload" --json
+orionCurl --url "/v2/entities/E1/attrs?type=T2&options=append" --payload "$payload" --json
 echo
 echo
 
@@ -141,8 +141,8 @@ Date: REGEX(.*)
 
 
 
-03. POST /v2/entities/E1 T1 (update attribute A1)
-=================================================
+03. POST /v2/entities/E1/attrs T1 (update attribute A1)
+=======================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -185,8 +185,8 @@ Date: REGEX(.*)
 ]
 
 
-05. POST/v2/entities/E1 T2 (append attribute A3)
-================================================
+05. POST/v2/entities/E1/attrs T2 (append attribute A3)
+======================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -234,8 +234,8 @@ Date: REGEX(.*)
 ]
 
 
-07. POST/v2/entities/E1 T2 (append attribute A3, error already exists)
-======================================================================
+07. POST/v2/entities/E1/attrs T2 (append attribute A3, error already exists)
+============================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 105
 Content-Type: application/json

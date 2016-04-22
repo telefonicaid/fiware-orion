@@ -1,0 +1,163 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Location - no actual location change (based on deprecated location metadata)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+echo "0: ++++++++++++++++++++"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "location",
+      "type": "centigrade",
+      "value": "-3.5, 45.20",
+      "metadatas": [
+        {
+          "name": "location",
+          "type": "string",
+          "value": "WGS84"
+        }
+      ]
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+echo "1: ++++++++++++++++++++"
+
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "location",
+      "type": "centigrade",
+      "value": "-3.6, 48.20",
+      "metadatas": [
+        {
+          "name": "location",
+          "type": "string",
+          "value": "WGS84"
+        }
+      ]
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+--REGEXPECT--
+0: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 584
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "centigrade",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 584
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "centigrade",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

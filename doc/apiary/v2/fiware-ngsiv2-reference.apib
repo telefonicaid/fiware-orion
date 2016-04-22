@@ -712,7 +712,7 @@ so notification receiver can know the format used without needing processing not
 ### Notification templates
 
 Based on the "template" field defined as part of the subscription and in a macro replacement language
-that could be used in "template" "callback", "headers" and "query". Details TBD.
+that could be used in "payload", "url", "headers", "method" and "qs". Details TBD.
 
 ## Group API Entry Point
 
@@ -939,7 +939,60 @@ Response:
             }
         }
 
-### Update or append entity attributes [POST /v2/entities/{entityId}{?type,options}]
+### Retrieve entity attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,options}]
+
+This request is similar to retreiving the whole entity, however this one omits `id` and `type` fields.
+
+As the general way of getting a whole entity, this operation must return only one entity element,
+but it may happen that there are more than one entity with the same ID (e.g. entities with same ID but different type). In those cases
+an error mesage is returned, specifying in the description the URL that could be used to get
+the list of conflicting entities, i.e. all the entities with such an ID.
+
+Response:
+
+* Successful operation uses 200 OK
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+
++ Parameters
+    + entityId (required, string) - Entity id to be retrieved
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
+    + attrs: temperature,humidity (optional, string) - Comma-separated list of attribute names which
+    data will be included in the response. The attributes are retrieved in the order specified by this parameter.
+    If this parameter is not included, all the attributes are retrieved in arbitrary order.
+    + options (optional, string) - Options dictionary
+      + Members
+          + keyValues - when used, the response payload uses `keyValues` simplified entity representation. See
+          corresponding section for details.
+          + values - when used, the response payload uses `values` simplified entity representation. See corresponding
+          section for details.
+          + unique - when used, the response payload uses `values` simplified entity representation. And, recurring values are left out.
+          See corresponding section for details.
+
++ Response 200 (application/json)
+
+        {
+            "temperature": {
+                "value": 21.7,
+                "type": "none"
+            },
+            "humidity": {
+                "value": 60,
+                "type": "none"
+            },
+            "location": {
+                "value": "41.3763726, 2.1864475",
+                "type": "geo:point",
+                "metadata": {
+                    "crs": {
+                        "value": "WGS84",
+                        "type": "none"
+                    }
+                }
+            }
+        }
+
+### Update or append entity attributes [POST /v2/entities/{entityId}/attrs{?type,options}]
 
 The request payload is an object representing the attributes to append or update. The object follows
 the JSON entity representation format (described in a section above), except that `id` and `type`
@@ -981,7 +1034,7 @@ Response:
 
 + Response 204
 
-### Update existing entity attributes [PATCH /v2/entities/{entityId}{?type,options}]
+### Update existing entity attributes [PATCH /v2/entities/{entityId}/attrs{?type,options}]
 
 The request payload is an object representing the attributes to update. The object follows
 the JSON entity representation format (described in a section above), except that `id` and `type`
@@ -1017,7 +1070,7 @@ Response:
 
 + Response 204
 
-### Replace all entity attributes [PUT /v2/entities/{entityId}{?type,options}]
+### Replace all entity attributes [PUT /v2/entities/{entityId}/attrs{?type,options}]
 
 The request payload is an object representing the new entity attributes. The object follows
 the JSON entity representation format (described in a section above), except that `id` and `type`
@@ -1343,6 +1396,8 @@ A subscription is represented by a JSON object with the following fields:
   If this field is not provided at subscription creation time, new subscriptions are created with
   the `active` status, which can be changed by clients afterwards. For expired subscriptions this
   attribute is set to `expired` value (no matter if the client updates it to `active`/`inactive`).
++ `throttling`: Minimal period of time in seconds which must elapse between two consecutive notifications. It
+  is optional.
 
 A `subject` contains the following subfields:
 
@@ -1350,36 +1405,40 @@ A `subject` contains the following subfields:
     + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same time, but at least one of them must be set.
     + `type`: Type of the affected entities (optional).
 + `condition`: Condition that will trigger the notification. It can have two optional properties:
-    + `attributes`: array of attribute names
+    + `attrs`: array of attribute names
     + `expression`: an expression composed of `q`, `georel`, `geometry` and `coords` (see "List entities" operation above
    about this field).
 
 A `notification` object contains the following subfields:
 
-+ `attributes`: List of attributes to be included in the notification message. If not specified (or empty), all attributes are included
++ `attrs`: List of attributes to be included in the notification message. If not specified (or empty), all attributes are included
   in the notification. It also defines the order in which attributes will appear in notifications when `attrsFormat` `value` is used
   (see "Notification messages" section).
-+ `callback` : URL pointing to the service which will be invoked when a notification is generated. A NGSIv2
-  compliant server must support `http` URL schema, other schemas (e.g. schemas for web sockets) could also be supported.
-+ `headers` (optional): a key-map of HTTP headers that will be included in the notification messages. Note that this cannot be used
-  to override headers that make the notification inconsistent (e.g. `Content-Type: application/json`).
-+ `query` (optional): a key-map of URL query parameters that will be included in the notification message.
++ `http`: It is used to convey parameters for notifications delivered through the HTTP protocol.
 + `attrsFormat` (optional): specifies how the entities will be represented in notifications. Accepted values are
   `normalized` (the one used if the field is omitted), `keyValues` or `values`. If `attrsFormat` takes any value different
   than those an error will be raised. See detail in "Notification messages" section.
-+ `throttling`: Minimal period of time in seconds which must elapse between two consecutive notifications. It
-  is optional.
 + `timesSent` (not editable, only in GET operations): Number of notifications sent due to this subscription.
 + `lastNotification`: Last notification date in ISO8601 format.
 
+An `http` object contains the following subfields:
+
++ `url` : URL referencing the service which is invoked when a notification is generated. A NGSIv2
+  compliant server must support `http` URL schema, other schemas could also be supported.
++ `headers` (optional): a key-map of HTTP headers that are included in the notification messages.
++ `qs` (optional): a key-map of URL query parameters that are included in the notification message.
++ `method` (optional): the method to use for sending the notification (default is POST)
++ `payload` (optional): the payload to be used in the notification. If omitted, the default payload (see
+  "Notification messages" sections) is used.
+
 Notification rules are as follow:
 
-* If `attributes` and `expression` are used, a notification is sent whenever one of the attributes in the `attributes` list changes and
+* If `attrs` and `expression` are used, a notification is sent whenever one of the attributes in the `attrs` list changes and
   at the same time `expression` matches.
-* If `attributes` is used and `expression` is not used, a notification is sent whenever one of the attributes in the `attributes` list changes-
-* If `attributes` is not used and `expression` is used, a notification is sent whenever any of the attributes of the entity changes and
+* If `attrs` is used and `expression` is not used, a notification is sent whenever one of the attributes in the `attrs` list changes-
+* If `attrs` is not used and `expression` is used, a notification is sent whenever any of the attributes of the entity changes and
   at the same time `expression` matches.
-* If neither `attributes` or `expression` are used, a notification is sent whenever any of the attributes of the entity changes.
+* If neither `attrs` or `expression` are used, a notification is sent whenever any of the attributes of the entity changes.
 
 ## Subscription List [/v2/subscriptions]
 
@@ -1420,21 +1479,23 @@ Response:
                     }
                 },
                 "notification": {
-                    "callback": "http://localhost:1234",
-                    "headers": {
-                      "X-MyHeader": "foo"
-                    },
-                    "query": {
-                      "authToken": "bar"
+                    "http": {
+                      "url": "http://localhost:1234",
+                      "headers": {
+                        "X-MyHeader": "foo"
+                      },
+                      "qs": {
+                        "authToken": "bar"
+                      }
                     },
                     "attrsFormat": "keyValues",
-                    "attributes": ["temperature", "humidity"],
-                    "throttling": 5,
-                    "count": 12,
+                    "attrs": ["temperature", "humidity"],
+                    "timesSent": 12,
                     "lastNotification": "2015-10-05T16:00:00.00Z"
                 },
                 "expires": "2016-04-05T14:00:00.00Z",
-                "status": "active"
+                "status": "active",
+                "throttling": 5
             }
         ]
 
@@ -1461,18 +1522,20 @@ Response:
                     }
                 ],
                 "condition": {
-                    "attributes": [ "temperature" ],
+                    "attrs": [ "temperature" ],
                     "expression": {
                        "q": "temperature>40"
                     }
                  }
             },
             "notification": {
-                "callback": "http://localhost:1234",
-                "attributes": ["temperature", "humidity"],
-                "throttling": 5
+                "http": {
+                  "url": "http://localhost:1234"
+                },
+                "attrs": ["temperature", "humidity"]
             },            
-            "expires": "2016-04-05T14:00:00.00Z"
+            "expires": "2016-04-05T14:00:00.00Z",
+            "throttling": 5
         }
 
 + Response 201
@@ -1509,21 +1572,23 @@ Response:
                     }
                 ],
                 "condition": {
-                    "attributes": [ "temperature " ],
+                    "attrs": [ "temperature " ],
                     "expression": {
                        "q": "temperature>40"
                     }
                  }
             },
             "notification": {
-                "callback": "http://localhost:1234",
-                "attributes": ["temperature", "humidity"],
-                "throttling": 5,
-                "count": 12,
+                "http": {
+                  "url": "http://localhost:1234"
+                },
+                "attrs": ["temperature", "humidity"],
+                "timesSent": 12,
                 "lastNotification": "2015-10-05T16:00:00.00Z"
             },
             "expires": "2016-04-05T14:00:00.00Z",
-            "status": "active"
+            "status": "active",
+            "throttling": 5,
         }
 
 

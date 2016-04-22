@@ -39,15 +39,8 @@ payload='{
     "attributes": [
     {
       "name": "location",
-      "type": "coords",
-      "value": "40.418889, -3.691944",
-      "metadatas": [
-        {
-          "name": "location",
-          "type": "string",
-          "value": "WGS84"
-        }
-      ]
+      "type": "geo:point",
+      "value": "40.418889, -3.691944"
     }
     ]
   }
@@ -69,15 +62,8 @@ payload='{
     "attributes": [
     {
       "name": "location",
-      "type": "coords",
-      "value": "40.533333, -3.633333",
-      "metadatas": [
-        {
-          "name": "location",
-          "type": "string",
-          "value": "WGS84"
-        }
-      ]
+      "type": "geo:point",
+      "value": "40.533333, -3.633333"
     }
     ]
   }
@@ -100,15 +86,8 @@ payload='{
     "attributes": [
     {
       "name": "location",
-      "type": "coords",
-      "value": "40.316667, -3.75",
-      "metadatas": [
-        {
-          "name": "location",
-          "type": "string",
-          "value": "WGS84"
-        }
-      ]
+      "type": "geo:point",
+      "value": "40.316667, -3.75"
     }
     ]
   }
@@ -206,7 +185,7 @@ orionCurl --url "$url" --payload "$payload" --json
 --REGEXPECT--
 1. Create entity corresponding to Madrid
 HTTP/1.1 200 OK
-Content-Length: 576
+Content-Length: 398
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -217,15 +196,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": ""
                     }
                 ],
@@ -243,7 +215,7 @@ Date: REGEX(.*)
 
 2. Create entity corresponding to Alcobendas
 HTTP/1.1 200 OK
-Content-Length: 580
+Content-Length: 402
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -254,15 +226,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": ""
                     }
                 ],
@@ -280,7 +245,7 @@ Date: REGEX(.*)
 
 3. Create entity corresponding to Leganes
 HTTP/1.1 200 OK
-Content-Length: 577
+Content-Length: 399
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -291,15 +256,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": ""
                     }
                 ],
@@ -316,7 +274,7 @@ Date: REGEX(.*)
 }
 4: ++++++++++ Madrid in 13.5 kms ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1157
+Content-Length: 801
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -327,15 +285,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": "40.418889, -3.691944"
                     }
                 ],
@@ -352,15 +303,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": "40.316667, -3.75"
                     }
                 ],
@@ -377,7 +321,7 @@ Date: REGEX(.*)
 }
 5: +++++++++++ Madrid in 15 kms +++++++++
 HTTP/1.1 200 OK
-Content-Length: 1725
+Content-Length: 1191
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -388,15 +332,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": "40.418889, -3.691944"
                     }
                 ],
@@ -413,15 +350,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": "40.533333, -3.633333"
                     }
                 ],
@@ -438,15 +368,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": "40.316667, -3.75"
                     }
                 ],
@@ -463,7 +386,7 @@ Date: REGEX(.*)
 }
 6: ++++++++++++ Madrid out 13.5 kms ++++++++
 HTTP/1.1 200 OK
-Content-Length: 600
+Content-Length: 422
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -474,15 +397,8 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WGS84"
-                            }
-                        ],
                         "name": "location",
-                        "type": "coords",
+                        "type": "geo:point",
                         "value": "40.533333, -3.633333"
                     }
                 ],

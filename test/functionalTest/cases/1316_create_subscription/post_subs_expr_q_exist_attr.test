@@ -99,7 +99,7 @@ echo "===================================="
 payload='{
   "A": 50
 }'
-orionCurl --url '/v2/entities/E2?options=keyValues' --payload "$payload" --json -X POST
+orionCurl --url '/v2/entities/E2/attrs?options=keyValues' --payload "$payload" --json -X POST
 echo
 echo
 

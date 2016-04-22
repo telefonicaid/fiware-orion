@@ -40,9 +40,9 @@
 *
 * Entity::Entity - 
 */
-Entity::Entity()
+Entity::Entity(): typeGiven(false), renderId(true)
 {
-  typeGiven = false;
+
 }
 
 
@@ -94,11 +94,14 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
     {
       out = "{";
 
-      out += JSON_VALUE("id", id);
-      out += ",";
+      if (renderId)
+      {
+        out += JSON_VALUE("id", id);
+        out += ",";
 
-      /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
-      out += JSON_STR("type") + ":" + ((type != "")? JSON_STR(type) : JSON_STR(DEFAULT_TYPE));
+        /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
+        out += JSON_STR("type") + ":" + ((type != "")? JSON_STR(type) : JSON_STR(DEFAULT_TYPE));
+      }
 
       if (attributeVector.size() != 0)
       {
@@ -252,4 +255,16 @@ void Entity::fill(QueryContextResponse* qcrsP)
 void Entity::release(void)
 {
   attributeVector.release();
+}
+
+/* ****************************************************************************
+*
+* Entity::hideIdAndType
+*
+*  Changes the attribute controlling if id and type
+*  are rendered in the JSON
+*/
+void Entity::hideIdAndType(bool hide)
+{
+  renderId = !hide;
 }

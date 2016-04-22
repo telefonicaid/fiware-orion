@@ -56,7 +56,7 @@ payload='{
     "rt.ty": "5678"
   }
 }'
-orionCurl --url '/v2/entities/apartment_3?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/apartment_3/attrs?options=keyValues' --payload "$payload" --json
 echo
 echo
 

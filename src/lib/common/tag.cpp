@@ -322,7 +322,7 @@ std::string valueTag1
   const std::string&  unescapedValue,
   bool                showComma,
   bool                isVectorElement,
-  bool                valueIsNumberOrBool
+  bool                withoutQuotes
 )
 {
 
@@ -347,7 +347,7 @@ std::string valueTag1
   std::string effectiveValue = jsonInvalidCharsTransformation(value);
   free(value);
 
-  effectiveValue = valueIsNumberOrBool ? effectiveValue : std::string("\"") + effectiveValue + "\"";
+  effectiveValue = withoutQuotes ? effectiveValue : std::string("\"") + effectiveValue + "\"";
 
   if (showComma == true)
   {
@@ -414,12 +414,12 @@ std::string valueTag2
   const std::string&  key,
   const std::string&  value,
   bool                showComma,
-  bool                valueIsNumberOrBool
+  bool                withoutQuotes
 )
 {
   std::string eValue = jsonInvalidCharsTransformation(value);
 
-  eValue = valueIsNumberOrBool? eValue : JSON_STR(eValue);
+  eValue = withoutQuotes? eValue : JSON_STR(eValue);
 
   if (key == "")
   {

@@ -95,7 +95,7 @@ echo "===================="
 payload='{
   "A": "foo"
 }'
-orionCurl --url /v2/entities/E3?options=keyValues -X POST --payload "$payload" --json
+orionCurl --url /v2/entities/E3/attrs?options=keyValues -X POST --payload "$payload" --json
 echo
 echo
 sleep 1s
@@ -106,7 +106,7 @@ echo "===================="
 payload='{
   "B": "bar"
 }'
-orionCurl --url /v2/entities/E2?options=keyValues -X POST --payload "$payload" --json
+orionCurl --url /v2/entities/E2/attrs?options=keyValues -X POST --payload "$payload" --json
 echo
 echo
 

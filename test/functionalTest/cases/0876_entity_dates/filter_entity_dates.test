@@ -120,7 +120,7 @@ payload='{
   "A": "entity 3 mod"
 }'
 T_6=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
-orionCurl --url '/v2/entities/E3?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/E3/attrs?options=keyValues' --payload "$payload" --json
 sleep 1s
 echo
 echo
@@ -132,7 +132,7 @@ payload='{
   "A": "entity 1 mod"
 }'
 T_7=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
-orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json
 echo
 echo
 

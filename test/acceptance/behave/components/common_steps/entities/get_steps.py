@@ -121,6 +121,20 @@ def get_entity_types(context):
     __logger__.info("...returned entity type with counter")
 
 
+@step(u'get an entity type by type "([^"]*)"')
+def get_entity_types(context, entity_type):
+    """
+    get an entity type with its attribute types
+    :param entity_type: type used
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.debug("getting an entity type...")
+    context.resp = context.cb.get_an_entity_type(context, entity_type)
+    __logger__.info("...returned an entity type")
+
+
+
+
 # ------------------------------------- validations ----------------------------------------------
 
 
@@ -209,8 +223,8 @@ def verify_that_the_attribute_value_by_id_is_returned(context):
     __logger__.info("...Verified the attribute value by ID returned from a request...")
 
 
-@step(u'verify that entity types are returned in response are: "([^"]*)"')
-def verify_that_attribute_types_are_returned_in_response(context, types):
+@step(u'verify that entity types returned in response are: "([^"]*)"')
+def verify_that_entity_types_are_returned_in_response(context, types):
     """
     verify that entity types are returned in response
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
@@ -229,6 +243,19 @@ def verify_that_attribute_types_are_returned_in_response(context):
     """
     __logger__.debug("Verifying that attribute types are returned from a request...")
     queries_parameters = context.cb.get_entities_parameters()
+    prefixes = context.cb.get_entities_prefix()
     ngsi = NGSI()
-    ngsi.verify_attributes_types_with_entity_types(queries_parameters, context.entities_accumulate, context.resp)
+    ngsi.verify_attributes_types_with_entity_types(queries_parameters, context.entities_accumulate, prefixes, context.resp)
     __logger__.info("...Verified that attribute types are returned from a request...")
+
+@step(u'verify that attributes types by entity type are returned in response based on the info in the recorder')
+def verify_that_attributes_types_by_entity_type_are_returned_in_response_based_on_the_info_in_the_recorder(context):
+    """
+    verify that attributes types by entity type are returned in response based on the info in the recorder
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.debug("Verifying that attribute types by entity type are returned in response...")
+    entity_type = context.cb.get_entity_type_to_request()
+    ngsi = NGSI()
+    ngsi.verify_attributes_types_by_entity_types(entity_type, context.entities_accumulate, context.resp)
+    __logger__.info("...Verified that attribute types by entity type are returned in response...")

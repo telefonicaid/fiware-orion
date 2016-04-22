@@ -189,7 +189,7 @@ echo "==========================="
 payload='{
   "A": 11
 }'
-orionCurl --url '/v2/entities/s01?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/s01/attrs?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -199,7 +199,7 @@ echo "=============================="
 payload='{
   "A": 12
 }'
-orionCurl --url '/v2/entities/s11?options=keyValues' --payload "$payload" --json --tenant t1
+orionCurl --url '/v2/entities/s11/attrs?options=keyValues' --payload "$payload" --json --tenant t1
 echo
 echo
 
@@ -209,7 +209,7 @@ echo "=============================="
 payload='{
   "A": 13
 }'
-orionCurl --url '/v2/entities/s21?options=keyValues' --payload "$payload" --json --tenant t2
+orionCurl --url '/v2/entities/s21/attrs?options=keyValues' --payload "$payload" --json --tenant t2
 echo
 echo
 
