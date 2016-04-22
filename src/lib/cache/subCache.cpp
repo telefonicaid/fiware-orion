@@ -940,7 +940,6 @@ void subCacheRefresh(void)
 {
   std::vector<std::string> databases;
 
-  LM_W(("KZ: In subCacheRefresh"));
   LM_T(LmtSubCache, ("Refreshing subscription cache"));
 
   // Empty the cache
@@ -960,10 +959,8 @@ void subCacheRefresh(void)
   for (unsigned int ix = 0; ix < databases.size(); ++ix)
   {
     LM_T(LmtSubCache, ("DB %d: %s", ix, databases[ix].c_str()));
-    LM_W(("KZ: Calling mongoSubCacheRefresh for '%s'", databases[ix].c_str()));
     mongoSubCacheRefresh(databases[ix]);
   }
-  LM_W(("KZ: After calls to mongoSubCacheRefresh"));
 
   ++subCache.noOfRefreshes;
   LM_T(LmtSubCache, ("Refreshed subscription cache [%d]", subCache.noOfRefreshes));

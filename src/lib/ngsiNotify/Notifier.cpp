@@ -67,8 +67,6 @@ void Notifier::sendNotifyContextRequest
 {
     ConnectionInfo ci;
 
-    LM_W(("KZ: renderFormat == '%s'", renderFormatToString(renderFormat)));
-
     //
     // Creating the value of the Fiware-ServicePath HTTP header.
     // This is a comma-separated list of the service-paths in the same order as the entities come in the payload
@@ -103,14 +101,10 @@ void Notifier::sendNotifyContextRequest
     std::string payload;
     if (renderFormat == NGSI_V1_LEGACY)
     {
-      LM_W(("KZ: rendering payload, renderFormat is NGSI_V1_LEGACY"));
       payload = ncr->render(&ci, NotifyContext, "");
     }
     else
     {
-      LM_W(("KZ: rendering payload, attrsFilter of %d items", attrsFilter.size()));
-      if (attrsFilter.size() > 0)
-        LM_W(("KZ: rendering payload, attrsFilter[0] == '%s'", attrsFilter[0].c_str()));
       payload = ncr->toJson(&ci, renderFormat, attrsFilter);
     }
 

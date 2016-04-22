@@ -67,10 +67,6 @@ extern std::string postSubscriptions
     parseDataP->scr.res.attrsFormat = NGSI_V2_NORMALIZED;
   }
 
-  LM_W(("KZ: Calling mongoSubscribeContext, parseDataP->scr.res.attributeList.attributeV.size == %d", parseDataP->scr.res.attributeList.attributeV.size()));
-  if (parseDataP->scr.res.attributeList.attributeV.size() > 0)
-    LM_W(("KZ: Calling mongoSubscribeContext, parseDataP->scr.res.attributeList.attributeV[0] == '%s'", parseDataP->scr.res.attributeList.attributeV[0].c_str()));
-
   TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV, ciP->httpHeaders.correlator));
 
   parseDataP->scr.res.release();

@@ -406,8 +406,6 @@ int mongoSubCacheItemInsert
 */
 void mongoSubCacheRefresh(const std::string& database)
 {
-  LM_W(("KZ: In mongoSubCacheRefresh"));
-
   LM_T(LmtSubCache, ("Refreshing subscription cache for DB '%s'", database.c_str()));
 
   BSONObj                   query       = BSON("conditions.type" << ON_CHANGE_CONDITION);

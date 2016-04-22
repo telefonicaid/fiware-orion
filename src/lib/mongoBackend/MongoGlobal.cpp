@@ -1829,7 +1829,6 @@ static bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
-        LM_W(("KZ: Calling sendNotifyContextRequest II (attrsFilter.size == %d)", attrsFilter.size()));
         getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsFilter);
         allCerV.release();
         ncr.contextElementResponseVector.release();
@@ -1841,7 +1840,6 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
-      LM_W(("KZ: Calling sendNotifyContextRequest III"));
       getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsFilter);
       ncr.contextElementResponseVector.release();
 
@@ -1900,7 +1898,6 @@ BSONArray processConditionVector
                         CSUB_CONDITIONS_VALUE << condValues.arr()
                         ));
 
-      LM_W(("KZ: Calling processOnChangeConditionForSubscription. attrsFilter.size(): %d", attrsFilter.size()));
       if ((status == STATUS_ACTIVE) &&
           (processOnChangeConditionForSubscription(enV,
                                                    attrL,

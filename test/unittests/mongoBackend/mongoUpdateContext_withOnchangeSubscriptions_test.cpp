@@ -293,16 +293,11 @@ static void prepareDatabase(bool useSubCache = true)
   connection->insert(SUBSCRIBECONTEXT_COLL, sub3);
 
   /* Given that preparation including csubs, we have to init cache */
-  LM_W(("KZ: useSubCache?"));
   if (useSubCache == true)
   {
-    LM_W(("KZ: useSubCache: YES"));
     subCacheInit();
-    LM_W(("KZ: Calling subCacheRefresh"));
     subCacheRefresh();
   }
-  else
-    LM_W(("KZ: useSubCache: NO"));
 }
 
 
@@ -436,11 +431,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch)
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
-    LM_W(("KZ: calling prepareDatabase"));
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    LM_W(("KZ: calling mongoUpdateContext"));
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
