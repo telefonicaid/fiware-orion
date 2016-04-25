@@ -41,7 +41,7 @@ const char* renderFormatToString(RenderFormat format, bool noDefault)
 {
   switch (format)
   {
-  case NGSI_V1_LEGACY:              return "legacy";
+  case NGSI_V1_LEGACY:              return "JSON";
   case NGSI_V2_NORMALIZED:          return "normalized";
   case NGSI_V2_KEYVALUES:           return "keyValues";
   case NGSI_V2_VALUES:              return "values";
@@ -68,7 +68,7 @@ const char* renderFormatToString(RenderFormat format, bool noDefault)
 */
 RenderFormat stringToRenderFormat(const std::string& s, bool noDefault)
 {
-  if (s == "JSON")         { return NGSI_V1_LEGACY;        }  // Older content in DB
+  if (s == "JSON")         { return NGSI_V1_LEGACY;        }  // DB content for NGSIv1 rendering due to legacy reasons
   if (s == "legacy")       { return NGSI_V1_LEGACY;        }
   if (s == "normalized")   { return NGSI_V2_NORMALIZED;    }
   if (s == "keyValues")    { return NGSI_V2_KEYVALUES;     }

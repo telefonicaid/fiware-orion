@@ -333,7 +333,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_C1)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
     ASSERT_EQ(1, entities.size());
@@ -421,7 +421,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_C1)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
     ASSERT_EQ(1, entities.size());
@@ -512,7 +512,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_CN)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
     ASSERT_EQ(1, entities.size());
@@ -605,7 +605,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_CNbis)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
     ASSERT_EQ(1, entities.size());
@@ -698,7 +698,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_CN)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
     ASSERT_EQ(1, entities.size());
@@ -797,7 +797,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_CNbis)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -891,7 +891,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_C1)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -985,7 +985,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_C1)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -1082,7 +1082,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_CN)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -1181,7 +1181,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_CNbis)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -1279,7 +1279,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_CN)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -1382,7 +1382,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_CNbis)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -1491,7 +1491,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1591,7 +1591,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1_JSON)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1693,7 +1693,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1798,7 +1798,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1_disjoint)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1917,7 +1917,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2036,7 +2036,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1_disjoint)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2148,7 +2148,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2260,7 +2260,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1_disjoint)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2384,7 +2384,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2508,7 +2508,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1_disjoint)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2613,7 +2613,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2722,7 +2722,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN_partial)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2936,7 +2936,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_disjoint)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -3050,7 +3050,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -3164,7 +3164,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial_disjoint)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     BSONObj ent0 = entities[0].embeddedObject();
@@ -3276,7 +3276,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CNbis)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -3387,7 +3387,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
     ASSERT_EQ(1, entities.size());
@@ -3507,7 +3507,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_C1)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -3622,7 +3622,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_C1)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -3741,7 +3741,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CN)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -3862,7 +3862,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CNbis)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -3981,7 +3981,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CN)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -4103,7 +4103,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CNbis)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -4198,7 +4198,7 @@ TEST(mongoSubscribeContext, defaultDuration)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -4278,7 +4278,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     EXPECT_EQ("Database Error (collection: utest.csubs "
               "- insert(): { _id: ObjectId('", s1);
     EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", servicePath: \"/#\", entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], status: \"active\", conditions: [ { type: \"ONCHANGE\", value: [ \"A\" ] } ], "
-              "expression: { q: \"\", geometry: \"\", coords: \"\", georel: \"\" }, format: \"legacy\" } "
+              "expression: { q: \"\", geometry: \"\", coords: \"\", georel: \"\" }, format: \"JSON\" } "
               "- exception: boom!!)", s2);
 
     /* Restore real DB connection */
