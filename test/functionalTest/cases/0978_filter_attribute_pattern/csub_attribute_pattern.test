@@ -25,7 +25,7 @@ Subscription filter string greater than
 
 --SHELL-INIT--
 dbInit CB
-brokerStart
+brokerStart CB
 accumulatorStart --pretty-print
 
 --SHELL--
