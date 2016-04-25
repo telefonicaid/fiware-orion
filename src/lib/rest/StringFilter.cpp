@@ -522,7 +522,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP)
   }
   if (forbiddenChars(lhs, ""))
   {
-    *errorStringP = "invalid character found in URI param /q/";  // fix this (and others)
+    *errorStringP = "invalid character found in URI param /q/";
     free(toFree);
     return false;
   }
