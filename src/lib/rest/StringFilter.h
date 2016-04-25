@@ -63,7 +63,6 @@ typedef enum StringFilterOp
 typedef enum StringFilterValueType
 {
   SfvtString,
-  SfvtPattern,   // really needed?
   SfvtBool,
   SfvtNumber,
   SfvtNull,

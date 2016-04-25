@@ -606,7 +606,6 @@ const char* StringFilterItem::valueTypeName(void)
   case SfvtNumberList:          return "NumberList";
   case SfvtDateList:            return "DateList";
   case SfvtStringList:          return "StringList";
-  case SfvtPattern:             return "Pattern";  // maybe not needed at the end
   }
 
   return "InvalidValueType";
