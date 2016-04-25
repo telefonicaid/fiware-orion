@@ -21,15 +21,18 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription filter string greater than
+Subscription filter string greater than (no cache variant)
 
 --SHELL-INIT--
 dbInit CB
-brokerStart
+brokerStart CB 0 IPv4 -noCache
 accumulatorStart --pretty-print
 
 --SHELL--
 
+#
+# This .test is the same as csub_attribute_pattern.test except in the way
+# brokerStart is done (it can be checked with diff)
 #
 # 01. Create subscription: colour ~= ow
 # 02. Create entity E1 colour 'black'
