@@ -1040,6 +1040,17 @@ static bool addTriggeredSubscriptions_withCache
       continue;
     }
 
+
+    //
+    // FIXME P4: See issue #2076.
+    //           aList is just a copy of cSubP->attributes - would be good to avoid
+    //           as a reference to the CachedSubscription is already in TriggeredSubscription
+    //           cSubP->attributes is of type    std::vector<std::string>
+    //           while AttributeList contains a  std::vector<std::string>
+    //           Practically the same, except for the methods that AttributeList offers.
+    //           Perhaps CachedSubscription should include an AttributeList (cSubP->attributes)
+    //           instead of its std::vector<std::string> ... ?
+    //
     AttributeList aList;
 
     aList.fill(cSubP->attributes);
