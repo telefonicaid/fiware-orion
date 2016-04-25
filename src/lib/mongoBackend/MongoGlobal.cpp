@@ -1044,10 +1044,15 @@ bool entitiesQuery
     }
     else if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
-      for (unsigned int ix = 0; ix < scopeP->stringFilterP->mongoFilters.size(); ++ix)
+      LM_W(("KZ: scopeP->stringFilterP at %p", scopeP->stringFilterP));
+      if (scopeP->stringFilterP)
       {
-        finalQuery.appendElements(scopeP->stringFilterP->mongoFilters[ix]);
+        for (unsigned int ix = 0; ix < scopeP->stringFilterP->mongoFilters.size(); ++ix)
+        {
+          finalQuery.appendElements(scopeP->stringFilterP->mongoFilters[ix]);
+        }
       }
+      LM_W(("KZ"));
     }
     else
     {

@@ -1446,7 +1446,7 @@ static bool processSubscriptions
     }
 
     /* Check 2: String Filter */
-    if (!trigs->stringFilterP->match(notifyCerP))
+    if (trigs->stringFilterP && !trigs->stringFilterP->match(notifyCerP))
     {
       continue;
     }
