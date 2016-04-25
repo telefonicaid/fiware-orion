@@ -1044,7 +1044,6 @@ bool entitiesQuery
     }
     else if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
-      LM_W(("KZ: scopeP->stringFilterP at %p", scopeP->stringFilterP));
       if (scopeP->stringFilterP)
       {
         for (unsigned int ix = 0; ix < scopeP->stringFilterP->mongoFilters.size(); ++ix)
@@ -1052,7 +1051,6 @@ bool entitiesQuery
           finalQuery.appendElements(scopeP->stringFilterP->mongoFilters[ix]);
         }
       }
-      LM_W(("KZ"));
     }
     else
     {

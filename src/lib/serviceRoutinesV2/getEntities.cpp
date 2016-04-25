@@ -195,7 +195,6 @@ std::string getEntities
     Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, q);
     std::string  errorString;
 
-    LM_W(("KZ: scopeP->stringFilterP at %p", scopeP->stringFilterP));
     scopeP->stringFilterP = new StringFilter();
     if (scopeP->stringFilterP->parse(q.c_str(), &errorString) == false)
     {
@@ -210,7 +209,6 @@ std::string getEntities
       return out;
     }
 
-    LM_W(("KZ: scopeP->stringFilterP at %p", scopeP->stringFilterP));
     parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
   }
 

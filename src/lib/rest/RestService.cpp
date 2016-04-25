@@ -482,9 +482,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     LM_T(LmtTenant, ("tenant: '%s'", ciP->tenant.c_str()));
     commonFilters(ciP, &parseData, &serviceV[ix]);
-    LM_W(("KZ: Before call to scopeFilter"));
     scopeFilter(ciP, &parseData, &serviceV[ix]);
-    LM_W(("KZ: After call to scopeFilter"));
 
     //
     // If we have gotten this far the Input is OK.
