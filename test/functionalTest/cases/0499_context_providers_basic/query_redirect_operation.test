@@ -1,0 +1,434 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+#
+# Uncached/Cached query
+#
+# 01. Start the contextBroker 'CB'
+# 02. Start contextProvider 'CP' (contextBroker functioning as contextProvider)
+# 03. Query broker for E1/A1 (nothing found)
+# 04. Register an entity/attribute E1/A1 in broker, with CP as providing application
+# 05. Query broker for E1/A1 (will go to CP, but CP doesn't know about E1/A1)
+# 06. Update/APPEND E1/A1(=CP) in CP
+# 07. Query CP for E1/A1
+# 08. Query broker for E1/A1 (will go to CP and it will work, A1=CP is returned)
+# 09. Update/APPEND E1/A1(=broker) in broker
+# 10. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=broker))
+#
+
+--NAME--
+Query Redirect Operation
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+brokerStart CB 0
+brokerStart CP1 0
+
+
+--SHELL--
+echo "01. contextBroker running"
+echo "02. contextProvider running (contextBroker functioning as contextProvider)"
+echo
+echo
+
+
+echo "03. Query broker for E1/A1 (nothing found)"
+url3="/v1/queryContext"
+payload3='{
+  "entities": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ]
+}'
+orionCurl --url "$url3" --payload "$payload3" --json
+echo
+echo
+
+
+echo "04. Register an entity/attribute E1/A1 in broker, with CP as providing application"
+url4="/v1/registry/registerContext"
+payload4='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "E",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A1",
+        "type": "T1",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://localhost:'$CP1_PORT'/v1"
+    }
+ ]
+}'
+orionCurl --url "$url4" --payload "$payload4" --json
+echo
+echo
+
+
+echo "05. Query broker for E1/A1 (will go to CP, but CP doesn't know about E1/A1)"
+url5="/v1/queryContext"
+payload5='{
+  "entities": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ]
+}'
+orionCurl --url "$url5" --payload "$payload5" --json
+echo
+echo
+
+
+echo "06. Update/APPEND E1/A1(=CP) in CP"
+url6="/v1/updateContext"
+payload6='{
+  "contextElements": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "T1",
+          "value": "CP"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url6" --payload "$payload6" --port $CP1_PORT --json
+echo
+echo
+
+
+echo "07. Query CP for E1/A1"
+url7="/v1/queryContext"
+payload7='{
+  "entities": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ]
+}'
+orionCurl --url "$url7" --payload "$payload7" --port $CP1_PORT --json
+echo
+echo
+
+
+echo "08. Query broker for E1/A1 (will go to CP and it will work, A1=CP is returned)"
+url8="/v1/queryContext"
+payload8='{
+  "entities": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ]
+}'
+orionCurl --url "$url8" --payload "$payload8" --json
+echo
+echo
+
+
+echo "09. Update/APPEND E1/A1(=broker) in broker"
+url9="/v1/updateContext"
+payload9='{
+  "contextElements": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "T1",
+          "value": "CB"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url9" --payload "$payload9" --json
+echo
+echo
+
+
+echo "10. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=CB))"
+url10="/v1/queryContext"
+payload10='{
+  "entities": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ]
+}'
+orionCurl --url "$url10" --payload "$payload10" --json
+echo
+echo
+
+
+--REGEXPECT--
+01. contextBroker running
+02. contextProvider running (contextBroker functioning as contextProvider)
+
+
+03. Query broker for E1/A1 (nothing found)
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+04. Register an entity/attribute E1/A1 in broker, with CP as providing application
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "PT24H",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+05. Query broker for E1/A1 (will go to CP, but CP doesn't know about E1/A1)
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+06. Update/APPEND E1/A1(=CP) in CP
+HTTP/1.1 200 OK
+Content-Length: 378
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "T1",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+07. Query CP for E1/A1
+HTTP/1.1 200 OK
+Content-Length: 380
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "T1",
+                        "value": "CP"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+08. Query broker for E1/A1 (will go to CP and it will work, A1=CP is returned)
+HTTP/1.1 200 OK
+Content-Length: 380
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "T1",
+                        "value": "CP"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+09. Update/APPEND E1/A1(=broker) in broker
+HTTP/1.1 200 OK
+Content-Length: 378
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "T1",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+10. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=CB))
+HTTP/1.1 200 OK
+Content-Length: 380
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "T1",
+                        "value": "CB"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+
+dbDrop CB
+dbDrop CP1

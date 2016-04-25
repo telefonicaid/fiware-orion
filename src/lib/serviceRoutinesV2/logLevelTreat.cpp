@@ -33,7 +33,6 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/orionReply.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
 #include "serviceRoutinesV2/logLevelTreat.h"
