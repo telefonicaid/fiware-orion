@@ -22,3 +22,4 @@
 - Fix: non-string attribute values were breaking JSON in attributeFormat=object mode (#2058)
 - Add: change/add path /entities/{id}/attrs (#2028)
 - Deprecate: "location" metadata to specify entity location
+- Fix: JSON response in log management operations

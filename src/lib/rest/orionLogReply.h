@@ -1,5 +1,5 @@
-#ifndef ORION_REPLY_H
-#define ORION_REPLY_H
+#ifndef SRC_LIB_REST_ORION_REPLY_H
+#define SRC_LIB_REST_ORION_REPLY_H
 
 /*
 *
@@ -35,6 +35,6 @@
 *
 * orionReply - 
 */
-extern std::string orionReply(ConnectionInfo* ciP, const std::string& what, const std::string& value);
+extern std::string orionLogReply(ConnectionInfo* ciP, const std::string& what, const std::string& value);
 
 #endif

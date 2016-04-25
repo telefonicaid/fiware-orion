@@ -32,9 +32,9 @@
 
 /* ****************************************************************************
 *
-* orionReply - 
+* orionLogReply -
 */
-std::string orionReply(ConnectionInfo* ciP, const std::string& what, const std::string& value)
+std::string orionLogReply(ConnectionInfo* ciP, const std::string& what, const std::string& value)
 {
    std::string out = "";
 

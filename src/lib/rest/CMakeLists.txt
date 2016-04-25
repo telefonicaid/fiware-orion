@@ -26,7 +26,7 @@ SET (SOURCES
     RestService.cpp
     Verb.cpp
     httpRequestSend.cpp
-    orionReply.cpp
+    orionLogReply.cpp
     OrionError.cpp
     HttpStatusCode.cpp
     ConnectionInfo.cpp
@@ -43,7 +43,7 @@ SET (HEADERS
     RestService.h
     Verb.h
     httpRequestSend.h
-    orionReply.h
+    orionLogReply.h
     OrionError.h
     HttpStatusCode.h
     StringFilter.h
