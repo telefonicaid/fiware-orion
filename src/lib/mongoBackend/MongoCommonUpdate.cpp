@@ -1285,8 +1285,7 @@ static bool addTriggeredSubscriptions_noCache
           }
           else
           {
-            trigs->stringFilterSet(stringFilterP);  // Clones the string filter
-            delete stringFilterP;
+            trigs->stringFilterSet(stringFilterP);
           }
         }
       }
@@ -1447,7 +1446,7 @@ static bool processSubscriptions
     }
 
     /* Check 2: String Filter */
-    if (!trigs->stringFilter.match(notifyCerP))
+    if (!trigs->stringFilterP->match(notifyCerP))
     {
       continue;
     }

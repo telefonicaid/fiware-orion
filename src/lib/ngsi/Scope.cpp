@@ -86,7 +86,7 @@ Scope::Scope(Scope* scopeP)
   oper     = scopeP->oper;
   areaType = scopeP->areaType;
 
-  stringFilter = scopeP->stringFilter;
+  stringFilterP = scopeP->stringFilterP;
 
   georel.maxDistance = -1;
   georel.minDistance = -1;

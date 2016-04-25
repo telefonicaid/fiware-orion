@@ -1044,9 +1044,9 @@ bool entitiesQuery
     }
     else if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
-      for (unsigned int ix = 0; ix < scopeP->stringFilter.mongoFilters.size(); ++ix)
+      for (unsigned int ix = 0; ix < scopeP->stringFilterP->mongoFilters.size(); ++ix)
       {
-        finalQuery.appendElements(scopeP->stringFilter.mongoFilters[ix]);
+        finalQuery.appendElements(scopeP->stringFilterP->mongoFilters[ix]);
       }
     }
     else

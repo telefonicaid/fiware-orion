@@ -90,10 +90,12 @@ std::string parseScope(ConnectionInfo* ciP, Value::ConstValueIterator valueP, Sc
   {
     std::string errorString;
 
-    bool b = scopeP->stringFilter.parse(scopeP->value.c_str(), &errorString);
+    scopeP->stringFilterP = new StringFilter();
+    bool b = scopeP->stringFilterP->parse(scopeP->value.c_str(), &errorString);
 
     if (b != true)
     {
+      delete scopeP->stringFilterP;
       return errorString;
     }
   }

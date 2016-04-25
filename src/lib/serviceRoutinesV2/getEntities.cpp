@@ -195,7 +195,7 @@ std::string getEntities
     Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, q);
     std::string  errorString;
 
-    if (scopeP->stringFilter.parse(q.c_str(), &errorString) == false)
+    if (scopeP->stringFilterP->parse(q.c_str(), &errorString) == false)
     {
       OrionError oe(SccBadRequest, errorString);
 
