@@ -670,7 +670,7 @@ void subCacheItemInsert
   const char*               subscriptionId,
   int64_t                   expirationTime,
   int64_t                   throttling,
-  NotificationFormat        notifyFormat,
+  RenderFormat              renderFormat,
   bool                      notificationDone,
   int64_t                   lastNotificationTime,
   StringFilter*             stringFilterP,
@@ -724,7 +724,7 @@ void subCacheItemInsert
   cSubP->expirationTime        = expirationTime;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
-  cSubP->notifyFormat          = notifyFormat;
+  cSubP->renderFormat          = renderFormat;
   cSubP->next                  = NULL;
   cSubP->count                 = (notificationDone == true)? 1 : 0;
   cSubP->status                = status;

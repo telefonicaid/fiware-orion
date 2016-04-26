@@ -29,7 +29,7 @@
 
 #include "mongo/client/dbclient.h"
 
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextRegistrationAttribute.h"
 #include "ngsi/ContextAttribute.h"
@@ -325,26 +325,6 @@ extern AttributeList subToAttributeList(const BSONObj& attrL);
 
 /* ****************************************************************************
 *
-* processOnChangeConditionForSubscription -
-*
-*/
-extern bool processOnChangeConditionForSubscription
-(
-  const EntityIdVector&            enV,
-  const AttributeList&             attrV,
-  ConditionValueList*              condValues,
-  const std::string&               subId,
-  const std::string&               notifyUrl,
-  Format                           format,
-  const std::string&               tenant,
-  const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV,
-  Restriction*                     resP,
-  const std::string&               fiwareCorrelator
-);
-
-/* ****************************************************************************
-*
 * processConditionVector -
 *
 */
@@ -356,13 +336,14 @@ extern BSONArray processConditionVector
   const std::string&               subId,
   const std::string&               url,
   bool*                            notificationDone,
-  NotificationFormat               notifyFormat,
+  RenderFormat                     renderFormat,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
   Restriction*                     resP,
   const std::string&               status,
-  const std::string&               fiwareCorrelator
+  const std::string&               fiwareCorrelator,
+  const std::vector<std::string>   attrsFilter
 );
 
 /* ****************************************************************************

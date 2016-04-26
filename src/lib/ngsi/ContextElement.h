@@ -29,7 +29,7 @@
 
 #include "ngsi/Request.h"
 #include "common/Format.h"
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
@@ -59,7 +59,7 @@ typedef struct ContextElement
   ContextElement(EntityId* eP);
 
   std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues = false);
-  std::string  toJson(NotificationFormat notifyFormat);
+  std::string  toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter);
   void         present(const std::string& indent, int ix);
   void         release(void);
   void         fill(const struct ContextElement& ce);

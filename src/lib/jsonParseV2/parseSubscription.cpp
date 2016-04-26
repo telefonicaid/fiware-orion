@@ -29,6 +29,7 @@
 
 #include "alarmMgr/alarmMgr.h"
 #include "common/globals.h"
+#include "common/RenderFormat.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
@@ -268,12 +269,12 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
       return oe.render(ciP, "");
     }
 
-    std::string         attrsFormatString = attrsFormat.GetString();
-    NotificationFormat  nFormat           = stringToNotificationFormat(attrsFormatString, true);
+    std::string   attrsFormatString = attrsFormat.GetString();
+    RenderFormat  nFormat           = stringToRenderFormat(attrsFormatString, true);
 
-    if (nFormat == NGSI_NO_NOTIFICATION_FORMAT)
+    if (nFormat == NO_FORMAT)
     {
-      const char*  details  = "invalid attrsFormat (accepted values: normalized, keyValues, values)";
+      const char*  details  = "invalid attrsFormat (accepted values: legacy, normalized, keyValues, values)";
       OrionError   oe(SccBadRequest, details);
 
       alarmMgr.badInput(clientIp, details);
@@ -282,9 +283,9 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
 
     destination->attrsFormat = nFormat;
   }
-  else if (destination->attrsFormat == NGSI_NO_NOTIFICATION_FORMAT)
+  else if (destination->attrsFormat == NO_FORMAT)
   {
-    destination->attrsFormat = DEFAULT_NOTIFICATION_FORMAT;  // Default format for NGSIv2: normalized
+    destination->attrsFormat = DEFAULT_RENDER_FORMAT;  // Default format for NGSIv2: normalized
   }
 
   return "OK";
@@ -658,9 +659,6 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
 */
 static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::string>* vec, const Value& attributes)
 {
-  std::set<std::string> s;
-
-
   if (!attributes.IsArray())
   {
     alarmMgr.badInput(clientIp, "attrs is not an array");
@@ -678,10 +676,9 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
 
       return oe.render(ciP, "");
     }
-    s.insert(iter->GetString());
+
+    vec->push_back(iter->GetString());
   }
 
-  vec->resize(s.size());
-  copy(s.begin(), s.end(),vec->begin());
   return "";
 }

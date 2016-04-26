@@ -56,7 +56,7 @@ std::string postUpdateContextSubscription
 
   if (ciP->version != "v2")
   {
-    parseDataP->ucsr.res.attrsFormat = NGSI_V1_JSON;
+    parseDataP->ucsr.res.attrsFormat = NGSI_V1_LEGACY;
   }
 
   TIMED_MONGO(ciP->httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res,

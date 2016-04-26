@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_COMMON_NOTIFICATIONFORMAT_H_
-#define SRC_LIB_COMMON_NOTIFICATIONFORMAT_H_
+#ifndef SRC_LIB_COMMON_RENDERFORMAT_H_
+#define SRC_LIB_COMMON_RENDERFORMAT_H_
 
 /*
 *
@@ -31,39 +31,40 @@
 
 /* ****************************************************************************
 *
-* DEFAULT_NOTIFICATION_FORMAT - 
+* DEFAULT_RENDER_FORMAT - 
 */
-#define DEFAULT_NOTIFICATION_FORMAT         NGSI_V2_NORMALIZED
+#define DEFAULT_RENDER_FORMAT         NGSI_V2_NORMALIZED
 
 
 
 /* ****************************************************************************
 *
-* NotificationFormat - 
+* RenderFormat - 
 */
-typedef enum NotificationFormat
+typedef enum RenderFormat
 {
-  NGSI_NO_NOTIFICATION_FORMAT = 0,
-  NGSI_V1_JSON                = 1,
-  NGSI_V2_NORMALIZED          = 2,
-  NGSI_V2_KEYVALUES           = 3,
-  NGSI_V2_VALUES              = 4
-} NotificationFormat;
+  NO_FORMAT              = 0,
+  NGSI_V1_LEGACY         = 1,
+  NGSI_V2_NORMALIZED     = 2,
+  NGSI_V2_KEYVALUES      = 3,
+  NGSI_V2_VALUES         = 4,
+  NGSI_V2_UNIQUE_VALUES  = 5
+} RenderFormat;
 
 
 
 /* ****************************************************************************
 *
-* notificationFormatToString - 
+* renderFormatToString - 
 */
-extern const char* notificationFormatToString(NotificationFormat format, bool noDefault = true);
+extern const char* renderFormatToString(RenderFormat format, bool noDefault = true);
 
 
 
 /* ****************************************************************************
 *
-* stringToNotificationFormat
+* stringToRenderFormat
 */
-extern NotificationFormat stringToNotificationFormat(const std::string& s, bool noDefault = false);
+extern RenderFormat stringToRenderFormat(const std::string& s, bool noDefault = false);
 
-#endif  // SRC_LIB_COMMON_NOTIFICATIONFORMAT_H_
+#endif  // SRC_LIB_COMMON_RENDERFORMAT_H_

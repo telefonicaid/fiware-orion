@@ -92,7 +92,7 @@ payload='
             }
         ],
         "condition": {
-            "attrs": [ "temperature", "pression", "humidity" ],
+            "attrs": [ "temperature", "pressure", "humidity" ],
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -170,7 +170,7 @@ payload='
             }
         ],
         "condition": {
-            "attrs": [ "temperature", "pression", "humidity" ],
+            "attrs": [ "temperature", "pressure", "humidity" ],
             "expression": {
                "q": "weight<140",
                "geometry": "rectangles",
@@ -258,8 +258,8 @@ Date: REGEX(.*)
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
-            "humidity",
-            "temperature"
+            "temperature",
+            "humidity"
         ],
         "http": {
             "url": "http://localhost:1234"
@@ -312,8 +312,8 @@ Date: REGEX(.*)
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
-            "humidity",
-            "temperature"
+            "temperature",
+            "humidity"
         ],
         "http": {
             "url": "http://localhost:1234"
@@ -323,9 +323,9 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [
-                "humidity",
-                "pression",
-                "temperature"
+                "temperature",
+                "pressure",
+                "humidity"
             ],
             "expression": {
                 "coords": "-40.4,-3.5",
@@ -379,9 +379,9 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [
-                "humidity",
-                "pression",
-                "temperature"
+                "temperature",
+                "pressure",
+                "humidity"
             ],
             "expression": {
                 "coords": "-40.4,-3.5",
@@ -435,9 +435,9 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [
-                "humidity",
-                "pression",
-                "temperature"
+                "temperature",
+                "pressure",
+                "humidity"
             ],
             "expression": {
                 "coords": "-40.4,-3.5",
@@ -491,9 +491,9 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [
-                "humidity",
-                "pression",
-                "temperature"
+                "temperature",
+                "pressure",
+                "humidity"
             ],
             "expression": {
                 "coords": "-4.41,-31.51",
@@ -536,8 +536,8 @@ Date: REGEX(.*)
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
-            "humidity",
-            "temperature"
+            "temperature",
+            "humidity"
         ],
         "http": {
             "url": "http://localhost:1234"

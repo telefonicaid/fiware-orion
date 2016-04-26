@@ -30,7 +30,6 @@
 #include "common/defaultValues.h"
 #include "common/Format.h"
 #include "common/sem.h"
-#include "common/NotificationFormat.h"
 #include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/dbConstants.h"
@@ -167,10 +166,11 @@ HttpStatusCode mongoSubscribeContext
     sub.append(CSUB_STATUS, status);
 
     /* Build conditions array (including side-effect notifications and threads creation) */
-    bool notificationDone = false;
-    BSONArray conds = processConditionVector(&requestP->notifyConditionVector,
+    bool       notificationDone = false;
+    BSONArray  conds = processConditionVector(&requestP->notifyConditionVector,
                                              requestP->entityIdVector,
-                                             requestP->attributeList, oid.toString(),
+                                             requestP->attributeList,
+                                             oid.toString(),
                                              requestP->reference.get(),
                                              &notificationDone,
                                              requestP->attrsFormat,
@@ -179,7 +179,8 @@ HttpStatusCode mongoSubscribeContext
                                              servicePathV,
                                              &requestP->restriction,
                                              status,
-                                             fiwareCorrelator);
+                                             fiwareCorrelator,
+                                             requestP->attributeList.attributeV);
 
     sub.append(CSUB_CONDITIONS, conds);
 
@@ -203,7 +204,7 @@ HttpStatusCode mongoSubscribeContext
     }
 
     /* Adding format to use in notifications */
-    sub.append(CSUB_FORMAT, notificationFormatToString(requestP->attrsFormat));
+    sub.append(CSUB_FORMAT, renderFormatToString(requestP->attrsFormat));
 
     /* Insert document in database */
     std::string err;

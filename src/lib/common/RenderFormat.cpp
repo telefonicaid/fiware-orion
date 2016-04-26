@@ -28,27 +28,28 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "common/wsStrip.h"
 
 
 
 /* ****************************************************************************
 *
-* notificationFormatToString - 
+* renderFormatToString - 
 */
-const char* notificationFormatToString(NotificationFormat format, bool noDefault)
+const char* renderFormatToString(RenderFormat format, bool noDefault)
 {
   switch (format)
   {
-  case NGSI_V1_JSON:                return "JSON";
+  case NGSI_V1_LEGACY:              return "JSON";
   case NGSI_V2_NORMALIZED:          return "normalized";
   case NGSI_V2_KEYVALUES:           return "keyValues";
   case NGSI_V2_VALUES:              return "values";
-  case NGSI_NO_NOTIFICATION_FORMAT:
+  case NGSI_V2_UNIQUE_VALUES:       return "uniqueValues";
+  case NO_FORMAT:
     if (noDefault == true)
     {
-      return "no notification format";
+      return "no render format";
     }
     else
     {
@@ -56,21 +57,23 @@ const char* notificationFormatToString(NotificationFormat format, bool noDefault
     }
   }
 
-  return "Unknown notification format";
+  return "Unknown render format";
 }
 
 
 
 /* ****************************************************************************
 *
-* stringToNotificationFormat -
+* stringToRenderFormat -
 */
-NotificationFormat stringToNotificationFormat(const std::string& s, bool noDefault)
+RenderFormat stringToRenderFormat(const std::string& s, bool noDefault)
 {
-  if (s == "JSON")       { return NGSI_V1_JSON;       }
-  if (s == "normalized") { return NGSI_V2_NORMALIZED; }
-  if (s == "keyValues")  { return NGSI_V2_KEYVALUES;  }
-  if (s == "values")     { return NGSI_V2_VALUES;     }
+  if (s == "JSON")         { return NGSI_V1_LEGACY;        }  // DB content for NGSIv1 rendering due to legacy reasons
+  if (s == "legacy")       { return NGSI_V1_LEGACY;        }
+  if (s == "normalized")   { return NGSI_V2_NORMALIZED;    }
+  if (s == "keyValues")    { return NGSI_V2_KEYVALUES;     }
+  if (s == "values")       { return NGSI_V2_VALUES;        }
+  if (s == "uniqueValues") { return NGSI_V2_UNIQUE_VALUES; }
   
-  return (noDefault == false)? DEFAULT_NOTIFICATION_FORMAT : NGSI_NO_NOTIFICATION_FORMAT;
+  return (noDefault == false)? DEFAULT_RENDER_FORMAT : NO_FORMAT;
 }
