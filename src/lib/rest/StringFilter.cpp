@@ -43,7 +43,7 @@ using namespace mongo;
 *
 * StringFilterItem::StringFilterItem -
 */
-StringFilterItem::StringFilterItem() : patternValueToBeFreed(false) {}
+StringFilterItem::StringFilterItem() : compiledPattern(false) {}
 
 
 
@@ -66,9 +66,9 @@ bool StringFilterItem::fill(StringFilterItem* sfiP, std::string* errorStringP)
   stringRangeFrom       = sfiP->stringRangeFrom;
   stringRangeTo         = sfiP->stringRangeTo;
   attributeName         = sfiP->attributeName;
-  patternValueToBeFreed = sfiP->patternValueToBeFreed;
+  compiledPattern = sfiP->compiledPattern;
 
-  if (patternValueToBeFreed)
+  if (compiledPattern)
   {
     if (regcomp(&patternValue, stringValue.c_str(), 0) != 0)
     {
@@ -91,10 +91,11 @@ StringFilterItem::~StringFilterItem()
   stringList.clear();
   numberList.clear();
 
-  if (patternValueToBeFreed == true)
+  LM_W(("FGM this is %s, destroying", stringValue.c_str()));
+  if (compiledPattern == true)
   {
     regfree(&patternValue);
-    patternValueToBeFreed = false;
+    compiledPattern = false;
   }
 }
 
@@ -138,7 +139,7 @@ bool StringFilterItem::valueParse(char* s, std::string* errorStringP)
       *errorStringP = std::string("error compiling filter regex: '") + stringValue + "'";
       return false;
     }
-    patternValueToBeFreed = true;
+    compiledPattern = true;
   }
 
   return true;
@@ -926,7 +927,10 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
     }
 
     str = NULL;  // So that strtok_r continues eating the initial string
-    item.patternValueToBeFreed = false;
+
+    // Next line is to avoid double-free at StringFilterItem destructor
+    // (Note that the "copy" inside the filters vector may have "true" for this)
+    item.compiledPattern = false;
   }
 
   free(toFree);
@@ -1312,6 +1316,10 @@ StringFilter* StringFilter::clone(std::string* errorStringP)
     }
 
     sfP->filters.push_back(sfi);
+
+    // Next line is to avoid double-free at StringFilterItem destructor
+    // (Note that the "copy" inside the filters vector may have "true" for this)
+    sfi.compiledPattern = false;
   }
 
   // Object copy

@@ -130,7 +130,7 @@ public:
   std::string               stringRangeTo;
   std::string               attributeName;  // Used for unary operators only
 
-  bool                      patternValueToBeFreed;
+  bool                      compiledPattern;
 
   StringFilterItem();
   ~StringFilterItem();
