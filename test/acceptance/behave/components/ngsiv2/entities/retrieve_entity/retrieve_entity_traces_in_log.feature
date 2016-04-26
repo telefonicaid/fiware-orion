@@ -71,22 +71,34 @@ Feature: verify fields in log traces with retrieve entity request using NGSI v2.
       | id     | true   |
     And verify that receive several "Created" http code
     When get an entity by ID "room_0"
-      | parameter | value                       |
-      | attrs     | temperature_0,temperature_1 |
+ #     | parameter | value                       |
+ #     | attrs     | temperature_0,temperature_1 |
     Then verify that receive an "OK" http code
     And verify that the entity by ID is returned
-    And check in log, label "INFO" and message "msg=logMsg.h[1803]: Starting transaction from"
+    And check in log, label "INFO" and message "Starting transaction from"
       | trace    | value              |
       | time     | ignored            |
+      | corr     | ignored            |
       | trans    | ignored            |
       | srv      | pending            |
       | subsrv   | pending            |
       | from     | pending            |
       | function | lmTransactionStart |
       | comp     | Orion              |
-    And check in log, label "INFO" and message "msg=logMsg.h[1887]: Transaction ended"
+    And check in log, label "DEBUG" and message "--------------------- Serving request GET /v2/entities/room_0 -----------------"
+      | trace    | value           |
+      | time     | ignored         |
+      | corr     | N/A             |
+      | trans    | N/A             |
+      | srv      | N/A             |
+      | subsrv   | N/A             |
+      | from     | N/A             |
+      | function | connectionTreat |
+      | comp     | Orion           |
+    And check in log, label "INFO" and message "Transaction ended"
       | trace    | value            |
       | time     | ignored          |
+      | corr     | ignored          |
       | trans    | ignored          |
       | srv      | test_log_traces  |
       | subsrv   | /test            |

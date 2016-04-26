@@ -73,18 +73,30 @@ Feature: verify fields in log traces with remove a single attribute request usin
     When delete an attribute "temperature_0" in the entity with id "room_1"
     Then verify that receive an "No Content" http code
     And verify that the attribute is deleted into mongo in the defined entity
-    And check in log, label "INFO" and message "msg=logMsg.h[1803]: Starting transaction from"
+    And check in log, label "INFO" and message "Starting transaction from"
       | trace    | value              |
       | time     | ignored            |
+      | corr     | ignored            |
       | trans    | ignored            |
       | srv      | pending            |
       | subsrv   | pending            |
       | from     | pending            |
       | function | lmTransactionStart |
       | comp     | Orion              |
-    And check in log, label "INFO" and message "msg=logMsg.h[1887]: Transaction ended"
+    And check in log, label "DEBUG" and message "--------------------- Serving request DELETE /v2/entities/room_1/attrs/temperature_0 -----------------"
+      | trace    | value           |
+      | time     | ignored         |
+      | corr     | N/A             |
+      | trans    | N/A             |
+      | srv      | N/A             |
+      | subsrv   | N/A             |
+      | from     | N/A             |
+      | function | connectionTreat |
+      | comp     | Orion           |
+    And check in log, label "INFO" and message "Transaction ended"
       | trace    | value            |
       | time     | ignored          |
+      | corr     | ignored          |
       | trans    | ignored          |
       | srv      | test_log_traces  |
       | subsrv   | /test            |
