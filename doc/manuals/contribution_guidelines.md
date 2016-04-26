@@ -658,6 +658,18 @@ values are assigned at object construction time in memory at execution time.
 
 *How to check*: combination of compiler warning + manually
 
+#### S13 (Pointer variables naming)
+
+*Rule*: pointer variable names should use `P` (capital P) as suffix.
+
+```
+ContextElement* ceP;
+```
+
+*Rationale*: pointer variables can be easily identified at a glanze, which makes the code clearer.
+
+*How to check*: manually
+
 ## Programming patterns
 
 Some patterns are not allowed in Orion Context Broker code, except if some strong reason justifies the use of it. 
@@ -672,3 +684,18 @@ If you plan to use some of them, please consult before with the core developers.
   making the code error-prone due to subtle interactions. It gets worse in a multithreaded environment.
   * The flavor of this project is biased to C clearly. Many plain C libraries are used and mixing exceptions and
   traditional if-checking method should be avoided as much as possible.
+* Object passing. In order to avoid inefficient object copies when calling functions, the following criteria apply:
+  * If the function doesn't modify the object (i.e. "read only"), then use const references, e.g. `const BigFish& bf`
+  * If the function modifies the object (i.e. "read/write" or "write"), then use a pointer type, e.g: `BigFish* bf`. Note that in this case we could also use a reference, but we prefer pointers to make more explicit that the object is to be modified by the function.
+
+```
+void myFunction(const& BigFish in, BigFish* out)
+```
+
+* Strings return. In order to avoid inefficient object copies when returning strings, the  `const std::string&` return type is preferred. In the case that pattern cannot be used (e.g. when literal string such as "black", "red", etc. are used in the function) then `const char*` should be used as return type.
+
+```
+const std::string& myFunction(...)
+const char* myOtherFunction(...)
+```
+
