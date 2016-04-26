@@ -68,7 +68,7 @@ void QueueNotifier::sendNotifyContextRequest
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsFilter
+  const std::vector<std::string>&  attrsOrder
 )
 {
   ConnectionInfo ci;
@@ -111,7 +111,7 @@ void QueueNotifier::sendNotifyContextRequest
   }
 
   ci.outFormat = JSON;
-  std::string payload = ncr->toJson(&ci, renderFormat, attrsFilter);
+  std::string payload = ncr->toJson(&ci, renderFormat, attrsOrder);
 
   /* Parse URL */
   std::string  host;
