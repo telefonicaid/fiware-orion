@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "ngsi/ContextElementResponse.h"
+#include "common/RenderFormat.h"
 #include "rest/ConnectionInfo.h"
 
 
@@ -47,7 +48,7 @@ typedef struct ContextElementResponseVector
                                   bool                comma               = false,
                                   bool                omitAttributeValues = false);
 
-  std::string              toJson(NotificationFormat notifyFormat);
+  std::string              toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter);
   void                     present(const std::string& indent);
   void                     push_back(ContextElementResponse* item);
   unsigned int             size(void);

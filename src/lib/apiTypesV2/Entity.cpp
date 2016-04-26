@@ -27,6 +27,7 @@
 
 #include "logMsg/traceLevels.h"
 #include "common/tag.h"
+#include "common/string.h"
 #include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 #include "parse/forbiddenChars.h"
@@ -68,32 +69,24 @@ Entity::~Entity()
 */
 std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
 {
-  std::string renderMode = RENDER_MODE_NORMALIZED;
+  RenderFormat  renderFormat = NGSI_V2_NORMALIZED;
 
-  if (ciP->uriParamOptions[OPT_KEY_VALUES] == true)
-  {
-    renderMode = RENDER_MODE_KEY_VALUES;
-  }
-  else if (ciP->uriParamOptions[OPT_VALUES] == true)
-  {
-    renderMode = RENDER_MODE_VALUES;
-  }
-  else if (ciP->uriParamOptions[OPT_UNIQUE_VALUES] == true)
-  {
-    renderMode = RENDER_MODE_UNIQUE_VALUES;
-  }
+  if      (ciP->uriParamOptions[OPT_KEY_VALUES]    == true)  { renderFormat = NGSI_V2_KEYVALUES;     }
+  else if (ciP->uriParamOptions[OPT_VALUES]        == true)  { renderFormat = NGSI_V2_VALUES;        }
+  else if (ciP->uriParamOptions[OPT_UNIQUE_VALUES] == true)  { renderFormat = NGSI_V2_UNIQUE_VALUES; }
 
   if ((errorCode.description == "") && ((errorCode.error == "OK") || (errorCode.error == "")))
   {
     std::string out;
 
-    if ((renderMode == RENDER_MODE_VALUES) || (renderMode == RENDER_MODE_UNIQUE_VALUES))
+    if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
     {
       out = "[";
       if (attributeVector.size() != 0)
       {
-        // FIXME PR: renderMode + attrsFormat ... a bit confusing. Should we join these two somehow? 
-        out += attributeVector.toJson(true, renderMode, NGSI_V2_NORMALIZED, ciP->uriParam["attrs"]);
+        std::vector<std::string> attrsFilter;
+        stringSplit(ciP->uriParam["attrs"], ',', attrsFilter);
+        out += attributeVector.toJson(true, renderFormat, attrsFilter);
       }
       out += "]";        
     }
@@ -108,18 +101,19 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
 
         /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
         out += JSON_STR("type") + ":" + ((type != "")? JSON_STR(type) : JSON_STR(DEFAULT_TYPE));
+
+        if (attributeVector.size() != 0)
+        {
+          out += ",";
+        }
       }
 
       if (attributeVector.size() != 0)
       {
+        std::vector<std::string> attrsFilter;
+        stringSplit(ciP->uriParam["attrs"], ',', attrsFilter);
 
-        if (renderId)
-        {
-          out += ",";
-        }
-        // FIXME PR: renderMode + attrsFormat ... a bit confusing. Should we join these two somehow?
-        out += attributeVector.toJson(true, renderMode, NGSI_V2_NORMALIZED, ciP->uriParam["attrs"]);
-
+        out += attributeVector.toJson(true, renderFormat, attrsFilter);
       }
 
       out += "}";

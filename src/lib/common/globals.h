@@ -104,10 +104,10 @@
 */
 #define OPT_COUNT           "count"
 #define OPT_APPEND          "append"
-#define OPT_NORMALIZED      RENDER_MODE_NORMALIZED
-#define OPT_VALUES          RENDER_MODE_VALUES
-#define OPT_KEY_VALUES      RENDER_MODE_KEY_VALUES
-#define OPT_UNIQUE_VALUES   RENDER_MODE_UNIQUE_VALUES
+#define OPT_NORMALIZED      "normalized"
+#define OPT_VALUES          "values"
+#define OPT_KEY_VALUES      "keyValues"
+#define OPT_UNIQUE_VALUES   "unique"
 #define OPT_DATE_CREATED    DATE_CREATED
 #define OPT_DATE_MODIFIED   DATE_MODIFIED
 

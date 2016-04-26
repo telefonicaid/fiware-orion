@@ -814,7 +814,7 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | my house            |
 
   @entity_id_update_invalid @BUG_1782 @BUG_1817
-  Scenario Outline:  try to update or append attributes by entity ID using NGSI v2 with invalid entity id values
+  Scenario:  try to update or append attributes by entity ID using NGSI v2 with invalid entity id values
     Given  a definition of headers
       | parameter          | value                 |
       | Fiware-Service     | test_update_entity_id |
@@ -825,17 +825,50 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | parameter        | value    |
       | attributes_name  | humidity |
       | attributes_value | 80       |
-    When update or append attributes by ID "<entity_id>" and with "normalized" mode
-    Then verify that receive an "Not Found" http code
+    When update or append attributes by ID "house_?" and with "normalized" mode
+    Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                 |
-      | error       | NotFound              |
-      | description | Entity does not exist |
-    Examples:
-      | entity_id |
-      | house_?   |
-      | house_/   |
-      | house_#   |
+      | parameter   | value                                        |
+      | error       | BadRequest                                   |
+      | description | Empty right-hand-side for URI param //attrs/ |
+
+  @entity_id_update_invalid @BUG_1782 @BUG_1817
+  Scenario:  try to update or append attributes by entity ID using NGSI v2 with invalid entity id values
+    Given  a definition of headers
+      | parameter          | value                 |
+      | Fiware-Service     | test_update_entity_id |
+      | Fiware-ServicePath | /test                 |
+      | Content-Type       | application/json      |
+   # These properties below are used in update request
+    And properties to entities
+      | parameter        | value    |
+      | attributes_name  | humidity |
+      | attributes_value | 80       |
+    When update or append attributes by ID "house_/" and with "normalized" mode
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value             |
+      | error       | BadRequest        |
+      | description | service not found |
+
+  @entity_id_update_invalid @BUG_1782 @BUG_1817 @ISSUE_2075 @skip
+  Scenario:  try to update or append attributes by entity ID using NGSI v2 with invalid entity id values
+    Given  a definition of headers
+      | parameter          | value                 |
+      | Fiware-Service     | test_update_entity_id |
+      | Fiware-ServicePath | /test                 |
+      | Content-Type       | application/json      |
+   # These properties below are used in update request
+    And properties to entities
+      | parameter        | value    |
+      | attributes_name  | humidity |
+      | attributes_value | 80       |
+    When update or append attributes by ID "house_#" and with "normalized" mode
+    Then verify that receive an "Method not allowed" http code
+    And verify an error response
+      | parameter   | value            |
+      | error       | MethodNotAllowed |
+      | description | No defined yet   |
 
   # ----------------------- attributes ---------------------------------------
 

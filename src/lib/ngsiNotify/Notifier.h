@@ -28,7 +28,7 @@
 #include <map>
 #include <pthread.h>
 
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsiNotify/ThreadData.h"
@@ -44,12 +44,13 @@ class Notifier
 public:
   virtual ~Notifier(void);
 
-  virtual void sendNotifyContextRequest(NotifyContextRequest* ncr,
-                                        const std::string&    url,
-                                        const std::string&    tenant,
-                                        const std::string&    xauthToken,
-                                        const std::string&    fiwareCorrelator,
-                                        NotificationFormat    notifyFormat);
+  virtual void sendNotifyContextRequest(NotifyContextRequest*            ncr,
+                                        const std::string&               url,
+                                        const std::string&               tenant,
+                                        const std::string&               xauthToken,
+                                        const std::string&               fiwareCorrelator,
+                                        RenderFormat                     renderFormat,
+                                        const std::vector<std::string>&  attrsOrder);
 
   virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr,
                                                     const std::string&                url,

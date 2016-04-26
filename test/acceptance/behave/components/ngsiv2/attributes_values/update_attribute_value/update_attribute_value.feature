@@ -695,7 +695,7 @@ Feature: update an attribute value by entity ID and attribute name if it exists 
       | house_&             |
       | my house            |
 
-  @entity_id_update_invalid @BUG_1351
+  @entity_id_update_invalid_2 @BUG_1351 @ISSUE_2083 @skip
   Scenario:  try to update an attribute value by entity ID and attribute name using NGSI v2 with invalid entity id values
     Given  a definition of headers
       | parameter          | value                 |
@@ -707,11 +707,11 @@ Feature: update an attribute value by entity ID and attribute name if it exists 
       | parameter        | value |
       | attributes_value | 80    |
     When update an attribute value by ID "house_#" and attribute name "temperature_0" if it exists
-    Then verify that receive an "Unsupported Media Type" http code
+    Then verify that receive an "Method not allowed" http code
     And verify an error response
-      | parameter   | value                                  |
-      | error       | UnsupportedMediaType                   |
-      | description | not supported content type: text/plain |
+      | parameter   | value            |
+      | error       | MethodNotAllowed |
+      | description | No defined yet   |
 
   @entity_id_update_invalid @BUG_1351
   Scenario:  try to update an attribute value by entity ID and attribute name using NGSI v2 with invalid entity id values

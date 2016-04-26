@@ -274,6 +274,7 @@ TEST(mongoQueryContextRequest_filters, equalToOne_s)
     std::string  errorString;
     bool         b;
 
+    sc.stringFilterP = new StringFilter();
     b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
     EXPECT_EQ("", errorString);
     EXPECT_EQ(true, b);
@@ -320,6 +321,7 @@ TEST(mongoQueryContextRequest_filters, equalToOne_n)
   std::string  errorString;
   bool         b;
 
+  sc.stringFilterP = new StringFilter();
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -377,6 +379,7 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_s)
   std::string  errorString;
   bool         b;
 
+  sc.stringFilterP = new StringFilter();
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -425,6 +428,7 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_n)
   std::string  errorString;
   bool         b;
 
+  sc.stringFilterP = new StringFilter();
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -483,6 +487,7 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_s)
   std::string  errorString;
   bool         b;
 
+  sc.stringFilterP = new StringFilter();
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -531,6 +536,7 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_n)
   std::string  errorString;
   bool         b;
 
+  sc.stringFilterP = new StringFilter();
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -591,6 +597,7 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_s)
   std::string  errorString;
   bool         b;
 
+  sc.stringFilterP = new StringFilter();
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -638,6 +645,7 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_n)
   std::string  errorString;
   bool         b;
 
+  sc.stringFilterP = new StringFilter();
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -697,6 +705,7 @@ TEST(mongoQueryContextRequest_filters, greaterThan_n)
   std::string  errorString;
   bool         b;
 
+  sc.stringFilterP = new StringFilter();
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -756,6 +765,7 @@ TEST(mongoQueryContextRequest_filters, greaterThanOrEqual_n)
   std::string  errorString;
   bool         b;
 
+  sc.stringFilterP = new StringFilter();
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -814,6 +824,7 @@ TEST(mongoQueryContextRequest_filters, lessThan_n)
   std::string  errorString;
   bool         b;
 
+  sc.stringFilterP = new StringFilter();
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -873,6 +884,7 @@ TEST(mongoQueryContextRequest_filters, lessThanOrEqual_n)
   std::string  errorString;
   bool         b;
 
+  sc.stringFilterP = new StringFilter();
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -931,6 +943,7 @@ TEST(mongoQueryContextRequest_filters, insideRange_n)
   std::string  errorString;
   bool         b;
 
+  sc.stringFilterP = new StringFilter();
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -989,6 +1002,7 @@ TEST(mongoQueryContextRequest_filters, outsideRange_n)
   std::string  errorString;
   bool         b;
 
+  sc.stringFilterP = new StringFilter();
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -1048,6 +1062,7 @@ TEST(mongoQueryContextRequest_filters, withAttribute)
   std::string  errorString;
   bool         b;
 
+  sc.stringFilterP = new StringFilter();
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -1098,6 +1113,7 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
   std::string  errorString;
   bool         b;
 
+  sc.stringFilterP = new StringFilter();
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -1151,6 +1167,7 @@ TEST(mongoQueryContextRequest_filters, stringsWithCommas)
   std::string  errorString;
   bool         b;
 
+  sc.stringFilterP = new StringFilter();
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -1198,6 +1215,7 @@ TEST(mongoQueryContextRequest_filters, cobingingSeveralFilters)
   std::string  errorString;
   bool         b;
 
+  sc.stringFilterP = new StringFilter();
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -1244,6 +1262,7 @@ TEST(mongoQueryContextRequest_filters, repeatSameFilter)
   std::string  errorString;
   bool         b;
 
+  sc.stringFilterP = new StringFilter();
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -1291,6 +1310,7 @@ TEST(mongoQueryContextRequest_filters, rangeWithDecimals)
   std::string  errorString;
   bool         b;
 
+  sc.stringFilterP = new StringFilter();
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);

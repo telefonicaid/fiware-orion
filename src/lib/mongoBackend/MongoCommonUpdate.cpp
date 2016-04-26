@@ -39,7 +39,7 @@
 #include "common/statistics.h"
 #include "common/errorMessages.h"
 #include "common/defaultValues.h"
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -1040,6 +1040,17 @@ static bool addTriggeredSubscriptions_withCache
       continue;
     }
 
+
+    //
+    // FIXME P4: See issue #2076.
+    //           aList is just a copy of cSubP->attributes - would be good to avoid
+    //           as a reference to the CachedSubscription is already in TriggeredSubscription
+    //           cSubP->attributes is of type    std::vector<std::string>
+    //           while AttributeList contains a  std::vector<std::string>
+    //           Practically the same, except for the methods that AttributeList offers.
+    //           Perhaps CachedSubscription should include an AttributeList (cSubP->attributes)
+    //           instead of its std::vector<std::string> ... ?
+    //
     AttributeList aList;
 
     aList.fill(cSubP->attributes);
@@ -1082,7 +1093,7 @@ static bool addTriggeredSubscriptions_withCache
 
     TriggeredSubscription* sub = new TriggeredSubscription((long long) cSubP->throttling,
                                                            (long long) cSubP->lastNotificationTime,
-                                                           cSubP->notifyFormat,
+                                                           cSubP->renderFormat,
                                                            cSubP->reference,
                                                            aList,
                                                            cSubP->subscriptionId,
@@ -1248,14 +1259,14 @@ static bool addTriggeredSubscriptions_noCache
 
       long long           throttling         = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
       long long           lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
-      std::string         notifyFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "";
-      NotificationFormat  notifyFormat       = stringToNotificationFormat(notifyFormatString);
+      std::string         renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "";
+      RenderFormat        renderFormat       = stringToRenderFormat(renderFormatString);
 
       TriggeredSubscription* trigs = new TriggeredSubscription
         (
           throttling,
           lastNotification,
-          notifyFormat,
+          renderFormat,
           getStringFieldF(sub, CSUB_REFERENCE),
           subToAttributeList(sub), "", "");
 
@@ -1332,7 +1343,7 @@ static bool addTriggeredSubscriptions
 *
 * processOnChangeConditionForUpdateContext -
 *
-* This method returns true if the notification was actually send. Otherwise, false
+* This method returns true if the notification was actually sent. Otherwise, false
 * is returned. This is used in the caller to know if lastNotification field in the
 * subscription document in csubs collection has to be modified or not.
 */
@@ -1342,10 +1353,11 @@ static bool processOnChangeConditionForUpdateContext
   const AttributeList&             attrL,
   std::string                      subId,
   std::string                      notifyUrl,
-  NotificationFormat               notifyFormat,
+  RenderFormat                     renderFormat,
   std::string                      tenant,
   const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator
+  const std::string&               fiwareCorrelator,
+  const std::vector<std::string>&  attrsOrder
 )
 {
   NotifyContextRequest   ncr;
@@ -1393,7 +1405,7 @@ static bool processOnChangeConditionForUpdateContext
   // FIXME: we use a proper origin name
   ncr.originator.set("localhost");
 
-  getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, notifyFormat);
+  getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
   return true;
 }
 
@@ -1456,14 +1468,20 @@ static bool processSubscriptions
 
     /* Send notification */
     LM_T(LmtSubCache, ("NOT ignored: %s", trigs->cacheSubId.c_str()));
-    if (processOnChangeConditionForUpdateContext(notifyCerP,
-                                                 trigs->attrL,
-                                                 mapSubId,
-                                                 trigs->reference,
-                                                 trigs->notifyFormat,
-                                                 tenant,
-                                                 xauthToken,
-                                                 fiwareCorrelator))
+
+    bool                 notificationSent;
+
+    notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
+                                                                trigs->attrL,
+                                                                mapSubId,
+                                                                trigs->reference,
+                                                                trigs->renderFormat,
+                                                                tenant,
+                                                                xauthToken,
+                                                                fiwareCorrelator,
+                                                                trigs->attrL.attributeV);
+
+    if (notificationSent)
     {
       long long rightNow = getCurrentTime();
 

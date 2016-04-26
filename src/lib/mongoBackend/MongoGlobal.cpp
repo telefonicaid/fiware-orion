@@ -41,7 +41,7 @@
 #include "common/string.h"
 #include "common/wsStrip.h"
 #include "common/statistics.h"
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -1771,19 +1771,20 @@ AttributeList subToAttributeList(const BSONObj& sub)
 * is returned. This is used in the caller to know if lastNotification field in the
 * subscription document in csubs collection has to be modified or not.
 */
-bool processOnChangeConditionForSubscription
+static bool processOnChangeConditionForSubscription
 (
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
   ConditionValueList*              condValues,
   const std::string&               subId,
   const std::string&               notifyUrl,
-  NotificationFormat               notifyFormat,
+  RenderFormat                     renderFormat,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
   Restriction*                     resP,
-  const std::string&               fiwareCorrelator
+  const std::string&               fiwareCorrelator,
+  const std::vector<std::string>&  attrsOrder
 )
 {
   std::string                   err;
@@ -1831,7 +1832,7 @@ bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
-        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, notifyFormat);
+        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
@@ -1842,7 +1843,7 @@ bool processOnChangeConditionForSubscription
     }
     else
     {
-      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, notifyFormat);
+      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
       ncr.contextElementResponseVector.release();
 
       return true;
@@ -1868,13 +1869,14 @@ BSONArray processConditionVector
   const std::string&               subId,
   const std::string&               url,
   bool*                            notificationDone,
-  NotificationFormat               notifyFormat,
+  RenderFormat                     renderFormat,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
   Restriction*                     resP,
   const std::string&               status,
-  const std::string&               fiwareCorrelator
+  const std::string&               fiwareCorrelator,
+  const std::vector<std::string>   attrsOrder
 )
 {
   BSONArrayBuilder conds;
@@ -1905,12 +1907,13 @@ BSONArray processConditionVector
                                                    &(nc->condValueList),
                                                    subId,
                                                    url,
-                                                   notifyFormat,
+                                                   renderFormat,
                                                    tenant,
                                                    xauthToken,
                                                    servicePathV,
                                                    resP,
-                                                   fiwareCorrelator)))
+                                                   fiwareCorrelator,
+                                                   attrsOrder)))
       {
         *notificationDone = true;
       }

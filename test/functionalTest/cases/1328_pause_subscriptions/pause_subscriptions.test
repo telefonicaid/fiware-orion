@@ -355,8 +355,8 @@ Date: REGEX(.*)
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
-            "humidity",
-            "temperature"
+            "temperature",
+            "humidity"
         ],
         "http": {
             "url": "http://localhost:1234"
@@ -409,8 +409,8 @@ Date: REGEX(.*)
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
-            "humidity",
-            "temperature"
+            "temperature",
+            "humidity"
         ],
         "http": {
             "url": "http://localhost:1234"
@@ -463,8 +463,8 @@ Date: REGEX(.*)
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
-            "humidity",
-            "temperature"
+            "temperature",
+            "humidity"
         ],
         "http": {
             "url": "http://localhost:1234"
@@ -517,8 +517,8 @@ Date: REGEX(.*)
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
-            "humidity",
-            "temperature"
+            "temperature",
+            "humidity"
         ],
         "http": {
             "url": "http://localhost:1234"
@@ -571,8 +571,8 @@ Date: REGEX(.*)
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
-            "humidity",
-            "temperature"
+            "temperature",
+            "humidity"
         ],
         "http": {
             "url": "http://localhost:1234"

@@ -33,7 +33,7 @@
 #include "common/sem.h"
 #include "common/string.h"
 #include "common/statistics.h"
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/StringFilter.h"
 
@@ -95,17 +95,17 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // 04. Extract data from subP
   //
-  std::string               notifyFormatString = sub.hasField(CSUB_FORMAT)? getFieldF(sub, CSUB_FORMAT).String() : "JSON";  // NGSIv1 JSON is 'default' (for old db-content)
+  std::string               renderFormatString = sub.hasField(CSUB_FORMAT)? getFieldF(sub, CSUB_FORMAT).String() : "legacy";  // NGSIv1 JSON is 'default' (for old db-content)
   std::vector<BSONElement>  eVec               = getFieldF(sub, CSUB_ENTITIES).Array();
   std::vector<BSONElement>  attrVec            = getFieldF(sub, CSUB_ATTRS).Array();
   std::vector<BSONElement>  condVec            = getFieldF(sub, CSUB_CONDITIONS).Array();
-  NotificationFormat        notifyFormat       = stringToNotificationFormat(notifyFormatString);
+  RenderFormat              renderFormat       = stringToRenderFormat(renderFormatString);
 
   cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);
   cSubP->subscriptionId        = strdup(idField.OID().toString().c_str());
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getFieldF(sub, CSUB_SERVICE_PATH).String().c_str() : "/");
   cSubP->reference             = strdup(sub.hasField(CSUB_REFERENCE)?    getFieldF(sub, CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
-  cSubP->notifyFormat          = notifyFormat;
+  cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       : 0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
@@ -230,7 +230,7 @@ int mongoSubCacheItemInsert
   const std::string&  coords,
   const std::string&  georel,
   StringFilter*       stringFilterP,
-  NotificationFormat  notifyFormat
+  RenderFormat        renderFormat
 )
 {
   //
@@ -314,7 +314,7 @@ int mongoSubCacheItemInsert
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->servicePath           = strdup(servicePath);
-  cSubP->notifyFormat          = notifyFormat;
+  cSubP->renderFormat          = renderFormat;
   cSubP->reference             = strdup(sub.hasField(CSUB_REFERENCE)? getFieldF(sub, CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;

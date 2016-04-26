@@ -1,0 +1,1136 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+#
+# Uncached/Cached query
+#
+# 01. Start the contextBroker 'broker'
+# 02. Start contextProvider 'CP1' (contextBroker serving as contextProvider)
+# 03. Start contextProvider 'CP2' (contextBroker serving as contextProvider)
+# 04. Start contextProvider 'CP3' (contextBroker serving as contextProvider)
+# 05. Query broker for E1/A1 (nothing found)
+# 06. Register an entity/attribute E1/A1 in broker, with CP1 as providing application
+# 07. Register an entity/attribute E1/A2 in broker, with CP2 as providing application
+# 08. Register an entity/attribute E1/A3 in broker, with CP3 as providing application
+# 09. Update/APPEND E1/A1(=CP1) in CP1
+# 10. Update/APPEND E1/A2(=CP2) in CP2
+# 11. Update/APPEND E1/A3(=CP3) in CP3
+# 12. Query broker for E1/A1 (will go to CP1 and it will work, A1=CP1 is returned)
+# 13. Query broker for E1/A2 (will go to CP2 and it will work, A1=CP2 is returned)
+# 14. Query broker for E1/A3 (will go to CP3 and it will work, A1=CP3 is returned)
+# 15. Update/UPDATE E1/A1(=CP1-2) in CB (is forwarded to CP1 and now it is updated)
+# 16. Update/UPDATE E1/A2(=CP2-2) in CB (is forwarded to CP2 and now it is updated)
+# 17. Update/UPDATE E1/A3(=CP3-2) in CB (is forwarded to CP3 and now it is updated)
+# 18. Query broker for E1/A1 (will go to CP1 and it will work, A1=CP1-1 is returned)
+# 19. Query broker for E1/A2 (will go to CP2 and it will work, A2=CP2-2 is returned)
+# 20. Query broker for E1/A3 (will go to CP3 and it will work, A3=CP3-2 is returned)
+# 21. Update/UPDATE <E1/A1, E1/A2, E1/A3> = <CP1-3, CP2-3, CP3-3>) in CB (is forwarded to CP1, CP2, CP3 and now they are updated)
+# 22. Query broker for E1/A1 (will go to CP1 and it will work, A1=CP1-3 is returned)
+# 23. Query broker for E1/A2 (will go to CP2 and it will work, A2=CP2-3 is returned)
+# 24. Query broker for E1/A3 (will go to CP3 and it will work, A3=CP3-3 is returned)
+
+--NAME--
+Query Redirect with three Context Providers
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+dbInit CP2
+dbInit CP3
+brokerStart CB
+brokerStart CP1
+brokerStart CP2
+brokerStart CP3
+
+--SHELL--
+cb=$(ps aux  | grep contextBroker | grep $CB_PORT)
+cp1=$(ps aux | grep contextBroker | grep $CP1_PORT)
+cp2=$(ps aux | grep contextBroker | grep $CP2_PORT)
+cp3=$(ps aux | grep contextBroker | grep $CP3_PORT)
+
+if [ -z "$cb" ]
+then
+  echo "Error, contextBroker not running"
+else
+  echo "01. contextBroker running"
+fi
+
+if [ -z "$cp1" ]
+then
+  echo "Error, contextProvider1 not running"
+else
+  echo "02. contextProvider CP1 running (contextBroker serving as contextProvider)"
+fi
+
+if [ -z "$cp2" ]
+then
+  echo "Error, contextProvider2 not running"
+else
+  echo "03. contextProvider CP2 running (contextBroker serving as contextProvider)"
+fi
+
+if [ -z "$cp3" ]
+then
+  echo "Error, contextProvider3 not running"
+else
+  echo "04. contextProvider CP3 running (contextBroker serving as contextProvider)"
+fi
+echo
+echo
+
+
+echo "05. Query broker for E1/A1 (nothing found)"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "06. Register an entity/attribute E1/A1 in broker, with CP1 as providing application"
+url="/v1/registry/registerContext"
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "E",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A1",
+        "type": "T1",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://localhost:'$CP1_PORT'/v1"
+    }
+ ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "07. Register an entity/attribute E1/A2 in broker, with CP2 as providing application"
+url="/v1/registry/registerContext"
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "E",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A2",
+        "type": "T1",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://localhost:'$CP2_PORT'/v1"
+    }
+ ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "08. Register an entity/attribute E1/A3 in broker, with CP3 as providing application"
+url="/v1/registry/registerContext"
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "E",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A3",
+        "type": "T1",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://localhost:'$CP3_PORT'/v1"
+    }
+ ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "09. Update/APPEND E1/A1(=CP1) in CP1"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "T1",
+          "value": "CP1"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --port $CP1_PORT --json
+echo
+echo
+
+
+echo "10. Update/APPEND E1/A2(=CP2) in CP2"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "A2",
+          "type": "T1",
+          "value": "CP2"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --port $CP2_PORT --json
+echo
+echo
+
+
+echo "11. Update/APPEND E1/A3(=CP3) in CP3"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "A3",
+          "type": "T1",
+          "value": "CP3"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --port $CP3_PORT --json
+echo
+echo
+
+
+echo "12. Query broker for E1/A1 (will go to CP1 and it will work, A1=CP1 is returned)"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "13. Query broker for E1/A2 (will go to CP2 and it will work, A1=CP2 is returned)"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ],
+  "attributes": [
+    "A2"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "14. Query broker for E1/A3 (will go to CP3 and it will work, A1=CP3 is returned)"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ],
+  "attributes": [
+    "A3"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "15. Update/UPDATE E1/A1(=CP1-2) in CB (is forwarded to CP1 and now it is updated)"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "T1",
+          "value": "CP1-2"
+        }
+      ]
+    }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "16. Update/UPDATE E1/A2(=CP2-2) in CB (is forwarded to CP2 and now it is updated)"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "A2",
+          "type": "T1",
+          "value": "CP2-2"
+        }
+      ]
+    }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "17. Update/UPDATE E1/A3(=CP3-2) in CB (is forwarded to CP3 and now it is updated)"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "A3",
+          "type": "T1",
+          "value": "CP3-2"
+        }
+      ]
+    }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "18. Query broker for E1/A1 (will go to CP1 and it will work, A1=CP1-1 is returned)"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "19. Query broker for E1/A2 (will go to CP2 and it will work, A2=CP2-2 is returned)"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ],
+  "attributes": [
+    "A2"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "20. Query broker for E1/A3 (will go to CP3 and it will work, A3=CP3-2 is returned)"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ],
+  "attributes": [
+    "A3"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "21. Update/UPDATE <E1/A1, E1/A2, E1/A3> = <CP1-3, CP2-3, CP3-3>) in CB (is forwarded to CP1, CP2, CP3 and now they are updated)"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "T1",
+          "value": "CP1-3"
+        }
+      ]
+    },
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "A2",
+          "type": "T1",
+          "value": "CP2-3"
+        }
+      ]
+    },
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "A3",
+          "type": "T1",
+          "value": "CP3-3"
+        }
+      ]
+    }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+echo "22. Query broker for E1/A1 (will go to CP1 and it will work, A1=CP1-3 is returned)"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+echo "23. Query broker for E1/A2 (will go to CP2 and it will work, A2=CP2-3 is returned)"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ],
+  "attributes": [
+    "A2"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+echo "24. Query broker for E1/A3 (will go to CP3 and it will work, A3=CP3-3 is returned)"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ],
+  "attributes": [
+    "A3"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+--REGEXPECT--
+01. contextBroker running
+02. contextProvider CP1 running (contextBroker serving as contextProvider)
+03. contextProvider CP2 running (contextBroker serving as contextProvider)
+04. contextProvider CP3 running (contextBroker serving as contextProvider)
+
+
+05. Query broker for E1/A1 (nothing found)
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+06. Register an entity/attribute E1/A1 in broker, with CP1 as providing application
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "PT24H",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+07. Register an entity/attribute E1/A2 in broker, with CP2 as providing application
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "PT24H",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+08. Register an entity/attribute E1/A3 in broker, with CP3 as providing application
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "PT24H",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+09. Update/APPEND E1/A1(=CP1) in CP1
+HTTP/1.1 200 OK
+Content-Length: 378
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "T1",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+10. Update/APPEND E1/A2(=CP2) in CP2
+HTTP/1.1 200 OK
+Content-Length: 378
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2",
+                        "type": "T1",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+11. Update/APPEND E1/A3(=CP3) in CP3
+HTTP/1.1 200 OK
+Content-Length: 378
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A3",
+                        "type": "T1",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+12. Query broker for E1/A1 (will go to CP1 and it will work, A1=CP1 is returned)
+HTTP/1.1 200 OK
+Content-Length: 381
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "T1",
+                        "value": "CP1"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+13. Query broker for E1/A2 (will go to CP2 and it will work, A1=CP2 is returned)
+HTTP/1.1 200 OK
+Content-Length: 381
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2",
+                        "type": "T1",
+                        "value": "CP2"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+14. Query broker for E1/A3 (will go to CP3 and it will work, A1=CP3 is returned)
+HTTP/1.1 200 OK
+Content-Length: 381
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A3",
+                        "type": "T1",
+                        "value": "CP3"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+15. Update/UPDATE E1/A1(=CP1-2) in CB (is forwarded to CP1 and now it is updated)
+HTTP/1.1 200 OK
+Content-Length: 378
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "T1",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+16. Update/UPDATE E1/A2(=CP2-2) in CB (is forwarded to CP2 and now it is updated)
+HTTP/1.1 200 OK
+Content-Length: 378
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2",
+                        "type": "T1",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+17. Update/UPDATE E1/A3(=CP3-2) in CB (is forwarded to CP3 and now it is updated)
+HTTP/1.1 200 OK
+Content-Length: 378
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A3",
+                        "type": "T1",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+18. Query broker for E1/A1 (will go to CP1 and it will work, A1=CP1-1 is returned)
+HTTP/1.1 200 OK
+Content-Length: 383
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "T1",
+                        "value": "CP1-2"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+19. Query broker for E1/A2 (will go to CP2 and it will work, A2=CP2-2 is returned)
+HTTP/1.1 200 OK
+Content-Length: 383
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2",
+                        "type": "T1",
+                        "value": "CP2-2"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+20. Query broker for E1/A3 (will go to CP3 and it will work, A3=CP3-2 is returned)
+HTTP/1.1 200 OK
+Content-Length: 383
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A3",
+                        "type": "T1",
+                        "value": "CP3-2"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+21. Update/UPDATE <E1/A1, E1/A2, E1/A3> = <CP1-3, CP2-3, CP3-3>) in CB (is forwarded to CP1, CP2, CP3 and now they are updated)
+HTTP/1.1 200 OK
+Content-Length: 586
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "T1",
+                        "value": ""
+                    },
+                    {
+                        "name": "A2",
+                        "type": "T1",
+                        "value": ""
+                    },
+                    {
+                        "name": "A3",
+                        "type": "T1",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+22. Query broker for E1/A1 (will go to CP1 and it will work, A1=CP1-3 is returned)
+HTTP/1.1 200 OK
+Content-Length: 383
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "T1",
+                        "value": "CP1-3"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+23. Query broker for E1/A2 (will go to CP2 and it will work, A2=CP2-3 is returned)
+HTTP/1.1 200 OK
+Content-Length: 383
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2",
+                        "type": "T1",
+                        "value": "CP2-3"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+24. Query broker for E1/A3 (will go to CP3 and it will work, A3=CP3-3 is returned)
+HTTP/1.1 200 OK
+Content-Length: 383
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A3",
+                        "type": "T1",
+                        "value": "CP3-3"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+brokerStop CP3
+
+dbDrop CB
+dbDrop CP1
+dbDrop CP2
+dbDrop CP3

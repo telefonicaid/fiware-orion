@@ -1,0 +1,484 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+/v1/ ALL Entities without filter
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 0. Query all entities using convop /v1/contextEntities
+# 1. APPEND entity E1, type T1 with attribute A1
+# 2. APPEND entity E2, WITHOUT TYPE and with attribute A2
+# 3. APPEND entity E2, type T2 with attribute A2
+# 4. APPEND entity E3, type T3 with attribute A3
+# 5. APPEND entity E4, type T3 with attribute A4
+# 6. Query all entities using convop /v1/contextEntities?entity::type=T1
+# 7. Query all entities using convop /v1/contextEntities?entity::type=T2
+# 8. Query all entities using convop /v1/contextEntities?entity::type=T3
+#
+
+echo "0. Query all entities using convop /v1/contextEntities"
+echo "======================================================"
+orionCurl --url /v1/contextEntities --json
+echo
+echo
+
+
+echo "1. APPEND entity E1, type T1 with attribute A1"
+echo "=============================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "T1",
+    "isPattern": "false",
+    "id": "E1",
+    "attributes": [
+    {
+      "name": "A1",
+      "type": "A1T",
+      "value": "a1"
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "${payload}" --json
+echo
+echo
+
+
+echo "2. APPEND entity E2, WITHOUT TYPE and with attribute A2"
+echo "======================================================="
+payload='{
+  "contextElements": [
+  {
+    "isPattern": "false",
+    "id": "E2",
+    "attributes": [
+    {
+      "name": "A2",
+      "type": "A2T",
+      "value": "a1"
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "${payload}" --json
+echo
+echo
+
+
+echo "3. APPEND entity E2, type T2 with attribute A2"
+echo "=============================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "T2",
+    "isPattern": "false",
+    "id": "E2",
+    "attributes": [
+    {
+      "name": "A2",
+      "type": "A2T",
+      "value": "a1"
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "${payload}" --json
+echo
+echo
+
+
+echo "4. APPEND entity E3, type T3 with attribute A3"
+echo "=============================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "T3",
+    "isPattern": "false",
+    "id": "E3",
+    "attributes": [
+    {
+      "name": "A3",
+      "type": "A3T",
+      "value": "a1"
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "${payload}" --json
+echo
+echo
+
+
+echo "5. APPEND entity E4, type T3 with attribute A4"
+echo "=============================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "T3",
+    "isPattern": "false",
+    "id": "E4",
+    "attributes": [
+    {
+      "name": "A4",
+      "type": "A4T",
+      "value": "a1"
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "${payload}" --json
+echo
+echo
+
+
+echo "6. Query all entities using convop /v1/contextEntities?entity::type=T1"
+echo "======================================================================"
+orionCurl --url /v1/contextEntities?entity::type=T1 --json
+echo
+echo
+
+
+echo "7. Query all entities using convop /v1/contextEntities?entity::type=T2"
+echo "======================================================================"
+orionCurl --url /v1/contextEntities?entity::type=T2 --json
+echo
+echo
+
+
+echo "8. Query all entities using convop /v1/contextEntities?entity::type=T3"
+echo "======================================================================"
+orionCurl --url /v1/contextEntities?entity::type=T3 --json
+echo
+echo
+
+
+--REGEXPECT--
+0. Query all entities using convop /v1/contextEntities
+======================================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+1. APPEND entity E1, type T1 with attribute A1
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 380
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "A1T",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T1"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+2. APPEND entity E2, WITHOUT TYPE and with attribute A2
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 378
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2",
+                        "type": "A2T",
+                        "value": ""
+                    }
+                ],
+                "id": "E2",
+                "isPattern": "false",
+                "type": ""
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+3. APPEND entity E2, type T2 with attribute A2
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 380
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2",
+                        "type": "A2T",
+                        "value": ""
+                    }
+                ],
+                "id": "E2",
+                "isPattern": "false",
+                "type": "T2"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+4. APPEND entity E3, type T3 with attribute A3
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 380
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A3",
+                        "type": "A3T",
+                        "value": ""
+                    }
+                ],
+                "id": "E3",
+                "isPattern": "false",
+                "type": "T3"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+5. APPEND entity E4, type T3 with attribute A4
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 380
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A4",
+                        "type": "A4T",
+                        "value": ""
+                    }
+                ],
+                "id": "E4",
+                "isPattern": "false",
+                "type": "T3"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+6. Query all entities using convop /v1/contextEntities?entity::type=T1
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 382
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "A1T",
+                        "value": "a1"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T1"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+7. Query all entities using convop /v1/contextEntities?entity::type=T2
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 382
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2",
+                        "type": "A2T",
+                        "value": "a1"
+                    }
+                ],
+                "id": "E2",
+                "isPattern": "false",
+                "type": "T2"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+8. Query all entities using convop /v1/contextEntities?entity::type=T3
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 732
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A3",
+                        "type": "A3T",
+                        "value": "a1"
+                    }
+                ],
+                "id": "E3",
+                "isPattern": "false",
+                "type": "T3"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A4",
+                        "type": "A4T",
+                        "value": "a1"
+                    }
+                ],
+                "id": "E4",
+                "isPattern": "false",
+                "type": "T3"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

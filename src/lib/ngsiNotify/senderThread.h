@@ -55,7 +55,7 @@ typedef struct SenderThreadParams
   std::string     content;
   char            transactionId[64];
   Format          format;
-  std::string     notifyFormat;
+  std::string     renderFormat;
   std::string     fiwareCorrelator;
   struct timespec timeStamp;
 } SenderThreadParams;

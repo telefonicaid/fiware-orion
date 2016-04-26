@@ -35,7 +35,7 @@
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/sem.h"
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "common/defaultValues.h"
 #include "alarmMgr/alarmMgr.h"
 
@@ -278,7 +278,7 @@ static bool addTriggeredSubscriptions
       //           the first parameter for TriggeredSubscription will have "normalized" as default value
       //
       TriggeredSubscription* trigs = new TriggeredSubscription(
-        sub.hasField(CASUB_FORMAT)? stringToNotificationFormat(getStringFieldF(sub, CASUB_FORMAT)) : NGSI_V1_JSON,
+        sub.hasField(CASUB_FORMAT)? stringToRenderFormat(getStringFieldF(sub, CASUB_FORMAT)) : NGSI_V1_LEGACY,
         getStringFieldF(sub, CASUB_REFERENCE),
         subToAttributeList(sub));
 
