@@ -1358,7 +1358,7 @@ static bool processOnChangeConditionForUpdateContext
   std::string                      tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
-  std::vector<std::string>         attributeV
+  std::vector<std::string>&        attributeV
 )
 {
   NotifyContextRequest   ncr;
@@ -1470,33 +1470,17 @@ static bool processSubscriptions
     /* Send notification */
     LM_T(LmtSubCache, ("NOT ignored: %s", trigs->cacheSubId.c_str()));
 
-    CachedSubscription*  cacheP = subCacheItemLookup(tenant.c_str(), trigs->cacheSubId.c_str());
     bool                 notificationSent;
 
-    if (cacheP)
-    {
-      notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
-                                                                  trigs->attrL,
-                                                                  mapSubId,
-                                                                  trigs->reference,
-                                                                  trigs->renderFormat,
-                                                                  tenant,
-                                                                  xauthToken,
-                                                                  fiwareCorrelator,
-                                                                  cacheP->attributes);
-    }
-    else
-    {
-      notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
-                                                                  trigs->attrL,
-                                                                  mapSubId,
-                                                                  trigs->reference,
-                                                                  trigs->renderFormat,
-                                                                  tenant,
-                                                                  xauthToken,
-                                                                  fiwareCorrelator,
-                                                                  trigs->attrL.attributeV);
-    }
+    notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
+                                                                trigs->attrL,
+                                                                mapSubId,
+                                                                trigs->reference,
+                                                                trigs->renderFormat,
+                                                                tenant,
+                                                                xauthToken,
+                                                                fiwareCorrelator,
+                                                                trigs->attrL.attributeV);
 
     if (notificationSent)
     {

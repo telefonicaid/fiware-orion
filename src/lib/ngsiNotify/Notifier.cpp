@@ -62,7 +62,7 @@ void Notifier::sendNotifyContextRequest
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsFilter
+  const std::vector<std::string>&  attrsOrder
 )
 {
     ConnectionInfo ci;
@@ -105,7 +105,7 @@ void Notifier::sendNotifyContextRequest
     }
     else
     {
-      payload = ncr->toJson(&ci, renderFormat, attrsFilter);
+      payload = ncr->toJson(&ci, renderFormat, attrsOrder);
     }
 
     /* Parse URL */

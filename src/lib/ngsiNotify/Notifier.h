@@ -50,7 +50,7 @@ public:
                                         const std::string&               xauthToken,
                                         const std::string&               fiwareCorrelator,
                                         RenderFormat                     renderFormat,
-                                        const std::vector<std::string>&  attrsFilter);
+                                        const std::vector<std::string>&  attrsOrder);
 
   virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr,
                                                     const std::string&                url,
