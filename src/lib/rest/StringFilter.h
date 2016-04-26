@@ -154,6 +154,7 @@ public:
   bool                      matchPattern(ContextAttribute* caP);
   bool                      matchGreaterThan(ContextAttribute* caP);
   bool                      matchLessThan(ContextAttribute* caP);
+  bool                      fill(StringFilterItem* sfiP, std::string* errorStringP);
 
 private:
   bool                      compatibleType(ContextAttribute* caP);
@@ -198,6 +199,8 @@ public:
   bool  parse(const char* q, std::string* errorStringP);
   bool  mongoFilterPopulate(std::string* errorStringP);
   bool  match(ContextElementResponse* cerP);
+
+  StringFilter*  clone(std::string* errorStringP);
 };
 
 #endif  // SRC_LIB_REST_STRINGFILTERS_H_

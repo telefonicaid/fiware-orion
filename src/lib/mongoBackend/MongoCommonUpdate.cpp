@@ -1091,7 +1091,7 @@ static bool addTriggeredSubscriptions_withCache
                          cSubP->throttling));
     }
 
-    TriggeredSubscription* sub = new TriggeredSubscription((long long) cSubP->throttling,
+    TriggeredSubscription* subP = new TriggeredSubscription((long long) cSubP->throttling,
                                                            (long long) cSubP->lastNotificationTime,
                                                            cSubP->renderFormat,
                                                            cSubP->reference,
@@ -1099,9 +1099,18 @@ static bool addTriggeredSubscriptions_withCache
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant);
 
-    sub->fillExpression(cSubP->expression.geometry, cSubP->expression.coords, cSubP->expression.georel);
-    sub->stringFilterSet(&cSubP->expression.stringFilter);
-    subs.insert(std::pair<string, TriggeredSubscription*>(cSubP->subscriptionId, sub));
+    subP->fillExpression(cSubP->expression.geometry, cSubP->expression.coords, cSubP->expression.georel);
+
+    std::string errorString;
+
+    if (!subP->stringFilterSet(&cSubP->expression.stringFilter, &errorString))
+    {
+      LM_E(("Runtime Error (error setting string filter: %s)", errorString.c_str()));
+      delete subP;
+      return false;
+    }
+
+    subs.insert(std::pair<string, TriggeredSubscription*>(cSubP->subscriptionId, subP));
   }
 
   cacheSemGive(__FUNCTION__, "match subs for notifications");
@@ -1296,7 +1305,16 @@ static bool addTriggeredSubscriptions_noCache
           }
           else
           {
-            trigs->stringFilterSet(stringFilterP);
+            std::string errorString;
+
+            if (!trigs->stringFilterSet(stringFilterP, &errorString))
+            {
+              delete stringFilterP;
+
+              LM_E(("Runtime Error (error setting string filter: %s)", errorString.c_str()));
+              releaseMongoConnection(connection);
+              return false;
+            }
           }
         }
       }

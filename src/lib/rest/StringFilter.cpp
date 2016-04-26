@@ -49,6 +49,41 @@ StringFilterItem::StringFilterItem() : patternValueToBeFreed(false) {}
 
 /* ****************************************************************************
 *
+* StringFilterItem::fill -
+*/
+bool StringFilterItem::fill(StringFilterItem* sfiP, std::string* errorStringP)
+{
+  left                  = sfiP->left;
+  op                    = sfiP->op;
+  valueType             = sfiP->valueType;
+  numberValue           = sfiP->numberValue;
+  stringValue           = sfiP->stringValue;
+  boolValue             = sfiP->boolValue;
+  stringList            = sfiP->stringList;
+  numberList            = sfiP->numberList;
+  numberRangeFrom       = sfiP->numberRangeFrom;
+  numberRangeTo         = sfiP->numberRangeTo;
+  stringRangeFrom       = sfiP->stringRangeFrom;
+  stringRangeTo         = sfiP->stringRangeTo;
+  attributeName         = sfiP->attributeName;
+  patternValueToBeFreed = sfiP->patternValueToBeFreed;
+
+  if (patternValueToBeFreed)
+  {
+    if (regcomp(&patternValue, stringValue.c_str(), 0) != 0)
+    {
+      *errorStringP = std::string("error compiling filter regex: '") + stringValue + "'";
+      return false;
+    }
+  }    
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
 * StringFilterItem::~StringFilterItem - 
 */
 StringFilterItem::~StringFilterItem()
@@ -1252,4 +1287,36 @@ bool StringFilter::match(ContextElementResponse* cerP)
   }
 
   return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* StringFilter::clone - 
+*/
+StringFilter* StringFilter::clone(std::string* errorStringP)
+{
+  LM_W(("KZ: Cloning StringFilter"));
+  StringFilter* sfP = new StringFilter();
+
+  for (unsigned int ix = 0; ix < filters.size(); ++ix)
+  {
+    StringFilterItem  sfi;
+
+    if (!sfi.fill(&filters[ix], errorStringP))
+    {
+      delete sfP;
+      LM_W(("KZ: Cloning StringFilter - ERROR"));
+      return NULL;
+    }
+
+    sfP->filters.push_back(sfi);
+  }
+
+  // Object copy
+  sfP->mongoFilters = mongoFilters;
+
+  LM_W(("KZ: Cloning StringFilter - OK"));
+  return sfP;
 }

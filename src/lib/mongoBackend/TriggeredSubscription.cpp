@@ -90,6 +90,11 @@ TriggeredSubscription::TriggeredSubscription
 */
 TriggeredSubscription::~TriggeredSubscription()
 {
+  if (stringFilterP != NULL)
+  {
+    delete stringFilterP;
+    stringFilterP = NULL;
+  }
 }
 
 
@@ -135,7 +140,10 @@ std::string TriggeredSubscription::toString(const std::string& delimiter)
 *
 * TriggeredSubscription::stringFilterSet - 
 */
-void TriggeredSubscription::stringFilterSet(StringFilter* _stringFilterP)
+bool TriggeredSubscription::stringFilterSet(StringFilter* _stringFilterP, std::string* errorStringP)
 {
-  stringFilterP = _stringFilterP;
+  stringFilterP = _stringFilterP->clone(errorStringP);
+
+  LM_W(("KZ: stringFilterP cloned to %p", stringFilterP));
+  return (stringFilterP == NULL)? false : true;
 }
