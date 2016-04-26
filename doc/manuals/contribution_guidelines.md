@@ -685,14 +685,14 @@ If you plan to use some of them, please consult before with the core developers.
   * The flavor of this project is biased to C clearly. Many plain C libraries are used and mixing exceptions and
   traditional if-checking method should be avoided as much as possible.
 * Object passing. In order to avoid inefficient object copies when calling functions, the following criteria apply:
-  * If the function doesn't modify the object (i.e. "read only"), then use const references, e.g. `const BigFish& bf`
-  * If the function modifies the object (i.e. "read/write" or "write"), then use a pointer type, e.g: `BigFish* bf`. Note that in this case we could also use a reference, but we prefer pointers to make more explicit that the object is to be modified by the function.
+  * If the function should not be able to modify the object (i.e. "read only"), then const references should be used, e.g. `const BigFish& bf`
+  * If the function must be able to modify the object (i.e. "read/write" or "write"), then a pointer type should be used, e.g: `BigFish* bf`. Note that in this case a C++ reference could be used as well, but we prefer pointers to clearly illustrate that the object might be be modified by the function.
 
 ```
 void myFunction(const& BigFish in, BigFish* out)
 ```
 
-* Strings return. In order to avoid inefficient object copies when returning strings, the  `const std::string&` return type is preferred. In the case that pattern cannot be used (e.g. when literal string such as "black", "red", etc. are used in the function) then `const char*` should be used as return type.
+* Strings return. In order to avoid inefficient object copies when returning strings, the  `const std::string&` return type is preferred. In the case this pattern cannot be used (e.g. when literal string such as "black", "red", etc. are used in the call of the function) then `const char*` should be used as return type.
 
 ```
 const std::string& myFunction(...)
