@@ -654,7 +654,7 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
       | error       | BadRequest        |
       | description | service not found |
 
-  @entity_id_update_invalid @BUG_1351
+  @entity_id_update_invalid @BUG_1351 @ISSUE_2080 @skip
   Scenario:  try to update an attribute by entity ID and attribute name using NGSI v2 with invalid entity id values
     Given  a definition of headers
       | parameter          | value                 |
@@ -983,30 +983,31 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
       | Content-Type       | application/json                 |
    # These properties below are used in create request
     And properties to entities
-      | parameter        | value       |
-      | entities_type    | house       |
-      | entities_id      | room        |
-      | attributes_name  | temperature |
-      | attributes_value | 34          |
-      | attributes_type  | celsius     |
-      | metadatas_number | 2           |
-      | metadatas_name   | very_hot    |
-      | metadatas_type   | alarm       |
-      | metadatas_value  | hot         |
-    And create entity group with "3" entities in "normalized" mode
+      | parameter         | value       |
+      | entities_type     | house       |
+      | entities_id       | room        |
+      | attributes_number | 4           |
+      | attributes_name   | temperature |
+      | attributes_value  | 34          |
+      | attributes_type   | celsius     |
+      | metadatas_number  | 2           |
+      | metadatas_name    | very_hot    |
+      | metadatas_type    | alarm       |
+      | metadatas_value   | hot         |
+    And create entity group with "1" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
     # These properties below are used in update request
     And properties to entities
-      | parameter        | value |
-      | attributes_value | 25    |
-    When update an attribute by ID "room_1" and attribute name "" if it exists
+      | parameter        | value     |
+      | attributes_value | 25        |
+    When update an attribute by ID "room" and attribute name "" if it exists
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value             |
-      | error       | BadRequest        |
-      | description | service not found |
+      | parameter   | value                                                            |
+      | error       | BadRequest                                                       |
+      | description | attribute must be a JSON object, unless keyValues option is used |
 
  # --------------------- attribute type  ------------------------------------
 

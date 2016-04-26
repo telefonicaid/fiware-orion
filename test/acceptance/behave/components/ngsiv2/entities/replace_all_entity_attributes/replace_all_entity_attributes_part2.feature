@@ -173,7 +173,7 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
       | my house            |
 
   @entity_id_replace_invalid @BUG_1782
-  Scenario Outline:  try to replace attributes by entity ID using NGSI v2 with invalid entity id values
+  Scenario:  try to replace attributes by entity ID using NGSI v2 with invalid entity id values
     Given  a definition of headers
       | parameter          | value                  |
       | Fiware-Service     | test_replace_entity_id |
@@ -184,17 +184,50 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
       | parameter        | value    |
       | attributes_name  | pressure |
       | attributes_value | 80       |
-    When replace attributes by ID "<entity_id>" if it exists and with "normalized" mode
-    Then verify that receive an "Not Found" http code
+    When replace attributes by ID "house_?" if it exists and with "normalized" mode
+    Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
-    Examples:
-      | entity_id |
-      | house_?   |
-      | house_/   |
-      | house_#   |
+      | parameter   | value                                        |
+      | error       | BadRequest                                   |
+      | description | Empty right-hand-side for URI param //attrs/ |
+
+  @entity_id_replace_invalid @BUG_1782
+  Scenario:  try to replace attributes by entity ID using NGSI v2 with invalid entity id values
+    Given  a definition of headers
+      | parameter          | value                  |
+      | Fiware-Service     | test_replace_entity_id |
+      | Fiware-ServicePath | /test                  |
+      | Content-Type       | application/json       |
+    # These properties below are used in update request
+    And properties to entities
+      | parameter        | value    |
+      | attributes_name  | pressure |
+      | attributes_value | 80       |
+    When replace attributes by ID "house_/" if it exists and with "normalized" mode
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value             |
+      | error       | BadRequest        |
+      | description | service not found |
+
+  @entity_id_replace_invalid @BUG_1782 @ISSUE_2075 @skip
+  Scenario:  try to replace attributes by entity ID using NGSI v2 with invalid entity id values
+    Given  a definition of headers
+      | parameter          | value                  |
+      | Fiware-Service     | test_replace_entity_id |
+      | Fiware-ServicePath | /test                  |
+      | Content-Type       | application/json       |
+    # These properties below are used in update request
+    And properties to entities
+      | parameter        | value    |
+      | attributes_name  | pressure |
+      | attributes_value | 80       |
+    When replace attributes by ID "house_/" if it exists and with "normalized" mode
+    Then verify that receive an "Method not allowed" http code
+    And verify an error response
+      | parameter   | value            |
+      | error       | MethodNotAllowed |
+      | description | No defined yet   |
 
   # --------------------- attribute name  ------------------------------------
 
