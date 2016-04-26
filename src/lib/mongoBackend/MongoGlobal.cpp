@@ -1781,7 +1781,7 @@ static bool processOnChangeConditionForSubscription
   const std::vector<std::string>&  servicePathV,
   Restriction*                     resP,
   const std::string&               fiwareCorrelator,
-  const std::vector<std::string>&  attrsFilter
+  const std::vector<std::string>&  attrsOrder
 )
 {
   std::string                   err;
@@ -1829,7 +1829,7 @@ static bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
-        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsFilter);
+        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
@@ -1840,7 +1840,7 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
-      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsFilter);
+      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
       ncr.contextElementResponseVector.release();
 
       return true;
@@ -1873,7 +1873,7 @@ BSONArray processConditionVector
   Restriction*                     resP,
   const std::string&               status,
   const std::string&               fiwareCorrelator,
-  const std::vector<std::string>   attrsFilter
+  const std::vector<std::string>   attrsOrder
 )
 {
   BSONArrayBuilder conds;
@@ -1910,7 +1910,7 @@ BSONArray processConditionVector
                                                    servicePathV,
                                                    resP,
                                                    fiwareCorrelator,
-                                                   attrsFilter)))
+                                                   attrsOrder)))
       {
         *notificationDone = true;
       }
