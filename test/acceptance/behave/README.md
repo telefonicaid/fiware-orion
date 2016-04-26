@@ -272,6 +272,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 | create_entity                               |    693       | POST    | /v2/entities/                                        | Yes       | Yes            |    
 |                                                                                                                                                          |
 | retrieve_entity                             |    220       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |
+| retrieve_entity_attributes                  |  (pending)   | GET     | /v2/entities/`<entity_id>/attrs`                     | No        | Yes            |
 | update_or_append_entity_attributes          |    823       | POST    | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
 | update_existing_entity_attributes           |    642       | PATCH   | /v2/entities/`<entity_id>`                           | Yes       | Yes            |
 | replace_all_entity_attributes               |    586       | PUT     | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  

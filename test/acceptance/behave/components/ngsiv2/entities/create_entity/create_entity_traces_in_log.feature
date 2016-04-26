@@ -68,18 +68,30 @@ Feature: verify fields in log traces with create entity request using NGSI v2.
     When create entity group with "1" entities in "normalized" mode
     And verify that receive several "Created" http code
     And verify that entities are stored in mongo
-    And check in log, label "INFO" and message "msg=logMsg.h[1803]: Starting transaction from"
+    And check in log, label "INFO" and message "Starting transaction from"
       | trace    | value              |
       | time     | ignored            |
+      | corr     | ignored            |
       | trans    | ignored            |
       | srv      | pending            |
       | subsrv   | pending            |
       | from     | pending            |
       | function | lmTransactionStart |
       | comp     | Orion              |
-    And check in log, label "INFO" and message "msg=logMsg.h[1887]: Transaction ended"
+    And check in log, label "DEBUG" and message "-------------------- Serving request POST /v2/entities -----------------"
+      | trace    | value           |
+      | time     | ignored         |
+      | corr     | N/A             |
+      | trans    | N/A             |
+      | srv      | N/A             |
+      | subsrv   | N/A             |
+      | from     | N/A             |
+      | function | connectionTreat |
+      | comp     | Orion           |
+    And check in log, label "INFO" and message "Transaction ended"
       | trace    | value            |
       | time     | ignored          |
+      | corr     | ignored          |
       | trans    | ignored          |
       | srv      | test_log_traces  |
       | subsrv   | /test            |

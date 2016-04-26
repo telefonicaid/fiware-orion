@@ -114,18 +114,30 @@ Feature: verify fields in log traces with list entities request using NGSI v2.
     And verify headers in response
       | parameter     | value |
       | x-total-count | 1     |
-    And check in log, label "INFO" and message "msg=logMsg.h[1803]: Starting transaction from"
+    And check in log, label "INFO" and message "Starting transaction from"
       | trace    | value              |
       | time     | ignored            |
+      | corr     | ignored            |
       | trans    | ignored            |
       | srv      | pending            |
       | subsrv   | pending            |
       | from     | pending            |
       | function | lmTransactionStart |
       | comp     | Orion              |
-    And check in log, label "INFO" and message "msg=logMsg.h[1887]: Transaction ended"
+    And check in log, label "DEBUG" and message "--------------------- Serving request GET /v2/entities -----------------"
+      | trace    | value           |
+      | time     | ignored         |
+      | corr     | N/A             |
+      | trans    | N/A             |
+      | srv      | N/A             |
+      | subsrv   | N/A             |
+      | from     | N/A             |
+      | function | connectionTreat |
+      | comp     | Orion           |
+    And check in log, label "INFO" and message "Transaction ended"
       | trace    | value            |
       | time     | ignored          |
+      | corr     | ignored          |
       | trans    | ignored          |
       | srv      | test_log_traces  |
       | subsrv   | /test            |
