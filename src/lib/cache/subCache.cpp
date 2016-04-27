@@ -745,7 +745,7 @@ void subCacheItemInsert
 
       //
       // NOTE
-      //   Here, the cached subscription should have a String Filter but as clone failed, it doesn't
+      //   Here, the cached subscription should have a String Filter but as 'fill()' failed, it doesn't.
       //   The subscription is already in mongo and hopefully this erroneous situation is fixed 
       //   once the sub-cache is refreshed.
       //
