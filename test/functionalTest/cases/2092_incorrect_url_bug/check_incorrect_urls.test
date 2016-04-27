@@ -117,13 +117,13 @@ echo
 01. Create subscription without url // and get error
 ====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 50
+Content-Length: 75
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Invalid URL",
+    "description": "Invalid URL parsing notification url",
     "error": "BadRequest"
 }
 
@@ -131,13 +131,13 @@ Date: REGEX(.*)
 02. Create subscription without url /// and get error
 =====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 50
+Content-Length: 75
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Invalid URL",
+    "description": "Invalid URL parsing notification url",
     "error": "BadRequest"
 }
 
@@ -145,13 +145,13 @@ Date: REGEX(.*)
 03. Create subscription without url http:///a and get error
 ===========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 50
+Content-Length: 75
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Invalid URL",
+    "description": "Invalid URL parsing notification url",
     "error": "BadRequest"
 }
 

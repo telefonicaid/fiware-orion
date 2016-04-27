@@ -263,6 +263,7 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
   {
     return false;
   }
+  protocol = urlTokens[0];  // needed by the caller
 
   //
   // Ensuring the host is present
