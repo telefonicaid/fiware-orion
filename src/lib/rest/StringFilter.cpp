@@ -97,7 +97,6 @@ StringFilterItem::~StringFilterItem()
   stringList.clear();
   numberList.clear();
 
-  LM_W(("FGM this is %s, destroying", stringValue.c_str()));
   if (compiledPattern == true)
   {
     regfree(&patternValue);
