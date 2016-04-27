@@ -442,7 +442,8 @@ int httpRequestSendWithCurl
 
 
   // Synchronous HTTP request
-  LM_T(LmtClientOutputPayload, ("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
+  // This was previously a LM_T trace, but we have "promoted" it to INFO due to it is needed to check logs in a .test case (case 000 notification_different_sizes.test)
+  LM_I(("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
   res = curl_easy_perform(curl);
 
   if (res != CURLE_OK)

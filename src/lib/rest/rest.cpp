@@ -695,7 +695,8 @@ int servicePathSplit(ConnectionInfo* ciP)
 
     ciP->servicePathV[ix] = removeTrailingSlash(stripped);
 
-    LM_T(LmtServicePath, ("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
+    // This was previously a LM_T trace, but we have "promoted" it to INFO due to it is needed to check logs in a .test case (case 0392 service_path_http_header.test)
+    LM_I(("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
   }
 
   for (int ix = 0; ix < servicePaths; ++ix)

@@ -27,7 +27,7 @@ FOREACH ( test_path ${test_files} )
     GET_FILENAME_COMPONENT ( test_file ${test_path} NAME_WE )
     ADD_TEST( ${test_file} ${PROJECT_SOURCE_DIR}/test/functionalTest/testHarness.sh ${test_path} )
     set_tests_properties( ${test_file} PROPERTIES
-        FAIL_REGULAR_EXPRESSION "[^a-z]Error;ERROR;Failed"
+        FAIL_REGULAR_EXPRESSION "[^a-z]Fail;FAIL;Failed"
         PASS_REGULAR_EXPRESSION "SUCCESS;Ok;seconds" )
 ENDFOREACH (test_path)
 
