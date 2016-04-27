@@ -1027,16 +1027,16 @@ class NGSI:
                         u' ERROR - thetype field "%s" is not stored correctly' % subscription_context["subject_type"]
         __logger__.info("entities field an its sub-fields are verified successfully")
         # conditions fields
-        if subscription_context["condition_attributes"] is not None:
+        if subscription_context["condition_attrs"] is not None:
             # conditions - type
             assert curs["conditions"][0]["type"] == "ONCHANGE", u' ERROR - the condition type "%s" is wrong in DB' % curs["conditions"][0]["type"]
             __logger__.info("type in the \"conditions\" field are verified successfully")
             # conditions - attributes
-            for a in range(int(subscription_context["condition_attributes_number"])):
-                if int(subscription_context["condition_attributes_number"]) > 1:
-                    condition_attr =  "%s_%s" % (subscription_context["condition_attributes"], str(a))
+            for a in range(int(subscription_context["condition_attrs_number"])):
+                if int(subscription_context["condition_attrs_number"]) > 1:
+                    condition_attr =  "%s_%s" % (subscription_context["condition_attrs"], str(a))
                 else:
-                    condition_attr = subscription_context["condition_attributes"]
+                    condition_attr = subscription_context["condition_attrs"]
                 assert condition_attr in curs["conditions"][0]["value"], \
                     u' ERROR - the condition attr "%s" does not exist in conditions values into DB' % condition_attr
             __logger__.info("attributes in the \"conditions\" field are verified successfully")
@@ -1055,13 +1055,13 @@ class NGSI:
               assert curs["expression"][k] == "", u' ERROR - the "%s" key in expression is not empty or not exists' % k
         __logger__.info("expressions in the \"conditions\" field are verified successfully")
         # reference field
-        if subscription_context["notification_callback"] is not None:
-            assert subscription_context["notification_callback"] == curs["reference"], u' ERROR - the reference "%s" is not the expected' % curs["reference"]
+        if subscription_context["notification_http_url"] is not None:
+            assert subscription_context["notification_http_url"] == curs["reference"], u' ERROR - the reference "%s" is not the expected' % curs["reference"]
         else:
            assert EMPTY == curs["reference"], u' ERROR - the reference "%s" is not the expected' % curs["reference"]
         __logger__.info("callback(reference) in the \"notification\" field is verified successfully")
         # throttling field
-        assert curs["throttling"] == int(subscription_context["notification_throttling"]), u' ERROR - the throttling "%s" is not the expected' % curs["throttling"]
+        assert curs["throttling"] == int(subscription_context["throttling"]), u' ERROR - the throttling "%s" is not the expected' % curs["throttling"]
         __logger__.info("throttling in the \"notification\" field is verified successfully")
         # expiration field
         if subscription_context["expires"] is not None:
@@ -1081,11 +1081,11 @@ class NGSI:
             assert curs["servicePath"] == service_path, u' ERROR the servicePath field "%s" is not the expected "%s"' % (curs["servicePath"], service_path)
             __logger__.info("servicePath field is verified successfully")
         # attrs field
-        for a in range(int(subscription_context["notification_attributes_number"])):
-            if int(subscription_context["notification_attributes_number"]) > 1:
-                condition_attr =  "%s_%s" % (subscription_context["notification_attributes"], str(a))
+        for a in range(int(subscription_context["notification_attrs_number"])):
+            if int(subscription_context["notification_attrs_number"]) > 1:
+                condition_attr =  "%s_%s" % (subscription_context["notification_attrs"], str(a))
             else:
-                condition_attr = subscription_context["notification_attributes"]
+                condition_attr = subscription_context["notification_attrs"]
             assert condition_attr in curs["attrs"], \
                 u' ERROR - the notification attrs "%s" does not exist in attrs into DB' % condition_attr
         __logger__.info("attributes in the \"notification\" field are verified successfully")
