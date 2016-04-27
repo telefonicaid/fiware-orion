@@ -53,3 +53,7 @@ cd libcoap-4.1.1
 make
 sudo cp examples/coap-client /usr/local/bin
 ```
+
+## Miscelanea
+
+This directory also include parts of harnessFunction.sh and testEnv.sh files related with CoAP.
