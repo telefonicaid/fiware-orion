@@ -134,7 +134,7 @@ function exitFunction()
   errorFile=$5
   forced=$6
 
-  echo -n "(ERROR $exitCode - $errorText) "
+  echo -n "(FAIL $exitCode - $errorText) "
 
   if [ "$stopOnError" == "on" ] || [ "$forced" == "DIE" ]
   then
