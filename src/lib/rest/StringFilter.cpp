@@ -1312,7 +1312,6 @@ bool StringFilter::match(ContextElementResponse* cerP)
 */
 StringFilter* StringFilter::clone(std::string* errorStringP)
 {
-  LM_W(("KZ: Cloning StringFilter"));
   StringFilter* sfP = new StringFilter();
 
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
@@ -1335,7 +1334,6 @@ StringFilter* StringFilter::clone(std::string* errorStringP)
   // Object copy
   sfP->mongoFilters = mongoFilters;
 
-  LM_W(("KZ: Cloning StringFilter - OK"));
   return sfP;
 }
 
@@ -1347,7 +1345,7 @@ StringFilter* StringFilter::clone(std::string* errorStringP)
 */
 bool StringFilter::fill(StringFilter* sfP, std::string* errorStringP)
 {
-  for (unsigned int ix = 0; ix < filters.size(); ++ix)
+  for (unsigned int ix = 0; ix < sfP->filters.size(); ++ix)
   {
     StringFilterItem  sfi;
 

@@ -144,6 +144,5 @@ bool TriggeredSubscription::stringFilterSet(StringFilter* _stringFilterP, std::s
 {
   stringFilterP = _stringFilterP->clone(errorStringP);
 
-  LM_W(("KZ: stringFilterP cloned to %p", stringFilterP));
   return (stringFilterP == NULL)? false : true;
 }

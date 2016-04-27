@@ -751,7 +751,7 @@ void subCacheItemInsert
       //
       //   This 'but' should be minimized once the issue 2082 gets implemented.
       //   [ Only reason for clone to fail (apart from out-of-memory) seems to be an invalid regex ]
-   }
+    }
   }
 
   LM_T(LmtSubCache, ("inserting a new sub in cache (%s). lastNotifictionTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
