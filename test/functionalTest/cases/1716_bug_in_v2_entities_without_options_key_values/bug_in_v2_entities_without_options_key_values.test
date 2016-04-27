@@ -42,14 +42,14 @@ brokerStart CB
 echo "01. Normal (but erroneous) v2 entity creation without keyValues (without crashing the broker)"
 echo "============================================================================================="
 payload='{"type": "house", "id": "bathroom", "temperature": "34"}'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "02. GET the entity to make sure the creation did NOT work"
 echo "========================================================="
-orionCurl --url /v2/entities/bathroom --json
+orionCurl --url /v2/entities/bathroom
 echo
 echo
 

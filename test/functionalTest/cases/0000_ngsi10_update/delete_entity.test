@@ -46,7 +46,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "1: ++++++++++++++++++++"
 url="/v1/queryContext"
@@ -60,7 +60,7 @@ payload='{
     ],
     "attributes": [ "temperature" ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "2: ++++++++++++++++++++"
 url="/v1/updateContext"
@@ -74,7 +74,7 @@ payload='{
   ],
   "updateAction": "DELETE"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "3: ++++++++++++++++++++"
 url="/v1/queryContext"
@@ -88,7 +88,7 @@ payload='{
     ],
     "attributes": [ "temperature" ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
 HTTP/1.1 200 OK

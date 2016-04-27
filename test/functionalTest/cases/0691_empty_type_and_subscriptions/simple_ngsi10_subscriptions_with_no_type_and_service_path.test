@@ -62,7 +62,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "${payload}" --servicePath "/Madrid/#" --json
+orionCurl --url /v1/subscribeContext --payload "${payload}" --servicePath "/Madrid/#"
 echo
 echo
 
@@ -78,7 +78,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T/id/E --payload "${payload}" --servicePath /Madrid --json
+orionCurl --url /v1/contextEntities/type/T/id/E --payload "${payload}" --servicePath /Madrid
 echo
 echo
 
@@ -94,7 +94,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T/id/E --payload "${payload}" --servicePath /Barcelona --json
+orionCurl --url /v1/contextEntities/type/T/id/E --payload "${payload}" --servicePath /Barcelona
 echo
 echo
 

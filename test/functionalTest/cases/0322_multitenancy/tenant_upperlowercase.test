@@ -51,21 +51,21 @@ payload='{
 
 # 1. Registering an entity with tenant in upper-case
 echo "1: ++++++++++"
-orionCurl --url "/v1/registry/registerContext" --payload "$payload" --tenant "CASE" --json
+orionCurl --url "/v1/registry/registerContext" --payload "$payload" --tenant "CASE"
 echo
 echo
 
 
 # 2. Registering another entity with same tenant but in mixed-case
 echo "2: ++++++++++"
-orionCurl --url "/v1/registry/registerContext" --payload "$payload" --tenant "Case" --json
+orionCurl --url "/v1/registry/registerContext" --payload "$payload" --tenant "Case"
 echo
 echo
 
 
 # 3. Registering another entity with same tenant but in lower-case
 echo "3: ++++++++++"
-orionCurl --url "/v1/registry/registerContext" --payload "$payload" --tenant "case" --json
+orionCurl --url "/v1/registry/registerContext" --payload "$payload" --tenant "case"
 echo
 echo
 
@@ -81,21 +81,21 @@ payload='{
   ]
 }'
 echo "4: ++++++++++"
-orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload" --tenant "CASE" --json
+orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload" --tenant "CASE"
 echo
 echo
 
 
 # 5. Discovering all three registrations with tenant in mixed-case
 echo "5: ++++++++++"
-orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload" --tenant "Case" --json
+orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload" --tenant "Case"
 echo
 echo
 
 
 # 6. Discovering all three registrations with tenant in lower-case
 echo "6: ++++++++++"
-orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload" --tenant "case" --json
+orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload" --tenant "case"
 
 
 --REGEXPECT--

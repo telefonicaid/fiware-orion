@@ -60,7 +60,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "${payload}" --servicePath "/Madrid/#,/Barcelona/#" --json
+orionCurl --url /v1/subscribeContext --payload "${payload}" --servicePath "/Madrid/#,/Barcelona/#"
 echo
 echo
 

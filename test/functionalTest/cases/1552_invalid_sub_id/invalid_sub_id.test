@@ -36,14 +36,14 @@ brokerStart CB
 
 echo "01. Ask to see a subscription with invalid ID"
 echo "============================================="
-orionCurl --url /v2/subscriptions/inexistentid --json
+orionCurl --url /v2/subscriptions/inexistentid
 echo
 echo
 
 
 echo "02. Ask to see a subscription that doesn't exist"
 echo "================================================"
-orionCurl --url /v2/subscriptions/000011112222333344445555 --json
+orionCurl --url /v2/subscriptions/000011112222333344445555
 echo
 echo
 

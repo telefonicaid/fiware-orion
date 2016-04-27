@@ -52,133 +52,133 @@ brokerStart CB
 
 echo "01. geometry without coords - see error"
 echo "======================================="
-orionCurl --url '/v2/entities?geometry=polygon' --json
+orionCurl --url '/v2/entities?geometry=polygon'
 echo
 echo
 
 
 echo "02. coords without geometry - see error"
 echo "======================================="
-orionCurl --url '/v2/entities?coords=1,2;3,4' --json
+orionCurl --url '/v2/entities?coords=1,2;3,4'
 echo
 echo
 
 
 echo "03. georel without geometry - see error"
 echo "======================================="
-orionCurl --url '/v2/entities?georel=intersects' --json
+orionCurl --url '/v2/entities?georel=intersects'
 echo
 echo
 
 
 echo "04. Non-supported area-type in geometry - see error"
 echo "==================================================="
-orionCurl --url '/v2/entities?geometry=triangle&coords=1,2' --json
+orionCurl --url '/v2/entities?geometry=triangle&coords=1,2'
 echo
 echo
 
 
 echo "05a. georel 'near' in box geometry - see error"
 echo "=============================================="
-orionCurl --url '/v2/entities?geometry=box&coords=1,2;3,4&georel=near;maxDistance:12' --json
+orionCurl --url '/v2/entities?geometry=box&coords=1,2;3,4&georel=near;maxDistance:12'
 echo
 echo
 
 
 echo "05b. georel 'near' in polygon geometry - see error"
 echo "=================================================="
-orionCurl --url '/v2/entities?geometry=polygon&coords=1,2;3,4;3,0;1,0;1,2&georel=near;maxDistance:12' --json
+orionCurl --url '/v2/entities?geometry=polygon&coords=1,2;3,4;3,0;1,0;1,2&georel=near;maxDistance:12'
 echo
 echo
 
 
 echo "05c. georel 'near' in line geometry - see error"
 echo "==============================================="
-orionCurl --url '/v2/entities?geometry=line&coords=1,2;3,4&georel=near;maxDistance:12' --json
+orionCurl --url '/v2/entities?geometry=line&coords=1,2;3,4&georel=near;maxDistance:12'
 echo
 echo
 
 
 echo "06. georel 'near' without min/max-distance - see error"
 echo "======================================================"
-orionCurl --url '/v2/entities?geometry=point&coords=1,2&georel=near' --json
+orionCurl --url '/v2/entities?geometry=point&coords=1,2&georel=near'
 echo
 echo
 
 
 echo "07. 3 coords in a point - see error"
 echo "==================================="
-orionCurl --url '/v2/entities?geometry=point&coords=1,2,3' --json
+orionCurl --url '/v2/entities?geometry=point&coords=1,2,3'
 echo
 echo
 
 
 echo "08. invalid point in coords - see error"
 echo "======================================="
-orionCurl --url '/v2/entities?geometry=point&coords=1;3,4' --json
+orionCurl --url '/v2/entities?geometry=point&coords=1;3,4'
 echo
 echo
 
 
 echo "09. Too many points for a Point - see error"
 echo "==========================================="
-orionCurl --url '/v2/entities?geometry=point&coords=1,2;3,4' --json
+orionCurl --url '/v2/entities?geometry=point&coords=1,2;3,4'
 echo
 echo
 
 
 echo "10. Too many points for a Line - see error"
 echo "==========================================="
-orionCurl --url '/v2/entities?geometry=line&coords=1,2;3,4;5.6' --json
+orionCurl --url '/v2/entities?geometry=line&coords=1,2;3,4;5.6'
 echo
 echo
 
 
 echo "11. Too few points for a Line - see error"
 echo "========================================="
-orionCurl --url '/v2/entities?geometry=line&coords=1,2' --json
+orionCurl --url '/v2/entities?geometry=line&coords=1,2'
 echo
 echo
 
 
 echo "12. Too many points for a Box - see error"
 echo "=========================================="
-orionCurl --url '/v2/entities?geometry=box&coords=1,2;3,4;5.6' --json
+orionCurl --url '/v2/entities?geometry=box&coords=1,2;3,4;5.6'
 echo
 echo
 
 
 echo "13. Too few points for a Box - see error"
 echo "========================================"
-orionCurl --url '/v2/entities?geometry=box&coords=1,2' --json
+orionCurl --url '/v2/entities?geometry=box&coords=1,2'
 echo
 echo
 
 
 echo "14. Too few points for a Polygon - see error"
 echo "============================================"
-orionCurl --url '/v2/entities?geometry=polygon&coords=1,2;3,4' --json
+orionCurl --url '/v2/entities?geometry=polygon&coords=1,2;3,4'
 echo
 echo
 
 
 echo "15a. Degenerated box - see error"
 echo "================================"
-orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=1,2;3,2' --json
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=1,2;3,2'
 echo
 echo
 
 
 echo "15b. Degenerated box - see error"
 echo "================================"
-orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=1,2;1,8' --json
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=1,2;1,8'
 echo
 echo
 
 
 echo "15c. Degenerated box - see error"
 echo "================================"
-orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=1,2;1,2' --json
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=1,2;1,2'
 echo
 echo
 

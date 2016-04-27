@@ -45,7 +45,7 @@ payload='{
     "id": "E1",
     "type": "T1"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -56,7 +56,7 @@ payload='{
     "id": "E1",
     "type": "T2"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -67,7 +67,7 @@ payload='{
     "id": "E1",
     "type": "T3"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -78,7 +78,7 @@ payload='{
     "id": "E1",
     "type": "T4"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -89,13 +89,13 @@ payload='{
     "id": "E1",
     "type": "T5"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 echo "06. GET /v2/entities/E1 (too many entities error)"
 echo "================================================="
-orionCurl --url '/v2/entities/E1' --json
+orionCurl --url '/v2/entities/E1'
 echo
 echo
 

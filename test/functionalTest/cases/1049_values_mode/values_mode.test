@@ -57,21 +57,21 @@ payload='{
     "value": 4
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "02. Get values without attrs param -> A, B, C, D"
 echo "================================================"
-orionCurl --url '/v2/entities/E?options=values' --json
+orionCurl --url '/v2/entities/E?options=values'
 echo
 echo
 
 
 echo "03. Get values in order B, D, C"
 echo "==============================="
-orionCurl --url '/v2/entities/E?attrs=B,D,C&options=values' --json
+orionCurl --url '/v2/entities/E?attrs=B,D,C&options=values'
 echo
 echo
 

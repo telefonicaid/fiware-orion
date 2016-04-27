@@ -50,42 +50,42 @@ payload='{
     "bool":    true
   }
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "02. GET /v2/entities/E1"
 echo "======================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
 
 echo "03. DELETE /v2/entities/E1/attrs/compattr"
 echo "========================================="
-orionCurl --url /v2/entities/E1/attrs/compattr -X DELETE --json
+orionCurl --url /v2/entities/E1/attrs/compattr -X DELETE
 echo
 echo
 
 
 echo "04. GET /v2/entities/E1"
 echo "======================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
 
 echo "05. DELETE /v2/entities/E1/attrs/simpleattr"
 echo "==========================================="
-orionCurl --url /v2/entities/E1/attrs/simpleattr -X DELETE --json
+orionCurl --url /v2/entities/E1/attrs/simpleattr -X DELETE
 echo
 echo
 
 
 echo "06. GET /v2/entities/E1"
 echo "======================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 --REGEXPECT--

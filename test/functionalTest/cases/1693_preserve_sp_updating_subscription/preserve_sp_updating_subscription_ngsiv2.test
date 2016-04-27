@@ -62,7 +62,7 @@ payload='
     "expires": "2050-04-05T14:00:00.00Z"
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --servicePath /s1 --json
+orionCurl --url /v2/subscriptions --payload "$payload" --servicePath /s1
 echo
 echo
 
@@ -71,7 +71,7 @@ idSubscription=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 
 
 echo "02. Get subscriptions by /sp1 and get it"
 echo "========================================"
-orionCurl --url /v2/subscriptions --servicePath /s1 --json
+orionCurl --url /v2/subscriptions --servicePath /s1
 echo
 echo
 
@@ -88,14 +88,14 @@ payload='
     }
 }
 '
-orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" --servicePath /s1 --json -X PATCH
+orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" --servicePath /s1 -X PATCH
 echo
 echo
 
 
 echo "04. Get subscriptions by /sp1 and get it"
 echo "========================================"
-orionCurl --url /v2/subscriptions --servicePath /s1 --json
+orionCurl --url /v2/subscriptions --servicePath /s1
 echo
 echo
 
@@ -112,21 +112,21 @@ payload='
     }
 }
 '
-orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" --servicePath /s2 --json -X PATCH
+orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" --servicePath /s2 -X PATCH
 echo
 echo
 
 
 echo "06. Get subscriptions by /sp1 without results"
 echo "============================================="
-orionCurl --url /v2/subscriptions --servicePath /s1 --json
+orionCurl --url /v2/subscriptions --servicePath /s1
 echo
 echo
 
 
 echo "07. Get subscriptions by /sp2 and get it"
 echo "========================================"
-orionCurl --url /v2/subscriptions --servicePath /s2 --json
+orionCurl --url /v2/subscriptions --servicePath /s2
 echo
 echo
 

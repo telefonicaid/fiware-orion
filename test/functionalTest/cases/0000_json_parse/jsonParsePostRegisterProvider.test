@@ -34,7 +34,7 @@ payload='{
   "duration" : "P1M",
   "providingApplication" : "http://mysensors.com/Rooms"
 }'
-orionCurl --url "${url}" --payload "${payload}" --json
+orionCurl --url "${url}" --payload "${payload}"
 
 echo "2: ***********************************"
 url="/v1/registry/contextEntities/Room1/attributes/temperature"
@@ -42,7 +42,7 @@ payload='{
   "duration" : "P1M",
   "providingApplication" : "http://mysensors.com/Rooms"
 }'
-orionCurl --url "${url}" --payload "${payload}" --json
+orionCurl --url "${url}" --payload "${payload}"
 
 echo "3: ***********************************"
 url="/v1/registry/contextEntities/Room1/attributes/pressure"
@@ -50,7 +50,7 @@ payload='{
   "duration" : "P1M",
   "providingApplication" : "http://mysensors.com/Rooms"
 }'
-orionCurl --url "${url}" --payload "${payload}" --json
+orionCurl --url "${url}" --payload "${payload}"
 
 --REGEXPECT--
 1: ***********************************

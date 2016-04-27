@@ -29,7 +29,7 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. get an entity +++++"
-orionCurl --url "/v1/contextEntities/entity01/attributes/attr01" --json
+orionCurl --url "/v1/contextEntities/entity01/attributes/attr01"
 
 --REGEXPECT--
 +++++ 1. get an entity +++++

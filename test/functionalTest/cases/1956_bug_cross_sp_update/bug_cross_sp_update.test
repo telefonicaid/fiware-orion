@@ -51,7 +51,7 @@ payload='{
         "value": "aaa"
     }
 }'
-orionCurl --url '/v2/entities' --payload "$payload" --json --servicePath '/aaa'
+orionCurl --url '/v2/entities' --payload "$payload" --servicePath '/aaa'
 echo
 echo
 
@@ -66,7 +66,7 @@ payload='{
         "type": "Tbis"
     }
 }'
-orionCurl --url '/v2/entities' --payload "$payload" --json
+orionCurl --url '/v2/entities' --payload "$payload"
 echo
 echo
 
@@ -91,21 +91,21 @@ payload='{
     "updateAction": "APPEND"
 }
 '
-orionCurl --url '/v1/updateContext' --payload "$payload" --json
+orionCurl --url '/v1/updateContext' --payload "$payload"
 echo
 echo
 
 
 echo '04. Check that entity at SP / receives the update'
 echo '================================================='
-orionCurl --url /v2/entities/E --json --servicePath '/'
+orionCurl --url /v2/entities/E --servicePath '/'
 echo
 echo
 
 
 echo '05. Check that entity at SP /add did not received the update'
 echo '============================================================'
-orionCurl --url /v2/entities/E --json --servicePath '/aaa'
+orionCurl --url /v2/entities/E --servicePath '/aaa'
 echo
 echo
 

@@ -63,14 +63,14 @@ payload='
         }
     }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "02. GET the entity to make sure the creation worked"
 echo "==================================================="
-orionCurl --url /v2/entities/Room10 --json
+orionCurl --url /v2/entities/Room10
 echo
 echo
 
@@ -90,14 +90,14 @@ payload='
         }
     }
 }'
-orionCurl --url /v2/entities/Room10/attrs/temperature --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/Room10/attrs/temperature --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "04. GET the entity to make sure the creation worked"
 echo "==================================================="
-orionCurl --url /v2/entities/Room10 --json
+orionCurl --url /v2/entities/Room10
 echo
 echo
 

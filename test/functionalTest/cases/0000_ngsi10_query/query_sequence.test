@@ -43,7 +43,7 @@ payload='{
     "lightstatus"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 sleep 1.1
 
 echo "2: ++++++++++++++++++++"
@@ -60,7 +60,7 @@ payload='{
     "temperature"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "3: ++++++++++++++++++++"
 url="/v1/updateContext"
@@ -93,7 +93,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "4: ++++++++++++++++++++"
 url="/v1/queryContext"
@@ -110,7 +110,7 @@ payload='{
     "lightstatus"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "5: ++++++++++++++++++++"
 url="/v1/queryContext"
@@ -126,7 +126,7 @@ payload='{
     "temperature"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "6: ++++++++++++++++++++"
 url="/v1/queryContext"
@@ -143,7 +143,7 @@ payload='{
     "lightstatus"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "7: ++++++++++++++++++++"
 url="/v1/queryContext"
@@ -159,7 +159,7 @@ payload='{
     "temperature"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "8: ++++++++++++++++++++"
 url="/v1/queryContext"
@@ -180,7 +180,7 @@ payload='{
     "temperature"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "9: ++++++++++++++++++++"
 url="/v1/queryContext"
@@ -202,7 +202,7 @@ payload='{
     "lightstatus"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "10: ++++++++++++++++++++"
 url="/v1/queryContext"
@@ -220,7 +220,7 @@ payload='{
     "temperature"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "11: ++++++++++++++++++++"
 url="/v1/queryContext"
@@ -238,7 +238,7 @@ payload='{
     "temperature"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "12: ++++++++++++++++++++"
 url="/v1/queryContext"
@@ -252,7 +252,7 @@ payload='{
   ],
   "attributes": [ ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "13: ++++++++++++++++++++"
 url="/v1/updateContext"
@@ -278,7 +278,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "14: ++++++++++++++++++++"
 url="/v1/queryContext"
@@ -292,7 +292,7 @@ payload='{
   ],
   "attributes": [ ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "15: ++++++++++++++++++++"
 url="/v1/updateContext"
@@ -318,7 +318,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "16: ++++++++++++++++++++"
 url="/v1/queryContext"
@@ -337,7 +337,7 @@ payload='{
   ],
   "attributes": [ ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 sleep 1.1
 
 echo "17: ++++++++++++++++++++"
@@ -359,7 +359,7 @@ payload='{
     "temperature"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "18.1: ++++++++++++++++++++"
 url="/v1/updateContext"
@@ -380,7 +380,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 sleep 1.1
 
 echo "18.2: ++++++++++++++++++++"
@@ -402,7 +402,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "19: ++++++++++++++++++++"
 url="/v1/queryContext"
@@ -418,7 +418,7 @@ payload='{
     "temperature"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "20: ++++++++++++++++++++"
 url="/v1/queryContext"
@@ -436,7 +436,7 @@ payload='{
     "lightstatus"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
 1: ++++++++++++++++++++

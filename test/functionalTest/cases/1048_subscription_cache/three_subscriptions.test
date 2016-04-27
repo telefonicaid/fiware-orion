@@ -74,7 +74,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload"
 SUB1=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
 echo
 echo
@@ -105,7 +105,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload"
 SUB2=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
 echo
 echo
@@ -136,7 +136,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload"
 SUB3=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
 echo
 echo
@@ -144,10 +144,10 @@ echo
 
 echo "04. Statistics"
 echo "=============="
-orionCurl --url /statistics --json
+orionCurl --url /statistics
 echo
 echo
-orionCurl --url /cache/statistics --json
+orionCurl --url /cache/statistics
 echo
 echo
 
@@ -158,17 +158,17 @@ payload='
 {
   "subscriptionId": "'$SUB1'"
 }'
-orionCurl --url /v1/unsubscribeContext --payload "$payload" --json
+orionCurl --url /v1/unsubscribeContext --payload "$payload"
 echo
 echo
 
 
 echo "06. Statistics"
 echo "=============="
-orionCurl --url /statistics --json
+orionCurl --url /statistics
 echo
 echo
-orionCurl --url /cache/statistics --json
+orionCurl --url /cache/statistics
 echo
 echo
 
@@ -179,17 +179,17 @@ payload='
 {
   "subscriptionId": "'$SUB2'"
 }'
-orionCurl --url /v1/unsubscribeContext --payload "$payload" --json
+orionCurl --url /v1/unsubscribeContext --payload "$payload"
 echo
 echo
 
 sleep 2
 echo "08. Statistics"
 echo "=============="
-orionCurl --url /statistics --json
+orionCurl --url /statistics
 echo
 echo
-orionCurl --url /cache/statistics --json
+orionCurl --url /cache/statistics
 echo
 echo
 

@@ -52,19 +52,19 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url '/v1/updateContext' --payload "$payload" --json
+orionCurl --url '/v1/updateContext' --payload "$payload"
 echo
 echo
 
 
 echo "1. Listing of Entity Type Attributes. Response in JSON"
-orionCurl --url /v1/contextTypes/Room --json 
+orionCurl --url /v1/contextTypes/Room 
 echo
 echo
 
 
 echo "2. Listing of Entity Type Attributes. Response in JSON, details=on"
-orionCurl --url /v1/contextTypes/Room?details=on --json 
+orionCurl --url /v1/contextTypes/Room?details=on 
 echo
 echo
 

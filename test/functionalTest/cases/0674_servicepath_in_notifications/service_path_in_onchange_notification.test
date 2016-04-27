@@ -50,7 +50,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/ET/id/E1 --servicePath '/entity' --payload "${payload}" --json
+orionCurl --url /v1/contextEntities/type/ET/id/E1 --servicePath '/entity' --payload "${payload}"
 echo
 echo
 
@@ -66,14 +66,14 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/ET/id/E2 --servicePath '/entity' --payload "${payload}" --json
+orionCurl --url /v1/contextEntities/type/ET/id/E2 --servicePath '/entity' --payload "${payload}"
 echo
 echo
 
 
 echo "03. Query ET-typed entities  with service-path /entity"
 echo "======================================================"
-orionCurl --url /v1/contextEntityTypes/ET --servicePath '/entity' --json
+orionCurl --url /v1/contextEntityTypes/ET --servicePath '/entity'
 echo
 echo
 
@@ -99,7 +99,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --servicePath '/entity' --json --payload "${payload}"
+orionCurl --url /v1/subscribeContext --servicePath '/entity' --payload "${payload}"
 echo
 echo
 

@@ -38,7 +38,7 @@ brokerStart CB
 echo '01. POST /v2/entities to create Espa>a/T1'
 echo "========================================="
 payload='{ "id": "Espa>a", "type": "T1", "A1": "" }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -46,7 +46,7 @@ echo
 echo '02. POST /v2/entities to create E1/Ol('
 echo "======================================"
 payload='{ "id": "E1", "type": "Ol(", "A2": { "value": "" }}'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -54,7 +54,7 @@ echo
 echo '03. POST /v2/entities to create E;/T1'
 echo "======================================"
 payload='{ "id": "E;", "type": "T1", "A2": { "value": "" }}'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 

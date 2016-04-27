@@ -53,7 +53,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/ET/id/E1 --payload "${payload}" --json
+orionCurl --url /v1/contextEntities/type/ET/id/E1 --payload "${payload}"
 echo
 echo
 
@@ -84,7 +84,7 @@ payload='{
   ]
 }'
 sleep 1
-orionCurl --url /v1/subscribeContext --json --payload "${payload}" --xauthToken kz01
+orionCurl --url /v1/subscribeContext --payload "${payload}" --xauthToken kz01
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
 echo
 echo
@@ -116,7 +116,7 @@ payload='{
   ]
 }'
 sleep 1
-orionCurl --url /v1/subscribeContext --port $CP1_PORT --json --payload "${payload}" --xauthToken kz02
+orionCurl --url /v1/subscribeContext --port $CP1_PORT --payload "${payload}" --xauthToken kz02
 echo
 echo
 
@@ -153,7 +153,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/ET/id/E1 --payload "${payload}" --json --xauthToken kz03
+orionCurl --url /v1/contextEntities/type/ET/id/E1 --payload "${payload}" --xauthToken kz03
 echo
 echo
 

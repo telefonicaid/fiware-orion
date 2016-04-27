@@ -44,14 +44,14 @@ brokerStart CB
 echo "01. Create E1 with attr1"
 echo "========================"
 payload='{ "id": "E1", "attr1": 1 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "02. Get E1 (only attr1)"
 echo "======================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -59,14 +59,14 @@ echo
 echo "03. POST /v2/entities/E1/attrs attribute 'attr2'"
 echo "================================================"
 payload='{  "attr2": 2 }'
-orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "04. Get E1 (attr1, attr2)"
 echo "========================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -74,14 +74,14 @@ echo
 echo "05. POST /v2/entities/E1/attrs?options=append attribute 'attr3'"
 echo "==============================================================="
 payload='{  "attr3": 3 }'
-orionCurl --url '/v2/entities/E1/attrs?options=append,keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/E1/attrs?options=append,keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "06. Get E1 (attr1, attr2, attr3)"
 echo "================================"
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -89,14 +89,14 @@ echo
 echo "07. POST /v2/entities/E1/attrs attribute 'attr3+attr4' (no error)"
 echo "================================================================="
 payload='{  "attr3": 33, "attr4": 4 }'
-orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "08. Get E1 (attr1, attr2, attr3, att4)"
 echo "======================================"
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -104,14 +104,14 @@ echo
 echo "09. POST /v2/entities/E1/attrs?options=append attribute 'attr4+attr5' (attr4 already exists. error)"
 echo "==================================================================================================="
 payload='{  "attr4": 44, "attr5": 5 }'
-orionCurl --url '/v2/entities/E1/attrs?options=append,keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/E1/attrs?options=append,keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "10. Get E1 (attr1, attr2, attr3, attr4, attr5)"
 echo "=============================================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 

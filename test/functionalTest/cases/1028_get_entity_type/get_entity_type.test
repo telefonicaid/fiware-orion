@@ -42,7 +42,7 @@ brokerStart CB
 
 echo "01. GET /v2/types/T1 and get Not Found"
 echo "======================================"
-orionCurl --url /v2/types/T1 --json
+orionCurl --url /v2/types/T1
 echo
 echo
 
@@ -55,14 +55,14 @@ payload='{
   "A1": { "type": "String", "value": "s" },
   "A2": { "type": "Int", "value": 2 }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "03. GET /v2/types/T1 and get a non-empty list"
 echo "============================================="
-orionCurl --url /v2/types/T1 --json
+orionCurl --url /v2/types/T1
 echo
 echo
 
@@ -75,7 +75,7 @@ payload='{
   "A1": { "type": "Cadena", "value": "s" },
   "A3": { "type": "Bool", "value": true }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -88,14 +88,14 @@ payload='{
   "A2": { "type": "Int", "value": 2 },
   "A4": { "type": "String", "value": "a4" }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "06. GET /v2/types/T1 and get a list of four attrs and three entities"
 echo "===================================================================="
-orionCurl --url /v2/types/T1 --json
+orionCurl --url /v2/types/T1
 echo
 echo
 
@@ -109,14 +109,14 @@ payload='{
   "A4": { "type": "String", "value": "a4" },
   "A3": { "type": "Booleano", "value": true }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "08. GET /v2/types/T1 and get a list of four attrs and four entities"
 echo "==================================================================="
-orionCurl --url /v2/types/T1 --json
+orionCurl --url /v2/types/T1
 echo
 echo
 

@@ -45,21 +45,21 @@ payload='{
     "C": true,
     "D": null
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo '02. Get entity'
 echo '=============='
-orionCurl --url '/v1/contextEntities/E' --json
+orionCurl --url '/v1/contextEntities/E'
 echo
 echo
 
 
 echo '02. Get entity with attributeFormat=object'
 echo '=========================================='
-orionCurl --url '/v1/contextEntities/E?attributesFormat=object' --json
+orionCurl --url '/v1/contextEntities/E?attributesFormat=object'
 echo
 echo
 

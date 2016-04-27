@@ -61,7 +61,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -76,7 +76,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -84,14 +84,14 @@ echo
 
 echo "03. DELETE E1/T1/A1/M2 and see it fail"
 echo "======================================"
-orionCurl --url /v1/contextEntities/E1/attributes/A1/M2 --json -X DELETE
+orionCurl --url /v1/contextEntities/E1/attributes/A1/M2 -X DELETE
 echo
 echo
 
 
 echo "04. DELETE E1/T1/A1/M1 and see it work"
 echo "======================================"
-orionCurl --url /v1/contextEntities/E1/attributes/A1/M1 --json -X DELETE
+orionCurl --url /v1/contextEntities/E1/attributes/A1/M1 -X DELETE
 echo
 echo
 
@@ -106,7 +106,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 

@@ -40,7 +40,7 @@ payload='{
   "id": "E1",
   "A1": "234"
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -52,14 +52,14 @@ payload='{
     "rt.ty": "5678"
   }
 }'
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PUT --json
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "03. GET E1/A1"
 echo "============="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 

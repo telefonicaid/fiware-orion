@@ -40,7 +40,7 @@ payload='{
   ]
 }'
 
-orionCurl --url "$url" --payload "${payload}" --out " " --json
+orionCurl --url "$url" --payload "${payload}" --out " "
 
 # Example of payload from file:
 # echo $payload > payload_file

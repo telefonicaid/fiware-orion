@@ -59,7 +59,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload"
 echo
 echo
 
@@ -77,7 +77,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/contextEntities --payload "${payload}" --json
+orionCurl --url /v1/contextEntities --payload "${payload}"
 echo
 echo
 
@@ -99,7 +99,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/contextEntities --payload "${payload}" --json
+orionCurl --url /v1/contextEntities --payload "${payload}"
 echo
 echo
 
@@ -109,7 +109,7 @@ echo "============================"
 payload='{
     "value": "aa"
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A1 --payload "$payload" --json -X PUT
+orionCurl --url /v1/contextEntities/E1/attributes/A1 --payload "$payload" -X PUT
 echo
 echo
 
@@ -119,7 +119,7 @@ echo "============================"
 payload='{
     "value": "bb"
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A2 --payload "$payload" --json -X PUT
+orionCurl --url /v1/contextEntities/E1/attributes/A2 --payload "$payload" -X PUT
 echo
 echo
 
@@ -129,7 +129,7 @@ echo "============================"
 payload='{
     "value": "cc"
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A3 --payload "$payload" --json -X POST
+orionCurl --url /v1/contextEntities/E1/attributes/A3 --payload "$payload" -X POST
 echo
 echo
 

@@ -39,14 +39,14 @@ brokerStart CB
 echo "01. PATCH /v2/ent=ities/E1 (invalid URI)"
 echo "========================================"
 payload='{ "A1": 1 }'
-orionCurl --url /v2/ent=ities/E1 --payload "$payload" --json -X PATCH 
+orionCurl --url /v2/ent=ities/E1 --payload "$payload" -X PATCH 
 echo
 echo
 
 echo "02. PATCH /v2/entities/E1/attrs (incorrect service path)"
 echo "========================================================"
 payload='{ "A1": 1 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --servicePath "/service.sr" --json -X PATCH
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --servicePath "/service.sr" -X PATCH
 echo
 echo
 
@@ -54,7 +54,7 @@ echo
 echo "03. PATCH /v2/entities/E1/attrs (service path without /)"
 echo "========================================================"
 payload='{ "A1": 1 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --servicePath "miservice" --json -X PATCH
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --servicePath "miservice" -X PATCH
 echo
 echo
 

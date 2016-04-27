@@ -75,7 +75,7 @@ payload='
     "throttling": 5
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -103,7 +103,7 @@ payload='
     "throttling": 5
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -136,7 +136,7 @@ payload='
     "throttling": 5
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -155,7 +155,7 @@ payload='
     "throttling": 5
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -185,7 +185,7 @@ payload='
     "expires": "1991-04-05T14:00:00.00Z"
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -220,7 +220,7 @@ payload='
     "throttling": 2
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -256,7 +256,7 @@ payload='
     "throttling": 2
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -284,7 +284,7 @@ payload='
     "throttling": 2
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -320,7 +320,7 @@ payload='
     "throttling": 2
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -351,7 +351,7 @@ payload='
 }
 
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -387,7 +387,7 @@ payload='
     "throttling": 2
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -423,7 +423,7 @@ payload='
     "throttling": 2
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -459,7 +459,7 @@ payload='
     "throttling": 2
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -495,7 +495,7 @@ payload='
     "throttling": 2
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -531,7 +531,7 @@ payload='
     "throttling": 2
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -567,7 +567,7 @@ payload='
     "throttling": 2
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -603,7 +603,7 @@ payload='
     "throttling": [2.5]
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 

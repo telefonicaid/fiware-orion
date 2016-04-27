@@ -61,7 +61,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload" --json
+orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload"
 echo
 echo
 
@@ -79,7 +79,7 @@ payload='{
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/part02"
 }'
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E1 --payload "$payload" --json
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E1 --payload "$payload"
 REG_ID=$(echo "$_response" | grep -Po '(?<="registrationId" : ")[^"]*')
 echo
 echo
@@ -96,7 +96,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload" --json
+orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload"
 echo
 echo
 
@@ -115,7 +115,7 @@ payload='{
   "providingApplication": "http://kz.tid.es/part04",
   "registrationId": "'$REG_ID'"
 }'
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E1 --payload "$payload" --json
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E1 --payload "$payload"
 echo
 echo
 
@@ -131,7 +131,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload" --json
+orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload"
 echo
 echo
 
@@ -149,7 +149,7 @@ payload='{
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part06"
 }'
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E2?!exist=entity::type --payload "$payload" --json
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E2?!exist=entity::type --payload "$payload"
 echo
 echo
 
@@ -167,7 +167,7 @@ payload='{
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part07"
 }'
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E2?exist=entity::type --payload "$payload" --json
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E2?exist=entity::type --payload "$payload"
 echo
 echo
 
@@ -185,7 +185,7 @@ payload='{
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part08"
 }'
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E2?entity::type=T2 --payload "$payload" --json
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E2?entity::type=T2 --payload "$payload"
 echo
 echo
 
@@ -203,7 +203,7 @@ payload='{
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part09"
 }'
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E2?entity::type=T1 --payload "$payload" --json
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E2?entity::type=T1 --payload "$payload"
 echo
 echo
 
@@ -221,7 +221,7 @@ payload='{
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part10"
 }'
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E2 --servicePath /s1 --payload "$payload" --json
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E2 --servicePath /s1 --payload "$payload"
 echo
 echo
 
@@ -239,7 +239,7 @@ payload='{
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part11"
 }'
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E2 --servicePath /s2 --payload "$payload" --json
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E2 --servicePath /s2 --payload "$payload"
 echo
 echo
 
@@ -255,7 +255,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload" --json
+orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload"
 echo
 echo
 
@@ -271,7 +271,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/registry/discoverContextAvailability --servicePath '/#' --payload "$payload" --json
+orionCurl --url /v1/registry/discoverContextAvailability --servicePath '/#' --payload "$payload"
 echo
 echo
 
@@ -287,7 +287,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/registry/discoverContextAvailability --servicePath / --payload "$payload" --json
+orionCurl --url /v1/registry/discoverContextAvailability --servicePath / --payload "$payload"
 echo
 echo
 
@@ -303,7 +303,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/registry/discoverContextAvailability --servicePath /s1 --payload "$payload" --json
+orionCurl --url /v1/registry/discoverContextAvailability --servicePath /s1 --payload "$payload"
 echo
 echo
 
@@ -319,7 +319,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/registry/discoverContextAvailability --servicePath /s2 --payload "$payload" --json
+orionCurl --url /v1/registry/discoverContextAvailability --servicePath /s2 --payload "$payload"
 echo
 echo
 
@@ -335,7 +335,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/registry/discoverContextAvailability --servicePath /s3 --payload "$payload" --json
+orionCurl --url /v1/registry/discoverContextAvailability --servicePath /s3 --payload "$payload"
 echo
 echo
 
@@ -351,7 +351,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/registry/discoverContextAvailability --servicePath /s1,/s2,/s3 --payload "$payload" --json
+orionCurl --url /v1/registry/discoverContextAvailability --servicePath /s1,/s2,/s3 --payload "$payload"
 echo
 echo
 

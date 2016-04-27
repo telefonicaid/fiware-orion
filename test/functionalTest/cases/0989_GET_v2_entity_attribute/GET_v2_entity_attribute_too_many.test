@@ -47,7 +47,7 @@ payload='{
             }
 
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -63,13 +63,13 @@ payload='{
             }
      
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 echo "03. GET /v2/entities/E1/attrs/A0"
 echo "================================"
-orionCurl --url /v2/entities/E1/attrs/A0 --json
+orionCurl --url /v2/entities/E1/attrs/A0
 echo
 echo
 

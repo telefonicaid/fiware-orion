@@ -55,7 +55,7 @@ brokerStart CB  0
 
 echo "01. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1, and see it fail"
 echo "==========================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 -X DELETE --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 -X DELETE
 echo
 echo
 
@@ -65,7 +65,7 @@ echo "========================================================"
 payload='{
   "value": 2
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --payload "$payload" --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --payload "$payload"
 echo
 echo
 
@@ -75,77 +75,77 @@ echo "========================================================"
 payload='{
   "value": 3
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2 --payload "$payload" --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2 --payload "$payload"
 echo
 echo
 
 
 echo "04. GET /v1/contextEntities - see 2 attributes"
 echo "=============================================="
-orionCurl --url /v1/contextEntities --json
+orionCurl --url /v1/contextEntities
 echo
 echo
 
 
 echo "05. DELETE /v1/contextEntities/type/T1/id/E2/attributes/A1, and see it fail"
 echo "==========================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E2/attributes/A1 -X DELETE --json
+orionCurl --url /v1/contextEntities/type/T1/id/E2/attributes/A1 -X DELETE
 echo
 echo
 
 
 echo "06. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A3, and see it fail"
 echo "==========================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A3 -X DELETE --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A3 -X DELETE
 echo
 echo
 
 
 echo "07. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1?entity::type=T2, and see it fail"
 echo "==========================================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1?entity::type=T2 -X DELETE --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1?entity::type=T2 -X DELETE
 echo
 echo
 
 
 echo "08. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1?!exist=entity::type, and see it fail"
 echo "==============================================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1?!exist=entity::type -X DELETE --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1?!exist=entity::type -X DELETE
 echo
 echo
 
 
 echo "09. GET /v1/contextEntities - see 2 attributes"
 echo "=============================================="
-orionCurl --url /v1/contextEntities --json
+orionCurl --url /v1/contextEntities
 echo
 echo
 
 
 echo "10. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1?entity::type=T1"
 echo "=========================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1?entity::type=T1 -X DELETE --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1?entity::type=T1 -X DELETE
 echo
 echo
 
 
 echo "11. GET /v1/contextEntities - see 1 attribute (A2)"
 echo "=================================================="
-orionCurl --url /v1/contextEntities --json
+orionCurl --url /v1/contextEntities
 echo
 echo
 
 
 echo "12. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A2"
 echo "=========================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2 -X DELETE --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2 -X DELETE
 echo
 echo
 
 
 echo "13. GET /v1/contextEntities - see 0 attributes"
 echo "=============================================="
-orionCurl --url /v1/contextEntities --json
+orionCurl --url /v1/contextEntities
 echo
 echo
 
@@ -155,7 +155,7 @@ echo "==========================================================================
 payload='{
   "value": 14
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A3 --payload "$payload" --json --servicePath /s1
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A3 --payload "$payload" --servicePath /s1
 echo
 echo
 
@@ -165,49 +165,49 @@ echo "==========================================================================
 payload='{
   "value": 15
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A3 --payload "$payload" --json --servicePath /s2
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A3 --payload "$payload" --servicePath /s2
 echo
 echo
 
 
 echo "16. GET /v1/contextEntities - see 2 attributes"
 echo "=============================================="
-orionCurl --url /v1/contextEntities --json
+orionCurl --url /v1/contextEntities
 echo
 echo
 
 
 echo "17. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A3, service-path /s3, and see it fail"
 echo "============================================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A3 -X DELETE --json --servicePath /s3
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A3 -X DELETE --servicePath /s3
 echo
 echo
 
 
 echo "18. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A3, service-path /s1"
 echo "============================================================================"
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A3 -X DELETE --json --servicePath /s1
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A3 -X DELETE --servicePath /s1
 echo
 echo
 
 
 echo "19. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A3, service-path /s1, and see it fail"
 echo "============================================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A3 -X DELETE --json --servicePath /s1
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A3 -X DELETE --servicePath /s1
 echo
 echo
 
 
 echo "20. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A3, service-path /s2"
 echo "============================================================================"
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A3 -X DELETE --json --servicePath /s2
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A3 -X DELETE --servicePath /s2
 echo
 echo
 
 
 echo "21. GET /v1/contextEntities - see 0 attributes"
 echo "=============================================="
-orionCurl --url /v1/contextEntities --json
+orionCurl --url /v1/contextEntities
 echo
 echo
 

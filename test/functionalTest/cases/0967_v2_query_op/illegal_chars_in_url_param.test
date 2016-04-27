@@ -53,63 +53,63 @@ brokerStart CB
 
 echo "01. GET /v2/entities/E1 with illegal char 1 in URI param 'w1' - error"
 echo "====================================================================="
-orionCurl --url '/v2/entities/E1?w1=a<' --json
+orionCurl --url '/v2/entities/E1?w1=a<'
 echo
 echo
 
 
 echo "02. GET /v2/entities/E1 with illegal char 2 in URI param 'w2' - error"
 echo "====================================================================="
-orionCurl --url '/v2/entities/E1?w2=a>' --json
+orionCurl --url '/v2/entities/E1?w2=a>'
 echo
 echo
 
 
 echo "03. GET /v2/entities/E1 with illegal char 3 in URI param 'w3' - error"
 echo "====================================================================="
-orionCurl --url '/v2/entities/E1?w3=a\"' --json
+orionCurl --url '/v2/entities/E1?w3=a\"'
 echo
 echo
 
 
 echo "04. GET /v2/entities/E1 with illegal char 4 in URI param 'w4' - error"
 echo "====================================================================="
-orionCurl --url "/v2/entities/E1?w4=a\'" --json
+orionCurl --url "/v2/entities/E1?w4=a\'"
 echo
 echo
 
 
 echo "05. GET /v2/entities/E1 with illegal char 5 in URI param 'w5' - error"
 echo "====================================================================="
-orionCurl --url '/v2/entities/E1?w5=a=' --json
+orionCurl --url '/v2/entities/E1?w5=a='
 echo
 echo
 
 
 echo "06. GET /v2/entities/E1 with illegal char 6 in URI param 'w6' - error"
 echo "====================================================================="
-orionCurl --url '/v2/entities/E1?w6=a;' --json
+orionCurl --url '/v2/entities/E1?w6=a;'
 echo
 echo
 
 
 echo "07. GET /v2/entities/E1 with illegal char 7 in URI param 'w7' - error"
 echo "====================================================================="
-orionCurl --url '/v2/entities/E1?w7=a(' --json
+orionCurl --url '/v2/entities/E1?w7=a('
 echo
 echo
 
 
 echo "08. GET /v2/entities/E1 with illegal char 8 in URI param 'w8' - error"
 echo "====================================================================="
-orionCurl --url '/v2/entities/E1?w8=a\)' --json
+orionCurl --url '/v2/entities/E1?w8=a\)'
 echo
 echo
 
 
 echo "09. GET /v2/entities/E1 with ALL illegal char in URI param 'q' - ok"
 echo "==================================================================="
-orionCurl --url '/v2/entities/E2?q=a==<>\"()=;'\'  --json
+orionCurl --url '/v2/entities/E2?q=a==<>\"()=;'\' 
 echo
 echo
 

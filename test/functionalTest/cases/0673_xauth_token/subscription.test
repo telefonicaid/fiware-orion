@@ -61,7 +61,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --json --payload "${payload}"
+orionCurl --url /v1/subscribeContext --payload "${payload}"
 echo
 echo
 
@@ -78,7 +78,7 @@ payload='{
   ]
 }'
 sleep 3
-orionCurl --url /v1/contextEntities/type/ET/id/E1 --payload "${payload}" --json  --xauthToken kz
+orionCurl --url /v1/contextEntities/type/ET/id/E1 --payload "${payload}"  --xauthToken kz
 echo
 echo
 

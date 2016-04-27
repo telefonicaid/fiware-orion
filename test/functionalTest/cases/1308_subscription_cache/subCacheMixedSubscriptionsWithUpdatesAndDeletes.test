@@ -69,7 +69,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload"
 SUB1=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
 echo
 echo
@@ -77,7 +77,7 @@ echo
 
 echo "02. Check statistics, see ONE entry in subCache"
 echo "==============================================="
-orionCurl --url /cache/statistics --json
+orionCurl --url /cache/statistics
 echo
 echo
 
@@ -89,14 +89,14 @@ payload='{
   "duration": "P5Y",
   "throttling": "PT10S"
 }'
-orionCurl --url /v1/updateContextSubscription --payload "$payload" --json
+orionCurl --url /v1/updateContextSubscription --payload "$payload"
 echo
 echo
 
 
 echo "04. Check statistics, see ONE entry in subCache"
 echo "==============================================="
-orionCurl --url /cache/statistics --json
+orionCurl --url /cache/statistics
 echo
 echo
 
@@ -120,7 +120,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload"
 SUB2=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
 echo
 echo
@@ -128,7 +128,7 @@ echo
 
 echo "06. Check statistics, see TWO entries in subCache"
 echo "================================================="
-orionCurl --url /cache/statistics --json
+orionCurl --url /cache/statistics
 echo
 echo
 
@@ -152,7 +152,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload"
 SUB3=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
 echo
 echo
@@ -160,7 +160,7 @@ echo
 
 echo "08. Check statistics, see THREE subCacheItems in subCache"
 echo "========================================================="
-orionCurl --url /cache/statistics --json
+orionCurl --url /cache/statistics
 echo
 echo
 
@@ -172,14 +172,14 @@ payload='{
   "duration": "P5Y",
   "throttling": "PT10S"
 }'
-orionCurl --url /v1/updateContextSubscription --payload "$payload" --json
+orionCurl --url /v1/updateContextSubscription --payload "$payload"
 echo
 echo
 
 
 echo "10. Check statistics, see THREE subCacheItems in subCache"
 echo "========================================================="
-orionCurl --url /cache/statistics --json
+orionCurl --url /cache/statistics
 echo
 echo
 
@@ -189,14 +189,14 @@ echo "============="
 payload='{
   "subscriptionId": "'$SUB1'"
 }'
-orionCurl --url /v1/unsubscribeContext --payload "$payload" --json
+orionCurl --url /v1/unsubscribeContext --payload "$payload"
 echo
 echo
 
 
 echo "12. Check statistics, see TWO subCacheItems in subCache"
 echo "======================================================="
-orionCurl --url /cache/statistics --json
+orionCurl --url /cache/statistics
 echo
 echo
 
@@ -208,14 +208,14 @@ payload='{
   "duration": "P5Y",
   "throttling": "PT10S"
 }'
-orionCurl --url /v1/updateContextSubscription --payload "$payload" --json
+orionCurl --url /v1/updateContextSubscription --payload "$payload"
 echo
 echo
 
 
 echo "14. Check statistics, see TWO subCacheItems in subCache"
 echo "======================================================="
-orionCurl --url /cache/statistics --json
+orionCurl --url /cache/statistics
 echo
 echo
 
@@ -225,14 +225,14 @@ echo "============="
 payload='{
   "subscriptionId": "'$SUB2'"
 }'
-orionCurl --url /v1/unsubscribeContext --payload "$payload" --json
+orionCurl --url /v1/unsubscribeContext --payload "$payload"
 echo
 echo
 
 
 echo "16. Check statistics, see ONE entry in subCache"
 echo "==============================================="
-orionCurl --url /cache/statistics --json
+orionCurl --url /cache/statistics
 echo
 echo
 

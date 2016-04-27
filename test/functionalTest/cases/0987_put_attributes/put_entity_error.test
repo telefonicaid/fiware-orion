@@ -41,14 +41,14 @@ brokerStart CB
 echo "01. Modify non-existing entity E1"
 echo "================================="
 payload='{ "attr1": 1 }'
-orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json -X PUT
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "02. Make sure E1 does not exist"
 echo "==============================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -56,14 +56,14 @@ echo
 echo "03. Create E1"
 echo "============="
 payload='{ "id": "E1", "attr1": 3 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "04. Make sure E1 is as created"
 echo "=============================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -71,14 +71,14 @@ echo
 echo "05. Modify E1"
 echo "============="
 payload='{ "attr1": 5 }'
-orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json -X PUT
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "06. Make sure E1 is as modified"
 echo "==============================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 

@@ -72,7 +72,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload"
 echo
 echo
 
@@ -95,7 +95,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json --tenant t1
+orionCurl --url /v1/subscribeContext --payload "$payload" --tenant t1
 echo
 echo
 
@@ -118,7 +118,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json --tenant t2
+orionCurl --url /v1/subscribeContext --payload "$payload" --tenant t2
 echo
 echo
 
@@ -129,7 +129,7 @@ payload='{
   "id": "s01",
   "A": 4
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -140,7 +140,7 @@ payload='{
   "id": "s11",
   "A": 5
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json --tenant t1
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --tenant t1
 echo
 echo
 
@@ -151,7 +151,7 @@ payload='{
   "id": "s21",
   "A": 6
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json --tenant t2
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --tenant t2
 echo
 echo
 
@@ -189,7 +189,7 @@ echo "==========================="
 payload='{
   "A": 11
 }'
-orionCurl --url '/v2/entities/s01/attrs?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/s01/attrs?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -199,7 +199,7 @@ echo "=============================="
 payload='{
   "A": 12
 }'
-orionCurl --url '/v2/entities/s11/attrs?options=keyValues' --payload "$payload" --json --tenant t1
+orionCurl --url '/v2/entities/s11/attrs?options=keyValues' --payload "$payload" --tenant t1
 echo
 echo
 
@@ -209,7 +209,7 @@ echo "=============================="
 payload='{
   "A": 13
 }'
-orionCurl --url '/v2/entities/s21/attrs?options=keyValues' --payload "$payload" --json --tenant t2
+orionCurl --url '/v2/entities/s21/attrs?options=keyValues' --payload "$payload" --tenant t2
 echo
 echo
 

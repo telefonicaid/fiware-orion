@@ -57,7 +57,7 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url "$url" --payload "${payload}" --json
+orionCurl --url "$url" --payload "${payload}"
 
 echo "1: ++++++++++++++++++++"
 url="/v1/registry/registerContext"
@@ -88,7 +88,7 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url "$url" --payload "${payload}" --json
+orionCurl --url "$url" --payload "${payload}"
 
 echo "2: ++++++++++++++++++++"
 url="/v1/registry/subscribeContextAvailability"
@@ -108,7 +108,7 @@ payload='{
   "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
   "duration": "PT5H"
 }'
-orionCurl --url "$url" --payload "${payload}" --json
+orionCurl --url "$url" --payload "${payload}"
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 
 echo "3: ++++++++++++++++++++"
@@ -135,7 +135,7 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url "$url" --payload "${payload}" --json
+orionCurl --url "$url" --payload "${payload}"
 
 echo "4: ++++++++++++++++++++"
 url="/v1/registry/updateContextAvailabilitySubscription"
@@ -155,7 +155,7 @@ payload='{
   "duration": "PT5H",
   "subscriptionId" : "'$SUB_ID'"
 }'
-orionCurl --url "$url" --payload "${payload}" --json
+orionCurl --url "$url" --payload "${payload}"
 
 echo "5: ++++++++++++++++++++"
 url="/v1/registry/registerContext"
@@ -181,14 +181,14 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url "$url" --payload "${payload}" --json
+orionCurl --url "$url" --payload "${payload}"
 
 echo "6: ++++++++++++++++++++"
 url="/v1/registry/unsubscribeContextAvailability"
 payload='{
   "subscriptionId": "'$SUB_ID'"
 }'
-orionCurl --url "$url" --payload "${payload}" --json
+orionCurl --url "$url" --payload "${payload}"
 
 echo "7: ++++++++++++++++++++"
 #Get accumulated data

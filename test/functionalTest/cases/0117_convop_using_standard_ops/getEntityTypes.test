@@ -45,7 +45,7 @@ brokerStart CB 0
 
 echo "01. GET /v1/contextTypes and see a list of zero types"
 echo "====================================================="
-orionCurl --url /v1/contextTypes --json
+orionCurl --url /v1/contextTypes
 echo
 echo
 
@@ -73,7 +73,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -96,7 +96,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -124,14 +124,14 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
 echo "05. GET /v1/contextTypes and see a list of three types"
 echo "======================================================"
-orionCurl --url /v1/contextTypes --json
+orionCurl --url /v1/contextTypes
 echo
 echo
 
@@ -154,7 +154,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json --servicePath /s1
+orionCurl --url /v1/updateContext --payload "$payload" --servicePath /s1
 echo
 echo
 
@@ -177,34 +177,34 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json --servicePath /s2
+orionCurl --url /v1/updateContext --payload "$payload" --servicePath /s2
 echo
 echo
 
 
 echo "08. GET /v1/contextTypes, servicePath /s1 and see a list of one type (T4)"
 echo "========================================================================="
-orionCurl --url /v1/contextTypes --json --servicePath /s1
+orionCurl --url /v1/contextTypes --servicePath /s1
 echo
 echo
 
 
 echo "09. GET /v1/contextTypes, servicePath /s2 and see a list of one type (T5)"
 echo "========================================================================="
-orionCurl --url /v1/contextTypes --json --servicePath /s2
+orionCurl --url /v1/contextTypes --servicePath /s2
 echo
 echo
 
 
 echo "10. GET /v1/contextTypes and see a list of five types"
 echo "====================================================="
-orionCurl --url /v1/contextTypes --json
+orionCurl --url /v1/contextTypes
 echo
 echo
 
 echo "11. GET /v1/contextTypes?collapse=true and see the list without attributes"
 echo "=========================================================================="
-orionCurl --url /v1/contextTypes?collapse=true --json
+orionCurl --url /v1/contextTypes?collapse=true
 echo
 echo
 

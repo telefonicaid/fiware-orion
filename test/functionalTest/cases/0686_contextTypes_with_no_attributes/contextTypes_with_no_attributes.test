@@ -42,7 +42,7 @@ payload='{
   "isPattern": false,
   "type": "empty_attributes"
 }'
-orionCurl --url /v1/contextEntities --payload "$payload" --json
+orionCurl --url /v1/contextEntities --payload "$payload"
 echo
 echo
 
@@ -62,21 +62,21 @@ payload='{
   "isPattern": false,
   "type": "type_with_attrs"
 }'
-orionCurl --url /v1/contextEntities --payload "$payload" --json
+orionCurl --url /v1/contextEntities --payload "$payload"
 echo
 echo
 
 
 echo "03. Query entity types with GET /v1/contextTypes"
 echo "================================================"
-orionCurl --url "/v1/contextTypes" --json
+orionCurl --url "/v1/contextTypes"
 echo
 echo
 
 
 echo "04. Query entity types with GET /v1/contextTypes?collapse=true"
 echo "=============================================================="
-orionCurl --url "/v1/contextTypes?collapse=true" --json
+orionCurl --url "/v1/contextTypes?collapse=true"
 echo
 echo
 

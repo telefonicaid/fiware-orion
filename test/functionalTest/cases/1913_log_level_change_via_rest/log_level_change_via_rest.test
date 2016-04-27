@@ -44,69 +44,69 @@ brokerStart CB 0-255
 
 echo "01. POST /admin/log and see error 'method not allowed'"
 echo "======================================================"
-orionCurl --url /admin/log -X POST --json
+orionCurl --url /admin/log -X POST
 echo
 echo
 
 echo "02. PUT /admin/log and see error 'log level missing'"
 echo "===================================================="
-orionCurl --url /admin/log -X PUT --json 
+orionCurl --url /admin/log -X PUT 
 echo
 echo
 
 
 echo "03. PUT /admin/log?level= and see error 'Empty right-hand-side for URI param'"
 echo "============================================================================="
-orionCurl --url /admin/log?level= -X PUT --json
+orionCurl --url /admin/log?level= -X PUT
 echo
 echo
 
 
 echo "04. PUT /admin/log?level=notValid and see error 'invalid log level'"
 echo "==================================================================="
-orionCurl --url /admin/log?level=notValid -X PUT --json
+orionCurl --url /admin/log?level=notValid -X PUT
 echo
 echo
 
 
 echo "05. PUT /admin/log?level=ERROR and see it work"
 echo "=============================================="
-orionCurl --url /admin/log?level=ERROR -X PUT --json
+orionCurl --url /admin/log?level=ERROR -X PUT
 echo
 echo
 
 
 echo "06. PUT /admin/log?level=Info and see it work"
 echo "============================================="
-orionCurl --url /admin/log?level=Info -X PUT --json
+orionCurl --url /admin/log?level=Info -X PUT
 echo
 echo
 
 
 echo "07. PUT /admin/log?level=warn and see it work"
 echo "============================================="
-orionCurl --url /admin/log?level=warn -X PUT --json
+orionCurl --url /admin/log?level=warn -X PUT
 echo
 echo
 
 
 echo "08. PUT /admin/log?level=wArNiNg and see it work"
 echo "================================================"
-orionCurl --url /admin/log?level=wArNiNg -X PUT --json
+orionCurl --url /admin/log?level=wArNiNg -X PUT
 echo
 echo
 
 
 echo "09. PUT /admin/log?level=Fatal and see it work"
 echo "=============================================="
-orionCurl --url /admin/log?level=Fatal -X PUT --json
+orionCurl --url /admin/log?level=Fatal -X PUT
 echo
 echo
 
 
 echo "10. PUT /admin/log?level=DEBUG and see it work"
 echo "=============================================="
-orionCurl --url /admin/log?level=DEBUG -X PUT --json
+orionCurl --url /admin/log?level=DEBUG -X PUT
 echo
 echo
 

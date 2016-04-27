@@ -44,14 +44,14 @@ payload='{
     "value": 1
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "02. Check attribute has type none"
 echo "================================="
-orionCurl --url /v2/entities/E --json
+orionCurl --url /v2/entities/E
 echo
 echo
 
@@ -66,7 +66,7 @@ payload='{
     "type": ""
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 

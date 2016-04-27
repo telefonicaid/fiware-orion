@@ -53,7 +53,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 #curl --header 'Content-Type: application/json' --header 'Accept: application/json' localhost:9999/v1/updateContext -d "$payload"
 echo
 echo
@@ -61,7 +61,7 @@ echo
 
 echo "02. Query entity"
 echo "================"
-orionCurl --url /v1/contextEntities/Bug2 --json
+orionCurl --url /v1/contextEntities/Bug2
 #curl --header 'Accept: application/json' localhost:9999/v1/contextEntities/Bug2
 echo
 echo

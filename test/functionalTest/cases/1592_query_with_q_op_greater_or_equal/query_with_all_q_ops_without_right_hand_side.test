@@ -51,112 +51,112 @@ brokerStart CB
 
 echo "01. Empty q"
 echo "==========="
-orionCurl --url '/v2/entities?q=' --json
+orionCurl --url '/v2/entities?q='
 echo
 echo
 
 
 echo "02. Operation NOT EXIST"
 echo "======================="
-orionCurl --url '/v2/entities?q=!' --json
+orionCurl --url '/v2/entities?q=!'
 echo
 echo
 
 
 echo "03. Operation =="
 echo "================"
-orionCurl --url '/v2/entities?q=A1==' --json
+orionCurl --url '/v2/entities?q=A1=='
 echo
 echo
 
 
 echo "04. Operation !="
 echo "================"
-orionCurl --url '/v2/entities?q=A1!=' --json
+orionCurl --url '/v2/entities?q=A1!='
 echo
 echo
 
 
 echo "05. Operation >"
 echo "==============="
-orionCurl --url '/v2/entities?q=A1>' --json
+orionCurl --url '/v2/entities?q=A1>'
 echo
 echo
 
 
 echo "06. Operation <"
 echo "==============="
-orionCurl --url '/v2/entities?q=A1<' --json
+orionCurl --url '/v2/entities?q=A1<'
 echo
 echo
 
 
 echo "07. Operation >="
 echo "================"
-orionCurl --url '/v2/entities?q=A1>=' --json
+orionCurl --url '/v2/entities?q=A1>='
 echo
 echo
 
 
 echo "08. Operation <="
 echo "================"
-orionCurl --url '/v2/entities?q=A1<=' --json
+orionCurl --url '/v2/entities?q=A1<='
 echo
 echo
 
 
 echo "09. Q-part empty I"
 echo "=================="
-orionCurl --url '/v2/entities?q=;' --json
+orionCurl --url '/v2/entities?q=;'
 echo
 echo
 
 
 echo "10. Q-part empty II"
 echo "==================="
-orionCurl --url '/v2/entities?q=type;;' --json
+orionCurl --url '/v2/entities?q=type;;'
 echo
 echo
 
 
 echo "11. Operation == without left-hand-side"
 echo "======================================="
-orionCurl --url '/v2/entities?q===12' --json
+orionCurl --url '/v2/entities?q===12'
 echo
 echo
 
 
 echo "12. Operation != without left-hand-side"
 echo "======================================="
-orionCurl --url '/v2/entities?q===12' --json
+orionCurl --url '/v2/entities?q===12'
 echo
 echo
 
 
 echo "13. Operation > without left-hand-side"
 echo "======================================="
-orionCurl --url '/v2/entities?q=>12' --json
+orionCurl --url '/v2/entities?q=>12'
 echo
 echo
 
 
 echo "14. Operation < without left-hand-side"
 echo "======================================="
-orionCurl --url '/v2/entities?q=<12' --json
+orionCurl --url '/v2/entities?q=<12'
 echo
 echo
 
 
 echo "15. Operation >= without left-hand-side"
 echo "======================================="
-orionCurl --url '/v2/entities?q=>=12' --json
+orionCurl --url '/v2/entities?q=>=12'
 echo
 echo
 
 
 echo "16. Operation <= without left-hand-side"
 echo "======================================="
-orionCurl --url '/v2/entities?q=<=12' --json
+orionCurl --url '/v2/entities?q=<=12'
 echo
 echo
 

@@ -40,26 +40,26 @@ brokerStart CB
 echo "01. PUT entity attribute with forbidden char in attr name"
 echo "========================================================="
 payload='{ "value": 1 }'
-orionCurl --url '/v2/entities/E1/attrs/A&' -X PUT --payload "$payload" --json
+orionCurl --url '/v2/entities/E1/attrs/A&' -X PUT --payload "$payload"
 echo
 echo
 
 echo "02. PUT entity attribute value with forbidden char in attr name"
 echo "==============================================================="
 payload='{"value":1}'
-orionCurl --url '/v2/entities/E1/attrs/A&/value' -X PUT --payload "$payload" --json
+orionCurl --url '/v2/entities/E1/attrs/A&/value' -X PUT --payload "$payload"
 echo
 echo
 
 echo "03. GET entity attribute with forbidden char in attr name"
 echo "========================================================="
-orionCurl --url '/v2/entities/E1/attrs/A&' --json
+orionCurl --url '/v2/entities/E1/attrs/A&'
 echo
 echo
 
 echo "04. GET entity attrbute value with forbidden char in attr name"
 echo "=============================================================="
-orionCurl --url '/v2/entities/E1/attrs/A&/value' --json
+orionCurl --url '/v2/entities/E1/attrs/A&/value'
 echo
 echo
 

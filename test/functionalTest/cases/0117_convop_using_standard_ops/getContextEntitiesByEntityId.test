@@ -72,7 +72,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json --servicePath /A1
+orionCurl --url /v1/registry/registerContext --payload "$payload" --servicePath /A1
 echo
 echo
 
@@ -101,7 +101,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json  --servicePath /A2
+orionCurl --url /v1/registry/registerContext --payload "$payload"  --servicePath /A2
 echo
 echo
 
@@ -130,63 +130,63 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json  --servicePath /A3
+orionCurl --url /v1/registry/registerContext --payload "$payload"  --servicePath /A3
 echo
 echo
 
 
 echo "04. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A1"
 echo "==========================================================================="
-orionCurl --url "/v1/registry/contextEntities/E1" --json --servicePath /A1
+orionCurl --url "/v1/registry/contextEntities/E1" --servicePath /A1
 echo
 echo
 
 
 echo "05. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A1,/A2"
 echo "==============================================================================="
-orionCurl --url "/v1/registry/contextEntities/E1" --json --servicePath /A1,/A2
+orionCurl --url "/v1/registry/contextEntities/E1" --servicePath /A1,/A2
 echo
 echo
 
 
 echo "06. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A1,/A3"
 echo "==============================================================================="
-orionCurl --url "/v1/registry/contextEntities/E1" --json --servicePath /A1,/A3
+orionCurl --url "/v1/registry/contextEntities/E1" --servicePath /A1,/A3
 echo
 echo
 
 
 echo "07. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A2,/A3"
 echo "==============================================================================="
-orionCurl --url "/v1/registry/contextEntities/E1" --json --servicePath /A2,/A3
+orionCurl --url "/v1/registry/contextEntities/E1" --servicePath /A2,/A3
 echo
 echo
 
 
 echo "08. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A1,/A2,/A3"
 echo "==================================================================================="
-orionCurl --url "/v1/registry/contextEntities/E1" --json --servicePath /A1,/A2,/A3
+orionCurl --url "/v1/registry/contextEntities/E1" --servicePath /A1,/A2,/A3
 echo
 echo
 
 
 echo "09. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /B1"
 echo "==========================================================================="
-orionCurl --url "/v1/registry/contextEntities/E1" --json --servicePath /B1
+orionCurl --url "/v1/registry/contextEntities/E1" --servicePath /B1
 echo
 echo
 
 
 echo "10. Discover E1 using /v1/registry/contextEntities/E1 without Service-Path"
 echo "=========================================================================="
-orionCurl --url "/v1/registry/contextEntities/E1" --json
+orionCurl --url "/v1/registry/contextEntities/E1"
 echo
 echo
 
 
 echo "11. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /#"
 echo "=========================================================================="
-orionCurl --url "/v1/registry/contextEntities/E1" --json --servicePath /#
+orionCurl --url "/v1/registry/contextEntities/E1" --servicePath /#
 echo
 echo
 

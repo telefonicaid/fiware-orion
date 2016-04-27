@@ -58,14 +58,14 @@ payload='{
     "value" : "Klasse C"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "02. GET /v2/entities/8787GHY"
 echo "============================"
-orionCurl --url /v2/entities/8787GHY --json
+orionCurl --url /v2/entities/8787GHY
 echo
 echo
 

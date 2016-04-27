@@ -57,70 +57,70 @@ payload='{
     "type": "geo:json"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "02. Query B1 coveredBy -> ok"
 echo "============================"
-orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=3,2;10,8' --json
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=3,2;10,8'
 echo
 echo
 
 
 echo "03. Query B1 intersects -> ok"
 echo "============================="
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=3,2;10,8' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=3,2;10,8'
 echo
 echo
 
 
 echo "04. Query B1 disjoint -> nok"
 echo "============================"
-orionCurl --url '/v2/entities?georel=disjoint&geometry=box&coords=3,2;10,8' --json
+orionCurl --url '/v2/entities?georel=disjoint&geometry=box&coords=3,2;10,8'
 echo
 echo
 
 
 echo "05. Query B2 coveredBy -> nok"
 echo "============================="
-orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=5,4;8,7' --json
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=5,4;8,7'
 echo
 echo
 
 
 echo "06. Query B2 intersects -> ok"
 echo "============================="
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,4;8,7' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,4;8,7'
 echo
 echo
 
 
 echo "07. Query B2 disjoint -> nok"
 echo "============================"
-orionCurl --url '/v2/entities?georel=disjoint&geometry=box&coords=5,4;8,7' --json
+orionCurl --url '/v2/entities?georel=disjoint&geometry=box&coords=5,4;8,7'
 echo
 echo
 
 
 echo "08. Query B3 coveredBy -> nok"
 echo "============================="
-orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=11,4;14,7' --json
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=11,4;14,7'
 echo
 echo
 
 
 echo "09. Query B3 intersects -> nok"
 echo "=============================="
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=11,4;14,7' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=11,4;14,7'
 echo
 echo
 
 
 echo "10. Query B3 disjoint -> ok"
 echo "==========================="
-orionCurl --url '/v2/entities?georel=disjoint&geometry=box&coords=11,4;14,7' --json
+orionCurl --url '/v2/entities?georel=disjoint&geometry=box&coords=11,4;14,7'
 echo
 echo
 

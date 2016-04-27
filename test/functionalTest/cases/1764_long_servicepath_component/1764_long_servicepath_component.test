@@ -62,14 +62,14 @@ payload='{
     "value" : "Klasse C"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload"  --servicePath "$SP_LONG" --json
+orionCurl --url /v2/entities --payload "$payload"  --servicePath "$SP_LONG"
 echo
 echo
 
 
 echo "02. GET /v2/entities/8787GHY"
 echo "============================"
-orionCurl --url "/v2/entities/8787GHY"  --servicePath "$SP_LONG" --json
+orionCurl --url "/v2/entities/8787GHY"  --servicePath "$SP_LONG"
 echo
 echo
 
@@ -79,14 +79,14 @@ echo "========================================"
 payload='{
     "value" : "999"
 }'
-orionCurl --url "/v2/entities/8787GHY/attrs/speed" --payload "$payload"  --servicePath "$SP_LONG" --json -X PUT
+orionCurl --url "/v2/entities/8787GHY/attrs/speed" --payload "$payload"  --servicePath "$SP_LONG" -X PUT
 echo
 echo
 
 
 echo "04. DELETE /v2/entities/8787GHY"
 echo "==============================="
-orionCurl --url "/v2/entities/8787GHY"  --servicePath "$SP_LONG" --json -X DELETE
+orionCurl --url "/v2/entities/8787GHY"  --servicePath "$SP_LONG" -X DELETE
 echo
 echo
 

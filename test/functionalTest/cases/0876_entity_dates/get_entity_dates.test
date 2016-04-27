@@ -50,21 +50,21 @@ payload='{
   "A": "foo"
 }'
 T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "02a. Get entity with dates"
 echo "=========================="
-orionCurl --url /v2/entities/E?options=dateCreated,dateModified --json
+orionCurl --url /v2/entities/E?options=dateCreated,dateModified
 echo
 echo
 
 
 echo "02b. Get entity with dates keyValues"
 echo "===================================="
-orionCurl --url /v2/entities/E?options=dateCreated,dateModified,keyValues --json
+orionCurl --url /v2/entities/E?options=dateCreated,dateModified,keyValues
 CRE_DATE=$(echo "$_response" | python -mjson.tool | grep dateCreated | awk -F '"' '{print $4}')
 MOD_DATE=$(echo "$_response" | python -mjson.tool | grep dateModified | awk -F '"' '{print $4}')
 echo
@@ -73,7 +73,7 @@ echo
 
 echo "02c. Get entity with dates values"
 echo "================================="
-orionCurl --url '/v2/entities/E?options=dateCreated,dateModified,values&attrs=dateCreated,dateModified,A' --json
+orionCurl --url '/v2/entities/E?options=dateCreated,dateModified,values&attrs=dateCreated,dateModified,A'
 echo
 echo
 
@@ -105,21 +105,21 @@ payload='{
   "value": "bar"
 }'
 T_1=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
-orionCurl --url '/v2/entities/E/attrs/A' -X PUT --payload "$payload" --json
+orionCurl --url '/v2/entities/E/attrs/A' -X PUT --payload "$payload"
 echo
 echo
 
 
 echo "05a. Get entity with dates"
 echo "=========================="
-orionCurl --url /v2/entities/E?options=dateCreated,dateModified --json
+orionCurl --url /v2/entities/E?options=dateCreated,dateModified
 echo
 echo
 
 
 echo "05b. Get entity with dates keyValues"
 echo "===================================="
-orionCurl --url /v2/entities/E?options=dateCreated,dateModified,keyValues --json
+orionCurl --url /v2/entities/E?options=dateCreated,dateModified,keyValues
 CRE_DATE=$(echo "$_response" | python -mjson.tool | grep dateCreated | awk -F '"' '{print $4}')
 MOD_DATE=$(echo "$_response" | python -mjson.tool | grep dateModified | awk -F '"' '{print $4}')
 #echo "$_response" | python -mjson.tool | grep dateCreated
@@ -129,7 +129,7 @@ echo
 
 echo "05c. Get entity with dates values"
 echo "================================="
-orionCurl --url '/v2/entities/E?options=dateCreated,dateModified,values&attrs=dateCreated,dateModified,A' --json
+orionCurl --url '/v2/entities/E?options=dateCreated,dateModified,values&attrs=dateCreated,dateModified,A'
 echo
 echo
 

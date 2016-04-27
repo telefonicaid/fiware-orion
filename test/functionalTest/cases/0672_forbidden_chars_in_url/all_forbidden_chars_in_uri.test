@@ -44,63 +44,63 @@ brokerStart CB 0-255
 
 echo '01. Test the forbidden character <'
 echo "=================================="
-orionCurl --url '/test/with/forbidden/character/<' --json
+orionCurl --url '/test/with/forbidden/character/<'
 echo
 echo
 
 
 echo '02. Test the forbidden character >'
 echo "=================================="
-orionCurl --url '/test/with/forbidden/character/>' --json
+orionCurl --url '/test/with/forbidden/character/>'
 echo
 echo
 
 
 echo '03. Test the forbidden character "'
 echo "=================================="
-orionCurl --url '/test/with/forbidden/character/\"' --json
+orionCurl --url '/test/with/forbidden/character/\"'
 echo
 echo
 
 
 echo "04. Test the forbidden character '"
 echo "=================================="
-orionCurl --url "/test/with/forbidden/character/'" --json
+orionCurl --url "/test/with/forbidden/character/'"
 echo
 echo
 
 
 echo '05. Test the forbidden character ='
 echo "=================================="
-orionCurl --url '/test/with/forbidden/character/=' --json
+orionCurl --url '/test/with/forbidden/character/='
 echo
 echo
 
 
 echo '06. Test the forbidden character ;'
 echo "=================================="
-orionCurl --url '/test/with/forbidden/character/;' --json
+orionCurl --url '/test/with/forbidden/character/;'
 echo
 echo
 
 
 echo '07. Test the forbidden character ('
 echo "=================================="
-orionCurl --url '/test/with/forbidden/character/(' --json
+orionCurl --url '/test/with/forbidden/character/('
 echo
 echo
 
 
 echo '08. Test the forbidden character )'
 echo "=================================="
-orionCurl --url '/test/with/forbidden/character/)' --json
+orionCurl --url '/test/with/forbidden/character/)'
 echo
 echo
 
 
 echo '09. Test without forbidden characters'
 echo "====================================="
-orionCurl --url '/test/without/forbidden/characters' --json
+orionCurl --url '/test/without/forbidden/characters'
 echo
 echo
 

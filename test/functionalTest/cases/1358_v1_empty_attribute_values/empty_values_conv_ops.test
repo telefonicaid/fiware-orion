@@ -54,14 +54,14 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/contextEntities/E1 --payload "$payload" --json
+orionCurl --url /v1/contextEntities/E1 --payload "$payload"
 echo
 echo
 
 
 echo "02. GET E1 and see empty value"
 echo "=============================="
-orionCurl --url /v1/contextEntities/E1 --json
+orionCurl --url /v1/contextEntities/E1
 echo
 echo
 
@@ -77,14 +77,14 @@ payload='{
         }
     ]
 }'
-orionCurl -X PUT --url /v1/contextEntities/E1 --payload "$payload" --json
+orionCurl -X PUT --url /v1/contextEntities/E1 --payload "$payload"
 echo
 echo
 
 
 echo "04. GET E1 and see non-empty value (foo)"
 echo "========================================"
-orionCurl --url /v1/contextEntities/E1 --json
+orionCurl --url /v1/contextEntities/E1
 echo
 echo
 
@@ -100,14 +100,14 @@ payload='{
         }
     ]
 }'
-orionCurl -X PUT --url /v1/contextEntities/E1 --payload "$payload" --json
+orionCurl -X PUT --url /v1/contextEntities/E1 --payload "$payload"
 echo
 echo
 
 
 echo "06. GET E1 and see empty value"
 echo "=============================="
-orionCurl --url /v1/contextEntities/E1 --json
+orionCurl --url /v1/contextEntities/E1
 echo
 echo
 
@@ -123,14 +123,14 @@ payload='{
         }
     ]
 }'
-orionCurl -X PUT --url /v1/contextEntities/E1 --payload "$payload" --json
+orionCurl -X PUT --url /v1/contextEntities/E1 --payload "$payload"
 echo
 echo
 
 
 echo "08. GET E1 and see non-empty value (bar)"
 echo "========================================"
-orionCurl --url /v1/contextEntities/E1 --json
+orionCurl --url /v1/contextEntities/E1
 echo
 echo
 
@@ -145,14 +145,14 @@ payload='{
         }
     ]
 }'
-orionCurl -X PUT --url /v1/contextEntities/E1 --payload "$payload" --json
+orionCurl -X PUT --url /v1/contextEntities/E1 --payload "$payload"
 echo
 echo
 
 
 echo "10. GET E1 and see attribute hasn't changed (bar)"
 echo "================================================="
-orionCurl --url /v1/contextEntities/E1 --json
+orionCurl --url /v1/contextEntities/E1
 echo
 echo
 

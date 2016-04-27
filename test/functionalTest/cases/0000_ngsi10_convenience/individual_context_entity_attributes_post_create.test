@@ -44,7 +44,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
 +++++ 1. post an entity +++++

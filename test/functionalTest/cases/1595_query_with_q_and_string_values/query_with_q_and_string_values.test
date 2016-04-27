@@ -48,7 +48,7 @@ payload='{
     "id": "E1",
     "A1": { "value": "10" }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -59,56 +59,56 @@ payload='{
     "id": "E2",
     "A1": { "value": 10 }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "03. GET all entities (2 entities)"
 echo "================================="
-orionCurl --url /v2/entities --json
+orionCurl --url /v2/entities
 echo
 echo
 
 
 echo "04. GET entities with q=A1==10 (1 hit)"
 echo "======================================"
-orionCurl --url '/v2/entities?q=A1==10' --json
+orionCurl --url '/v2/entities?q=A1==10'
 echo
 echo
 
 
 echo "05. GET entities with q=A1=='10' (1 hit)"
 echo "========================================"
-orionCurl --url "/v2/entities?q=A1=='10'" --json
+orionCurl --url "/v2/entities?q=A1=='10'"
 echo
 echo
 
 
 echo "06. GET entities with q=A1!=10 (1 hit)"
 echo "======================================"
-orionCurl --url '/v2/entities?q=A1!=10' --json
+orionCurl --url '/v2/entities?q=A1!=10'
 echo
 echo
 
 
 echo "07. GET entities with q=A1!='10' (1 hit)"
 echo "========================================"
-orionCurl --url "/v2/entities?q=A1!='10'" --json
+orionCurl --url "/v2/entities?q=A1!='10'"
 echo
 echo
 
 
 echo "08. GET entities with invalid q=A1=='10'x (error)"
 echo "================================================="
-orionCurl --url "/v2/entities?q=A1=='10'x" --json
+orionCurl --url "/v2/entities?q=A1=='10'x"
 echo
 echo
 
 
 echo "09. GET entities with invalid q=A1=='10'x' (error)"
 echo "=================================================="
-orionCurl --url "/v2/entities?q=A1=='10'x'" --json
+orionCurl --url "/v2/entities?q=A1=='10'x'"
 echo
 echo
 

@@ -50,7 +50,7 @@ payload='{
   "surname": "Doe",
   "age": 36
 }'
-orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
 echo
 echo
 
@@ -64,7 +64,7 @@ payload='{
   "surname": "Smith",
   "age": 37
 }'
-orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
 echo
 echo
 
@@ -78,7 +78,7 @@ payload='{
   "surname": "Simpson",
   "age": 27
 }'
-orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
 echo
 echo
 
@@ -92,7 +92,7 @@ payload='{
   "surname": "Thompson",
   "age": 18
 }'
-orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
 echo
 echo
 
@@ -106,7 +106,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url '/v2/op/query?options=keyValues&orderBy=age' --payload "$payload" --json
+orionCurl --url '/v2/op/query?options=keyValues&orderBy=age' --payload "$payload"
 echo
 echo
 
@@ -120,7 +120,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url '/v2/op/query?options=keyValues&orderBy=!age' --payload "$payload" --json
+orionCurl --url '/v2/op/query?options=keyValues&orderBy=!age' --payload "$payload"
 echo
 echo
 
@@ -134,7 +134,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url '/v2/op/query?options=keyValues&orderBy=name,age' --payload "$payload" --json
+orionCurl --url '/v2/op/query?options=keyValues&orderBy=name,age' --payload "$payload"
 echo
 echo
 
@@ -148,7 +148,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url '/v2/op/query?options=keyValues&orderBy=!name,age' --payload "$payload" --json
+orionCurl --url '/v2/op/query?options=keyValues&orderBy=!name,age' --payload "$payload"
 echo
 echo
 
@@ -162,7 +162,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url '/v2/op/query?options=keyValues&orderBy=name,!age' --payload "$payload" --json
+orionCurl --url '/v2/op/query?options=keyValues&orderBy=name,!age' --payload "$payload"
 echo
 echo
 

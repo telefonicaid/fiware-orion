@@ -52,7 +52,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/contextEntities/E1?entity::type=T1 --payload "${payload}" --json
+orionCurl --url /v1/contextEntities/E1?entity::type=T1 --payload "${payload}"
 echo
 echo
 
@@ -68,56 +68,56 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/contextEntities/E2?entity::type=T2 --payload "${payload}" --json
+orionCurl --url /v1/contextEntities/E2?entity::type=T2 --payload "${payload}"
 echo
 echo
 
 
 echo "03. GET /v1/contextEntities - see 2 entities"
 echo "============================================"
-orionCurl --url /v1/contextEntities --json
+orionCurl --url /v1/contextEntities
 echo
 echo
 
 
 echo "04. DELETE /v1/contextEntities/E4, and see it fail"
 echo "=================================================="
-orionCurl --url /v1/contextEntities/E4 -X DELETE --json
+orionCurl --url /v1/contextEntities/E4 -X DELETE
 echo
 echo
 
 
 echo "05. DELETE /v1/contextEntities/E1?entity::type=T4, and see it fail"
 echo "=================================================================="
-orionCurl --url /v1/contextEntities/E1?entity::type=T4 -X DELETE --json
+orionCurl --url /v1/contextEntities/E1?entity::type=T4 -X DELETE
 echo
 echo
 
 
 echo "06. GET /v1/contextEntities - see 2 entities"
 echo "============================================"
-orionCurl --url /v1/contextEntities --json
+orionCurl --url /v1/contextEntities
 echo
 echo
 
 
 echo "07. DELETE /v1/contextEntities/E1"
 echo "================================="
-orionCurl --url /v1/contextEntities/E1 -X DELETE --json
+orionCurl --url /v1/contextEntities/E1 -X DELETE
 echo
 echo
 
 
 echo "08. DELETE /v1/contextEntities/E2?entity::type=T2"
 echo "================================================="
-orionCurl --url /v1/contextEntities/E2?entity::type=T2 -X DELETE --json
+orionCurl --url /v1/contextEntities/E2?entity::type=T2 -X DELETE
 echo
 echo
 
 
 echo "09. GET /v1/contextEntities - see 0 entities"
 echo "============================================"
-orionCurl --url /v1/contextEntities --json
+orionCurl --url /v1/contextEntities
 echo
 echo
 

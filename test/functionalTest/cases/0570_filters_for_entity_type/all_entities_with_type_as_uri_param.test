@@ -56,7 +56,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -79,7 +79,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -102,21 +102,21 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
 echo "4. Lookup E1/T1 using GET /v1/contextEntities?entity::type=T1"
 echo "============================================================="
-orionCurl --url '/v1/contextEntities?entity::type=T1' --json
+orionCurl --url '/v1/contextEntities?entity::type=T1'
 echo
 echo
 
 
 echo "5. Lookup E1/T2+E2/T2 using GET /v1/contextEntities?entity::type=T2"
 echo "==================================================================="
-orionCurl --url '/v1/contextEntities?entity::type=T2' --json
+orionCurl --url '/v1/contextEntities?entity::type=T2'
 echo
 echo
 

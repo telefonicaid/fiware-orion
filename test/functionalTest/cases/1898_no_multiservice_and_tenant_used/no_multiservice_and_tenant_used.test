@@ -61,7 +61,7 @@ payload='
     "expires": "2050-04-05T14:00:00.00Z"
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -72,7 +72,7 @@ payload='{
   "id": "E2",
   "A2": 2
 }'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
 echo
 echo
 
@@ -83,7 +83,7 @@ payload='{
   "id": "E3",
   "A3": 3
 }'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json --tenant ""
+orionCurl --url /v2/entities?options=keyValues --payload "$payload" --tenant ""
 echo
 echo
 
@@ -94,7 +94,7 @@ payload='{
   "id": "E4",
   "A4": 4
 }'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json --tenant "abc"
+orionCurl --url /v2/entities?options=keyValues --payload "$payload" --tenant "abc"
 echo
 echo
 

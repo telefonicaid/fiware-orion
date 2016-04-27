@@ -72,7 +72,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "2: +++++++++ create object compound +++++++++++"
 url="/v1/contextEntities/EObject"
@@ -116,19 +116,19 @@ payload='{
     }
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "3: ++++++++++ query for vector compound by valueID 'ground' ++++++++++"
-orionCurl --url "/v1/contextEntities/EVector/attributes/att/ground" --json
+orionCurl --url "/v1/contextEntities/EVector/attributes/att/ground"
 
 echo "4: ++++++++++ query for vector compound by valueID 'wall' ++++++++++"
-orionCurl --url "/v1/contextEntities/EVector/attributes/att/wall" --json
+orionCurl --url "/v1/contextEntities/EVector/attributes/att/wall"
 
 echo "5: ++++++++++ query for object compound by valueID 'ground' ++++++++++"
-orionCurl --url "/v1/contextEntities/EObject/attributes/att/ground" --json
+orionCurl --url "/v1/contextEntities/EObject/attributes/att/ground"
 
 echo "6: ++++++++++ query for object compound by valueID 'wall' ++++++++++"
-orionCurl --url "/v1/contextEntities/EObject/attributes/att/wall" --json
+orionCurl --url "/v1/contextEntities/EObject/attributes/att/wall"
 
 --REGEXPECT--
 1: +++++++++ create vector compound +++++++++++

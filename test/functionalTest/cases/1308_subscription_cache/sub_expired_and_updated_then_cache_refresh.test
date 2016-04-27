@@ -58,7 +58,7 @@ payload='{
   "id": "E10",
   "A1": "01. Creation"
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -87,7 +87,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload"
 SUB_ID=$(echo "$_response" | grep subscriptionId |  awk -F ':' '{gsub(/[ \t",]+/, "", $2); print $2}' )
 echo
 echo
@@ -96,7 +96,7 @@ echo
 echo "03. Statistics - just for fun"
 echo "============================="
 valgrindSleep 1
-orionCurl --url /cache/statistics --json
+orionCurl --url /cache/statistics
 echo
 echo
 
@@ -114,7 +114,7 @@ payload='{
   "subscriptionId": "'$SUB_ID'",
   "duration": "PT30S"
 }'
-orionCurl --url /v1/updateContextSubscription --payload "$payload" --json
+orionCurl --url /v1/updateContextSubscription --payload "$payload"
 echo
 echo
 
@@ -122,7 +122,7 @@ echo
 
 echo "06. Statistics - to see the sub-update"
 echo "======================================"
-orionCurl --url /cache/statistics --json
+orionCurl --url /cache/statistics
 echo
 echo
 
@@ -136,7 +136,7 @@ echo
 
 echo "08. Statistics - see 2 refresh, one notification"
 echo "================================================"
-orionCurl --url /cache/statistics --json
+orionCurl --url /cache/statistics
 echo
 echo
 
@@ -146,7 +146,7 @@ echo "================="
 payload='{
   "A1": "09. Updated"
 }'
-orionCurl --url '/v2/entities/E10/attrs?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/E10/attrs?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -157,7 +157,7 @@ sleep 2
 payload='{
   "A1": "10. Updated"
 }'
-orionCurl --url '/v2/entities/E10/attrs?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/E10/attrs?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -168,14 +168,14 @@ sleep 2
 payload='{
   "A1": "11. Updated"
 }'
-orionCurl --url '/v2/entities/E10/attrs?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/E10/attrs?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "12. Statistics - see 2 refresh, four notifications"
 echo "=================================================="
-orionCurl --url /cache/statistics --json
+orionCurl --url /cache/statistics
 echo
 echo
 

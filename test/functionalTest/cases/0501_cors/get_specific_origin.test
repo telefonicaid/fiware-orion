@@ -46,19 +46,19 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 echo "02. Query E1-T1 with rivendel origin (Access-Control-Allow-Origin header included)"
 echo "=================================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1 --json -X GET --origin rivendel
+orionCurl --url /v1/contextEntities/type/T1/id/E1 -X GET --origin rivendel
 echo
 echo
 
 echo "03. Query E1-T1 with mordor origin (Access-Control-Allow-Origin header not included)"
 echo "===================================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1 --json -X GET --origin mordor
+orionCurl --url /v1/contextEntities/type/T1/id/E1 -X GET --origin mordor
 echo
 echo
 
@@ -80,7 +80,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json --origin rivendel
+orionCurl --url /v1/updateContext --payload "$payload" --origin rivendel
 echo
 echo
 

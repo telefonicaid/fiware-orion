@@ -67,7 +67,7 @@ payload='{
     "type": "geo:point"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -82,7 +82,7 @@ payload='{
     "type": "geo:point"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -97,7 +97,7 @@ payload='{
     "type": "geo:point"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -112,7 +112,7 @@ payload='{
     "type": "geo:point"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -127,147 +127,147 @@ payload='{
     "type": "geo:point"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "06. Query coveredBy point (5, 5) -> not supported"
 echo "================================================="
-orionCurl --url '/v2/entities?georel=coveredBy&geometry=point&coords=5,5' --json
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=point&coords=5,5'
 echo
 echo
 
 
 echo "07. Query coveredBy line (5, 5) (9, 5) -> not supported"
 echo "======================================================="
-orionCurl --url '/v2/entities?georel=coveredBy&geometry=line&coords=5,5;9,5' --json
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=line&coords=5,5;9,5'
 echo
 echo
 
 
 echo "08. Query coveredBy box (-5, 0) (6, 11) -> A, E"
 echo "==============================================="
-orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=-5,0;6,11' --json
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=-5,0;6,11'
 echo
 echo
 
 
 echo "08b. Query coveredBy (same) box (-5, 11) (6, 0) -> A, E"
 echo "======================================================="
-orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=-5,11;6,0' --json
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=-5,11;6,0'
 echo
 echo
 
 
 echo "09. Query coveredBy polygon (0, 0) (24, 0) (0, 20) -> A, B, C"
 echo "============================================================="
-orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=0,0;24,0;0,20;0,0' --json
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=0,0;24,0;0,20;0,0'
 echo
 echo
 
 
 echo "10. Query intersects point (5, 5) -> A"
 echo "======================================"
-orionCurl --url '/v2/entities?georel=intersects&geometry=point&coords=5,5' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=point&coords=5,5'
 echo
 echo
 
 
 echo "11. Query intersects line (5, 5) (9, 5) -> A, B"
 echo "==============================================="
-orionCurl --url '/v2/entities?georel=intersects&geometry=line&coords=5,5;9,5' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=line&coords=5,5;9,5'
 echo
 echo
 
 
 echo "12. Query intersects box (-5, 0) (6, 11) -> A, E"
 echo "================================================"
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=-5,0;6,11' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=-5,0;6,11'
 echo
 echo
 
 
 echo "12b. Query intersects (same) box (-5, 11) (6, 0) -> A, E"
 echo "========================================================"
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=-5,11;6,0' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=-5,11;6,0'
 echo
 echo
 
 
 echo "13. Query intersects polygon (0, 0) (24, 0) (0, 20) -> A, B, C"
 echo "=============================================================="
-orionCurl --url '/v2/entities?georel=intersects&geometry=polygon&coords=0,0;24,0;0,20;0,0' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=polygon&coords=0,0;24,0;0,20;0,0'
 echo
 echo
 
 
 echo "14. Query disjoint point (5, 5) -> B, C, D, E"
 echo "============================================="
-orionCurl --url '/v2/entities?georel=disjoint&geometry=point&coords=5,5' --json
+orionCurl --url '/v2/entities?georel=disjoint&geometry=point&coords=5,5'
 echo
 echo
 
 
 echo "15. Query disjoint line (5, 5) (9, 5) -> C, D, E"
 echo "================================================"
-orionCurl --url '/v2/entities?georel=disjoint&geometry=line&coords=5,5;9,5' --json
+orionCurl --url '/v2/entities?georel=disjoint&geometry=line&coords=5,5;9,5'
 echo
 echo
 
 
 echo "16. Query disjoint box (-5, 0) (6, 11) -> B, C, D"
 echo "================================================="
-orionCurl --url '/v2/entities?georel=disjoint&geometry=box&coords=-5,0;6,11' --json
+orionCurl --url '/v2/entities?georel=disjoint&geometry=box&coords=-5,0;6,11'
 echo
 echo
 
 
 echo "16b. Query disjoint (same) box (-5, 11) (6, 0) -> B, C, D"
 echo "========================================================="
-orionCurl --url '/v2/entities?georel=disjoint&geometry=box&coords=-5,11;6,0' --json
+orionCurl --url '/v2/entities?georel=disjoint&geometry=box&coords=-5,11;6,0'
 echo
 echo
 
 
 echo "17. Query disjoint polygon (0, 0) (24, 0) (0, 20) -> D, E"
 echo "========================================================="
-orionCurl --url '/v2/entities?georel=disjoint&geometry=polygon&coords=0,0;24,0;0,20;0,0' --json
+orionCurl --url '/v2/entities?georel=disjoint&geometry=polygon&coords=0,0;24,0;0,20;0,0'
 echo
 echo
 
 
 echo "18. Query equals point (15, 15) -> D"
 echo "===================================="
-orionCurl --url '/v2/entities?georel=equals&geometry=point&coords=15,15' --json
+orionCurl --url '/v2/entities?georel=equals&geometry=point&coords=15,15'
 echo
 echo
 
 
 echo "19. Query equals line (5, 5) (9, 5) -> none"
 echo "==========================================="
-orionCurl --url '/v2/entities?georel=equals&geometry=line&coords=5,5;9,5' --json
+orionCurl --url '/v2/entities?georel=equals&geometry=line&coords=5,5;9,5'
 echo
 echo
 
 
 echo "20. Query equals box (-5, 0) (6, 11) -> none"
 echo "============================================"
-orionCurl --url '/v2/entities?georel=equals&geometry=box&coords=-5,0;6,11' --json
+orionCurl --url '/v2/entities?georel=equals&geometry=box&coords=-5,0;6,11'
 echo
 echo
 
 
 echo "20b. Query equals (same) box (-5, 11) (6, 0) -> none"
 echo "===================================================="
-orionCurl --url '/v2/entities?georel=equals&geometry=box&coords=-5,11;6,0' --json
+orionCurl --url '/v2/entities?georel=equals&geometry=box&coords=-5,11;6,0'
 echo
 echo
 
 
 echo "21. Query equals polygon (0, 0) (24, 0) (0, 20) -> none"
 echo "======================================================="
-orionCurl --url '/v2/entities?georel=equals&geometry=polygon&coords=0,0;24,0;0,20;0,0' --json
+orionCurl --url '/v2/entities?georel=equals&geometry=polygon&coords=0,0;24,0;0,20;0,0'
 echo
 echo
 

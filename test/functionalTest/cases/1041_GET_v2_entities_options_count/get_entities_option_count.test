@@ -42,7 +42,7 @@ brokerStart CB
 
 echo "01. GET /v2/entities"
 echo "===================="
-orionCurl --url /v2/entities?options=count --json
+orionCurl --url /v2/entities?options=count
 echo
 echo
 
@@ -57,13 +57,13 @@ payload='{
            "value" : "Klasse C"
         }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 echo "03. GET /v2/entities"
 echo "===================="
-orionCurl --url /v2/entities?options=count --json
+orionCurl --url /v2/entities?options=count
 echo
 echo
 
@@ -74,7 +74,7 @@ payload='{
       "id":   "E2",
       "type": "Car"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -85,7 +85,7 @@ payload='{
       "id":   "E3",
       "type": "Car"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -96,13 +96,13 @@ payload='{
       "id":   "E4",
       "type": "Car"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 echo "07. GET /v2/entities"
 echo "===================="
-orionCurl --url /v2/entities?options=count --json
+orionCurl --url /v2/entities?options=count
 echo
 echo
 

@@ -64,14 +64,14 @@ payload='{
 ],
 "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
 echo "02. Query Room1"
 echo "==============="
-orionCurl --url /v1/contextEntities/Room1 --json
+orionCurl --url /v1/contextEntities/Room1
 echo
 echo
 
@@ -94,14 +94,14 @@ payload='{
 ],
 "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
 echo "04. Query Room1"
 echo "==============="
-orionCurl --url /v1/contextEntities/Room1 --json
+orionCurl --url /v1/contextEntities/Room1
 echo
 echo
 
@@ -132,14 +132,14 @@ payload='{
 ],
 "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
 echo "06. Query Room1"
 echo "==============="
-orionCurl --url /v1/contextEntities/Room1 --json
+orionCurl --url /v1/contextEntities/Room1
 echo
 echo
 
@@ -169,14 +169,14 @@ payload='{
 ],
 "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
 echo "08. Query Room1"
 echo "==============="
-orionCurl --url /v1/contextEntities/Room1 --json
+orionCurl --url /v1/contextEntities/Room1
 echo
 echo
 

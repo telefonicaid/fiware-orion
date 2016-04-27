@@ -46,7 +46,7 @@ payload='{
       "id":   "E1",
       "type": "T1"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -58,7 +58,7 @@ payload='{
       "id":   "E2",
       "type": "T2"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -70,7 +70,7 @@ payload='{
       "id":   "E3",
       "type": "T3"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -82,7 +82,7 @@ payload='{
       "id":   "E4",
       "type": "T4"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -94,21 +94,21 @@ payload='{
       "id":   "E5",
       "type": "T5"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "06. GET /v2/entities?limit=2&options=count"
 echo "=========================================="
-orionCurl --url '/v2/entities?limit=2&options=count' --json
+orionCurl --url '/v2/entities?limit=2&options=count'
 echo
 echo
 
 
 echo "07. GET /v2/entities?offset=2"
 echo "============================="
-orionCurl --url /v2/entities?offset=2 --json
+orionCurl --url /v2/entities?offset=2
 echo
 echo
 

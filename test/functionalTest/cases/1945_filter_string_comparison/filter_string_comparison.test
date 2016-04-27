@@ -51,7 +51,7 @@ payload='{
   "type": "T",
   "colour": "black"
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -63,7 +63,7 @@ payload='{
   "type": "T",
   "colour": "purple"
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -75,7 +75,7 @@ payload='{
   "type": "T",
   "colour": "red"
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -87,7 +87,7 @@ payload='{
   "type": "T",
   "colour": "brown"
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -99,49 +99,49 @@ payload='{
   "type": "T",
   "colour": "yellow"
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "06. Get entities colour <= brown -> E1 (black), E4 (brown)"
 echo "=========================================================="
-orionCurl --url '/v2/entities?options=keyValues&q=colour<=brown' --json
+orionCurl --url '/v2/entities?options=keyValues&q=colour<=brown'
 echo
 echo
 
 
 echo "07. Get entities colour <  brown -> E1 (black)"
 echo "=============================================="
-orionCurl --url '/v2/entities?options=keyValues&q=colour<brown' --json
+orionCurl --url '/v2/entities?options=keyValues&q=colour<brown'
 echo
 echo
 
 
 echo "08. Get entities colour >= red -> E3 (red), E5 (yellow)"
 echo "======================================================="
-orionCurl --url '/v2/entities?options=keyValues&q=colour>=red' --json
+orionCurl --url '/v2/entities?options=keyValues&q=colour>=red'
 echo
 echo
 
 
 echo "09. Get entities colour > red -> E5 (yellow)"
 echo "============================================"
-orionCurl --url '/v2/entities?options=keyValues&q=colour>red' --json
+orionCurl --url '/v2/entities?options=keyValues&q=colour>red'
 echo
 echo
 
 
 echo "10. Get entities colour in range: brown to red -> E2 (purple), E3 (red), E4 (brown)"
 echo "==================================================================================="
-orionCurl --url '/v2/entities?options=keyValues&q=colour==brown..red' --json
+orionCurl --url '/v2/entities?options=keyValues&q=colour==brown..red'
 echo
 echo
 
 
 echo "11. Get entities colour out range: brown to red -> E1 (black), E5 (yellow)"
 echo "=========================================================================="
-orionCurl --url '/v2/entities?options=keyValues&q=colour!=brown..red' --json
+orionCurl --url '/v2/entities?options=keyValues&q=colour!=brown..red'
 echo
 echo
 

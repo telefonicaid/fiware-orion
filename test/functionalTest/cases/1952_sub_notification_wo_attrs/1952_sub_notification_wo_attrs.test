@@ -63,14 +63,14 @@ payload='
     "throttling": 5
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
 idSubscription=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 echo "02. GET /v2/subscriptions/ID"
 echo "============================"
-orionCurl --url "/v2/subscriptions/${idSubscription}" --json
+orionCurl --url "/v2/subscriptions/${idSubscription}"
 echo
 echo
 

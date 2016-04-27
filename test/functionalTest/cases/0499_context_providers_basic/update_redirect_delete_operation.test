@@ -65,7 +65,7 @@ payload='{
     }
  ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
@@ -90,7 +90,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --port $CP1_PORT --json
+orionCurl --url "$url" --payload "$payload" --port $CP1_PORT
 echo
 echo
 
@@ -110,7 +110,7 @@ payload='{
     "A1"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
@@ -135,7 +135,7 @@ payload='{
   ],
   "updateAction": "DELETE"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
@@ -155,7 +155,7 @@ payload='{
     "A1"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 

@@ -65,7 +65,7 @@ brokerStart CB 0-255
 echo '01. POST /v2/entities creating E1 A1=1'
 echo '======================================'
 payload='{ "id": "E1", "A1": 1 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -73,7 +73,7 @@ echo
 echo '02. PUT /v2/entities/E1/attrs/A1/value with erroneous JSON payload'
 echo '=================================================================='
 payload='{ "A1" }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --json
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT
 echo
 echo
 
@@ -81,14 +81,14 @@ echo
 echo '03. PUT /v2/entities/E1/attrs/A1/value with JSON object as payload'
 echo '=================================================================='
 payload='{ "a": "1", "b": 2 }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --json
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT
 echo
 echo
 
 
 echo '04. Check that A1 == "that JSON object"'
 echo '======================================='
-orionCurl --url /v2/entities/E1/attrs/A1 --json
+orionCurl --url /v2/entities/E1/attrs/A1
 echo
 echo
 
@@ -96,14 +96,14 @@ echo
 echo '05. PUT /v2/entities/E1/attrs/A1/value with JSON array as payload'
 echo '================================================================='
 payload='[ "a", "b", "c" ]'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --json
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT
 echo
 echo
 
 
 echo '06. Check that A1 == "that JSON array"'
 echo '======================================'
-orionCurl --url /v2/entities/E1/attrs/A1 --json
+orionCurl --url /v2/entities/E1/attrs/A1
 echo
 echo
 
@@ -118,7 +118,7 @@ echo
 
 echo '08. Check that A1 == "STRING"'
 echo '============================='
-orionCurl --url /v2/entities/E1/attrs/A1 --json
+orionCurl --url /v2/entities/E1/attrs/A1
 echo
 echo
 
@@ -133,7 +133,7 @@ echo
 
 echo '10. Check that A1 == true'
 echo '========================='
-orionCurl --url /v2/entities/E1/attrs/A1 --json
+orionCurl --url /v2/entities/E1/attrs/A1
 echo
 echo
 
@@ -148,7 +148,7 @@ echo
 
 echo '12. Check that A1 == true'
 echo '========================='
-orionCurl --url /v2/entities/E1/attrs/A1 --json
+orionCurl --url /v2/entities/E1/attrs/A1
 echo
 echo
 
@@ -163,7 +163,7 @@ echo
 
 echo '14. Check that A1 == true'
 echo '========================='
-orionCurl --url /v2/entities/E1/attrs/A1 --json
+orionCurl --url /v2/entities/E1/attrs/A1
 echo
 echo
 
@@ -178,7 +178,7 @@ echo
 
 echo '16. Check that A1 == false'
 echo '=========================='
-orionCurl --url /v2/entities/E1/attrs/A1 --json
+orionCurl --url /v2/entities/E1/attrs/A1
 echo
 echo
 
@@ -193,7 +193,7 @@ echo
 
 echo '18. Check that A1 == false'
 echo '=========================='
-orionCurl --url /v2/entities/E1/attrs/A1 --json
+orionCurl --url /v2/entities/E1/attrs/A1
 echo
 echo
 
@@ -208,7 +208,7 @@ echo
 
 echo '20. Check that A1 == false'
 echo '=========================='
-orionCurl --url /v2/entities/E1/attrs/A1 --json
+orionCurl --url /v2/entities/E1/attrs/A1
 echo
 echo
 
@@ -223,7 +223,7 @@ echo
 
 echo '22. Check that A1 == 123'
 echo '========================'
-orionCurl --url /v2/entities/E1/attrs/A1 --json
+orionCurl --url /v2/entities/E1/attrs/A1
 echo
 echo
 
@@ -238,7 +238,7 @@ echo
 
 echo '24. Check that A1 == 3.14'
 echo '========================='
-orionCurl --url /v2/entities/E1/attrs/A1 --json
+orionCurl --url /v2/entities/E1/attrs/A1
 echo
 echo
 
@@ -253,7 +253,7 @@ echo
 
 echo '26. Check that A1 == 3.14 still'
 echo '==============================='
-orionCurl --url /v2/entities/E1/attrs/A1 --json
+orionCurl --url /v2/entities/E1/attrs/A1
 echo
 echo
 
@@ -268,7 +268,7 @@ echo
 
 echo "28. Check that A1 == -12.1"
 echo "=========================="
-orionCurl --url /v2/entities/E1/attrs/A1 --json
+orionCurl --url /v2/entities/E1/attrs/A1
 echo
 echo
 
@@ -283,7 +283,7 @@ echo
 
 echo "30. Check that A1 == 3.2e2"
 echo "=========================="
-orionCurl --url /v2/entities/E1/attrs/A1 --json
+orionCurl --url /v2/entities/E1/attrs/A1
 echo
 echo
 

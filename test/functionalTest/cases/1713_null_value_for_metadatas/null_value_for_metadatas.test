@@ -39,14 +39,14 @@ brokerStart CB
 echo "01. Create a metadata with value NULL"
 echo "====================================="
 payload='{"type": "room", "id": "room17", "temperature":{"metadata": {"alarm": {"value": null}}, "value": "34"}}'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "02. GET the entity to make sure the creation worked"
 echo "==================================================="
-orionCurl --url /v2/entities/room17 --json
+orionCurl --url /v2/entities/room17
 echo
 echo
 

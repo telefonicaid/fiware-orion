@@ -87,7 +87,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -116,7 +116,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -145,7 +145,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -174,7 +174,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -203,7 +203,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -232,7 +232,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -261,7 +261,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -290,7 +290,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -319,7 +319,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -348,7 +348,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -377,7 +377,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -406,7 +406,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -435,7 +435,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -464,7 +464,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -493,110 +493,110 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
 
 echo "16. Discover E1 using /v1/registry/contextEntities/E1, pagination '0-2'"
 echo "======================================================================="
-orionCurl --url "/v1/registry/contextEntities/E1?offset=0&limit=3" --json
+orionCurl --url "/v1/registry/contextEntities/E1?offset=0&limit=3"
 echo
 echo
 
 
 echo "17. Discover E1 using /v1/registry/contextEntities/E1, pagination '3-23'"
 echo "========================================================================"
-orionCurl --url "/v1/registry/contextEntities/E1?offset=3&limit=20" --json
+orionCurl --url "/v1/registry/contextEntities/E1?offset=3&limit=20"
 echo
 echo
 
 echo "18. Discover E1 using /v1/registry/contextEntities/E1, pagination '5', with details"
 echo "==================================================================================="
-orionCurl --url "/v1/registry/contextEntities/E1?offset=5&limit=1&details=on" --json
+orionCurl --url "/v1/registry/contextEntities/E1?offset=5&limit=1&details=on"
 echo
 echo
 
 
 echo "19. Discover E1 using /v1/registry/contextEntities/E1/attributes, pagination '0-2'"
 echo "=================================================================================="
-orionCurl --url "/v1/registry/contextEntities/E1/attributes?offset=0&limit=3" --json
+orionCurl --url "/v1/registry/contextEntities/E1/attributes?offset=0&limit=3"
 echo
 echo
 
 
 echo "20. Discover E1 using /v1/registry/contextEntities/E1/attributes, pagination '3-23'"
 echo "==================================================================================="
-orionCurl --url "/v1/registry/contextEntities/E1/attributes?offset=3&limit=20" --json
+orionCurl --url "/v1/registry/contextEntities/E1/attributes?offset=3&limit=20"
 echo
 echo
 
 echo "21. Discover E1 using /v1/registry/contextEntities/E1/attributes, pagination '5', with details"
 echo "=============================================================================================="
-orionCurl --url "/v1/registry/contextEntities/E1/attributes?offset=5&limit=1&details=on" --json
+orionCurl --url "/v1/registry/contextEntities/E1/attributes?offset=5&limit=1&details=on"
 echo
 echo
 
 
 echo "22. Discover E2 using /v1/registry/contextEntities/E2/attributes/A9, pagination '0-1'"
 echo "====================================================================================="
-orionCurl --url "/v1/registry/contextEntities/E2/attributes/A9?offset=0&limit=2" --json
+orionCurl --url "/v1/registry/contextEntities/E2/attributes/A9?offset=0&limit=2"
 echo
 echo
 
 
 echo "23. Discover E2 using /v1/registry/contextEntities/E2/attributes/A9, pagination '1-21'"
 echo "======================================================================================"
-orionCurl --url "/v1/registry/contextEntities/E2/attributes/A9?offset=1&limit=20" --json
+orionCurl --url "/v1/registry/contextEntities/E2/attributes/A9?offset=1&limit=20"
 echo
 echo
 
 
 echo "24. Discover E2 using /v1/registry/contextEntities/E2/attributes/A9, pagination '0', with details"
 echo "================================================================================================="
-orionCurl --url "/v1/registry/contextEntities/E2/attributes/A9?offset=0&limit=1&details=on" --json
+orionCurl --url "/v1/registry/contextEntities/E2/attributes/A9?offset=0&limit=1&details=on"
 echo
 echo
 
 
 echo "25. Discover type T1 using /v1/registry/contextEntityTypes/T1, pagination '0-1'"
 echo "==============================================================================="
-orionCurl --url "/v1/registry/contextEntityTypes/T1?offset=0&limit=2" --json
+orionCurl --url "/v1/registry/contextEntityTypes/T1?offset=0&limit=2"
 echo
 echo
 
 
 echo "26. Discover type T1 using /v1/registry/contextEntityTypes/T1, pagination '1-21'"
 echo "================================================================================"
-orionCurl --url "/v1/registry/contextEntityTypes/T1?offset=1&limit=20" --json
+orionCurl --url "/v1/registry/contextEntityTypes/T1?offset=1&limit=20"
 echo
 echo
 
 
 echo "27. Discover type T1 using /v1/registry/contextEntityTypes/T1, pagination '0', with details"
 echo "==========================================================================================="
-orionCurl --url "/v1/registry/contextEntityTypes/T1?offset=0&limit=1&details=on" --json
+orionCurl --url "/v1/registry/contextEntityTypes/T1?offset=0&limit=1&details=on"
 echo
 echo
 
 
 echo "28. Discover type T4, attribute A10, using /v1/registry/contextEntityTypes/T4/attributes/A10, pagination '0-1'"
 echo "=============================================================================================================="
-orionCurl --url "/v1/registry/contextEntityTypes/T4/attributes/A10?offset=0&limit=2" --json
+orionCurl --url "/v1/registry/contextEntityTypes/T4/attributes/A10?offset=0&limit=2"
 echo
 echo
 
 
 echo "29. Discover type T4, attribute A10, using /v1/registry/contextEntityTypes/T4/attributes/A10, pagination '1-21'"
 echo "==============================================================================================================="
-orionCurl --url "/v1/registry/contextEntityTypes/T4/attributes/A10?offset=1&limit=20" --json
+orionCurl --url "/v1/registry/contextEntityTypes/T4/attributes/A10?offset=1&limit=20"
 echo
 echo
 
 
 echo "30. Discover type T4, attribute A10, using /v1/registry/contextEntityTypes/T4/attributes/A10, pagination '0', with details"
 echo "=========================================================================================================================="
-orionCurl --url "/v1/registry/contextEntityTypes/T4/attributes/A10?offset=0&limit=1&details=on" --json
+orionCurl --url "/v1/registry/contextEntityTypes/T4/attributes/A10?offset=0&limit=1&details=on"
 echo
 echo
 

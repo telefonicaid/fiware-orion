@@ -63,17 +63,17 @@ payload='{
     "type": "no-location"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "02. B1: nok, B2: nok, B3: nok, B4: nok"
 echo "======================================"
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,0;4,4' --json
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,5;4,9' --json
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,0;6,4' --json
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,5;9,9' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,0;4,4'
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,5;4,9'
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,0;6,4'
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,5;9,9'
 echo
 echo
 
@@ -84,17 +84,17 @@ payload='{
   "value": "2, 2",
   "type": "geo:point"
 }'
-orionCurl -X PUT --url /v2/entities/A/attrs/location --payload "$payload" --json
+orionCurl -X PUT --url /v2/entities/A/attrs/location --payload "$payload"
 echo
 echo
 
 
 echo "04. B1: ok, B2: nok, B3: nok, B4: nok"
 echo "====================================="
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,0;4,4' --json
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,5;4,9' --json
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,0;9,4' --json
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,5;9,9' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,0;4,4'
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,5;4,9'
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,0;9,4'
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,5;9,9'
 echo
 echo
 
@@ -105,17 +105,17 @@ payload='{
   "value": [ "2, 2", "7, 7" ],
   "type": "geo:line"
 }'
-orionCurl -X PUT --url /v2/entities/A/attrs/location --payload "$payload" --json
+orionCurl -X PUT --url /v2/entities/A/attrs/location --payload "$payload"
 echo
 echo
 
 
 echo "06. B1: ok, B2: nok, B3: nok, B4: ok"
 echo "===================================="
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,0;4,4' --json
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,5;4,9' --json
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,0;9,4' --json
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,5;9,9' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,0;4,4'
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,5;4,9'
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,0;9,4'
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,5;9,9'
 echo
 echo
 
@@ -126,17 +126,17 @@ payload='{
   "value": [ "2, 2", "7, 7" ],
   "type": "geo:box"
 }'
-orionCurl -X PUT --url /v2/entities/A/attrs/location --payload "$payload" --json
+orionCurl -X PUT --url /v2/entities/A/attrs/location --payload "$payload"
 echo
 echo
 
 
 echo "08. B1: ok, B2: ok, B3: ok, B4: ok"
 echo "=================================="
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,0;4,4' --json
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,5;4,9' --json
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,0;9,4' --json
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,5;9,9' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,0;4,4'
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,5;4,9'
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,0;9,4'
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,5;9,9'
 echo
 echo
 
@@ -147,17 +147,17 @@ payload='{
   "value": [ "2, 2", "7, 7", "7, 2", "2, 2" ],
   "type": "geo:polygon"
 }'
-orionCurl -X PUT --url /v2/entities/A/attrs/location --payload "$payload" --json
+orionCurl -X PUT --url /v2/entities/A/attrs/location --payload "$payload"
 echo
 echo
 
 
 echo "10. B1: ok, B2: nok, B3: ok, B4: ok"
 echo "==================================="
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,0;4,4' --json
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,5;4,9' --json
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,0;9,4' --json
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,5;9,9' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,0;4,4'
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,5;4,9'
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,0;9,4'
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,5;9,9'
 echo
 echo
 
@@ -168,17 +168,17 @@ payload='{
   "value": "foo",
   "type": "no-location"
 }'
-orionCurl -X PUT --url /v2/entities/A/attrs/location --payload "$payload" --json
+orionCurl -X PUT --url /v2/entities/A/attrs/location --payload "$payload"
 echo
 echo
 
 
 echo "12. B1: nok, B2: nok, B3: nok, B4: nok"
 echo "======================================"
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,0;4,4' --json
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,5;4,9' --json
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,0;9,4' --json
-orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,5;9,9' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,0;4,4'
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,5;4,9'
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,0;9,4'
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,5;9,9'
 echo
 echo
 

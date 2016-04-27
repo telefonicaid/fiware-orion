@@ -64,7 +64,7 @@ payload='{
   },
   "subscriptionId" : "012345678901234567890123"
 }'
-orionCurl --url ${url} --payload "${payload}" --json
+orionCurl --url ${url} --payload "${payload}"
 
 echo "2: ***********************************"
 
@@ -103,7 +103,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url ${url} --payload "${payload}" --json
+orionCurl --url ${url} --payload "${payload}"
 
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 
@@ -145,7 +145,7 @@ payload='{
   "subscriptionId" : "'${SUB_ID}'"
 }'
 
-orionCurl --url ${url} --payload "${payload}" --json
+orionCurl --url ${url} --payload "${payload}"
 
 echo "4: ***********************************"
 --REGEXPECT--

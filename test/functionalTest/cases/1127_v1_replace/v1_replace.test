@@ -40,14 +40,14 @@ brokerStart CB
 echo "01. Create E1 with attr1"
 echo "========================"
 payload='{ "id": "E1", "type": "T1", "attr1": "1", "attr2": "2" }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "02. Get E1 (attr1, attr2)"
 echo "========================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -73,14 +73,14 @@ payload='{
   ],
   "updateAction": "REPLACE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
 echo "04. Get E1 (attr3, attr4)"
 echo "========================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 

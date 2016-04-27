@@ -40,7 +40,7 @@ brokerStart CB 0-255 IPv4 -statCounters
 
 echo "01. GET /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr01 and see it fail"
 echo "==========================================================================================="
-orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr01 --json
+orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr01
 echo
 echo
 
@@ -64,14 +64,14 @@ payload='{
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/abc"
 }'
-orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr01 --payload "$payload" --json
+orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr01 --payload "$payload"
 echo
 echo
 
 
 echo "03. GET /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr01 OK"
 echo "=============================================================================="
-orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr01 --json
+orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr01
 echo
 echo
 
@@ -94,20 +94,20 @@ payload='{
   "duration" : "PT1H",
   "providingApplication" : "http://kz.tid.es/abc"
 }'
-orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr02 --payload "$payload" --json
+orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr02 --payload "$payload"
 echo
 echo
 
 
 echo "05. GET /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr02"
 echo "==========================================================================="
-orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr02 --json
+orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr02
 echo
 echo
 
 echo "06. GET /statistics"
 echo "==================="
-orionCurl --url /statistics --json
+orionCurl --url /statistics
 echo
 echo
 

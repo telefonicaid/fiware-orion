@@ -40,42 +40,42 @@ brokerStart CB
 
 echo "01. OK: Send a request with one valid option (count)"
 echo "===================================================="
-orionCurl --url /v2/entities?options=count --json --payload '{ "id": "ID", "type": "type" }'
+orionCurl --url /v2/entities?options=count --payload '{ "id": "ID", "type": "type" }'
 echo
 echo
 
 
 echo "02. OK: Send a request with two valid options (count + keyValues)"
 echo "================================================================="
-orionCurl --url /v2/entities?options=count,keyValues --json --payload '{ "id": "ID2", "type": "type" }'
+orionCurl --url /v2/entities?options=count,keyValues --payload '{ "id": "ID2", "type": "type" }'
 echo
 echo
 
 
 echo "03. Error: Send a request with one invalid option (canonical)"
 echo "============================================================="
-orionCurl --url /v2/entities?options=canonical --json --payload '{ "id": "ID3", "type": "type" }'
+orionCurl --url /v2/entities?options=canonical --payload '{ "id": "ID3", "type": "type" }'
 echo
 echo
 
 
 echo "04. OK: Send a request with MANY valid options (count, keyValues, append)"
 echo "========================================================================="
-orionCurl --url '/v2/entities?options=count,keyValues,append' --json --payload '{ "id": "ID4", "type": "type" }'
+orionCurl --url '/v2/entities?options=count,keyValues,append' --payload '{ "id": "ID4", "type": "type" }'
 echo
 echo
 
 
 echo "05. Error: Send a request with MANY valid options and ONE invalid"
 echo "================================================================="
-orionCurl --url '/v2/entities?options=count,keyValues,values,append,BAD' --json --payload '{ "id": "ID5", "type": "type" }'
+orionCurl --url '/v2/entities?options=count,keyValues,values,append,BAD' --payload '{ "id": "ID5", "type": "type" }'
 echo
 echo
 
 
 echo "06. Error: Test an arbitrary API v1 path"
 echo "========================================"
-orionCurl --url /ngsi10/updateContextSubscription?options=BAD --json --payload '{ "subscriptionId": "000000000000000000000000" }'
+orionCurl --url /ngsi10/updateContextSubscription?options=BAD --payload '{ "subscriptionId": "000000000000000000000000" }'
 echo
 echo
 

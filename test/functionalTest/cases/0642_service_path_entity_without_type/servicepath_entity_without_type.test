@@ -43,13 +43,13 @@ payload='{
     }
   ]
 }'
-orionCurl --servicePath '/mine' --url /v1/contextEntities/E1 --payload "${payload}" --json
+orionCurl --servicePath '/mine' --url /v1/contextEntities/E1 --payload "${payload}"
 echo
 echo
 
 echo "02. Query on servicePath /mine and get E1"
 echo "========================================="
-orionCurl --servicePath '/mine' --url /v1/contextEntities/E1 --json
+orionCurl --servicePath '/mine' --url /v1/contextEntities/E1
 echo
 echo
 

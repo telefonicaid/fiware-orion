@@ -42,14 +42,14 @@ payload='{
   "type": "T",
   "temperature": 20
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --tenant T01234567890123456789012345678901234567890123456789 --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --tenant T01234567890123456789012345678901234567890123456789
 echo
 echo
 
 
 echo "02. Query the 'not created entity' on the 'invalid tenant'"
 echo "=========================================================="
-orionCurl --url /v2/entities --tenant T01234567890123456789012345678901234567890123456789 --json
+orionCurl --url /v2/entities --tenant T01234567890123456789012345678901234567890123456789
 echo
 echo
 

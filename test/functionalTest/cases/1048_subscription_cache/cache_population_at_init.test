@@ -62,7 +62,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload"
 echo
 echo
 
@@ -98,7 +98,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload"
 echo
 echo
 
@@ -141,7 +141,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload"
 echo
 echo
 
@@ -160,7 +160,7 @@ echo
 
 echo "05. Statistics in JSON"
 echo "======================"
-orionCurl --url /cache/statistics --json
+orionCurl --url /cache/statistics
 echo
 echo
 

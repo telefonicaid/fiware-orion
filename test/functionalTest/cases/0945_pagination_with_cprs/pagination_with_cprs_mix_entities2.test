@@ -66,7 +66,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 sleep 0.5s
@@ -87,7 +87,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 sleep 0.5s
@@ -108,7 +108,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 sleep 0.5s
@@ -129,7 +129,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -152,7 +152,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json --port $CP1_PORT
+orionCurl --url /v1/updateContext --payload "$payload" --port $CP1_PORT
 echo
 echo
 
@@ -180,49 +180,49 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
 echo "04. Query all"
 echo "============="
-orionCurl --url /v1/contextEntities --json
+orionCurl --url /v1/contextEntities
 echo
 echo
 
 echo "05. Query offset=0, limit=1"
 echo "==========================="
-orionCurl --url "/v1/contextEntities?offset=0&limit=1" --json
+orionCurl --url "/v1/contextEntities?offset=0&limit=1"
 echo
 echo
 
 echo "06. Query offset=0, limit=2"
 echo "==========================="
-orionCurl --url "/v1/contextEntities?offset=0&limit=2" --json
+orionCurl --url "/v1/contextEntities?offset=0&limit=2"
 echo
 echo
 
 echo "07. Query offset=0, limit=3"
 echo "==========================="
-orionCurl --url "/v1/contextEntities?offset=0&limit=3" --json
+orionCurl --url "/v1/contextEntities?offset=0&limit=3"
 echo
 echo
 
 echo "08. Query offset=0, limit=4"
 echo "==========================="
-orionCurl --url "/v1/contextEntities?offset=0&limit=4" --json
+orionCurl --url "/v1/contextEntities?offset=0&limit=4"
 echo
 echo
 
 echo "09. Query offset=0, limit=5"
 echo "==========================="
-orionCurl --url "/v1/contextEntities?offset=0&limit=5" --json
+orionCurl --url "/v1/contextEntities?offset=0&limit=5"
 echo
 echo
 
 echo "10. Query offset=1, limit=1"
 echo "==========================="
-orionCurl --url "/v1/contextEntities?offset=1&limit=1" --json
+orionCurl --url "/v1/contextEntities?offset=1&limit=1"
 echo
 echo
 

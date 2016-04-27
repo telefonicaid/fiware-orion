@@ -71,13 +71,13 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 echo "02. GET /v2/entities/8787GHY?attrs=speed,brand,plateCountry,madeInCountry,model"
 echo "==============================================================================="
-orionCurl --url /v2/entities/8787GHY?attrs=speed,brand,plateCountry,madeInCountry,model --json
+orionCurl --url /v2/entities/8787GHY?attrs=speed,brand,plateCountry,madeInCountry,model
 echo
 echo
 

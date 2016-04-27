@@ -46,7 +46,7 @@ payload='{
   "id": "E1",
   "a1": "a1"
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"
 echo
 echo
 
@@ -57,7 +57,7 @@ payload='{
   "type":"T1",
   "a1": "a1"
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"
 echo
 echo
 
@@ -68,7 +68,7 @@ payload='{
   "id": "E1",
   "a1": "a1"
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PUT
 echo
 echo
 
@@ -79,7 +79,7 @@ payload='{
   "type":"T1",
   "a1": "a1"
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PUT
 echo
 echo
 
@@ -90,7 +90,7 @@ payload='{
   "id": "E1",
   "a1": "a1"
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PATCH
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
 echo
 echo
 
@@ -101,7 +101,7 @@ payload='{
   "type":"T1",
   "a1": "a1"
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PATCH
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
 echo
 echo
 
@@ -115,7 +115,7 @@ payload='{
     "bad_tag": 14
   }
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"
 echo
 echo
 
@@ -130,7 +130,7 @@ payload='{
     "type": "int"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 

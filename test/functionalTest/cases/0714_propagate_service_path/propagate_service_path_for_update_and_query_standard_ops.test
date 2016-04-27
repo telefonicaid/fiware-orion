@@ -64,7 +64,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "${payload}" --json --port $CP1_PORT --servicePath /world/1
+orionCurl --url /v1/updateContext --payload "${payload}" --port $CP1_PORT --servicePath /world/1
 echo
 echo
 
@@ -87,7 +87,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "${payload}" --json --port $CP1_PORT --servicePath /world/2
+orionCurl --url /v1/updateContext --payload "${payload}" --port $CP1_PORT --servicePath /world/2
 echo
 echo
 
@@ -116,7 +116,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "${payload}" --json --servicePath /world/1
+orionCurl --url /v1/registry/registerContext --payload "${payload}" --servicePath /world/1
 echo
 echo
 
@@ -145,7 +145,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "${payload}" --json --servicePath /world/2
+orionCurl --url /v1/registry/registerContext --payload "${payload}" --servicePath /world/2
 echo
 echo
 
@@ -168,7 +168,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "${payload}" --json --servicePath /world/1
+orionCurl --url /v1/updateContext --payload "${payload}" --servicePath /world/1
 echo
 echo
 
@@ -191,7 +191,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "${payload}" --json --servicePath /world/2
+orionCurl --url /v1/updateContext --payload "${payload}" --servicePath /world/2
 echo
 echo
 
@@ -207,7 +207,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "${payload}" --json --port $CP1_PORT --servicePath /world/1
+orionCurl --url /v1/queryContext --payload "${payload}" --port $CP1_PORT --servicePath /world/1
 echo
 echo
 
@@ -223,7 +223,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "${payload}" --json --port $CP1_PORT --servicePath /world/2
+orionCurl --url /v1/queryContext --payload "${payload}" --port $CP1_PORT --servicePath /world/2
 echo
 echo
 
@@ -239,7 +239,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "${payload}" --json --port $CP1_PORT --servicePath /world/#
+orionCurl --url /v1/queryContext --payload "${payload}" --port $CP1_PORT --servicePath /world/#
 echo
 echo
 
@@ -255,7 +255,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "${payload}" --json --port $CP1_PORT
+orionCurl --url /v1/queryContext --payload "${payload}" --port $CP1_PORT
 echo
 echo
 

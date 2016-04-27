@@ -62,7 +62,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "${payload}" --json --servicePath /a1/e1
+orionCurl --url /v1/registry/registerContext --payload "${payload}" --servicePath /a1/e1
 echo
 echo
 
@@ -90,7 +90,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "${payload}" --json --servicePath /a1/e2
+orionCurl --url /v1/registry/registerContext --payload "${payload}" --servicePath /a1/e2
 echo
 echo
 
@@ -109,7 +109,7 @@ payload='{
         "A1"
     ]
 }'
-orionCurl --url /v1/registry/discoverContextAvailability --payload "${payload}" --json --servicePath /a1/e1
+orionCurl --url /v1/registry/discoverContextAvailability --payload "${payload}" --servicePath /a1/e1
 echo
 echo
 
@@ -128,7 +128,7 @@ payload='{
         "A1"
     ]
 }'
-orionCurl --url /v1/registry/discoverContextAvailability --payload "${payload}" --json --servicePath /a1/e2
+orionCurl --url /v1/registry/discoverContextAvailability --payload "${payload}" --servicePath /a1/e2
 echo
 echo
 
@@ -147,7 +147,7 @@ payload='{
         "A1"
     ]
 }'
-orionCurl --url /v1/registry/discoverContextAvailability --payload "${payload}" --json --servicePath /a1
+orionCurl --url /v1/registry/discoverContextAvailability --payload "${payload}" --servicePath /a1
 echo
 echo
 
@@ -166,7 +166,7 @@ payload='{
         "A1"
     ]
 }'
-orionCurl --url /v1/registry/discoverContextAvailability --payload "${payload}" --json --servicePath '/a1/#'
+orionCurl --url /v1/registry/discoverContextAvailability --payload "${payload}" --servicePath '/a1/#'
 echo
 echo
 
@@ -185,7 +185,7 @@ payload='{
         "A1"
     ]
 }'
-orionCurl --url /v1/registry/discoverContextAvailability --payload "${payload}" --json --servicePath '/a2/#'
+orionCurl --url /v1/registry/discoverContextAvailability --payload "${payload}" --servicePath '/a2/#'
 echo
 echo
 

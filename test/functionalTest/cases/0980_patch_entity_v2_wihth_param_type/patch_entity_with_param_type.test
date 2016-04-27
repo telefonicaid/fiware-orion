@@ -47,7 +47,7 @@ payload='{
          "value": "V1 A1 E1/T1"
     }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -64,7 +64,7 @@ payload='{
          "value": "V1 A2 E1/T2"
     }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -76,13 +76,13 @@ payload='{
          "value": "CHANGED A1 E1/T2"
     }
 }'
-orionCurl --url "/v2/entities/E1/attrs?type=T1" --payload "$payload" --json -X PATCH
+orionCurl --url "/v2/entities/E1/attrs?type=T1" --payload "$payload" -X PATCH
 echo
 echo
 
 echo "04. GET /v2/entities (updated attribute A1 in E1/T1, not updated in E1/T2)"
 echo "=========================================================================="
-orionCurl --url "/v2/entities" --json
+orionCurl --url "/v2/entities"
 echo
 echo
 
@@ -94,7 +94,7 @@ payload='{
          "value": "CHANGED A2 E1/T1"
     }
 }'
-orionCurl --url "/v2/entities/E1/attrs?type=T1" --payload "$payload" --json -X PATCH
+orionCurl --url "/v2/entities/E1/attrs?type=T1" --payload "$payload" -X PATCH
 echo
 echo
 

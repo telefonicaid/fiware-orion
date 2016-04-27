@@ -65,7 +65,7 @@ payload='
     }
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -77,7 +77,7 @@ payload='{
   "type": "T",
   "status": "off"
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -87,7 +87,7 @@ echo "======================================"
 payload='{
   "status": "on"
 }'
-orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json -X PATCH
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" -X PATCH
 echo
 echo
 
@@ -97,7 +97,7 @@ echo "============================================"
 payload='{
   "status": "fail"
 }'
-orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json -X PATCH
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" -X PATCH
 echo
 echo
 
@@ -107,7 +107,7 @@ echo "======================================"
 payload='{
   "status": "on"
 }'
-orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json -X PATCH
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" -X PATCH
 echo
 echo
 

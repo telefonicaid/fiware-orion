@@ -28,43 +28,43 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-orionCurl --url "/v1/registry/registerContext" --payload "{}" --json
+orionCurl --url "/v1/registry/registerContext" --payload "{}"
 echo "1: ++++++++++++++++++++"
 
-orionCurl --url "/v1/registry/discoverContextAvailability" --payload "{}" --json
+orionCurl --url "/v1/registry/discoverContextAvailability" --payload "{}"
 echo "2: ++++++++++++++++++++"
 
-orionCurl --url "/v1/registry/subscribeContextAvailability" --payload "{}" --json
+orionCurl --url "/v1/registry/subscribeContextAvailability" --payload "{}"
 echo "3: ++++++++++++++++++++"
 
-orionCurl --url "/v1/registry/updateContextAvailabilitySubscription" --payload "{}" --json
+orionCurl --url "/v1/registry/updateContextAvailabilitySubscription" --payload "{}"
 echo "4: ++++++++++++++++++++"
 
-orionCurl --url "/v1/registry/unsubscribeContextAvailability" --payload "{}" --json
+orionCurl --url "/v1/registry/unsubscribeContextAvailability" --payload "{}"
 echo "5: ++++++++++++++++++++"
 
-orionCurl --url "/v1/queryContext" --payload "{}" --json
+orionCurl --url "/v1/queryContext" --payload "{}"
 echo "6: ++++++++++++++++++++"
 
-orionCurl --url "/v1/updateContext" --payload "{}" --json
+orionCurl --url "/v1/updateContext" --payload "{}"
 echo "7: ++++++++++++++++++++"
 
-orionCurl --url "/v1/subscribeContext" --payload "{}" --json
+orionCurl --url "/v1/subscribeContext" --payload "{}"
 echo "8: ++++++++++++++++++++"
 
-orionCurl --url "/v1/updateContextSubscription" --payload "{}" --json
+orionCurl --url "/v1/updateContextSubscription" --payload "{}"
 echo "9: ++++++++++++++++++++"
 
-orionCurl --url "/v1/unsubscribeContext" --payload "{}" --json
+orionCurl --url "/v1/unsubscribeContext" --payload "{}"
 echo "10: ++++++++++++++++++++"
 
-orionCurl --url "/v1/registry/notSupportedRequest" --payload "{}" --json
+orionCurl --url "/v1/registry/notSupportedRequest" --payload "{}"
 echo "11: ++++++++++++++++++++"
 
-orionCurl --url "/v1/notSupportedRequest" --payload "{}" --json
+orionCurl --url "/v1/notSupportedRequest" --payload "{}"
 echo "12: ++++++++++++++++++++"
 
-orionCurl --url "/notSupportedRequest" --payload "{}" --json
+orionCurl --url "/notSupportedRequest" --payload "{}"
 echo "13: ++++++++++++++++++++"
 
 --REGEXPECT--

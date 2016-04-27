@@ -59,21 +59,21 @@ payload='{
     "value": "BMW"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "02. Get all values of entity CarPool"
 echo "===================================="
-orionCurl --url '/v2/entities/CarPool?options=values' --json
+orionCurl --url '/v2/entities/CarPool?options=values'
 echo
 echo
 
 
 echo "03. Get all UNIQUE values of entity CarPool"
 echo "==========================================="
-orionCurl --url '/v2/entities/CarPool?options=unique' --json
+orionCurl --url '/v2/entities/CarPool?options=unique'
 echo
 echo
 

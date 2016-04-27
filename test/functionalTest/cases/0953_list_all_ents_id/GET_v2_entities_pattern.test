@@ -40,7 +40,7 @@ brokerStart CB
 
 echo "01. GET /v2/entities?idPattern=E.*"
 echo "=================================="
-orionCurl --url '/v2/entities?idPattern=E.*' --json
+orionCurl --url '/v2/entities?idPattern=E.*'
 echo
 echo
 
@@ -56,21 +56,21 @@ payload='
       "type":"AT2"
    }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "03. GET /v2/entities?idPattern=E.*"
 echo "=================================="
-orionCurl --url '/v2/entities?idPattern=E.*' --json
+orionCurl --url '/v2/entities?idPattern=E.*'
 echo
 echo
 
 
 echo "04. GET /v2/entities?idPattern=E1&options=count"
 echo "==============================================="
-orionCurl --url '/v2/entities?idPattern=E1&options=count' --json
+orionCurl --url '/v2/entities?idPattern=E1&options=count'
 echo
 echo
 
@@ -87,21 +87,21 @@ payload='
         }
     }
 '
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "06. GET /v2/entities?idPattern=E(1|2)"
 echo "====================================="
-orionCurl --url '/v2/entities?idPattern=E(1|2)' --json
+orionCurl --url '/v2/entities?idPattern=E(1|2)'
 echo
 echo
 
 
 echo "07. GET /v2/entities?idPattern=E\[23\]"
 echo "======================================"
-orionCurl --url '/v2/entities?idPattern=E\[23\]' --json
+orionCurl --url '/v2/entities?idPattern=E\[23\]'
 echo
 echo
 

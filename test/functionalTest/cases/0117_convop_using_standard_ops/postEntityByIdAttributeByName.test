@@ -45,14 +45,14 @@ payload='{
   "duration": "PT1M", 
   "providingApplication": "http://localhost:'$CP1_PORT'/v1"
 }'
-orionCurl --url /v1/registry/contextEntities/E1/attributes/A1 --payload "$payload" --json
+orionCurl --url /v1/registry/contextEntities/E1/attributes/A1 --payload "$payload"
 echo
 echo
 
 
 echo "02. Discover E1/A1"
 echo "=================="
-orionCurl --url /v1/registry/contextEntities/E1/attributes/A1 --json
+orionCurl --url /v1/registry/contextEntities/E1/attributes/A1
 echo
 echo
 
@@ -76,7 +76,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --port $CP1_PORT --json
+orionCurl --url /v1/updateContext --payload "$payload" --port $CP1_PORT
 echo
 echo
 
@@ -100,7 +100,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -119,7 +119,7 @@ payload='{
     "A1"
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 

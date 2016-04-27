@@ -35,7 +35,7 @@ brokerStart CB
 
 echo "01. GET /v2/entities/NONE/attrs/ANY/value"
 echo "========================================="
-orionCurl --url /v2/entities/NONE/attrs/ANY/value --json --out text
+orionCurl --url /v2/entities/NONE/attrs/ANY/value --out text
 echo
 echo
 

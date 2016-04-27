@@ -56,7 +56,7 @@ payload='{
     }
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --servicePath "/test" --tenant "a.b" --json
+orionCurl --url /v2/entities --payload "$payload" --servicePath "/test" --tenant "a.b"
 echo
 echo
 

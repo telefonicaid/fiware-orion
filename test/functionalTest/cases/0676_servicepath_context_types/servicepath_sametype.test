@@ -59,7 +59,7 @@ payload='{
     }
   ]
 }'
-orionCurl --servicePath / --url /v1/contextEntities/type/T/id/E --payload "${payload}" --json
+orionCurl --servicePath / --url /v1/contextEntities/type/T/id/E --payload "${payload}"
 echo
 echo
 
@@ -77,7 +77,7 @@ payload='{
     }
   ]
 }'
-orionCurl --servicePath /A --url /v1/contextEntities/type/T/id/EA --payload "${payload}" --json
+orionCurl --servicePath /A --url /v1/contextEntities/type/T/id/EA --payload "${payload}"
 echo
 echo
 
@@ -95,7 +95,7 @@ payload='{
     }
   ]
 }'
-orionCurl --servicePath /A/A1 --url /v1/contextEntities/type/T/id/EA1 --payload "${payload}" --json
+orionCurl --servicePath /A/A1 --url /v1/contextEntities/type/T/id/EA1 --payload "${payload}"
 echo
 echo
 
@@ -113,43 +113,43 @@ payload='{
     }
   ]
 }'
-orionCurl --servicePath /A/A2 --url /v1/contextEntities/type/T/id/EA2 --payload "${payload}" --json
+orionCurl --servicePath /A/A2 --url /v1/contextEntities/type/T/id/EA2 --payload "${payload}"
 echo
 echo
 
 echo "02. Query types on / (returns: T - [a, b])"
 echo "=========================================="
-orionCurl --servicePath / --url /v1/contextTypes --json
+orionCurl --servicePath / --url /v1/contextTypes
 echo
 echo
 
 echo "03. Query types on /# (returns: T - [a, b, c, d, e])"
 echo "===================================================="
-orionCurl --servicePath '/#' --url /v1/contextTypes --json
+orionCurl --servicePath '/#' --url /v1/contextTypes
 echo
 echo
 
 echo "04. Query types on /A (returns: T - [b, c])"
 echo "==========================================="
-orionCurl --servicePath /A --url /v1/contextTypes --json
+orionCurl --servicePath /A --url /v1/contextTypes
 echo
 echo
 
 echo "05. Query types on /A/# (returns: T - [b, c, d, e])"
 echo "==================================================="
-orionCurl --servicePath '/A/#' --url /v1/contextTypes --json
+orionCurl --servicePath '/A/#' --url /v1/contextTypes
 echo
 echo
 
 echo "06. Query types on /A/A1 (returns: T- [c, d])"
 echo "============================================="
-orionCurl --servicePath /A/A1 --url /v1/contextTypes --json
+orionCurl --servicePath /A/A1 --url /v1/contextTypes
 echo
 echo
 
 echo "07. Query types on /A/A1/# (returns: T - [c, d])"
 echo "================================================"
-orionCurl --servicePath '/A/A1/#' --url /v1/contextTypes --json
+orionCurl --servicePath '/A/A1/#' --url /v1/contextTypes
 echo
 echo
 

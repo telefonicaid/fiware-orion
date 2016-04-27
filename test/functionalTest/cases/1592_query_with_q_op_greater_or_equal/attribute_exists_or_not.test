@@ -47,7 +47,7 @@ payload='{
   "A2": 2,
   "A3": 3
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -61,7 +61,7 @@ payload='{
   "A3": 3,
   "A4": 4
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -76,21 +76,21 @@ payload='{
   "A4": 4,
   "A5": 5
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "04. GET entities that has A1 (see E1,E3)"
 echo "========================================"
-orionCurl --url '/v2/entities?q=A1&options=keyValues' --json
+orionCurl --url '/v2/entities?q=A1&options=keyValues'
 echo
 echo
 
 
 echo "05. GET entities that does NOT have A1 (see E2)"
 echo "==============================================="
-orionCurl --url '/v2/entities?q=!A1&options=keyValues' --json
+orionCurl --url '/v2/entities?q=!A1&options=keyValues'
 echo
 echo
 

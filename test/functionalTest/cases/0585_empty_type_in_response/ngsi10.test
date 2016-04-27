@@ -67,62 +67,62 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
 echo "02. Query with convop GET /v1/contextEntities/Room"
 echo "=================================================="
-orionCurl --url /v1/contextEntities/Room --json
+orionCurl --url /v1/contextEntities/Room
 echo
 echo
 
 
 echo "03. Query with convop GET /v1/contextEntities/Room/attributes/temperature"
 echo "========================================================================="
-orionCurl --url /v1/contextEntities/Room/attributes/temperature --json
+orionCurl --url /v1/contextEntities/Room/attributes/temperature
 echo
 echo
 
 
 echo "04. Query with convop GET /v1/contextEntities/Room/attributes/temperature/ID"
 echo "============================================================================"
-orionCurl --url /v1/contextEntities/Room/attributes/temperature/backup --json
+orionCurl --url /v1/contextEntities/Room/attributes/temperature/backup
 echo
 echo
 
 echo "05. Query with convop GET /v1/contextEntities/type/Room/id/Room"
 echo "==============================================================="
-orionCurl --url /v1/contextEntities/type/Room/id/Room --json
+orionCurl --url /v1/contextEntities/type/Room/id/Room
 echo
 echo
 
 
 echo "06. Query with convop GET /v1/contextEntities/type/Room/id/Room/attributes/temperature"
 echo "======================================================================================"
-orionCurl --url /v1/contextEntities/type/Room/id/Room/attributes/temperature --json
+orionCurl --url /v1/contextEntities/type/Room/id/Room/attributes/temperature
 echo
 echo
 
 
 echo "07. Query with convop GET /v1/contextEntities/type/Room/id/Room/attributes/temperature/backup"
 echo "============================================================================================="
-orionCurl --url /v1/contextEntities/type/Room/id/Room/attributes/temperature/backup --json
+orionCurl --url /v1/contextEntities/type/Room/id/Room/attributes/temperature/backup
 echo
 echo
 
 
 echo "08. Query with convop GET /v1/contextEntityTypes/Room"
 echo "====================================================="
-orionCurl --url /v1/contextEntityTypes/Room --json
+orionCurl --url /v1/contextEntityTypes/Room
 echo
 echo
 
 
 echo "09. Query with convop GET /v1/contextEntityTypes/Room/attributes/temperature"
 echo "============================================================================"
-orionCurl --url /v1/contextEntityTypes/Room/attributes/temperature --json
+orionCurl --url /v1/contextEntityTypes/Room/attributes/temperature
 echo
 echo
 

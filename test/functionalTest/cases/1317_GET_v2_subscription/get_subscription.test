@@ -68,7 +68,7 @@ payload='{
   ],
   "throttling": "PT5S"
 }'
-orionCurl --url /v1/subscribeContext --payload "${payload}" --json
+orionCurl --url /v1/subscribeContext --payload "${payload}"
 SUB_ID=$(echo "$_response" | grep subscriptionId |  awk -F ':' '{gsub(/[ \t",]+/, "", $2); print $2}' )
 echo
 echo
@@ -101,7 +101,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "${payload}" --json
+orionCurl --url /v1/subscribeContext --payload "${payload}"
 SUB_ID2=$(echo "$_response" | grep subscriptionId |  awk -F ':' '{gsub(/[ \t",]+/, "", $2);print $2}' )
 echo
 echo
@@ -109,14 +109,14 @@ echo
 
 echo "02. GET /v2/subscriptions/$SUB_ID"
 echo "=================================================="
-orionCurl --url /v2/subscriptions/$SUB_ID --json
+orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
 
 
 echo "03. GET /v2/subscriptions/$SUB_ID2"
 echo "=================================================="
-orionCurl --url /v2/subscriptions/$SUB_ID2 --json
+orionCurl --url /v2/subscriptions/$SUB_ID2
 echo
 echo
 

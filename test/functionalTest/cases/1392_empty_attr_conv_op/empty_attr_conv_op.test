@@ -49,14 +49,14 @@ payload='{
    "type": "T",
    "value": ""
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/attr --payload "$payload" --json
+orionCurl --url /v1/contextEntities/E1/attributes/attr --payload "$payload"
 echo
 echo
 
 
 echo "02. GET E1 and see empty value"
 echo "=============================="
-orionCurl --url /v1/contextEntities/E1 --json
+orionCurl --url /v1/contextEntities/E1
 echo
 echo
 
@@ -67,14 +67,14 @@ payload='{
    "type": "T",
    "value": "foo"
 }'
-orionCurl -X PUT --url /v1/contextEntities/E1/attributes/attr --payload "$payload" --json
+orionCurl -X PUT --url /v1/contextEntities/E1/attributes/attr --payload "$payload"
 echo
 echo
 
 
 echo "04. GET E1 and see non-empty value (foo)"
 echo "========================================"
-orionCurl --url /v1/contextEntities/E1 --json
+orionCurl --url /v1/contextEntities/E1
 echo
 echo
 
@@ -85,14 +85,14 @@ payload='{
    "type": "T",
    "value": ""
 }'
-orionCurl -X PUT --url /v1/contextEntities/E1/attributes/attr --payload "$payload" --json
+orionCurl -X PUT --url /v1/contextEntities/E1/attributes/attr --payload "$payload"
 echo
 echo
 
 
 echo "06. GET E1 and see empty value"
 echo "=============================="
-orionCurl --url /v1/contextEntities/E1 --json
+orionCurl --url /v1/contextEntities/E1
 echo
 echo
 
@@ -103,14 +103,14 @@ payload='{
    "type": "T",
    "value": "bar"
 }'
-orionCurl -X PUT --url /v1/contextEntities/E1/attributes/attr --payload "$payload" --json
+orionCurl -X PUT --url /v1/contextEntities/E1/attributes/attr --payload "$payload"
 echo
 echo
 
 
 echo "08. GET E1 and see non-empty value (bar)"
 echo "========================================"
-orionCurl --url /v1/contextEntities/E1 --json
+orionCurl --url /v1/contextEntities/E1
 echo
 echo
 
@@ -120,14 +120,14 @@ echo "=============================="
 payload='{
    "type": "T"
 }'
-orionCurl -X PUT --url /v1/contextEntities/E1/attributes/attr --payload "$payload" --json
+orionCurl -X PUT --url /v1/contextEntities/E1/attributes/attr --payload "$payload"
 echo
 echo
 
 
 echo "10. GET E1 and see attribute hasn't changed (bar)"
 echo "================================================="
-orionCurl --url /v1/contextEntities/E1 --json
+orionCurl --url /v1/contextEntities/E1
 echo
 echo
 

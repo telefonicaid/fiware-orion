@@ -49,7 +49,7 @@ payload='{
     "y": [ 24, "y2", true ]
   }
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -69,21 +69,21 @@ payload='{
     [ "z1", true ]
   ]
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "03. GET /v1/contextEntities/E1"
 echo "=============================="
-orionCurl --url /v1/contextEntities/E1 --json
+orionCurl --url /v1/contextEntities/E1
 echo
 echo
 
 
 echo "04. GET /v1/contextEntities/E2"
 echo "=============================="
-orionCurl --url /v1/contextEntities/E2 --json
+orionCurl --url /v1/contextEntities/E2
 echo
 echo
 

@@ -58,16 +58,16 @@ payload='{
   }
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "+++++ 2. lookup an attribute by valueID +++++"
-orionCurl --url "/v1/contextEntities/Room1/attributes/temperature/ground" --json
+orionCurl --url "/v1/contextEntities/Room1/attributes/temperature/ground"
 
 echo "+++++ 3. delete an attribute by valueID +++++"
-orionCurl --url "/v1/contextEntities/Room1/attributes/temperature/ground" -X "DELETE" --json
+orionCurl --url "/v1/contextEntities/Room1/attributes/temperature/ground" -X "DELETE"
 
 echo "+++++ 4. lookup the attribute again +++++"
-orionCurl --url "/v1/contextEntities/Room1/attributes/temperature/ground" --json
+orionCurl --url "/v1/contextEntities/Room1/attributes/temperature/ground"
 
 --REGEXPECT--
 +++++ 1. create an entity +++++

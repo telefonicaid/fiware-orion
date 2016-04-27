@@ -54,7 +54,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A1?entity::type=T1 --payload "$payload" --json
+orionCurl --url /v1/contextEntities/E1/attributes/A1?entity::type=T1 --payload "$payload"
 echo
 echo
 
@@ -72,7 +72,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A2?entity::type=T2 --payload "$payload" --json
+orionCurl --url /v1/contextEntities/E1/attributes/A2?entity::type=T2 --payload "$payload"
 echo
 echo
 
@@ -87,7 +87,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -102,7 +102,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -120,7 +120,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A3?entity::type=T1 --payload "$payload" --json --servicePath /e1/a3
+orionCurl --url /v1/contextEntities/E1/attributes/A3?entity::type=T1 --payload "$payload" --servicePath /e1/a3
 echo
 echo
 
@@ -138,7 +138,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A4?entity::type=T1 --payload "$payload" --json --servicePath /e1/a4
+orionCurl --url /v1/contextEntities/E1/attributes/A4?entity::type=T1 --payload "$payload" --servicePath /e1/a4
 echo
 echo
 
@@ -156,7 +156,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A5?entity::type=T1 --payload "$payload" --json --servicePath /e1/a5
+orionCurl --url /v1/contextEntities/E1/attributes/A5?entity::type=T1 --payload "$payload" --servicePath /e1/a5
 echo
 echo
 
@@ -170,7 +170,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json --servicePath /e1/#
+orionCurl --url /v1/queryContext --payload "$payload" --servicePath /e1/#
 echo
 echo
 
@@ -184,7 +184,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json --servicePath /e1/a4
+orionCurl --url /v1/queryContext --payload "$payload" --servicePath /e1/a4
 echo
 echo
 

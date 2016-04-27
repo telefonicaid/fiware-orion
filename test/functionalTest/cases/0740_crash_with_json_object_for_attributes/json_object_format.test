@@ -64,21 +64,21 @@ payload='{
     ],
     "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
 echo "02. Issue a normal listing to see all is OK"
 echo "==========================================="
-orionCurl --url /v1/contextEntities --json
+orionCurl --url /v1/contextEntities
 echo
 echo
 
 
 echo "03. List contextTypes (which is where the broker crash occurs)"
 echo "=============================================================="
-orionCurl --url '/v1/contextTypes?attributesFormat=object' --json
+orionCurl --url '/v1/contextTypes?attributesFormat=object'
 echo
 echo
 

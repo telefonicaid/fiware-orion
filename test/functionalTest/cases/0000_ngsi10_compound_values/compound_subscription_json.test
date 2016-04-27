@@ -51,7 +51,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "2: ++++++++++ Create the entity attribute with vector value ++++++++++"
 url="/v1/updateContext"
@@ -79,7 +79,7 @@ payload='{
     ],
     "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "3: ++++++++++ Update the entity attribute with object value ++++++++++"
 url="/v1/updateContext"
@@ -106,7 +106,7 @@ payload='{
     ],
     "updateAction": "UPDATE"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 #Get accumulated data
 accumulatorDump

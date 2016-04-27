@@ -36,7 +36,7 @@ brokerStart CB
 
 echo "01. GET /v2/entities?id=E1&idPattern=.*"
 echo "======================================="
-orionCurl --url '/v2/entities?id=E1&idPattern=.*' --json
+orionCurl --url '/v2/entities?id=E1&idPattern=.*'
 echo
 echo
 
@@ -52,13 +52,13 @@ payload='
       "type":"AT2"
    }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 echo "03. GET /v2/entities?id=E1&idPattern=.*"
 echo "======================================="
-orionCurl --url '/v2/entities?id=E1&idPattern=.*' --json
+orionCurl --url '/v2/entities?id=E1&idPattern=.*'
 echo
 echo
 --REGEXPECT--

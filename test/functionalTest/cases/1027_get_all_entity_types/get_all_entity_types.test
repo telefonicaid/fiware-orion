@@ -42,7 +42,7 @@ brokerStart CB
 
 echo "01. GET /v2/types and get an empty list"
 echo "======================================="
-orionCurl --url /v2/types --json
+orionCurl --url /v2/types
 echo
 echo
 
@@ -55,14 +55,14 @@ payload='{
   "A1": { "type": "String", "value": "s" },
   "A2": { "type": "Int", "value": 2 }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "03. GET /v2/types and get a non-empty list"
 echo "=========================================="
-orionCurl --url /v2/types --json
+orionCurl --url /v2/types
 echo
 echo
 
@@ -75,7 +75,7 @@ payload='{
   "A1": { "type": "String", "value": "s" },
   "A3": { "type": "Bool", "value": true }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -88,14 +88,14 @@ payload='{
   "A2": { "type": "Int", "value": 2 },
   "A4": { "type": "String", "value": "a4" }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "06. GET /v2/types and get a list of three types, each with one entity"
 echo "====================================================================="
-orionCurl --url /v2/types --json
+orionCurl --url /v2/types
 echo
 echo
 
@@ -109,21 +109,21 @@ payload='{
   "A4": { "type": "String", "value": "a4" },
   "A3": { "type": "Bool", "value": true }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "08. GET /v2/types and get a list of three types, T3 now has two entities"
 echo "========================================================================"
-orionCurl --url /v2/types?options=count --json
+orionCurl --url /v2/types?options=count
 echo
 echo
 
 
 echo "09. GET /v2/types wiht limit, getting 2 types but X-Total-Count 3"
 echo "================================================================="
-orionCurl --url '/v2/types?limit=2&options=count' --json
+orionCurl --url '/v2/types?limit=2&options=count'
 echo
 echo
 

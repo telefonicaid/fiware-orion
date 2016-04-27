@@ -53,12 +53,12 @@ brokerStart CB 101,38 IPv4 -statTiming
 #
 
 # 00. Pre-call to GET /statistics to give VALGRIND a possibility
-orionCurl --url /statistics --json > /dev/null 2>&1
+orionCurl --url /statistics > /dev/null 2>&1
 
 
 echo "01. Second call to GET /statistics (gives time stat of FIRST request for /statistics)"
 echo "====================================================================================="
-orionCurl --url /statistics --json
+orionCurl --url /statistics
 echo
 echo
 
@@ -136,14 +136,14 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
 echo "03. GET /statistics"
 echo "==================="
-orionCurl --url /statistics --json
+orionCurl --url /statistics
 echo
 echo
 
@@ -179,28 +179,28 @@ payload='{
     "metadata": { "ID": "ceiling" }
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "05. GET /statistics"
 echo "==================="
-orionCurl --url /statistics --json
+orionCurl --url /statistics
 echo
 echo
 
 
 echo "06. GET /v1/contextTypes"
 echo "========================"
-orionCurl --url /v1/contextTypes --json
+orionCurl --url /v1/contextTypes
 echo
 echo
 
 
 echo "07. GET /statistics"
 echo "==================="
-orionCurl --url /statistics --json
+orionCurl --url /statistics
 echo
 echo
 

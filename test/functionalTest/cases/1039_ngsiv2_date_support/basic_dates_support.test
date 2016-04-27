@@ -50,14 +50,14 @@ payload='{
     "type": "date"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "02. Check entity hasn't been created"
 echo "===================================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -72,14 +72,14 @@ payload='{
     "type": "date"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "04. Get entity"
 echo "=============="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -92,14 +92,14 @@ payload='{
     "type": "date"
   }
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PATCH
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
 echo
 echo
 
 
 echo "06. Check entity hasn't been modified"
 echo "====================================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -112,14 +112,14 @@ payload='{
     "type": "date"
   }
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PATCH
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
 echo
 echo
 
 
 echo "08. Get entity"
 echo "=============="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 

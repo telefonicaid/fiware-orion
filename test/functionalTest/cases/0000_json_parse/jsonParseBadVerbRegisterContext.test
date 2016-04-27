@@ -70,7 +70,7 @@ payload='{
   ],
   "duration": "PT1M"
 }'
-orionCurl --url "$url" -X "BAD_VERB" --payload "${payload}" --json 
+orionCurl --url "$url" -X "BAD_VERB" --payload "${payload}" 
 
 echo "++++++++++++++++++++"
 --REGEXPECT--

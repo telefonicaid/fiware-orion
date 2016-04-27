@@ -51,7 +51,7 @@ payload='{
   "id": "E1",
   "type": "T1"
 }'
-orionCurl --url /v2/entities  --payload "$payload" --json
+orionCurl --url /v2/entities  --payload "$payload"
 echo
 echo
 
@@ -61,14 +61,14 @@ echo "================================================================="
 payload='{
   "A1": 1
 }'
-orionCurl --url '/v2/entities/E1/attrs?options=keyValues'  --payload "$payload" --json
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues'  --payload "$payload"
 echo
 echo
 
 
 echo "03. GET /v2/entities/E1"
 echo "======================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -78,14 +78,14 @@ echo "================================================================="
 payload='{
   "A2": 2
 }'
-orionCurl --url '/v2/entities/E1/attrs?options=keyValues'  --payload "$payload" --json
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues'  --payload "$payload"
 echo
 echo
 
 
 echo "05. GET /v2/entities/E1?options=keyValues"
 echo "========================================="
-orionCurl --url '/v2/entities/E1?options=keyValues' --json
+orionCurl --url '/v2/entities/E1?options=keyValues'
 echo
 echo
 
@@ -95,14 +95,14 @@ echo "========================================================================"
 payload='{
   "A3": 3
 }'
-orionCurl --url '/v2/entities/E1/attrs?options=keyValues'  --payload "$payload" -X PUT --json
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues'  --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "07. GET /v2/entities/E1?options=keyValues"
 echo "========================================="
-orionCurl --url '/v2/entities/E1?options=keyValues' --json
+orionCurl --url '/v2/entities/E1?options=keyValues'
 echo
 echo
 
@@ -112,14 +112,14 @@ echo "================================================================="
 payload='{
   "A4": 4
 }'
-orionCurl --url '/v2/entities/E1/attrs?options=keyValues'  --payload "$payload" -X POST --json
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues'  --payload "$payload" -X POST
 echo
 echo
 
 
 echo "09. GET /v2/entities/E1?options=keyValues"
 echo "========================================="
-orionCurl --url '/v2/entities/E1?options=keyValues' --json
+orionCurl --url '/v2/entities/E1?options=keyValues'
 echo
 echo
 
@@ -129,14 +129,14 @@ echo "================================================="
 payload='{
   "A4": 10
 }'
-orionCurl --url '/v2/entities/E1/attrs?options=keyValues'  --payload "$payload" -X PATCH --json
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues'  --payload "$payload" -X PATCH
 echo
 echo
 
 
 echo "11. GET /v2/entities/E1, to see A4 == 10"
 echo "========================================"
-orionCurl --url '/v2/entities/E1?options=keyValues' --json
+orionCurl --url '/v2/entities/E1?options=keyValues'
 echo
 echo
 
@@ -147,14 +147,14 @@ payload='{
   "id": "E1",
   "type": "T2"
 }'
-orionCurl --url /v2/entities  --payload "$payload" --json
+orionCurl --url /v2/entities  --payload "$payload"
 echo
 echo
 
 
 echo "13. GET /v2/entities/E1?options=keyValues"
 echo "========================================="
-orionCurl --url '/v2/entities/E1?options=keyValues' --json
+orionCurl --url '/v2/entities/E1?options=keyValues'
 echo
 echo
 

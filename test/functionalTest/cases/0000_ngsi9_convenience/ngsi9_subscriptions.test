@@ -52,7 +52,7 @@ payload='{
   "reference": "http://10.1.1.1:80/test/interfaceNotification",
   "duration": "PT1M"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 
@@ -73,15 +73,15 @@ payload='{
   "duration": "P1Y",
   "subscriptionId": "'$SUB_ID'"
 }'
-orionCurl --url "$url" --payload "$payload" -X "PUT" --json
+orionCurl --url "$url" --payload "$payload" -X "PUT"
 
 # 3. Delete the subscription
 echo "3: ++++++++++++++++++++"
-orionCurl --url "/v1/registry/contextAvailabilitySubscriptions/$SUB_ID" -X "DELETE" --json
+orionCurl --url "/v1/registry/contextAvailabilitySubscriptions/$SUB_ID" -X "DELETE"
 
 # 4. Bad verb
 echo "4: ++++++++++++++++++++"
-orionCurl --url "/v1/registry/contextAvailabilitySubscriptions/$SUB_ID" -X "DELETE2" --json
+orionCurl --url "/v1/registry/contextAvailabilitySubscriptions/$SUB_ID" -X "DELETE2"
 
 echo "5: ++++++++++++++++++++"
 --REGEXPECT--

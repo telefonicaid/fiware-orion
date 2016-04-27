@@ -64,7 +64,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload"
 SUB_ID=$(echo "$_response" | grep subscriptionId |  awk -F ':' '{gsub(/[ \t",]+/, "", $2); print $2}' )
 echo
 echo
@@ -84,7 +84,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/updateContextSubscription --payload "$payload" --json
+orionCurl --url /v1/updateContextSubscription --payload "$payload"
 echo
 echo
 
@@ -96,7 +96,7 @@ payload='{
   "id": "s01",
   "A": "03. Creation"
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -104,7 +104,7 @@ echo
 echo "03. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling"
 echo "============================================================================"
 payload='{ "A": "04. notification lost by throttling" }'
-orionCurl --url '/v2/entities/s01/attrs?options=keyValues' -X PUT --payload "$payload" --json
+orionCurl --url '/v2/entities/s01/attrs?options=keyValues' -X PUT --payload "$payload"
 echo
 echo
 
@@ -112,7 +112,7 @@ echo
 echo "04. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling"
 echo "============================================================================"
 payload='{ "A": "05. notification lost by throttling" }'
-orionCurl --url '/v2/entities/s01/attrs?options=keyValues' -X PUT --payload "$payload" --json
+orionCurl --url '/v2/entities/s01/attrs?options=keyValues' -X PUT --payload "$payload"
 echo
 echo
 
@@ -132,7 +132,7 @@ echo
 echo "06. Modify entity s01 w/ attr A w/o tenant - notification NOT lost by throttling"
 echo "================================================================================"
 payload='{ "A": "07. Modification" }'
-orionCurl --url '/v2/entities/s01/attrs?options=keyValues' -X PUT --payload "$payload" --json
+orionCurl --url '/v2/entities/s01/attrs?options=keyValues' -X PUT --payload "$payload"
 echo
 echo
 
@@ -140,7 +140,7 @@ echo
 echo "07. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling"
 echo "============================================================================"
 payload='{ "A": "08. notification lost by throttling" }'
-orionCurl --url '/v2/entities/s01/attrs?options=keyValues' -X PUT --payload "$payload" --json
+orionCurl --url '/v2/entities/s01/attrs?options=keyValues' -X PUT --payload "$payload"
 echo
 echo
 
@@ -155,7 +155,7 @@ echo
 echo "09. Modify entity s01 w/ attr A w/o tenant - no notification as expired"
 echo "======================================================================="
 payload='{ "A": "10. no notification as expired" }'
-orionCurl --url '/v2/entities/s01/attrs?options=keyValues' -X PUT --payload "$payload" --json
+orionCurl --url '/v2/entities/s01/attrs?options=keyValues' -X PUT --payload "$payload"
 echo
 echo
 

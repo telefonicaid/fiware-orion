@@ -51,7 +51,7 @@ payload='{
     "id": "E1",
     "A1": { "value": 10 }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -62,7 +62,7 @@ payload='{
     "id": "E2",
     "A1": { "value": 20 }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -73,70 +73,70 @@ payload='{
     "id": "E3",
     "A1": { "value": 30 }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "04. GET all entities (3 entities)"
 echo "================================="
-orionCurl --url /v2/entities --json
+orionCurl --url /v2/entities
 echo
 echo
 
 
 echo "05. Erroneous GET entities with q=A1>="
 echo "======================================"
-orionCurl --url '/v2/entities?q=A1>=' --json
+orionCurl --url '/v2/entities?q=A1>='
 echo
 echo
 
 
 echo "06. GET all entities with attribute A1>=0 (3 hits)"
 echo "=================================================="
-orionCurl --url '/v2/entities?q=A1>=0' --json
+orionCurl --url '/v2/entities?q=A1>=0'
 echo
 echo
 
 
 echo "07. GET all entities with attribute A1>=10 (3 hits)"
 echo "==================================================="
-orionCurl --url '/v2/entities?q=A1>=10' --json
+orionCurl --url '/v2/entities?q=A1>=10'
 echo
 echo
 
 
 echo "08. GET all entities with attribute A1>=11 (2 hits)"
 echo "==================================================="
-orionCurl --url '/v2/entities?q=A1>=11' --json
+orionCurl --url '/v2/entities?q=A1>=11'
 echo
 echo
 
 
 echo "09. GET all entities with attribute A1>=20 (2 hits)"
 echo "==================================================="
-orionCurl --url '/v2/entities?q=A1>=20' --json
+orionCurl --url '/v2/entities?q=A1>=20'
 echo
 echo
 
 
 echo "10. GET all entities with attribute A1>=21 (1 hit)"
 echo "=================================================="
-orionCurl --url '/v2/entities?q=A1>=21' --json
+orionCurl --url '/v2/entities?q=A1>=21'
 echo
 echo
 
 
 echo "11. GET all entities with attribute A1>=30 (1 hit)"
 echo "=================================================="
-orionCurl --url '/v2/entities?q=A1>=30' --json
+orionCurl --url '/v2/entities?q=A1>=30'
 echo
 echo
 
 
 echo "12. GET all entities with attribute A1>=31 (0 hits)"
 echo "==================================================="
-orionCurl --url '/v2/entities?q=A1>=31' --json
+orionCurl --url '/v2/entities?q=A1>=31'
 echo
 echo
 

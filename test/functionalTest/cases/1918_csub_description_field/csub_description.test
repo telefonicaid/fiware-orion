@@ -76,7 +76,7 @@ payload='
     "throttling": 5
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -86,7 +86,7 @@ id=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "
 
 echo "02. Get subscription (without desc)"
 echo "==================================="
-orionCurl --url "/v2/subscriptions/$id" --json
+orionCurl --url "/v2/subscriptions/$id"
 echo
 echo
 
@@ -97,14 +97,14 @@ payload='
 {
     "description": "one"
 }'
-orionCurl --url /v2/subscriptions/$id -X PATCH --payload "$payload" --json
+orionCurl --url /v2/subscriptions/$id -X PATCH --payload "$payload"
 echo
 echo
 
 
 echo "04. Get subscription (see desc = one)"
 echo "===================================="
-orionCurl --url "/v2/subscriptions/$id" --json
+orionCurl --url "/v2/subscriptions/$id"
 echo
 echo
 
@@ -115,14 +115,14 @@ payload='
 {
     "description": "two"
 }'
-orionCurl --url /v2/subscriptions/$id -X PATCH --payload "$payload" --json
+orionCurl --url /v2/subscriptions/$id -X PATCH --payload "$payload"
 echo
 echo
 
 
 echo "06. Get subscription (see desc = two)"
 echo "===================================="
-orionCurl --url "/v2/subscriptions/$id" --json
+orionCurl --url "/v2/subscriptions/$id"
 echo
 echo
 
@@ -133,14 +133,14 @@ payload='
 {
     "description": ""
 }'
-orionCurl --url /v2/subscriptions/$id -X PATCH --payload "$payload" --json
+orionCurl --url /v2/subscriptions/$id -X PATCH --payload "$payload"
 echo
 echo
 
 
 echo "08. Get subscription (without desc)"
 echo "==================================="
-orionCurl --url "/v2/subscriptions/$id" --json
+orionCurl --url "/v2/subscriptions/$id"
 echo
 echo
 
@@ -176,7 +176,7 @@ payload='
     "throttling": 5
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -186,14 +186,14 @@ id=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "
 
 echo "10. Get subscription (see desc = three)"
 echo "======================================="
-orionCurl --url "/v2/subscriptions/$id" --json
+orionCurl --url "/v2/subscriptions/$id"
 echo
 echo
 
 
 echo "11. Get subscriptions list (first csub without desc, second with desc = three)"
 echo "=============================================================================="
-orionCurl --url "/v2/subscriptions" --json
+orionCurl --url "/v2/subscriptions"
 echo
 echo
 
@@ -206,7 +206,7 @@ payload='
       "foo": "bar"
     }
 }'
-orionCurl --url /v2/subscriptions/$id -X PATCH --payload "$payload" --json
+orionCurl --url /v2/subscriptions/$id -X PATCH --payload "$payload"
 echo
 echo
 

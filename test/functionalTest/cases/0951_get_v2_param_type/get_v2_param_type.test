@@ -50,7 +50,7 @@ payload='{
          "value": "V1 A2 E1/T1"
     }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -67,28 +67,28 @@ payload='{
          "value": "V1 A2 E1/T2"
     }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "03. GET /v2/entities/E1?type=T1"
 echo "==============================="
-orionCurl --url "/v2/entities/E1?type=T1" --json
+orionCurl --url "/v2/entities/E1?type=T1"
 echo
 echo
 
 
 echo "04. GET /v2/entities/E1?type=T1&attrs=A1"
 echo "========================================"
-orionCurl --url "/v2/entities/E1?type=T1&attrs=A1" --json
+orionCurl --url "/v2/entities/E1?type=T1&attrs=A1"
 echo
 echo
 
 
 echo "05. GET /v2/entities/E1/attrs/A2?type=T2"
 echo "========================================"
-orionCurl --url "/v2/entities/E1/attrs/A2?type=T2" --json
+orionCurl --url "/v2/entities/E1/attrs/A2?type=T2"
 echo
 echo
 

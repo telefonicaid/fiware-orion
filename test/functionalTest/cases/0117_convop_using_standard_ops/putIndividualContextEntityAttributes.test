@@ -57,7 +57,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/E1/attributes --payload "$payload" --json -X PUT
+orionCurl --url /v1/contextEntities/E1/attributes --payload "$payload" -X PUT
 echo
 echo
 
@@ -80,7 +80,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -96,7 +96,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/E1/attributes --payload "$payload" --json -X PUT
+orionCurl --url /v1/contextEntities/E1/attributes --payload "$payload" -X PUT
 echo
 echo
 
@@ -115,7 +115,7 @@ payload='{
     "A1"
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -138,7 +138,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json --port $CP1_PORT
+orionCurl --url /v1/updateContext --payload "$payload" --port $CP1_PORT
 echo
 echo
 
@@ -167,7 +167,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -183,7 +183,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/E2/attributes --payload "$payload" --json -X PUT
+orionCurl --url /v1/contextEntities/E2/attributes --payload "$payload" -X PUT
 echo
 echo
 
@@ -201,7 +201,7 @@ payload='{
     "A2"
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -219,7 +219,7 @@ payload='{
     "A2"
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json --urlParams 'attributesFormat=object'
+orionCurl --url /v1/queryContext --payload "$payload" --urlParams 'attributesFormat=object'
 echo
 echo
 
@@ -242,7 +242,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -258,7 +258,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/E3/attributes --payload "$payload" --json -X PUT --urlParams entity::type=EEE
+orionCurl --url /v1/contextEntities/E3/attributes --payload "$payload" -X PUT --urlParams entity::type=EEE
 echo
 echo
 
@@ -277,7 +277,7 @@ payload='{
     "A1"
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 

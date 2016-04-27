@@ -51,7 +51,7 @@ brokerStart CB
 
 echo "01. GET /v1/registry/contextEntities/type/T1/id/E1 and see it fail"
 echo "========================================================================"
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E1 --json
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E1
 echo
 echo
 
@@ -80,56 +80,56 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
 
 echo "03. GET /v1/registry/contextEntities/type/T1/id/E1 and see it work"
 echo "=================================================================="
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E1 --json
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E1
 echo
 echo
 
 
 echo "04. GET /v1/registry/contextEntities/type/T1/id/E1?exist=entity::type and see it work"
 echo "====================================================================================="
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E1?exist=entity::type --json
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E1?exist=entity::type
 echo
 echo
 
 
 echo "05. GET /v1/registry/contextEntities/type/T1/id/E1?entity::type=T1 and see it work"
 echo "=================================================================================="
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E1?entity::type=T1 --json
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E1?entity::type=T1
 echo
 echo
 
 
 echo "06. GET /v1/registry/contextEntities/type/T1/id/E2 and see it fail"
 echo "=================================================================="
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E2 --json
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E2
 echo
 echo
 
 
 echo "07. GET /v1/registry/contextEntities/type/T2/id/E1 and see it fail"
 echo "=================================================================="
-orionCurl --url /v1/registry/contextEntities/type/T2/id/E1 --json
+orionCurl --url /v1/registry/contextEntities/type/T2/id/E1
 echo
 echo
 
 
 echo "08. GET /v1/registry/contextEntities/type/T1/id/E1?entity::type=T2 and see it fail"
 echo "=================================================================================="
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E1?entity::type=T2 --json
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E1?entity::type=T2
 echo
 echo
 
 
 echo "09. GET /v1/registry/contextEntities/type/T1/id/E1?!exist=entity::type and see it fail"
 echo "======================================================================================"
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E1?!exist=entity::type --json
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E1?!exist=entity::type
 echo
 echo
 
@@ -158,7 +158,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json --servicePath /s1
+orionCurl --url /v1/registry/registerContext --payload "$payload" --servicePath /s1
 echo
 echo
 
@@ -187,49 +187,49 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json --servicePath /s2
+orionCurl --url /v1/registry/registerContext --payload "$payload" --servicePath /s2
 echo
 echo
 
 
 echo "12. GET /v1/registry/contextEntities/type/T1/id/E1 with Service-Path /s1"
 echo "========================================================================"
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E1 --json --servicePath /s1
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E1 --servicePath /s1
 echo
 echo
 
 
 echo "13. GET /v1/registry/contextEntities/type/T1/id/E1 with Service-Path /s2"
 echo "========================================================================"
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E1 --json --servicePath /s2
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E1 --servicePath /s2
 echo
 echo
 
 
 echo "14. GET /v1/registry/contextEntities/type/T1/id/E1 with Service-Path /s3 and see it fail"
 echo "========================================================================================"
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E1 --json --servicePath /s3
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E1 --servicePath /s3
 echo
 echo
 
 
 echo "15. GET /v1/registry/contextEntities/type/T1/id/E1 without Service-Path"
 echo "======================================================================="
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E1 --json
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E1
 echo
 echo
 
 
 echo "16. GET /v1/registry/contextEntities/type/T1/id/E1 with Service-Path /#"
 echo "======================================================================="
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E1 --json --servicePath /#
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E1 --servicePath /#
 echo
 echo
 
 
 echo "17. GET /v1/registry/contextEntities/type/T1/id/E1 with Service-Path /"
 echo "======================================================================"
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E1 --json --servicePath /
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E1 --servicePath /
 echo
 echo
 

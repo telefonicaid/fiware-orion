@@ -30,7 +30,7 @@ brokerStart CB
 --SHELL--
 
 echo "0: ++++++++++++++++++++"
-orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes" --json
+orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes"
 
 echo "1: ++++++++++++++++++++"
 url="/v1/registry/registerContext"
@@ -61,14 +61,14 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "2: ++++++++++++++++++++"
-orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes" --json
+orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes"
 
 echo "3: ++++++++++++++++++++"
 # DELETE is not allowed
-orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes" -X "DELETE" --json
+orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes" -X "DELETE"
 
 --REGEXPECT--
 0: ++++++++++++++++++++

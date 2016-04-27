@@ -46,21 +46,21 @@ brokerStart CB
 echo "01. Create E1/A1+A2"
 echo "==================="
 payload='{ "id": "E1", "A1.X": 1, "A2..y": 2 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "02. Make sure E1 is as created"
 echo "=============================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
 
 echo "02b. Now look at E1 with options=keyValues"
 echo "=========================================="
-orionCurl --url /v2/entities/E1?options=keyValues --json
+orionCurl --url /v2/entities/E1?options=keyValues
 echo
 echo
 
@@ -68,49 +68,49 @@ echo
 echo "03. Modify E1 to E1/A2+A3"
 echo "========================="
 payload='{ "A2..y": 2, "A3.Z": 3 }'
-orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json -X PUT
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "04. Make sure E1 is as modified"
 echo "==============================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
 
 echo "04b. Now look at E1 with options=keyValues"
 echo "=========================================="
-orionCurl --url /v2/entities/E1?options=keyValues --json
+orionCurl --url /v2/entities/E1?options=keyValues
 echo
 echo
 
 
 echo "05. GET attribute A2..y"
 echo "======================="
-orionCurl --url "/v2/entities/E1/attrs/A2..y" --json
+orionCurl --url "/v2/entities/E1/attrs/A2..y"
 echo
 echo
 
 
 echo "05b. GET attribute A2..y using options=keyValues"
 echo "================================================"
-orionCurl --url "/v2/entities/E1/attrs/A2..y?options=keyValues" --json
+orionCurl --url "/v2/entities/E1/attrs/A2..y?options=keyValues"
 echo
 echo
 
 
 echo "06. GET attribute A3.Z"
 echo "======================"
-orionCurl --url "/v2/entities/E1/attrs/A3.Z" --json
+orionCurl --url "/v2/entities/E1/attrs/A3.Z"
 echo
 echo
 
 
 echo "06b. GET attribute A3.Z using options=keyValues"
 echo "==============================================="
-orionCurl --url "/v2/entities/E1/attrs/A3.Z?options=keyValues" --json
+orionCurl --url "/v2/entities/E1/attrs/A3.Z?options=keyValues"
 echo
 echo
 

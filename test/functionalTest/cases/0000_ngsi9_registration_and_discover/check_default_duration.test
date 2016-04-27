@@ -54,7 +54,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url "/v1/registry/registerContext" --payload "${payload}" --json
+orionCurl --url "/v1/registry/registerContext" --payload "${payload}"
 
 echo "++++++++++++++++++++"
 
@@ -76,7 +76,7 @@ payload='{
     "pressure"
   ]
 }'
-orionCurl --url "/v1/registry/discoverContextAvailability" --payload "${payload}" --json
+orionCurl --url "/v1/registry/discoverContextAvailability" --payload "${payload}"
 
 --REGEXPECT--
 HTTP/1.1 200 OK

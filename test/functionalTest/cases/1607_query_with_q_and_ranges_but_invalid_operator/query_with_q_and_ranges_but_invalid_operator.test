@@ -49,7 +49,7 @@ payload='{
     "id": "E1",
     "A1": { "value": 10 }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -60,7 +60,7 @@ payload='{
     "id": "E2",
     "A1": { "value": 20 }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -71,54 +71,54 @@ payload='{
     "id": "E3",
     "A1": { "value": 30 }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "04. GET all entities (3 entities)"
 echo "================================="
-orionCurl --url /v2/entities --json
+orionCurl --url /v2/entities
 echo
 echo
 
 
 echo "05. Erroneous GET entities with q=A1>=0..20"
 echo "==========================================="
-orionCurl --url '/v2/entities?q=A1>=0..20' --json
+orionCurl --url '/v2/entities?q=A1>=0..20'
 echo
 echo
 
 
 echo "06. Erroneous GET entities with q=A1>0..20"
 echo "=========================================="
-orionCurl --url '/v2/entities?q=A1>0..20' --json
+orionCurl --url '/v2/entities?q=A1>0..20'
 echo
 echo
 
 echo "07. Erroneous GET entities with q=A1<=0..20"
 echo "==========================================="
-orionCurl --url '/v2/entities?q=A1<=0..20' --json
+orionCurl --url '/v2/entities?q=A1<=0..20'
 echo
 echo
 
 echo "08. Erroneous GET entities with q=A1<0..20"
 echo "=========================================="
-orionCurl --url '/v2/entities?q=A1<=0..20' --json
+orionCurl --url '/v2/entities?q=A1<=0..20'
 echo
 echo
 
 
 echo "09. Correct GET entities with q=A1==0..20 (2 hits)"
 echo "=================================================="
-orionCurl --url '/v2/entities?q=A1==0..20' --json
+orionCurl --url '/v2/entities?q=A1==0..20'
 echo
 echo
 
 
 echo "10. Correct GET entities with q=A1!=0..20 (1 hit)"
 echo "================================================="
-orionCurl --url '/v2/entities?q=A1!=0..20' --json
+orionCurl --url '/v2/entities?q=A1!=0..20'
 echo
 echo
 

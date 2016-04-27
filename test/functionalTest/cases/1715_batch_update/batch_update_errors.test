@@ -45,21 +45,21 @@ brokerStart CB 0-255
 
 echo "01. Batch Update without payload"
 echo "================================"
-orionCurl --url /v2/op/update -X POST --json
+orionCurl --url /v2/op/update -X POST
 echo
 echo
 
 
 echo "02. Batch Update with empty payload"
 echo "==================================="
-orionCurl --url /v2/op/update --payload "{}" -X POST --json
+orionCurl --url /v2/op/update --payload "{}" -X POST
 echo
 echo
 
 
 echo "03. Batch Update with invalid JSON payload"
 echo "=========================================="
-orionCurl --url /v2/op/update --payload "invalid JSON payload" --json
+orionCurl --url /v2/op/update --payload "invalid JSON payload"
 echo
 echo
 
@@ -74,7 +74,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v2/op/update --payload "$payload" --json
+orionCurl --url /v2/op/update --payload "$payload"
 echo
 echo
 
@@ -84,7 +84,7 @@ echo "========================================================"
 payload='{
   "actionType": "UPDATE"
 }'
-orionCurl --url /v2/op/update --payload "$payload" --json
+orionCurl --url /v2/op/update --payload "$payload"
 echo
 echo
 
@@ -101,7 +101,7 @@ payload='{
   ],
   "foo": 6
 }'
-orionCurl --url /v2/op/update --payload "$payload" --json
+orionCurl --url /v2/op/update --payload "$payload"
 echo
 echo
 
@@ -113,7 +113,7 @@ payload='{
   "entities": [
   ],
 }'
-orionCurl --url /v2/op/update --payload "$payload" --json
+orionCurl --url /v2/op/update --payload "$payload"
 echo
 echo
 
@@ -128,7 +128,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v2/op/update --payload "$payload" --json
+orionCurl --url /v2/op/update --payload "$payload"
 echo
 echo
 
@@ -145,7 +145,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v2/op/update --payload "$payload" --json
+orionCurl --url /v2/op/update --payload "$payload"
 echo
 echo
 

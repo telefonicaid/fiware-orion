@@ -45,7 +45,7 @@ payload='{
   "duration": "PT1M",
   "providingApplication": "none"
 }'
-orionCurl --url /v1/registry/contextEntityTypes/ET --payload "$payload" --json
+orionCurl --url /v1/registry/contextEntityTypes/ET --payload "$payload"
 REG_ID=$(echo "$_response" | grep -Po '(?<="registrationId" : ")[^"]*')
 echo
 echo
@@ -53,7 +53,7 @@ echo
 
 echo "02. Discover entities of type ET"
 echo "================================"
-orionCurl --url /v1/registry/contextEntityTypes/ET --json
+orionCurl --url /v1/registry/contextEntityTypes/ET
 echo
 echo
 
@@ -65,14 +65,14 @@ payload='{
   "providingApplication": "some", 
   "registrationId": "'$REG_ID'"
 }'
-orionCurl --url /v1/registry/contextEntityTypes/ET --payload "$payload" --json
+orionCurl --url /v1/registry/contextEntityTypes/ET --payload "$payload"
 echo
 echo
 
 
 echo "04. Discover entities of type ET"
 echo "================================"
-orionCurl --url /v1/registry/contextEntityTypes/ET --json
+orionCurl --url /v1/registry/contextEntityTypes/ET
 echo
 echo
 

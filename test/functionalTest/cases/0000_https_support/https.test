@@ -59,7 +59,7 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --host "https://localhost" --url "$url" --payload "${payload}" "--cacert /tmp/harnessTest.pem" --json
+orionCurl --host "https://localhost" --url "$url" --payload "${payload}" "--cacert /tmp/harnessTest.pem"
 
 echo
 echo
@@ -81,7 +81,7 @@ payload='{
     "temperature"
   ]
 }'
-orionCurl --host "https://localhost" --url "$url" --payload "${payload}" "--cacert /tmp/harnessTest.pem" --json
+orionCurl --host "https://localhost" --url "$url" --payload "${payload}" "--cacert /tmp/harnessTest.pem"
 
 
 --REGEXPECT--
