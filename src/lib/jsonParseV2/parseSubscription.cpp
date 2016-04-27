@@ -507,7 +507,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
     if (refError != "OK")
     {
       alarmMgr.badInput(clientIp, refError);
-      OrionError oe(SccBadRequest, refError);
+      OrionError oe(SccBadRequest, refError + " parsing notification url");
 
       return oe.render(ciP, "");
     }
