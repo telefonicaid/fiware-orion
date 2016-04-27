@@ -1359,8 +1359,13 @@ bool StringFilter::fill(StringFilter* sfP, std::string* errorStringP)
     
     filters.push_back(sfi);
 
-    // Next line is to avoid double-free at StringFilterItem destructor
+    //
+    // The next line is to avoid premature free in StringFilterItem destructor, when this scope ends,
+    // as 'sfi' is an object on the stack and its destructor will be called automatically at
+    // end of scope.
+    //
     // (Note that the "copy" inside the filters vector may have "true" for this)
+    //
     sfi.compiledPattern = false;
   }
 
