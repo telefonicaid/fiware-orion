@@ -254,14 +254,20 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
   /* First: split by the first '/' to get host:ip and path */
   std::vector<std::string>  urlTokens;
-  int                       components = stringSplit(url, '/', urlTokens);
-
-  protocol = urlTokens[0];
+  int                       components = stringSplit(url, '/', urlTokens);  
 
   //
   // Ensuring the scheme is present
   //
-  if ((protocol != "https:") && (protocol != "http:"))
+  if ((urlTokens.size() == 0) || ((urlTokens[0] != "https:") && (urlTokens[0] != "http:")))
+  {
+    return false;
+  }
+
+  //
+  // Ensuring the host is present
+  //
+  if (urlTokens[2] == "")
   {
     return false;
   }
