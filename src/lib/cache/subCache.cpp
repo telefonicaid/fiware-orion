@@ -741,8 +741,6 @@ void subCacheItemInsert
 
     if (!cSubP->expression.stringFilter.fill(stringFilterP, &errorString))
     {
-      LM_E(("Runtime Error (%s)", errorString.c_str()));
-
       //
       // NOTE
       //   Here, the cached subscription should have a String Filter but as 'fill()' failed, it doesn't.
