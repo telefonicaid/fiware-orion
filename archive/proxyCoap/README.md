@@ -54,6 +54,6 @@ make
 sudo cp examples/coap-client /usr/local/bin
 ```
 
-## Miscelanea
+## Miscellanea
 
-This directory also include parts of harnessFunction.sh and testEnv.sh files related with CoAP.
+This directory also includes parts of harnessFunction.sh and testEnv.sh files related with CoAP.
