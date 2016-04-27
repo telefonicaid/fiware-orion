@@ -484,7 +484,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     commonFilters(ciP, &parseData, &serviceV[ix]);
     scopeFilter(ciP, &parseData, &serviceV[ix]);
 
-
     //
     // If we have gotten this far the Input is OK.
     // Except for all the badVerb/badRequest, etc.

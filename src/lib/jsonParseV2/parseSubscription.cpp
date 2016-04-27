@@ -601,8 +601,10 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
       std::string  errorString;
       Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, expression["q"].GetString());
 
-      if (scopeP->stringFilter.parse(scopeP->value.c_str(), &errorString) == false)
+      scopeP->stringFilterP = new StringFilter();
+      if (scopeP->stringFilterP->parse(scopeP->value.c_str(), &errorString) == false)
       {
+        delete scopeP->stringFilterP;
         delete scopeP;
         return errorString;
       }

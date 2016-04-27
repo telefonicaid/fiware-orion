@@ -52,7 +52,8 @@ TriggeredSubscription::TriggeredSubscription
   reference               (_reference),
   attrL                   (_attrL),
   cacheSubId              (_cacheSubId),
-  tenant                  ((_tenant == NULL)? "" : _tenant)
+  tenant                  ((_tenant == NULL)? "" : _tenant),
+  stringFilterP           (NULL)
 {
 }
 
@@ -76,7 +77,8 @@ TriggeredSubscription::TriggeredSubscription
   reference               (_reference),
   attrL                   (_attrL),
   cacheSubId              (""),
-  tenant                  ("")
+  tenant                  (""),
+  stringFilterP           (NULL)
 {
 }
 
@@ -88,6 +90,11 @@ TriggeredSubscription::TriggeredSubscription
 */
 TriggeredSubscription::~TriggeredSubscription()
 {
+  if (stringFilterP != NULL)
+  {
+    delete stringFilterP;
+    stringFilterP = NULL;
+  }
 }
 
 
@@ -133,12 +140,9 @@ std::string TriggeredSubscription::toString(const std::string& delimiter)
 *
 * TriggeredSubscription::stringFilterSet - 
 */
-void TriggeredSubscription::stringFilterSet(StringFilter* stringFilterP)
+bool TriggeredSubscription::stringFilterSet(StringFilter* _stringFilterP, std::string* errorStringP)
 {
-  //
-  // This is an object copy, like
-  //   memcpy(&stringFilter, stringFilterP)
-  // but including the vectors inside stringFilterP
-  //
-  stringFilter = *stringFilterP;
+  stringFilterP = _stringFilterP->clone(errorStringP);
+
+  return (stringFilterP == NULL)? false : true;
 }

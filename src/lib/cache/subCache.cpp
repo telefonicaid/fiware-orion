@@ -77,6 +77,8 @@ EntityInfo::EntityInfo(const std::string& _entityId, const std::string& _entityT
 
   if (isPattern)
   {
+    // FIXME P5: recomp error should be captured? have a look to other usages of regcomp()
+    // in order to see how it works
     regcomp(&entityIdPattern, _entityId.c_str(), 0);
     entityIdPatternToBeFreed = true;
   }
@@ -735,7 +737,18 @@ void subCacheItemInsert
 
   if (stringFilterP != NULL)
   {
-    cSubP->expression.stringFilter = *stringFilterP;  // Object copy
+    std::string  errorString;
+
+    //
+    // NOTE
+    //   Here, the cached subscription should have a String Filter but if 'fill()' fails, it won't.
+    //   The subscription is already in mongo and hopefully this erroneous situation is fixed 
+    //   once the sub-cache is refreshed.
+    //
+    //   This 'but' should be minimized once the issue 2082 gets implemented.
+    //   [ Only reason for fill() to fail (apart from out-of-memory) seems to be an invalid regex ]
+    //
+    cSubP->expression.stringFilter.fill(stringFilterP, &errorString);
   }
 
   LM_T(LmtSubCache, ("inserting a new sub in cache (%s). lastNotifictionTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));

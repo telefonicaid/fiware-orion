@@ -329,7 +329,18 @@ int mongoSubCacheItemInsert
 
   if (stringFilterP != NULL)
   {
-    cSubP->expression.stringFilter = *stringFilterP;
+    std::string errorString;
+
+    //
+    // NOTE
+    //   Here, the subscription should have a String Filter but if fill() fails, it won't.
+    //   The subscription is already in mongo and hopefully this erroneous situation is fixed 
+    //   once the sub-cache is refreshed.
+    //
+    //   This 'but' should be minimized once the issue 2082 gets implemented.
+    //   [ Only reason for fill() to fail (apart from out-of-memory) seems to be an invalid regex ]
+    //
+    cSubP->expression.stringFilter.fill(stringFilterP, &errorString);
   }
 
   LM_T(LmtSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));

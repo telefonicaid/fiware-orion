@@ -39,6 +39,54 @@
 using namespace mongo;
 
 
+/* ****************************************************************************
+*
+* StringFilterItem::StringFilterItem -
+*/
+StringFilterItem::StringFilterItem() : compiledPattern(false) {}
+
+
+
+/* ****************************************************************************
+*
+* StringFilterItem::fill -
+*/
+bool StringFilterItem::fill(StringFilterItem* sfiP, std::string* errorStringP)
+{
+  left                  = sfiP->left;
+  op                    = sfiP->op;
+  valueType             = sfiP->valueType;
+  numberValue           = sfiP->numberValue;
+  stringValue           = sfiP->stringValue;
+  boolValue             = sfiP->boolValue;
+  stringList            = sfiP->stringList;
+  numberList            = sfiP->numberList;
+  numberRangeFrom       = sfiP->numberRangeFrom;
+  numberRangeTo         = sfiP->numberRangeTo;
+  stringRangeFrom       = sfiP->stringRangeFrom;
+  stringRangeTo         = sfiP->stringRangeTo;
+  attributeName         = sfiP->attributeName;
+  compiledPattern = sfiP->compiledPattern;
+
+  if (compiledPattern)
+  {
+    //
+    // FIXME P4: not very optimized to recalculate the regex.
+    // 
+    // We don't know of a better way to copy the regex from sfiP, and have a question out on SOF:
+    // http://stackoverflow.com/questions/36846426/best-way-of-cloning-compiled-regex-t-struct-in-c
+    //
+    if (regcomp(&patternValue, stringValue.c_str(), 0) != 0)
+    {
+      *errorStringP = std::string("error compiling filter regex: '") + stringValue + "'";
+      return false;
+    }
+  }    
+
+  return true;
+}
+
+
 
 /* ****************************************************************************
 *
@@ -48,6 +96,12 @@ StringFilterItem::~StringFilterItem()
 {
   stringList.clear();
   numberList.clear();
+
+  if (compiledPattern == true)
+  {
+    regfree(&patternValue);
+    compiledPattern = false;
+  }
 }
 
 
@@ -81,6 +135,16 @@ bool StringFilterItem::valueParse(char* s, std::string* errorStringP)
       *errorStringP = std::string("values of type /") + valueTypeName() + "/ not supported for operator /" + opName() + "/";
       return false;
     }
+  }
+
+  if (op == SfopMatchPattern)
+  {
+    if (regcomp(&patternValue, stringValue.c_str(), 0) != 0)
+    {
+      *errorStringP = std::string("error compiling filter regex: '") + stringValue + "'";
+      return false;
+    }
+    compiledPattern = true;
   }
 
   return true;
@@ -396,6 +460,7 @@ bool StringFilterItem::valueGet
 * - Valid operators:
 *     - Binary operators
 *       ==         Translates to EQUALS
+*       ~=         Translates to MATCH PATTERN
 *       !=         Translates to NOT EQUAL
 *       >          Translates to GT
 *       <          Translates to LT
@@ -469,6 +534,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP)
   char* opP = NULL;
 
   if      ((opP = strstr(s, "==")) != NULL)  { op  = SfopEquals;              rhs = &opP[2];        }
+  else if ((opP = strstr(s, "~=")) != NULL)  { op  = SfopMatchPattern;        rhs = &opP[2];        }
   else if ((opP = strstr(s, "!=")) != NULL)  { op  = SfopDiffers;             rhs = &opP[2];        }
   else if ((opP = strstr(s, "<=")) != NULL)  { op  = SfopLessThanOrEqual;     rhs = &opP[2];        }
   else if ((opP = strstr(s, "<"))  != NULL)  { op  = SfopLessThan;            rhs = &opP[1];        }
@@ -554,6 +620,7 @@ const char* StringFilterItem::opName(void)
   case SfopGreaterThanOrEqual:  return "GreaterThanOrEqual";
   case SfopLessThan:            return "LessThan";
   case SfopLessThanOrEqual:     return "LessThanOrEqual";
+  case SfopMatchPattern:        return "MatchPattern";
   }
 
   return "InvalidOperator";
@@ -677,6 +744,25 @@ bool StringFilterItem::matchEquals(ContextAttribute* caP)
 
   return true;
 }
+
+
+
+/* ****************************************************************************
+*
+* StringFilterItem::matchPattern -
+*/
+bool StringFilterItem::matchPattern(ContextAttribute* caP)
+{
+  // pattern evaluation only make sense for string attributes
+  if (caP->valueType != orion::ValueTypeString)
+  {
+    return false;
+  }
+
+  return (regexec(&patternValue, caP->stringValue.c_str(), 0, NULL, 0) == 0);
+}
+
+
 
 /* ****************************************************************************
 *
@@ -846,6 +932,15 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
     }
 
     str = NULL;  // So that strtok_r continues eating the initial string
+
+    //
+    // The next line is to avoid premature free in StringFilterItem destructor, when this scope ends,
+    // as 'item' is an object on the stack and its destructor will be called automatically at
+    // end of scope.
+    //
+    // (Note that the "copy" inside the filters vector may have "true" for this)
+    //
+    item.compiledPattern = false;
   }
 
   free(toFree);
@@ -1078,7 +1173,18 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       bob.append(k, bb.obj());
       f = bob.obj();
       break;
-    }
+
+    case SfopMatchPattern:
+      if (itemP->valueType != SfvtString)
+      {
+        // Pattern filter only makes sense with string value
+        continue;
+      }
+      bb.append("$regex", itemP->stringValue);
+      bob.append(k, bb.obj());
+      f = bob.obj();
+      break;
+    }             
 
     mongoFilters.push_back(f);
   }
@@ -1187,8 +1293,84 @@ bool StringFilter::match(ContextElementResponse* cerP)
         return false;
       }
       break;
+
+    case SfopMatchPattern:
+      return itemP->matchPattern(caP);
+      break;
     }
   }
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* StringFilter::clone - 
+*/
+StringFilter* StringFilter::clone(std::string* errorStringP)
+{
+  StringFilter* sfP = new StringFilter();
+
+  for (unsigned int ix = 0; ix < filters.size(); ++ix)
+  {
+    StringFilterItem  sfi;
+
+    if (!sfi.fill(&filters[ix], errorStringP))
+    {
+      delete sfP;
+      return NULL;
+    }
+
+    sfP->filters.push_back(sfi);
+
+    // Next line is to avoid premature free in StringFilterItem destructor, when this scope ends,
+    // as 'item' is an object on the stack and its destructor will be called automatically at
+    // end of scope.
+    //
+    // (Note that the "copy" inside the filters vector may have "true" for this)
+    sfi.compiledPattern = false;
+  }
+
+  // Object copy
+  sfP->mongoFilters = mongoFilters;
+
+  return sfP;
+}
+
+
+
+/* ****************************************************************************
+*
+* StringFilter::fill - 
+*/
+bool StringFilter::fill(StringFilter* sfP, std::string* errorStringP)
+{
+  for (unsigned int ix = 0; ix < sfP->filters.size(); ++ix)
+  {
+    StringFilterItem  sfi;
+
+    if (!sfi.fill(&sfP->filters[ix], errorStringP))
+    {
+      LM_E(("Runtime Error (error filling StringFilterItem: %s)", errorStringP->c_str()));
+      return false;
+    }
+    
+    filters.push_back(sfi);
+
+    //
+    // The next line is to avoid premature free in StringFilterItem destructor, when this scope ends,
+    // as 'sfi' is an object on the stack and its destructor will be called automatically at
+    // end of scope.
+    //
+    // (Note that the "copy" inside the filters vector may have "true" for this)
+    //
+    sfi.compiledPattern = false;
+  }
+
+  // Object copy
+  mongoFilters = sfP->mongoFilters;
 
   return true;
 }

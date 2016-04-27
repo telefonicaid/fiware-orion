@@ -27,6 +27,7 @@
 */
 #include <string>
 #include <vector>
+#include <regex.h>
 
 #include "mongo/client/dbclient.h"
 
@@ -49,7 +50,8 @@ typedef enum StringFilterOp
   SfopGreaterThan,         // >
   SfopGreaterThanOrEqual,  // >=
   SfopLessThan,            // <
-  SfopLessThanOrEqual      // <=
+  SfopLessThanOrEqual,     // <=
+  SfopMatchPattern         // ~=
 } StringFilterOp;
 
 
@@ -104,6 +106,7 @@ typedef enum StringFilterValueType
 *   listParse            parse a list 'a,b,c,d' and check its validity
 *   listItemAdd          add an item to a list - used by listParse
 *   matchEquals          returns true if '== comparison' with ContextAttribute gives a match
+*   matchPattern         returns true if '~= comparison' with ContextAttribute gives a match
 *   matchGreaterThan     returns true if '> comparison' with ContextAttribute gives a match
 *                        Note that '<= comparisons' use !matchGreaterThan()
 *   matchLessThan        returns true if '< comparison' with ContextAttribute gives a match
@@ -117,6 +120,7 @@ public:
   StringFilterValueType     valueType;
   double                    numberValue;
   std::string               stringValue;
+  regex_t                   patternValue;
   bool                      boolValue;
   std::vector<std::string>  stringList;
   std::vector<double>       numberList;
@@ -126,6 +130,9 @@ public:
   std::string               stringRangeTo;
   std::string               attributeName;  // Used for unary operators only
 
+  bool                      compiledPattern;
+
+  StringFilterItem();
   ~StringFilterItem();
 
   bool                      parse(char* qItem, std::string* errorStringP);
@@ -144,8 +151,10 @@ public:
   bool                      listParse(char* s, std::string* errorStringP);
   bool                      listItemAdd(char* s, std::string* errorStringP);
   bool                      matchEquals(ContextAttribute* caP);
+  bool                      matchPattern(ContextAttribute* caP);
   bool                      matchGreaterThan(ContextAttribute* caP);
   bool                      matchLessThan(ContextAttribute* caP);
+  bool                      fill(StringFilterItem* sfiP, std::string* errorStringP);
 
 private:
   bool                      compatibleType(ContextAttribute* caP);
@@ -190,6 +199,9 @@ public:
   bool  parse(const char* q, std::string* errorStringP);
   bool  mongoFilterPopulate(std::string* errorStringP);
   bool  match(ContextElementResponse* cerP);
+
+  StringFilter*  clone(std::string* errorStringP);
+  bool           fill(StringFilter* sfP, std::string* errorStringP);
 };
 
 #endif  // SRC_LIB_REST_STRINGFILTERS_H_

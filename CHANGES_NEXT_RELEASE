@@ -22,5 +22,6 @@
 - Fix: non-string attribute values were breaking JSON in attributeFormat=object mode (#2058)
 - Add: change/add path /entities/{id}/attrs (#2028)
 - Deprecate: "location" metadata to specify entity location
+- Add: ~= operator to simple query language in order to implement attribute value patterns (#978)
 - Fix: JSON response in log management operations
 - Fix: capturing invalid URLs at subscription time (and returning error response) that otherwise would make Orion crash (#2092)

@@ -241,7 +241,7 @@ HttpStatusCode mongoUpdateContextSubscription
   {
     if (requestP->restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
-      stringFilterP = &requestP->restriction.scopeVector[ix]->stringFilter;
+      stringFilterP = requestP->restriction.scopeVector[ix]->stringFilterP;
     }
   }
   
