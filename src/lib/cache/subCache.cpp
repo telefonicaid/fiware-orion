@@ -737,7 +737,21 @@ void subCacheItemInsert
 
   if (stringFilterP != NULL)
   {
-    cSubP->expression.stringFilter = *stringFilterP;  // Object copy
+    std::string  errorString;
+
+    if (!cSubP->expression.stringFilter.fill(stringFilterP, &errorString))
+    {
+      LM_E(("Runtime Error (%s)", errorString.c_str()));
+
+      //
+      // NOTE
+      //   Here, the cached subscription should have a String Filter but as clone failed, it doesn't
+      //   The subscription is already in mongo and hopefully this erroneous situation is fixed 
+      //   once the sub-cache is refreshed.
+      //
+      //   This 'but' should be minimized once the issue 2082 gets implemented.
+      //   [ Only reason for clone to fail (apart from out-of-memory) seems to be an invalid regex ]
+   }
   }
 
   LM_T(LmtSubCache, ("inserting a new sub in cache (%s). lastNotifictionTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));

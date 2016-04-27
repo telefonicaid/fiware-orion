@@ -54,6 +54,8 @@ Scope::Scope()
 
   georel.maxDistance = -1;
   georel.minDistance = -1;
+
+  stringFilterP      = NULL;
 }
 
 
@@ -71,26 +73,10 @@ Scope::Scope(const std::string& _type, const std::string& _value, const std::str
 
   georel.maxDistance = -1;
   georel.minDistance = -1;
+
+  stringFilterP      = NULL;
 }
 
-
-
-/* ****************************************************************************
-*
-* Scope::Scope -
-*/
-Scope::Scope(Scope* scopeP, std::string* errorStringP)
-{
-  type     = scopeP->type;
-  value    = scopeP->value;
-  oper     = scopeP->oper;
-  areaType = scopeP->areaType;
-
-  stringFilterP = scopeP->stringFilterP->clone(errorStringP);
-
-  georel.maxDistance = -1;
-  georel.minDistance = -1;
-}
 
 
 /* ****************************************************************************

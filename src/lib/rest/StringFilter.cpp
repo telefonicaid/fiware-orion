@@ -70,6 +70,12 @@ bool StringFilterItem::fill(StringFilterItem* sfiP, std::string* errorStringP)
 
   if (compiledPattern)
   {
+    //
+    // FIXME P4: not very optimized to recalculate the regex.
+    // 
+    // We don't know of a better way to copy the regex from sfiP, and have a question out on SOF:
+    // http://stackoverflow.com/questions/36846426/best-way-of-cloning-compiled-regex-t-struct-in-c
+    //
     if (regcomp(&patternValue, stringValue.c_str(), 0) != 0)
     {
       *errorStringP = std::string("error compiling filter regex: '") + stringValue + "'";
@@ -928,8 +934,13 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
 
     str = NULL;  // So that strtok_r continues eating the initial string
 
-    // Next line is to avoid double-free at StringFilterItem destructor
+    //
+    // The next line is to avoid premature free in StringFilterItem destructor, when this scope ends,
+    // as item is an object on the stack and its destructor will be called automatically at
+    // end of scope.
+    //
     // (Note that the "copy" inside the filters vector may have "true" for this)
+    //
     item.compiledPattern = false;
   }
 
@@ -1311,7 +1322,6 @@ StringFilter* StringFilter::clone(std::string* errorStringP)
     if (!sfi.fill(&filters[ix], errorStringP))
     {
       delete sfP;
-      LM_W(("KZ: Cloning StringFilter - ERROR"));
       return NULL;
     }
 
@@ -1327,4 +1337,35 @@ StringFilter* StringFilter::clone(std::string* errorStringP)
 
   LM_W(("KZ: Cloning StringFilter - OK"));
   return sfP;
+}
+
+
+
+/* ****************************************************************************
+*
+* StringFilter::fill - 
+*/
+bool StringFilter::fill(StringFilter* sfP, std::string* errorStringP)
+{
+  for (unsigned int ix = 0; ix < filters.size(); ++ix)
+  {
+    StringFilterItem  sfi;
+
+    if (!sfi.fill(&sfP->filters[ix], errorStringP))
+    {
+      LM_E(("Runtime Error (error filling StringFilterItem: %s)", errorStringP->c_str()));
+      return false;
+    }
+    
+    filters.push_back(sfi);
+
+    // Next line is to avoid double-free at StringFilterItem destructor
+    // (Note that the "copy" inside the filters vector may have "true" for this)
+    sfi.compiledPattern = false;
+  }
+
+  // Object copy
+  mongoFilters = sfP->mongoFilters;
+
+  return true;
 }

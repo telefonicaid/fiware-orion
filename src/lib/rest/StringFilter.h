@@ -201,6 +201,7 @@ public:
   bool  match(ContextElementResponse* cerP);
 
   StringFilter*  clone(std::string* errorStringP);
+  bool           fill(StringFilter* sfP, std::string* errorStringP);
 };
 
 #endif  // SRC_LIB_REST_STRINGFILTERS_H_
