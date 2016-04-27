@@ -267,7 +267,7 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
   //
   // Ensuring the host is present
   //
-  if (urlTokens[2] == "")
+  if ((urlTokens.size() < 3) || (urlTokens[2] == ""))
   {
     return false;
   }
