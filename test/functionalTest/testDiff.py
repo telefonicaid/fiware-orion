@@ -45,6 +45,11 @@ def line_count(file_name):
     return lines
 
 
+def escape(s):
+    # Maybe some other "regex sensible" chars need to be escaped... this function will be
+    # adjusted in that case
+    return s.replace('[', '\[').replace(']', '\]').replace('{','\{').replace('}', '\}')
+
 
 def diff_files(input_file, ref_file):
 
@@ -70,7 +75,7 @@ def diff_files(input_file, ref_file):
         if m is not  None:
             # We build the regex, concatenating preamble,
             # regex expression itself and the last part
-            regex = m.group(1) + m.group(2) + m.group(3)
+            regex = escape(m.group(1)) + m.group(2) + escape(m.group(3))
 
             if not re.match(regex, input_line):
                 validation_error(input_line, ref_line)

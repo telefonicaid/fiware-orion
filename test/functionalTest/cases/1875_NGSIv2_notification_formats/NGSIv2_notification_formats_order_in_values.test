@@ -77,7 +77,6 @@ payload='
   "expires": "2050-04-05T14:00:00.00Z"
 }'
 orionCurl --url /v2/subscriptions --payload "$payload" --json
-sub5=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 echo
 echo
 
