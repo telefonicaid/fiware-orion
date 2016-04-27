@@ -30,13 +30,13 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# 01. Create subscription without url // and get error
-# 02. Create subscription without url /// and get error
-# 03. Create subscription without url http:///a and get error
+# 01. Create subscription with url // and get error
+# 02. Create subscription with url /// and get error
+# 03. Create subscription with url http:///a and get error
 #
 
-echo "01. Create subscription without url // and get error"
-echo "===================================================="
+echo "01. Create subscription with url // and get error"
+echo "================================================="
 payload='
 {
     "subject": {
@@ -61,8 +61,8 @@ echo
 echo
 
 
-echo "02. Create subscription without url /// and get error"
-echo "====================================================="
+echo "02. Create subscription with url /// and get error"
+echo "=================================================="
 payload='
 {
     "subject": {
@@ -87,8 +87,8 @@ echo
 echo
 
 
-echo "03. Create subscription without url http:///a and get error"
-echo "==========================================================="
+echo "03. Create subscription with url http:///a and get error"
+echo "========================================================"
 payload='
 {
     "subject": {
@@ -114,8 +114,8 @@ echo
 
 
 --REGEXPECT--
-01. Create subscription without url // and get error
-====================================================
+01. Create subscription with url // and get error
+=================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 75
 Content-Type: application/json
@@ -128,8 +128,8 @@ Date: REGEX(.*)
 }
 
 
-02. Create subscription without url /// and get error
-=====================================================
+02. Create subscription with url /// and get error
+==================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 75
 Content-Type: application/json
@@ -142,8 +142,8 @@ Date: REGEX(.*)
 }
 
 
-03. Create subscription without url http:///a and get error
-===========================================================
+03. Create subscription with url http:///a and get error
+========================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 75
 Content-Type: application/json
