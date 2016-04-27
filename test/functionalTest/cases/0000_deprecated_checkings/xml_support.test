@@ -47,7 +47,7 @@ payload='<appendContextElementRequest>
     </contextAttribute>
   </contextAttributeList>
 </appendContextElementRequest>'
-orionCurl --url "$url" --payload "${payload}"
+orionCurl --url "$url" --payload "${payload}" --in xml --out json
 echo
 echo
 
@@ -55,7 +55,7 @@ echo
 echo "02. Operation requesting XML as response payload, see error"
 echo "==========================================================="
 url=/v1/contextEntities/E01
-orionCurl --url "$url"
+orionCurl --url "$url" --out xml
 echo
 echo
 
