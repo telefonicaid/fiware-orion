@@ -902,9 +902,9 @@ TEST(mongoRegisterContext_update, NotifyContextAvailability1)
   expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", "no correlator", JSON))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", "no correlator", NGSI_V1_LEGACY))
           .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", "no correlator", JSON))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", "no correlator", NGSI_V1_LEGACY))
           .Times(0);
   setNotifier(notifierMock);
 
@@ -969,9 +969,9 @@ TEST(mongoRegisterContext_update, NotifyContextAvailability2)
   expectedNcar2.subscriptionId.set("51307b66f481db11bf860020");
 
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar1),"http://notify1.me", "", "no correlator", JSON))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar1),"http://notify1.me", "", "no correlator", NGSI_V1_LEGACY))
           .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar2),"http://notify2.me", "", "no correlator", JSON))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar2),"http://notify2.me", "", "no correlator", NGSI_V1_LEGACY))
           .Times(1);
   setNotifier(notifierMock);
 
@@ -1035,9 +1035,9 @@ TEST(mongoRegisterContext_update, NotifyContextAvailability3)
   expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", "no correlator", JSON))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", "no correlator", NGSI_V1_LEGACY))
           .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", "no correlator", JSON))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", "no correlator", NGSI_V1_LEGACY))
           .Times(0);
   setNotifier(notifierMock);
 

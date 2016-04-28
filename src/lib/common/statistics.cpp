@@ -29,31 +29,6 @@
 #include "common/JsonHelper.h"
 
 
-/* ****************************************************************************
-*
-* STAT_ADD - 
-*/
-#define STAT_ADD(out, indent, buf, tag, comma)                                \
-do                                                                            \
-{                                                                             \
-  if (format == JSON)                                                         \
-  {                                                                           \
-    if (comma)                                                                \
-    {                                                                         \
-      out += indent + JSON_STR(tag) + ": " + JSON_STR(buf) + ",\n";           \
-    }                                                                         \
-    else                                                                      \
-    {                                                                         \
-      out += indent + JSON_STR(tag) + ": " + JSON_STR(buf) + "\n";            \
-    }                                                                         \
-  }                                                                           \
-  else                                                                        \
-  {                                                                           \
-    out += indent + "<" + tag + ">" + buf + "</" + tag + ">\n";               \
-  }                                                                           \
-} while (0)
-
-
 
 /* ****************************************************************************
 *
@@ -302,13 +277,13 @@ void timingStatisticsReset(void)
 * FIXME P6: No statistics for received QueryResponses (Response from Provider Application
 *           after forwarding a query)
 */
-void statisticsUpdate(RequestType request, Format inFormat)
+void statisticsUpdate(RequestType request, MimeType inMimeType)
 {
-  if (inFormat == JSON)
+  if (inMimeType == JSON)
   {
     ++noOfJsonRequests;
   }
-  else if (inFormat == NOFORMAT)
+  else if (inMimeType == NOMIMETYPE)
   {
     // FIXME P4: Include this counter in the statistics (Issue #1400)
     ++noOfRequestsWithoutPayload;

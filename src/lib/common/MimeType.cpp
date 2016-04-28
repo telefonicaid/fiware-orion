@@ -28,54 +28,55 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-#include "common/Format.h"
+
+#include "common/MimeType.h"
 #include "common/wsStrip.h"
 
 
 
 /* ****************************************************************************
 *
-* formatToString - 
+* mimeTypeToString - 
 */
-const char* formatToString(Format format)
+const char* mimeTypeToString(MimeType mimeType)
 {
-  switch (format)
+  switch (mimeType)
   {  
   case JSON:     return "JSON";
   case TEXT:     return "TEXT";
   case HTML:     return "HTML";
-  case NOFORMAT: return "NOFORMAT";
+  case NOMIMETYPE: return "NOMIMETYPE";
   }
 
-  return "Unknown format";
+  return "Unknown mimeType";
 }
 
 
 
 /* ****************************************************************************
 *
-* stringToFormat
+* stringToMimeType
 */
-Format stringToFormat(const std::string& s)
+MimeType stringToMimeType(const std::string& s)
 {
   if (s == "JSON")
   {
     return JSON;
   }
 
-  return NOFORMAT;
+  return NOMIMETYPE;
 }
 
 
 
 /* ****************************************************************************
 *
-* formatParse - 
+* mimeTypeParse - 
 */
-Format formatParse(const std::string& formatString, std::string* charsetP)
+MimeType mimeTypeParse(const std::string& mimeTypeString, std::string* charsetP)
 {
   char* s;
-  char* cP = (char*) formatString.c_str();
+  char* cP = (char*) mimeTypeString.c_str();
 
   if ((s = strstr(cP, ";")) != NULL)
   {
@@ -89,12 +90,12 @@ Format formatParse(const std::string& formatString, std::string* charsetP)
     }
   }
 
-  std::string format(wsStrip(cP));
+  std::string mimeType(wsStrip(cP));
 
-  if      (format == "*/*")                               return JSON;
-  else if (format == "text/json")                         return JSON;
-  else if (format == "application/json")                  return JSON;
-  else if (format == "text/plain")                        return TEXT;
+  if      (mimeType == "*/*")                               return JSON;
+  else if (mimeType == "text/json")                         return JSON;
+  else if (mimeType == "application/json")                  return JSON;
+  else if (mimeType == "text/plain")                        return TEXT;
 
   return JSON;
 }

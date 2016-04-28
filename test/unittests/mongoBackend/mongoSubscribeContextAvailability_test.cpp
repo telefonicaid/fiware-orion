@@ -793,7 +793,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsAll)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -880,7 +880,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsAll_JSON)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -963,7 +963,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrOneSingle)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1057,7 +1057,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrOneMulti)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1145,7 +1145,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsSubset)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1243,7 +1243,7 @@ TEST(mongoSubscribeContextAvailability, noPatternSeveralCREs)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1336,7 +1336,7 @@ TEST(mongoSubscribeContextAvailability, noPatternSeveralRegistrations)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1438,7 +1438,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiEntity)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1533,7 +1533,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiAttr)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1635,7 +1635,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiEntityAttrs)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1752,7 +1752,7 @@ TEST(mongoSubscribeContextAvailability, noPatternNoType)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1853,7 +1853,7 @@ TEST(mongoSubscribeContextAvailability, pattern0Attr)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1935,7 +1935,7 @@ TEST(mongoSubscribeContextAvailability, pattern1AttrSingle)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2026,7 +2026,7 @@ TEST(mongoSubscribeContextAvailability, pattern1AttrMulti)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2124,7 +2124,7 @@ TEST(mongoSubscribeContextAvailability, patternNAttr)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2234,7 +2234,7 @@ TEST(mongoSubscribeContextAvailability, patternNoType)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2339,7 +2339,7 @@ TEST(mongoSubscribeContextAvailability, mixPatternAndNotPattern)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify.me", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 

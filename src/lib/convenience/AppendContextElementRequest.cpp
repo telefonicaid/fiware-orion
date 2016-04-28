@@ -25,7 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "common/Format.h"
 #include "common/tag.h"
 #include "convenience/AppendContextElementRequest.h"
 #include "convenience/AppendContextElementResponse.h"

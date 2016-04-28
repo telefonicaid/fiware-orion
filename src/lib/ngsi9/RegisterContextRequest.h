@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "common/Format.h"
 #include "convenience/RegisterProviderRequest.h"
 #include "ngsi/ContextRegistrationVector.h"
 #include "ngsi/Duration.h"

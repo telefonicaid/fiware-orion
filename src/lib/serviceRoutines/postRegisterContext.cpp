@@ -29,7 +29,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/Format.h"
 #include "common/string.h"
 #include "common/defaultValues.h"
 #include "common/statistics.h"

@@ -54,7 +54,7 @@ TEST(EntityTypeResponse, check)
 
   utInit();
 
-  ci.outFormat = JSON;
+  ci.outMimeType = JSON;
   EntityTypeResponse etR1;
   EntityTypeResponse etR2;
 

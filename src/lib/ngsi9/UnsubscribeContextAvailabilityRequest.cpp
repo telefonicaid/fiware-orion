@@ -24,7 +24,6 @@
 */
 #include <string>
 
-#include "common/Format.h"
 #include "ngsi/SubscriptionId.h"
 #include "ngsi9/UnsubscribeContextAvailabilityResponse.h"
 #include "ngsi9/UnsubscribeContextAvailabilityRequest.h"

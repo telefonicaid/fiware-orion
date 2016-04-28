@@ -28,7 +28,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/Format.h"
+#include "common/MimeType.h"
 #include "common/sem.h"
 #include "alarmMgr/alarmMgr.h"
 
@@ -68,7 +68,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
     reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo assertion exception)", reqSemTaken);
     if (responseP->errorCode.code == SccContextElementNotFound)
     {
-      std::string details = std::string("invalid OID format: '") + requestP->subscriptionId.get() + "'"; 
+      std::string details = std::string("invalid OID mimeType: '") + requestP->subscriptionId.get() + "'"; 
       alarmMgr.badInput(clientIp, details);
     }
     else // SccReceiverInternalError

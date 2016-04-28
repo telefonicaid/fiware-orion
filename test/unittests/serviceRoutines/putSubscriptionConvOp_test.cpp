@@ -74,38 +74,38 @@ TEST(putSubscriptionConvOp, DISABLED_put)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  ci1.outFormat    = JSON;
-  ci1.inFormat     = JSON;
-  ci1.payload      = NULL;
-  ci1.payloadSize  = 0;
-  out              = restService(&ci1, rs);
+  ci1.outMimeType    = JSON;
+  ci1.inMimeType     = JSON;
+  ci1.payload        = NULL;
+  ci1.payloadSize    = 0;
+  out                = restService(&ci1, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
   
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  ci2.outFormat    = JSON;
-  ci2.inFormat     = JSON;
-  ci2.payload      = testBuf;
-  ci2.payloadSize  = strlen(testBuf);
-  out              = restService(&ci2, rs);
+  ci2.outMimeType    = JSON;
+  ci2.inMimeType     = JSON;
+  ci2.payload        = testBuf;
+  ci2.payloadSize    = strlen(testBuf);
+  out                = restService(&ci2, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
-  ci3.outFormat    = JSON;
-  ci3.inFormat     = JSON;
-  ci3.payload      = testBuf;
-  ci3.payloadSize  = strlen(testBuf);
-  out              = restService(&ci3, rs);
+  ci3.outMimeType    = JSON;
+  ci3.inMimeType     = JSON;
+  ci3.payload        = testBuf;
+  ci3.payloadSize    = strlen(testBuf);
+  out                = restService(&ci3, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
-  ci4.outFormat    = JSON;
-  ci4.inFormat     = JSON;
-  ci4.payload      = NULL;
-  ci4.payloadSize  = 0;
-  out              = restService(&ci4, rs);
+  ci4.outMimeType    = JSON;
+  ci4.inMimeType     = JSON;
+  ci4.payload        = NULL;
+  ci4.payloadSize    = 0;
+  out                = restService(&ci4, rs);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow",       ci4.httpHeader[0]);
   EXPECT_EQ("PUT, DELETE", ci4.httpHeaderValue[0]);

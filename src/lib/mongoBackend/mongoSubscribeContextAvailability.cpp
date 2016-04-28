@@ -25,11 +25,11 @@
 #include <string>
 #include <map>
 
-#include "common/globals.h"
-
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 
+#include "common/globals.h"
+#include "common/sem.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubscribeContextAvailability.h"
 #include "mongoBackend/connectionOperations.h"
@@ -37,8 +37,6 @@
 #include "ngsi9/SubscribeContextAvailabilityRequest.h"
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
 #include "rest/uriParamNames.h"
-#include "common/Format.h"
-#include "common/sem.h"
 
 
 

@@ -25,7 +25,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/Format.h"
+#include "common/MimeType.h"
 #include "convenience/AppendContextElementRequest.h"
 #include "ngsi/ContextElement.h"
 #include "ngsi/Metadata.h"
@@ -53,7 +53,7 @@ TEST(AppendContextElementRequest, render_json)
    acer.attributeDomainName.set("ADN");
    acer.contextAttributeVector.push_back(&ca);
    
-   ci.outFormat = JSON;
+   ci.outMimeType = JSON;
    out = acer.render(&ci, UpdateContext, "");
 
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -86,7 +86,7 @@ TEST(AppendContextElementRequest, check_json)
    acer.domainMetadataVector.push_back(&md);
 
    // 1. ok
-   ci.outFormat = JSON;
+   ci.outMimeType = JSON;
    out = acer.check(&ci, AppendContextElement, "", "", 0);
    EXPECT_STREQ("OK", out.c_str());
 

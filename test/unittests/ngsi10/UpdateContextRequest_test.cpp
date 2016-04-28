@@ -58,8 +58,8 @@ TEST(UpdateContextRequest, ok_json)
 
    EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-   ci.inFormat  = JSON;
-   ci.outFormat = JSON;
+   ci.inMimeType  = JSON;
+   ci.outMimeType = JSON;
 
    lmTraceLevelSet(LmtDump, true);
    std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
@@ -94,8 +94,8 @@ TEST(UpdateContextRequest, badIsPattern_json)
 
    utInit();
 
-   ci.inFormat  = JSON;
-   ci.outFormat = JSON;
+   ci.inMimeType  = JSON;
+   ci.outMimeType = JSON;
 
    EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile;

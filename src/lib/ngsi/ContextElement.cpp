@@ -28,7 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/Format.h"
+#include "common/MimeType.h"
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/ContextElement.h"
@@ -230,7 +230,7 @@ void ContextElement::present(const std::string& indent, int ix)
     LM_T(LmtPresent, ("%s  PA: %s (%s)", 
 		      indent.c_str(), 
 		      providingApplicationList[ix].get().c_str(), 
-		      formatToString(providingApplicationList[ix].getFormat())));
+		      mimeTypeToString(providingApplicationList[ix].getMimeType())));
     LM_T(LmtPresent, ("%s  providingApplication: %s", 
 		      indent.c_str(), 
 		      providingApplicationList[ix].c_str()));

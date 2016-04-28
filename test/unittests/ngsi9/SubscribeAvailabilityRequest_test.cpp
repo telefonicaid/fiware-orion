@@ -68,8 +68,8 @@ TEST(SubscribeContextAvailabilityRequest, json_ok)
 
   utInit();
 
-  ci.inFormat      = JSON;
-  ci.outFormat     = JSON;
+  ci.inMimeType      = JSON;
+  ci.outMimeType     = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
@@ -95,8 +95,8 @@ TEST(SubscribeContextAvailabilityRequest, json_badIsPattern)
 
   utInit();
 
-  ci.inFormat      = JSON;
-  ci.outFormat     = JSON;
+  ci.inMimeType      = JSON;
+  ci.outMimeType     = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
@@ -149,8 +149,8 @@ TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
 
   utInit();
 
-  ci.inFormat      = JSON;
-  ci.outFormat     = JSON;
+  ci.inMimeType      = JSON;
+  ci.outMimeType     = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -235,8 +235,8 @@ TEST(SubscribeContextAvailabilityRequest, DISABLD_xml_noReference)
 
   utInit();
 
-  ci.inFormat      = JSON;
-  ci.outFormat     = JSON;
+  ci.inMimeType      = JSON;
+  ci.outMimeType     = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -263,8 +263,8 @@ TEST(SubscribeContextAvailabilityRequest, json_badDuration)
 
   utInit();
 
-  ci.inFormat      = JSON;
-  ci.outFormat     = JSON;
+  ci.inMimeType      = JSON;
+  ci.outMimeType     = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";

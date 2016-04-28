@@ -29,7 +29,6 @@
 #include <vector>
 
 #include "ngsi/Request.h"
-#include "common/Format.h"
 
 
 

@@ -79,7 +79,7 @@ void* startSenderThread(void* p)
 
       if (r == 0)
       {
-        statisticsUpdate(NotifyContextSent, params->format);
+        statisticsUpdate(NotifyContextSent, params->mimeType);
         alarmMgr.notificationErrorReset(url);
       }
     }

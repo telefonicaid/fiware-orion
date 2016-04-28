@@ -24,7 +24,6 @@
 */
 #include <string>
 
-#include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/AttributeList.h"

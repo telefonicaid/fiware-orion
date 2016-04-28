@@ -49,8 +49,8 @@ TEST(UnsubscribeContextRequest, badSubscriptionId_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
   lmTraceLevelSet(LmtDump, true);
   out = jsonTreat(testBuf, &ci, &reqData, UnsubscribeContext, "unsubscribeContextRequest", NULL);
   lmTraceLevelSet(LmtDump, false);

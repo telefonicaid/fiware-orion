@@ -28,7 +28,6 @@
 #include <string>
 
 #include "ngsi/Request.h"
-#include "common/Format.h"
 #include "orionTypes/areas.h"
 #include "rest/StringFilter.h"
 

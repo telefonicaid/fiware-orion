@@ -145,7 +145,7 @@ static void* workerFunc(void* pSyncQ)
 
       if (r == 0)
       {
-        statisticsUpdate(NotifyContextSent, params->format);
+        statisticsUpdate(NotifyContextSent, params->mimeType);
         QueueStatistics::incSentOK();
         alarmMgr.notificationErrorReset(url);
       }

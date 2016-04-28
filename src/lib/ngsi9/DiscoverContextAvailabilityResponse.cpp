@@ -30,7 +30,6 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/tag.h"
-#include "common/Format.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 
 

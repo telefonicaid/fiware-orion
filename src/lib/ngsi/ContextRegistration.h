@@ -29,7 +29,6 @@
 #include <vector>
 
 #include "ngsi/EntityIdVector.h"
-#include "common/Format.h"
 #include "ngsi/ProvidingApplication.h"
 #include "ngsi/ContextRegistrationAttributeVector.h"
 #include "ngsi/MetadataVector.h"
