@@ -62,7 +62,7 @@ payload='{
     ],
     "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
@@ -78,7 +78,7 @@ payload='{
     ],
     "attributes": [ "A1", "A2" ]
 }'
-orionCurl --url "$url" --payload "$payload" --urlParams attributeFormat=object --json
+orionCurl --url "$url" --payload "$payload" --urlParams attributeFormat=object
 echo
 echo
 
@@ -120,7 +120,7 @@ payload='{
     ],
     "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
@@ -136,7 +136,7 @@ payload='{
     ],
     "attributes": [ "A3" ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
@@ -152,7 +152,7 @@ payload='{
     ],
     "attributes": [ "A3" ]
 }'
-orionCurl --url "$url" --payload "$payload"  --json --urlParams attributeFormat=object
+orionCurl --url "$url" --payload "$payload"  --urlParams attributeFormat=object
 echo
 echo
 

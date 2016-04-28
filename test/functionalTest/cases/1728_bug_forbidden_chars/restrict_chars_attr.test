@@ -50,7 +50,7 @@ payload='{
     }
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -70,7 +70,7 @@ payload='{
     }
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -90,7 +90,7 @@ payload='{
     }
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 

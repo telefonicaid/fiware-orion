@@ -59,20 +59,20 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/E1/attributes --payload "$payload" --urlParams attributeFormat=object --json
+orionCurl --url /v1/contextEntities/E1/attributes --payload "$payload" --urlParams attributeFormat=object
 echo
 echo
 
 
 echo "02. Query  E1/A1 using conv op GET  /v1/contextEntities/E1 (with attributeFormat=object)"
 echo "========================================================================================"
-orionCurl --url /v1/contextEntities/E1 --out json --urlParams attributeFormat=object
+orionCurl --url /v1/contextEntities/E1 --urlParams attributeFormat=object
 echo
 echo
 
 echo "03. Query  E1/A1 using conv op GET  /v1/contextEntities/E1 (without attributeFormat=object)"
 echo "==========================================================================================="
-orionCurl --url /v1/contextEntities/E1 --out json
+orionCurl --url /v1/contextEntities/E1
 echo
 echo
 
@@ -88,28 +88,28 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/E1 --payload "$payload" --urlParams attributeFormat=object --json -X PUT
+orionCurl --url /v1/contextEntities/E1 --payload "$payload" --urlParams attributeFormat=object -X PUT
 echo
 echo
 
 
 echo "05. Query  E1/A1 using conv op GET  /v1/contextEntities/E1/attributes/A1 (with attributeFormat=object)"
 echo "======================================================================================================"
-orionCurl --url /v1/contextEntities/E1/attributes/A1 --urlParams attributeFormat=object --out json
+orionCurl --url /v1/contextEntities/E1/attributes/A1 --urlParams attributeFormat=object
 echo
 echo
 
 
 echo "06. Query  E1/A1 using conv op GET  /v1/contextEntities/E1/attributes/A1 (without attributeFormat=object)"
 echo "========================================================================================================="
-orionCurl --url /v1/contextEntities/E1/attributes/A1 --out json
+orionCurl --url /v1/contextEntities/E1/attributes/A1
 echo
 echo
 
 
 echo "07. Query  E1/A1 using conv op GET  /v1/contextEntities/E1 (with attributesFormat=object)"
 echo "========================================================================================="
-orionCurl --url /v1/contextEntities/E1 --out json --urlParams attributesFormat=object
+orionCurl --url /v1/contextEntities/E1 --urlParams attributesFormat=object
 echo
 echo
 

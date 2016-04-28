@@ -55,7 +55,7 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url "${url}" --payload "${payload}" --tenant "t_01" --json
+orionCurl --url "${url}" --payload "${payload}" --tenant "t_01"
 echo
 echo
 
@@ -85,7 +85,7 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url "${url}" --payload "${payload}" --tenant "t_02" --json
+orionCurl --url "${url}" --payload "${payload}" --tenant "t_02"
 echo
 echo
 
@@ -102,7 +102,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url "${url}" --payload "${payload}" --tenant "t_01" --json
+orionCurl --url "${url}" --payload "${payload}" --tenant "t_01"
 echo
 echo
 
@@ -119,7 +119,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url "${url}" --payload "${payload}" --tenant "t_02" --json
+orionCurl --url "${url}" --payload "${payload}" --tenant "t_02"
 
 --REGEXPECT--
 1. Register entity E with HTTP-Tenant t_01

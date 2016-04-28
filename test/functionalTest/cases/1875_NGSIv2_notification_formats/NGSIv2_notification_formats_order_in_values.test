@@ -48,7 +48,7 @@ payload='{
   "A5": 5,
   "A6": 6
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -76,7 +76,7 @@ payload='
   "attrsFormat": "values",
   "expires": "2050-04-05T14:00:00.00Z"
 }'
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 

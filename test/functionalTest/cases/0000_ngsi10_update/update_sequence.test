@@ -69,7 +69,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -104,7 +104,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -128,7 +128,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -164,7 +164,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -188,7 +188,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -212,7 +212,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -248,7 +248,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -272,7 +272,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -296,7 +296,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -320,7 +320,7 @@ payload='{
   ],
   "updateAction": "DELETE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -344,7 +344,7 @@ payload='{
   ],
   "updateAction": "DELETE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -368,7 +368,7 @@ payload='{
   ],
   "updateAction": "DELETE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -392,7 +392,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -428,7 +428,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -452,7 +452,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -481,7 +481,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -510,7 +510,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -546,7 +546,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 

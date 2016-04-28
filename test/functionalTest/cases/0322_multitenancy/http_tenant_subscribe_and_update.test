@@ -56,7 +56,7 @@ payload='{
       }
   ]
 }'
-orionCurl --url "$url" --payload "${payload}" --tenant "t_01" --json
+orionCurl --url "$url" --payload "${payload}" --tenant "t_01"
 echo
 
 
@@ -83,7 +83,7 @@ payload='{
       }
   ]
 }'
-orionCurl --url "$url" --payload "${payload}" --tenant "t_02" --json
+orionCurl --url "$url" --payload "${payload}" --tenant "t_02"
 echo
 
 
@@ -107,7 +107,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "${payload}" --tenant "t_01" --json
+orionCurl --url "$url" --payload "${payload}" --tenant "t_01"
 echo
 
 
@@ -131,7 +131,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "${payload}" --tenant "t_02" --json
+orionCurl --url "$url" --payload "${payload}" --tenant "t_02"
 echo
 
 

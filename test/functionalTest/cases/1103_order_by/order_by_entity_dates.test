@@ -48,7 +48,7 @@ payload='{
   "id": "E1",
   "type": "T"
 }'
-orionCurl --url /v2/entities -X POST --payload "$payload" --json
+orionCurl --url /v2/entities -X POST --payload "$payload"
 echo
 echo
 sleep 1s
@@ -60,7 +60,7 @@ payload='{
   "id": "E2",
   "type": "T"
 }'
-orionCurl --url /v2/entities -X POST --payload "$payload" --json
+orionCurl --url /v2/entities -X POST --payload "$payload"
 echo
 echo
 sleep 1s
@@ -72,7 +72,7 @@ payload='{
   "id": "E3",
   "type": "T"
 }'
-orionCurl --url /v2/entities -X POST --payload "$payload" --json
+orionCurl --url /v2/entities -X POST --payload "$payload"
 echo
 echo
 sleep 1s
@@ -84,7 +84,7 @@ payload='{
   "id": "E4",
   "type": "T"
 }'
-orionCurl --url /v2/entities -X POST --payload "$payload" --json
+orionCurl --url /v2/entities -X POST --payload "$payload"
 echo
 echo
 sleep 1s
@@ -95,7 +95,7 @@ echo "===================="
 payload='{
   "A": "foo"
 }'
-orionCurl --url /v2/entities/E3/attrs?options=keyValues -X POST --payload "$payload" --json
+orionCurl --url /v2/entities/E3/attrs?options=keyValues -X POST --payload "$payload"
 echo
 echo
 sleep 1s
@@ -106,31 +106,31 @@ echo "===================="
 payload='{
   "B": "bar"
 }'
-orionCurl --url /v2/entities/E2/attrs?options=keyValues -X POST --payload "$payload" --json
+orionCurl --url /v2/entities/E2/attrs?options=keyValues -X POST --payload "$payload"
 echo
 echo
 
 echo "05. Get sorted by dateCreated: E1, E2, E3, E4"
 echo "============================================="
-orionCurl --url '/v2/entities?options=keyValues&orderBy=dateCreated' --json
+orionCurl --url '/v2/entities?options=keyValues&orderBy=dateCreated'
 echo
 echo
 
 echo "06. Get sorted by !dateCreated: E4, E3, E2, E1"
 echo "=============================================="
-orionCurl --url '/v2/entities?options=keyValues&orderBy=!dateCreated' --json
+orionCurl --url '/v2/entities?options=keyValues&orderBy=!dateCreated'
 echo
 echo
 
 echo "07. Get sorted by dateModified: E1, E4, E3, E2"
 echo "=============================================="
-orionCurl --url '/v2/entities?options=keyValues&orderBy=dateModified' --json
+orionCurl --url '/v2/entities?options=keyValues&orderBy=dateModified'
 echo
 echo
 
 echo "08. Get sorted by !dateModified: E2, E3, E4, E1"
 echo "==============================================="
-orionCurl --url '/v2/entities?options=keyValues&orderBy=!dateModified' --json
+orionCurl --url '/v2/entities?options=keyValues&orderBy=!dateModified'
 echo
 echo
 

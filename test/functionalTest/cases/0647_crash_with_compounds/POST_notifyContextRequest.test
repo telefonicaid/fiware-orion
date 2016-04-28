@@ -64,7 +64,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/notifyContext --payload "$payload" --json
+orionCurl --url /v1/notifyContext --payload "$payload"
 echo
 echo
 

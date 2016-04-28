@@ -60,14 +60,14 @@ payload='{
     "value" : "Klasse C"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload"  --servicePath "$SP_LONG" --json
+orionCurl --url /v2/entities --payload "$payload"  --servicePath "$SP_LONG"
 echo
 echo
 
 
 echo "02. GET /v2/entities"
 echo "===================="
-orionCurl --url /v2/entities  --servicePath "$SP_LONG" --json
+orionCurl --url /v2/entities  --servicePath "$SP_LONG"
 echo
 echo
 

@@ -31,10 +31,10 @@ accumulatorStart :: ${LISTENER2_PORT}
 
 --SHELL--
 echo "1: ++++++++++++++++++++"
-orionCurl --url "/version" --json --host "[::1]" -g 2> /dev/null
+orionCurl --url "/version" --host "[::1]" -g 2> /dev/null
 
 echo "2: ++++++++++++++++++++"
-orionCurl --url "/version" --json --host "127.0.0.1" -g 2> /dev/null
+orionCurl --url "/version" --host "127.0.0.1" -g 2> /dev/null
 
 echo "3: ++++++++++++++++++++"
 url="/v1/subscribeContext"
@@ -62,7 +62,7 @@ payload='{
       }
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json --host "[::1]" -g 2> /dev/null
+orionCurl --url "$url" --payload "$payload" --host "[::1]" -g 2> /dev/null
 
 echo "4: ++++++++++++++++++++"
 url="/v1/subscribeContext"
@@ -90,7 +90,7 @@ payload='{
       }
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json --host "127.0.0.1" -g 2> /dev/null
+orionCurl --url "$url" --payload "$payload" --host "127.0.0.1" -g 2> /dev/null
 
 echo "5: ++++++++++++++++++++"
 url="/v1/updateContext"
@@ -116,7 +116,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json --host "[::1]" -g 2> /dev/null
+orionCurl --url "$url" --payload "$payload" --host "[::1]" -g 2> /dev/null
 
 echo "6: ++++++++++++++++++++"
 #Get accumulated data

@@ -50,31 +50,31 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E --payload "${payload}" --json
+orionCurl --url /v1/contextEntities/type/T1/id/E --payload "${payload}"
 echo
 echo
-orionCurl --servicePath '/' --url /v1/contextEntities/type/T2/id/E --payload "${payload}" --json
+orionCurl --servicePath '/' --url /v1/contextEntities/type/T2/id/E --payload "${payload}"
 echo
 echo
-orionCurl --servicePath '/path' --url /v1/contextEntities/type/T3/id/E --payload "${payload}" --json
+orionCurl --servicePath '/path' --url /v1/contextEntities/type/T3/id/E --payload "${payload}"
 echo
 echo
 
 echo "02. Query on / (returns: T1, T2)"
 echo "================================"
-orionCurl --servicePath '/' --url /v1/contextTypes --json
+orionCurl --servicePath '/' --url /v1/contextTypes
 echo
 echo
 
 echo "03. Query on /# (returns: T1, T2, T3)"
 echo "====================================="
-orionCurl --servicePath '/#' --url /v1/contextTypes --json
+orionCurl --servicePath '/#' --url /v1/contextTypes
 echo
 echo
 
 echo "04. Query without servicePath (returns: T1, T2, T3)"
 echo "==================================================="
-orionCurl --url /v1/contextTypes --json
+orionCurl --url /v1/contextTypes
 echo
 echo
 

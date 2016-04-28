@@ -45,14 +45,14 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/registry/registerContext --payload "${payload}" --json
+orionCurl --url /v1/registry/registerContext --payload "${payload}"
 echo
 echo
 
 
 echo "1. NOP /v1/registry/registerContext"
 echo "==================================="
-orionCurl --url /v1/registry/registerContext --payload "${payload}" -X NOP --json
+orionCurl --url /v1/registry/registerContext --payload "${payload}" -X NOP
 echo
 echo
 
@@ -68,14 +68,14 @@ payload='{
         }
     ]
 }'
-orionCurl --url "/v1/registry/discoverContextAvailability" --payload "${payload}" --json
+orionCurl --url "/v1/registry/discoverContextAvailability" --payload "${payload}"
 echo
 echo
 
 
 echo "2. NOP /v1/registry/discoverContextAvailability"
 echo "==============================================="
-orionCurl --url "/v1/registry/discoverContextAvailability" --payload "${payload}" -X NOP --json
+orionCurl --url "/v1/registry/discoverContextAvailability" --payload "${payload}" -X NOP
 echo
 echo
 
@@ -93,7 +93,7 @@ payload='{
   "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
   "duration": "PT5H"
 }'
-orionCurl --url /v1/registry/subscribeContextAvailability --payload "${payload}" --json
+orionCurl --url /v1/registry/subscribeContextAvailability --payload "${payload}"
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 echo
 echo
@@ -101,7 +101,7 @@ echo
 
 echo "3. NOP /v1/registry/subscribeContextAvailability"
 echo "================================================"
-orionCurl --url /v1/registry/subscribeContextAvailability --payload "${payload}" -X NOP --json
+orionCurl --url /v1/registry/subscribeContextAvailability --payload "${payload}" -X NOP
 echo
 echo
 
@@ -119,14 +119,14 @@ payload='{
   "duration": "PT5H",
   "subscriptionId": "'$SUB_ID'"
 }'
-orionCurl --url "/v1/registry/updateContextAvailabilitySubscription" --payload "$payload" --json
+orionCurl --url "/v1/registry/updateContextAvailabilitySubscription" --payload "$payload"
 echo
 echo
 
 
 echo "4. NOP /v1/registry/updateContextAvailabilitySubscription"
 echo "========================================================="
-orionCurl --url "/v1/registry/updateContextAvailabilitySubscription" --payload "$payload" -X NOP --json
+orionCurl --url "/v1/registry/updateContextAvailabilitySubscription" --payload "$payload" -X NOP
 echo
 echo
 
@@ -136,14 +136,14 @@ echo "==================================================="
 payload='{
   "subscriptionId": "'$SUB_ID'"
 }'
-orionCurl --url /v1/registry/unsubscribeContextAvailability --payload "${payload}" --json
+orionCurl --url /v1/registry/unsubscribeContextAvailability --payload "${payload}"
 echo
 echo
 
 
 echo "5. NOP /v1/registry/unsubscribeContextAvailability"
 echo "=================================================="
-orionCurl --url /v1/registry/unsubscribeContextAvailability --payload "${payload}" -X NOP --json
+orionCurl --url /v1/registry/unsubscribeContextAvailability --payload "${payload}" -X NOP
 echo
 echo
 
@@ -154,21 +154,21 @@ payload='{
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/abc"
 }'
-orionCurl --url /v1/registry/contextEntities/E --payload "${payload}" --json
+orionCurl --url /v1/registry/contextEntities/E --payload "${payload}"
 echo
 echo
 
 
 echo "6. GET /v1/registry/contextEntities/E"
 echo "====================================="
-orionCurl --url /v1/registry/contextEntities/E --json
+orionCurl --url /v1/registry/contextEntities/E
 echo
 echo
 
 
 echo "6. NOP /v1/registry/contextEntities/E"
 echo "====================================="
-orionCurl --url /v1/registry/contextEntities/E --payload "${payload}" -X NOP --json
+orionCurl --url /v1/registry/contextEntities/E --payload "${payload}" -X NOP
 echo
 echo
 
@@ -179,21 +179,21 @@ payload='{
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/abc"
 }'
-orionCurl --url /v1/registry/contextEntities/F/attributes --payload "${payload}" --json
+orionCurl --url /v1/registry/contextEntities/F/attributes --payload "${payload}"
 echo
 echo
 
 
 echo "7. GET /v1/registry/contextEntities/F/attributes"
 echo "================================================"
-orionCurl --url /v1/registry/contextEntities/F/attributes --json
+orionCurl --url /v1/registry/contextEntities/F/attributes
 echo
 echo
 
 
 echo "7. NOP /v1/registry/contextEntities/F/attributes"
 echo "================================================"
-orionCurl --url /v1/registry/contextEntities/F/attributes --payload "${payload}" -X NOP --json
+orionCurl --url /v1/registry/contextEntities/F/attributes --payload "${payload}" -X NOP
 echo
 echo
 
@@ -204,21 +204,21 @@ payload='{
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/abc"
 }'
-orionCurl --url /v1/registry/contextEntities/G/attributes/A --payload "$payload" --json
+orionCurl --url /v1/registry/contextEntities/G/attributes/A --payload "$payload"
 echo
 echo
 
 
 echo "8. GET /v1/registry/contextEntities/G/attributes/A"
 echo "=================================================="
-orionCurl --url /v1/registry/contextEntities/G/attributes/A --json
+orionCurl --url /v1/registry/contextEntities/G/attributes/A
 echo
 echo
 
 
 echo "8. NOP /v1/registry/contextEntities/G/attributes/A"
 echo "=================================================="
-orionCurl --url /v1/registry/contextEntities/G/attributes/A --payload "$payload" -X NOP --json
+orionCurl --url /v1/registry/contextEntities/G/attributes/A --payload "$payload" -X NOP
 echo
 echo
 
@@ -228,21 +228,21 @@ echo "========================================="
 payload='{
   "providingApplication": "http://kz.tid.es/abc"
 }'
-orionCurl --url /v1/registry/contextEntityTypes/S --payload "${payload}" --json
+orionCurl --url /v1/registry/contextEntityTypes/S --payload "${payload}"
 echo
 echo
 
 
 echo "9. GET /v1/registry/contextEntityTypes/S"
 echo "========================================"
-orionCurl --url /v1/registry/contextEntityTypes/S --json
+orionCurl --url /v1/registry/contextEntityTypes/S
 echo
 echo
 
 
 echo "9. NOP /v1/registry/contextEntityTypes/S"
 echo "========================================"
-orionCurl --url /v1/registry/contextEntityTypes/S --payload "${payload}" -X NOP --json
+orionCurl --url /v1/registry/contextEntityTypes/S --payload "${payload}" -X NOP
 echo
 echo
 
@@ -252,21 +252,21 @@ echo "====================================================="
 payload='{
   "providingApplication": "http://kz.tid.es/abc"
 }'
-orionCurl --url /v1/registry/contextEntityTypes/U/attributes --payload "${payload}" --json
+orionCurl --url /v1/registry/contextEntityTypes/U/attributes --payload "${payload}"
 echo
 echo
 
 
 echo "10. GET /v1/registry/contextEntityTypes/U/attributes"
 echo "===================================================="
-orionCurl --url /v1/registry/contextEntityTypes/U/attributes --json
+orionCurl --url /v1/registry/contextEntityTypes/U/attributes
 echo
 echo
 
 
 echo "10. NOP /v1/registry/contextEntityTypes/U/attributes"
 echo "===================================================="
-orionCurl --url /v1/registry/contextEntityTypes/U/attributes --payload "${payload}" -X NOP --json
+orionCurl --url /v1/registry/contextEntityTypes/U/attributes --payload "${payload}" -X NOP
 echo
 echo
 
@@ -277,21 +277,21 @@ payload='{
   "providingApplication": "http://kz.tid.es/abc",
   "duration": "PT1H"
 }'
-orionCurl --url /v1/registry/contextEntityTypes/V/attributes/A --payload "${payload}" --json
+orionCurl --url /v1/registry/contextEntityTypes/V/attributes/A --payload "${payload}"
 echo
 echo
 
 
 echo "11. GET /v1/registry/contextEntityTypes/V/attributes/A"
 echo "======================================================"
-orionCurl --url /v1/registry/contextEntityTypes/V/attributes/A --json
+orionCurl --url /v1/registry/contextEntityTypes/V/attributes/A
 echo
 echo
 
 
 echo "11. NOP /v1/registry/contextEntityTypes/V/attributes/A"
 echo "======================================================"
-orionCurl --url /v1/registry/contextEntityTypes/V/attributes/A --payload "${payload}" -X NOP --json
+orionCurl --url /v1/registry/contextEntityTypes/V/attributes/A --payload "${payload}" -X NOP
 echo
 echo
 
@@ -312,7 +312,7 @@ payload='{
   "reference": "http://10.1.1.1:80/test/interfaceNotification",
   "duration": "PT1M"
 }'
-orionCurl --url /v1/registry/contextAvailabilitySubscriptions --payload "${payload}" --json
+orionCurl --url /v1/registry/contextAvailabilitySubscriptions --payload "${payload}"
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 echo
 echo
@@ -320,7 +320,7 @@ echo
 
 echo "12. NOP /v1/registry/contextAvailabilitySubscriptions"
 echo "====================================================="
-orionCurl --url /v1/registry/contextAvailabilitySubscriptions --payload "${payload}" -X NOP --json
+orionCurl --url /v1/registry/contextAvailabilitySubscriptions --payload "${payload}" -X NOP
 echo
 echo
 
@@ -341,21 +341,21 @@ payload='{
   "duration": "P1Y",
   "subscriptionId" : "'$SUB_ID'"
 }'
-orionCurl --url /v1/registry/contextAvailabilitySubscriptions/$SUB_ID --payload "$payload" -X PUT --json
+orionCurl --url /v1/registry/contextAvailabilitySubscriptions/$SUB_ID --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "13. DELETE /v1/registry/contextAvailabilitySubscriptions/SUB_ID"
 echo "==============================================================="
-orionCurl --url /v1/registry/contextAvailabilitySubscriptions/$SUB_ID -X DELETE --json
+orionCurl --url /v1/registry/contextAvailabilitySubscriptions/$SUB_ID -X DELETE
 echo
 echo
 
 
 echo "13. NOP /v1/registry/contextAvailabilitySubscriptions/SUB_ID"
 echo "============================================================"
-orionCurl --url /v1/registry/contextAvailabilitySubscriptions/$SUB_ID -X NOP --json
+orionCurl --url /v1/registry/contextAvailabilitySubscriptions/$SUB_ID -X NOP
 echo
 echo
 

@@ -44,7 +44,7 @@ brokerStart CB 0-255
 echo "01. Create entity vehicle1"
 echo "=========================="
 payload='{ "id": "vehicle1", "type": "car", "model": "ford" }'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
 echo
 echo
 
@@ -52,7 +52,7 @@ echo
 echo "02. Create entity vehicle2"
 echo "=========================="
 payload='{ "id": "vehicle2", "type": "car", "model": "seat" }'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
 echo
 echo
 
@@ -60,28 +60,28 @@ echo
 echo "02. Create entity vehicle3"
 echo "=========================="
 payload='{ "id": "vehicle3", "type": "car", "model": "fiat" }'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
 echo
 echo
 
 
 echo "04. Query for id=vehicle -> no result"
 echo "====================================="
-orionCurl --url '/v2/entities?id=vehicle&options=keyValues' --json
+orionCurl --url '/v2/entities?id=vehicle&options=keyValues'
 echo
 echo
 
 
 echo "05. Query for id=vehicle1 -> vehicle"
 echo "====================================="
-orionCurl --url '/v2/entities?id=vehicle1&options=keyValues' --json
+orionCurl --url '/v2/entities?id=vehicle1&options=keyValues'
 echo
 echo
 
 
 echo "06. Query for id=vehicle1,vehicle3 -> vehicle1, vehicle3"
 echo "========================================================"
-orionCurl --url '/v2/entities?id=vehicle1,vehicle3&options=keyValues' --json
+orionCurl --url '/v2/entities?id=vehicle1,vehicle3&options=keyValues'
 echo
 echo
 

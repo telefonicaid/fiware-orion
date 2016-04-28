@@ -55,7 +55,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 
 echo "2: ++++++++++++++++++++"
@@ -78,7 +78,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "3: ++++++++++++++++++++"
 #Do an update after subscription expiration: notification is not generated
@@ -101,7 +101,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "4: ++++++++++++++++++++"
 #Get accumulated data

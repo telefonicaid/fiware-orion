@@ -49,7 +49,7 @@ payload='{
     "A1"
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -72,7 +72,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -90,7 +90,7 @@ payload='{
     "A1"
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -105,7 +105,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 

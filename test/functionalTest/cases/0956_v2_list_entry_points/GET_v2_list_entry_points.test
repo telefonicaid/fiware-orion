@@ -30,7 +30,7 @@ brokerStart CB
 --SHELL--
 
 echo "1: ++++++++++++++++++++"
-orionCurl --url /v2 --json
+orionCurl --url /v2
 echo
 echo
 

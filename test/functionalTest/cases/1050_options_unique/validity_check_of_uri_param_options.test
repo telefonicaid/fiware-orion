@@ -38,21 +38,21 @@ brokerStart CB 0-255
 
 echo "01. URI param options with both 'keyValues' and 'values', see error"
 echo "==================================================================="
-orionCurl --url '/v2/entities/CarPool?options=keyValues,values' --json
+orionCurl --url '/v2/entities/CarPool?options=keyValues,values'
 echo
 echo
 
 
 echo "02. URI param options with both 'keyValues' and 'unique', see error"
 echo "==================================================================="
-orionCurl --url '/v2/entities/CarPool?options=keyValues,unique' --json
+orionCurl --url '/v2/entities/CarPool?options=keyValues,unique'
 echo
 echo
 
 
 echo "03. URI param options with both 'values' and 'unique', see error"
 echo "================================================================"
-orionCurl --url '/v2/entities/CarPool?options=values,unique' --json
+orionCurl --url '/v2/entities/CarPool?options=values,unique'
 echo
 echo
 

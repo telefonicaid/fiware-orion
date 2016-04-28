@@ -29,12 +29,12 @@ brokerStart CB 0 IPv4 -statSemWait -statTiming
 
 --SHELL--
 echo "+++++ 1. statistics in JSON"
-orionCurl --url /statistics --json
+orionCurl --url /statistics
 echo
 echo
 
 echo "+++++ 2. statistics in JSON (a second time, to see more things)"
-orionCurl --url /statistics --json
+orionCurl --url /statistics
 echo
 echo
 

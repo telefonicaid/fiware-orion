@@ -49,7 +49,7 @@ brokerStart CP1 0
 
 echo "01. GET /v1/contextEntities/E1/attributes/A1 and see it fail"
 echo "============================================================"
-orionCurl --url /v1/contextEntities/E1/attributes/A1 --json
+orionCurl --url /v1/contextEntities/E1/attributes/A1
 echo
 echo
 
@@ -72,21 +72,21 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
 echo "03. GET /v1/contextEntities/E1/attributes/A1 and see it work"
 echo "============================================================"
-orionCurl --url /v1/contextEntities/E1/attributes/A1 --json
+orionCurl --url /v1/contextEntities/E1/attributes/A1
 echo
 echo
 
 
 echo "04. GET /v1/contextEntities/E1/attributes/A1?!exist=entity::type and see it fail"
 echo "================================================================================"
-orionCurl --url /v1/contextEntities/E1/attributes/A1?!exist=entity::type --json
+orionCurl --url /v1/contextEntities/E1/attributes/A1?!exist=entity::type
 echo
 echo
 
@@ -108,42 +108,42 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
 echo "06. GET /v1/contextEntities/E2/attributes/A1?!exist=entity::type: E2//A1"
 echo "========================================================================"
-orionCurl --url /v1/contextEntities/E2/attributes/A1?!exist=entity::type --json
+orionCurl --url /v1/contextEntities/E2/attributes/A1?!exist=entity::type
 echo
 echo
 
 
 echo "07. GET /v1/contextEntities/E1/attributes/A1?exist=entity::type: E1/T1/A1"
 echo "========================================================================="
-orionCurl --url /v1/contextEntities/E1/attributes/A1?exist=entity::type --json
+orionCurl --url /v1/contextEntities/E1/attributes/A1?exist=entity::type
 echo
 echo
 
 
 echo "08. GET /v1/contextEntities/E1/attributes/A1?entity::type=T2 and see it fail"
 echo "============================================================================"
-orionCurl --url /v1/contextEntities/E1/attributes/A1?entity::type=T2 --json
+orionCurl --url /v1/contextEntities/E1/attributes/A1?entity::type=T2
 echo
 echo
 
 
 echo "09. GET /v1/contextEntities/E1/attributes/A1?entity::type=T1: E1/T1/A1"
 echo "======================================================================"
-orionCurl --url /v1/contextEntities/E1/attributes/A1?entity::type=T1 --json
+orionCurl --url /v1/contextEntities/E1/attributes/A1?entity::type=T1
 echo
 echo
 
 
 echo "10. GET /v1/contextEntities/E1/attributes/A1?attributesFormat=object"
 echo "===================================================================="
-orionCurl --url /v1/contextEntities/E1/attributes/A1?attributesFormat=object --json
+orionCurl --url /v1/contextEntities/E1/attributes/A1?attributesFormat=object
 echo
 echo
 
@@ -166,7 +166,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --port $CP1_PORT --json
+orionCurl --url /v1/updateContext --payload "$payload" --port $CP1_PORT
 echo
 echo
 
@@ -195,14 +195,14 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json --servicePath /A1
+orionCurl --url /v1/registry/registerContext --payload "$payload" --servicePath /A1
 echo
 echo
 
 
 echo "13. GET /v1/contextEntities/E3/attributes/A1?entity::type=T1 (from CP1)"
 echo "========================================================================="
-orionCurl --url /v1/contextEntities/E3/attributes/A1?entity::type=T1 --json
+orionCurl --url /v1/contextEntities/E3/attributes/A1?entity::type=T1
 echo
 echo
 

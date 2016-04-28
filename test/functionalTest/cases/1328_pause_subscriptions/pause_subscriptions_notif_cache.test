@@ -75,7 +75,7 @@ payload='
     "expires": "2050-04-05T14:00:00.00Z",
     "status": "inactive"
 }'
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 id1=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
@@ -91,7 +91,7 @@ payload='
     "value": "foo"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 sleep $WAIT_TIME
@@ -99,7 +99,7 @@ sleep $WAIT_TIME
 
 echo '03. Check subscription timesSent value (0)'
 echo "=========================================="
-orionCurl --url /v2/subscriptions/$id1 --json
+orionCurl --url /v2/subscriptions/$id1
 echo
 echo
 
@@ -110,7 +110,7 @@ payload='
 {
     "status": "active"
 }'
-orionCurl --url /v2/subscriptions/$id1 -X PATCH --payload "$payload" --json
+orionCurl --url /v2/subscriptions/$id1 -X PATCH --payload "$payload"
 echo
 echo
 
@@ -123,7 +123,7 @@ payload='
     "value": "bar"
   }
 }'
-orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload" --json
+orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload"
 echo
 echo
 sleep $WAIT_TIME
@@ -131,7 +131,7 @@ sleep $WAIT_TIME
 
 echo '06. Check subscription timesSent value (1)'
 echo "=========================================="
-orionCurl --url /v2/subscriptions/$id1 --json
+orionCurl --url /v2/subscriptions/$id1
 echo
 echo
 
@@ -142,7 +142,7 @@ payload='
 {
     "status": "inactive"
 }'
-orionCurl --url /v2/subscriptions/$id1 -X PATCH --payload "$payload" --json
+orionCurl --url /v2/subscriptions/$id1 -X PATCH --payload "$payload"
 echo
 echo
 
@@ -155,7 +155,7 @@ payload='
     "value": "ree"
   }
 }'
-orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload" --json
+orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload"
 echo
 echo
 sleep $WAIT_TIME
@@ -163,7 +163,7 @@ sleep $WAIT_TIME
 
 echo '09. Check subscription timesSent value (1)'
 echo "=========================================="
-orionCurl --url /v2/subscriptions/$id1 --json
+orionCurl --url /v2/subscriptions/$id1
 echo
 echo
 

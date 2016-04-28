@@ -55,7 +55,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 echo
 
@@ -83,7 +83,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo Notification count from mongo:
 mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
@@ -114,7 +114,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo Notification count from mongo:
 mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
@@ -127,7 +127,7 @@ payload='{
   "throttling": "PT6S"
 }'
 
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo Notification count from mongo:
 mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
@@ -161,7 +161,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo Notification count from mongo:
 mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
@@ -192,7 +192,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 
 
@@ -217,7 +217,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo Notification count from mongo:
 mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
@@ -243,7 +243,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 
 
@@ -252,7 +252,7 @@ url=/v1/unsubscribeContext
 payload='{
   "subscriptionId": "'$SUB_ID'"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 
 
@@ -275,7 +275,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 
 

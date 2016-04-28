@@ -56,7 +56,7 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 #REG_ID=$(echo "$_response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 REG_ID=$(echo "$_response" | grep -Po '(?<="registrationId" : ")[^"]*')
 
@@ -81,7 +81,7 @@ payload='{
     "pressure"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "++++++++++++++++++++"
 
@@ -101,7 +101,7 @@ payload='{
   ],
   "attributes": [ ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "++++++++++++++++++++"
 
@@ -129,7 +129,7 @@ payload='{
   "duration": "PT5H",
   "registrationId": "'$REG_ID'"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "++++++++++++++++++++"
 
@@ -152,7 +152,7 @@ payload='{
     "pressure"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
 HTTP/1.1 200 OK

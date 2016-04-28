@@ -247,7 +247,7 @@ payload='{
   "duration": "PT1H"
 }'
 
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "++++++++++++++++++++"
 
@@ -264,7 +264,7 @@ payload='{
     "cra1"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
 HTTP/1.1 200 OK

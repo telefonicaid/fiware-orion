@@ -54,7 +54,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 
@@ -82,7 +82,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 # Get notifications count
 mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
@@ -111,7 +111,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 # Get notifications count
 mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
@@ -123,7 +123,7 @@ payload='{
     "duration": "P1Y",
     "throttling": "PT6S"
 }'
-orionCurl --url "$url" --payload "$payload" -X "PUT" --json
+orionCurl --url "$url" --payload "$payload" -X "PUT"
 
 # Get notifications count
 mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
@@ -156,7 +156,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 # Get notifications count
 mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
@@ -185,7 +185,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo "6: ++++++++++++++++++++"
 
 #Wait sleep >6s to reset the throttling interval
@@ -209,7 +209,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 # Get notifications count
 mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
@@ -233,10 +233,10 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "8: ++++++++++++++++++++"
-orionCurl --url "/v1/contextSubscriptions/${SUB_ID}" -X "DELETE" --json
+orionCurl --url "/v1/contextSubscriptions/${SUB_ID}" -X "DELETE"
 
 echo "9: ++++++++++++++++++++"
 url="/v1/updateContext"
@@ -257,7 +257,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "10: ++++++++++++++++++++"
 #Get accumulated data

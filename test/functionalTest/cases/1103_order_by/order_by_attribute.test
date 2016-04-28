@@ -50,7 +50,7 @@ payload='{
   "surname": "Doe",
   "age": 36
 }'
-orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
 echo
 echo
 
@@ -64,7 +64,7 @@ payload='{
   "surname": "Smith",
   "age": 37
 }'
-orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
 echo
 echo
 
@@ -78,7 +78,7 @@ payload='{
   "surname": "Simpson",
   "age": 27
 }'
-orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
 echo
 echo
 
@@ -92,42 +92,42 @@ payload='{
   "surname": "Thompson",
   "age": 18
 }'
-orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
 echo
 echo
 
 
 echo "05. Get sorted by age: User4, User3, User1, User2"
 echo "================================================="
-orionCurl --url '/v2/entities?options=keyValues&orderBy=age' --json
+orionCurl --url '/v2/entities?options=keyValues&orderBy=age'
 echo
 echo
 
 
 echo "06. Get sorted by age in reverse order: User2, User1, User3, User4"
 echo "=================================================================="
-orionCurl --url '/v2/entities?options=keyValues&orderBy=!age' --json
+orionCurl --url '/v2/entities?options=keyValues&orderBy=!age'
 echo
 echo
 
 
 echo "07. Get sorted by name, then age: User4, User3, User1, User2"
 echo "============================================================"
-orionCurl --url '/v2/entities?options=keyValues&orderBy=name,age' --json
+orionCurl --url '/v2/entities?options=keyValues&orderBy=name,age'
 echo
 echo
 
 
 echo "08. Get sorted by reverse name, then age: User1, User2, User4, User3"
 echo "===================================================================="
-orionCurl --url '/v2/entities?options=keyValues&orderBy=!name,age' --json
+orionCurl --url '/v2/entities?options=keyValues&orderBy=!name,age'
 echo
 echo
 
 
 echo "09. Get sorted by name, then reserve age: User3, User4, User2, User1"
 echo "===================================================================="
-orionCurl --url '/v2/entities?options=keyValues&orderBy=name,!age' --json
+orionCurl --url '/v2/entities?options=keyValues&orderBy=name,!age'
 echo
 echo
 

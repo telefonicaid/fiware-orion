@@ -54,21 +54,21 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
 echo "02. Delete E1//A1, using Convop DELETE /v1/contextEntities/E1"
 echo "============================================================="
-orionCurl --url /v1/contextEntities/E1 -X DELETE --json
+orionCurl --url /v1/contextEntities/E1 -X DELETE
 echo
 echo
 
 
 #echo "03. Delete E1//A1 again, using Convop DELETE /v1/contextEntities/E1"
 #echo "==================================================================="
-#orionCurl --url /v1/contextEntities/E1 -X DELETE --json
+#orionCurl --url /v1/contextEntities/E1 -X DELETE
 #echo
 #echo
 

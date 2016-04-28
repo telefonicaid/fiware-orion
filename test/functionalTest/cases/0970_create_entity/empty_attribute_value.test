@@ -44,14 +44,14 @@ payload='{
     "type": "AT"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "02. GET /v2/entities/ID"
 echo "======================="
-orionCurl --url /v2/entities/ID --json
+orionCurl --url /v2/entities/ID
 echo
 echo
 

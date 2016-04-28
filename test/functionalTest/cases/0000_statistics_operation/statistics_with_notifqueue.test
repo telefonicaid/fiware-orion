@@ -29,7 +29,7 @@ brokerStart CB 0 IPv4 -notificationMode threadpool -statNotifQueue
 
 --SHELL--
 echo "+++++ 1. statistics in JSON"
-orionCurl --url /statistics --json
+orionCurl --url /statistics
 echo
 echo
 

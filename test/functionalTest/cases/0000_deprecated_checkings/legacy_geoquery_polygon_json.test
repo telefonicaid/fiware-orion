@@ -54,7 +54,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 sleep 1.1
 echo
 echo
@@ -86,7 +86,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 sleep 1.1
 echo
 echo
@@ -118,7 +118,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 sleep 1.1
 echo
 echo
@@ -164,7 +164,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
@@ -209,7 +209,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
@@ -250,7 +250,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
@@ -296,7 +296,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
@@ -338,7 +338,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 

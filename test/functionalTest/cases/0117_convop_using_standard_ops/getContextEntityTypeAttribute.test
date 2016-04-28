@@ -69,7 +69,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json --servicePath /E1
+orionCurl --url /v1/registry/registerContext --payload "$payload" --servicePath /E1
 echo
 echo
 
@@ -98,7 +98,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json --servicePath /E2
+orionCurl --url /v1/registry/registerContext --payload "$payload" --servicePath /E2
 echo
 echo
 
@@ -127,7 +127,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json  --servicePath /E3
+orionCurl --url /v1/registry/registerContext --payload "$payload"  --servicePath /E3
 echo
 echo
 
@@ -156,7 +156,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json  --servicePath /E4
+orionCurl --url /v1/registry/registerContext --payload "$payload"  --servicePath /E4
 echo
 echo
 
@@ -185,56 +185,56 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json  --servicePath /E5
+orionCurl --url /v1/registry/registerContext --payload "$payload"  --servicePath /E5
 echo
 echo
 
 
 echo "06. Discover entity type T1 using /v1/registry/contextEntityTypes/T1/attributes/A1 with Service-Path /E1"
 echo "========================================================================================================"
-orionCurl --url /v1/registry/contextEntityTypes/T1/attributes/A1 --json --servicePath /E1
+orionCurl --url /v1/registry/contextEntityTypes/T1/attributes/A1 --servicePath /E1
 echo
 echo
 
 
 echo "07. Discover entity type T1 using /v1/registry/contextEntityTypes/T1/attributes/A1 with Service-Path /E1,/E2"
 echo "============================================================================================================"
-orionCurl --url /v1/registry/contextEntityTypes/T1/attributes/A1 --json --servicePath /E1,/E2
+orionCurl --url /v1/registry/contextEntityTypes/T1/attributes/A1 --servicePath /E1,/E2
 echo
 echo
 
 
 echo "08. Discover entity type T1 using /v1/registry/contextEntityTypes/T1/attributes/A1 with Service-Path /E1,/E2,/E3"
 echo "================================================================================================================"
-orionCurl --url /v1/registry/contextEntityTypes/T1/attributes/A1 --json --servicePath /E1,/E2,/E3
+orionCurl --url /v1/registry/contextEntityTypes/T1/attributes/A1 --servicePath /E1,/E2,/E3
 echo
 echo
 
 
 echo "09. Discover entity type T1 using /v1/registry/contextEntityTypes/T1/attributes/A1 with Service-Path /E1,/E2,/E3,/E4"
 echo "===================================================================================================================="
-orionCurl --url /v1/registry/contextEntityTypes/T1/attributes/A1 --json --servicePath /E1,/E2,/E3,/E4
+orionCurl --url /v1/registry/contextEntityTypes/T1/attributes/A1 --servicePath /E1,/E2,/E3,/E4
 echo
 echo
 
 
 echo "10. Discover entity type T1 using /v1/registry/contextEntityTypes/T1/attributes/A1 with Service-Path /E1,/E2,/E3,/E4,/E5"
 echo "========================================================================================================================"
-orionCurl --url /v1/registry/contextEntityTypes/T1/attributes/A1 --json --servicePath /E1,/E2,/E3,/E4,/E5
+orionCurl --url /v1/registry/contextEntityTypes/T1/attributes/A1 --servicePath /E1,/E2,/E3,/E4,/E5
 echo
 echo
 
 
 echo "11. Discover entity type T1 using /v1/registry/contextEntityTypes/T1/attributes/A1 without Service-Path"
 echo "======================================================================================================="
-orionCurl --url /v1/registry/contextEntityTypes/T1/attributes/A1 --json
+orionCurl --url /v1/registry/contextEntityTypes/T1/attributes/A1
 echo
 echo
 
 
 echo "12. Discover entity type T2 using /v1/registry/contextEntityTypes/T1/attributes/A1 with Service-Path /#"
 echo "======================================================================================================="
-orionCurl --url /v1/registry/contextEntityTypes/T1/attributes/A1 --json --servicePath /#
+orionCurl --url /v1/registry/contextEntityTypes/T1/attributes/A1 --servicePath /#
 echo
 echo
 

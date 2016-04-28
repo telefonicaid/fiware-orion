@@ -50,7 +50,7 @@ brokerStart CB
 echo "01. POST /v2/entities (without payload)"
 echo "======================================="
 payload=''
-orionCurl --url /v2/entities --payload "$payload" --json -X POST
+orionCurl --url /v2/entities --payload "$payload" -X POST
 echo
 echo
 
@@ -58,7 +58,7 @@ echo
 echo "02. POST /v2/entities (empty payload)"
 echo "====================================="
 payload='{}'
-orionCurl --url /v2/entities --payload "$payload" --json  -X POST
+orionCurl --url /v2/entities --payload "$payload"  -X POST
 echo
 echo
 
@@ -66,7 +66,7 @@ echo
 echo "03. POST /v2/entities to create E1/A1=0"
 echo "======================================="
 payload='{ "id": "E1", "type": "T1", "A1": 0 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json -X POST
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" -X POST
 echo
 echo
 
@@ -74,7 +74,7 @@ echo
 echo "04. PUT /v2/entities/E1/attrs (without payload)"
 echo "==============================================="
 payload=''
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PUT
 echo
 echo
 
@@ -82,7 +82,7 @@ echo
 echo "05. PUT /v2/entities/E1/attrs (empty payload)"
 echo "============================================="
 payload='{}'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PUT
 echo
 echo
 
@@ -90,7 +90,7 @@ echo
 echo "06. PATCH /v2/entities/E1/attrs (without payload)"
 echo "================================================="
 payload=''
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PATCH
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
 echo
 echo
 
@@ -98,7 +98,7 @@ echo
 echo "07. PATCH /v2/entities/E1/attrs (empty payload)"
 echo "==============================================="
 payload='{}'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PATCH
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
 echo
 echo
 
@@ -106,7 +106,7 @@ echo
 echo "08. POST /v2/entities/E1/attrs (without payload)"
 echo "================================================"
 payload=''
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X POST
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X POST
 echo
 echo
 
@@ -114,7 +114,7 @@ echo
 echo "09. POST /v2/entities/E1/attrs (empty payload)"
 echo "=============================================="
 payload='{}'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json  -X POST
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"  -X POST
 echo
 echo
 
@@ -122,14 +122,14 @@ echo
 echo "10. PUT /v2/entities/E1/attrs/A1 (without payload)"
 echo "=================================================="
 payload=''
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PUT 
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PUT 
 echo
 echo
 
 
 echo "11. GET /v2/entities/E1/attrs/A1"
 echo "================================="
-orionCurl --url /v2/entities/E1/attrs/A1 --json
+orionCurl --url /v2/entities/E1/attrs/A1
 echo
 echo
 
@@ -137,13 +137,13 @@ echo
 echo "12. PUT /v2/entities/E1/attrs/A1 (empty payload)"
 echo "================================================="
 payload='{}'
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PUT 
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PUT 
 echo
 echo
 
 echo "13. GET /v2/entities/E1/attrs/A1 - A1 should be null"
 echo "====================================================="
-orionCurl --url /v2/entities/E1/attrs/A1 --json
+orionCurl --url /v2/entities/E1/attrs/A1
 echo
 echo
 
@@ -151,7 +151,7 @@ echo
 echo "14. PATCH /v2/entities/E1/attrs/A1 (without payload)"
 echo "===================================================="
 payload=''
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PATCH 
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PATCH 
 echo
 echo
 
@@ -159,7 +159,7 @@ echo
 echo "15. PATCH /v2/entities/E1/attrs/A1 (empty payload)"
 echo "=================================================="
 payload='{}'
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PATCH 
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PATCH 
 echo
 echo
 

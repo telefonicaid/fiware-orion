@@ -50,7 +50,7 @@ brokerStart CB
 echo "01. PUT /v2/entities/E1/attrs/A1/value and see it fail"
 echo "======================================================"
 payload='{ "a": 1 }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT
 echo
 echo
  
@@ -58,14 +58,14 @@ echo
 echo "02. POST /v2/entities to create E1/A1=2"
 echo "======================================="
 payload='{ "id": "E1", "type": "T1", "A1": 2 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "03. GET /v2/entities/E1 to see A1==2"
 echo "===================================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -80,7 +80,7 @@ echo
 
 echo "05. GET /v2/entities/E1 to see A1==4"
 echo "===================================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -95,7 +95,7 @@ echo
 
 echo "07. GET /v2/entities/E1 to see A1==true"
 echo "======================================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -110,7 +110,7 @@ echo
 
 echo "09. GET /v2/entities/E1 to see A1==false"
 echo "========================================"
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -124,7 +124,7 @@ echo
 
 echo '11. GET /v2/entities/E1 to see A1=="STRING"'
 echo "==========================================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -132,14 +132,14 @@ echo
 echo "12. PUT /v2/entities/E1/attrs/A1/value (=[ 1, 2, 3 ])"
 echo "====================================================="
 payload='[ 1, 2, 3 ]'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "13. GET /v2/entities/E1 to see A1==[ 1, 2, 3 ]"
 echo "=============================================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -147,14 +147,14 @@ echo
 echo '14. PUT /v2/entities/E1/attrs/A1/value (={ "a": 1, "b": 2, "c": 3 })'
 echo "===================================================================="
 payload='{ "a": 1, "b": 2, "c": 3 }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT
 echo
 echo
 
 
 echo '15. GET /v2/entities/E1 to see A1=={ "a": 1, "b": 2, "c": 3 }'
 echo "============================================================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 

@@ -75,7 +75,7 @@ payload='
     "expires": "2050-04-05T14:00:00.00Z",
     "throttling": 5
 }'
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 id1=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
@@ -83,7 +83,7 @@ id1=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d 
 
 echo '02. GET /v2/subscriptions/ID1 and see status "active"'
 echo "====================================================="
-orionCurl --url /v2/subscriptions/$id1 --json
+orionCurl --url /v2/subscriptions/$id1
 echo
 echo
 
@@ -95,14 +95,14 @@ payload='
     "status": "inactive"
 }
 '
-orionCurl --url /v2/subscriptions/$id1 -X PATCH --payload "$payload" --json
+orionCurl --url /v2/subscriptions/$id1 -X PATCH --payload "$payload"
 echo
 echo
 
 
 echo '04. GET /v2/subscriptions/ID1 and see status "inactive"'
 echo "======================================================="
-orionCurl --url /v2/subscriptions/$id1 --json
+orionCurl --url /v2/subscriptions/$id1
 echo
 echo
 
@@ -136,7 +136,7 @@ payload='
     "status": "inactive",
     "throttling": 5
 }'
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 id2=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
@@ -144,7 +144,7 @@ id2=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d 
 
 echo '06. GET /v2/subscriptions/ID2 and see status "inactive"'
 echo "======================================================="
-orionCurl --url /v2/subscriptions/$id2 --json
+orionCurl --url /v2/subscriptions/$id2
 echo
 echo
 
@@ -156,14 +156,14 @@ payload='
     "status": "active"
 }
 '
-orionCurl --url /v2/subscriptions/$id2 -X PATCH --payload "$payload" --json
+orionCurl --url /v2/subscriptions/$id2 -X PATCH --payload "$payload"
 echo
 echo
 
 
 echo '08. GET /v2/subscriptions/ID2 and see status "active"'
 echo "====================================================="
-orionCurl --url /v2/subscriptions/$id2 --json
+orionCurl --url /v2/subscriptions/$id2
 echo
 echo
 
@@ -176,7 +176,7 @@ payload='
     "expires": "'$currentDate'"
 }
 '
-orionCurl --url /v2/subscriptions/$id2 -X PATCH --payload "$payload" --json
+orionCurl --url /v2/subscriptions/$id2 -X PATCH --payload "$payload"
 echo
 echo
 sleep 1s
@@ -184,7 +184,7 @@ sleep 1s
 
 echo '10. GET /v2/subscriptions/ID2 and see status "expired"'
 echo "======================================================"
-orionCurl --url /v2/subscriptions/$id2 --json
+orionCurl --url /v2/subscriptions/$id2
 echo
 echo
 
@@ -196,14 +196,14 @@ payload='
     "status": "inactive"
 }
 '
-orionCurl --url /v2/subscriptions/$id2 -X PATCH --payload "$payload" --json
+orionCurl --url /v2/subscriptions/$id2 -X PATCH --payload "$payload"
 echo
 echo
 
 
 echo '12. GET /v2/subscriptions/ID2 and see status "expired"'
 echo "======================================================"
-orionCurl --url /v2/subscriptions/$id2 --json
+orionCurl --url /v2/subscriptions/$id2
 echo
 echo
 
@@ -216,14 +216,14 @@ payload='
     "expires": "'$futureDate'"
 }
 '
-orionCurl --url /v2/subscriptions/$id2 -X PATCH --payload "$payload" --json
+orionCurl --url /v2/subscriptions/$id2 -X PATCH --payload "$payload"
 echo
 echo
 
 
 echo '13. GET /v2/subscriptions/ID2 and see status "inactive"'
 echo "======================================================="
-orionCurl --url /v2/subscriptions/$id2 --json
+orionCurl --url /v2/subscriptions/$id2
 echo
 echo
 

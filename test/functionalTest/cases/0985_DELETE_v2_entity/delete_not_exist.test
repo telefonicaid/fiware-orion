@@ -35,7 +35,7 @@ brokerStart CB 51
 
 echo "01. DELETE /v2/entities/E1NOTEXIST"
 echo "=================================="
-orionCurl --url /v2/entities/E1 -X DELETE --json
+orionCurl --url /v2/entities/E1 -X DELETE
 echo
 echo
 

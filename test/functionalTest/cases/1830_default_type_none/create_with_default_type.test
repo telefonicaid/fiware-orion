@@ -53,14 +53,14 @@ payload='{
     }
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "02. Get entity: E, A1, A2 and M2 types are none"
 echo "==============================================="
-orionCurl --url /v2/entities/E --json
+orionCurl --url /v2/entities/E
 echo
 echo
 
@@ -80,14 +80,14 @@ payload='{
     }
   }
 }'
-orionCurl --url /v2/entities/E/attrs --payload "$payload" --json
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
 echo
 echo
 
 
 echo "04. Get entity: E, A1, A2, A4, A4, M2, M4 types are none"
 echo "========================================================"
-orionCurl --url /v2/entities/E --json
+orionCurl --url /v2/entities/E
 echo
 echo
 

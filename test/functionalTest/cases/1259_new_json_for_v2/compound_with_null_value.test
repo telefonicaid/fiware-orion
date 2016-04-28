@@ -48,14 +48,14 @@ payload='{
     "value": { "a": null, "b": 0 }
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "02. Get E1/A1"
 echo "============="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -68,14 +68,14 @@ payload='{
     "value": { "c": null }
   }
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PATCH
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
 echo
 echo
 
 
 echo "04. Get E1/A1"
 echo "============="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -88,14 +88,14 @@ payload='{
     "value": { "d": null }
   }
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "06. Get E1/A1"
 echo "============="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 

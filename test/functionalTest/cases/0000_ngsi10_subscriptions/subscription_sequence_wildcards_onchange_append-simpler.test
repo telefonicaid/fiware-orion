@@ -60,7 +60,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload"
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 echo
 echo
@@ -85,7 +85,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 

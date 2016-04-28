@@ -62,7 +62,7 @@ brokerStart CB 0-255
 
 echo "01. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail"
 echo "======================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1
 echo
 echo
 
@@ -80,14 +80,14 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --payload "$payload" --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --payload "$payload"
 echo
 echo
 
 
 echo "03. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 OK"
 echo "=========================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1
 echo
 echo
 
@@ -105,7 +105,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E2/attributes/A2 --payload "$payload" --json -X PUT
+orionCurl --url /v1/contextEntities/type/T1/id/E2/attributes/A2 --payload "$payload" -X PUT
 echo
 echo
 
@@ -123,7 +123,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2 --payload "$payload" --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2 --payload "$payload"
 echo
 echo
 
@@ -141,14 +141,14 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2 --payload "$payload" --json -X PUT
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2 --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "07. GET /v1/contextEntities/type/T1/id/E1/attributes/A2 to see A2=13"
 echo "===================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2 --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2
 echo
 echo
 
@@ -166,7 +166,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E2/attributes/A1 --payload "$payload" --json
+orionCurl --url /v1/contextEntities/type/T1/id/E2/attributes/A1 --payload "$payload"
 echo
 echo
 
@@ -185,42 +185,42 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E2/attributes/A2 --payload "$payload" --json
+orionCurl --url /v1/contextEntities/type/T1/id/E2/attributes/A2 --payload "$payload"
 echo
 echo
 
 
 echo "10. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 OK"
 echo "=========================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1
 echo
 echo
 
 
 echo "11. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1 OK"
 echo "============================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --json -X DELETE
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 -X DELETE
 echo
 echo
 
 
 echo "12. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail"
 echo "=========================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --json -X DELETE
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 -X DELETE
 echo
 echo
 
 
 echo "13. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail"
 echo "======================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1
 echo
 echo
 
 
 echo "14. NOP /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail"
 echo "======================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 -X NOP --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 -X NOP
 echo
 echo
 
@@ -238,7 +238,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --payload "$payload" --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --payload "$payload"
 echo
 echo
 
@@ -256,14 +256,14 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "17. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 OK"
 echo "=========================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1
 echo
 echo
 

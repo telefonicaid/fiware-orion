@@ -47,7 +47,7 @@ payload='{
   "duration" : "PT1H",
   "providingApplication" : "http://kz.tid.es/abc"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 REG_ID=$(echo "$_response" | grep -Po '(?<="registrationId" : ")[^"]*')
 
@@ -70,7 +70,7 @@ payload='{
   "providingApplication" : "http://kz.tid.es/abc",
   "registrationId": "'$REG_ID'"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "2: ++++++++++++++++++++"
 url="/v1/registry/contextEntityTypes/Room/attributes"
@@ -91,10 +91,10 @@ payload='{
   "providingApplication" : "http://kz.tid.es/abc",
   "registrationId": "012301230123012301230123"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "3: ++++++++++++++++++++"
-orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes" --json
+orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes"
 
 --REGEXPECT--
 0: ++++++++++++++++++++

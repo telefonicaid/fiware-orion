@@ -56,7 +56,7 @@ echo "================================================================"
 payload='{
   "value": 1
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A1/M1 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/E1/attributes/A1/M1 --payload "$payload" -X PUT
 echo
 echo
 
@@ -85,7 +85,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -95,7 +95,7 @@ echo "================================================================"
 payload='{
   "value": 3
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A1/M1 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/E1/attributes/A1/M1 --payload "$payload" -X PUT
 echo
 echo
 
@@ -105,7 +105,7 @@ echo "================================================================"
 payload='{
   "value": 4
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A1/M2 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/E1/attributes/A1/M2 --payload "$payload" -X PUT
 echo
 echo
 
@@ -115,7 +115,7 @@ echo "==========================================================================
 payload='{
   "value": 5
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A1/M2?entity::type=T1 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/E1/attributes/A1/M2?entity::type=T1 --payload "$payload" -X PUT
 echo
 echo
 
@@ -129,7 +129,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "${payload}" --json
+orionCurl --url /v1/queryContext --payload "${payload}"
 echo
 echo
 
@@ -139,7 +139,7 @@ echo "================================================================"
 payload='{
   "value": 6
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A1/M1 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/E1/attributes/A1/M1 --payload "$payload" -X PUT
 echo
 echo
 
@@ -156,7 +156,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A1/M1 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/E1/attributes/A1/M1 --payload "$payload" -X PUT
 echo
 echo
 
@@ -166,7 +166,7 @@ echo "==========================================================================
 payload='{
   "value": 9
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A1/M1?!exist=entity::type --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/E1/attributes/A1/M1?!exist=entity::type --payload "$payload" -X PUT
 echo
 echo
 
@@ -176,7 +176,7 @@ echo "==========================================================================
 payload='{
   "value": 9
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A1/M1?exist=entity::type --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/E1/attributes/A1/M1?exist=entity::type --payload "$payload" -X PUT
 echo
 echo
 
@@ -203,7 +203,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -220,14 +220,14 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/E2/attributes/A1/M1?entity::type=T1 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/E2/attributes/A1/M1?entity::type=T1 --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "12. GET /v1/contextEntities/E2/attributes/A1/M1?entity::type=T1 and see it fail (remotely)"
 echo "=========================================================================================="
-orionCurl --url /v1/contextEntities/E2/attributes/A1/M1?entity::type=T1 --json
+orionCurl --url /v1/contextEntities/E2/attributes/A1/M1?entity::type=T1
 echo
 echo
 
@@ -256,14 +256,14 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json --port $CP1_PORT
+orionCurl --url /v1/updateContext --payload "$payload" --port $CP1_PORT
 echo
 echo
 
 
 echo "14. GET /v1/contextEntities/E2/attributes/A1/M1?entity::type=T1 and see it work (remotely)"
 echo "=========================================================================================="
-orionCurl --url /v1/contextEntities/E2/attributes/A1/M1?entity::type=T1 --json
+orionCurl --url /v1/contextEntities/E2/attributes/A1/M1?entity::type=T1
 echo
 echo
 
@@ -273,7 +273,7 @@ echo "==========================================================================
 payload='{
   "value": 15
 }'
-orionCurl --url /v1/contextEntities/E2/attributes/A1/M1?entity::type=T1 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/E2/attributes/A1/M1?entity::type=T1 --payload "$payload" -X PUT
 echo
 echo
 
@@ -283,7 +283,7 @@ echo "==========================================================================
 payload='{
   "value": 16
 }'
-orionCurl --url /v1/contextEntities/E2/attributes/A1/M2?entity::type=T1 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/E2/attributes/A1/M2?entity::type=T1 --payload "$payload" -X PUT
 echo
 echo
 
@@ -298,7 +298,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 

@@ -55,7 +55,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 sleep 1.1
 
@@ -85,7 +85,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 sleep 1.1
 
@@ -116,7 +116,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 
 echo "4: ++++++++++ Madrid in 13.5 kms ++++++++++"
@@ -145,7 +145,7 @@ payload='{
         ]
     }
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "5: +++++++++++ Madrid in 15 kms +++++++++"
 # Query inside 15 kms radius from Madrid center
@@ -173,7 +173,7 @@ payload='{
         ]
     }
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "6: ++++++++++++ Madrid out 13.5 kms ++++++++"
 # Query in 13.5 kms radius outside Madrid center
@@ -202,7 +202,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
 1. Create entity corresponding to Madrid

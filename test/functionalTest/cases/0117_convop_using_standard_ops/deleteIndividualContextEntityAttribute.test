@@ -44,7 +44,7 @@ brokerStart CB
 
 echo "00. Try to delete an attribute with TWO service-paths"
 echo "====================================================="
-orionCurl --url /v1/contextEntities/E1/attributes/A2?entity::type=T1 --json -X DELETE --servicePath /a,/b
+orionCurl --url /v1/contextEntities/E1/attributes/A2?entity::type=T1 -X DELETE --servicePath /a,/b
 echo
 echo
 
@@ -78,7 +78,7 @@ payload='{
     ],
     "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -93,14 +93,14 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "${payload}" --json
+orionCurl --url /v1/queryContext --payload "${payload}"
 echo
 echo
 
 
 echo "03. Remove E1/A2, using URI param entity::type=T1"
 echo "================================================="
-orionCurl --url /v1/contextEntities/E1/attributes/A2?entity::type=T1 --json -X DELETE
+orionCurl --url /v1/contextEntities/E1/attributes/A2?entity::type=T1 -X DELETE
 echo
 echo
 
@@ -115,35 +115,35 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "${payload}" --json
+orionCurl --url /v1/queryContext --payload "${payload}"
 echo
 echo
 
 
 echo "05. Try to remove E1/T2/A2 and see it fail"
 echo "=========================================="
-orionCurl --url /v1/contextEntities/E1/attributes/A2?entity::type=T2 --json -X DELETE
+orionCurl --url /v1/contextEntities/E1/attributes/A2?entity::type=T2 -X DELETE
 echo
 echo
 
 
 echo "06. Try to remove E1/T1/A2 again and see it fail"
 echo "================================================"
-orionCurl --url /v1/contextEntities/E1/attributes/A2?entity::type=T1 --json -X DELETE
+orionCurl --url /v1/contextEntities/E1/attributes/A2?entity::type=T1 -X DELETE
 echo
 echo
 
 
 echo "07. Try to remove E1/T1/A1, with service-path /bad and see it fail"
 echo "=================================================================="
-orionCurl --url /v1/contextEntities/E1/attributes/A1?entity::type=T1 --json -X DELETE --servicePath /bad
+orionCurl --url /v1/contextEntities/E1/attributes/A1?entity::type=T1 -X DELETE --servicePath /bad
 echo
 echo
 
 
 echo "08. Remove E1/A1, with service-path / and see it work"
 echo "====================================================="
-orionCurl --url /v1/contextEntities/E1/attributes/A1?entity::type=T1 --json -X DELETE --servicePath /
+orionCurl --url /v1/contextEntities/E1/attributes/A1?entity::type=T1 -X DELETE --servicePath /
 echo
 echo
 
@@ -158,7 +158,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "${payload}" --json
+orionCurl --url /v1/queryContext --payload "${payload}"
 echo
 echo
 

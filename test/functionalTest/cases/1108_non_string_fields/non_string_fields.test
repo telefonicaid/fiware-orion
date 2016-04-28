@@ -47,7 +47,7 @@ payload='{
   "id": false,
   "temperature": { "type": "AT", "value": 25 }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -59,7 +59,7 @@ payload='{
   "id": "E1",
   "temperature": 25
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -71,7 +71,7 @@ payload='{
   "id": "E1",
   "temperature": { "type": false, "value": 25 }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -83,7 +83,7 @@ payload='{
   "id": "E1",
   "temperature": { "type": "AT", "value": 25, "metadata": { "meta": { "type": false, "value": "STRING" } } }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -95,7 +95,7 @@ payload='{
   "id": "E1",
   "temperature": { "type": "AT", "value": 25, "metadata": { "meta": { "type": "md", "value": [ 1, 2, 3 ] } } }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -107,7 +107,7 @@ payload='{
   "id": "E1",
   "temperature": { "type": "AT", "value": 25, "metadata": { "meta": { "type": "md", "value": 3, "invalid": true } } }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 

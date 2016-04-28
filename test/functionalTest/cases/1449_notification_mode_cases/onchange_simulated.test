@@ -58,7 +58,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --json --payload "${payload}"
+orionCurl --url /v1/subscribeContext --payload "${payload}"
 echo
 echo
 
@@ -74,7 +74,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/ET/id/E1 --payload "${payload}" --json
+orionCurl --url /v1/contextEntities/type/ET/id/E1 --payload "${payload}"
 echo
 echo
 
@@ -88,7 +88,7 @@ echo
 
 echo "04. Get statistics (one simulated notification)"
 echo "==============================================="
-orionCurl --url /statistics --json
+orionCurl --url /statistics
 echo
 echo
 

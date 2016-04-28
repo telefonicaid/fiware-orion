@@ -44,7 +44,7 @@ payload='{
     "value": 40
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -56,13 +56,13 @@ payload='{
     "rt.ty": "5678"
   }
 }'
-orionCurl --url '/v2/entities/apartment_3/attrs?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/apartment_3/attrs?options=keyValues' --payload "$payload"
 echo
 echo
 
 echo "03. Get entity"
 echo "=============="
-orionCurl --url /v2/entities/apartment_3  --json
+orionCurl --url /v2/entities/apartment_3 
 echo
 echo
 

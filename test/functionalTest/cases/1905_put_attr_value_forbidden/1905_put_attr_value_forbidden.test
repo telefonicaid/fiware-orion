@@ -46,7 +46,7 @@ payload='{
   }
 }
 '
-orionCurl --url '/v2/entities' --payload "$payload" --json
+orionCurl --url '/v2/entities' --payload "$payload"
 echo
 echo
 
@@ -54,7 +54,7 @@ echo
 echo '02. PUT /v2/entities/room/attrs/temperature/value (forbidden chars)'
 echo '==================================================================='
 payload='{"x": "a(7)"}'
-orionCurl --url /v2/entities/room/attrs/temperature/value --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/room/attrs/temperature/value --payload "$payload" -X PUT
 echo
 echo
 

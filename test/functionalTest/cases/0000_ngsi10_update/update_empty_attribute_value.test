@@ -49,7 +49,7 @@ payload='{
     ],
     "updateAction":"APPEND"
 }'
-orionCurl --url "$url" --payload "${payload}" --json
+orionCurl --url "$url" --payload "${payload}"
 
 --REGEXPECT--
 1: Empty context attribute value for JSON

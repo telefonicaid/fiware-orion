@@ -40,7 +40,7 @@ brokerStart CB
 
 echo "01. GET /v1/registry/contextEntities/type/ET1/id/entity01 and see it fail"
 echo "========================================================================="
-orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity01 --json
+orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity01
 echo
 echo
 
@@ -62,13 +62,13 @@ payload='{
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/abc"
 }'
-orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity01 --payload "$payload" --json
+orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity01 --payload "$payload"
 echo
 echo
 
 echo "03. GET /v1/registry/contextEntities/type/ET1/id/entity01 OK"
 echo "============================================================"
-orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity01 --json
+orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity01
 echo
 echo
 
@@ -86,14 +86,14 @@ payload='{
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/abc"
 }'
-orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity02 --payload "$payload" --json
+orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity02 --payload "$payload"
 echo
 echo
 
 
 echo "05. GET /v1/registry/contextEntities/type/ET1/id/entity02 OK"
 echo "============================================================"
-orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity02 --json
+orionCurl --url /v1/registry/contextEntities/type/ET1/id/entity02
 echo
 echo
 

@@ -37,7 +37,7 @@ brokerStart CB
 
 echo "01. Delete a non-existing subscription"
 echo "======================================"
-orionCurl --url /v1/registry/contextAvailabilitySubscriptions/012345678901234567891234 -X DELETE --json
+orionCurl --url /v1/registry/contextAvailabilitySubscriptions/012345678901234567891234 -X DELETE
 echo
 echo
 
@@ -58,7 +58,7 @@ payload='{
   "reference": "http://10.1.1.1:80/test/interfaceNotification",
   "duration": "PT1M"
 }'
-orionCurl --url /v1/registry/subscribeContextAvailability --payload "$payload" --json
+orionCurl --url /v1/registry/subscribeContextAvailability --payload "$payload"
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 echo
 echo
@@ -66,7 +66,7 @@ echo
 
 echo "03. Delete the subscription to availability of E1/A1"
 echo "===================================================="
-orionCurl --url /v1/registry/contextAvailabilitySubscriptions/$SUB_ID -X DELETE --json
+orionCurl --url /v1/registry/contextAvailabilitySubscriptions/$SUB_ID -X DELETE
 echo
 echo
 

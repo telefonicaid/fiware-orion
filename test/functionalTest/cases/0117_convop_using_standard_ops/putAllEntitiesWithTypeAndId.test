@@ -56,7 +56,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "$payload" -X PUT
 echo
 echo
 
@@ -78,7 +78,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -93,7 +93,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "$payload" -X PUT
 echo
 echo
 
@@ -108,7 +108,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1?attributeFormat=object --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1?attributeFormat=object --payload "$payload" -X PUT
 echo
 echo
 
@@ -123,7 +123,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1?entity::type=T1 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1?entity::type=T1 --payload "$payload" -X PUT
 echo
 echo
 
@@ -138,7 +138,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1?entity::type=T2 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1?entity::type=T2 --payload "$payload" -X PUT
 echo
 echo
 
@@ -153,7 +153,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1?!exist=entity::type --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1?!exist=entity::type --payload "$payload" -X PUT
 echo
 echo
 
@@ -168,7 +168,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1?exist=entity::type --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1?exist=entity::type --payload "$payload" -X PUT
 echo
 echo
 
@@ -195,7 +195,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -210,7 +210,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E2 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/type/T1/id/E2 --payload "$payload" -X PUT
 echo
 echo
 
@@ -232,7 +232,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json --port $CP1_PORT
+orionCurl --url /v1/updateContext --payload "$payload" --port $CP1_PORT
 echo
 echo
 
@@ -247,7 +247,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E2 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/type/T1/id/E2 --payload "$payload" -X PUT
 echo
 echo
 

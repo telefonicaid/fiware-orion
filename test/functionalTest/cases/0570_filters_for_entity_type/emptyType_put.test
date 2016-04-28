@@ -62,7 +62,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -85,7 +85,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -101,21 +101,21 @@ payload='{
     }
   ]
 }'
-orionCurl --url '/v1/contextEntities/E1?!exist=entity::type' --payload "$payload" --json -X PUT
+orionCurl --url '/v1/contextEntities/E1?!exist=entity::type' --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "4. Lookup E1/<empty> to check A=000"
 echo "========================================================================="
-orionCurl --url '/v1/contextEntities/E1?!exist=entity::type' --json
+orionCurl --url '/v1/contextEntities/E1?!exist=entity::type'
 echo
 echo
 
 
 echo "5. Lookup E1/T1 to check A=22 (not touched)"
 echo "========================================================================="
-orionCurl --url '/v1/contextEntities/E1?exist=entity::type' --json
+orionCurl --url '/v1/contextEntities/E1?exist=entity::type'
 echo
 echo
 

@@ -44,59 +44,59 @@ brokerStart CB
 echo "01. PATCH entity with forbidden char in ID"
 echo "=========================================="
 payload='{ "attr1": 1 }'
-orionCurl --url '/v2/entities/E&/attrs?options=keyValues' -X PATCH --payload "$payload" --json
+orionCurl --url '/v2/entities/E&/attrs?options=keyValues' -X PATCH --payload "$payload"
 echo
 echo
 
 echo "02. POST entity with forbidden char in ID"
 echo "=========================================="
 payload='{ "attr1": 1 }'
-orionCurl --url '/v2/entities/E&/attrs?options=keyValues' -X POST --payload "$payload" --json
+orionCurl --url '/v2/entities/E&/attrs?options=keyValues' -X POST --payload "$payload"
 echo
 echo
 
 echo "03. PUT entity with forbidden char in ID"
 echo "=========================================="
 payload='{ "attr1": 1 }'
-orionCurl --url '/v2/entities/E&/attrs?options=keyValues' -X PUT --payload "$payload" --json
+orionCurl --url '/v2/entities/E&/attrs?options=keyValues' -X PUT --payload "$payload"
 echo
 echo
 
 echo "04. PUT entity attribute with forbidden char in ID"
 echo "=================================================="
 payload='{ "value": 1 }'
-orionCurl --url '/v2/entities/E&/attrs/A1' -X PUT --payload "$payload" --json
+orionCurl --url '/v2/entities/E&/attrs/A1' -X PUT --payload "$payload"
 echo
 echo
 
 echo "05. PUT entity attribute value with forbidden char in ID"
 echo "========================================================"
 payload='{"value":1}'
-orionCurl --url '/v2/entities/E&/attrs/A1/value' -X PUT --payload "$payload" --json
+orionCurl --url '/v2/entities/E&/attrs/A1/value' -X PUT --payload "$payload"
 echo
 echo
 
 echo "06. DELETE entity with forbidden char in ID"
 echo "==========================================="
-orionCurl --url '/v2/entities/E&' -X DELETE --json
+orionCurl --url '/v2/entities/E&' -X DELETE
 echo
 echo
 
 echo "07. GET entity with forbidden char in ID"
 echo "========================================"
-orionCurl --url '/v2/entities/E&' --json
+orionCurl --url '/v2/entities/E&'
 echo
 echo
 
 echo "08. GET entity attribute with forbidden char in ID"
 echo "=================================================="
-orionCurl --url '/v2/entities/E&/attrs/A1' --json
+orionCurl --url '/v2/entities/E&/attrs/A1'
 echo
 echo
 
 echo "09. GET entity attrbute value with forbidden char in ID"
 echo "======================================================="
-orionCurl --url '/v2/entities/E&/attrs/A1/value' --json
+orionCurl --url '/v2/entities/E&/attrs/A1/value'
 echo
 echo
 

@@ -44,11 +44,11 @@ brokerStart CB 0 IPv4 -logSummary 3 -relogAlarms
 
 echo "01. Provoke FOUR Bad Inputs"
 echo "==========================="
-orionCurl --url /v2/noService --json
+orionCurl --url /v2/noService
 payload='abc'
-orionCurl --url /v2/entities --payload "$payload" --json
-orionCurl --url /v2/entities -X GETT --json
-orionCurl --url /v2/entities --json -X POST
+orionCurl --url /v2/entities --payload "$payload"
+orionCurl --url /v2/entities -X GETT
+orionCurl --url /v2/entities -X POST
 echo
 echo
 

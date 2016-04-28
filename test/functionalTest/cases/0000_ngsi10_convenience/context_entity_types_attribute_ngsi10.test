@@ -31,7 +31,7 @@ brokerStart CB
 
 # query for all entities of type "Room"
 echo "1: ++++++++++++++++++++"
-orionCurl --url "/v1/contextEntityTypes/Room/attributes/temperature" --json
+orionCurl --url "/v1/contextEntityTypes/Room/attributes/temperature"
 
 # Add an entity of type Room, with one attribute: 'temperature'
 echo "2: ++++++++++++++++++++"
@@ -60,11 +60,11 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 # query for all entities of type "Room", attribute 'temperature'
 echo "3: ++++++++++++++++++++"
-orionCurl --url "/v1/contextEntityTypes/Room/attributes/temperature" --json
+orionCurl --url "/v1/contextEntityTypes/Room/attributes/temperature"
 
 # Add another attribute for entity ConferenceRoom - 'pressure'
 echo "4: ++++++++++++++++++++"
@@ -94,23 +94,23 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 # Now, query again for entities of type "Room", attribute 'temperature', making sure attribute 'pressure' isn't found
 echo "5: ++++++++++++++++++++"
-orionCurl --url "/v1/contextEntityTypes/Room/attributes/temperature" --json
+orionCurl --url "/v1/contextEntityTypes/Room/attributes/temperature"
 
 # And, query for entities of type "Room", attribute 'pressure' ...
 echo "6: ++++++++++++++++++++"
-orionCurl --url "/v1/contextEntityTypes/Room/attributes/pressure" --json
+orionCurl --url "/v1/contextEntityTypes/Room/attributes/pressure"
 
 # query for all entities of type "Room2", attribute 'temperature'
 echo "7: ++++++++++++++++++++"
-orionCurl --url "/v1/contextEntityTypes/Room2/attributes/temperature" --json
+orionCurl --url "/v1/contextEntityTypes/Room2/attributes/temperature"
 
 # DELETE is not allowed
 echo "8: ++++++++++++++++++++"
-orionCurl --url "/v1/contextEntityTypes/Room/attributes/temperature" -X "DELETE" --json
+orionCurl --url "/v1/contextEntityTypes/Room/attributes/temperature" -X "DELETE"
 
 --REGEXPECT--
 1: ++++++++++++++++++++

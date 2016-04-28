@@ -41,8 +41,6 @@ export MAXIMUM_WAIT=${MAXIMUM_WAIT:-30}
 #
 # o CB_PORT        - port where the main contextBroker listens for connections
 #
-# o COAP_PORT      - port where proxyCoap listens for connections
-#
 # o CP1_PORT       - port where the first contextProvider listens for connections
 # o CP2_PORT       - port where the second contextProvider listens for connections
 # o CP3_PORT       - port where the third contextProvider listens for connections
@@ -54,7 +52,6 @@ export MAXIMUM_WAIT=${MAXIMUM_WAIT:-30}
 # o LISTENER3_PORT - port where a third listening (test) application listens for connections
 #
 export CB_PORT=${CB_PORT:-9999}
-export COAP_PORT=${COAP_PORT:-5683}
 export CP1_PORT=${CP1_PORT:-9801}
 export CP2_PORT=${CP2_PORT:-9802}
 export CP3_PORT=${CP3_PORT:-9803}

@@ -50,14 +50,14 @@ payload='{
   "isPattern": false,
   "type": "ET"
 }'
-orionCurl --url /v1/contextEntities --payload "$payload" --json
+orionCurl --url /v1/contextEntities --payload "$payload"
 echo
 echo
 
 
 echo "02. Query E1/ET with GET /v1/contextEntities/type/ET/id/E1"
 echo "=========================================================="
-orionCurl --url /v1/contextEntities/type/ET/id/E1 --json
+orionCurl --url /v1/contextEntities/type/ET/id/E1
 echo
 echo
 

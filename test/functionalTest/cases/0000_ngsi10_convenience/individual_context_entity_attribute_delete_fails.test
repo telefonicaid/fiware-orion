@@ -29,7 +29,7 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. delete an entity +++++"
-orionCurl --url "/v1/contextEntities/entity01/attributes/attr01" -X "DELETE" --json
+orionCurl --url "/v1/contextEntities/entity01/attributes/attr01" -X "DELETE"
 
 --REGEXPECT--
 +++++ 1. delete an entity +++++

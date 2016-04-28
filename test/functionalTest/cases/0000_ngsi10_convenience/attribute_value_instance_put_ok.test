@@ -58,27 +58,27 @@ payload='{
   }
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "+++++ 2. lookup the entity +++++"
-orionCurl --url "/v1/contextEntities/Room1" --json
+orionCurl --url "/v1/contextEntities/Room1"
 
 echo "+++++ 3. change an attribute by valueID +++++"
 url="/v1/contextEntities/Room1/attributes/temperature/ground"
 payload='{
   "value": "18.4"
  }'
-orionCurl --url "$url" --payload "$payload"  --json -X "PUT"
+orionCurl --url "$url" --payload "$payload"  -X "PUT"
 
 echo "+++++ 4. change an attribute by the other valueID in XML +++++"
 url="/v1/contextEntities/Room1/attributes/temperature/wall"
 payload='{
   "value": "17.8"
  }'
-orionCurl --url "$url" --payload "$payload" -X "PUT" --json
+orionCurl --url "$url" --payload "$payload" -X "PUT"
 
 echo "+++++ 5. lookup the entity again +++++"
-orionCurl --json --url "/v1/contextEntities/Room1" 
+orionCurl --url "/v1/contextEntities/Room1" 
 
 --REGEXPECT--
 +++++ 1. creating base entity +++++

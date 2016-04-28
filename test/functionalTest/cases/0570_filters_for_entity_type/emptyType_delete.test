@@ -62,7 +62,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -85,28 +85,28 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
 echo "3. DELETE E1/<empty>"
 echo "==================================================================="
-orionCurl --url '/v1/contextEntities/E1?!exist=entity::type' --json -X DELETE
+orionCurl --url '/v1/contextEntities/E1?!exist=entity::type' -X DELETE
 echo
 echo
 
 
 echo "4. Lookup E1/<empty> (not found)"
 echo "========================================================================="
-orionCurl --url '/v1/contextEntities/E1?!exist=entity::type' --json
+orionCurl --url '/v1/contextEntities/E1?!exist=entity::type'
 echo
 echo
 
 
 echo "5. Lookup E1/T1 (found)"
 echo "========================================================================="
-orionCurl --url '/v1/contextEntities/E1?exist=entity::type' --json
+orionCurl --url '/v1/contextEntities/E1?exist=entity::type'
 echo
 echo
 

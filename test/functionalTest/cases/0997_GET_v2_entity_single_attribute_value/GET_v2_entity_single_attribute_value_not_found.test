@@ -53,14 +53,14 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
 echo "02. GET /v2/entities/E1/attrs/NONE/value"
 echo "========================================"
-orionCurl --url /v2/entities/E1/attrs/NONE/value --json --out text
+orionCurl --url /v2/entities/E1/attrs/NONE/value --out text
 echo
 echo
 

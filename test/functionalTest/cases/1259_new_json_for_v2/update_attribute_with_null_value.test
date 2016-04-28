@@ -64,14 +64,14 @@ payload='{
     "value": null
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "02. Get E1/A1 (see that A1 has null value)"
 echo "=========================================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -86,7 +86,7 @@ payload='{
     "value": "03"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -96,14 +96,14 @@ echo "============================="
 payload='{
   "A2": null
 }'
-orionCurl --url '/v2/entities/E2/attrs?options=keyValues' --payload "$payload" --json -X PATCH
+orionCurl --url '/v2/entities/E2/attrs?options=keyValues' --payload "$payload" -X PATCH
 echo
 echo
 
 
 echo "05. Get E2/A2 (value of A2 has been replaced)"
 echo "============================================="
-orionCurl --url /v2/entities/E2 --json
+orionCurl --url /v2/entities/E2
 echo
 echo
 
@@ -118,7 +118,7 @@ payload='{
     "value": "06"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -128,14 +128,14 @@ echo "==========================="
 payload='{
   "A3": null
 }'
-orionCurl --url '/v2/entities/E3/attrs?options=keyValues' --payload "$payload" --json -X PUT
+orionCurl --url '/v2/entities/E3/attrs?options=keyValues' --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "08. Get E3/A3 (value of A3 has been replaced)"
 echo "============================================="
-orionCurl --url /v2/entities/E3 --json
+orionCurl --url /v2/entities/E3
 echo
 echo
 
@@ -150,7 +150,7 @@ payload='{
     "value": "09"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -160,14 +160,14 @@ echo "============================"
 payload='{
   "A4": null
 }'
-orionCurl --url '/v2/entities/E4/attrs?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/E4/attrs?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "11. Get E4/A4 (value of A4 has been replaced)"
 echo "============================================="
-orionCurl --url /v2/entities/E4 --json
+orionCurl --url /v2/entities/E4
 echo
 echo
 
@@ -179,14 +179,14 @@ payload='{
   "type": "T5",
   "A5": null
 }'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
 echo
 echo
 
 
 echo "13. Get E5/A5 (see that A5 has null value)"
 echo "=========================================="
-orionCurl --url /v2/entities/E5?options=keyValues --json
+orionCurl --url /v2/entities/E5?options=keyValues
 echo
 echo
 
@@ -198,7 +198,7 @@ payload='{
   "type": "T6",
   "A6": "14"
 }'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
 echo
 echo
 
@@ -208,14 +208,14 @@ echo "=========================================================="
 payload='{
   "A6": null
 }'
-orionCurl --url /v2/entities/E6/attrs?options=keyValues --payload "$payload" --json -X PATCH
+orionCurl --url /v2/entities/E6/attrs?options=keyValues --payload "$payload" -X PATCH
 echo
 echo
 
 
 echo "16. Get E6/A6 (see that A6 is null)"
 echo "==================================="
-orionCurl --url /v2/entities/E6?options=keyValues --json
+orionCurl --url /v2/entities/E6?options=keyValues
 echo
 echo
 
@@ -227,7 +227,7 @@ payload='{
   "type": "T7",
   "A7": "17"
 }'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
 echo
 echo
 
@@ -237,14 +237,14 @@ echo "==========================================="
 payload='{
   "A7": null
 }'
-orionCurl --url /v2/entities/E7/attrs?options=keyValues --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E7/attrs?options=keyValues --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "19. Get E7/A7 (see that A7 has been replaced with null)"
 echo "======================================================="
-orionCurl --url /v2/entities/E7?options=keyValues --json
+orionCurl --url /v2/entities/E7?options=keyValues
 echo
 echo
 
@@ -256,7 +256,7 @@ payload='{
   "type": "T8",
   "A8": "20"
 }'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
 echo
 echo
 
@@ -266,14 +266,14 @@ echo "============================================"
 payload='{
   "A8": null
 }'
-orionCurl --url /v2/entities/E8/attrs?options=keyValues --payload "$payload" --json
+orionCurl --url /v2/entities/E8/attrs?options=keyValues --payload "$payload"
 echo
 echo
 
 
 echo "22. GET E8/A8 (see A8 null)"
 echo "==========================="
-orionCurl --url /v2/entities/E8?options=keyValues --json
+orionCurl --url /v2/entities/E8?options=keyValues
 echo
 echo
 

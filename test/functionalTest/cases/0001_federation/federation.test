@@ -63,7 +63,7 @@ payload='{
     "throttling": "PT5S"
 
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json --port $CP1_PORT
+orionCurl --url /v1/subscribeContext --payload "$payload" --port $CP1_PORT
 echo
 echo
 
@@ -89,7 +89,7 @@ payload='{
     ],
     "throttling": "PT5S"
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json --port $CP2_PORT
+orionCurl --url /v1/subscribeContext --payload "$payload" --port $CP2_PORT
 echo
 echo
 
@@ -112,7 +112,7 @@ payload='{
     ],
     "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json --port $CP1_PORT
+orionCurl --url /v1/updateContext --payload "$payload" --port $CP1_PORT
 echo
 
 
@@ -128,7 +128,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json --port $CP2_PORT
+orionCurl --url /v1/queryContext --payload "$payload" --port $CP2_PORT
 echo
 
 --REGEXPECT--

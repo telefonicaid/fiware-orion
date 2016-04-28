@@ -68,7 +68,7 @@ payload='{
   ],
   "throttling": "PT5S"
 }'
-orionCurl --url /v1/subscribeContext --payload "${payload}" --json
+orionCurl --url /v1/subscribeContext --payload "${payload}"
 echo
 echo
 
@@ -100,20 +100,20 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "${payload}" --json
+orionCurl --url /v1/subscribeContext --payload "${payload}"
 echo
 echo
 
 echo "02. GET /v2/subscriptions?limit=1&options=count"
 echo "==============================================="
-orionCurl --url "/v2/subscriptions?limit=1&options=count" --json
+orionCurl --url "/v2/subscriptions?limit=1&options=count"
 echo
 echo
 
 
 echo "03. GET /v2/subscriptions?limit=1&offset=1&options=count"
 echo "========================================================"
-orionCurl --url "/v2/subscriptions?limit=1&offset=1&options=count" --json
+orionCurl --url "/v2/subscriptions?limit=1&offset=1&options=count"
 echo
 echo
 

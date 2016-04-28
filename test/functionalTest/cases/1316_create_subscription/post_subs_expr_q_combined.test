@@ -63,7 +63,7 @@ payload='
     "expires": "2050-04-05T14:00:00.00Z"
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -76,7 +76,7 @@ payload='{
   "temperature": 21,
   "status": "on"
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -87,7 +87,7 @@ payload='{
   "temperature": 19,
   "status": "off"
 }'
-orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json -X PATCH
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" -X PATCH
 echo
 echo
 
@@ -97,7 +97,7 @@ echo "======================================================="
 payload='{
   "temperature": 22
 }'
-orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json -X PATCH
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" -X PATCH
 echo
 echo
 

@@ -51,7 +51,7 @@ payload='{
     "type": "geo:point"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 sleep 1.1
 echo
 echo
@@ -67,7 +67,7 @@ payload='{
     "type": "geo:point"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 sleep 1.1
 echo
 echo
@@ -83,7 +83,7 @@ payload='{
     "type": "geo:point"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 sleep 1.1
 echo
 echo
@@ -91,35 +91,35 @@ echo
 
 echo "04. Rectangle in: A, B"
 echo "======================"
-orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=0,0;0,6;6,6;6,0;0,0' --json
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=0,0;0,6;6,6;6,0;0,0'
 echo
 echo
 
 
 echo "05. Rectangle in: B, C"
 echo "======================"
-orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=3,3;3,8;11,8;11,3;3,3' --json
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=3,3;3,8;11,8;11,3;3,3'
 echo
 echo
 
 
 echo "06. Triangle in: A"
 echo "=================="
-orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=0,0;0,6;6,0;0,0' --json
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=0,0;0,6;6,0;0,0'
 echo
 echo
 
 
 echo "07. Rectangle out: A"
 echo "===================="
-orionCurl --url '/v2/entities?georel=disjoint&geometry=polygon&coords=3,3;3,8;11,8;11,3;3,3' --json
+orionCurl --url '/v2/entities?georel=disjoint&geometry=polygon&coords=3,3;3,8;11,8;11,3;3,3'
 echo
 echo
 
 
 echo "08. Triangle out: B, C"
 echo "======================"
-orionCurl --url '/v2/entities?georel=disjoint&geometry=polygon&coords=0,0;0,6;6,0;0,0' --json
+orionCurl --url '/v2/entities?georel=disjoint&geometry=polygon&coords=0,0;0,6;6,0;0,0'
 echo
 echo
 

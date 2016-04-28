@@ -49,14 +49,14 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url ${url} --payload "${payload}" --json
+orionCurl --url ${url} --payload "${payload}"
 echo
 echo
 
 
 echo "0.1: Query the Entity just to make sure it is there"
 echo "==================================================="
-orionCurl --url "/v1/contextEntities/OfficeRoom" --json
+orionCurl --url "/v1/contextEntities/OfficeRoom"
 echo
 echo
 

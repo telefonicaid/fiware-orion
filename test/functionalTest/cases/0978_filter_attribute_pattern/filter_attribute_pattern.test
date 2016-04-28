@@ -49,7 +49,7 @@ payload='{
   "type": "T",
   "colour": "black"
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -61,7 +61,7 @@ payload='{
   "type": "T",
   "colour": "purple"
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -73,7 +73,7 @@ payload='{
   "type": "T",
   "colour": "red"
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -85,7 +85,7 @@ payload='{
   "type": "T",
   "colour": "brown"
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -97,35 +97,35 @@ payload='{
   "type": "T",
   "colour": "yellow"
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "06. Get entities colour ~=.* -> E1 (black), E2 (purple), E3 (red), E4 (brown), E5 (yellow)"
 echo "==========================================================================================="
-orionCurl --url '/v2/entities?options=keyValues&q=colour~=.*' --json
+orionCurl --url '/v2/entities?options=keyValues&q=colour~=.*'
 echo
 echo
 
 
 echo "07. Get entities colour ~=^b -> E1 (black), E4 (brown)"
 echo "======================================================="
-orionCurl --url '/v2/entities?options=keyValues&q=colour~=^b' --json
+orionCurl --url '/v2/entities?options=keyValues&q=colour~=^b'
 echo
 echo
 
 
 echo "08. Get entities colour ~=e$ -> brown -> E2 (purple)"
 echo "===================================================="
-orionCurl --url '/v2/entities?options=keyValues&q=colour~=e$' --json
+orionCurl --url '/v2/entities?options=keyValues&q=colour~=e$'
 echo
 echo
 
 
 echo "09. Get entities colour ~= ow -> E4 (brown), E5 (yellow)"
 echo "========================================================="
-orionCurl --url '/v2/entities?options=keyValues&q=colour~=ow' --json
+orionCurl --url '/v2/entities?options=keyValues&q=colour~=ow'
 echo
 echo
 

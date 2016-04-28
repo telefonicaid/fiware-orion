@@ -53,7 +53,7 @@ payload='{
   "a_number": 0,
   "a_vector": [ 1, 2, 3, 4 ]
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -81,14 +81,14 @@ echo
 
 echo "05. GET /v2/entities/E1/attrs/a_compound/value"
 echo "=============================================="
-orionCurl --url /v2/entities/E1/attrs/a_compound/value --out json
+orionCurl --url /v2/entities/E1/attrs/a_compound/value
 echo
 echo
 
 
 echo "06. GET /v2/entities/E1/attrs/a_vector/value"
 echo "============================================"
-orionCurl --url /v2/entities/E1/attrs/a_vector/value --out json
+orionCurl --url /v2/entities/E1/attrs/a_vector/value
 echo
 echo
 

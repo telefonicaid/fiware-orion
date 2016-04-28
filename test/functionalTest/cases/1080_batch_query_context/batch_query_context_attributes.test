@@ -50,7 +50,7 @@ payload='{
   "A4": 14,
   "A5": 15
 }'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
 echo
 echo
 
@@ -63,7 +63,7 @@ payload='{
   "A2": 22,
   "A5": 25
 }'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
 echo
 echo
 
@@ -77,7 +77,7 @@ payload='{
   "A4": 34,
   "A5": 35
 }'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
 echo
 echo
 
@@ -89,7 +89,7 @@ payload='{
     "A5"
   ]
 }'
-orionCurl --url /v2/op/query --payload "$payload" --json
+orionCurl --url /v2/op/query --payload "$payload"
 echo
 echo
 
@@ -106,7 +106,7 @@ payload='{
     "A1"
   ]
 }'
-orionCurl --url /v2/op/query --payload "$payload" --json
+orionCurl --url /v2/op/query --payload "$payload"
 echo
 echo
 
@@ -123,7 +123,7 @@ payload='{
     "A5"
   ]
 }'
-orionCurl --url /v2/op/query --payload "$payload" --json
+orionCurl --url /v2/op/query --payload "$payload"
 echo
 echo
 
@@ -141,7 +141,7 @@ payload='{
     "A2"
   ]
 }'
-orionCurl --url /v2/op/query --payload "$payload" --json
+orionCurl --url /v2/op/query --payload "$payload"
 echo
 echo
 

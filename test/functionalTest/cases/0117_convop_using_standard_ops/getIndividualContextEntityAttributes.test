@@ -72,7 +72,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -96,7 +96,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json  --servicePath /A1
+orionCurl --url /v1/updateContext --payload "$payload"  --servicePath /A1
 echo
 echo
 
@@ -120,7 +120,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json --servicePath /A2
+orionCurl --url /v1/updateContext --payload "$payload" --servicePath /A2
 echo
 echo
 
@@ -144,7 +144,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json --servicePath /A3
+orionCurl --url /v1/updateContext --payload "$payload" --servicePath /A3
 echo
 echo
 
@@ -168,7 +168,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json --servicePath /A2
+orionCurl --url /v1/updateContext --payload "$payload" --servicePath /A2
 echo
 echo
 
@@ -192,48 +192,48 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json --servicePath /A2
+orionCurl --url /v1/updateContext --payload "$payload" --servicePath /A2
 echo
 echo
 
 
 echo "07. Query E2 with service-path '/A2'"
 echo "===================================="
-orionCurl --url /v1/contextEntities/E2/attributes --json --servicePath /A2
+orionCurl --url /v1/contextEntities/E2/attributes --servicePath /A2
 echo
 echo
 
 
 echo "08. Query E1 with service-path '/A2' and URI param !exist=entity::type"
 echo "======================================================================"
-orionCurl --url /v1/contextEntities/E1/attributes?!exist=entity::type --json --servicePath /A2
+orionCurl --url /v1/contextEntities/E1/attributes?!exist=entity::type --servicePath /A2
 echo
 echo
 
 
 echo "09. Query E1 with service-path '/A2' and URI param exist=entity::type"
 echo "====================================================================="
-orionCurl --url /v1/contextEntities/E1/attributes?exist=entity::type --json --servicePath /A2
+orionCurl --url /v1/contextEntities/E1/attributes?exist=entity::type --servicePath /A2
 echo
 echo
 
 echo "10. Query E1 with service-path '/A2' and URI param entity::type=T1"
 echo "=================================================================="
-orionCurl --url /v1/contextEntities/E1/attributes?entity::type=T1 --json --servicePath /A2
+orionCurl --url /v1/contextEntities/E1/attributes?entity::type=T1 --servicePath /A2
 echo
 echo
 
 
 echo "11. Query E3 with service-path '/A2' and URI param !exist=entity::type"
 echo "======================================================================"
-orionCurl --url /v1/contextEntities/E3/attributes?!exist=entity::type --json --servicePath /A2
+orionCurl --url /v1/contextEntities/E3/attributes?!exist=entity::type --servicePath /A2
 echo
 echo
 
 
 echo "12. Query E2 with service-path '/A2' and attributesFormat set to JSON-object"
 echo "============================================================================"
-orionCurl --url /v1/contextEntities/E2/attributes --json --servicePath /A2 --urlParams attributesFormat=object
+orionCurl --url /v1/contextEntities/E2/attributes --servicePath /A2 --urlParams attributesFormat=object
 echo
 echo
 

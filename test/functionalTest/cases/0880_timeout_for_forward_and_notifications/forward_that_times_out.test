@@ -63,7 +63,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -86,7 +86,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -119,7 +119,7 @@ payload='{
     "A1"
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 

@@ -52,7 +52,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/contextEntities --payload "${payload}"  --json
+orionCurl --url /v1/contextEntities --payload "${payload}" 
 echo
 echo
 
@@ -71,7 +71,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/contextEntities/EID --payload "${payload}" --json
+orionCurl --url /v1/contextEntities/EID --payload "${payload}"
 echo
 echo
 
@@ -90,7 +90,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/contextEntities --payload "${payload}"  --json
+orionCurl --url /v1/contextEntities --payload "${payload}" 
 echo
 echo
 
@@ -106,7 +106,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/contextEntities/EID --payload "${payload}"  --json
+orionCurl --url /v1/contextEntities/EID --payload "${payload}" 
 echo
 echo
 
@@ -125,7 +125,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}"  --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}" 
 echo
 echo
 
@@ -141,7 +141,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}"  --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}" 
 echo
 echo
 

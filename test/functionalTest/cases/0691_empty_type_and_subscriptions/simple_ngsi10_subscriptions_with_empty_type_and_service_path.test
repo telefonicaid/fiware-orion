@@ -59,7 +59,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "${payload}" --json
+orionCurl --url /v1/subscribeContext --payload "${payload}"
 echo
 echo
 
@@ -75,7 +75,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E --payload "${payload}" --json
+orionCurl --url /v1/contextEntities/type/T1/id/E --payload "${payload}"
 echo
 echo
 

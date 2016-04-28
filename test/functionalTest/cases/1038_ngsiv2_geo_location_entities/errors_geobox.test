@@ -56,14 +56,14 @@ payload='{
     "type": "geo:box"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "01b. Check entity"
 echo "================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -77,14 +77,14 @@ payload='{
     "type": "geo:box"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "02b. Check entity"
 echo "================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -98,14 +98,14 @@ payload='{
     "type": "geo:box"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "03b. Check entity"
 echo "================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -119,14 +119,14 @@ payload='{
     "type": "geo:box"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "04b. Check entity"
 echo "================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -144,14 +144,14 @@ payload='{
     "type": "geo:box"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "05b. Check entity"
 echo "================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -165,14 +165,14 @@ payload='{
     "type": "geo:box"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "06b. Check entity"
 echo "================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -185,14 +185,14 @@ payload='{
     "type": "geo:box"
   }
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
 echo
 echo
 
 
 echo "07b. Check entity"
 echo "================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -205,28 +205,28 @@ payload='{
     "type": "geo:box"
   }
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X POST --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X POST
 echo
 echo
 
 
 echo "08b. Check entity"
 echo "================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
 
 echo "09. Remove the geo:box attribute (attr1) -> OK"
 echo "=============================================="
-orionCurl --url /v2/entities/E1/attrs/attr1 -X DELETE --json
+orionCurl --url /v2/entities/E1/attrs/attr1 -X DELETE
 echo
 echo
 
 
 echo "09b. Check entity"
 echo "================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -239,14 +239,14 @@ payload='{
     "type": "geo:box"
   }
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X POST --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X POST
 echo
 echo
 
 
 echo "10b. Check entity"
 echo "================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -259,14 +259,14 @@ payload='{
     "type": "no-geopoint"
   }
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X POST --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X POST
 echo
 echo
 
 
 echo "11b. Check entity"
 echo "================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -279,14 +279,14 @@ payload='{
     "type": "geo:box"
   }
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X POST --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X POST
 echo
 echo
 
 
 echo "12b. Check entity"
 echo "================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -299,14 +299,14 @@ payload='{
     "type": "geo:box"
   }
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X POST --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X POST
 echo
 echo
 
 
 echo "13b. Check entity"
 echo "================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 

@@ -39,13 +39,13 @@ echo "========================================"
 payload='{
   "subscriptionId": ""
 }'
-orionCurl --url /v1/unsubscribeContext --payload "${payload}" --json
+orionCurl --url /v1/unsubscribeContext --payload "${payload}"
 echo
 echo
 
 echo "02. Unsubscribe with empty ID second time (ensuring that semaphore releasing was ok first time)"
 echo "==============================================================================================="
-orionCurl --url /v1/unsubscribeContext --payload "${payload}" --json
+orionCurl --url /v1/unsubscribeContext --payload "${payload}"
 echo
 echo
 

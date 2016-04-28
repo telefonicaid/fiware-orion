@@ -47,7 +47,7 @@ payload='{
   "duration" : "PT1H",
   "providingApplication" : "http://kz.tid.es/abc"
 }'
-orionCurl --url ${url} --payload "${payload}" --json
+orionCurl --url ${url} --payload "${payload}"
 
 REG_ID=$(echo "$_response" | grep -Po '(?<="registrationId" : ")[^"]*')
 
@@ -63,7 +63,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url ${url} --payload "${payload}" --json
+orionCurl --url ${url} --payload "${payload}"
 
 # Modify the first registration
 echo "3: ++++++++++++++++++++"
@@ -85,7 +85,7 @@ payload='{
   "providingApplication" : "http://kz.tid.es/abc2",
   "registrationId" : "'$REG_ID'"
 }'
-orionCurl --url ${url} --payload "${payload}" --json
+orionCurl --url ${url} --payload "${payload}"
 
 # Now discover that very registration again to see the change
 echo "4: ++++++++++++++++++++"
@@ -99,19 +99,19 @@ payload='{
         }
     ]
 }'
-orionCurl --url ${url} --payload "${payload}" --json
+orionCurl --url ${url} --payload "${payload}"
 
 # Now try the GET method
 echo "5: ++++++++++++++++++++"
-orionCurl --url "/v1/registry/contextEntities/ENTITY_ID/attributes" --json 
+orionCurl --url "/v1/registry/contextEntities/ENTITY_ID/attributes" 
 
 # And a GET that fails
 echo "6: ++++++++++++++++++++"
-orionCurl --url "/v1/registry/contextEntities/ENTITY_ID2/attributes" --json 
+orionCurl --url "/v1/registry/contextEntities/ENTITY_ID2/attributes" 
 
 # DELETE and PUT should give errors
 echo "7: ++++++++++++++++++++"
-orionCurl --url "/v1/registry/contextEntities/ENTITY_ID/attributes" -X "DELETE" --json 
+orionCurl --url "/v1/registry/contextEntities/ENTITY_ID/attributes" -X "DELETE" 
 
 echo "8: ++++++++++++++++++++"
 url="/v1/registry/contextEntities/ENTITY_ID/attributes"
@@ -131,7 +131,7 @@ payload='{
   "duration" : "PT2H",
   "providingApplication" : "http://kz.tid.es/abc2"
 }'
-orionCurl --url ${url} --payload "${payload}" -X "PUT" --json
+orionCurl --url ${url} --payload "${payload}" -X "PUT"
 
 echo "9: ++++++++++++++++++++"
 

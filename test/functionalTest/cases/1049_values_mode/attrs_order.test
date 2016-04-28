@@ -59,35 +59,35 @@ payload='{
     "value": 4
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "02. Get entity without attrs param -> A, B, C, D"
 echo "================================================"
-orionCurl --url /v2/entities/E --json --noPayloadCheck --json
+orionCurl --url /v2/entities/E --noPayloadCheck
 echo
 echo
 
 
 echo "03. Get entity without attrs param (keyValues) -> A, B, C, D"
 echo "============================================================"
-orionCurl --url '/v2/entities/E?options=keyValues' --noPayloadCheck --json
+orionCurl --url '/v2/entities/E?options=keyValues' --noPayloadCheck
 echo
 echo
 
 
 echo "04. Get entity ordering B, D, C"
 echo "==============================="
-orionCurl --url '/v2/entities/E?attrs=B,D,C' --noPayloadCheck --json
+orionCurl --url '/v2/entities/E?attrs=B,D,C' --noPayloadCheck
 echo
 echo
 
 
 echo "05. Get entity ordering (keyValues) B, D, C"
 echo "==========================================="
-orionCurl --url '/v2/entities/E?attrs=B,D,C&options=keyValues' --noPayloadCheck --json
+orionCurl --url '/v2/entities/E?attrs=B,D,C&options=keyValues' --noPayloadCheck
 echo
 echo
 

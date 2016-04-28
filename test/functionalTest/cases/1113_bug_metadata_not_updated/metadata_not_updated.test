@@ -45,7 +45,7 @@ payload='{
     "metadata": { "m1": 1 }
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -58,14 +58,14 @@ payload='{
     "metadata": { "m1": 2 }
   }
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"
 echo
 echo
 
 
 echo "03. GET /v2/entities/E1"
 echo "======================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 

@@ -63,14 +63,14 @@ payload='
     "throttling": 5
 }
 '
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
 idSubscription=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 echo "02. GET /v2/subscriptions/ID (w/o expires field)"
 echo "================================================"
-orionCurl --url "/v2/subscriptions/${idSubscription}" --json
+orionCurl --url "/v2/subscriptions/${idSubscription}"
 echo
 echo
 
@@ -83,14 +83,14 @@ payload='
     "expires": "1982-06-14T17:15:00.00Z"
 }
 '
-orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" --json -X PATCH
+orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" -X PATCH
 echo
 echo
 
 
 echo "04. GET /v2/subscriptions/ID (with expires field)"
 echo "================================================="
-orionCurl --url "/v2/subscriptions/${idSubscription}" --json
+orionCurl --url "/v2/subscriptions/${idSubscription}"
 echo
 echo
 
@@ -103,14 +103,14 @@ payload='
     "expires": ""
 }
 '
-orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" --json -X PATCH
+orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" -X PATCH
 echo
 echo
 
 
 echo "06. GET /v2/subscriptions/ID (w/o expires field)"
 echo "================================================="
-orionCurl --url "/v2/subscriptions/${idSubscription}" --json
+orionCurl --url "/v2/subscriptions/${idSubscription}"
 echo
 echo
 

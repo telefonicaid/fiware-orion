@@ -56,7 +56,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/entityId -X PUT --payload "$payload" --json
+orionCurl --url /v1/contextEntities/entityId -X PUT --payload "$payload"
 echo
 echo
 
@@ -72,7 +72,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/entityId --payload "$payload" --json
+orionCurl --url /v1/contextEntities/entityId --payload "$payload"
 echo
 echo
 
@@ -88,14 +88,14 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/entityId -X PUT --payload "$payload" --json
+orionCurl --url /v1/contextEntities/entityId -X PUT --payload "$payload"
 echo
 echo
 
 
 echo "04. GET /v1/contextEntities/entityId with compound attribute value using JSON"
 echo "============================================================================="
-orionCurl --url /v1/contextEntities/entityId --json
+orionCurl --url /v1/contextEntities/entityId
 echo
 echo
 

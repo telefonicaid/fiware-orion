@@ -55,7 +55,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "${payload}" --out " " --json
+orionCurl --url /v1/queryContext --payload "${payload}" --out " "
 echo
 echo
 
@@ -63,7 +63,7 @@ echo
 echo "02. Invalid JSON payload"
 echo "======================="
 payload='no meaningful payload (failing tests)'
-orionCurl --url /v1/queryContext --payload "${payload}" --json
+orionCurl --url /v1/queryContext --payload "${payload}"
 echo
 echo
 
@@ -78,7 +78,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "${payload}" --out "application/json" --json
+orionCurl --url /v1/queryContext --payload "${payload}" --out "application/json"
 echo
 echo
 
@@ -93,7 +93,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "${payload}" --out "text/plain, application/json" --json
+orionCurl --url /v1/queryContext --payload "${payload}" --out "text/plain, application/json"
 echo
 echo
 
@@ -108,7 +108,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "${payload}" --out "text/plain, application/json; charset=UTF-8" --json
+orionCurl --url /v1/queryContext --payload "${payload}" --out "text/plain, application/json; charset=UTF-8"
 echo
 echo
 

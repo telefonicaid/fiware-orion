@@ -40,7 +40,7 @@ echo "==========================================================================
 payload='{
   "value": "10"
 }'
-orionCurl --url /v1/contextEntities/EID/attributes/A --payload "$payload"  --json
+orionCurl --url /v1/contextEntities/EID/attributes/A --payload "$payload" 
 echo
 echo
 
@@ -55,7 +55,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 

@@ -49,7 +49,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/TEnt/id/E --payload "${payload}" --json
+orionCurl --url /v1/contextEntities/type/TEnt/id/E --payload "${payload}"
 echo
 echo
 
@@ -76,7 +76,7 @@ payload='{
   ]
 }
 '
-orionCurl --url /v1/subscribeContext --payload "${payload}" --json
+orionCurl --url /v1/subscribeContext --payload "${payload}"
 echo
 echo
 
@@ -87,7 +87,7 @@ payload='{
    "type" : "T2",
    "value" : "V"
 }'
-orionCurl --url /v1/contextEntities/type/TEnt/id/E/attributes/A --payload "${payload}" -X PUT --json
+orionCurl --url /v1/contextEntities/type/TEnt/id/E/attributes/A --payload "${payload}" -X PUT
 echo
 echo
 
@@ -98,7 +98,7 @@ payload='{
    "type" : "T2",
    "value" : "V"
 }'
-orionCurl --url /v1/contextEntities/type/TEnt/id/E/attributes/A --payload "${payload}" -X PUT --json
+orionCurl --url /v1/contextEntities/type/TEnt/id/E/attributes/A --payload "${payload}" -X PUT
 echo
 echo
 

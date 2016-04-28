@@ -51,7 +51,7 @@ payload='{
          "value": "V1 A2 E1/T1"
     }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -68,34 +68,34 @@ payload='{
          "value": "V1 A2 E1/T2"
     }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "03. DELETE /v2/entities/E1/attrs/A2?type=T2"
 echo "==========================================="
-orionCurl --url "/v2/entities/E1/attrs/A2?type=T2" --json -X DELETE
+orionCurl --url "/v2/entities/E1/attrs/A2?type=T2" -X DELETE
 echo
 echo
 
 
 echo "04. GET /v2/entities (missing attribute A2 in E1/T2)"
 echo "===================================================="
-orionCurl --url "/v2/entities" --json
+orionCurl --url "/v2/entities"
 echo
 echo
 
 echo "05. DELETE /v2/entities/E1?type=T1"
 echo "=================================="
-orionCurl --url "/v2/entities/E1?type=T1" --json -X DELETE
+orionCurl --url "/v2/entities/E1?type=T1" -X DELETE
 echo
 echo
 
 
 echo "06. GET /v2/entities (missing entity E1/T1)"
 echo "==========================================="
-orionCurl --url "/v2/entities" --json
+orionCurl --url "/v2/entities"
 echo
 echo
 

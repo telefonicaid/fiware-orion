@@ -53,7 +53,7 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 
 echo "1: ++++++++++++++++++++"
@@ -79,7 +79,7 @@ payload='{
   "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
   "duration": "PT5H"
 }'
-orionCurl --url "$url" --payload "${payload}" --json
+orionCurl --url "$url" --payload "${payload}"
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 echo
 
@@ -111,7 +111,7 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 
 echo Notification count from mongo:
@@ -142,7 +142,7 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 
 echo "4: ++++++++++++++++++++"
@@ -168,7 +168,7 @@ payload='{
   "duration": "PT5H",
   "subscriptionId" : "'$SUB_ID'"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo Notification count from mongo:
 mongoCmd ${CB_DB_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
@@ -199,7 +199,7 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 
 
@@ -227,7 +227,7 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 
 echo Notification count from mongo:
@@ -239,7 +239,7 @@ url=/v1/registry/unsubscribeContextAvailability
 payload='{
   "subscriptionId": "'$SUB_ID'"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 
 echo "8: ++++++++++++++++++++"
@@ -247,7 +247,7 @@ url=/v1/registry/unsubscribeContextAvailability
 payload='{
   "subscriptionId": "'$SUB_ID'"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 
 echo "9: ++++++++++++++++++++"
@@ -274,7 +274,7 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo Accumulated data:
 accumulatorDump

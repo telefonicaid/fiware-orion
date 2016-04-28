@@ -583,56 +583,6 @@ function brokerStop
 
 # ------------------------------------------------------------------------------
 #
-# proxyCoapStart
-#
-function proxyCoapStart()
-{
-  extraParams=$*
-
-  proxyCoap $extraParams -cbPort $CB_PORT
-
-  # Test to see whether we have a proxy running. If not raise an error
-  running_proxyCoap=$(ps -fe | grep ' proxyCoap' | grep "cbPort $CB_PORT" | wc -l)
-  if [ "$running_proxyCoap" == "" ]
-  then
-    echo "Unable to start proxyCoap"
-    exit 1
-  fi
-}
-
-
-
-# ------------------------------------------------------------------------------
-#
-# proxyCoapStop
-#
-function proxyCoapStop
-{
-  port=$COAP_PORT
-
-  # Test to see if we have a proxy running if so kill it!
-  running_proxyCoap=$(ps -fe | grep proxyCoap | wc -l)
-  if [ $running_proxyCoap -ne 1 ]; then
-    kill $(ps -fe | grep proxyCoap | awk '{print $2}') 2> /dev/null
-    # Wait some time so the proxy can finish properly
-    sleep 1
-    running_proxyCoap=$(ps -fe | grep proxyCoap | wc -l)
-    if [ $running_proxyCoap -ne 1 ]; then
-      # If the proxy refuses to stop politely, kill the process by brute force
-      kill -9 $(ps -fe | grep proxyCoap | awk '{print $2}') 2> /dev/null
-      sleep 1
-      running_proxyCoap=$(ps -fe | grep proxyCoap | wc -l)
-      if [ $running_proxyCoap -ne 1 ]; then
-        echo "Existing proxyCoap is immortal, can not be killed!"
-        exit 1
-      fi
-    fi
-  fi
-}
-
-
-# ------------------------------------------------------------------------------
-#
 # accumulatorStop - 
 #
 function accumulatorStop()
@@ -928,9 +878,9 @@ function dbInsertEntity()
 # 
 function orionCurl()
 {
-  payloadCheckFormat='xml'
+  payloadCheckFormat='json'
 
-  dMsg 
+  dMsg
   dMsg $(date)
   dMsg orionCurl $*
 
@@ -945,11 +895,10 @@ function orionCurl()
   _noPayloadCheck='off'
   _tenant=''
   _origin=''
-  _inFormat='--header "Content-Type: application/xml"'
-  _outFormat='--header "Accept: application/xml"'
+  _inFormat='--header "Content-Type: application/json"'
+  _outFormat='--header "Accept: application/json"'
   _in='';
   _out='';
-  _json=''
   _urlParams=''
   _xauthToken=''
   _payloadCheck=''
@@ -974,7 +923,6 @@ function orionCurl()
     elif [ "$1" == "--header" ]; then          _headers=${_headers}" --header \"$2\""; shift;
     elif [ "$1" == "--in" ]; then              _in="$2"; shift;
     elif [ "$1" == "--out" ]; then             _out="$2"; shift;
-    elif [ "$1" == "--json" ]; then            _in='json'; _out='json'; payloadCheckFormat='json'
     elif [ "$1" == "--xauthToken" ]; then      _xauthToken='--header "X-Auth-Token: '${2}'"'; shift;
     elif [ "$1" == "-v" ]; then                _verbose=on;
     elif [ "$1" == "--verbose" ]; then         _verbose=on;
@@ -1008,7 +956,7 @@ function orionCurl()
       _PAYLOAD="-d @/tmp/orionFuncTestPayload"
     fi
   fi
-  
+
   # 3. Fix for 'Content-Type' and 'Accept' short names 'xml' and 'json'
   if   [ "$_in"   == "application/xml" ];  then _in='xml';   fi
   if   [ "$_in"   == "application/json" ]; then _in='json';  fi
@@ -1022,7 +970,8 @@ function orionCurl()
   elif [ "$_in"  != "" ];      then _inFormat='--header "Content-Type: '${_in}'"'
   fi
 
-  if   [ "$_out" == "xml" ];   then _outFormat='--header "Accept: application/xml"'; payloadCheckFormat='xml'
+  # Note that payloadCheckFormat is also json in the case of --in xml, as the CB also returns error in JSON in this case
+  if   [ "$_out" == "xml" ];   then _outFormat='--header "Accept: application/xml"'; payloadCheckFormat='json'
   elif [ "$_out" == "json" ];  then _outFormat='--header "Accept: application/json"'; payloadCheckFormat='json'
   elif [ "$_out" == "text" ];  then _outFormat='--header "Accept: text/plain"'; _noPayloadCheck='on'
   elif [ "$_out" == "any" ];   then _outFormat='--header "Accept: */*"'; _noPayloadCheck='on'
@@ -1052,7 +1001,7 @@ function orionCurl()
   if [ "$_PAYLOAD"     != "" ]; then  command=${command}' '${_PAYLOAD};     fi
   if [ "$_method"      != "" ]; then  command=${command}' '${_method};      fi
   if [ "$_tenant"      != "" ]; then  command=${command}' '${_tenant};      fi
-  if [ "$_servicePath" != "" ]; then  command=${command}' '${_servicePath}; fi 
+  if [ "$_servicePath" != "" ]; then  command=${command}' '${_servicePath}; fi
   if [ "$_inFormat"    != "" ]; then  command=${command}' '${_inFormat};    fi
   if [ "$_outFormat"   != "" ]; then  command=${command}' '${_outFormat};   fi
   if [ "$_origin"      != "" ]; then  command=${command}' '${_origin};      fi
@@ -1081,7 +1030,7 @@ function orionCurl()
     #
     sed '/Connection: Keep-Alive/d' /tmp/httpHeaders.out  > /tmp/httpHeaders2.out
     sed '/Connection: close/d'      /tmp/httpHeaders2.out > /tmp/httpHeaders.out
-    sed '/Connection: Close/d'      /tmp/httpHeaders.out  
+    sed '/Connection: Close/d'      /tmp/httpHeaders.out
   fi
 
   #
@@ -1100,200 +1049,12 @@ function orionCurl()
     then
       dMsg buffer to $payloadCheckFormat beautify: $_response
 
-      if [ "$payloadCheckFormat" == xml ] || [ "$payloadCheckFormat" == "" ]
-      then
-        # FIXME P10: XML removal
-        #vMsg Running xmllint tool for $_response
-        #echo $_response | xmllint --format -
-        echo $_response | python -mjson.tool
-      elif [ "$payloadCheckFormat" == json ]
+      if [ "$payloadCheckFormat" == json ] || [ "$payloadCheckFormat" == "" ]
       then
         vMsg Running python tool for $_response
         echo $_response | python -mjson.tool
       else
-        # FIXME P10: XML removal
-        #vMsg Running xmllint tool for $_response
-        #echo $_response | xmllint --format -
-        echo $_response | python -mjson.tool
-      fi
-    fi
-  fi
-}
-
-
-# ------------------------------------------------------------------------------
-#
-# coapCurl
-#
-# Options:
-#   -X            <HTTP method>    (default: according to curl. GET if no payload, POST if with payload)
-#   --host        <host>           (default: localhost)
-#   --port        <port>           (default: $COAP_PORT)
-#   --url         <URL>            (default: empty string)
-#   --payload     <payload>        (default: NO PAYLOAD. Possible values: [filename | "${string}"])
-#   --in          (input payload)  (default: xml => application/xml, If 'json': application/json)
-#   --out         (output payload  (default: xml => application/xml, If 'json': application/json)
-#   --json        (in/out JSON)    (if --in/out is used AFTER --json, it overrides)
-#   --tenant      <tenant>         (tenant in HTTP header)
-#   --servicePath <path>           (Service Path in HTTP header)
-#   --noPayloadCheck               (skip paylosd check filter)
-#
-# Any parameters are sent as is to 'curl'
-#
-function coapCurl()
-{
-  #
-  # Default values
-  #
-  _method=""
-  _host="0.0.0.0"
-  _port=$COAP_PORT
-  _url=""
-  _payload=""
-  _inFormat=""
-  _outFormat=""
-  _json=""
-  _tenant=""
-  _servicePath=""
-  _xtra=''
-  _noPayloadCheck='off'
-
-  while [ "$#" != 0 ]
-  do
-    if   [ "$1" == "-X" ]; then                _method="$2"; shift;
-    elif [ "$1" == "--host" ]; then            _host="$2"; shift;
-    elif [ "$1" == "--port" ]; then            _port="$2"; shift;
-    elif [ "$1" == "--url" ]; then             _url="$2"; shift;
-    elif [ "$1" == "--payload" ]; then         _payload="$2"; shift;
-    elif [ "$1" == "--in" ]; then              _inFormat="$2"; shift;
-    elif [ "$1" == "--out" ]; then             _outFormat="$2"; shift;
-    elif [ "$1" == "--json" ]; then            _inFormat=application/json; _outFormat=application/json;
-    elif [ "$1" == "--tenant" ]; then          _tenant="$2"; shift;
-    elif [ "$1" == "--servicePath" ]; then     _servicePath="$2"; shift;
-    elif [ "$1" == "--noPayloadCheck" ]; then  _noPayloadCheck=on;
-    else                                       _xtra="$_xtra $1"; shift;
-    fi
-
-    shift
-  done
-
-  #
-  # Sanity check of parameters
-  #
-  if [ "$_url" == "" ]
-  then
-    echo "No URL";
-    return 1;
-  fi
-
-
-  #
-  # Fix for 'Content-Type' and 'Accept' short names 'xml' and 'json'
-  #
-  if [ "$_inFormat" == "xml" ];   then _inFormat=application/xml;   fi;
-  if [ "$_outFormat" == "xml" ];  then _outFormat=application/xml;  fi;
-  if [ "$_inFormat" == "json" ];  then _inFormat=application/json;  fi;
-  if [ "$_outFormat" == "json" ]; then _outFormat=application/json; fi;
-
-
-
-  #
-  # Cleanup 'compound' variables, so that we don't inherit values from previous calls
-  #
-  _METHOD=''
-  _URL=''
-  _ACCEPT=''
-  _CONTENTFORMAT=''
-
-  if [ "$_inFormat" != "" ];  then  _CONTENTFORMAT="-t $_inFormat";  fi
-  if [ "$_outFormat" != "" ]; then  _ACCEPT="-A $_outFormat";        fi
-  if [ "$_method" != "" ];    then  _METHOD=' -m '$_method;          fi
-
-  _URL="coap://$_host:$_port$_url"
-
-  #   usage: coap-client [-A type...] [-t type] [-b [num,]size] [-B seconds] [-e text]
-  #                   [-g group] [-m method] [-N] [-o file] [-P addr[:port]] [-p port]
-  #                   [-s duration] [-O num,text] [-T string] [-v num] URI
-  #
-  #           URI can be an absolute or relative coap URI,
-  #           -A type...      accepted media types as comma-separated list of
-  #                           symbolic or numeric values
-  #           -t type         content type for given resource for PUT/POST
-  #           -b [num,]size   block size to be used in GET/PUT/POST requests
-  #                           (value must be a multiple of 16 not larger than 1024)
-  #                           If num is present, the request chain will start at
-  #                           block num
-  #           -B seconds      break operation after waiting given seconds
-  #                           (default is 90)
-  #           -e text         include text as payload (use percent-encoding for
-  #                           non-ASCII characters)
-  #           -f file         file to send with PUT/POST (use '-' for STDIN)
-  #           -g group        join the given multicast group
-  #           -m method       request method (get|put|post|delete), default is 'get'
-  #           -N              send NON-confirmable message
-  #           -o file         output received data to this file (use '-' for STDOUT)
-  #           -p port         listen on specified port
-  #           -s duration     subscribe for given duration [s]
-  #           -v num          verbosity level (default: 3)
-  #           -O num,text     add option num with contents text to request
-  #           -P addr[:port]  use proxy (automatically adds Proxy-Uri option to
-  #                           request)
-  #           -T token        include specified token
-  #
-  #   examples:
-  #           coap-client -m get coap://[::1]/
-  #           coap-client -m get coap://[::1]/.well-known/core
-  #           coap-client -m get -T cafe coap://[::1]/time
-  #           echo 1000 | coap-client -m put -T cafe coap://[::1]/time -f -
-
-
-  _BUILTINS='-B 1 -b 1024'
-
-
-#   echo '====================================================================================='
-  if [ "$_payload" != "" ]
-  then
-#     echo "echo "$_payload" | ./coap-client -f - $_BUILTINS $_METHOD $_ACCEPT $_CONTENTFORMAT $_URL"
-    _response=$(echo "$_payload" | coap-client -f - $_BUILTINS $_METHOD $_ACCEPT $_CONTENTFORMAT $_URL)
-  else
-#     echo "./coap-client $_BUILTINS $_METHOD $_ACCEPT $_CONTENTFORMAT $_URL"
-    _response=$(coap-client $_BUILTINS $_METHOD $_ACCEPT $_CONTENTFORMAT $_URL)
-  fi
-#   echo '====================================================================================='
-
-
-  # Get headers
-  _responseHeaders=$(echo "$_response" | head -n 1)
-
-  # Strip headers and garbage bytes from response
-  _response=$(echo "$_response" | tail -n +2 | head -c-3)
-
-
-  echo $_responseHeaders
-  echo
-
-  #
-  # Print and beautify response body (IF ANY)
-  #
-  if [ "$_noPayloadCheck" == "on" ]
-  then
-    echo $_response
-  else
-    if [ "$_response" != "" ]
-    then
-      if [ "$_outFormat" == application/xml ] || [ "$_outFormat" == "" ]
-      then
-        # FIXME P10: XML removal
-        #echo $_response | xmllint --format -
-        echo $_response | python -mjson.tool
-      elif [ "$_outFormat" == application/json ]
-      then
-        vMsg "JSON check for:" $_response
-        echo $_response | python -mjson.tool
-      else
-        # FIXME P10: XML removal
-        #echo $_response | xmllint --format -
-        echo $_response | python -mjson.tool
+        dMsg Unknown payloadCheckFormat
       fi
     fi
   fi
@@ -1308,8 +1069,6 @@ export -f brokerStart
 export -f localBrokerStop
 export -f localBrokerStart
 export -f brokerStop
-export -f proxyCoapStart
-export -f proxyCoapStop
 export -f accumulatorStart
 export -f accumulatorStop
 export -f accumulatorDump
@@ -1322,7 +1081,6 @@ export -f accumulatorReset
 export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd
-export -f coapCurl
 export -f vMsg
 export -f dMsg
 export -f valgrindSleep

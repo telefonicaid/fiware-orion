@@ -41,14 +41,14 @@ brokerStart CB
 echo "01. Create E1"
 echo "============="
 payload='{ "id": "E1", "attr1": 1 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "02. Make sure E1 exists"
 echo "======================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -56,14 +56,14 @@ echo
 echo "03. Try to create E1/T1 again, using POST /v2/entities/E1/attrs?options=append"
 echo "=============================================================================="
 payload='{  "attr1": 2 }'
-orionCurl --url '/v2/entities/E1/attrs?options=append,keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/E1/attrs?options=append,keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "04. Make sure it didn't work"
 echo "============================"
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -71,14 +71,14 @@ echo
 echo "05. Now update E1, using POST /v2/entities/E1/attrs"
 echo "==================================================="
 payload='{  "attr1": 5 }'
-orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "06. Make sure it worked"
 echo "======================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 

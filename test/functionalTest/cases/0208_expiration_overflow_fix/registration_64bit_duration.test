@@ -56,7 +56,7 @@ payload='{
   ],
   "duration": "P300Y"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "++++++++++++++++++++"
 
@@ -79,7 +79,7 @@ payload='{
     "pressure"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo "++++++++++++++++++++"
 
 --REGEXPECT--

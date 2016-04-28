@@ -30,9 +30,9 @@ brokerStart CB
 --SHELL--
 
 echo "0: ++++++++++++++++++++"
-orionCurl --url "/NGSI8/contextEntities/entity01" --json
+orionCurl --url "/NGSI8/contextEntities/entity01"
 echo "1: ++++++++++++++++++++"
-orionCurl --url "/v1/registry/nothingAtAll" --json
+orionCurl --url "/v1/registry/nothingAtAll"
 
 --REGEXPECT--
 0: ++++++++++++++++++++

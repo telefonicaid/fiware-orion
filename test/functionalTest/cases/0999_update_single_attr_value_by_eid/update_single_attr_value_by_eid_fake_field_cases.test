@@ -41,7 +41,7 @@ brokerStart CB
 echo "01. BADVERB /v2/entities/E1/attrs/A1/value to see BAD METHOD, only GET, PUT"
 echo "==========================================================================="
 payload='{ "value": 1 }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X BADVERB
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X BADVERB
 echo
 echo
 
@@ -49,7 +49,7 @@ echo
 echo "02. Create E1-A1"
 echo "================"
 payload='{ "id": "E1", "A1": { "value": 1 } }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -57,14 +57,14 @@ echo
 echo "03. PUT /v2/entities/E1/attrs/A1/value without 'value' in payload"
 echo "================================================================="
 payload='{ "type": 1 }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "04. Get entity"
 echo "=============="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 
@@ -72,14 +72,14 @@ echo
 echo "05. PUT /v2/entities/E1/attrs/A1/value with 'value' and 'type' in payload"
 echo "========================================================================="
 payload='{ "value": 3, "type": 3 }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "06. Get entity"
 echo "=============="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 

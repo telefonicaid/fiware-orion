@@ -50,7 +50,7 @@ payload='{
     "type": "house:flat"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -61,14 +61,14 @@ payload='{
   "value": 2,
   "type": "house<flat>"
 }'
-orionCurl --url /v2/entities/E/attrs/A1 --payload "$payload" -X PUT --json
+orionCurl --url /v2/entities/E/attrs/A1 --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "03. Make sure step 2 DID NOT modify E/A1"
 echo "========================================"
-orionCurl --url /v2/entities/E --json
+orionCurl --url /v2/entities/E
 echo
 echo
 
@@ -79,14 +79,14 @@ payload='{
   "value": 4,
   "type": "habitación"
 }'
-orionCurl --url /v2/entities/E/attrs/A1 --payload "$payload" -X PUT --json
+orionCurl --url /v2/entities/E/attrs/A1 --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "05. Make sure step 4 DID NOT modify E/A1"
 echo "========================================"
-orionCurl --url /v2/entities/E --json
+orionCurl --url /v2/entities/E
 echo
 echo
 
@@ -97,14 +97,14 @@ payload='{
   "value": 4,
   "type": "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF=256+6"
 }'
-orionCurl --url /v2/entities/E/attrs/A1 --payload "$payload" -X PUT --json
+orionCurl --url /v2/entities/E/attrs/A1 --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "07. Make sure step 5 DID NOT modify E/A1"
 echo "========================================"
-orionCurl --url /v2/entities/E --json
+orionCurl --url /v2/entities/E
 echo
 echo
 
@@ -114,14 +114,14 @@ echo "===================================================================="
 payload='{
   "": "5678"
 }'
-orionCurl --url /v2/entities/E/attrs/A1 --payload "$payload" -X PUT --json
+orionCurl --url /v2/entities/E/attrs/A1 --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "09. Make sure step 7 DID NOT modify E/A1"
 echo "========================================"
-orionCurl --url /v2/entities/E --json
+orionCurl --url /v2/entities/E
 echo
 echo
 

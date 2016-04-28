@@ -49,7 +49,7 @@ payload='{
   "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
   "duration": "PT5S"
 }'
-orionCurl --url "$url" --payload "${payload}" --json
+orionCurl --url "$url" --payload "${payload}"
 
 echo "1: ++++++++++++++++++++"
 #Do an register context inmediatelly after the subscription: notification is generated
@@ -76,7 +76,7 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url "$url" --payload "${payload}" --json
+orionCurl --url "$url" --payload "${payload}"
 
 echo "2: ++++++++++++++++++++"
 #Do an register context after subscription expiration: notification is not generated
@@ -104,7 +104,7 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url "$url" --payload "${payload}" --json
+orionCurl --url "$url" --payload "${payload}"
 
 echo "3: ++++++++++++++++++++"
 #Get accumulated data

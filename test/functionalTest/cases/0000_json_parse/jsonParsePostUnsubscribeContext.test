@@ -33,7 +33,7 @@ url="/v1/unsubscribeContext"
 payload='{
   "subscriptionId": "012345678901234567890123"
 }'
-orionCurl --url ${url} --payload "${payload}" --json
+orionCurl --url ${url} --payload "${payload}"
 
 echo "2: ***********************************"
 url="/v1/subscribeContext"
@@ -83,7 +83,7 @@ payload='{
   ],
   "throttling": "P5Y"
 }'
-orionCurl --url ${url} --payload "${payload}" --json
+orionCurl --url ${url} --payload "${payload}"
 
 subscriptionId=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
 
@@ -92,7 +92,7 @@ url="/v1/unsubscribeContext"
 payload='{
   "subscriptionId": "'${subscriptionId}'"
 }'
-orionCurl --url ${url} --payload "${payload}" --json
+orionCurl --url ${url} --payload "${payload}"
 
 echo "4: ***********************************"
 --REGEXPECT--

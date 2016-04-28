@@ -52,7 +52,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json --servicePath /#
+orionCurl --url /v1/updateContext --payload "$payload" --servicePath /#
 echo
 echo
 
@@ -75,7 +75,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json --servicePath /a,/b
+orionCurl --url /v1/updateContext --payload "$payload" --servicePath /a,/b
 echo
 echo
 

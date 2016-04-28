@@ -60,73 +60,73 @@ payload='{
     }
   ]
 }'
-orionCurl --servicePath /Madrid/Gardens --url /v1/contextEntities/type/T/id/EG --payload "${payload}" --json
+orionCurl --servicePath /Madrid/Gardens --url /v1/contextEntities/type/T/id/EG --payload "${payload}"
 echo
 echo
-orionCurl --servicePath /Madrid/Gardens/North --url /v1/contextEntities/type/T/id/EGN --payload "${payload}" --json
+orionCurl --servicePath /Madrid/Gardens/North --url /v1/contextEntities/type/T/id/EGN --payload "${payload}"
 echo
 echo
-orionCurl --servicePath /Madrid/Gardens/South --url /v1/contextEntities/type/T/id/EGS --payload "${payload}" --json
+orionCurl --servicePath /Madrid/Gardens/South --url /v1/contextEntities/type/T/id/EGS --payload "${payload}"
 echo
 echo
-orionCurl --servicePath /Madrid/Transport --url /v1/contextEntities/type/T/id/ET --payload "${payload}" --json
+orionCurl --servicePath /Madrid/Transport --url /v1/contextEntities/type/T/id/ET --payload "${payload}"
 echo
 echo
-orionCurl --servicePath /Madrid/Transport/Police --url /v1/contextEntities/type/T/id/ETP --payload "${payload}" --json
+orionCurl --servicePath /Madrid/Transport/Police --url /v1/contextEntities/type/T/id/ETP --payload "${payload}"
 echo
 echo
-orionCurl --servicePath /Madrid/Transport/Hospital --url /v1/contextEntities/type/T/id/ETH --payload "${payload}" --json
+orionCurl --servicePath /Madrid/Transport/Hospital --url /v1/contextEntities/type/T/id/ETH --payload "${payload}"
 echo
 echo
-orionCurl --servicePath /Madrid/Health --url /v1/contextEntities/type/T/id/EH --payload "${payload}" --json
+orionCurl --servicePath /Madrid/Health --url /v1/contextEntities/type/T/id/EH --payload "${payload}"
 echo
 echo
 
 echo "02. Query on /Madrid/Gardens/# (returns: EG, EGN, EGS)"
 echo "======================================================"
-orionCurl --servicePath '/Madrid/Gardens/#' --url /v1/contextEntityTypes/T --json
+orionCurl --servicePath '/Madrid/Gardens/#' --url /v1/contextEntityTypes/T
 echo
 echo
 
 echo "03. Query on /Madrid/Gardens (returns: EG)"
 echo "=========================================="
-orionCurl --servicePath /Madrid/Gardens --url /v1/contextEntityTypes/T --json
+orionCurl --servicePath /Madrid/Gardens --url /v1/contextEntityTypes/T
 echo
 echo
 
 echo "04. Query on /Madrid/Gardens/North (returns: EGN)"
 echo "================================================="
-orionCurl --servicePath /Madrid/Gardens/North --url /v1/contextEntityTypes/T --json
+orionCurl --servicePath /Madrid/Gardens/North --url /v1/contextEntityTypes/T
 echo
 echo
 
 echo "05. Query on /Madrid/Gardens/North/# (returns: EGN)"
 echo "==================================================="
-orionCurl --servicePath '/Madrid/Gardens/North/#' --url /v1/contextEntityTypes/T --json
+orionCurl --servicePath '/Madrid/Gardens/North/#' --url /v1/contextEntityTypes/T
 echo
 echo
 
 echo "06. Query on /Madrid/Gardens, /Madrid/Transport (returns: EG, ET)"
 echo "================================================================="
-orionCurl --servicePath '/Madrid/Gardens, /Madrid/Transport' --url /v1/contextEntityTypes/T --json
+orionCurl --servicePath '/Madrid/Gardens, /Madrid/Transport' --url /v1/contextEntityTypes/T
 echo
 echo
 
 echo "07. Query on /Madrid/Gardens/#, /Madrid/Transport/# (returns: EG, EGN, EGS, ET, ETP, ETH)"
 echo "========================================================================================="
-orionCurl --servicePath '/Madrid/Gardens/#, /Madrid/Transport/#' --url /v1/contextEntityTypes/T --json
+orionCurl --servicePath '/Madrid/Gardens/#, /Madrid/Transport/#' --url /v1/contextEntityTypes/T
 echo
 echo
 
 echo "08. Query on /Madrid/Gardens, /Madrid/Transport/# (return: EG, ET, ETP, ETH)"
 echo "============================================================================"
-orionCurl --servicePath '/Madrid/Gardens, /Madrid/Transport/#' --url /v1/contextEntityTypes/T --json
+orionCurl --servicePath '/Madrid/Gardens, /Madrid/Transport/#' --url /v1/contextEntityTypes/T
 echo
 echo
 
 echo "09. Query on /Madrid/Gardens, /Madrid/Transport (return: EG, ET)"
 echo "================================================================"
-orionCurl --servicePath '/Madrid/Gardens, /Madrid/Transport' --url /v1/contextEntityTypes/T --json
+orionCurl --servicePath '/Madrid/Gardens, /Madrid/Transport' --url /v1/contextEntityTypes/T
 echo
 echo
 

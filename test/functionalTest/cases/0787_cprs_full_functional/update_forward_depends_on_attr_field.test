@@ -69,7 +69,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -97,7 +97,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json --port $CP1_PORT
+orionCurl --url /v1/updateContext --payload "$payload" --port $CP1_PORT
 echo
 echo
 
@@ -125,7 +125,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json --port $CP2_PORT
+orionCurl --url /v1/updateContext --payload "$payload" --port $CP2_PORT
 echo
 echo
 
@@ -148,7 +148,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json --port $CP3_PORT
+orionCurl --url /v1/updateContext --payload "$payload" --port $CP3_PORT
 echo
 echo
 
@@ -182,7 +182,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -216,7 +216,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -238,7 +238,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
@@ -262,7 +262,7 @@ payload='{
     "A7"
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -315,7 +315,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -339,7 +339,7 @@ payload='{
     "A7"
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -354,7 +354,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json --port $CP1_PORT
+orionCurl --url /v1/queryContext --payload "$payload" --port $CP1_PORT
 echo
 echo
 
@@ -369,7 +369,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json --port $CP2_PORT
+orionCurl --url /v1/queryContext --payload "$payload" --port $CP2_PORT
 echo
 echo
 
@@ -384,7 +384,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json --port $CP3_PORT
+orionCurl --url /v1/queryContext --payload "$payload" --port $CP3_PORT
 echo
 echo
 

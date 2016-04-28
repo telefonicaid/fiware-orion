@@ -59,14 +59,14 @@ payload='{
   ],
   "throttling": "PT1M"
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload"
 echo
 echo
 
 
 echo "02. Make sure it was correctly created"
 echo "======================================"
-orionCurl --url /v2/subscriptions --json
+orionCurl --url /v2/subscriptions
 echo
 echo
 

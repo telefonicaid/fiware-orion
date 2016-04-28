@@ -59,7 +59,7 @@ payload='{
     "type": "date"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -73,7 +73,7 @@ payload='{
     "type": "date"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -87,7 +87,7 @@ payload='{
     "type": "date"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -95,77 +95,77 @@ echo
 
 echo "04. GET entities with birthdate=2016-02-24T10:00:00.00Z, see E24"
 echo "================================================================"
-orionCurl --url '/v2/entities?q=birthdate==2016-02-24T10:00:00.00Z&options=keyValues' --json
+orionCurl --url '/v2/entities?q=birthdate==2016-02-24T10:00:00.00Z&options=keyValues'
 echo
 echo
 
 
 echo "04b. GET entities with birthdate=2016-02-24T10:00:00.00Z, see E24 (without keyValues)"
 echo "====================================================================================="
-orionCurl --url '/v2/entities?q=birthdate==2016-02-24T10:00:00.00Z' --json
+orionCurl --url '/v2/entities?q=birthdate==2016-02-24T10:00:00.00Z'
 echo
 echo
 
 
 echo "05. GET entities with birthdate>2016-02-24T10:00:00.00Z, see nothing"
 echo "===================================================================="
-orionCurl --url '/v2/entities?q=birthdate>2016-02-24T10:00:00.00Z&options=keyValues' --json
+orionCurl --url '/v2/entities?q=birthdate>2016-02-24T10:00:00.00Z&options=keyValues'
 echo
 echo
 
 
 echo "05b. GET entities with birthdate>2016-02-24T10:00:00.00Z, see nothing (without keyValues)"
 echo "========================================================================================="
-orionCurl --url '/v2/entities?q=birthdate>2016-02-24T10:00:00.00Z' --json
+orionCurl --url '/v2/entities?q=birthdate>2016-02-24T10:00:00.00Z'
 echo
 echo
 
 
 echo "06. GET entities with birthdate<2016-02-25T10:00:00.00Z, see all three"
 echo "======================================================================"
-orionCurl --url '/v2/entities?q=birthdate<2016-02-25T10:00:00.00Z&options=keyValues' --json
+orionCurl --url '/v2/entities?q=birthdate<2016-02-25T10:00:00.00Z&options=keyValues'
 echo
 echo
 
 
 echo "06b. GET entities with birthdate<2016-02-25T10:00:00.00Z, see all three (without keyValues)"
 echo "==========================================================================================="
-orionCurl --url '/v2/entities?q=birthdate<2016-02-25T10:00:00.00Z' --json
+orionCurl --url '/v2/entities?q=birthdate<2016-02-25T10:00:00.00Z'
 echo
 echo
 
 
 echo "07. GET entities with birthdate>=2016-02-23T10:00:00.00Z, see E23 and E24"
 echo "========================================================================="
-orionCurl --url '/v2/entities?q=birthdate>=2016-02-23T10:00:00.00Z&options=keyValues' --json
+orionCurl --url '/v2/entities?q=birthdate>=2016-02-23T10:00:00.00Z&options=keyValues'
 echo
 echo
 
 
 echo "07b. GET entities with birthdate>=2016-02-23T10:00:00.00Z, see E23 and E24 (without keyValues)"
 echo "=============================================================================================="
-orionCurl --url '/v2/entities?q=birthdate>=2016-02-23T10:00:00.00Z' --json
+orionCurl --url '/v2/entities?q=birthdate>=2016-02-23T10:00:00.00Z'
 echo
 echo
 
 
 echo "08. GET entities with birthdate<=2016-02-23T10:00:00.00Z, see E22 and E23"
 echo "========================================================================="
-orionCurl --url '/v2/entities?q=birthdate<=2016-02-23T10:00:00.00Z&options=keyValues' --json
+orionCurl --url '/v2/entities?q=birthdate<=2016-02-23T10:00:00.00Z&options=keyValues'
 echo
 echo
 
 
 echo "08b. GET entities with birthdate<=2016-02-23T10:00:00.00Z, see E22 and E23 (without keyValues)"
 echo "=============================================================================================="
-orionCurl --url '/v2/entities?q=birthdate<=2016-02-23T10:00:00.00Z' --json
+orionCurl --url '/v2/entities?q=birthdate<=2016-02-23T10:00:00.00Z'
 echo
 echo
 
 
 echo "09. GET entities with birthdate as a string, not a date: '2016-02-24T10:00:00.00Z', E24 NOT found"
 echo "================================================================================================="
-orionCurl --url "/v2/entities?q=birthdate=='2016-02-23T10:00:00.00Z'" --json
+orionCurl --url "/v2/entities?q=birthdate=='2016-02-23T10:00:00.00Z'"
 echo
 echo
 
@@ -179,21 +179,21 @@ payload='{
     "type": "string"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "11. GET entities with birthdate=2016-02-25T10:00:00.00Z, see nothing"
 echo "===================================================================="
-orionCurl --url "/v2/entities?q=birthdate==2016-02-25T10:00:00.00Z" --json
+orionCurl --url "/v2/entities?q=birthdate==2016-02-25T10:00:00.00Z"
 echo
 echo
 
 
 echo "12. GET entities with birthdate=2016-02-25T10:00:00.00Z, see E25"
 echo "================================================================"
-orionCurl --url "/v2/entities?q=birthdate=='2016-02-25T10:00:00.00Z'" --json
+orionCurl --url "/v2/entities?q=birthdate=='2016-02-25T10:00:00.00Z'"
 echo
 echo
 

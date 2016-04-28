@@ -31,7 +31,7 @@ brokerStart CB 0 -statCounters
 
 echo "0. Query all entities using convop /v1/contextEntities"
 echo "======================================================"
-orionCurl --url /v1/contextEntities --json
+orionCurl --url /v1/contextEntities
 echo
 echo
 
@@ -55,7 +55,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "${payload}" --json
+orionCurl --url /v1/updateContext --payload "${payload}"
 echo
 echo
 
@@ -79,7 +79,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "${payload}" --json
+orionCurl --url /v1/updateContext --payload "${payload}"
 echo
 echo
 
@@ -103,21 +103,21 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "${payload}" --json
+orionCurl --url /v1/updateContext --payload "${payload}"
 echo
 echo
 
 
 echo "4. Query all entities using convop /v1/contextEntities"
 echo "======================================================"
-orionCurl --url /v1/contextEntities --json
+orionCurl --url /v1/contextEntities
 echo
 echo
 
 
 echo "5. Statistics"
 echo "============="
-orionCurl --url /v1/admin/statistics --json
+orionCurl --url /v1/admin/statistics
 echo
 echo
 

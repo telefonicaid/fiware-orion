@@ -59,7 +59,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "${payload}" --json
+orionCurl --url /v1/updateContext --payload "${payload}"
 echo
 echo
 
@@ -82,7 +82,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "${payload}" --json
+orionCurl --url /v1/updateContext --payload "${payload}"
 echo
 echo
 
@@ -106,7 +106,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "${payload}" --json
+orionCurl --url /v1/updateContext --payload "${payload}"
 echo
 echo
 
@@ -129,21 +129,21 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "${payload}" --json
+orionCurl --url /v1/updateContext --payload "${payload}"
 echo
 echo
 
 
 echo "5. Query for Entities with type EMPTY"
 echo "====================================="
-orionCurl --url /v1/contextEntities?!exist=entity::type --json
+orionCurl --url /v1/contextEntities?!exist=entity::type
 echo
 echo
 
 
 echo "6. Query for Entities with type NOT EMPTY"
 echo "========================================="
-orionCurl --url /v1/contextEntities?exist=entity::type --json
+orionCurl --url /v1/contextEntities?exist=entity::type
 echo
 echo
 
@@ -167,7 +167,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -191,7 +191,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 

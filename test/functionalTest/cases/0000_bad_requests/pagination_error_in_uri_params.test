@@ -32,14 +32,14 @@ brokerStart CB
 echo "+++++ 1. bad characters in URI param 'limit'"
 url="/v1/queryContext?limit=abc"
 payload='NO PAYLOAD NECESSARY'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
 echo "+++++ 2. bad characters in URI param 'offset'"
 url="/v1/queryContext?offset=qwe"
 payload='NO PAYLOAD NECESSARY'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
@@ -47,7 +47,7 @@ echo
 echo "+++++ 3. URI param 'limit' == 0"
 url="/v1/queryContext?limit=000000"
 payload='NO PAYLOAD NECESSARY'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
@@ -55,7 +55,7 @@ echo
 echo "+++++ 4. URI param 'details' == 'Yes'"
 url="/v1/queryContext?details=Yes"
 payload='NO PAYLOAD NECESSARY'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 

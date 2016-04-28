@@ -41,14 +41,14 @@ payload='{
   "type": "T1",
   "cvec": [ 1, 2, 3 ]
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "02. GET /v2/entities/E1"
 echo "======================="
-orionCurl --url /v2/entities/E1 --json
+orionCurl --url /v2/entities/E1
 echo
 echo
 

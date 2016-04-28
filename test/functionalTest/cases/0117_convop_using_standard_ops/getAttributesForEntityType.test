@@ -41,7 +41,7 @@ brokerStart CB 0-255
 
 echo "01. GET /v1/contextTypes/T1 and see it fail"
 echo "==========================================="
-orionCurl --url /v1/contextTypes/T1 --json
+orionCurl --url /v1/contextTypes/T1
 echo
 echo
 
@@ -69,14 +69,14 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
 echo "03. GET /v1/contextTypes/T1 and see it work"
 echo "==========================================="
-orionCurl --url /v1/contextTypes/T1 --json
+orionCurl --url /v1/contextTypes/T1
 echo
 echo
 
@@ -104,28 +104,28 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json --servicePath /s1
+orionCurl --url /v1/updateContext --payload "$payload" --servicePath /s1
 echo
 echo
 
 
 echo "05. GET /v1/contextTypes/T1, without servicePath, see four types"
 echo "================================================================"
-orionCurl --url /v1/contextTypes/T1 --json
+orionCurl --url /v1/contextTypes/T1
 echo
 echo
 
 
 echo "06. GET /v1/contextTypes/T1, with servicePath /s1, see two types"
 echo "================================================================"
-orionCurl --url /v1/contextTypes/T1 --json --servicePath /s1
+orionCurl --url /v1/contextTypes/T1 --servicePath /s1
 echo
 echo
 
 
 echo "07. GET /v1/contextTypes/T1, with servicePath /, see two types"
 echo "=============================================================="
-orionCurl --url /v1/contextTypes/T1 --json --servicePath /
+orionCurl --url /v1/contextTypes/T1 --servicePath /
 echo
 echo
 

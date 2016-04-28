@@ -52,7 +52,7 @@ unset BROKER_AWAIT_SLEEP_TIME
 
 echo "01. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/primary and see it fail"
 echo "==============================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/primary --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/primary
 echo
 echo
 
@@ -82,56 +82,56 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
 echo "03. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/primary and see it work"
 echo "==============================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/primary --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/primary
 echo
 echo
 
 
 echo "04. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/primary?attributesFormat=object and see it work"
 echo "======================================================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/primary?attributesFormat=object --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/primary?attributesFormat=object
 echo
 echo
 
 
 echo "05. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/primary?entity::type=T1 and see it work"
 echo "==============================================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/primary?entity::type=T1 --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/primary?entity::type=T1
 echo
 echo
 
 
 echo "06. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/primary?exist=entity::type and see it work"
 echo "=================================================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/primary?exist=entity::type --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/primary?exist=entity::type
 echo
 echo
 
 
 echo "07. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/primary?entity::type=T2 and see it fail"
 echo "==============================================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/primary?entity::type=T2 --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/primary?entity::type=T2
 echo
 echo
 
 
 echo "08. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/primary?!exist=entity::type and see it fail"
 echo "==================================================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/primary?!exist=entity::type --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/primary?!exist=entity::type
 echo
 echo
 
 
 echo "09. GET /v1/contextEntities/type/T1/id/E1/attributes/A2/backup and see it find nothing"
 echo "======================================================================================"
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2/backup --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2/backup
 echo
 echo
 
@@ -166,7 +166,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json 
+orionCurl --url /v1/registry/registerContext --payload "$payload" 
 
 echo
 echo
@@ -174,7 +174,7 @@ echo
 
 echo "11. GET /v1/contextEntities/type/T1/id/E1/attributes/A2/backup and see it fail remotely"
 echo "======================================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2/backup --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2/backup
 echo
 echo
 
@@ -204,14 +204,14 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --port $CP1_PORT --json
+orionCurl --url /v1/updateContext --payload "$payload" --port $CP1_PORT
 echo
 echo
 
 
 echo "13. GET /v1/contextEntities/type/T1/id/E1/attributes/A2/backup and see it work remotely"
 echo "======================================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2/backup --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2/backup
 echo
 echo
 

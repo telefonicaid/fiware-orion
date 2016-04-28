@@ -45,7 +45,7 @@ payload='{
     "type": "intstring"
   }
 }'
-orionCurl --url /v2/entities?options=keyValues  --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues  --payload "$payload"
 echo
 echo
 
@@ -60,14 +60,14 @@ payload='{
     "type": "intstring"
   }
 }'
-orionCurl --url /v2/entities  --payload "$payload" --json
+orionCurl --url /v2/entities  --payload "$payload"
 echo
 echo
 
 
 echo "03. GET /v2/entities (E1/A1 is compound, E2/A1 is not compound)"
 echo "==============================================================="
-orionCurl --url /v2/entities?options=keyValues  --json
+orionCurl --url /v2/entities?options=keyValues 
 echo
 echo
 

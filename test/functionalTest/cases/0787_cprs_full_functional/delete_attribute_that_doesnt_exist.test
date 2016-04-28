@@ -48,7 +48,7 @@ payload='{
   ],
   "updateAction": "DELETE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 

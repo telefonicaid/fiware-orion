@@ -49,19 +49,19 @@ payload='{
         }
     ]
 }'
-orionCurl --url "$url" --payload "$payload" --urlParams attributeFormat=object --json
+orionCurl --url "$url" --payload "$payload" --urlParams attributeFormat=object
 echo
 echo
 
 
 echo "2. query E1/A1 using conv op GET /v1/contextEntities/E1 (with attributeFormat=object)"
 url="/v1/contextEntities/E1"
-orionCurl --url "$url" --urlParams attributeFormat=object --out json
+orionCurl --url "$url" --urlParams attributeFormat=object
 echo
 echo
 
 echo "3. query E1/A1 using conv op GET /v1/contextEntities/E1 (without attributeFormat=object)"
-orionCurl --url "$url" --out json
+orionCurl --url "$url"
 echo
 echo
 
@@ -77,21 +77,21 @@ payload='{
         }
     ]
 }'
-orionCurl --url "$url" --payload "$payload" --urlParams attributeFormat=object --json -X PUT
+orionCurl --url "$url" --payload "$payload" --urlParams attributeFormat=object -X PUT
 echo
 echo
 
 
 echo "5. query E1/A1 using conv op GET /v1/contextEntities/E1/attributes/A1 (with attributeFormat=object)"
 url="/v1/contextEntities/E1/attributes/A1"
-orionCurl --url "$url" --urlParams attributeFormat=object --out json
+orionCurl --url "$url" --urlParams attributeFormat=object
 echo
 echo
 
 
 echo "6. query E1/A1 using conv op GET /v1/contextEntities/E1/attributes/A1 (without attributeFormat=object)"
 url="/v1/contextEntities/E1/attributes/A1"
-orionCurl --url "$url" --out json
+orionCurl --url "$url"
 echo
 echo
 

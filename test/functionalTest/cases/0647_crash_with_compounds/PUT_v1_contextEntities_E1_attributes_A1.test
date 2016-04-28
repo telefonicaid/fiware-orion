@@ -59,7 +59,7 @@ payload1='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/E/attributes/A -X PUT --payload "$payload1" --json
+orionCurl --url /v1/contextEntities/E/attributes/A -X PUT --payload "$payload1"
 echo
 echo
 
@@ -90,14 +90,14 @@ payload3='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload3" --json
+orionCurl --url /v1/updateContext --payload "$payload3"
 echo
 echo
 
 
 echo "03. GET /v1/contextEntities/E to make sure 03 worked"
 echo "===================================================="
-orionCurl --url /v1/contextEntities/E --json
+orionCurl --url /v1/contextEntities/E
 echo
 echo
 
@@ -115,14 +115,14 @@ payload5='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/E/attributes/A -X PUT --payload "$payload5" --json
+orionCurl --url /v1/contextEntities/E/attributes/A -X PUT --payload "$payload5"
 echo
 echo
 
 
 echo "05. GET /v1/contextEntities/E to make sure 05 worked"
 echo "===================================================="
-orionCurl --url /v1/contextEntities/E --json
+orionCurl --url /v1/contextEntities/E
 echo
 echo
 

@@ -46,7 +46,7 @@ payload='{
   "A2": 2,
   "A3": 3
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -72,7 +72,7 @@ payload='
     "attrs": [ "A3", "A1", "A2" ]
   }
 }'
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -99,7 +99,7 @@ payload='
   },
   "attrsFormat": "keyValues"
 }'
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 

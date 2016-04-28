@@ -58,7 +58,7 @@ payload='{
   ],
   "throttling": "P5Y"
 }'
-orionCurl --url ${url} --payload "${payload}" --json
+orionCurl --url ${url} --payload "${payload}"
 
 echo "2: ***********************************"
 url="/v1/subscribeContext"
@@ -108,7 +108,7 @@ payload='{
   ],
   "throttling": "P5Y"
 }'
-orionCurl --url ${url} --payload "${payload}" --json
+orionCurl --url ${url} --payload "${payload}"
 
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 
@@ -142,7 +142,7 @@ payload='{
   ],
   "throttling": "P4Y"
 }'
-orionCurl --url ${url} --payload "${payload}" --json
+orionCurl --url ${url} --payload "${payload}"
 
 echo "4: ***********************************"
 --REGEXPECT--

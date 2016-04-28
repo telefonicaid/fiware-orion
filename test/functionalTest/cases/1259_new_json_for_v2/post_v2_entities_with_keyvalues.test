@@ -137,7 +137,7 @@ payload='{
     }
   }
 }'
-orionCurl --url /v2/entities?options=keyValues  --payload "$payload" --json
+orionCurl --url /v2/entities?options=keyValues  --payload "$payload"
 echo
 echo
 
@@ -157,21 +157,21 @@ payload='{
     }
   }
 }'
-orionCurl --url /v2/entities  --payload "$payload" --json
+orionCurl --url /v2/entities  --payload "$payload"
 echo
 echo
 
 
 echo "03. GET /v2/entities"
 echo "===================="
-orionCurl --url /v2/entities --json
+orionCurl --url /v2/entities
 echo
 echo
 
 
 echo "04. GET /v2/entities?options=keyValues"
 echo "======================================"
-orionCurl --url /v2/entities?options=keyValues --json
+orionCurl --url /v2/entities?options=keyValues
 echo
 echo
 

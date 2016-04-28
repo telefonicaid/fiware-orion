@@ -68,48 +68,48 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload"
 echo
 echo
 
 
 echo "02. Discover with convop GET /v1/registry/contextEntities/Room"
 echo "=============================================================="
-orionCurl --url /v1/registry/contextEntities/Room --json
+orionCurl --url /v1/registry/contextEntities/Room
 echo
 echo
 
 
 echo "03. Discover with convop GET /v1/registry/contextEntities/Room/attributes/temperature"
 echo "====================================================================================="
-orionCurl --url /v1/registry/contextEntities/Room/attributes/temperature --json
+orionCurl --url /v1/registry/contextEntities/Room/attributes/temperature
 echo
 echo
 
 
 echo "04. Discover with convop GET /v1/registry/contextEntityTypes/Room"
 echo "================================================================="
-orionCurl --url /v1/registry/contextEntityTypes/Room --json
+orionCurl --url /v1/registry/contextEntityTypes/Room
 echo
 echo
 
 
 echo "05. Discover with convop GET /v1/registry/contextEntityTypes/Room/attributes/temperature"
 echo "========================================================================================"
-orionCurl --url /v1/registry/contextEntityTypes/Room/attributes/temperature --json
+orionCurl --url /v1/registry/contextEntityTypes/Room/attributes/temperature
 echo
 echo
 
 echo "06. Discover with convop GET /v1/registry/contextEntities/type/Room/id/Room"
 echo "==========================================================================="
-orionCurl --url /v1/registry/contextEntities/type/Room/id/Room --json
+orionCurl --url /v1/registry/contextEntities/type/Room/id/Room
 echo
 echo
 
 
 echo "07. Discover with convop GET /v1/registry/contextEntities/type/Room/id/Room/attributes/temperature"
 echo "=================================================================================================="
-orionCurl --url /v1/registry/contextEntities/type/Room/id/Room/attributes/temperature --json
+orionCurl --url /v1/registry/contextEntities/type/Room/id/Room/attributes/temperature
 echo
 echo
 

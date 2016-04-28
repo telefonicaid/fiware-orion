@@ -48,7 +48,7 @@ brokerStart CB 0
 
 echo "01. GET /v1/contextEntityTypes/ET1 and see 0 responses"
 echo "======================================================"
-orionCurl --url /v1/contextEntityTypes/ET1 --json
+orionCurl --url /v1/contextEntityTypes/ET1
 echo
 echo
 
@@ -72,14 +72,14 @@ payload='{
     ],
     "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
 echo "03. GET /v1/contextEntityTypes/ET1 and see 1 response"
 echo "====================================================="
-orionCurl --url /v1/contextEntityTypes/ET1 --json
+orionCurl --url /v1/contextEntityTypes/ET1
 echo
 echo
 
@@ -103,56 +103,56 @@ payload='{
     ],
     "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
 
 echo "05. GET /v1/contextEntityTypes/ET1 and see 1 response"
 echo "====================================================="
-orionCurl --url /v1/contextEntityTypes/ET1 --json
+orionCurl --url /v1/contextEntityTypes/ET1
 echo
 echo
 
 
 echo "06. GET /v1/contextEntityTypes/ET2 and see 1 response"
 echo "====================================================="
-orionCurl --url /v1/contextEntityTypes/ET2 --json
+orionCurl --url /v1/contextEntityTypes/ET2
 echo
 echo
 
 
 echo "07. GET /v1/contextEntityTypes/ET1?attributesFormat=object"
 echo "=========================================================="
-orionCurl --url /v1/contextEntityTypes/ET1?attributesFormat=object --json
+orionCurl --url /v1/contextEntityTypes/ET1?attributesFormat=object
 echo
 echo
 
 
 echo "08. GET /v1/contextEntityTypes/ET1?entity::type=ET1 and see 1 response"
 echo "======================================================================"
-orionCurl --url /v1/contextEntityTypes/ET1?entity::type=ET1 --json
+orionCurl --url /v1/contextEntityTypes/ET1?entity::type=ET1
 echo
 echo
 
 
 echo "09. GET /v1/contextEntityTypes/ET1?exist=entity::type and see 1 response"
 echo "========================================================================"
-orionCurl --url /v1/contextEntityTypes/ET1?exist=entity::type --json
+orionCurl --url /v1/contextEntityTypes/ET1?exist=entity::type
 echo
 echo
 
 
 echo "10. GET /v1/contextEntityTypes/ET1?!exist=entity::type end see it fail"
 echo "======================================================================"
-orionCurl --url /v1/contextEntityTypes/ET1?!exist=entity::type --json
+orionCurl --url /v1/contextEntityTypes/ET1?!exist=entity::type
 echo
 echo
 
 
 echo "11. GET /v1/contextEntityTypes/ET1?entity::type=ET2 and see it fail"
 echo "==================================================================="
-orionCurl --url /v1/contextEntityTypes/ET1?entity::type=ET2 --json
+orionCurl --url /v1/contextEntityTypes/ET1?entity::type=ET2
 echo
 echo
 

@@ -47,7 +47,7 @@ payload='{
     "attr": "value",
     "attr": 1
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 

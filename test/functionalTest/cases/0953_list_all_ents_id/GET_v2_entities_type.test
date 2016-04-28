@@ -47,7 +47,7 @@ payload='
       "id":   "E1",
       "type": "T1"
     }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -59,7 +59,7 @@ payload='
       "id":   "E2",
       "type": "T1"
     }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -71,7 +71,7 @@ payload='
       "id":   "E3",
       "type": "T2"
     }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -83,7 +83,7 @@ payload='
       "id":   "E1",
       "type": "T3"
     }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -95,28 +95,28 @@ payload='
       "id":   "E2",
       "type": "T3"
     }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "06. GET /v2/entities?type=T1"
 echo "============================"
-orionCurl --url '/v2/entities?type=T1' --json
+orionCurl --url '/v2/entities?type=T1'
 echo
 echo
 
 
 echo "07. GET /v2/entities?type=T3"
 echo "============================"
-orionCurl --url '/v2/entities?type=T3' --json
+orionCurl --url '/v2/entities?type=T3'
 echo
 echo
 
 
 echo "08. GET /v2/entities?type=NONE"
 echo "=============================="
-orionCurl --url '/v2/entities?type=NONE' --json
+orionCurl --url '/v2/entities?type=NONE'
 echo
 echo
 

@@ -39,10 +39,10 @@ payload='{
     }
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "+++++ 2. lookup the entity +++++"
-orionCurl --url "/v1/contextEntities/entity01/attributes" -X "GET" --json
+orionCurl --url "/v1/contextEntities/entity01/attributes" -X "GET"
 
 --REGEXPECT--
 +++++ 1. create an entity +++++

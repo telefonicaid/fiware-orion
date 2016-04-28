@@ -49,7 +49,7 @@ payload=' {
  "id": "room_1"
 }
 '
-orionCurl --url '/v2/entities' --payload "$payload" --json
+orionCurl --url '/v2/entities' --payload "$payload"
 echo
 echo
 
@@ -93,7 +93,7 @@ Date: REGEX(.*)
 ================================================
 HTTP/1.1 200 OK
 Content-Length: 477
-Content-Type: text/plain
+Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

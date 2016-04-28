@@ -48,14 +48,14 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /ngsi10/updateContext --payload "${payload}" --json
+orionCurl --url /ngsi10/updateContext --payload "${payload}"
 echo
 echo
 
 
 echo "1.2. NOP /ngsi10/updateContext"
 echo "=============================="
-orionCurl --url /ngsi10/updateContext --payload "${payload}" -X NOP --json
+orionCurl --url /ngsi10/updateContext --payload "${payload}" -X NOP
 echo
 echo
 
@@ -75,14 +75,14 @@ payload='{
     "A2"
   ]
 }'
-orionCurl --url /ngsi10/queryContext --payload "${payload}" --json
+orionCurl --url /ngsi10/queryContext --payload "${payload}"
 echo
 echo
 
 
 echo "2.2. NOP /ngsi10/queryContext"
 echo "============================="
-orionCurl --url /ngsi10/queryContext --payload "${payload}" -X NOP --json
+orionCurl --url /ngsi10/queryContext --payload "${payload}" -X NOP
 echo
 echo
 
@@ -100,7 +100,7 @@ payload='{
   "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
   "duration": "PT5H"
 }'
-orionCurl --url /ngsi10/subscribeContext --payload "${payload}" --json
+orionCurl --url /ngsi10/subscribeContext --payload "${payload}"
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 echo
 echo
@@ -108,7 +108,7 @@ echo
 
 echo "3.2. NOP /ngsi10/subscribeContext"
 echo "================================="
-orionCurl --url /ngsi10/subscribeContext --payload "${payload}" -X NOP --json
+orionCurl --url /ngsi10/subscribeContext --payload "${payload}" -X NOP
 echo
 echo
 
@@ -127,14 +127,14 @@ payload='{
     }
   ]
 }'
-orionCurl --url /ngsi10/updateContextSubscription --payload "${payload}" --json
+orionCurl --url /ngsi10/updateContextSubscription --payload "${payload}"
 echo
 echo
 
 
 echo "4.2. NOP /ngsi10/updateContextSubscription"
 echo "=========================================="
-orionCurl --url /ngsi10/updateContextSubscription --payload "${payload}" -X NOP --json
+orionCurl --url /ngsi10/updateContextSubscription --payload "${payload}" -X NOP
 echo
 echo
 
@@ -144,21 +144,21 @@ echo "===================================="
 payload='{
   "subscriptionId": "'$SUB_ID'"
 }'
-orionCurl --url /ngsi10/unsubscribeContext --payload "${payload}" --json
+orionCurl --url /ngsi10/unsubscribeContext --payload "${payload}"
 echo
 echo
 
 
 echo "5.2. NOP /ngsi10/unsubscribeContext"
 echo "==================================="
-orionCurl --url /ngsi10/unsubscribeContext --payload "${payload}" -X NOP --json
+orionCurl --url /ngsi10/unsubscribeContext --payload "${payload}" -X NOP
 echo
 echo
 
 
 echo "6.1. GET /ngsi10/contextEntities/EID"
 echo "===================================="
-orionCurl --url /ngsi10/contextEntities/EID --json
+orionCurl --url /ngsi10/contextEntities/EID
 echo
 echo
 
@@ -174,7 +174,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /ngsi10/contextEntities/EID --payload "${payload}" -X PUT --json
+orionCurl --url /ngsi10/contextEntities/EID --payload "${payload}" -X PUT
 echo
 echo
 
@@ -190,14 +190,14 @@ payload='{
     }
   ]
 }'
-orionCurl --url /ngsi10/contextEntities/EID --payload "${payload}" --json
+orionCurl --url /ngsi10/contextEntities/EID --payload "${payload}"
 echo
 echo
 
 
 echo "6.4. DELETE /ngsi10/contextEntities/EID"
 echo "======================================="
-orionCurl --url /ngsi10/contextEntities/EID -X DELETE --json
+orionCurl --url /ngsi10/contextEntities/EID -X DELETE
 echo
 echo
 
@@ -205,7 +205,7 @@ echo
 echo "6.5. NOP /ngsi10/contextEntities/EID"
 echo "===================================="
 payload='<?xml version="1.0"?>'
-orionCurl --url /ngsi10/contextEntities/EID -X NOP --json
+orionCurl --url /ngsi10/contextEntities/EID -X NOP
 echo
 echo
 
@@ -213,7 +213,7 @@ echo
 
 echo "7.1. GET /ngsi10/contextEntities/EID/attributes"
 echo "==============================================="
-orionCurl --url /ngsi10/contextEntities/EID/attributes --json
+orionCurl --url /ngsi10/contextEntities/EID/attributes
 echo
 echo
 
@@ -229,7 +229,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /ngsi10/contextEntities/EID/attributes --payload "${payload}" -X PUT --json
+orionCurl --url /ngsi10/contextEntities/EID/attributes --payload "${payload}" -X PUT
 echo
 echo
 
@@ -245,21 +245,21 @@ payload='{
     }
   ]
 }'
-orionCurl --url /ngsi10/contextEntities/EID/attributes --payload "${payload}" --json
+orionCurl --url /ngsi10/contextEntities/EID/attributes --payload "${payload}"
 echo
 echo
 
 
 echo "7.4. DELETE /ngsi10/contextEntities/EID/attributes"
 echo "=================================================="
-orionCurl --url /ngsi10/contextEntities/EID/attributes -X DELETE --json
+orionCurl --url /ngsi10/contextEntities/EID/attributes -X DELETE
 echo
 echo
 
 
 echo "7.5. NOP /ngsi10/contextEntities/EID/attributes"
 echo "==============================================="
-orionCurl --url /ngsi10/contextEntities/EID/attributes -X NOP --json
+orionCurl --url /ngsi10/contextEntities/EID/attributes -X NOP
 echo
 echo
 
@@ -267,7 +267,7 @@ echo
 
 echo "8.1. GET /ngsi10/contextEntities/EID/attributes/A1"
 echo "=================================================="
-orionCurl --url /ngsi10/contextEntities/EID/attributes/A1 --json
+orionCurl --url /ngsi10/contextEntities/EID/attributes/A1
 echo
 echo
 
@@ -285,14 +285,14 @@ payload='{
     }
   ]
 }'
-orionCurl --url /ngsi10/contextEntities/EID/attributes/A1 --payload "${payload}" -X PUT --json
+orionCurl --url /ngsi10/contextEntities/EID/attributes/A1 --payload "${payload}" -X PUT
 echo
 echo
 
 
 echo "8.3. GET /ngsi10/contextEntities/EID/attributes/A1"
 echo "=================================================="
-orionCurl --url /ngsi10/contextEntities/EID/attributes/A1 --json
+orionCurl --url /ngsi10/contextEntities/EID/attributes/A1
 echo
 echo
 
@@ -310,35 +310,35 @@ payload='{
     }
   ]
 }'
-orionCurl --url /ngsi10/contextEntities/EID/attributes/A1 --payload "${payload}" --json
+orionCurl --url /ngsi10/contextEntities/EID/attributes/A1 --payload "${payload}"
 echo
 echo
 
 
 echo "8.5. GET /ngsi10/contextEntities/EID/attributes/A1"
 echo "=================================================="
-orionCurl --url /ngsi10/contextEntities/EID/attributes/A1 --json
+orionCurl --url /ngsi10/contextEntities/EID/attributes/A1
 echo
 echo
 
 
 echo "8.6. DELETE /ngsi10/contextEntities/EID/attributes/A1"
 echo "====================================================="
-orionCurl --url /ngsi10/contextEntities/EID/attributes/A1 -X DELETE --json
+orionCurl --url /ngsi10/contextEntities/EID/attributes/A1 -X DELETE
 echo
 echo
 
 
 echo "8.7. NOP /ngsi10/contextEntities/EID/attributes/A1"
 echo "=================================================="
-orionCurl --url /ngsi10/contextEntities/EID/attributes/A1 -X NOP --json
+orionCurl --url /ngsi10/contextEntities/EID/attributes/A1 -X NOP
 echo
 echo
 
 
 echo "9.1. GET /ngsi10/contextEntities/EID/attributes/A1/left"
 echo "======================================================="
-orionCurl --url /ngsi10/contextEntities/EID/attributes/A1/left --json
+orionCurl --url /ngsi10/contextEntities/EID/attributes/A1/left
 echo
 echo
 
@@ -356,21 +356,21 @@ payload='{
     }
   ]
 }'
-orionCurl --url /ngsi10/contextEntities/EID/attributes/A1/left --payload "${payload}" -X PUT --json
+orionCurl --url /ngsi10/contextEntities/EID/attributes/A1/left --payload "${payload}" -X PUT
 echo
 echo
 
 
 echo "9.3. DELETE /ngsi10/contextEntities/EID/attributes/A1/left"
 echo "=========================================================="
-orionCurl --url /ngsi10/contextEntities/EID/attributes/A1/left -X DELETE --json
+orionCurl --url /ngsi10/contextEntities/EID/attributes/A1/left -X DELETE
 echo
 echo
 
 
 echo "9.4. NOP /ngsi10/contextEntities/EID/attributes/A1/left"
 echo "======================================================="
-orionCurl --url /ngsi10/contextEntities/EID/attributes/A1/left -X NOP --json
+orionCurl --url /ngsi10/contextEntities/EID/attributes/A1/left -X NOP
 echo
 echo
 
@@ -378,14 +378,14 @@ echo
 
 echo "10.1. GET /ngsi10/contextEntityTypes/T"
 echo "======================================"
-orionCurl --url /ngsi10/contextEntityTypes/T --json
+orionCurl --url /ngsi10/contextEntityTypes/T
 echo
 echo
 
 
 echo "10.2. NOP /ngsi10/contextEntityTypes/T"
 echo "======================================"
-orionCurl --url /ngsi10/contextEntityTypes/T -X NOP --json
+orionCurl --url /ngsi10/contextEntityTypes/T -X NOP
 echo
 echo
 
@@ -393,14 +393,14 @@ echo
 
 echo "11.1. GET /ngsi10/contextEntityTypes/typeName/attributes"
 echo "========================================================"
-orionCurl --url /ngsi10/contextEntityTypes/typeName/attributes --json
+orionCurl --url /ngsi10/contextEntityTypes/typeName/attributes
 echo
 echo
 
 
 echo "11.2. NOP /ngsi10/contextEntityTypes/typeName/attributes"
 echo "========================================================"
-orionCurl --url /ngsi10/contextEntityTypes/typeName/attributes -X NOP --json
+orionCurl --url /ngsi10/contextEntityTypes/typeName/attributes -X NOP
 echo
 echo
 
@@ -408,14 +408,14 @@ echo
 
 echo "12.1. GET /ngsi10/contextEntityTypes/typeName/attributes/A1"
 echo "==========================================================="
-orionCurl --url /ngsi10/contextEntityTypes/typeName/attributes/A1 --json
+orionCurl --url /ngsi10/contextEntityTypes/typeName/attributes/A1
 echo
 echo
 
 
 echo "12.2. NOP /ngsi10/contextEntityTypes/typeName/attributes/A1"
 echo "==========================================================="
-orionCurl --url /ngsi10/contextEntityTypes/typeName/attributes/A1 -X NOP --json
+orionCurl --url /ngsi10/contextEntityTypes/typeName/attributes/A1 -X NOP
 echo
 echo
 
@@ -446,7 +446,7 @@ payload='{
         }
     ]
 }'
-orionCurl --url /ngsi10/contextSubscriptions --payload "${payload}" --json
+orionCurl --url /ngsi10/contextSubscriptions --payload "${payload}"
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 echo
 echo
@@ -454,7 +454,7 @@ echo
 
 echo "13.2. NOP /ngsi10/contextSubscriptions"
 echo "======================================"
-orionCurl --url /ngsi10/contextSubscriptions -X NOP --json
+orionCurl --url /ngsi10/contextSubscriptions -X NOP
 echo
 echo
 
@@ -474,21 +474,21 @@ payload='{
     ],
     "subscriptionId": "'$SUB_ID'"
 }'
-orionCurl --url /ngsi10/contextSubscriptions/$SUB_ID --payload "${payload}" -X PUT --json
+orionCurl --url /ngsi10/contextSubscriptions/$SUB_ID --payload "${payload}" -X PUT
 echo
 echo
 
 
 echo "14.2. DELETE /ngsi10/contextSubscriptions/SUB_ID"
 echo "================================================"
-orionCurl --url /ngsi10/contextSubscriptions/$SUB_ID -X DELETE --json
+orionCurl --url /ngsi10/contextSubscriptions/$SUB_ID -X DELETE
 echo
 echo
 
 
 echo "14.3. NOP /ngsi10/contextSubscriptions/SUB_ID"
 echo "============================================="
-orionCurl --url /ngsi10/contextSubscriptions/SUB_ID -X NOP --json
+orionCurl --url /ngsi10/contextSubscriptions/SUB_ID -X NOP
 echo
 echo
 

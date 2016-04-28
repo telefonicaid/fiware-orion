@@ -75,31 +75,31 @@ payload='{
 
    
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 echo "02. GET /v2/entities/8787GHY/attrs/brand"
 echo "========================================"
-orionCurl --url /v2/entities/8787GHY/attrs/brand --json
+orionCurl --url /v2/entities/8787GHY/attrs/brand
 echo
 echo
 
 echo "03. GET /v2/entities/8787GHY/attrs/model"
 echo "========================================"
-orionCurl --url /v2/entities/8787GHY/attrs/model --json
+orionCurl --url /v2/entities/8787GHY/attrs/model
 echo
 echo
 
 echo "04. GET /v2/entities/8787GHY/attrs/speed"
 echo "========================================"
-orionCurl --url /v2/entities/8787GHY/attrs/speed --json
+orionCurl --url /v2/entities/8787GHY/attrs/speed
 echo
 echo
 
 echo "05. GET /v2/entities/8787GHY/attrs/A3"
 echo "====================================="
-orionCurl --url /v2/entities/8787GHY/attrs/A3 --json
+orionCurl --url /v2/entities/8787GHY/attrs/A3
 echo
 echo
 

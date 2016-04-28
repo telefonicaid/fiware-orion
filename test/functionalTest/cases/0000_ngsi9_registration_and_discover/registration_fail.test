@@ -47,7 +47,7 @@ payload='{
     "pressure"
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "++++++++++++++++++++"
 # Updating non existing registration
@@ -75,7 +75,7 @@ payload='{
   "duration": "PT1H",
   "registrationId": "51307b66f481db11bf860001"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
 HTTP/1.1 200 OK

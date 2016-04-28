@@ -47,7 +47,7 @@ payload='{
     "id": "E1",
     "A1": { "value": 1 }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -58,7 +58,7 @@ payload='{
     "id": "E2",
     "A1": { "value": 2 }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -69,42 +69,42 @@ payload='{
     "id": "E3",
     "A3": { "value": 3 }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "04. GET all entities (3 entities)"
 echo "================================="
-orionCurl --url /v2/entities --json
+orionCurl --url /v2/entities
 echo
 echo
 
 
 echo "05. GET entities with attribute A1 (2 entities)"
 echo "==============================================="
-orionCurl --url '/v2/entities?q=A1' --json
+orionCurl --url '/v2/entities?q=A1'
 echo
 echo
 
 
 echo "06. GET entities with attribute A2 (ZERO entities)"
 echo "=================================================="
-orionCurl --url '/v2/entities?q=A2' --json
+orionCurl --url '/v2/entities?q=A2'
 echo
 echo
 
 
 echo "07. GET entities with attribute A3 (1 entity)"
 echo "============================================="
-orionCurl --url '/v2/entities?q=A3' --json
+orionCurl --url '/v2/entities?q=A3'
 echo
 echo
 
 
 echo "08. GET entities without attribute A3 (2 entities)"
 echo "=================================================="
-orionCurl --url '/v2/entities?q=!A3' --json
+orionCurl --url '/v2/entities?q=!A3'
 echo
 echo
 

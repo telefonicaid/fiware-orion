@@ -54,7 +54,7 @@ brokerStart CB 0-255
 
 echo "01. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 and see it fail"
 echo "=========================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12
 echo
 echo
 
@@ -72,33 +72,33 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --payload "$payload" --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --payload "$payload"
 echo
 echo
 
 
 echo "03. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK"
 echo "============================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12
 echo
 echo
 
 
 echo "04. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK"
 echo "================================================================"
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --json -X DELETE
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 -X DELETE
 echo
 echo
 
 echo "05. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 and see it fail"
 echo "=========================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12
 echo
 echo
 
 echo "06. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1/12 and see it fail"
 echo "============================================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --json -X DELETE
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 -X DELETE
 echo
 echo
 
@@ -116,7 +116,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --payload "$payload" --json -X PUT
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --payload "$payload" -X PUT
 echo
 echo
 
@@ -134,14 +134,14 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --payload "$payload" --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --payload "$payload"
 echo
 echo
 
 
 echo "09. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK"
 echo "============================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12
 echo
 echo
 
@@ -159,21 +159,21 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --payload "$payload" --json -X PUT
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --payload "$payload" -X PUT
 echo
 echo
 
 
 echo "11. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK"
 echo "============================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12
 echo
 echo
 
 
 echo "12. NOP /v1/contextEntities/type/T1/id/E1/attributes/A1/12"
 echo "=========================================================="
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --json -X NOP
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 -X NOP
 echo
 echo
 

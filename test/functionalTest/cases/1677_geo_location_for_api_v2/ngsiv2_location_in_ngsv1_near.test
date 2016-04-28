@@ -50,7 +50,7 @@ payload='{
     "type": "geo:point"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 sleep 1.1
@@ -66,7 +66,7 @@ payload='{
     "type": "geo:point"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 sleep 1.1
@@ -82,7 +82,7 @@ payload='{
     "type": "geo:point"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -110,7 +110,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -138,7 +138,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -166,7 +166,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 

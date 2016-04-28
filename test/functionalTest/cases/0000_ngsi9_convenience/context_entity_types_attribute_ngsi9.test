@@ -30,7 +30,7 @@ brokerStart CB
 --SHELL--
 
 echo "0: ++++++++++++++++++++"
-orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes/temperature" --json
+orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes/temperature"
 
 echo "1: ++++++++++++++++++++"
 url="/v1/registry/registerContext"
@@ -66,14 +66,14 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url "$url" --payload "$payload" --json
+orionCurl --url "$url" --payload "$payload"
 
 echo "2: ++++++++++++++++++++"
-orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes/temperature" --json
+orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes/temperature"
 
 # DELETE is not allowed
 echo "3: ++++++++++++++++++++"
-orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes/temperature" -X "DELETE" --json
+orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes/temperature" -X "DELETE"
 
 # PUT is not allowed
 echo "4: ++++++++++++++++++++"
@@ -94,7 +94,7 @@ payload='{
   "duration" : "PT1H",
   "providingApplication" : "http://kz.tid.es/abc"
 }'
-orionCurl --url "$url" --payload "$payload" -X "PUT" --json
+orionCurl --url "$url" --payload "$payload" -X "PUT"
 
 --REGEXPECT--
 0: ++++++++++++++++++++

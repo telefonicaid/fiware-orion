@@ -69,7 +69,7 @@ payload='{
   ],
   "throttling": "PT5S"
 }'
-orionCurl --url /v1/subscribeContext --payload "${payload}" --json
+orionCurl --url /v1/subscribeContext --payload "${payload}"
 echo
 echo
 
@@ -101,13 +101,13 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "${payload}" --json
+orionCurl --url /v1/subscribeContext --payload "${payload}"
 echo
 echo
 
 echo "02. GET /v2/subscriptions?options=count"
 echo "======================================="
-orionCurl --url /v2/subscriptions?options=count --json
+orionCurl --url /v2/subscriptions?options=count
 echo
 echo
 
@@ -119,14 +119,14 @@ payload='{
   "type": "Car",
   "speed": "1"
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 echo "04. GET /v2/subscriptions (now seeing the timesSent and lastNotification in one sub)"
 echo "===================================================================================="
-orionCurl --url /v2/subscriptions --json
+orionCurl --url /v2/subscriptions
 echo
 echo
 

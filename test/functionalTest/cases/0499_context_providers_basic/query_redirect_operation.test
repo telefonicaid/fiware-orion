@@ -66,7 +66,7 @@ payload3='{
     "A1"
   ]
 }'
-orionCurl --url "$url3" --payload "$payload3" --json
+orionCurl --url "$url3" --payload "$payload3"
 echo
 echo
 
@@ -94,7 +94,7 @@ payload4='{
     }
  ]
 }'
-orionCurl --url "$url4" --payload "$payload4" --json
+orionCurl --url "$url4" --payload "$payload4"
 echo
 echo
 
@@ -113,7 +113,7 @@ payload5='{
     "A1"
   ]
 }'
-orionCurl --url "$url5" --payload "$payload5" --json
+orionCurl --url "$url5" --payload "$payload5"
 echo
 echo
 
@@ -137,7 +137,7 @@ payload6='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url6" --payload "$payload6" --port $CP1_PORT --json
+orionCurl --url "$url6" --payload "$payload6" --port $CP1_PORT
 echo
 echo
 
@@ -156,7 +156,7 @@ payload7='{
     "A1"
   ]
 }'
-orionCurl --url "$url7" --payload "$payload7" --port $CP1_PORT --json
+orionCurl --url "$url7" --payload "$payload7" --port $CP1_PORT
 echo
 echo
 
@@ -175,7 +175,7 @@ payload8='{
     "A1"
   ]
 }'
-orionCurl --url "$url8" --payload "$payload8" --json
+orionCurl --url "$url8" --payload "$payload8"
 echo
 echo
 
@@ -199,7 +199,7 @@ payload9='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url9" --payload "$payload9" --json
+orionCurl --url "$url9" --payload "$payload9"
 echo
 echo
 
@@ -218,7 +218,7 @@ payload10='{
     "A1"
   ]
 }'
-orionCurl --url "$url10" --payload "$payload10" --json
+orionCurl --url "$url10" --payload "$payload10"
 echo
 echo
 

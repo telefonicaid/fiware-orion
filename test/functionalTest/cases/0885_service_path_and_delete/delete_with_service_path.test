@@ -55,7 +55,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --servicePath /father --json
+orionCurl --url /v1/updateContext --payload "$payload" --servicePath /father
 echo
 echo
 
@@ -78,7 +78,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --servicePath /father/son --json
+orionCurl --url /v1/updateContext --payload "$payload" --servicePath /father/son
 echo
 echo
 
@@ -96,7 +96,7 @@ payload='{
     "A1"
   ]
 }'
-orionCurl --url /v1/queryContext --payload "${payload}" --json
+orionCurl --url /v1/queryContext --payload "${payload}"
 echo
 echo
 
@@ -118,7 +118,7 @@ payload='{
   ],
   "updateAction": "DELETE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --servicePath /father --json
+orionCurl --url /v1/updateContext --payload "$payload" --servicePath /father
 echo
 echo
 
@@ -136,7 +136,7 @@ payload='{
     "A1"
   ]
 }'
-orionCurl --url /v1/queryContext --payload "${payload}" --json
+orionCurl --url /v1/queryContext --payload "${payload}"
 echo
 echo
 

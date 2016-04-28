@@ -60,7 +60,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextSubscriptions/1234567890 --payload "$payload" --json -X PUT
+orionCurl --url /v1/contextSubscriptions/1234567890 --payload "$payload" -X PUT
 echo
 echo
 
@@ -80,7 +80,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextSubscriptions/123456789012345678901234 --payload "$payload" --json -X PUT
+orionCurl --url /v1/contextSubscriptions/123456789012345678901234 --payload "$payload" -X PUT
 echo
 echo
 
@@ -100,7 +100,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextSubscriptions/123456789012345678901234 --payload "$payload" --json -X PUT
+orionCurl --url /v1/contextSubscriptions/123456789012345678901234 --payload "$payload" -X PUT
 echo
 echo
 
@@ -130,7 +130,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload"
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 echo
 echo
@@ -159,7 +159,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -186,7 +186,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextSubscriptions/$SUB_ID --payload "$payload" --json -X PUT
+orionCurl --url /v1/contextSubscriptions/$SUB_ID --payload "$payload" -X PUT
 echo
 echo
 
@@ -216,7 +216,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -249,7 +249,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 

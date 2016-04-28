@@ -42,7 +42,7 @@ echo "==========================================================================
 payload='{
   "value": 1
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/M1?entity::type=T2 --payload "$payload" --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/M1?entity::type=T2 --payload "$payload"
 echo
 echo
 
@@ -59,7 +59,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/M1 --payload "$payload" --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/M1 --payload "$payload"
 echo
 echo
 
@@ -69,7 +69,7 @@ echo "==========================================================================
 payload='{
   "value": 3
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/M1 --payload "$payload" --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/M1 --payload "$payload"
 echo
 echo
 
@@ -86,7 +86,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2/M1 --payload "$payload" --json
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2/M1 --payload "$payload"
 echo
 echo
 
@@ -101,7 +101,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 

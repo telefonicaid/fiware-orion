@@ -63,7 +63,7 @@ payload='{
     "type": "geo:point"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -78,7 +78,7 @@ payload='{
     "type": "geo:point"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -93,7 +93,7 @@ payload='{
     "type": "geo:point"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -108,7 +108,7 @@ payload='{
     "type": "geo:point"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -123,7 +123,7 @@ payload='{
     "type": "geo:point"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -151,7 +151,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -179,7 +179,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -207,7 +207,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -235,7 +235,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -263,14 +263,14 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
 
 echo "11. Query intersects line (5, 5) (9, 5) -> A, B"
 echo "==============================================="
-#orionCurl --url '/v2/entities?georel=&geometry=line&coords=' --json
+#orionCurl --url '/v2/entities?georel=&geometry=line&coords='
 payload='{
   "entities": [
   {
@@ -292,7 +292,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -320,7 +320,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -348,7 +348,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -376,7 +376,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -404,7 +404,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -432,7 +432,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -460,7 +460,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -488,7 +488,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -516,7 +516,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -544,7 +544,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -572,7 +572,7 @@ payload='{
     ]
   }
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 

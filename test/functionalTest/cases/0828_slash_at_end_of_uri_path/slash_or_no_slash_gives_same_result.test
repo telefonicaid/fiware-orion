@@ -55,14 +55,14 @@ payload='{
     ],
     "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext/ --payload "$payload" --json
+orionCurl --url /v1/updateContext/ --payload "$payload"
 echo
 echo
 
 
 echo "02. GET /v1/contextEntityTypes/ and see error 'service not found'"
 echo "================================================================="
-orionCurl --url /v1/contextEntityTypes////////// --json
+orionCurl --url /v1/contextEntityTypes//////////
 echo
 echo
 

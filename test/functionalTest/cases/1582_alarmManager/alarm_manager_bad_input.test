@@ -43,7 +43,7 @@ brokerStart CB 0 IPv4
 
 echo "01. PUT /v2/noService"
 echo "====================="
-orionCurl --url /v2/noService --json
+orionCurl --url /v2/noService
 echo
 echo
 
@@ -51,34 +51,34 @@ echo
 echo "02. POST /v2/entities with invalid JSON"
 echo "======================================="
 payload='abc'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
 echo "03. GETT /v2/entities - bad verb"
 echo "================================"
-orionCurl --url /v2/entities -X GETT --json
+orionCurl --url /v2/entities -X GETT
 echo
 echo
 
 
 echo "04. POST /v2/entities without payload"
 echo "====================================="
-orionCurl --url /v2/entities --json -X POST
+orionCurl --url /v2/entities -X POST
 echo
 echo
 
 
 echo "05. GET /v2/entities to reset Bad Input"
 echo "======================================="
-orionCurl --url /v2/entities --json
+orionCurl --url /v2/entities
 echo
 echo
 
 echo "06. One more error, just to show how it looks in the log file ..."
 echo "================================================================="
-orionCurl --url /v2/entities --json -X PROUST
+orionCurl --url /v2/entities -X PROUST
 echo
 echo
 

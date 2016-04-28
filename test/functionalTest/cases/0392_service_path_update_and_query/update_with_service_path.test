@@ -63,7 +63,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/kz --json
+orionCurl --url "$url" --payload "$payload" --servicePath /home/kz
 echo
 echo
 
@@ -87,7 +87,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/kz/01 --json
+orionCurl --url "$url" --payload "$payload" --servicePath /home/kz/01
 echo
 echo
 
@@ -111,7 +111,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/kz/02 --json
+orionCurl --url "$url" --payload "$payload" --servicePath /home/kz/02
 echo
 echo
 
@@ -135,7 +135,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/kz/03 --json
+orionCurl --url "$url" --payload "$payload" --servicePath /home/kz/03
 echo
 echo
 
@@ -159,7 +159,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/fg --json
+orionCurl --url "$url" --payload "$payload" --servicePath /home/fg
 echo
 echo
 
@@ -183,7 +183,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/fg/01 --json
+orionCurl --url "$url" --payload "$payload" --servicePath /home/fg/01
 echo
 echo
 
@@ -207,7 +207,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/fg/02 --json
+orionCurl --url "$url" --payload "$payload" --servicePath /home/fg/02
 echo
 echo
 
@@ -231,7 +231,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/fg/03 --json
+orionCurl --url "$url" --payload "$payload" --servicePath /home/fg/03
 echo
 echo
 
@@ -247,7 +247,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/kz --json
+orionCurl --url "$url" --payload "$payload" --servicePath /home/kz
 echo
 echo
 
@@ -263,7 +263,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/kz/01 --json
+orionCurl --url "$url" --payload "$payload" --servicePath /home/kz/01
 echo
 echo
 
@@ -279,7 +279,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/fg --json
+orionCurl --url "$url" --payload "$payload" --servicePath /home/fg
 echo
 echo
 
@@ -295,7 +295,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/fg/01 --json
+orionCurl --url "$url" --payload "$payload" --servicePath /home/fg/01
 echo
 echo
 
@@ -311,7 +311,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url "$url" --payload "$payload" --servicePath '/home/#' --json
+orionCurl --url "$url" --payload "$payload" --servicePath '/home/#'
 echo
 echo
 

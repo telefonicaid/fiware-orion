@@ -60,7 +60,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "${payload}" --json --port $CP1_PORT --servicePath /cb/cpr
+orionCurl --url /v1/updateContext --payload "${payload}" --port $CP1_PORT --servicePath /cb/cpr
 echo
 echo
 
@@ -89,7 +89,7 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "${payload}" --json --servicePath /cb/cpr
+orionCurl --url /v1/registry/registerContext --payload "${payload}" --servicePath /cb/cpr
 echo
 echo
 
@@ -112,7 +112,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/updateContext --payload "${payload}" --json --servicePath /cb/cpr
+orionCurl --url /v1/updateContext --payload "${payload}" --servicePath /cb/cpr
 echo
 echo
 
@@ -131,7 +131,7 @@ payload='{
     "A1"
   ]
 }'
-orionCurl --url /v1/queryContext --payload "${payload}" --json --port $CP1_PORT --servicePath /cb/cpr
+orionCurl --url /v1/queryContext --payload "${payload}" --port $CP1_PORT --servicePath /cb/cpr
 echo
 echo
 
@@ -150,7 +150,7 @@ payload='{
     "A1"
   ]
 }'
-orionCurl --url /v1/queryContext --payload "${payload}" --json --servicePath /cb/cpr
+orionCurl --url /v1/queryContext --payload "${payload}" --servicePath /cb/cpr
 echo
 echo
 

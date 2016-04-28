@@ -38,7 +38,7 @@ brokerStart CB 0-255
 echo '01. POST /v2/entities creating E1 A1=1'
 echo '======================================'
 payload='{ "id": "E1", "A1": 1 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -46,14 +46,14 @@ echo
 echo '02. PUT /v2/entities/E1/attrs/A1/value with JSON object as payload'
 echo '=================================================================='
 payload='{ "a": "1", "b": 2 }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --json
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT
 echo
 echo
 
 
 echo '03. GET /v2/entities/E1/attrs/A1/value as application/json: OK'
 echo '=============================================================='
-orionCurl --url /v2/entities/E1/attrs/A1/value --json
+orionCurl --url /v2/entities/E1/attrs/A1/value
 echo
 echo
 
