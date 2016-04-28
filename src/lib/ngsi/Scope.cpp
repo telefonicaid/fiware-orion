@@ -685,9 +685,15 @@ void Scope::present(const std::string& indent, int ix)
 */
 void Scope::release(void)
 {  
-  // note that georel, circle, box, point don't use dynamic memory, so they don't need release methods
+  // NOTE: georel, circle, box, and point don't use dynamic memory, so they don't need release methods
   polygon.release();
   line.release();
+
+  if (stringFilterP != NULL)
+  {
+    delete stringFilterP;
+    stringFilterP = NULL;
+  }
 }
 
 

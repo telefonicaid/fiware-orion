@@ -141,12 +141,15 @@ std::string EntityId::render
 std::string EntityId::toJson(void)
 {
   std::string  out;
-  std::string  typeEscaped  = htmlEscape(type.c_str());
-  std::string  idEscaped    = htmlEscape(id.c_str());
+  char*        typeEscaped  = htmlEscape(type.c_str());
+  char*        idEscaped    = htmlEscape(id.c_str());
 
   out += JSON_VALUE("id", idEscaped);
   out += ",";
   out += JSON_VALUE("type", typeEscaped);
+
+  delete typeEscaped;
+  delete idEscaped;
 
   return out;
 }

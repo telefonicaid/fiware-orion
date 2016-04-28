@@ -1315,6 +1315,8 @@ static bool addTriggeredSubscriptions_noCache
               releaseMongoConnection(connection);
               return false;
             }
+
+            delete stringFilterP;
           }
         }
       }

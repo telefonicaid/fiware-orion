@@ -954,7 +954,7 @@ static int connectionTreat
     }
 
     LM_T(LmtRequest, (""));
-	// WARNING: This log message below is crucial for the correct function of the Behave tests - CANNOT BE REMOVED
+    // WARNING: This log message below is crucial for the correct function of the Behave tests - CANNOT BE REMOVED
     LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", method, url));
     *con_cls     = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
     ciP->port    = port;
