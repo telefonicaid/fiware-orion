@@ -56,7 +56,7 @@ public:
                                                     const std::string&                url,
                                                     const std::string&                tenant,
                                                     const std::string&                fiwareCorrelator,
-                                                    Format                            format           = JSON);
+                                                    RenderFormat                      renderFormat);
 };
 
 #endif  // SRC_LIB_NGSINOTIFY_NOTIFIER_H_

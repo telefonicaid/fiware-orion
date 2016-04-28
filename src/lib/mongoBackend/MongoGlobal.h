@@ -356,7 +356,7 @@ extern bool processAvailabilitySubscription(
     const AttributeList&  attrL,
     const std::string&    subId,
     const std::string&    notifyUrl,
-    Format                format,
+    RenderFormat          renderFormat,
     const std::string&    tenant,
     const std::string&    fiwareCorrelator
 );

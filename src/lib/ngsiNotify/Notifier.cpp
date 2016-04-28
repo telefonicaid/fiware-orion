@@ -168,7 +168,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
   const std::string&                 url,
   const std::string&                 tenant,
   const std::string&                 fiwareCorrelator,
-  Format                             format
+  RenderFormat                       renderFormat
 )
 {
     /* Render NotifyContextAvailabilityRequest */
@@ -203,6 +203,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
     params->content_type     = content_type;
     params->content          = payload;
     params->fiwareCorrelator = fiwareCorrelator;
+    params->renderFormat     = renderFormatToString(renderFormat);
 
     strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 

@@ -1968,7 +1968,7 @@ bool processAvailabilitySubscription
   const AttributeList&  attrL,
   const std::string&    subId,
   const std::string&    notifyUrl,
-  Format                format,
+  RenderFormat          renderFormat,
   const std::string&    tenant,
   const std::string&    fiwareCorrelator
 )
@@ -1989,8 +1989,7 @@ bool processAvailabilitySubscription
     /* Complete the fields in NotifyContextRequest */
     ncar.subscriptionId.set(subId);
 
-    // FIXME P4: When 'ngsi9' notifications get implemented fot NGSIv2, the fifth param, hardcoded to 'JSON', will change for a variable.
-    getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenant, fiwareCorrelator, JSON);
+    getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenant, fiwareCorrelator, renderFormat);
     ncar.contextRegistrationResponseVector.release();
 
     /* Update database fields due to new notification */
