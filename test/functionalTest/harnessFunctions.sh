@@ -428,6 +428,16 @@ function localBrokerStart()
 
   ps=$(ps aux | grep contextBroker)
   dMsg $ps
+
+  # Some times (specially when using remote DB) CB needs some time to connect DB and
+  # the test execution needs to a guard time. The righ value for CB_WAIT_AFTER_START
+  # needs to be find empirically (it seems that when DB is localhost this time is
+  # not needed at all)
+  #
+  # (A better solution will be to detect when CB is ready to start the test, but
+  # it can be complex. Note that and check above ensures that the port is ready, but
+  # it doesn't guarantee that DB connection is ok).
+  sleep $CB_WAIT_AFTER_START
 }
 
 

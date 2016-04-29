@@ -36,6 +36,7 @@
 #include "alarmMgr/alarmMgr.h"
 #include "serviceRoutines/versionTreat.h"     // For orionInit()
 #include "mongoBackend/MongoGlobal.h"         // For orionInit()
+#include "mongoBackend/dbConstants.h"         // For mongoInit()
 
 
 
@@ -182,6 +183,69 @@ void orionInit
   strncpy(transactionId, "N/A", sizeof(transactionId));
 
   checkIdv1 = _checkIdv1;
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoInit -
+*/
+void mongoInit
+(
+  const char*  dbHost,
+  const char*  rplSet,
+  std::string  dbName,
+  const char*  user,
+  const char*  pwd,
+  bool         mtenant,
+  long         timeout,
+  int          writeConcern,
+  int          dbPoolSize,
+  bool         mutexTimeStat
+)
+{
+  double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
+
+  if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo, writeConcern, dbPoolSize, mutexTimeStat))
+  {
+    LM_X(1, ("Fatal Error (MongoDB error)"));
+  }
+
+  if (user[0] != 0)
+  {
+    LM_I(("Connected to mongo at %s:%s as user '%s'", dbHost, dbName.c_str(), user));
+  }
+  else
+  {
+    LM_I(("Connected to mongo at %s:%s", dbHost, dbName.c_str()));
+  }
+
+  setDbPrefix(dbName);
+  setEntitiesCollectionName(COL_ENTITIES);
+  setRegistrationsCollectionName(COL_REGISTRATIONS);
+  setSubscribeContextCollectionName(COL_CSUBS);
+  setSubscribeContextAvailabilityCollectionName(COL_CASUBS);
+
+  //
+  // Note that index creation operation is idempotent.
+  // From http://docs.mongodb.org/manual/reference/method/db.collection.ensureIndex:
+  // "If you call multiple ensureIndex() methods with the same index specification at the same time,
+  // only the first operation will succeed, all other operations will have no effect."
+  //
+  ensureLocationIndex("");
+  if (mtenant)
+  {
+    /* We get tenant database names and apply ensure the location index in each one */
+    std::vector<std::string> orionDbs;
+    getOrionDatabases(orionDbs);
+    for (unsigned int ix = 0; ix < orionDbs.size(); ++ix)
+    {
+      std::string orionDb = orionDbs[ix];
+      std::string tenant = orionDb.substr(dbName.length() + 1);   // + 1 for the "_" in "orion_tenantA"
+      ensureLocationIndex(tenant);
+    }
+  }
 }
 
 
