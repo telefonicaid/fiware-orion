@@ -60,10 +60,6 @@ ifndef MOCK_CONFIG
     MOCK_CONFIG=epel-6-tid
 endif
 
-ifndef XSD_DIR
-    XSD_DIR=/tmp/xsd
-endif
-
 all: prepare_release release
 
 di: install_debug
