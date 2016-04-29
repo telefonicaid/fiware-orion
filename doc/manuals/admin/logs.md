@@ -61,7 +61,7 @@ The different fields in each line are as follows:
 
 -   **time**. A timestamp corresponding to the moment in which the log
     line was generated in [ISO8601](https://es.wikipedia.org/wiki/ISO_8601) format.
--   **lvl (level)**. There are five level types:
+-   **lvl (level)**. There are five level:
     -   ERROR: This level designates error events. There is a severe
         problem that should be fixed. A subclass of ERROR is FATAL,
         which designates very severe error events that will
