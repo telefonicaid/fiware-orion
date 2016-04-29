@@ -110,34 +110,6 @@ TEST(SubscribeContextAvailabilityRequest, json_badIsPattern)
 
 /* ****************************************************************************
 *
-* xml_badEntityId - 
-*
-* FIXME P5 #1862: _json counterpart?
-*/
-TEST(SubscribeContextAvailabilityRequest, DISABLED_xml_badEntityId)
-{
-#if 0
-  ParseData       reqData;
-  const char*     infile  = "ngsi9.subscribeContextAvailabilityRequest.entityId.invalid.xml";
-  const char*     outfile = "ngsi9.subscribeContextAvailabilityResponse.unsupportedEntityAttribute.valid.xml";
-  ConnectionInfo  ci("", "POST", "1.1");
-  
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-
-  std::string out = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-#endif
-}
-
-
-
-/* ****************************************************************************
-*
 * json_noEntityId - 
 */
 TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
@@ -159,93 +131,6 @@ TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* xml_entityIdTypeAsBothFieldAndAttribute - 
-*
-* FIXME P5 #1862: _json counterpart?
-*/
-TEST(SubscribeContextAvailabilityRequest, DISABLED_xml_entityIdTypeAsBothFieldAndAttribute)
-{
-#if 0
-  ParseData       reqData;
-  const char*     inFile  = "ngsi9.subscribeContextAvailabilityRequest.entityIdTypeAsBothFieldAndAttribute.invalid.xml";
-  const char*     outFile = "ngsi9.subscribeContextAvailabilityResponse.entityIdTypeAsBothFieldAndAttribute.valid.xml";
-  ConnectionInfo  ci("", "POST", "1.1");
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
-
-  std::string out = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-#endif
-}
-
-
-
-/* ****************************************************************************
-*
-* xml_entityIdIsPatternAsBothFieldAndAttribute - 
-*
-* FIME P5 #1862: _json counterpart?
-*/
-TEST(SubscribeContextAvailabilityRequest, DISABLED_xml_entityIdIsPatternAsBothFieldAndAttribute)
-{
-#if 0
-  ParseData       reqData;
-  const char*     inFile  = "ngsi9.subscribeContextAvailabilityRequest.entityIdIsPatternAsBothFieldAndAttribute.invalid.xml";
-  const char*     outFile = "ngsi9.subscribeContextAvailabilityResponse.entityIdIsPatternAsBothFieldAndAttribute.valid.xml";
-  ConnectionInfo  ci("", "POST", "1.1");
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
-
-  std::string out = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-#endif
-}
-
-
-
-/* ****************************************************************************
-*
-* xml_noReference - 
-*
-* FIME P5 #1862: _json counterpart?
-*/
-TEST(SubscribeContextAvailabilityRequest, DISABLD_xml_noReference)
-{
-#if 0
-  ParseData       reqData;
-  const char*     infile  = "ngsi9.subscribeContextAvailabilityRequest.noReference.invalid.xml";
-  const char*     outfile = "ngsi9.subscribeContextAvailabilityResponse.noReference.valid.xml";
-  ConnectionInfo  ci("", "POST", "1.1");
-
-  utInit();
-
-  ci.inFormat      = JSON;
-  ci.outFormat     = JSON;
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-
-  std::string out = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-#endif
 }
 
 

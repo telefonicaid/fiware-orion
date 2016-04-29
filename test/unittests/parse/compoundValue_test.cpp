@@ -383,35 +383,6 @@ TEST(compoundValue, updateContextValueVectorFiveItemsJson)
 
 /* ****************************************************************************
 *
-* updateContextValueVectorFiveItemsPlusBadOne - 
-*
-* FIXME P5 #1862: _json counterpart?
-*/
-TEST(compoundValue, DISABLED_updateContextValueVectorFiveItemsPlusBadOne)
-{
-#if 0
-  ParseData       reqData;
-  const char*     inFile  = "ngsi10.updateContextRequest.updateContextValueVectorFiveItemsPlusBadOne.valid.xml";
-  const char*     outFile = "ngsi10.updateContextResponse.updateContextValueVectorFiveItemsPlusBadOne.valid.xml";
-  ConnectionInfo  ci("/ngsi10/updateContext", "POST", "1.1");
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
-
-  std::string result = xmlTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
-
-  EXPECT_STREQ(expectedBuf, result.c_str());
-
-  utExit();
-#endif
-}
-
-
-
-/* ****************************************************************************
-*
 * updateTwoStructsJson - 
 */
 TEST(compoundValue, updateTwoStructsJson)
@@ -983,30 +954,18 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
 *
 * tenCompounds - 
 *
-* FIXME P5 #1862: _json counterpart?
 */
-TEST(compoundValue, DISABLED_tenCompounds)
+TEST(compoundValue, tenCompounds)
 {
-#if 0
   ParseData                  reqData;
-  const char*                inFile       = "ngsi10.updateContextRequest.tenCompounds.valid.xml";
-  const char*                renderedFile = "ngsi10.updateContextRequest.tenCompoundsRendered.valid.xml";
   ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
   UpdateContextRequest*      upcrP;
   std::string                rendered;
    
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  std::string result = xmlTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
-  EXPECT_STREQ("OK", result.c_str());
-
   upcrP = &reqData.upcr.res;
   rendered = upcrP->render(&ci, UpdateContext, "");
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
-
   utExit();
-#endif
 }

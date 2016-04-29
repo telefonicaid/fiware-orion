@@ -35,24 +35,17 @@
 *
 * render - 
 *
-* FIXME P5 #1862: _json counterpart?
 */
-TEST(ContextRegistrationVector, DISABLED_render)
+TEST(ContextRegistrationVector, render)
 {
   ContextRegistrationVector  crv;
   ContextRegistration        cr;
   std::string                out;
-  const char*                outfile = "ngsi.contextRegistrationVector.render.middle.xml";
 
   utInit();
 
   out = crv.render("", false);
   EXPECT_STREQ("", out.c_str());
-
-  crv.push_back(&cr);
-  out = crv.render("", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

@@ -53,19 +53,13 @@ static RestService rs[] =
 *
 * delete - 
 *
-* FIXME P5 #1862: _json countepart?
 */
-TEST(statisticsTreat, DISABLED_delete)
+TEST(statisticsTreat, delete)
 {
   ConnectionInfo ci("/statistics",  "DELETE", "1.1");
-  const char*    outfile1   = "orion.statistics.ok.valid.xml";
   std::string    out;
 
   utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out       = restService(&ci, rs);
-  EXPECT_STREQ(expectedBuf, out.c_str());
 
   ci.outFormat = JSON;
   out       = restService(&ci, rs);
@@ -80,19 +74,13 @@ TEST(statisticsTreat, DISABLED_delete)
 *
 * get - 
 *
-* FIXME P5 #1862: _json countepart?
 */
-TEST(statisticsTreat, DISABLED_get)
+TEST(statisticsTreat, get)
 {
   ConnectionInfo ci("/statistics",  "GET", "1.1");
-  const char*    outfile1  = "orion.statistics.ok.valid.xml";
   std::string    out;
 
   utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out = restService(&ci, rs);
-  EXPECT_STREQ(expectedBuf, out.c_str());
 
   ci.outFormat = JSON;  
   out = restService(&ci, rs);
@@ -105,19 +93,13 @@ TEST(statisticsTreat, DISABLED_get)
 *
 * delete (cache) -
 *
-* FIXME P5 #1862: _json countepart?
 */
-TEST(statisticsTreat, DISABLED_deleteCache)
+TEST(statisticsTreat, deleteCache)
 {
   ConnectionInfo ci("/cache/statistics",  "DELETE", "1.1");
-  const char*    outfile1   = "orion.statistics.ok.valid.xml";
   std::string    out;
 
   utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out       = restService(&ci, rs);
-  EXPECT_STREQ(expectedBuf, out.c_str());
 
   ci.outFormat = JSON;
   out       = restService(&ci, rs);
@@ -132,19 +114,13 @@ TEST(statisticsTreat, DISABLED_deleteCache)
 *
 * get (cache) -
 *
-* FIXME P5 #1862: _json countepart?
 */
-TEST(statisticsTreat, DISABLED_getCache)
+TEST(statisticsTreat, getCache)
 {
   ConnectionInfo ci("/cache/statistics",  "GET", "1.1");
-  const char*    outfile1  = "orion.statistics.ok.valid.xml";
   std::string    out;
 
   utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out = restService(&ci, rs);
-  EXPECT_STREQ(expectedBuf, out.c_str());
 
   ci.outFormat = JSON;
   out = restService(&ci, rs);

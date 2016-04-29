@@ -37,36 +37,6 @@
 
 /* ****************************************************************************
 *
-* xml_invalidEntityAttribute - 
-*
-* FIXME P5 #1862: _json counterpart?
-*/
-TEST(UpdateContextAvailabilitySubscriptionRequest, DISABLED_xml_invalidEntityAttribute)
-{
-#if 0
-  ParseData       reqData;
-  const char*     infile  = "ngsi9.updateContextAvailabilitySubscriptionRequest.entityIdAttribute.invalid.xml";
-  const char*     outfile = "ngsi9.updateContextAvailabilitySubscriptionResponse.entityIdAttribute.valid.xml";
-  ConnectionInfo  ci("", "POST", "1.1");
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-
-  lmTraceLevelSet(LmtDump, true);
-  std::string out = xmlTreat(testBuf, &ci, &reqData, UpdateContextAvailabilitySubscription, "updateContextAvailabilitySubscriptionRequest", NULL);
-  lmTraceLevelSet(LmtDump, false);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-#endif
-}
-
-
-
-/* ****************************************************************************
-*
 * json_ok - 
 */
 TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
@@ -142,18 +112,13 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_invalidIsPattern)
 *
 * response - 
 *
-* FIXME P5 #1862: _json countepart?
 */
-TEST(UpdateContextAvailabilitySubscriptionRequest, DISABLED_response)
+TEST(UpdateContextAvailabilitySubscriptionRequest, response)
 {
   UpdateContextAvailabilitySubscriptionResponse  ucas;
   StatusCode                                     ec(SccBadRequest, "Detail");
   UpdateContextAvailabilitySubscriptionResponse  ucas2(ec);
   std::string                                    out;
-  const char*                                    outfile1 = "ngsi9.updateContextAvailabilitySubscriptionResponse.response1.valid.xml";
-  const char*                                    outfile2 = "ngsi9.updateContextAvailabilitySubscriptionResponse.response2.valid.xml";
-  const char*                                    outfile3 = "ngsi9.updateContextAvailabilitySubscriptionResponse.response3.valid.xml";
-  const char*                                    outfile4 = "ngsi9.updateContextAvailabilitySubscriptionResponse.response4.valid.xml";
   
   utInit();
 
@@ -164,24 +129,5 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, DISABLED_response)
   out = ucas.check(UpdateContextAvailabilitySubscription, "", "", 0);
   EXPECT_EQ("OK", out);
   
-  out = ucas.render(UpdateContextAvailabilitySubscription, "", 0);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  ucas.errorCode.fill(SccBadRequest, "Detail");
-  out = ucas.render(UpdateContextAvailabilitySubscription, "", 0);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-  
-  ucas.errorCode.fill(SccNone);
-  ucas.duration.set("ddd");
-  out = ucas.check(UpdateContextAvailabilitySubscription, "", "", 0);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = ucas.check(UpdateContextAvailabilitySubscription, "", "predetected error", 0);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
   utExit();
 }

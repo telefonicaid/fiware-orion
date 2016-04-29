@@ -102,16 +102,14 @@ TEST(CompoundValueNode, typeName)
 *
 * vectorInvalidAndOk -
 *
-* FIXME P5 #1862: _json counterpart?
 */
-TEST(CompoundValueNode, DISABLED_vectorInvalidAndOk)
+TEST(CompoundValueNode, vectorInvalidAndOk)
 {
   lmTraceLevelSet(LmtCompoundValueAdd, true);
 
   orion::CompoundValueNode*  tree     = new orion::CompoundValueNode(orion::ValueTypeObject);
   orion::CompoundValueNode*  vec      = new orion::CompoundValueNode(tree, "/vec", "vec", "", 0, orion::ValueTypeVector, 1);
   orion::CompoundValueNode*  item1    = new orion::CompoundValueNode(vec, std::string("/vec/vecitem1"), "vecitem1",  "a", 0, orion::ValueTypeString, 2);
-  const char*                outFile1 = "ngsi.compoundValue.vector.valid.xml";
   const char*                outFile2 = "ngsi.compoundValue.vector.invalid.json";
 
   utInit();
@@ -132,10 +130,6 @@ TEST(CompoundValueNode, DISABLED_vectorInvalidAndOk)
   EXPECT_STREQ("OK", tree->error.c_str());
 
   std::string rendered;
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile1)) << "Error getting test data from '" << outFile1 << "'";
-  rendered = tree->render(&ci, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
   rendered = tree->render(&ci, "");
@@ -157,9 +151,8 @@ TEST(CompoundValueNode, DISABLED_vectorInvalidAndOk)
 *
 * structInvalidAndOk -
 *
-* FIXME P5 #1862: _json counterpart?
 */
-TEST(CompoundValueNode, DISABLED_structInvalidAndOk)
+TEST(CompoundValueNode, structInvalidAndOk)
 {
   lmTraceLevelSet(LmtCompoundValueAdd, true);
 
@@ -167,7 +160,6 @@ TEST(CompoundValueNode, DISABLED_structInvalidAndOk)
   orion::CompoundValueNode*  str      = new orion::CompoundValueNode(tree, "/struct", "struct", "", 0, orion::ValueTypeObject, 1);
   orion::CompoundValueNode*  item1    = new orion::CompoundValueNode(str, std::string("/struct/structitem"), "structitem", "a", 0, orion::ValueTypeString, 2);
   orion::CompoundValueNode*  item2    = new orion::CompoundValueNode(str, std::string("/struct/structitem"), "structitem", "a", 1, orion::ValueTypeString, 2);
-  const char*                outFile1 = "ngsi.compoundValue.struct.valid.xml";
   const char*                outFile2 = "ngsi.compoundValue.struct.invalid.json";
 
   utInit();
@@ -187,10 +179,6 @@ TEST(CompoundValueNode, DISABLED_structInvalidAndOk)
   EXPECT_STREQ("OK", tree->error.c_str());
 
   std::string rendered;
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile1)) << "Error getting test data from '" << outFile1 << "'";
-  rendered = tree->render(&ci, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
   rendered = tree->render(&ci, "");

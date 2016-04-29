@@ -108,58 +108,6 @@ TEST(NotifyContextRequest, json_badIsPattern)
 
 /* ****************************************************************************
 *
-* xml_invalidEntityIdAttribute - 
-*
-* FIXME P5 #1862: _json counterpart?
-*/
-TEST(NotifyContextRequest, DISABLED_xml_invalidEntityIdAttribute)
-{
-#if 0
-  ParseData       reqData;
-  ConnectionInfo  ci("", "POST", "1.1");
-  const char*     infile  = "ngsi10.notifyContextRequest.entityIdAttribute.invalid.xml";
-  const char*     outfile = "ngsi10.notifyContextResponse.entityIdAttribute.valid.xml";
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-
-  std::string out = xmlTreat(testBuf, &ci, &reqData, NotifyContext, "notifyContextRequest", NULL);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-#endif
-}
-
-
-
-/* ****************************************************************************
-*
-* predetectedError - 
-*
-* FIXME P5 #1862: _json countepart?
-*/
-TEST(NotifyContextRequest, DISABLED_predetectedError)
-{
-  NotifyContextRequest ncr;
-  const char*          outfile = "ngsi10.notifyContextResponse.predetectedError.valid.xml";
-  std::string          out;
-  ConnectionInfo       ci(JSON);
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  out = ncr.check(&ci, NotifyContext, "", "predetected error", 0);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * Constructor - 
 */
 TEST(NotifyContextResponse, Constructor)

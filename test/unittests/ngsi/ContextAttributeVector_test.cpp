@@ -36,25 +36,18 @@
 *
 * render - 
 *
-* FIXME P5 #1862: _json counterpart?
 */
-TEST(ContextAttributeVector, DISABLED_render)
+TEST(ContextAttributeVector, render)
 {
   ContextAttributeVector  cav;
   ContextAttribute        ca("Name", "Type", "Value");
   std::string             out;
-  const char*             outfile = "ngsi.contextAttributeList.render.middle.xml";
   ConnectionInfo          ci(JSON);
 
   utInit();
 
   out = cav.render(&ci, UpdateContextAttribute, "");
   EXPECT_STREQ("", out.c_str());
-
-  cav.push_back(&ca);
-  out = cav.render(&ci, UpdateContextAttribute, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Just to exercise the code ...
   cav.present("");

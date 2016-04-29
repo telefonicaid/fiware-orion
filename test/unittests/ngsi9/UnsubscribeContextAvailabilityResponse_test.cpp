@@ -33,9 +33,8 @@
 *
 * constructorsAndRender - 
 *
-* FIXME P5 #1862: _json countepart?
 */
-TEST(UnsubscribeContextAvailabilityResponse, DISABLED_constructorsAndRender)
+TEST(UnsubscribeContextAvailabilityResponse, constructorsAndRender)
 {
   UnsubscribeContextAvailabilityResponse  ucar1;
   SubscriptionId                          subscriptionId;
@@ -48,15 +47,10 @@ TEST(UnsubscribeContextAvailabilityResponse, DISABLED_constructorsAndRender)
   StatusCode                              ec(SccBadRequest, "D");
   UnsubscribeContextAvailabilityResponse  ucar3(ec);
   std::string                             out;
-  const char*                             outfile = "ngsi9.unsubscribeContextAvailabilityResponse.constructorsAndRender.valid.xml";
 
   EXPECT_EQ(0,                    ucar1.statusCode.code);
   EXPECT_EQ(subscriptionId.get(), ucar2.subscriptionId.get());
   EXPECT_EQ(SccBadRequest,        ucar3.statusCode.code);
-
-  out = ucar3.render(UnsubscribeContext, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

@@ -74,60 +74,20 @@ TEST(NotifyContextAvailabilityRequest, ok_json)
 
 /* ****************************************************************************
 *
-* badEntityAttribute_xml - 
-*
-* FIME P5 #1862: _json counterpart?
-*/
-TEST(NotifyContextAvailabilityRequest, DISABLED_badEntityAttribute_xml)
-{
-#if 0
-  ParseData       parseData;
-  const char*     infile  = "ngsi9.notifyContextAvailabilityRequest.entityAttribute.invalid.xml";
-  const char*     outfile = "ngsi9.notifyContextAvailabilityResponse.invalidEntityAttribute.valid.xml";
-  ConnectionInfo  ci("", "POST", "1.1");
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-
-  std::string out = xmlTreat(testBuf, &ci, &parseData, NotifyContextAvailability, "notifyContextAvailabilityRequest", NULL);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-  
-  utExit();
-#endif
-}
-
-
-
-/* ****************************************************************************
-*
 * check - 
 *
-* FIXME P5 #1862: _json countepart?
 */
-TEST(NotifyContextAvailabilityRequest, DISABLED_check)
+TEST(NotifyContextAvailabilityRequest, check)
 {
   NotifyContextAvailabilityRequest  ncr;
   std::string                       out;
-  const char*                       outfile1 = "ngsi9.notifyContextAvailabilityResponse.predetectedError.valid.xml";
-  const char*                       outfile2 = "ngsi9.notifyContextAvailabilityResponse.invalidSubscriptionId.valid.xml";
   ConnectionInfo                    ci;
 
   utInit();
 
   out = ncr.check(&ci, NotifyContextAvailability, "", "", 0);
   EXPECT_EQ("OK", out);
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out = ncr.check(&ci, NotifyContextAvailability, "", "predetected error", 0);
-  EXPECT_STREQ(expectedBuf, out.c_str());
- 
-  ncr.subscriptionId.set("12345");
-  out = ncr.check(&ci, NotifyContextAvailability, "", "", 0);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-  
+   
   utExit();
 }
 
