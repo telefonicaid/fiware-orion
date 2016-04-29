@@ -1,6 +1,9 @@
 Old versions of Orion (0.28.0 and before) supported XML. This directory contains some stuff
 related with that functionality that is not longer needed.
 
+In particular, the xmlCheck checker (which was used to check that XML in unittest testData/
+and test harness fragments were compliant with NGSI XSD).
+
 In addition, the following XML-based unit tests were removed. If you want to have a look to them,
 have a look to code just before merging PR #X (this is the commit number: X).
 

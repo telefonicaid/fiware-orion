@@ -392,20 +392,10 @@ valgrind: install_debug
 files_compliance:
 	scripts/check_files_compliance.py .
 
-xml_check:
-	test/xmlCheck/xmlCheck.sh --xsd-dir $(XSD_DIR)
-
 json_check:
 	test/jsonCheck/jsonCheck.sh
 
-check_delimiter:
-	@echo
-	@echo
-	@echo
-	@echo "==========================  JSON PAYLOAD CHECK ============================================="
-	@echo
-
-payload_check: xml_check check_delimiter json_check
+payload_check: json_check
 
 cppcheck:
 	cppcheck --xml -j 8 --enable=all -I src/lib/ src/ 2> cppcheck-result.xml
