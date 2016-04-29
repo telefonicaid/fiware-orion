@@ -1,8 +1,0 @@
-<subscribeContextAvailabilityResponse>
-  <subscriptionId>000000000000000000000000</subscriptionId>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Unknown XML field: nothing</details>
-  </errorCode>
-</subscribeContextAvailabilityResponse>
