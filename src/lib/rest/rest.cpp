@@ -527,7 +527,7 @@ static int outMimeTypeCheck(ConnectionInfo* ciP)
                                     SccNotAcceptable,
                                     std::string("acceptable MIME types: application/json. Accept header in request: ") + ciP->httpHeaders.accept);
 
-    ciP->outMimeType      = JSON; // We use JSON as default mimeType
+    ciP->outMimeType    = JSON; // We use JSON as default mimeType
     ciP->httpStatusCode = SccNotAcceptable;
 
     return 1;
@@ -1008,7 +1008,7 @@ static int connectionTreat
 
     char tenant[SERVICE_NAME_MAX_LEN + 1];
     ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
-    ciP->outMimeType            = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
+    ciP->outMimeType          = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outMimeType == NOMIMETYPE)
     {
       ciP->outMimeType = JSON; // JSON is default output mimeType

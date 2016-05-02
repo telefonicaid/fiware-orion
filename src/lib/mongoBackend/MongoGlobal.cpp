@@ -1397,7 +1397,7 @@ static void processContextRegistrationElement
   const EntityIdVector&               enV,
   const AttributeList&                attrL,
   ContextRegistrationResponseVector*  crrV,
-  MimeType                              mimeType
+  MimeType                            mimeType
 )
 {
   ContextRegistrationResponse crr;
@@ -1591,7 +1591,7 @@ bool registrationsQuery
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    MimeType                    mimeType = JSON;
+    MimeType                  mimeType = JSON;
     std::vector<BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
@@ -2182,7 +2182,7 @@ void cprLookupByAttribute
       /* CRR without attributes (keep searching in other CRR) */
       if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
       {
-        *perEntPa       = crr->contextRegistration.providingApplication.get();
+        *perEntPa         = crr->contextRegistration.providingApplication.get();
         *perEntPaMimeType = crr->contextRegistration.providingApplication.getMimeType();
 
         break; /* enIx */
