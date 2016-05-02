@@ -68,6 +68,8 @@ char          pwd[64];
 long          dbTimeout;
 int           dbPoolSize;
 int           writeConcern;
+char          gtest_filter[1024];
+char          gtest_output[1024];
 
 // we don't need the full descriptions for unit test binary
 #define  NULL_DESC ""
@@ -78,14 +80,16 @@ int           writeConcern;
 */
 PaArgument paArgs[] =
 {
-  { "-dbhost",        dbHost,        "DB_HOST",        PaString, PaOpt, (int64_t) "localhost",  PaNL,   PaNL,  NULL_DESC  },
-  { "-rplSet",        rplSet,        "RPL_SET",        PaString, PaOpt, (int64_t) "",      PaNL,   PaNL,  NULL_DESC  },
-  { "-dbuser",        user,          "DB_USER",        PaString, PaOpt, (int64_t) "",      PaNL,   PaNL,  NULL_DESC  },
-  { "-dbpwd",         pwd,           "DB_PASSWORD",    PaString, PaOpt, (int64_t) "",      PaNL,   PaNL,  NULL_DESC  },
-  { "-db",            dbName,        "DB",             PaString, PaOpt, (int64_t) "orion", PaNL,   PaNL,  NULL_DESC  },
-  { "-dbTimeout",     &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,      PaNL,   PaNL,  NULL_DESC  },
-  { "-dbPoolSize",    &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,         1,      10000, NULL_DESC  },
-  { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     NULL_DESC  },
+  { "-dbhost",         dbHost,        "DB_HOST",        PaString, PaOpt, (int64_t) "localhost",  PaNL,   PaNL,  NULL_DESC },
+  { "-rplSet",         rplSet,        "RPL_SET",        PaString, PaOpt, (int64_t) "",           PaNL,   PaNL,  NULL_DESC },
+  { "-dbuser",         user,          "DB_USER",        PaString, PaOpt, (int64_t) "",           PaNL,   PaNL,  NULL_DESC },
+  { "-dbpwd",          pwd,           "DB_PASSWORD",    PaString, PaOpt, (int64_t) "",           PaNL,   PaNL,  NULL_DESC },
+  { "-db",             dbName,        "DB",             PaString, PaOpt, (int64_t) "orion",      PaNL,   PaNL,  NULL_DESC },
+  { "-dbTimeout",      &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,                  PaNL,   PaNL,  NULL_DESC },
+  { "-dbPoolSize",     &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,                     1,      10000, NULL_DESC },
+  { "-writeConcern",   &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,                      0,      1,     NULL_DESC },
+  { "--gtest_filter=", gtest_filter,  "",               PaString, PaOpt, (int64_t) "",           PaNL,   PaNL,  NULL_DESC },
+  { "--gtest_output=", gtest_output,  "",               PaString, PaOpt, (int64_t) "",           PaNL,   PaNL,  NULL_DESC },
 
   PA_END_OF_ARGS
 };
@@ -111,6 +115,15 @@ const char* orionUnitTestVersion = "0.0.1-unittest";
 */
 int main(int argC, char** argV)
 {
+#if 0
+  printf("\n\n===================================================================================\n");
+  for (int ix = 1; ix < argC; ++ix)
+  {
+    printf("argV[%d] = '%s'\n", ix, argV[ix]);
+  }
+  printf("===================================================================================\n\n\n");
+#endif
+
   paConfig("usage and exit on any warning", (void*) true);
   paConfig("log to screen",                 (void*) "only errors");
   paConfig("log file line format",          (void*) "TYPE:DATE:EXEC-AUX/FILE[LINE](p.PID)(t.TID) FUNC: TEXT");
