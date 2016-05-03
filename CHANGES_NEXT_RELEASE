@@ -25,3 +25,4 @@
 - Add: ~= operator to simple query language in order to implement attribute value patterns (#978)
 - Fix: JSON response in log management operations
 - Fix: capturing invalid URLs at subscription time (and returning error response) that otherwise would make Orion crash (#2092)
+- Fix: bug setting throttling to -1 in the subscription cache for v2 subscriptions (Issue #2114)
