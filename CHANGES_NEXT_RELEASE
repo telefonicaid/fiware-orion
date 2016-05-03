@@ -25,3 +25,4 @@
 - Add: ~= operator to simple query language in order to implement attribute value patterns (#978)
 - Fix: JSON response in log management operations
 - Fix: capturing invalid URLs at subscription time (and returning error response) that otherwise would make Orion crash (#2092)
+- Fix: crash when updating entities which corresponding document at DB is somehow large (#2112)
