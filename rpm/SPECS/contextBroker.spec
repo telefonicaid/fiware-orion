@@ -164,6 +164,35 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Tue May 03 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.1.0-1
+- Add: NGSIv2 notifications (#1875)
+- Add: ~= operator to simple query language in order to implement attribute value patterns (#978)
+- Add: string support in <, >, <=, >= and range filters (#1945)
+- Add: support for geo:line, geo:box and geo:polygon types as ways of specifying entity location in NGSIv2 (#1038)
+- Add: GeoJSON support as a way of specifying entity location in NGSIv2 (#1920)
+- Add: Add permanent subscriptions (#1949)
+- Add: pause subscriptions using the NGSIv2 API (#1328)
+- Add: description field for NGSIv2 subscriptions (#1918)
+- Add: change/add path /entities/{id}/attrs (#2028)
+- Add: Correlator as HTTP header and in log file (#1916)
+- Fix: updates on default service path entity causes wrong update in same id/type entity in not-default service path (#1956)
+- Fix: crash with some invalid subscriptions in NGSIv2 API (#1947, #1972)
+- Fix: csub cache sync logic not persisting lastNotification when the field doesn't initially exist in DB
+- Fix: csub cache at mongoBackend update context subscription logic wrongly setting expiration with current time, ignoring actual expires/duration in the request
+- Fix: GET /v2/types response payload, from key-map to array (#1832)
+- Fix: GET /v2/types response payload, now using array for attribute types (#1636)
+- Fix: using "/#" as default service path instead of "/" in subscriptions (#1961, #2024)
+- Fix: POST /v2/subscriptions, attributes in notification are optional (#1952)
+- Fix: no longer considering service (tenant) for subscriptions when broker is started without '-multitenant' CLI option (#1898)
+- Fix: NGSIv2 subscription payload (#2014)
+- Fix: right X-Total-Count in GET /v2/types operation (#2046)
+- Fix: right 404 Not Found response in GET /v2/types/{type} operation when type doesn't exist (#2056)
+- Fix: 'null' attribute value not surrounded by quotes (") in NGSIv1 renderings (#2058)
+- Fix: non-string attribute values were breaking JSON in attributeFormat=object mode (#2058)
+- Fix: JSON response in log management operations
+- Fix: capturing invalid URLs at subscription time (and returning error response) that otherwise would make Orion crash (#2092)
+- Deprecate: "location" metadata to specify entity location
+
 * Tue Mar 29 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.0.0-1
 - Add: new value for URI param 'options': unique - like 'values', but avoiding duplicates (Issue #1050)
 - Add: PUT /admin/log?level=XXX to change log level in run-time (Issue #1913)
