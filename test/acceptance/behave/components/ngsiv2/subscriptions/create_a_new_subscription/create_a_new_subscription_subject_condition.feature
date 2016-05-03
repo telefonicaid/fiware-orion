@@ -552,7 +552,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | parameter   | value                    |
       | error       | BadRequest               |
       | description | invalid query expression |
-    Examples:
+    Examples: # now all return 200 and a payload in plain text
       | q                |
       | speed>=69..90    |
       | speed>69..90     |
@@ -560,6 +560,11 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | speed<99..190    |
       | speed==99....190 |
       | speed==99,,,190  |
+    Examples: # now all return 201 and the subsc is created
+      | q               |
+      | speed==100..1   |
+      | speed==100..-1  |
+      | speed==-100..-1 |
 
   @condition_expression_q_invalid_chars.row<row.id>
   @condition_expression_q_invalid_chars @BUG_1994 @BUG_2106 @skip

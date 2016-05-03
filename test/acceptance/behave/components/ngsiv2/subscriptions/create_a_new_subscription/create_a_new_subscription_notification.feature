@@ -217,7 +217,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | ://               |
       | ftps://foo.bar/   |
 
-  @notification_http_url_invalid.row<row.id>
+  @notification_http_url_invalid_201.row<row.id>
   @notification_http_url_invalid_201 @BUG_2006 @BUG_2009 @skip
   Scenario Outline:  try to create a new subscription using NGSI v2 with notification http url field invalid values
     Given  a definition of headers
@@ -241,6 +241,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | description | Invalid URL parsing notification url |
     Examples:
       | url                        |
+      | http://localhost:900000    |
       | http://localhost:dsfsdf    |
       | http://localhost\my_path   |
       | http://e34.56.45.34        |
