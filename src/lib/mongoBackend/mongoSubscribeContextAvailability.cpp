@@ -100,7 +100,7 @@ HttpStatusCode mongoSubscribeContextAvailability
 
     // FIXME P5: RenderFormat right now hardcoded to "JSON" (NGSI_V1_LEGACY), in the future the RenderFormat will be taken from the payload
     /* Adding format to use in notifications */
-    sub.append(CASUB_FORMAT, "JSON");
+    sub.append(CASUB_FORMAT, renderFormatToString(NGSI_V1_LEGACY));
 
     /* Insert document in database */
     std::string err;
