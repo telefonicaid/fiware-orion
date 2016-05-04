@@ -1,1 +1,1 @@
-- Fix: bug setting throttling to -1 in the subscription cache for v2 subscriptions (Issue #2114)
+- Fix: bug disabling throttling when creating a v2 subscription (Issue #2114)
