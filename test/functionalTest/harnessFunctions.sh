@@ -172,11 +172,23 @@ function dbList
 {
   name="$1"
 
+  host="${CB_DATABASE_HOST}"
+  if [ "$host" == "" ]
+  then
+    host="localhost"
+  fi
+
+  port="${CB_DATABASE_PORT}"
+  if [ "$port" == "" ]
+  then
+    port="27017"
+  fi
+
   if [ "$name" != "" ]
   then
-    echo show dbs | mongo --quiet | grep "$name" | awk '{ print $1 }'
+    echo show dbs | mongo $host:$port --quiet | grep "$name" | awk '{ print $1 }'
   else
-    echo show dbs | mongo --quiet | awk '{ print $1 }'
+    echo show dbs | mongo $host:$port --quiet | awk '{ print $1 }'
   fi
 }
 
@@ -809,9 +821,21 @@ function valgrindSleep()
 function mongoCmd()
 {
 
+  host="${CB_DATABASE_HOST}"
+  if [ "$host" == "" ]
+  then
+    host="localhost"
+  fi
+
+  port="${CB_DATABASE_PORT}"
+  if [ "$port" == "" ]
+  then
+    port="27017"
+  fi
+
   db=$1
   cmd=$2
-  echo $cmd | mongo $db | tail -n 2 | head -n 1
+  echo $cmd | mongo $host:$port/$db | tail -n 2 | head -n 1
 }
 
 # ------------------------------------------------------------------------------
@@ -854,7 +878,19 @@ function dbInsertEntity()
 
   cmd='db.entities.insert(doc)'
 
-  echo "$jsCode ; $ent ; $doc ; $cmd" | mongo $db
+  host="${CB_DATABASE_HOST}"
+  if [ "$host" == "" ]
+  then
+    host="localhost"
+  fi
+
+  port="${CB_DATABASE_PORT}"
+  if [ "$port" == "" ]
+  then
+    port="27017"
+  fi
+
+  echo "$jsCode ; $ent ; $doc ; $cmd" | mongo $host:$port/$db
 }
 
 
