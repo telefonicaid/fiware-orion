@@ -757,20 +757,6 @@ void subCacheItemInsert
   //
   // 2. Then the values that have functions/methods for filling/parsing
   //
-  if (scrP->throttling.string != "")
-  {
-    //
-    // NOTE: In v1, the throttling of a subscription enters as a string and parsing that string makes sense (right?).
-    //       In v2 however, the throttling is an integer and as the integer value is passed as the sixth parameter of
-    //       this function, the call to scrP->throttling.parse() (the string is empty and parse returns -1) destroys
-    //       the throttling, setting it to -1 (inactive).
-    //       
-    //       For v2, not calling scrP->throttling.parse() is pretty clear.
-    //       What is still a little strange is that v1 has the throttling come is as the sixth parameter but then
-    //       overwrites that value by calling scrP->throttling.parse() ...
-    //
-    cSubP->throttling = scrP->throttling.parse();
-  }
   cSubP->notifyConditionVector.fill(scrP->notifyConditionVector);
 
 
