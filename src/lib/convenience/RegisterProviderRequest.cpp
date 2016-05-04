@@ -30,7 +30,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/Format.h"
 #include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 

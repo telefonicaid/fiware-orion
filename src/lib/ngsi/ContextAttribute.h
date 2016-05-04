@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "common/Format.h"
 #include "common/RenderFormat.h"
 #include "orionTypes/OrionValueType.h"
 #include "ngsi/MetadataVector.h"

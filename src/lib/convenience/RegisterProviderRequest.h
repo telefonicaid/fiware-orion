@@ -32,7 +32,6 @@
 #include "ngsi/Duration.h"
 #include "ngsi/ProvidingApplication.h"
 #include "ngsi/RegistrationId.h"
-#include "common/Format.h"
 
 
 

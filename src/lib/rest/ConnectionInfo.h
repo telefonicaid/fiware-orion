@@ -33,7 +33,7 @@
 
 #include "logMsg/logMsg.h"
 
-#include "common/Format.h"
+#include "common/MimeType.h"
 #include "parse/CompoundValueNode.h"
 #include "rest/HttpStatusCode.h"
 #include "rest/mhd.h"
@@ -55,8 +55,8 @@ public:
   ConnectionInfo():
     connection             (NULL),
     verb                   (NOVERB),
-    inFormat               (JSON),
-    outFormat              (JSON),
+    inMimeType             (JSON),
+    outMimeType            (JSON),
     tenant                 (""),
     servicePath            (""),
     payload                (NULL),
@@ -74,11 +74,11 @@ public:
     memset(payloadWord, 0, sizeof(payloadWord));
   }
 
-  ConnectionInfo(Format _outFormat):
+  ConnectionInfo(MimeType _outMimeType):
     connection             (NULL),
     verb                   (NOVERB),
-    inFormat               (JSON),
-    outFormat              (_outFormat),
+    inMimeType             (JSON),
+    outMimeType            (_outMimeType),
     tenant                 (""),
     servicePath            (""),
     payload                (NULL),
@@ -99,8 +99,8 @@ public:
   ConnectionInfo(std::string _url, std::string _method, std::string _version, MHD_Connection* _connection = NULL):
     connection             (_connection),
     verb                   (NOVERB),
-    inFormat               (JSON),
-    outFormat              (JSON),
+    inMimeType             (JSON),
+    outMimeType            (JSON),
     url                    (_url),
     method                 (_method),
     version                (_version),
@@ -139,8 +139,8 @@ public:
 
   MHD_Connection*            connection;
   Verb                       verb;
-  Format                     inFormat;
-  Format                     outFormat;
+  MimeType                   inMimeType;
+  MimeType                   outMimeType;
   std::string                url;
   std::string                method;
   std::string                version;

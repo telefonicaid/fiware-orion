@@ -25,7 +25,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/Format.h"
 #include "convenience/UpdateContextAttributeRequest.h"
 #include "convenience/ContextAttributeResponseVector.h"
 

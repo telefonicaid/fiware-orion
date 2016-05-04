@@ -106,7 +106,7 @@ TEST(ContextAttribute, render)
 
   utInit();
 
-  ci.outFormat = JSON;
+  ci.outMimeType = JSON;
   out = ca.render(&ci, UpdateContext, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());

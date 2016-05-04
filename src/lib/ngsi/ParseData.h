@@ -27,7 +27,6 @@
 */
 #include <string>
 
-#include "common/Format.h"
 #include "orionTypes/areas.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextRegistrationAttribute.h"

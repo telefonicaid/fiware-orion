@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "common/Format.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"

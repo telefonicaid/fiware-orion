@@ -56,7 +56,7 @@ TEST(EntityTypeVectorResponse, check)
 
   utInit();
 
-  ci.outFormat = JSON;
+  ci.outMimeType = JSON;
 
   EntityType et1("myType");
   EntityType et2("");

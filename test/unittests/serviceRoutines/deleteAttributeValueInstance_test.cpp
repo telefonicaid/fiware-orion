@@ -67,8 +67,8 @@ TEST(deleteAttributeValueInstance, DISABLED_notFound)
 
   utInit();
   
-  ci.outFormat = JSON;
-  out          = restService(&ci, rs);
+  ci.outMimeType = JSON;
+  out            = restService(&ci, rs);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
@@ -99,16 +99,16 @@ TEST(deleteAttributeValueInstance, DISABLED_found)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  ci1.outFormat    = JSON;
-  ci1.inFormat     = JSON;
-  ci1.payload      = testBuf;
-  ci1.payloadSize  = strlen(testBuf);
-  out              = restService(&ci1, rs);
+  ci1.outMimeType    = JSON;
+  ci1.inMimeType     = JSON;
+  ci1.payload        = testBuf;
+  ci1.payloadSize    = strlen(testBuf);
+  out                = restService(&ci1, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  ci2.outFormat    = JSON;
-  out              = restService(&ci2, rs);
+  ci2.outMimeType    = JSON;
+  out                = restService(&ci2, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

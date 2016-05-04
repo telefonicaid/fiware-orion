@@ -27,7 +27,7 @@
 */
 #include <string>
 
-#include "common/Format.h"
+#include "common/MimeType.h"
 #include "ngsi/Request.h"
 
 
@@ -39,13 +39,13 @@
 typedef struct ProvidingApplication
 {
   std::string   string;
-  Format        format;                  // Not part of NGSI itself, used by the CB to specify the preferred format for CPr interaction
+  MimeType      mimeType;     // Not part of NGSI itself, used by the CB to specify the preferred Mime-Type for CPr interaction
 
   ProvidingApplication();
   void          set(const std::string& value);
-  void          setFormat(const Format& f);
+  void          setMimeType(const MimeType mimeType);
   std::string   get(void);
-  Format        getFormat(void);
+  MimeType      getMimeType(void);
   bool          isEmpty(void);
   std::string   render(const std::string& indent, bool comma);
   void          present(const std::string& indent);

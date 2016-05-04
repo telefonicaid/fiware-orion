@@ -27,7 +27,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/Format.h"
+#include "common/MimeType.h"
 #include "convenience/ContextAttributeResponse.h"
 #include "rest/ConnectionInfo.h"
 
@@ -51,7 +51,7 @@ TEST(ContextAttributeResponse, render_json)
   car.contextAttributeVector.push_back(&ca);
   car.statusCode.fill(SccOk, "OK"); 
 
-  ci.outFormat = JSON;
+  ci.outMimeType = JSON;
   out = car.render(&ci, ContextEntityAttributes, "");
 
   utExit();
@@ -78,7 +78,7 @@ TEST(ContextAttributeResponse, check_json)
   car.contextAttributeVector.push_back(&ca);
   car.statusCode.fill(SccOk, "OK"); 
 
-  ci.outFormat = JSON;
+  ci.outMimeType = JSON;
   out = car.check(&ci, UpdateContextAttribute, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 

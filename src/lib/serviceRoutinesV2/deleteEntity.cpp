@@ -94,7 +94,7 @@ std::string deleteEntity
   // Any error in the response?
   UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
 
-  ciP->outFormat = JSON;
+  ciP->outMimeType = JSON;
 
   for (unsigned int ix = 0; ix < upcrsP->contextElementResponseVector.size(); ++ix)
   {

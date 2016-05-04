@@ -79,7 +79,7 @@ std::string EntityType::render
   std::string  out = "";
   std::string  key = "type";
 
-  if ((typeNameBefore == true) && (ciP->outFormat == JSON))
+  if ((typeNameBefore == true) && (ciP->outMimeType == JSON))
   {
     out += valueTag1(indent  + "  ", "name", type, true);
     out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", true, true, true);

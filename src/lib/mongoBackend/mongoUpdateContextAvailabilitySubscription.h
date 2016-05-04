@@ -27,7 +27,7 @@
 */
 #include <string>
 
-#include "common/Format.h"
+#include "rest/HttpStatusCode.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionRequest.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
 

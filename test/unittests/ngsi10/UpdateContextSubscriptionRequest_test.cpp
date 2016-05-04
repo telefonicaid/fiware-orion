@@ -62,8 +62,8 @@ TEST(UpdateContextSubscriptionRequest, badLength_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   lmTraceLevelSet(LmtDump, true);
@@ -115,8 +115,8 @@ TEST(UpdateContextSubscriptionRequest, invalidDuration_json)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   std::string out = jsonTreat(testBuf, &ci, &parseData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
@@ -139,8 +139,8 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleOkJson)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
@@ -164,8 +164,8 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedJson)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   out = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
@@ -190,8 +190,8 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedBadValueJso
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -218,8 +218,8 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleZeroRadiusJson)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -245,8 +245,8 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonOkJson)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
@@ -270,8 +270,8 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedJson)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
@@ -296,8 +296,8 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedBadValueJs
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -324,8 +324,8 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonNoVerticesJson)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -352,8 +352,8 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonOneVertexJson)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -380,8 +380,8 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonTwoVerticesJson)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";

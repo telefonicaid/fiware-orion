@@ -27,7 +27,6 @@
 */
 #include <string>
 
-#include "common/Format.h"
 #include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
 #include "rest/HttpStatusCode.h"

@@ -26,7 +26,6 @@
 #include <string>
 
 #include "common/tag.h"
-#include "common/Format.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "rest/errorAdaptation.h"

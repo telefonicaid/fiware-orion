@@ -30,7 +30,6 @@
 #include <sstream>
 
 #include "ngsi/ContextElementResponseVector.h"
-#include "common/Format.h"
 #include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
 

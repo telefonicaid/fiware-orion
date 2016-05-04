@@ -30,7 +30,6 @@
 #include "ngsi/SubscribeResponse.h"
 #include "ngsi/SubscribeError.h"
 #include "ngsi/StatusCode.h"
-#include "common/Format.h"
 
 
 
