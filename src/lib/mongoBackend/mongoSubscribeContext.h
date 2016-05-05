@@ -28,7 +28,6 @@
 #include <string>
 #include <map>
 
-#include "common/Format.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/SubscribeContextResponse.h"
 

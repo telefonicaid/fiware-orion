@@ -28,7 +28,6 @@
 #include <string>
 
 #include "ngsi/Request.h"
-#include "common/Format.h"
 #include "common/RenderFormat.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/AttributeDomainName.h"

@@ -26,7 +26,7 @@
 
 #include "logMsg/logMsg.h"
 
-#include "common/Format.h"
+#include "common/MimeType.h"
 #include "ngsi/StatusCode.h"
 
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
@@ -81,11 +81,11 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
 
   if (answer != "")
   {
-    if (ciP->outFormat == JSON)
+    if (ciP->outMimeType == JSON)
     {
       MHD_add_response_header(response, "Content-Type", "application/json");
     }
-    else if (ciP->outFormat == TEXT)
+    else if (ciP->outMimeType == TEXT)
     {
       MHD_add_response_header(response, "Content-Type", "text/plain");
     }

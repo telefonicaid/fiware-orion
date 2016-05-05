@@ -27,8 +27,6 @@
 */
 #include <string>
 
-#include "common/Format.h"
-
 /* FIXME P2: this file (along with some other places around all the code) uses
  * the old term "tag", coming from the XML days. Now we only support JSON and
  * all the terminology should use "key" or "keyName". We have changed terminology

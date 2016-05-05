@@ -26,7 +26,7 @@
 * Author: Ken Zangelin
 */
 #include "ngsi/Request.h"
-#include "common/Format.h"
+#include "common/MimeType.h"
 #include "common/clockFunctions.h"
 
 
@@ -329,6 +329,6 @@ extern void timingStatisticsReset(void);
 *
 * statisticsUpdate - 
 */
-extern void statisticsUpdate(RequestType request, Format inFormat);
+extern void statisticsUpdate(RequestType request, MimeType inMimeType);
 
 #endif  // SRC_LIB_COMMON_STATISTICS_H_

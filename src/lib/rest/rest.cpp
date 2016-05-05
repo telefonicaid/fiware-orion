@@ -321,7 +321,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 *
 * wantedOutputSupported - 
 */
-static Format wantedOutputSupported(const std::string& apiVersion, const std::string& acceptList, std::string* charsetP)
+static MimeType wantedOutputSupported(const std::string& apiVersion, const std::string& acceptList, std::string* charsetP)
 {
   std::vector<std::string>  vec;
   char*                     copy;
@@ -391,12 +391,12 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
         }
      }
 
-     std::string format = vec[ix].c_str();
-     if (format == "*/*")              { json = true; text=true;}
-     if (format == "application/*")    { json = true; }
-     if (format == "application/json") { json = true; }
-     if (format == "*/json")           { json = true; }
-     if (format == "text/plain")       { text = true; }
+     std::string mimeType = vec[ix].c_str();
+     if (mimeType == "*/*")              { json = true; text=true;}
+     if (mimeType == "application/*")    { json = true; }
+     if (mimeType == "application/json") { json = true; }
+     if (mimeType == "*/json")           { json = true; }
+     if (mimeType == "text/plain")       { text = true; }
 
      //
      // Resetting charset
@@ -427,7 +427,7 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
   }
 
   alarmMgr.badInput(clientIp, "no valid 'Accept-format' found");
-  return NOFORMAT;
+  return NOMIMETYPE;
 }
 
 
@@ -512,12 +512,12 @@ static void requestCompleted
 
 /* ****************************************************************************
 *
-* outFormatCheck - 
+* outMimeTypeCheck - 
 */
-static int outFormatCheck(ConnectionInfo* ciP)
+static int outMimeTypeCheck(ConnectionInfo* ciP)
 {
-  ciP->outFormat  = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
-  if (ciP->outFormat == NOFORMAT)
+  ciP->outMimeType  = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
+  if (ciP->outMimeType == NOMIMETYPE)
   {
     /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
     ciP->httpStatusCode = SccNotAcceptable;
@@ -527,7 +527,7 @@ static int outFormatCheck(ConnectionInfo* ciP)
                                     SccNotAcceptable,
                                     std::string("acceptable MIME types: application/json. Accept header in request: ") + ciP->httpHeaders.accept);
 
-    ciP->outFormat      = JSON; // We use JSON as default format
+    ciP->outMimeType    = JSON; // We use JSON as default mimeType
     ciP->httpStatusCode = SccNotAcceptable;
 
     return 1;
@@ -1008,10 +1008,10 @@ static int connectionTreat
 
     char tenant[SERVICE_NAME_MAX_LEN + 1];
     ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
-    ciP->outFormat            = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
-    if (ciP->outFormat == NOFORMAT)
+    ciP->outMimeType          = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
+    if (ciP->outMimeType == NOMIMETYPE)
     {
-      ciP->outFormat = JSON; // JSON is default output format
+      ciP->outMimeType = JSON; // JSON is default output mimeType
     }
 
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
@@ -1099,14 +1099,14 @@ static int connectionTreat
     alarmMgr.badInput(clientIp, "invalid mime-type in Content-Type http-header");
     restReply(ciP, ciP->answer);
   }
-  else if (outFormatCheck(ciP) != 0)
+  else if (outMimeTypeCheck(ciP) != 0)
   {
     alarmMgr.badInput(clientIp, "invalid mime-type in Accept http-header");
     restReply(ciP, ciP->answer);
   }
   else
   {
-    ciP->inFormat = formatParse(ciP->httpHeaders.contentType, NULL);
+    ciP->inMimeType = mimeTypeParse(ciP->httpHeaders.contentType, NULL);
   }
 
   if (ciP->httpStatusCode != SccOk)

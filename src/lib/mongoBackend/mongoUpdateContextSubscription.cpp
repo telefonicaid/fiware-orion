@@ -30,6 +30,8 @@
 #include "common/globals.h"
 #include "common/defaultValues.h"
 #include "common/RenderFormat.h"
+#include "common/sem.h"
+#include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
@@ -40,10 +42,6 @@
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
-
-#include "common/Format.h"
-#include "common/sem.h"
-#include "alarmMgr/alarmMgr.h"
 
 
 
@@ -77,7 +75,7 @@ HttpStatusCode mongoUpdateContextSubscription
     reqSemGive(__FUNCTION__, "ngsi10 update subscription request (safeGetSubId fail)", reqSemTaken);
     if (responseP->subscribeError.errorCode.code == SccContextElementNotFound)
     {
-      std::string details = std::string("invalid OID format: '") + requestP->subscriptionId.get() + "'";
+      std::string details = std::string("invalid OID mimeType: '") + requestP->subscriptionId.get() + "'";
       alarmMgr.badInput(clientIp, details);
     }
     else // SccReceiverInternalError

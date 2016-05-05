@@ -29,7 +29,6 @@
 
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/StatusCode.h"
-#include "common/Format.h"
 
 
 

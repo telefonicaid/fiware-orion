@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_COMMON_FORMAT_H_
-#define SRC_LIB_COMMON_FORMAT_H_
+#ifndef SRC_LIB_COMMON_MIMETYPE_H_
+#define SRC_LIB_COMMON_MIMETYPE_H_
 
 /*
 *
@@ -31,47 +31,47 @@
 
 /* ****************************************************************************
 *
-* DEFAULT_FORMAT - 
+* DEFAULT_MIMETYPE - 
 */
-#define DEFAULT_FORMAT              JSON
-#define DEFAULT_FORMAT_AS_STRING    "JSON"
+#define DEFAULT_MIMETYPE              JSON
+#define DEFAULT_MIMETYPE_AS_STRING    "JSON"
 
 
 
 /* ****************************************************************************
 *
-* Format - 
+* MimeType - 
 */
-typedef enum Format
+typedef enum MimeType
 {
   JSON     = 1,
   TEXT     = 2,
   HTML     = 3,
-  NOFORMAT = 4
-} Format;
+  NOMIMETYPE = 4
+} MimeType;
 
 
 
 /* ****************************************************************************
 *
-* formatToString - 
+* mimeTypeToString - 
 */
-extern const char* formatToString(Format format);
+extern const char* mimeTypeToString(MimeType mimeType);
 
 
 
 /* ****************************************************************************
 *
-* stringToFormat
+* stringToMimeType
 */
-extern Format stringToFormat(const std::string& s);
+extern MimeType stringToMimeType(const std::string& s);
 
 
 
 /* ****************************************************************************
 *
-* formatParse - 
+* mimeTypeParse - 
 */
-extern Format formatParse(const std::string& format, std::string* charsetP);
+extern MimeType mimeTypeParse(const std::string& mimeType, std::string* charsetP);
 
-#endif  // SRC_LIB_COMMON_FORMAT_H_
+#endif  // SRC_LIB_COMMON_MIMETYPE_H_

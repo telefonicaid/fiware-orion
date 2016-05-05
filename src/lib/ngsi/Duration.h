@@ -28,7 +28,6 @@
 #include <stdint.h>   // int64_t et al
 #include <string>
 
-#include "common/Format.h"
 #include "ngsi/Request.h"
 
 #define DEFAULT_DURATION "PT24H"

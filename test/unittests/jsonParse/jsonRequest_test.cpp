@@ -47,8 +47,8 @@ TEST(jsonRequest, jsonTreat)
 
    utInit();
 
-   ci.outFormat  = JSON;
-   ci.apiVersion = "v1";
+   ci.outMimeType  = JSON;
+   ci.apiVersion   = "v1";
    out  = jsonTreat("non-empty content", &ci, &parseData, InvalidRequest, "", NULL);
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());

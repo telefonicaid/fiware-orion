@@ -78,8 +78,8 @@ TEST(QueryContextRequest, ok_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   lmTraceLevelSet(LmtDump, true);
   std::string out = jsonTreat(testBuf, &ci, &parseData, QueryContext, "queryContextRequest", NULL);
@@ -148,8 +148,8 @@ TEST(QueryContextRequest, badIsPattern_json)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -174,8 +174,8 @@ TEST(QueryContextRequest, emptyAttribute_json)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -200,8 +200,8 @@ TEST(QueryContextRequest, emptyAttributeExpression_json)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -651,8 +651,8 @@ TEST(QueryContextRequest, scopeGeolocationCircleOkJson)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   out = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, "queryContextRequest", NULL);
@@ -676,8 +676,8 @@ TEST(QueryContextRequest, scopeGeolocationCircleInvertedJson)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   out = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, "queryContextRequest", NULL);
@@ -702,8 +702,8 @@ TEST(QueryContextRequest, scopeGeolocationCircleInvertedBadValueJson)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -729,8 +729,8 @@ TEST(QueryContextRequest, scopeGeolocationCircleZeroRadiusJson)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -755,8 +755,8 @@ TEST(QueryContextRequest, scopeGeolocationPolygonOkJson)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = jsonTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
@@ -780,8 +780,8 @@ TEST(QueryContextRequest, scopeGeolocationPolygonInvertedJson)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = jsonTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
@@ -806,8 +806,8 @@ TEST(QueryContextRequest, scopeGeolocationPolygonInvertedBadValueJson)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -834,8 +834,8 @@ TEST(QueryContextRequest, scopeGeolocationPolygonNoVerticesJson)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -862,8 +862,8 @@ TEST(QueryContextRequest, scopeGeolocationPolygonOneVertexJson)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -890,8 +890,8 @@ TEST(QueryContextRequest, scopeGeolocationPolygonTwoVerticesJson)
 
   utInit();
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";

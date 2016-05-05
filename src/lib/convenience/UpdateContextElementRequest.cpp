@@ -26,7 +26,6 @@
 #include <vector>
 
 #include "common/globals.h"
-#include "common/Format.h"
 #include "common/tag.h"
 #include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"

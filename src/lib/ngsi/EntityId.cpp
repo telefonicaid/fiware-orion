@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/Format.h"
 #include "ngsi/EntityId.h"
 #include "common/tag.h"
 

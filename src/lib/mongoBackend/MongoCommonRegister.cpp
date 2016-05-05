@@ -83,7 +83,7 @@ static bool processSubscriptions
                                          trigs->attrL,
                                          mapSubId,
                                          trigs->reference,
-                                         JSON,
+                                         trigs->renderFormat,
                                          tenant,
                                          fiwareCorrelator))
     {

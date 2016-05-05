@@ -29,7 +29,6 @@
 
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/Duration.h"
-#include "common/Format.h"
 #include "ngsi/Throttling.h"
 
 

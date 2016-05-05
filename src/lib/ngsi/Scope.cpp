@@ -29,7 +29,6 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
-#include "common/Format.h"
 #include "common/string.h"
 #include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"

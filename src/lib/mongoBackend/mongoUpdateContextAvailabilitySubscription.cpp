@@ -28,7 +28,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/Format.h"
+#include "common/MimeType.h"
 #include "common/sem.h"
 #include "alarmMgr/alarmMgr.h"
 
@@ -68,7 +68,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
     reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo assertion exception)", reqSemTaken);
     if (responseP->errorCode.code == SccContextElementNotFound)
     {
-      std::string details = std::string("invalid OID format: '") + requestP->subscriptionId.get() + "'"; 
+      std::string details = std::string("invalid OID mimeType: '") + requestP->subscriptionId.get() + "'"; 
       alarmMgr.badInput(clientIp, details);
     }
     else // SccReceiverInternalError
@@ -151,6 +151,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
       newSub.append(CASUB_COUNT, count);
   }
 
+  // FIXME P5: RenderFormat right now hardcoded to "JSON" (NGSI_V1_LEGACY), in the future the RenderFormat will be taken from the payload
   /* Adding format to use in notifications */
   newSub.append(CASUB_FORMAT, "JSON");
 
@@ -162,8 +163,9 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
     return SccOk;
   }
 
+  // FIXME P5: RenderFormat right now hardcoded to NGSI_V1_LEGACY, in the future the RenderFormat will be taken from the payload
   /* Send notifications for matching context registrations */
-  processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, requestP->subscriptionId.get(), getStringFieldF(sub, CASUB_REFERENCE), JSON, tenant, fiwareCorrelator);
+  processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, requestP->subscriptionId.get(), getStringFieldF(sub, CASUB_REFERENCE), NGSI_V1_LEGACY, tenant, fiwareCorrelator);
 
   /* Duration is an optional parameter, it is only added in the case they
    * was used for update */

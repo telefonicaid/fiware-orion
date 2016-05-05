@@ -1397,13 +1397,13 @@ static void processContextRegistrationElement
   const EntityIdVector&               enV,
   const AttributeList&                attrL,
   ContextRegistrationResponseVector*  crrV,
-  Format                              format
+  MimeType                            mimeType
 )
 {
   ContextRegistrationResponse crr;
 
   crr.contextRegistration.providingApplication.set(getStringFieldF(cr, REG_PROVIDING_APPLICATION));
-  crr.contextRegistration.providingApplication.setFormat(format);
+  crr.contextRegistration.providingApplication.setMimeType(mimeType);
 
   std::vector<BSONElement> queryEntityV = getFieldF(cr, REG_ENTITIES).Array();
 
@@ -1591,12 +1591,12 @@ bool registrationsQuery
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    Format                    format = JSON;
+    MimeType                  mimeType = JSON;
     std::vector<BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
     {
-      processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, format);
+      processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType);
     }
 
     /* FIXME: note that given the response doesn't distinguish from which registration ID the
@@ -1968,7 +1968,7 @@ bool processAvailabilitySubscription
   const AttributeList&  attrL,
   const std::string&    subId,
   const std::string&    notifyUrl,
-  Format                format,
+  RenderFormat          renderFormat,
   const std::string&    tenant,
   const std::string&    fiwareCorrelator
 )
@@ -1989,8 +1989,7 @@ bool processAvailabilitySubscription
     /* Complete the fields in NotifyContextRequest */
     ncar.subscriptionId.set(subId);
 
-    // FIXME P4: When 'ngsi9' notifications get implemented fot NGSIv2, the fifth param, hardcoded to 'JSON', will change for a variable.
-    getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenant, fiwareCorrelator, JSON);
+    getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenant, fiwareCorrelator, renderFormat);
     ncar.contextRegistrationResponseVector.release();
 
     /* Update database fields due to new notification */
@@ -2099,20 +2098,20 @@ void fillContextProviders(ContextElementResponse* cer, ContextRegistrationRespon
     /* Search for some CPr in crrV */
     std::string  perEntPa;
     std::string  perAttrPa;
-    Format       perEntPaFormat = NOFORMAT;
-    Format       perAttrPaFormat= NOFORMAT;
+    MimeType     perEntPaMimeType  = NOMIMETYPE;
+    MimeType     perAttrPaMimeType = NOMIMETYPE;
 
     cprLookupByAttribute(cer->contextElement.entityId,
                          ca->name,
                          crrV,
                          &perEntPa,
-                         &perEntPaFormat,
+                         &perEntPaMimeType,
                          &perAttrPa,
-                         &perAttrPaFormat);
+                         &perAttrPaMimeType);
 
     /* Looking results after crrV processing */
     ca->providingApplication.set(perAttrPa == "" ? perEntPa : perAttrPa);
-    ca->providingApplication.setFormat(perAttrPa == "" ? perEntPaFormat : perAttrPaFormat);
+    ca->providingApplication.setMimeType(perAttrPa == "" ? perEntPaMimeType : perAttrPaMimeType);
     ca->found = (ca->providingApplication.get() != "");
   }
 }
@@ -2157,9 +2156,9 @@ void cprLookupByAttribute
   const std::string&                  attrName,
   ContextRegistrationResponseVector&  crrV,
   std::string*                        perEntPa,
-  Format*                             perEntPaFormat,
+  MimeType*                           perEntPaMimeType,
   std::string*                        perAttrPa,
-  Format*                             perAttrPaFormat
+  MimeType*                           perAttrPaMimeType
 )
 {
   *perEntPa  = "";
@@ -2183,8 +2182,8 @@ void cprLookupByAttribute
       /* CRR without attributes (keep searching in other CRR) */
       if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
       {
-        *perEntPa       = crr->contextRegistration.providingApplication.get();
-        *perEntPaFormat = crr->contextRegistration.providingApplication.getFormat();
+        *perEntPa         = crr->contextRegistration.providingApplication.get();
+        *perEntPaMimeType = crr->contextRegistration.providingApplication.getMimeType();
 
         break; /* enIx */
       }
@@ -2196,8 +2195,8 @@ void cprLookupByAttribute
         if (regAttrName == attrName)
         {
           /* We cannot "improve" this result keep searching in CRR vector, so we return */
-          *perAttrPa       = crr->contextRegistration.providingApplication.get();
-          *perAttrPaFormat = crr->contextRegistration.providingApplication.getFormat();
+          *perAttrPa         = crr->contextRegistration.providingApplication.get();
+          *perAttrPaMimeType = crr->contextRegistration.providingApplication.getMimeType();
 
           return;
         }

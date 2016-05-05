@@ -25,11 +25,11 @@
 #include <string>
 #include <map>
 
-#include "common/globals.h"
-
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 
+#include "common/globals.h"
+#include "common/sem.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubscribeContextAvailability.h"
 #include "mongoBackend/connectionOperations.h"
@@ -38,8 +38,7 @@
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
 #include "rest/uriParamNames.h"
 
-#include "common/Format.h"
-#include "common/sem.h"
+
 
 /* ****************************************************************************
 *
@@ -99,8 +98,9 @@ HttpStatusCode mongoSubscribeContextAvailability
     }
     sub.append(CASUB_ATTRS, attrs.arr());
 
+    // FIXME P5: RenderFormat right now hardcoded to "JSON" (NGSI_V1_LEGACY), in the future the RenderFormat will be taken from the payload
     /* Adding format to use in notifications */
-    sub.append(CASUB_FORMAT, "JSON");
+    sub.append(CASUB_FORMAT, renderFormatToString(NGSI_V1_LEGACY));
 
     /* Insert document in database */
     std::string err;
@@ -111,8 +111,9 @@ HttpStatusCode mongoSubscribeContextAvailability
       return SccOk;
     }
 
+    // FIXME P5: RenderFormat right now hardcoded to NGSI_V1_LEGACY, in the future the RenderFormat will be taken from the payload
     /* Send notifications for matching context registrations */
-    processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, oid.toString(), requestP->reference.get(), JSON, tenant, fiwareCorrelator);
+    processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, oid.toString(), requestP->reference.get(), NGSI_V1_LEGACY, tenant, fiwareCorrelator);
 
     /* Fill the response element */
     responseP->duration = requestP->duration;

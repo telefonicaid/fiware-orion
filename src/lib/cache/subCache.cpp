@@ -757,7 +757,6 @@ void subCacheItemInsert
   //
   // 2. Then the values that have functions/methods for filling/parsing
   //
-  cSubP->throttling = scrP->throttling.parse();
   cSubP->notifyConditionVector.fill(scrP->notifyConditionVector);
 
 

@@ -29,7 +29,6 @@
 #include <vector>
 
 #include "ngsi/MetadataVector.h"
-#include "common/Format.h"
 #include "ngsi/Request.h"
 
 

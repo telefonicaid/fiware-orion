@@ -30,7 +30,6 @@
 #include "ngsi/StatusCode.h"
 #include "ngsi/RegistrationId.h"
 #include "ngsi/Duration.h"
-#include "common/Format.h"
 #include "ngsi9/RegisterContextRequest.h"
 
 

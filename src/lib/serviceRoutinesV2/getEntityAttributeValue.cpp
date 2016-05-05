@@ -66,7 +66,7 @@ std::string getEntityAttributeValue
   Attribute    attribute;
   std::string  answer;
   std::string  type       = ciP->uriParam["type"];
-  bool         text       = (ciP->outFormat == TEXT);
+  bool         text       = (ciP->outMimeType == TEXT);
 
   if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
   {
@@ -152,7 +152,7 @@ std::string getEntityAttributeValue
 
       }
 
-      ciP->outFormat = TEXT;
+      ciP->outMimeType = TEXT;
     }
   }
 
