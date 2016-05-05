@@ -33,16 +33,19 @@
 #include "ngsi/ProvidingApplication.h"
 
 
+
 /* ****************************************************************************
 *
 * ProvidingApplication::ProvidingApplication -
 */
 ProvidingApplication::ProvidingApplication()
 {
-  /* It is better to have a default constructor that leave format with a random value */
-  string = "";
-  format = NOFORMAT;
+  /* It is better to have a default constructor than leave mimeType with a random value */
+  string   = "";
+  mimeType = NOMIMETYPE;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -86,13 +89,15 @@ void ProvidingApplication::set(const std::string& value)
   string = value;
 }
 
+
+
 /* ****************************************************************************
 *
-* ProvidingApplication::setFormat -
+* ProvidingApplication::setMimeType -
 */
-void ProvidingApplication::setFormat(const Format& f)
+void ProvidingApplication::setMimeType(const MimeType m)
 {
-  format = f;
+  mimeType = m;
 }
 
 
@@ -106,13 +111,15 @@ std::string ProvidingApplication::get(void)
   return string;
 }
 
+
+
 /* ****************************************************************************
 *
-* ProvidingApplication::getFormat -
+* ProvidingApplication::getMimeType -
 */
-Format ProvidingApplication::getFormat(void)
+MimeType ProvidingApplication::getMimeType(void)
 {
-  return format;
+  return mimeType;
 }
 
 

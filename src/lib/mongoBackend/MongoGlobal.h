@@ -356,7 +356,7 @@ extern bool processAvailabilitySubscription(
     const AttributeList&  attrL,
     const std::string&    subId,
     const std::string&    notifyUrl,
-    Format                format,
+    RenderFormat          renderFormat,
     const std::string&    tenant,
     const std::string&    fiwareCorrelator
 );
@@ -409,8 +409,8 @@ extern void cprLookupByAttribute(EntityId&                          en,
                                  const std::string&                 attrName,
                                  ContextRegistrationResponseVector& crrV,
                                  std::string*                       perEntPa,
-                                 Format*                            perEntPaFormat,
+                                 MimeType*                          perEntPaMimeType,
                                  std::string*                       perAttrPa,
-                                 Format*                            perAttrPaFormat);
+                                 MimeType*                          perAttrPaMimeType);
 
 #endif

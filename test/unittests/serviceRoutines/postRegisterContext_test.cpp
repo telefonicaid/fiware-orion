@@ -71,11 +71,11 @@ TEST(postRegisterContext, DISABLED_ok)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
 
-  ci.outFormat    = JSON;
-  ci.inFormat     = JSON;
-  ci.payload      = testBuf;
-  ci.payloadSize  = strlen(testBuf);
-  out             = restService(&ci, rs);
+  ci.outMimeType    = JSON;
+  ci.inMimeType     = JSON;
+  ci.payload        = testBuf;
+  ci.payloadSize    = strlen(testBuf);
+  out               = restService(&ci, rs);
 
   char* outStart  = (char*) out.c_str();
 
@@ -89,11 +89,11 @@ TEST(postRegisterContext, DISABLED_ok)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  ci2.outFormat    = JSON;
-  ci2.inFormat     = JSON;
-  ci2.payload      = testBuf;
-  ci2.payloadSize  = strlen(testBuf);
-  out              = restService(&ci2, rs);
+  ci2.outMimeType    = JSON;
+  ci2.inMimeType     = JSON;
+  ci2.payload        = testBuf;
+  ci2.payloadSize    = strlen(testBuf);
+  out                = restService(&ci2, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Putting old value back

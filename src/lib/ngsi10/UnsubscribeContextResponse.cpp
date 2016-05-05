@@ -26,7 +26,6 @@
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
-#include "common/Format.h"
 #include "common/tag.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/UnsubscribeContextResponse.h"

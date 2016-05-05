@@ -26,7 +26,6 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
-#include "common/Format.h"
 #include "ngsi/SubscribeResponse.h"
 
 

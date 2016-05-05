@@ -27,7 +27,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/Format.h"
+#include "common/MimeType.h"
 #include "convenience/AppendContextElementResponse.h"
 #include "rest/ConnectionInfo.h"
 
@@ -51,7 +51,7 @@ TEST(AppendContextElementResponse, render_json)
   utInit();
 
   // 1. empty acer
-  ci.outFormat = JSON;
+  ci.outMimeType = JSON;
   out = acer.render(&ci, AppendContextElement, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
@@ -84,7 +84,7 @@ TEST(AppendContextElementResponse, check_json)
   utInit();
 
   // 1. predetected error
-  ci.outFormat = JSON;
+  ci.outMimeType = JSON;
   out = acer.check(&ci, IndividualContextEntity, "", "PRE ERR", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());

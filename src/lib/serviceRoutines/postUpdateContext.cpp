@@ -127,16 +127,16 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   //
   // 2. Render the string of the request we want to forward
   //
-  Format       outFormat = ciP->outFormat;
+  MimeType     outMimeType = ciP->outMimeType;
   std::string  payload;
   char*        cleanPayload;
 
-  ciP->outFormat  = JSON;
+  ciP->outMimeType  = JSON;
 
   TIMED_RENDER(payload = upcrP->render(ciP, UpdateContext, ""));
 
-  ciP->outFormat  = outFormat;
-  cleanPayload    = (char*) payload.c_str();
+  ciP->outMimeType  = outMimeType;
+  cleanPayload      = (char*) payload.c_str();
 
   //
   // 3. Send the request to the Context Provider (and await the reply)

@@ -27,7 +27,6 @@
 */
 #include <string>
 
-#include "common/Format.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/Request.h"
 #include "ngsi/SubscriptionId.h"

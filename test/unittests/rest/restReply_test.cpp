@@ -74,7 +74,7 @@ TEST(restReply, json)
 
   utInit();
 
-  ci.outFormat = JSON;
+  ci.outMimeType = JSON;
   restReply(&ci, "123");
 
   utExit();

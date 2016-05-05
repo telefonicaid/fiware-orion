@@ -96,7 +96,7 @@ void Notifier::sendNotifyContextRequest
       spathList = "";
     }
     
-    ci.outFormat = JSON;
+    ci.outMimeType = JSON;
 
     std::string payload;
     if (renderFormat == NGSI_V1_LEGACY)
@@ -137,7 +137,7 @@ void Notifier::sendNotifyContextRequest
     params->resource         = uriPath;
     params->content_type     = content_type;
     params->content          = payload;
-    params->format           = JSON;
+    params->mimeType         = JSON;
     params->renderFormat     = renderFormatToString(renderFormat);
     params->fiwareCorrelator = fiwareCorrelator;
 
@@ -168,7 +168,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
   const std::string&                 url,
   const std::string&                 tenant,
   const std::string&                 fiwareCorrelator,
-  Format                             format
+  RenderFormat                       renderFormat
 )
 {
     /* Render NotifyContextAvailabilityRequest */
@@ -202,7 +202,9 @@ void Notifier::sendNotifyContextAvailabilityRequest
     params->resource         = uriPath;   
     params->content_type     = content_type;
     params->content          = payload;
+    params->mimeType         = JSON;
     params->fiwareCorrelator = fiwareCorrelator;
+    params->renderFormat     = renderFormatToString(renderFormat);
 
     strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 

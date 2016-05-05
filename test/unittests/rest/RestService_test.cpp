@@ -87,27 +87,27 @@ TEST(RestService, payloadParse)
   //
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
 
-  ci.inFormat     = JSON;
-  ci.outFormat    = JSON;
-  ci.payload      = testBuf;
-  ci.payloadSize  = strlen(testBuf);
+  ci.inMimeType     = JSON;
+  ci.outMimeType    = JSON;
+  ci.payload        = testBuf;
+  ci.payloadSize    = strlen(testBuf);
 
   out = payloadParse(&ci, &parseData, &rs[0], NULL, &jsonRelease, compV);
   EXPECT_EQ("OK", out);
 
 
   //
-  // 2. NOFORMAT
+  // 2. NOMIMETYPE
   //
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
 
-  ci.inFormat     = NOFORMAT;
-  ci.outFormat    = JSON;
-  ci.payload      = (char*) "123";
-  ci.payloadSize  = strlen(ci.payload);
+  ci.inMimeType     = NOMIMETYPE;
+  ci.outMimeType    = JSON;
+  ci.payload        = (char*) "123";
+  ci.payloadSize    = strlen(ci.payload);
 
   out = payloadParse(&ci, &parseData, &rs[0], NULL, &jsonRelease, compV);
-  EXPECT_EQ("Bad inFormat", out);
+  EXPECT_EQ("Bad inMimeType", out);
 
   utExit();
 }
@@ -133,21 +133,21 @@ TEST(RestService, noSuchServiceAndNotFound)
   // No such service
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  ci.outFormat    = JSON;
-  ci.inFormat     = JSON;
-  ci.payload      = testBuf;
-  ci.payloadSize  = strlen(testBuf);
-  out             = restService(&ci, rs);
+  ci.outMimeType    = JSON;
+  ci.inMimeType     = JSON;
+  ci.payload        = testBuf;
+  ci.payloadSize    = strlen(testBuf);
+  out               = restService(&ci, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Not found
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  ci.outFormat    = JSON;
-  ci.inFormat     = JSON;
-  ci.payload      = testBuf;
-  ci.payloadSize  = strlen(testBuf);
-  out             = restService(&ci, rs2);
+  ci.outMimeType    = JSON;
+  ci.inMimeType     = JSON;
+  ci.payload        = testBuf;
+  ci.payloadSize    = strlen(testBuf);
+  out               = restService(&ci, rs2);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

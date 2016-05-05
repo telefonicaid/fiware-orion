@@ -110,7 +110,7 @@ void QueueNotifier::sendNotifyContextRequest
     spathList = "";
   }
 
-  ci.outFormat = JSON;
+  ci.outMimeType = JSON;
   std::string payload = ncr->toJson(&ci, renderFormat, attrsOrder);
 
   /* Parse URL */
@@ -141,7 +141,7 @@ void QueueNotifier::sendNotifyContextRequest
   params->resource         = uriPath;
   params->content_type     = content_type;
   params->content          = payload;
-  params->format           = JSON;
+  params->mimeType         = JSON;
   params->renderFormat     = renderFormatToString(renderFormat, false);
   params->fiwareCorrelator = fiwareCorrelator;
   strncpy(params->transactionId, transactionId, sizeof(params->transactionId));

@@ -28,7 +28,7 @@
 #include <string>
 #include <map>
 
-#include "common/Format.h"
+#include "rest/HttpStatusCode.h"
 #include "ngsi9/SubscribeContextAvailabilityRequest.h"
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
 

@@ -25,7 +25,7 @@ SET (SOURCES
     string.cpp
     tag.cpp
     sem.cpp
-    Format.cpp
+    MimeType.cpp
     RenderFormat.cpp
     Timer.cpp
     idCheck.cpp
@@ -39,7 +39,7 @@ SET (HEADERS
     globals.h
     string.h
     sem.h
-    Format.h
+    MimeType.h
     RenderFormat.h
     Timer.h
     idCheck.h

@@ -267,7 +267,7 @@ ContextAttribute::ContextAttribute()
   typeGiven             = false;
 
   providingApplication.set("");
-  providingApplication.setFormat(NOFORMAT);
+  providingApplication.setMimeType(NOMIMETYPE);
 }
 
 
@@ -301,7 +301,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
   typeGiven             = caP->typeGiven;
 
   providingApplication.set(caP->providingApplication.get());
-  providingApplication.setFormat(caP->providingApplication.getFormat());
+  providingApplication.setMimeType(caP->providingApplication.getMimeType());
 
   LM_T(LmtClone, ("Creating a ContextAttribute: compoundValueP at %p for attribute '%s' at %p",
                   compoundValueP,
@@ -351,7 +351,7 @@ ContextAttribute::ContextAttribute
   typeGiven             = false;
 
   providingApplication.set("");
-  providingApplication.setFormat(NOFORMAT);
+  providingApplication.setMimeType(NOMIMETYPE);
 }
 
 
@@ -383,7 +383,7 @@ ContextAttribute::ContextAttribute
   typeGiven             = false;
 
   providingApplication.set("");
-  providingApplication.setFormat(NOFORMAT);
+  providingApplication.setMimeType(NOMIMETYPE);
 }
 
 
@@ -415,7 +415,7 @@ ContextAttribute::ContextAttribute
   typeGiven             = false;
 
   providingApplication.set("");
-  providingApplication.setFormat(NOFORMAT);
+  providingApplication.setMimeType(NOMIMETYPE);
 }
 
 
@@ -447,7 +447,7 @@ ContextAttribute::ContextAttribute
   typeGiven             = false;
 
   providingApplication.set("");
-  providingApplication.setFormat(NOFORMAT);
+  providingApplication.setMimeType(NOMIMETYPE);
 }
 
 
@@ -475,7 +475,7 @@ ContextAttribute::ContextAttribute
   typeGiven             = false;
 
   providingApplication.set("");
-  providingApplication.setFormat(NOFORMAT);
+  providingApplication.setMimeType(NOMIMETYPE);
 }
 
 
@@ -678,7 +678,7 @@ std::string ContextAttribute::render
 
   metadataVector.keyNameSet("metadata");
 
-  if ((ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (ciP->outFormat == JSON))
+  if ((ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (ciP->outMimeType == JSON))
   {
     return renderAsJsonObject(ciP, request, indent, comma, omitValue);
   }
@@ -896,7 +896,7 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
 {
   std::string  out;
 
-  if (ciP->outFormat == JSON)
+  if (ciP->outMimeType == JSON)
   {
     if (compoundValueP != NULL)
     {
@@ -1098,7 +1098,7 @@ void ContextAttribute::present(const std::string& indent, int ix)
   LM_T(LmtPresent, ("%s  PA:       %s (%s)", 
 		    indent.c_str(), 
 		    providingApplication.get().c_str(), 
-		    formatToString(providingApplication.getFormat())));
+		    mimeTypeToString(providingApplication.getMimeType())));
   LM_T(LmtPresent, ("%s  found:    %s", 
 		    indent.c_str(), 
 		    FT(found)));

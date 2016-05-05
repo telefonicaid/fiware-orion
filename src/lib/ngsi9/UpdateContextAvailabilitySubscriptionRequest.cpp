@@ -25,7 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/Request.h"

@@ -162,16 +162,16 @@ public:
     }
 
     MOCK_METHOD7(sendNotifyContextRequest, void(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, RenderFormat renderFormat, const std::vector<std::string>&  attrsFilter));
-    MOCK_METHOD5(sendNotifyContextAvailabilityRequest, void(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, const std::string& fiwareCorrelator, Format f));
+    MOCK_METHOD5(sendNotifyContextAvailabilityRequest, void(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, const std::string& fiwareCorrelator, RenderFormat renderFormat));
 
     /* Wrappers for parent methods (used in ON_CALL() defaults set in the constructor) */
     void parent_sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, RenderFormat renderFormat, const std::vector<std::string>&  attrsFilter)
     {
       Notifier::sendNotifyContextRequest(ncr, url, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsFilter);
     }
-    void parent_sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, const std::string& fiwareCorrelator, Format format)
+    void parent_sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, const std::string& fiwareCorrelator, RenderFormat renderFormat)
     {
-      Notifier::sendNotifyContextAvailabilityRequest(ncar, url, tenant, fiwareCorrelator, format);
+      Notifier::sendNotifyContextAvailabilityRequest(ncar, url, tenant, fiwareCorrelator, renderFormat);
     }
 };
 

@@ -25,7 +25,7 @@
 */
 #include <string>
 
-#include "common/Format.h"
+#include "common/MimeType.h"
 
 
 
@@ -54,7 +54,7 @@ typedef struct SenderThreadParams
   std::string     content_type;
   std::string     content;
   char            transactionId[64];
-  Format          format;
+  MimeType        mimeType;
   std::string     renderFormat;
   std::string     fiwareCorrelator;
   struct timespec timeStamp;

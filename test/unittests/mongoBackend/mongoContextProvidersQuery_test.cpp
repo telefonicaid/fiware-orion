@@ -595,19 +595,19 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsAll)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getMimeType());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -666,7 +666,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneSingle)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr2.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -731,7 +731,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneMulti)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -791,13 +791,13 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsSubset)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -858,25 +858,25 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralCREs)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getMimeType());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getMimeType());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->stringValue);
   EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 3)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 3)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -937,19 +937,19 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralRegistrations)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getMimeType());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1094,25 +1094,25 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getMimeType());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getMimeType());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->stringValue);
   EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 3)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 3)->providingApplication.getMimeType());
 
   /* Context Element response # 1 */
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
@@ -1129,19 +1129,19 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ("A2", RES_CER_ATTR(1, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getMimeType());
 
   EXPECT_EQ("A3", RES_CER_ATTR(1, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 2)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 2)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(1, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 2)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -1202,13 +1202,13 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1275,13 +1275,13 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1298,7 +1298,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -1365,7 +1365,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr5.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1382,7 +1382,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -1399,7 +1399,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
   EXPECT_EQ("", RES_CER_ATTR(2, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(2, 0)->stringValue);
   EXPECT_EQ("http://cr4.com", RES_CER_ATTR(2, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(2, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(2, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
   EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
@@ -1463,19 +1463,19 @@ TEST(mongoContextProvidersQueryRequest, pattern0Attr)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getMimeType());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getMimeType());
 
   /* Context Element response # 2 */
   EXPECT_EQ("E3", RES_CER(1).entityId.id);
@@ -1488,19 +1488,19 @@ TEST(mongoContextProvidersQueryRequest, pattern0Attr)
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ("A2", RES_CER_ATTR(1, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 1)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(1, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 1)->providingApplication.getMimeType());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 2)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(1, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 2)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1558,7 +1558,7 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrSingle)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr2.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1620,7 +1620,7 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1637,7 +1637,7 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -1700,13 +1700,13 @@ TEST(mongoContextProvidersQueryRequest, patternNAttr)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1723,13 +1723,13 @@ TEST(mongoContextProvidersQueryRequest, patternNAttr)
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ("A2", RES_CER_ATTR(1, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(1, 1)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(1, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(1, 1)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -1833,7 +1833,7 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1850,7 +1850,7 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -1867,7 +1867,7 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
   EXPECT_EQ("", RES_CER_ATTR(2, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(2, 0)->stringValue);
   EXPECT_EQ("http://cr4.com", RES_CER_ATTR(2, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(2, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(2, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
   EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
@@ -1884,7 +1884,7 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
   EXPECT_EQ("", RES_CER_ATTR(3, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(3, 0)->stringValue);
   EXPECT_EQ("http://cr5.com", RES_CER_ATTR(3, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(3, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(3, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(3).code);
   EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
@@ -1949,25 +1949,25 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getMimeType());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getMimeType());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->stringValue);
   EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 3)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 3)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1984,19 +1984,19 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ("A2", RES_CER_ATTR(1, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(1, 1)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(1, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(1, 1)->providingApplication.getMimeType());
 
   EXPECT_EQ("A3", RES_CER_ATTR(1, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 2)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(1, 2)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(1, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(1, 2)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -2013,19 +2013,19 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
   EXPECT_EQ("", RES_CER_ATTR(2, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(2, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(2, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(2, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(2, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ("A2", RES_CER_ATTR(2, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(2, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(2, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(2, 1)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(2, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(2, 1)->providingApplication.getMimeType());
 
   EXPECT_EQ("A3", RES_CER_ATTR(2, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(2, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(2, 2)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(2, 2)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(2, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(2, 2)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
   EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
@@ -2097,37 +2097,37 @@ TEST(mongoContextProvidersQueryRequest, severalCprs1)
   EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("1", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(NOMIMETYPE, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getMimeType());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cpr2.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getMimeType());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->stringValue);
   EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 3)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 3)->providingApplication.getMimeType());
 
   EXPECT_EQ("A5", RES_CER_ATTR(0, 4)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 4)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 4)->stringValue);
   EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 4)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 4)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 4)->providingApplication.getMimeType());
 
   EXPECT_EQ("A6", RES_CER_ATTR(0, 5)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 5)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 5)->stringValue);
   EXPECT_EQ("http://cpr3.com", RES_CER_ATTR(0, 5)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 5)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 5)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -2194,31 +2194,31 @@ TEST(mongoContextProvidersQueryRequest, severalCprs2)
   EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("1", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(NOMIMETYPE, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getMimeType());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cpr2.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getMimeType());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->stringValue);
   EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 3)->providingApplication.get());
-  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 3)->providingApplication.getMimeType());
 
   EXPECT_EQ("A5", RES_CER_ATTR(0, 4)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 4)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 4)->stringValue);
   EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 4)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 4)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 4)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -2270,9 +2270,9 @@ TEST(mongoContextProvidersQueryRequest, severalCprs3)
   EXPECT_EQ("false", RES_CER(0).entityId.isPattern);  
   ASSERT_EQ(2, RES_CER(0).providingApplicationList.size());
   EXPECT_EQ("http://cpr2.com", RES_CER(0).providingApplicationList[0].get());
-  EXPECT_EQ(JSON, RES_CER(0).providingApplicationList[0].getFormat());
+  EXPECT_EQ(JSON, RES_CER(0).providingApplicationList[0].getMimeType());
   EXPECT_EQ("http://cpr3.com", RES_CER(0).providingApplicationList[1].get());
-  EXPECT_EQ(JSON, RES_CER(0).providingApplicationList[1].getFormat());
+  EXPECT_EQ(JSON, RES_CER(0).providingApplicationList[1].getMimeType());
 
   ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
 
@@ -2280,19 +2280,19 @@ TEST(mongoContextProvidersQueryRequest, severalCprs3)
   EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("1", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(NOMIMETYPE, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cpr1.com", RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 1)->providingApplication.getMimeType());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 2)->providingApplication.getMimeType());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
