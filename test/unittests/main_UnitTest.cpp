@@ -115,15 +115,6 @@ const char* orionUnitTestVersion = "0.0.1-unittest";
 */
 int main(int argC, char** argV)
 {
-#if 0
-  printf("\n\n===================================================================================\n");
-  for (int ix = 1; ix < argC; ++ix)
-  {
-    printf("argV[%d] = '%s'\n", ix, argV[ix]);
-  }
-  printf("===================================================================================\n\n\n");
-#endif
-
   paConfig("usage and exit on any warning", (void*) true);
   paConfig("log to screen",                 (void*) "only errors");
   paConfig("log file line format",          (void*) "TYPE:DATE:EXEC-AUX/FILE[LINE](p.PID)(t.TID) FUNC: TEXT");
@@ -132,31 +123,7 @@ int main(int argC, char** argV)
   paConfig("default value", "-logDir",      (void*) "/tmp");
   paConfig("man author",                    "Fermín Galán and Ken Zangelin");
 
-#if 0
-  if (argC > 1)
-  {
-     if (strcmp(argV[1], "-t") == 0)
-       paParse(paArgs, 3, argV, 3, false);
-     else
-       paParse(paArgs, 1, argV, 1, false);
-  }
-  else
-    paParse(paArgs, 1, argV, 1, false);
-#else
-  // FIXME PR: With this change the following works:
-  //
-  // BUILD_UNITTEST/test/unittests/unitTest -t 0-255 -dbhost qa-bigdata-sth-01
-  //
-  // However, if we introduce gtest arguments, it breaks, e.g:
-  //
-  // BUILD_UNITTEST/test/unittests/unitTest -t 0-255 -dbhost localhost --gtest_filter=*.*
-  // ...
-  // option '--' is a boolean option - cannot have a value (gtest_filter=*.*)
-  //
-  // I don't know how to fix this... paArgs wisdom is required :)
-
   paParse(paArgs, argC, (char**) argV, 1, false);
-#endif
 
   LM_M(("Init tests"));
   orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false, false, false, false, false);
