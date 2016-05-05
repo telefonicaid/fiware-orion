@@ -209,26 +209,6 @@ extern void orionInit
 
 /* ****************************************************************************
 *
-* mongoInit -
-*/
-void mongoInit
-(
-  const char*  dbHost,
-  const char*  rplSet,
-  std::string  dbName,
-  const char*  user,
-  const char*  pwd,
-  bool         mtenant,
-  long         timeout,
-  int          writeConcern,
-  int          dbPoolSize,
-  bool         mutexTimeStat
-);
-
-
-
-/* ****************************************************************************
-*
 * isTrue - 
 */
 extern bool isTrue(const std::string& s);
