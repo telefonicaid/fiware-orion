@@ -1107,6 +1107,7 @@ static bool addTriggeredSubscriptions_withCache
     {
       LM_E(("Runtime Error (error setting string filter: %s)", errorString.c_str()));
       delete subP;
+      cacheSemGive(__FUNCTION__, "match subs for notifications");
       return false;
     }
 
