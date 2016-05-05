@@ -29,6 +29,7 @@ SET (SOURCES
     Subscription.cpp
     BatchQuery.cpp
     BatchUpdate.cpp
+    HttpInfo.cpp
 )
 
 SET (HEADERS
@@ -40,6 +41,7 @@ SET (HEADERS
     Subscription.h
     BatchQuery.h
     BatchUpdate.h
+    HttpInfo.h
 )
 
 

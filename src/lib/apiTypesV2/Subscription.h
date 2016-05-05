@@ -25,14 +25,15 @@
 *
 * Author: Orion dev team
 */
-
 #include <string>
 #include <vector>
 
 #include "ngsi/Duration.h"
 #include "ngsi/Throttling.h"
+#include "apiTypesV2/HttpInfo.h"
 
-namespace ngsiv2 {
+namespace ngsiv2
+{
 
 struct EntID
 {
@@ -42,19 +43,12 @@ struct EntID
   std::string toJson();
 };
 
-struct Http
-{
-  std::string url;
-  std::string toJson();
-};
-
-
 struct Notification
 {
   std::vector<std::string> attributes;  
   long long                timesSent;
   long long                lastNotification;
-  Http                     http;
+  HttpInfo                 httpInfo;
   std::string              toJson();
 };
 
