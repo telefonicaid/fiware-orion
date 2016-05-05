@@ -2924,9 +2924,9 @@ void processContextElement
       alarmMgr.dbError(details);
       continue;
     }
-    // we need to copy() here, otherwise we have empirically found that bad things may happend with long BSONObjs
+    // we need to getOwned() here, otherwise we have empirically found that bad things may happend with long BSONObjs
     // (see http://stackoverflow.com/questions/36917731/context-broker-crashing-with-certain-update-queries)
-    results.push_back(r.copy());
+    results.push_back(r.getOwned());
   }
   releaseMongoConnection(connection);
 
