@@ -449,7 +449,9 @@ function localBrokerStart()
   # (A better solution will be to detect when CB is ready to start the test, but
   # it can be complex. Note that and check above ensures that the port is ready, but
   # it doesn't guarantee that DB connection is ok).
-  sleep $CB_WAIT_AFTER_START
+  if [ "$CB_WAIT_AFTER_START" != "" ]; then
+    sleep $CB_WAIT_AFTER_START
+  fi
 }
 
 
