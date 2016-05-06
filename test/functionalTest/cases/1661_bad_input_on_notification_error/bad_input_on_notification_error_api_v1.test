@@ -164,7 +164,7 @@ echo
 
 echo "07. Corrupt reference in subscription (using mongo)"
 echo "==================================================="
-echo 'db.csubs.update({_id: ObjectId("'$SUB_ID'")}, { $set: { "reference": "badReferenceForSubscription" }})' | mongo $CB_DB_NAME --quiet
+mongoCmd ${CB_DB_NAME} 'db.csubs.update({_id: ObjectId("'$SUB_ID'")}, { $set: { "reference": "badReferenceForSubscription" }})'
 echo
 echo
 
