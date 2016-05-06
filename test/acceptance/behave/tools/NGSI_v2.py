@@ -561,9 +561,9 @@ class NGSI:
         """
         verify headers in response, it is possible to use regular expressions
         Ex:
-          | parameter      | value                |
-          | x-total-counts | 5                    |
-          | location       | /v2/subscriptions/.* |
+          | parameter          | value                |
+          | fiware-total-count | 5                    |
+          | location           | /v2/subscriptions/.* |
         :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
         """
         headers= {}                                # headers to verify

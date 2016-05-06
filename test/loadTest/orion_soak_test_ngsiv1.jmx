@@ -341,7 +341,7 @@ vars.put(&quot;subscriptionRequest&quot;,request.toString());
             <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="get total of subscriptions (regExp)" enabled="true">
               <stringProp name="RegexExtractor.useHeaders">true</stringProp>
               <stringProp name="RegexExtractor.refname">total</stringProp>
-              <stringProp name="RegexExtractor.regex">X-Total-Count: (\d+)</stringProp>
+              <stringProp name="RegexExtractor.regex">Fiware-Total-Count: (\d+)</stringProp>
               <stringProp name="RegexExtractor.template">$1$</stringProp>
               <stringProp name="RegexExtractor.default">0</stringProp>
               <stringProp name="RegexExtractor.match_number"></stringProp>
