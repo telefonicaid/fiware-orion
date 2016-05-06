@@ -1,2 +1,3 @@
+- Fix: crash when updating entities which corresponding document at DB is somehow large (#2112)
 - Fix: bug disabling throttling when creating a v2 subscription (Issue #2114)
 - Deprecated: /ngsi10 and /ngsi9 as URL path prefixes
