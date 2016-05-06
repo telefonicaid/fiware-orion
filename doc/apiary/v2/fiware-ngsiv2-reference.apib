@@ -713,8 +713,70 @@ so notification receiver can know the format used without needing processing not
 
 ### Notification templates
 
-Based on the "template" field defined as part of the subscription and in a macro replacement language
-that could be used in "payload", "url", "headers", "method" and "qs". Details TBD.
+At notification time, NGSIv2 implementations will send a notification based on the `notification.http`
+field of the associated subscription. This fields can be interpreted litearly or use a
+templating mechanism, based in macros substitution, that is described in the present subsection.
+
+The following fields inside `notification.http` in subscriptions are intepreted as templates:
+
+* `url`
+* `headers` (both header names and values)
+* `qs` (both in parameters names and values)
+* `payload`
+
+It is worth mentioning that `method` is not a template and it is always used literarly.
+
+Macro substitution is based in the syntax `${..}`. In particular:
+
+* `${id}` is replaced by entity id
+* `${type}` is replaced by entity type
+* Any other `${token}` is replaced by the value of attribute which name is `token` or with
+  an empty string if the attribute is not included in the data to notify. If the value is
+  not a string (i.e. it is a number, a bool, a JSON object or array) it is casted to a string.
+
+Example:
+
+Let's consider the following `notification.http` object in a given subscription.
+
+```
+"http": {
+  "url": "http://foo.com/entity/${id}",
+  "headers": {
+    "Content-Type": "text/plain"
+  },
+  "method": "PUT",
+  "qs": {
+    "type": "${type}"
+  },
+  "payload": "The temperature is ${temperature} degrees"
+}
+```
+
+Now, let's consider that NGSIv2 implementation triggers a notification associated to this subscription.
+Notification data is for entity with id "DC_S1-D41" and type "Room", including an attribute named
+"temperature" with value 23.4. The resulting notification after applying the template would be:
+
+```
+PUT http://foo.com/entity/DC_S1-D41?type=Room
+Content-Type: text/plain
+Content-Length: 31
+
+The temperature is 23.4 degrees
+```
+
+Some considerations to take into account:
+
+* It is user's responsability to ensure that after substitution the notification is a correct
+  HTTP message. Otherwise the NGSIv2 implementation could skip the notification (e.g. if URL results in a
+  malformed URL) or the receiver could get something formally wrong (e.g. the Conent-Type header is
+  application/xml but the payload doesn't correspond to a well-formed XML document).
+* In case the data to notify contains more than one entity, a separate notification (HTTP message) is sent
+  for each of the entities (contrary to default behaviour, which is to send all that in the same HTTP mesage)
+  if at least one of the following is true:
+  * `url` contains one or more substitutions.
+  * `qs` contains one or more substitutions (either in parameters names or values).
+  * `headers` contains one or more substitutions (either header names or values).
+  * `payload` contains one or more substitutions.
 
 ## Group API Entry Point
 
@@ -1429,7 +1491,8 @@ An `http` object contains the following subfields:
   compliant server must support `http` URL schema, other schemas could also be supported.
 + `headers` (optional): a key-map of HTTP headers that are included in the notification messages.
 + `qs` (optional): a key-map of URL query parameters that are included in the notification message.
-+ `method` (optional): the method to use for sending the notification (default is POST)
++ `method` (optional): the method to use for sending the notification (default is POST). Only valid
+  HTTP methods are allowed.
 + `payload` (optional): the payload to be used in the notification. If omitted, the default payload (see
   "Notification messages" sections) is used.
 
