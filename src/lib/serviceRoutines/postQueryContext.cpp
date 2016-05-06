@@ -274,7 +274,7 @@ std::string postQueryContext
   std::string                 answer;
   QueryContextRequestVector   requestV;
   QueryContextResponseVector  responseV;
-  long long                   count;
+  long long                   count = 0;
   long long*                  countP = NULL;
 
 
