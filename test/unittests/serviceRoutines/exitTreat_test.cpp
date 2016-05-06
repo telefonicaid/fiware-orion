@@ -54,40 +54,18 @@ static RestService rs[] =
 *
 * error - 
 *
-* FIXME P5 #1862: _json countepart?
 */
-TEST(exitTreat, DISABLED_error)
+TEST(exitTreat, error)
 {
-  ConnectionInfo ci1("/exit",  "GET", "1.1");
-  ConnectionInfo ci2("/exit/nadadenada",  "GET", "1.1");
-  ConnectionInfo ci3("/exit/harakiri",  "GET", "1.1");
-  const char*    outfile1 = "orion.exit.error1.valid.xml";
-  const char*    outfile2 = "orion.exit.error2.valid.xml";
-  const char*    outfile3 = "orion.exit.error3.valid.xml";
+  ConnectionInfo ci1("/exit/harakiri",  "GET", "1.1");
   std::string    out;
 
   utInit();
 
   harakiri = true;
-
   ci1.apiVersion = "v1";
+
   out = restService(&ci1, rs);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  ci2.apiVersion = "v1";
-  out = restService(&ci2, rs);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  harakiri = false;
-  ci3.apiVersion = "v1";
-  out = restService(&ci3, rs);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  harakiri = true;
-  out = restService(&ci3, rs);
   EXPECT_STREQ("DIE", out.c_str());
   harakiri = false;
 

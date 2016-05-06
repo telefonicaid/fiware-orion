@@ -37,9 +37,8 @@
 *
 * constructors - 
 *
-* FIXME P5 #1862: _json countepart?
 */
-TEST(RegisterContextResponse, DISABLED_constructors)
+TEST(RegisterContextResponse, constructors)
 {
   RegisterContextResponse* rcr1 = new RegisterContextResponse();
   RegisterContextResponse  rcr2("012301230123012301230123", "PT1S");
@@ -50,10 +49,6 @@ TEST(RegisterContextResponse, DISABLED_constructors)
   RegisterContextResponse  rcr5("012345678901234567890123", "PT1M");
 
   std::string              out;
-  const char*              outFile1  = "ngsi9.registerContextResponse.constructors1.valid.xml";
-  const char*              outFile2  = "ngsi9.registerContextResponse.constructors2.valid.xml";
-  const char*              outFile3  = "ngsi9.registerContextResponse.constructors3.valid.xml";
-  const char*              outFile4  = "ngsi9.registerContextResponse.constructors4.valid.xml";
 
   std::string              expected5 = "OK";
 
@@ -65,25 +60,7 @@ TEST(RegisterContextResponse, DISABLED_constructors)
   EXPECT_STREQ("", rcr3.registrationId.get().c_str());
   EXPECT_EQ("012345678901234567890123", rcr4.registrationId.get());
   EXPECT_EQ(SccBadRequest, rcr4.errorCode.code);
-  
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile1)) << "Error getting test data from '" << outFile1 << "'";
-  out = rcr2.render(RegisterContext, "");
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
-  rcr2.registrationId.set("12345");
-  out = rcr2.check(RegisterContext, "", "", 0);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile3)) << "Error getting test data from '" << outFile3 << "'";
-  out = rcr2.check(RegisterContext, "", "Forced Error", 0);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile4)) << "Error getting test data from '" << outFile4 << "'";
-  rcr2.duration.set("dddd");
-  out = rcr2.check(RegisterContext, "", "", 0);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-  
+    
   out = rcr5.check(RegisterContext, "", "", 0);
   EXPECT_EQ(expected5, out);
 

@@ -75,40 +75,34 @@ TEST(Convenience, emptyPath)
 
 /* ****************************************************************************
 *
-* shortPath - 
+* shortPath -
 *
-* FIXME P5 #1862: _json countepart?
 */
-TEST(Convenience, DISABLED_shortPath)
+TEST(Convenience, shortPath)
 {
   ConnectionInfo  ci1("ngsi9", "GET", "1.1");
   ConnectionInfo  ci2("ngsi10", "GET", "1.1");
   ConnectionInfo  ci3("ngsi8", "GET", "1.1");
   ConnectionInfo  ci4("ngsi10/nada", "GET", "1.1");
   std::string     out;
-  const char*     outfile1 = "ngsi.convenience.shortPath.postponed.xml";
-  const char*     outfile2 = "ngsi.convenience.shortPath2.postponed.xml";
-  const char*     outfile3 = "ngsi.convenience.shortPath3.postponed.xml";
-  const char*     outfile4 = "ngsi.convenience.shortPath4.postponed.xml";
+  const char*     outfile = "ngsi.unrecognizedRequest.json";
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
   ci1.apiVersion = "v1";
   out = restService(&ci1, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   ci2.apiVersion = "v1";
   out = restService(&ci2, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   ci3.apiVersion = "v1";
   out = restService(&ci3, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
   ci4.apiVersion = "v1";
   out = restService(&ci4, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
@@ -120,15 +114,14 @@ TEST(Convenience, DISABLED_shortPath)
 
 /* ****************************************************************************
 *
-* badPathNgsi9 - 
+* badPathNgsi9 -
 *
-* FIXME P5 #1862: _json countepart?
 */
-TEST(Convenience, DISABLED_badPathNgsi9)
+TEST(Convenience, badPathNgsi9)
 {
   ConnectionInfo            ci("ngsi9/badpathcomponent", "GET", "1.1");
   std::string               out;
-  const char*               outfile = "ngsi.convenience.badPathNgsi9.postponed.xml";
+  const char*               outfile = "ngsi.unrecognizedRequest.json";
 
   utInit();
 
@@ -145,15 +138,14 @@ TEST(Convenience, DISABLED_badPathNgsi9)
 
 /* ****************************************************************************
 *
-* badPathNgsi10 - 
+* badPathNgsi10 -
 *
-* FIXME P5 #1862: _json countepart?
 */
-TEST(Convenience, DISABLED_badPathNgsi10)
+TEST(Convenience, badPathNgsi10)
 {
   ConnectionInfo            ci("ngsi10/badpathcomponent", "GET", "1.1");
   std::string               out;
-  const char*               outfile = "ngsi10.convenience.badPathNgsi10.postponed.xml";
+  const char*               outfile = "ngsi.unrecognizedRequest.json";
 
   utInit();
 

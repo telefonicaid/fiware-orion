@@ -56,59 +56,23 @@ static RestService rs[] =
 *
 * put - 
 *
-* FIXME P5 #1862: _json counterpart?
 */
-TEST(putSubscriptionConvOp, DISABLED_put)
+TEST(putSubscriptionConvOp, put)
 {
-  ConnectionInfo ci1("/ngsi10/contextSubscriptions/012345678901234567890123",  "DELETE", "1.1");
-  ConnectionInfo ci2("/ngsi10/contextSubscriptions/111222333444555666777888",  "PUT",    "1.1");
-  ConnectionInfo ci3("/ngsi10/contextSubscriptions/111222333444555666777881",  "PUT",    "1.1");
-  ConnectionInfo ci4("/ngsi10/contextSubscriptions/012345678901234567890123",  "XVERB",  "1.1");
-  const char*    infile       = "ngsi10.updateContextSubscriptionRequest.subscriptionNotFound.valid.xml";
-  const char*    outfile1     = "ngsi10.unsubscribeContextResponse.putSubscriptionConvOp.notFound.valid.xml";
-  const char*    outfile2     = "ngsi10.updateContextSubscriptionResponse.putSubscriptionConvOp.notFound.valid.xml";
-  const char*    outfile3     = "ngsi10.updateContextSubscriptionResponse.putSubscriptionConvOp.unmatchingSubscriptionId.valid.xml";
+  ConnectionInfo ci1("/ngsi10/contextSubscriptions/012345678901234567890123",  "XVERB",  "1.1");
   std::string    out;
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   ci1.outMimeType    = JSON;
   ci1.inMimeType     = JSON;
   ci1.payload        = NULL;
   ci1.payloadSize    = 0;
   out                = restService(&ci1, rs);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-  
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  ci2.outMimeType    = JSON;
-  ci2.inMimeType     = JSON;
-  ci2.payload        = testBuf;
-  ci2.payloadSize    = strlen(testBuf);
-  out                = restService(&ci2, rs);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
-  ci3.outMimeType    = JSON;
-  ci3.inMimeType     = JSON;
-  ci3.payload        = testBuf;
-  ci3.payloadSize    = strlen(testBuf);
-  out                = restService(&ci3, rs);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-
-  ci4.outMimeType    = JSON;
-  ci4.inMimeType     = JSON;
-  ci4.payload        = NULL;
-  ci4.payloadSize    = 0;
-  out                = restService(&ci4, rs);
   EXPECT_EQ("", out);
-  EXPECT_EQ("Allow",       ci4.httpHeader[0]);
-  EXPECT_EQ("PUT, DELETE", ci4.httpHeaderValue[0]);
+  EXPECT_EQ("Allow",       ci1.httpHeader[0]);
+  EXPECT_EQ("PUT, DELETE", ci1.httpHeaderValue[0]);
 
   utExit();
 }

@@ -47,16 +47,13 @@ static RestService rs[] =
 *
 * error - 
 *
-* FIXME P5 #1862: _json counterpart?
 */
-TEST(badVerbAllFour, DISABLED_error)
+TEST(badVerbAllFour, error)
 {
   ConnectionInfo ci1("/ngsi10/contextEntities/123",  "PUST", "1.1");
   ConnectionInfo ci2("/ngsi10/contextEntities",      "PUST", "1.1");
   ConnectionInfo ci3("/ngsi10/",                     "PUST", "1.1");
   ConnectionInfo ci4("/ngsi10/1/2/3/4",              "PUST", "1.1");
-  const char*    outfile1 = "orion.serviceNotRecognized.valid.xml";
-  const char*    outfile2 = "orion.serviceNotRecognized2.valid.xml";
   std::string    out;
 
   utInit();
@@ -72,16 +69,6 @@ TEST(badVerbAllFour, DISABLED_error)
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci2.httpHeader[0]);
   EXPECT_EQ("POST, GET, PUT, DELETE", ci2.httpHeaderValue[0]);
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  ci3.apiVersion = "v1";
-  out = restService(&ci3, rs);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  ci4.apiVersion = "v1";
-  out = restService(&ci4, rs);
-  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

@@ -33,34 +33,6 @@
 
 /* ****************************************************************************
 *
-* ok_xml - 
-*
-* FIXME P5 #1862: _json countepart?
-*/
-TEST(QueryContextResponse, DISABLED_ok_xml)
-{
-  StatusCode*           ecP = new StatusCode(SccOk, "Detail");
-  StatusCode            ec(SccOk, "Detail2");
-  QueryContextResponse  qcr(ec);
-  std::string           out;
-  const char*           outfile  = "ngsi10.queryContextResponse.ok.valid.xml";
-  ConnectionInfo        ci(JSON);
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  out = qcr.render(&ci, QueryContext, "");
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  delete ecP;
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * json_render - 
 */
 TEST(QueryContextResponse, json_render)

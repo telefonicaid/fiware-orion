@@ -31,37 +31,6 @@
 
 /* ****************************************************************************
 *
-* constructors - 
-*
-* FIXME P5 #1862: _json counterpart?
-*/
-TEST(UpdateContextResponse, DISABLED_constructors)
-{
-  UpdateContextResponse  ucr1;
-  StatusCode             ec(SccBadRequest, "D");
-  UpdateContextResponse  ucr2(ec);
-  std::string            out;
-  const char*            outfile1 = "ngsi10.updateContextResponse.constructors.render1.valid.xml";
-  const char*            outfile2 = "ngsi10.updateContextResponse.constructors.render2.valid.xml";
-  ConnectionInfo         ci(JSON);
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out = ucr1.render(&ci, UpdateContext, "");
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  out = ucr2.render(&ci, UpdateContext, "");
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * jsonRender - 
 */
 TEST(UpdateContextResponse, jsonRender)

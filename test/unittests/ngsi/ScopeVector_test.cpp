@@ -33,13 +33,11 @@
 *
 * renderAndRelease - 
 *
-* FIXME P5 #1862: _json counterpart?
 */
-TEST(ScopeVector, DISABLED_renderAndRelease)
+TEST(ScopeVector, renderAndRelease)
 {
   Scope*         s = new Scope("Type", "Value");
   ScopeVector    sV;
-  const char*    outfile = "ngsi.scopeVector.render.middle.xml";
   std::string    out;
 
   utInit();
@@ -50,8 +48,6 @@ TEST(ScopeVector, DISABLED_renderAndRelease)
   sV.push_back(s);
 
   out = sV.render("", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ(sV.size(), 1);
   sV.release();
