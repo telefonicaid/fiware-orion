@@ -1,1 +1,2 @@
 - Fix: bug disabling throttling when creating a v2 subscription (Issue #2114)
+- Deprecated: /ngsi10 and /ngsi9 as URL path prefixes
