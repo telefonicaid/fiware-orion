@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_COMMON_FORMAT_H_
-#define SRC_LIB_COMMON_FORMAT_H_
-
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,55 +20,42 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Orion dev team
 */
 #include <string>
+#include <map>
+
+#include "logMsg/logMsg.h"
+
+#include "common/JsonHelper.h"
+#include "apiTypesV2/HttpInfo.h"
 
 
 
-/* ****************************************************************************
-*
-* DEFAULT_FORMAT - 
-*/
-#define DEFAULT_FORMAT              JSON
-#define DEFAULT_FORMAT_AS_STRING    "JSON"
-
-
-
-/* ****************************************************************************
-*
-* Format - 
-*/
-typedef enum Format
+namespace ngsiv2
 {
-  JSON     = 1,
-  TEXT     = 2,
-  HTML     = 3,
-  NOFORMAT = 4
-} Format;
+
+/* ****************************************************************************
+*
+* HttpInfo::HttpInfo - 
+*/
+HttpInfo::HttpInfo() : verb(NOVERB)
+{
+}
 
 
 
 /* ****************************************************************************
 *
-* formatToString - 
+* HttpInfo::toJson -
 */
-extern const char* formatToString(Format format);
+std::string HttpInfo::toJson()
+{
+  JsonHelper jh;
 
+  jh.addString("url", this->url);
 
+  return jh.str();
+}
 
-/* ****************************************************************************
-*
-* stringToFormat
-*/
-extern Format stringToFormat(const std::string& s);
-
-
-
-/* ****************************************************************************
-*
-* formatParse - 
-*/
-extern Format formatParse(const std::string& format, std::string* charsetP);
-
-#endif  // SRC_LIB_COMMON_FORMAT_H_
+}

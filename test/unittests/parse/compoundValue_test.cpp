@@ -47,7 +47,7 @@ TEST(compoundValue, updateNoCompoundValue)
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFileJson)) << "Error getting test data from '" << inFileJson << "'";
-  ci.inFormat = JSON;
+  ci.inMimeType = JSON;
   result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
   EXPECT_STREQ("OK", result.c_str());
   caP = reqData.upcr.res.contextElementVector[0]->contextAttributeVector[0];
@@ -73,8 +73,8 @@ TEST(compoundValue, updateUnknownPath)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFileJson)) << "Error getting test data from '" << inFileJson << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFileJson)) << "Error getting test data from '" << outFileJson << "'";
-  ciJson.inFormat  = JSON;
-  ciJson.outFormat = JSON;
+  ciJson.inMimeType  = JSON;
+  ciJson.outMimeType = JSON;
   result = jsonTreat(testBuf, &ciJson, &reqData, UpdateContext, "updateContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 
@@ -100,8 +100,8 @@ TEST(compoundValue, updateOneStringJson)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
 
@@ -165,8 +165,8 @@ TEST(compoundValue, updateTwoStringsJson)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
 
   EXPECT_STREQ("OK", result.c_str());
@@ -242,8 +242,8 @@ TEST(compoundValue, updateTwoItemsSameNameInStructJson)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
 
   EXPECT_STREQ(expectedBuf, result.c_str());
@@ -269,8 +269,8 @@ TEST(compoundValue, updateContextValueVectorOneItemJson)
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
   EXPECT_STREQ("OK", result.c_str());
 
@@ -331,8 +331,8 @@ TEST(compoundValue, updateContextValueVectorFiveItemsJson)
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
   EXPECT_STREQ("OK", result.c_str());
 
@@ -397,8 +397,8 @@ TEST(compoundValue, updateTwoStructsJson)
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
   EXPECT_STREQ("OK", result.c_str());
 
@@ -408,7 +408,7 @@ TEST(compoundValue, updateTwoStructsJson)
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
-  ci.outFormat = JSON;
+  ci.outMimeType = JSON;
   rendered = caP->render(&ci, UpdateContext, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
@@ -546,8 +546,8 @@ TEST(compoundValue, sixLevelsJson)
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
   EXPECT_STREQ("OK", result.c_str());
 
@@ -556,7 +556,7 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
-  ci.outFormat = JSON;
+  ci.outMimeType = JSON;
   rendered = caP->render(&ci, UpdateContext, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
@@ -860,8 +860,8 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
+  ci.inMimeType  = JSON;
+  ci.outMimeType = JSON;
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
   EXPECT_STREQ("OK", result.c_str());
 

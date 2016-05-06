@@ -99,11 +99,11 @@ std::string payloadParse
   std::string result = "NONE";
 
   LM_T(LmtParsedPayload, ("parsing data for service '%s'. Method: '%s'", requestType(service->request), ciP->method.c_str()));
-  LM_T(LmtParsedPayload, ("outFormat: %s", formatToString(ciP->outFormat)));
+  LM_T(LmtParsedPayload, ("outMimeType: %s", mimeTypeToString(ciP->outMimeType)));
 
   ciP->requestType = service->request;
 
-  if (ciP->inFormat == JSON)
+  if (ciP->inMimeType == JSON)
   {
     if (compV[0] == "v2")
     {
@@ -114,18 +114,18 @@ std::string payloadParse
       result = jsonTreat(ciP->payload, ciP, parseDataP, service->request, service->payloadWord, jsonPP);
     }
   }
-  else if (ciP->inFormat == TEXT)
+  else if (ciP->inMimeType == TEXT)
   {
     result = textRequestTreat(ciP, parseDataP, service->request);
   }
   else
   {
     alarmMgr.badInput(clientIp, "payload mime-type is not JSON");
-    return "Bad inFormat";
+    return "Bad inMimeType";
   }
 
-  LM_T(LmtParsedPayload, ("result: '%s'", result.c_str()));
-  LM_T(LmtParsedPayload, ("outFormat: %s", formatToString(ciP->outFormat)));
+  LM_T(LmtParsedPayload, ("result:      '%s'", result.c_str()));
+  LM_T(LmtParsedPayload, ("outMimeType: '%s'", mimeTypeToString(ciP->outMimeType)));
 
   if (result != "OK")
   {
@@ -437,9 +437,9 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     LM_T(LmtService, ("Treating service %s %s", serviceV[ix].verb.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
     if (ciP->payloadSize == 0)
     {
-      ciP->inFormat = NOFORMAT;
+      ciP->inMimeType = NOMIMETYPE;
     }
-    statisticsUpdate(serviceV[ix].request, ciP->inFormat);
+    statisticsUpdate(serviceV[ix].request, ciP->inMimeType);
 
     // Tenant to connectionInfo
     ciP->tenant = ciP->tenantFromHttpHeader;

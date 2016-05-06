@@ -64,11 +64,12 @@ TEST(putSubscriptionConvOp, put)
 
   utInit();
 
-  ci1.outFormat    = JSON;
-  ci1.inFormat     = JSON;
-  ci1.payload      = NULL;
-  ci1.payloadSize  = 0;
-  out              = restService(&ci1, rs);
+  ci1.outMimeType    = JSON;
+  ci1.inMimeType     = JSON;
+  ci1.payload        = NULL;
+  ci1.payloadSize    = 0;
+  out                = restService(&ci1, rs);
+
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow",       ci1.httpHeader[0]);
   EXPECT_EQ("PUT, DELETE", ci1.httpHeaderValue[0]);

@@ -27,7 +27,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/Format.h"
+#include "common/MimeType.h"
 #include "convenience/ContextAttributeResponseVector.h"
 #include "convenience/ContextAttributeResponse.h"
 #include "ngsi/ContextAttribute.h"
@@ -51,7 +51,7 @@ TEST(ContextAttributeResponseVector, render_json)
   ConnectionInfo                  ci;
 
   // 1. empty vector
-  ci.outFormat = JSON;
+  ci.outMimeType = JSON;
   car.statusCode.fill(SccBadRequest, "Empty Vector");
   out = carV.render(&ci, ContextEntityAttributes, "");
   EXPECT_STREQ("", out.c_str());

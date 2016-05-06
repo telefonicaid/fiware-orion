@@ -65,6 +65,18 @@ def get_an_entity_by_id(context, entity_id):
     __logger__.info("...returned an entity by id")
 
 
+@step(u'get attributes in an entity by ID "([^"]*)"')
+def get_attributes_in_an_entity_by_id(context, entity_id):
+    """
+    get attributes in an entity by ID
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    :param entity_id: entity ID
+    """
+    __logger__.debug("getting attributes in an entity by id...")
+    context.resp = context.cb.list_an_entity_by_id(context, entity_id, "/attrs")
+    __logger__.info("...returned attributes in an entity by id")
+
+
 @step(u'get an attribute "([^"]*)" by ID "([^"]*)"')
 def get_an_attribute_by_id(context, attribute_name, entity_id):
     """
@@ -179,6 +191,21 @@ def verify_that_the_entity_by_id_is_returned(context):
     ngsi = NGSI()
     ngsi.verify_an_entity_by_id(queries_parameters, entities_context, context.resp, entity_id_to_request)
     __logger__.info("...Verified an entity by ID returned from a request...")
+
+
+@step(u'verify that attributes in an entity by ID are returned')
+def verify_that_attributes_in_an_entity_by_id_are_returned(context):
+    """
+    verify that attributes in an entity by ID are returned
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.debug("Verifying that attributes in an entity by ID are returned from a request...")
+    queries_parameters = context.cb.get_entities_parameters()
+    entities_context = context.cb.get_entity_context()
+    entity_id_to_request = context.cb.get_entity_id_to_request()
+    ngsi = NGSI()
+    ngsi.verify_an_entity_by_id(queries_parameters, entities_context, context.resp, entity_id_to_request, attrs=True)
+    __logger__.info("...Verified that attributes in an entity by ID are returned from a request...")
 
 
 @step(u'verify that the attribute by ID is returned')

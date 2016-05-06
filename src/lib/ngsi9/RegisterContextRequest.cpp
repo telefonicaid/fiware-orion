@@ -29,7 +29,6 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
-#include "common/Format.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/Duration.h"

@@ -22,16 +22,17 @@
 *
 * Author: Orion dev team
 */
-
-#include "Subscription.h"
-
 #include <string>
 #include <sstream>
 #include <vector>
 
 #include "logMsg/logMsg.h"
+
 #include "common/JsonHelper.h"
 #include "common/globals.h"
+#include "apiTypesV2/Subscription.h"
+
+
 
 namespace ngsiv2
 {
@@ -85,7 +86,7 @@ std::string Notification::toJson()
   }
   jh.addRaw("attrs", vectorToJson(this->attributes));
 
-  jh.addRaw("http", this->http.toJson());
+  jh.addRaw("http", this->httpInfo.toJson());
 
   return jh.str();
 }
@@ -145,20 +146,6 @@ std::string EntID::toJson()
   jh.addString("id", this->id);
   jh.addString("idPattern", this->idPattern);
   jh.addString("type", this->type);
-
-  return jh.str();
-}
-
-
-/* ****************************************************************************
-*
-* Http::toJson -
-*/
-std::string Http::toJson()
-{
-  JsonHelper jh;
-
-  jh.addString("url", this->url);
 
   return jh.str();
 }

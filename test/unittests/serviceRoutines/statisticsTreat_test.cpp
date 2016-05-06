@@ -61,8 +61,9 @@ TEST(statisticsTreat, delete)
 
   utInit();
 
-  ci.outFormat = JSON;
-  out       = restService(&ci, rs);
+  ci.outMimeType = JSON;
+  out            = restService(&ci, rs);
+
   EXPECT_STREQ("{\"message\":\"All statistics counter reset\"}", out.c_str());
 
   utExit();
@@ -82,8 +83,9 @@ TEST(statisticsTreat, get)
 
   utInit();
 
-  ci.outFormat = JSON;  
-  out = restService(&ci, rs);
+  ci.outMimeType = JSON;
+  out            = restService(&ci, rs);
+
   EXPECT_STREQ("{\"uptime_in_secs\":0,\"measuring_interval_in_secs\":0}", out.c_str());
 
   utExit();
@@ -101,8 +103,9 @@ TEST(statisticsTreat, deleteCache)
 
   utInit();
 
-  ci.outFormat = JSON;
-  out       = restService(&ci, rs);
+  ci.outMimeType = JSON;
+  out            = restService(&ci, rs);
+
   EXPECT_STREQ("{\"message\":\"All statistics counter reset\"}", out.c_str());
 
   utExit();
@@ -122,8 +125,9 @@ TEST(statisticsTreat, getCache)
 
   utInit();
 
-  ci.outFormat = JSON;
-  out = restService(&ci, rs);
+  ci.outMimeType = JSON;
+  out            = restService(&ci, rs);
+
   EXPECT_STREQ("{\"ids\":\"\",\"refresh\":0,\"inserts\":0,\"removes\":0,\"updates\":0,\"items\":0}", out.c_str());
 
   utExit();

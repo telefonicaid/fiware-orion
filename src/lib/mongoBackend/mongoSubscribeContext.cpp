@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
 #include "common/defaultValues.h"
-#include "common/Format.h"
 #include "common/sem.h"
 #include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/MongoGlobal.h"

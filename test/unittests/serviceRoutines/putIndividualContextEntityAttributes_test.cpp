@@ -61,10 +61,10 @@ TEST(putIndividualContextEntityAttributes, notFound)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  ci.outFormat    = JSON;
-  ci.inFormat     = JSON;
-  ci.payload      = testBuf;
-  ci.payloadSize  = strlen(testBuf);
+  ci.outMimeType    = JSON;
+  ci.inMimeType     = JSON;
+  ci.payload        = testBuf;
+  ci.payloadSize    = strlen(testBuf);
 
   out             = restService(&ci, rs);
 

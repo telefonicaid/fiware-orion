@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "common/Format.h"
 #include "ngsi/MetadataVector.h"
 #include "parse/CompoundValueNode.h"
 

@@ -32,7 +32,6 @@
 #include "ngsi/Duration.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/Request.h"
-#include "common/Format.h"
 
 
 

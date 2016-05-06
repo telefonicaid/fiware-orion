@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "common/Format.h"
 #include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
 #include "orionTypes/EntityTypeVector.h"

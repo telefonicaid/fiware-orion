@@ -26,7 +26,6 @@
 #include <vector>
 
 #include "logMsg/traceLevels.h"
-#include "common/Format.h"
 #include "common/tag.h"
 #include "convenience/ContextAttributeResponse.h"
 #include "convenience/UpdateContextElementResponse.h"

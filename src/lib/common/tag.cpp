@@ -27,7 +27,6 @@
 #include <sstream>
 
 #include "logMsg/logMsg.h"
-#include "common/Format.h"
 #include "common/tag.h"
 
 
@@ -177,12 +176,13 @@ std::string jsonInvalidCharsTransformation(const std::string& input)
     switch (char ch = *iter)
     {
     case '\\': ss << "\\\\"; break;
-    case '"': ss << "\\\""; break;    
-    case '\b': ss << "\\b"; break;
-    case '\f': ss << "\\f"; break;
-    case '\n': ss << "\\n"; break;
-    case '\r': ss << "\\r"; break;
-    case '\t': ss << "\\t"; break;
+    case '"':  ss << "\\\""; break;    
+    case '\b': ss << "\\b";  break;
+    case '\f': ss << "\\f";  break;
+    case '\n': ss << "\\n";  break;
+    case '\r': ss << "\\r";  break;
+    case '\t': ss << "\\t";  break;
+
     default:
       /* Converting the rest of special chars 0-31 to \u00xx. Note that 0x80 - 0xFF are untouched as they
        * correspond to UTF-8 multi-byte characters */
@@ -197,11 +197,13 @@ std::string jsonInvalidCharsTransformation(const std::string& input)
         ss << ch;
       }
       break;
-    } //end-switch
+    }  // end-switch
 
-  } //end-for
+  }  // end-for
+
   return ss.str();
 }
+
 
 
 /* ****************************************************************************
@@ -216,31 +218,22 @@ std::string startTag1
   bool                isToplevel
 )
 {
-
   if (isToplevel)
   {
     if (showKey == false)
     {
       return indent + "{\n" + indent + "  {\n";
     }
-    else
-    {
-      return indent + "{\n" + indent + "  " + "\"" + key + "\" : {\n";
-    }
-  }
-  else
-  {
-    if (showKey == false)
-    {
-      return indent + "{\n";
-    }
-    else
-    {
-      return indent + "\"" + key + "\" : {\n";
-    }
+ 
+    return indent + "{\n" + indent + "  " + "\"" + key + "\" : {\n";
   }
 
-  return "Format not supported";
+  if (showKey == false)
+  {
+    return indent + "{\n";
+  }
+
+  return indent + "\"" + key + "\" : {\n";
 }
 
 
@@ -269,12 +262,10 @@ std::string startTag2
   {
     return indent + "\"" + key + "\" : {\n";
   }
-  else if (!isVector && !showKey)
-  {
-    return indent + "{\n";
-  }
 
-  return "Format not supported";
+  // else: !isVector && !showKey
+
+  return indent + "{\n";
 }
 
 
@@ -292,7 +283,6 @@ std::string endTag
   bool                isToplevel
 )
 {
-
   if (isToplevel)
   {
     return indent + "}\n}\n";
@@ -325,7 +315,6 @@ std::string valueTag1
   bool                withoutQuotes
 )
 {
-
   char* value;
 
   if (unescapedValue == "")
@@ -376,6 +365,7 @@ std::string valueTag1
     }
   }
 }
+
 
 
 /* ****************************************************************************
