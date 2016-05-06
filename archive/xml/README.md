@@ -5,7 +5,7 @@ In particular, the xmlCheck checker (which was used to check that XML in unittes
 and test harness fragments were compliant with NGSI XSD).
 
 In addition, the following XML-based unit tests were removed. If you want to have a look to them,
-have a look to code just before merging PR #2104 (this is the commit number: 
+have a look at code just before merging PR #2104 (this is the commit number: 
 https://github.com/telefonicaid/fiware-orion/commit/d6969490c8db77b2147fccbd986aab49303b5e8c).
 
 Deleted files containing only XML-based unit tests:
@@ -54,9 +54,6 @@ The following XML-based test were also removed (most of them were in DISABLED
 state just before removing it):
 
 * TEST(compoundValue, DISABLED_updateContextValueVectorFiveItemsPlusBadOne)
-* TEST(Convenience, DISABLED_badPathNgsi10)
-* TEST(Convenience, DISABLED_badPathNgsi9)
-* TEST(Convenience, DISABLED_shortPath)
 * TEST(DiscoverContextAvailabilityRequest, DISABLED_entityIdIdAsAttribute_xml)
 * TEST(DiscoverContextAvailabilityRequest, DISABLED_entityIdIsPattern_xml)
 * TEST(DiscoverContextAvailabilityRequest, DISABLED_entityIdTypeAsField_xml)

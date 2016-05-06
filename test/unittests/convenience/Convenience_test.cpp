@@ -70,3 +70,89 @@ TEST(Convenience, emptyPath)
 
   utExit();
 }
+
+
+
+/* ****************************************************************************
+*
+* shortPath -
+*
+*/
+TEST(Convenience, shortPath)
+{
+  ConnectionInfo  ci1("ngsi9", "GET", "1.1");
+  ConnectionInfo  ci2("ngsi10", "GET", "1.1");
+  ConnectionInfo  ci3("ngsi8", "GET", "1.1");
+  ConnectionInfo  ci4("ngsi10/nada", "GET", "1.1");
+  std::string     out;
+  const char*     outfile = "ngsi.unrecognizedRequest.json";
+
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  ci1.apiVersion = "v1";
+  out = restService(&ci1, restServiceV);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  ci2.apiVersion = "v1";
+  out = restService(&ci2, restServiceV);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  ci3.apiVersion = "v1";
+  out = restService(&ci3, restServiceV);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  ci4.apiVersion = "v1";
+  out = restService(&ci4, restServiceV);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* badPathNgsi9 -
+*
+*/
+TEST(Convenience, badPathNgsi9)
+{
+  ConnectionInfo            ci("ngsi9/badpathcomponent", "GET", "1.1");
+  std::string               out;
+  const char*               outfile = "ngsi.unrecognizedRequest.json";
+
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  ci.apiVersion = "v1";
+  out = restService(&ci, restServiceV);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* badPathNgsi10 -
+*
+*/
+TEST(Convenience, badPathNgsi10)
+{
+  ConnectionInfo            ci("ngsi10/badpathcomponent", "GET", "1.1");
+  std::string               out;
+  const char*               outfile = "ngsi.unrecognizedRequest.json";
+
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  ci.apiVersion = "v1";
+  out = restService(&ci, restServiceV);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
+}
