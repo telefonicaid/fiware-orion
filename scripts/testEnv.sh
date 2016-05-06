@@ -108,9 +108,9 @@ export CP5_PID_FILE=${CP5_PID_FILE:-/tmp/orion_${CP5_PORT}.pid}
 #
 # Database configuration for all instances of contextBroker
 #
-export ORION_DATABASE_HOST=${ORION_DATABASE_HOST:-localhost}
-export ORION_DATABASE_USER=${ORION_DATABASE_USER:-orion}
-export ORION_DATABASE_PASSWORD=${ORION_DATABASE_PASSWORD:-orion}
+export CB_DATABASE_HOST=${CB_DATABASE_HOST:-localhost}
+export CB_DATABASE_USER=${CB_DATABASE_USER:-orion}
+export CB_DATABASE_PASSWORD=${CB_DATABASE_PASSWORD:-orion}
 
 
 

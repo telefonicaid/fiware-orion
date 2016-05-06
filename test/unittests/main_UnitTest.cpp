@@ -45,18 +45,6 @@
 #include "unittest.h"
 
 
-
-/* ****************************************************************************
-*
-* parse arguments
-*/
-PaArgument paArgs[] =
-{
-  PA_END_OF_ARGS
-};
-
-
-
 /* ****************************************************************************
 *
 * global variables
@@ -71,6 +59,40 @@ char          fwdHost[64];
 char          notificationMode[64];
 bool          simulatedNotification;
 int           lsPeriod             = 0;
+
+char          dbHost[64];
+char          rplSet[64];
+char          dbName[64];
+char          user[64];
+char          pwd[64];
+long          dbTimeout;
+int           dbPoolSize;
+int           writeConcern;
+char          gtest_filter[1024];
+char          gtest_output[1024];
+
+// we don't need the full descriptions for unit test binary
+#define  NULL_DESC ""
+
+/* ****************************************************************************
+*
+* parse arguments
+*/
+PaArgument paArgs[] =
+{
+  { "-dbhost",         dbHost,        "DB_HOST",        PaString, PaOpt, (int64_t) "localhost",  PaNL,   PaNL,  NULL_DESC },
+  { "-rplSet",         rplSet,        "RPL_SET",        PaString, PaOpt, (int64_t) "",           PaNL,   PaNL,  NULL_DESC },
+  { "-dbuser",         user,          "DB_USER",        PaString, PaOpt, (int64_t) "",           PaNL,   PaNL,  NULL_DESC },
+  { "-dbpwd",          pwd,           "DB_PASSWORD",    PaString, PaOpt, (int64_t) "",           PaNL,   PaNL,  NULL_DESC },
+  { "-db",             dbName,        "DB",             PaString, PaOpt, (int64_t) "orion",      PaNL,   PaNL,  NULL_DESC },
+  { "-dbTimeout",      &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,                  PaNL,   PaNL,  NULL_DESC },
+  { "-dbPoolSize",     &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,                     1,      10000, NULL_DESC },
+  { "-writeConcern",   &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,                      0,      1,     NULL_DESC },
+  { "--gtest_filter=", gtest_filter,  "",               PaString, PaOpt, (int64_t) "",           PaNL,   PaNL,  NULL_DESC },
+  { "--gtest_output=", gtest_output,  "",               PaString, PaOpt, (int64_t) "",           PaNL,   PaNL,  NULL_DESC },
+
+  PA_END_OF_ARGS
+};
 
 
 /* ****************************************************************************
@@ -101,18 +123,12 @@ int main(int argC, char** argV)
   paConfig("default value", "-logDir",      (void*) "/tmp");
   paConfig("man author",                    "Fermín Galán and Ken Zangelin");
 
-  if (argC > 1)
-  {
-     if (strcmp(argV[1], "-t") == 0)
-       paParse(paArgs, 3, argV, 3, false);
-     else
-       paParse(paArgs, 1, argV, 1, false);
-  }
-  else
-    paParse(paArgs, 1, argV, 1, false);
+  paParse(paArgs, argC, (char**) argV, 1, false);
 
   LM_M(("Init tests"));
   orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false, false, false, false, false);
+  // Note that multitenancy and mutex time stats are disabled for unit test mongo init
+  mongoInit(dbHost, rplSet, dbName, user, pwd, false, dbTimeout, writeConcern, dbPoolSize, false);
   alarmMgr.init(false);
   logSummaryInit(&lsPeriod);
   setupDatabase();

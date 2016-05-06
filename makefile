@@ -60,6 +60,10 @@ ifndef MOCK_CONFIG
     MOCK_CONFIG=epel-6-tid
 endif
 
+ifndef MONGO_HOST
+    MONGO_HOST=localhost
+endif
+
 all: prepare_release release
 
 di: install_debug
@@ -275,9 +279,9 @@ build_unit_test: prepare_unit_test
 unit_test: build_unit_test
 	@echo '------------------------------- unit_test starts ---------------------------------'
 	if [ -z "${TEST_FILTER}" ]; then \
-	   BUILD_UNITTEST/test/unittests/unitTest -t 0-255 --gtest_output=xml:BUILD_UNITTEST/unit_test.xml; \
+	   BUILD_UNITTEST/test/unittests/unitTest -t 0-255 -dbhost ${MONGO_HOST} --gtest_output=xml:BUILD_UNITTEST/unit_test.xml; \
         else \
-	   BUILD_UNITTEST/test/unittests/unitTest -t 0-255 --gtest_output=xml:BUILD_UNITTEST/unit_test.xml --gtest_filter=${TEST_FILTER}; \
+	   BUILD_UNITTEST/test/unittests/unitTest -t 0-255 -dbhost ${MONGO_HOST} --gtest_output=xml:BUILD_UNITTEST/unit_test.xml --gtest_filter=${TEST_FILTER}; \
         fi
 	@echo '------------------------------- unit_test ended ---------------------------------'
 
