@@ -1,0 +1,244 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Filter using colon as double equal synonym
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E1 colour 'black'
+# 02. Create entity E2 colour 'purple'
+# 03. Create entity E3 colour 'red'
+# 04. Create entity E4 colour 'brown'
+# 05. Create entity E5 colour 'yellow'
+# 06. Get entities colour : black -> E1 (black)
+# 07. Get entities colour : red, yellow   -> E3 (red), E5 (yellow)
+# 08. Get entities colour in range:  brown to red -> E2 (purple), E3 (red), E4 (brown)
+#
+
+
+echo "01. Create entity E1 colour 'black'"
+echo "==================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "colour": "black"
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E2 colour 'purple'"
+echo "===================================="
+payload='{
+  "id": "E2",
+  "type": "T",
+  "colour": "purple"
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity E3 colour 'red'"
+echo "================================="
+payload='{
+  "id": "E3",
+  "type": "T",
+  "colour": "red"
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "04. Create entity E4 colour 'brown'"
+echo "==================================="
+payload='{
+  "id": "E4",
+  "type": "T",
+  "colour": "brown"
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "05. Create entity E5 colour 'yellow'"
+echo "===================================="
+payload='{
+  "id": "E5",
+  "type": "T",
+  "colour": "yellow"
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "06. Get entities colour : black -> E1 (black)"
+echo "============================================="
+orionCurl --url '/v2/entities?options=keyValues&q=colour:black'
+echo
+echo
+
+
+echo "07. Get entities colour : red, yellow -> E3 (red), E5 (yellow)"
+echo "=============================================================="
+orionCurl --url '/v2/entities?options=keyValues&q=colour:red,yellow'
+echo
+echo
+
+
+echo "08. Get entities colour in range: brown to red -> E2 (purple), E3 (red), E4 (brown)"
+echo "==================================================================================="
+orionCurl --url '/v2/entities?options=keyValues&q=colour:brown..red'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 colour 'black'
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity E2 colour 'purple'
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create entity E3 colour 'red'
+=================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create entity E4 colour 'brown'
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create entity E5 colour 'yellow'
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E5?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Get entities colour : black -> E1 (black)
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 41
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "colour": "black",
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+07. Get entities colour : red, yellow -> E3 (red), E5 (yellow)
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "colour": "red",
+        "id": "E3",
+        "type": "T"
+    },
+    {
+        "colour": "yellow",
+        "id": "E5",
+        "type": "T"
+    }
+]
+
+
+08. Get entities colour in range: brown to red -> E2 (purple), E3 (red), E4 (brown)
+===================================================================================
+HTTP/1.1 200 OK
+Content-Length: 120
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "colour": "purple",
+        "id": "E2",
+        "type": "T"
+    },
+    {
+        "colour": "red",
+        "id": "E3",
+        "type": "T"
+    },
+    {
+        "colour": "brown",
+        "id": "E4",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
