@@ -48,10 +48,10 @@ struct HttpInfo
   std::string                         payload;
 
   HttpInfo();
+  HttpInfo(const std::string& _url);
 
   std::string toJson();
 };
-
 
 }
 

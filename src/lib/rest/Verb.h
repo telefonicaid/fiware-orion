@@ -25,6 +25,7 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
 
 
 
@@ -53,5 +54,13 @@ typedef enum Verb
 * verbName - 
 */
 extern const char* verbName(Verb verb);
+
+
+
+/* ****************************************************************************
+*
+* stringToVerb - 
+*/
+extern Verb stringToVerb(const std::string& str);
 
 #endif

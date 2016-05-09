@@ -47,6 +47,16 @@ HttpInfo::HttpInfo() : verb(NOVERB)
 
 /* ****************************************************************************
 *
+* HttpInfo::HttpInfo - 
+*/
+HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(POST)
+{
+}
+
+
+
+/* ****************************************************************************
+*
 * HttpInfo::toJson -
 */
 std::string HttpInfo::toJson()

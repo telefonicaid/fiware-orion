@@ -55,6 +55,8 @@ TriggeredSubscription::TriggeredSubscription
   tenant                  ((_tenant == NULL)? "" : _tenant),
   stringFilterP           (NULL)
 {
+  httpInfo.url  = _reference;
+  httpInfo.verb = POST;  // FIXME PR: unhardwire
 }
 
 
@@ -80,6 +82,8 @@ TriggeredSubscription::TriggeredSubscription
   tenant                  (""),
   stringFilterP           (NULL)
 {
+  httpInfo.url  = _reference;
+  httpInfo.verb = POST;  // FIXME PR: unhardwire
 }
 
 

@@ -30,6 +30,7 @@
 #include "common/globals.h"
 #include "common/RenderFormat.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "apiTypesV2/HttpInfo.h"
 
 using ::testing::_;
 using ::testing::Invoke;
@@ -149,11 +150,12 @@ public:
 *
 * Mock class for Notifier
 */
-class NotifierMock : public Notifier {
-
+class NotifierMock : public Notifier
+{
 public:
 
-    NotifierMock() {
+    NotifierMock()
+    {
         /* By default, all methods are redirected to the parent ones. We use the
          * technique described at
          * http://code.google.com/p/googlemock/wiki/CookBook#Delegating_Calls_to_a_Parent_Class.
@@ -161,19 +163,21 @@ public:
          * actually created/sent */
     }
 
-    MOCK_METHOD7(sendNotifyContextRequest, void(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, RenderFormat renderFormat, const std::vector<std::string>&  attrsFilter));
+    MOCK_METHOD7(sendNotifyContextRequest, void(NotifyContextRequest* ncr, const ngsiv2::HttpInfo& httpInfo, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, RenderFormat renderFormat, const std::vector<std::string>&  attrsFilter));
     MOCK_METHOD5(sendNotifyContextAvailabilityRequest, void(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, const std::string& fiwareCorrelator, RenderFormat renderFormat));
 
     /* Wrappers for parent methods (used in ON_CALL() defaults set in the constructor) */
-    void parent_sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, RenderFormat renderFormat, const std::vector<std::string>&  attrsFilter)
+    void parent_sendNotifyContextRequest(NotifyContextRequest* ncr, const ngsiv2::HttpInfo& httpInfo, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, RenderFormat renderFormat, const std::vector<std::string>&  attrsFilter)
     {
-      Notifier::sendNotifyContextRequest(ncr, url, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsFilter);
+      Notifier::sendNotifyContextRequest(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsFilter);
     }
     void parent_sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, const std::string& fiwareCorrelator, RenderFormat renderFormat)
     {
       Notifier::sendNotifyContextAvailabilityRequest(ncar, url, tenant, fiwareCorrelator, renderFormat);
     }
 };
+
+
 
 /* ****************************************************************************
 *
@@ -218,6 +222,29 @@ MATCHER_P(MatchNcar, expected, "") {
 
     return matchNotifyContextAvailabilityRequest(expected, arg);
 
+}
+
+
+
+/* ****************************************************************************
+*
+* MatchHttpInfo -
+*
+* NOTE
+*   HttpInfo is a class, but after fighting with operator== quite some time I (kz) gave up
+*   and tried this way instead.
+*/
+MATCHER_P(MatchHttpInfo, expected, "")
+{
+  ngsiv2::HttpInfo* expectedP = (ngsiv2::HttpInfo*) expected;
+  ngsiv2::HttpInfo* argP      = (ngsiv2::HttpInfo*) &arg;
+
+  if (expectedP->url != argP->url)
+  {
+    return false;
+  }
+
+  return true;
 }
 
 #endif

@@ -30,7 +30,7 @@
 #include "common/limits.h"
 #include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"
-
+#include "apiTypesV2/HttpInfo.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
@@ -50,14 +50,17 @@ Notifier::~Notifier (void)
   LM_T(LmtNotImplemented, ("Notifier destructor is not implemented"));
 }
 
+
+
 /* ****************************************************************************
 *
-* Notifier::sendNotifyContextRequest -
+* templateNotify - 
 */
-void Notifier::sendNotifyContextRequest
+static void templateNotify
 (
-  NotifyContextRequest*            ncr,
-  const std::string&               url,
+  const SubscriptionId&            subscriptionId,
+  const ContextElemen&             ce,
+  const ngsiv2::HttpInfo&          httpInfo,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
@@ -65,14 +68,97 @@ void Notifier::sendNotifyContextRequest
   const std::vector<std::string>&  attrsOrder
 )
 {
-    ConnectionInfo ci;
+  //
+  //
+  //
+  Verb            verb = httpInfo.verb;
+
+  if (verb == NOVERB)
+  {
+    // Default verb/method is POST
+    verb = POST;
+  }
+
+  
+}
+
+
+
+/* ****************************************************************************
+*
+* Notifier::sendNotifyContextRequestAsPerTemplate -
+*/
+void Notifier::sendNotifyContextRequestAsPerTemplate
+(
+  NotifyContextRequest*            ncrP,
+  const ngsiv2::HttpInfo&          httpInfo,
+  const std::string&               tenant,
+  const std::string&               xauthToken,
+  const std::string&               fiwareCorrelator,
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsOrder
+)
+{
+  LM_W(("KZ: In sendNotifyContextRequestAsPerTemplate"));
+
+  for (unsigned int ix = 0; ix < ncrP->contextElementResponseVector.size(); ++ix)
+  {
+    templateNotify(ncrP->subscriptionId, ncrP->contextElementResponseVector[ix]->contextElement, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* Notifier::sendNotifyContextRequest -
+*/
+void Notifier::sendNotifyContextRequest
+(
+  NotifyContextRequest*            ncr,
+  const ngsiv2::HttpInfo&          httpInfo,
+  const std::string&               tenant,
+  const std::string&               xauthToken,
+  const std::string&               fiwareCorrelator,
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsOrder
+)
+{
+    ConnectionInfo  ci;
+    Verb            verb = httpInfo.verb;
+
+    if (verb == NOVERB)
+    {
+      // Default verb/method is POST
+      verb = POST;
+    }
+
+    //
+    // If any of the 'template parameters' is used by the subscripion, then it is not a question of an ordinary notification but one using templates.
+    // Ordinary notifications are simply sent, all of it as one message.
+    //
+    // Notifications for subscriptions using templates are more complex:
+    //   - if there is more than one entity for the notification, split into N notifications, one per entity
+    //   - if 'url' contains substitution keys, substitute the keys for their current values
+    //   - if 'qs' contains query strings, add this to 'url', with the proper substitutions done
+    //   - if 'headers' is non-empty, perform eventual substitutions and make sure the information is added as HTTP headers for the notification
+    //   - if 'payload' is given, use that string as template instead of the default payload string, substituting all fields that are to be substituted
+    //
+    // Redirect to the method sendNotifyContextRequestAsPerTemplate()
+    //
+    if ((httpInfo.qs.size() != 0) || (httpInfo.headers.size() != 0) || (httpInfo.payload != "") || (httpInfo.verb != NOVERB))
+    {
+        return sendNotifyContextRequestAsPerTemplate(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
+    }
+
 
     //
     // Creating the value of the Fiware-ServicePath HTTP header.
     // This is a comma-separated list of the service-paths in the same order as the entities come in the payload
     //
     std::string spathList;
-    bool atLeastOneNotDefault = false;
+    bool        atLeastOneNotDefault = false;
+
     for (unsigned int ix = 0; ix < ncr->contextElementResponseVector.size(); ++ix)
     {
       EntityId* eP = &ncr->contextElementResponseVector[ix]->contextElement.entityId;
@@ -84,6 +170,8 @@ void Notifier::sendNotifyContextRequest
       spathList += eP->servicePath;
       atLeastOneNotDefault = atLeastOneNotDefault || (eP->servicePath != "/");
     }
+
+    //
     // FIXME P8: the stuff about atLeastOneNotDefault was added after PR #729, which makes "/" the default servicePath in
     // request not having that header. However, this causes as side-effect that a
     // "Fiware-ServicePath: /" or "Fiware-ServicePath: /,/" header is added in notifications, thus breaking several tests harness.
@@ -91,6 +179,7 @@ void Notifier::sendNotifyContextRequest
     // soon (it has been scheduled for version 0.19.0, see https://github.com/telefonicaid/fiware-orion/issues/714)
     // we introduce the atLeastOneNotDefault hack. Once #714 gets implemented,
     // this FIXME will be removed (and all the test harness adjusted, if needed)
+    //
     if (!atLeastOneNotDefault)
     {
       spathList = "";
@@ -98,14 +187,14 @@ void Notifier::sendNotifyContextRequest
     
     ci.outMimeType = JSON;
 
-    std::string payload;
+    std::string payloadString;
     if (renderFormat == NGSI_V1_LEGACY)
     {
-      payload = ncr->render(&ci, NotifyContext, "");
+      payloadString = ncr->render(&ci, NotifyContext, "");
     }
     else
     {
-      payload = ncr->toJson(&ci, renderFormat, attrsOrder);
+      payloadString = ncr->toJson(&ci, renderFormat, attrsOrder);
     }
 
     /* Parse URL */
@@ -114,9 +203,9 @@ void Notifier::sendNotifyContextRequest
     std::string  uriPath;
     std::string  protocol;
 
-    if (!parseUrl(url, host, port, uriPath, protocol))
+    if (!parseUrl(httpInfo.url, host, port, uriPath, protocol))
     {
-      LM_E(("Runtime Error (not sending NotifyContextRequest: malformed URL: '%s')", url.c_str()));
+      LM_E(("Runtime Error (not sending NotifyContextRequest: malformed URL: '%s')", httpInfo.url.c_str()));
       return;
     }
 
@@ -130,13 +219,13 @@ void Notifier::sendNotifyContextRequest
     params->ip               = host;
     params->port             = port;
     params->protocol         = protocol;
-    params->verb             = "POST";
+    params->verb             = verbName(verb);
     params->tenant           = tenant;
     params->servicePath      = spathList;
     params->xauthToken       = xauthToken;
     params->resource         = uriPath;
     params->content_type     = content_type;
-    params->content          = payload;
+    params->content          = payloadString;
     params->mimeType         = JSON;
     params->renderFormat     = renderFormatToString(renderFormat);
     params->fiwareCorrelator = fiwareCorrelator;

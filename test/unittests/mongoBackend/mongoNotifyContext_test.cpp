@@ -30,6 +30,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "apiTypesV2/HttpInfo.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoNotifyContext.h"
 
@@ -898,3 +899,23 @@ TEST(mongoNotifyContextRequest, createEntity)
     utExit();
 }
 
+
+
+/* ****************************************************************************
+*
+* templateNotificationVerb -
+*/
+TEST(mongoNotifyContextRequest, templateNotificationVerb)
+{
+  utInit();
+
+  HttpInfo                  httpInfo("http://notify.me");
+  Notifier                  notifier;
+  std::vector<std::string>  attrsOrder;
+
+  httpInfo.verb = PUT;
+  
+  notifier.sendNotifyContextRequest(&ncr, httpInfo, "", "", "", NGSI_V2_NORMALIZED, attrsOrder);
+
+  utExit();
+}
