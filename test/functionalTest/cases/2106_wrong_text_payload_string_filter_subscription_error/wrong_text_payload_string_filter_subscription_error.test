@@ -30,11 +30,11 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create subscription without wrong q filter and get JSON error
+# 01. Create subscription with invalid q filter and get JSON error
 #
 
-echo "01. Create subscription without wrong q filter and get JSON error"
-echo "================================================================="
+echo "01. Create subscription with invalid q filter and get JSON error"
+echo "================================================================"
 payload='
 {
         "notification": {
@@ -65,8 +65,8 @@ echo
 
 
 --REGEXPECT--
-01. Create subscription without wrong q filter and get JSON error
-=================================================================
+01. Create subscription with invalid q filter and get JSON error
+================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 69
 Content-Type: application/json
