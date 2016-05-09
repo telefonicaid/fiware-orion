@@ -55,9 +55,16 @@ std::string getEntityAllTypes
 {
   EntityTypeVectorResponse  response;
   std::string               answer;
-  unsigned int              totalTypes;
+  unsigned int              totalTypes = 0;
 
-  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, &totalTypes));
+  // NGSIv2 uses options=count to request count
+  unsigned int* totalTypesP = NULL;
+  if (ciP->uriParamOptions["count"])
+  {
+    totalTypesP = &totalTypes;
+  }
+
+  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP));
   TIMED_RENDER(answer = response.toJson(ciP));
 
   if (ciP->uriParamOptions["count"])

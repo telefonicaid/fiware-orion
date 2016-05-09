@@ -69,14 +69,6 @@ std::map<std::string, std::string> uriParams;
 
 /* ****************************************************************************
 *
-* totalTypes -
-*/
-unsigned int totalTypes;
-
-
-
-/* ****************************************************************************
-*
 * options -
 */
 std::map<std::string, bool> options;

@@ -162,13 +162,11 @@ HttpStatusCode mongoEntityTypes
 )
 {
   unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
-  unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
-  std::string    detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
-  bool           details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;  
+  unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());  
   bool           reqSemTaken    = false;
 
   LM_T(LmtMongo, ("Query Entity Types"));
-  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
+  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Count: %s", offset, limit, (totalTypesP != NULL)? "true" : "false"));
 
   reqSemTake(__FUNCTION__, "query types request", SemReadOp, &reqSemTaken);
 
@@ -257,7 +255,7 @@ HttpStatusCode mongoEntityTypes
 
   /* Another strategy to implement pagination is to use the $skip and $limit operators in the
    * aggregation framework. However, doing so, we don't know the total number of results, which can
-   * be needed in the case of details=on (using that approach, we need to do two queries: one to get
+   * be needed in the case of count request (using that approach, we need to do two queries: one to get
    * the count and other to get the actual results with $skip and $limit, in the same "transaction" to
    * avoid incoherence between both if some entity type is created or deleted in the process).
    *
@@ -273,7 +271,10 @@ HttpStatusCode mongoEntityTypes
   EntityType* emptyEntityType     = new EntityType("");
   bool        emptyEntityTypeUsed = false;
 
-  *totalTypesP = resultsArray.size();
+  if (totalTypesP != NULL)
+  {
+    *totalTypesP = resultsArray.size();
+  }
 
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
@@ -350,7 +351,7 @@ HttpStatusCode mongoEntityTypes
   char detailsMsg[256];
   if (responseP->entityTypeVector.size() > 0)
   {
-    if (details)
+    if (totalTypesP != NULL)
     {
       snprintf(detailsMsg, sizeof(detailsMsg), "Count: %d", (int) resultsArray.size());
       responseP->statusCode.fill(SccOk, detailsMsg);
@@ -362,7 +363,7 @@ HttpStatusCode mongoEntityTypes
   }
   else
   {
-    if (details)
+    if (totalTypesP != NULL)
     {      
       snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %zu. Offset is %u", resultsArray.size(), offset);
       responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
@@ -396,15 +397,21 @@ HttpStatusCode mongoAttributesForEntityType
 {  
   unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
   unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
-  std::string    detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
-  bool           details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
   bool           reqSemTaken    = false;
+  bool           count          = false;
+
+  // Count only makes sense for this operation in the case of NGSIv1
+  if (apiVersion == "v1")
+  {
+    std::string    detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
+    count = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
+  }
 
   // Setting the name of the entity type for the response
   responseP->entityType.type = entityType;
 
   LM_T(LmtMongo, ("Query Types Attribute for <%s>", entityType.c_str()));
-  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
+  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Count: %s", offset, limit, (count == true)? "true" : "false"));
 
   reqSemTake(__FUNCTION__, "query types attributes request", SemReadOp, &reqSemTaken);
 
@@ -499,7 +506,7 @@ HttpStatusCode mongoAttributesForEntityType
   char detailsMsg[256];
   if (responseP->entityType.contextAttributeVector.size() > 0)
   {
-    if (details)
+    if (count)
     {
       snprintf(detailsMsg, sizeof(detailsMsg), "Count: %d", (int) resultsArray.size());
       responseP->statusCode.fill(SccOk, detailsMsg);
@@ -511,7 +518,7 @@ HttpStatusCode mongoAttributesForEntityType
   }
   else
   {
-    if (details)
+    if (count)
     {
       snprintf(detailsMsg, sizeof(detailsMsg), "Number of attributes: %zu. Offset is %u", resultsArray.size(), offset);
       responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
