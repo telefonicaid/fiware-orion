@@ -2,5 +2,6 @@
 - Fix: bug disabling throttling when creating a v2 subscription (Issue #2114)
 - Fix: NGSIv2 header name change: X-Total-Count -> Fiware-Total-Count (#2124)
 - Fix: NGSIv2 header name change: X-Ngsiv2-AttrsFormat -> Ngsiv2-AttrsFormat (#2124)
+- Fix: wrong text payload when subscription string filter error occurs (#2106)
 - Fix: total count return in GET /v2/types operation (#2115)
 - Deprecated: /ngsi10 and /ngsi9 as URL path prefixes
