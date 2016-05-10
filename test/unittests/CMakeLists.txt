@@ -193,6 +193,7 @@ SET (SOURCES
     mongoBackend/mongoQueryTypes_test.cpp
     mongoBackend/mongoQueryContextFilterExistEntity_test.cpp
     mongoBackend/mongoGetSubscriptions_test.cpp
+    mongoBackend/mongoCreateSubscription_test.cpp
 
     parse/CompoundValueNode_test.cpp
     parse/compoundValue_test.cpp
