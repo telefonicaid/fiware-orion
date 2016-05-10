@@ -58,7 +58,7 @@ TEST(mongoCreateSubscriptions, x)
   sub.id = SUB_OID1;
 
   /* Invoke the function in mongoBackend library */
-  bool result = mongoCreateSubscription(sub, &oe, uriParams, "");
+  bool result = mongoCreateSubscription(sub, &oe, uriParams, "", servicePathVector, "", "");
 
   /* Check response is as expected */
   EXPECT_TRUE(result);

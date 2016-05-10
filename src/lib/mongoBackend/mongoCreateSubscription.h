@@ -47,8 +47,11 @@ extern bool mongoCreateSubscription
 (
   const ngsiv2::Subscription&          sub,
   OrionError*                          oe,
-  std::map<std::string, std::string>&  uriParam,
-  const std::string&                   tenant
+  std::map<std::string, std::string>&  uriParams,
+  const std::string&                   tenant,
+  const std::vector<std::string>&      servicePathV,
+  const std::string&                   xauthToken,
+  const std::string&                   fiwareCorrelator
 );
 
 #endif // SRC_LIB_MONGOBACKEND_MONGOCREATESUBSCRIPION_H
