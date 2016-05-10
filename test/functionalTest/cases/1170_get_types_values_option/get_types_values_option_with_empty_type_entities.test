@@ -36,8 +36,8 @@ brokerStart CB 0-255
 # 04. Create E2/""/A1+A3 (using NGSIv1)
 # 05. Create E3/T3/A2+A4
 # 06. GET /v2/types?options=values and get a list of three types
-# 07. GET /v2/types?options=values wiht limit, getting 2 types but Fiware-Total-Count 3
-# 08. GET /v2/types?options=values wiht offset=3, thus out of limits
+# 07. GET /v2/types?options=values with limit, getting 2 types but Fiware-Total-Count 3
+# 08. GET /v2/types?options=values with offset=3, thus out of limits
 #
 
 echo "01. GET /v2/types?options=values and get an empty list"
@@ -120,14 +120,14 @@ echo
 echo
 
 
-echo "07. GET /v2/types?options=values wiht limit, getting 2 types but Fiware-Total-Count 3"
+echo "07. GET /v2/types?options=values with limit, getting 2 types but Fiware-Total-Count 3"
 echo "====================================================================================="
 orionCurl --url '/v2/types?limit=2&options=count,values'
 echo
 echo
 
 
-echo "08. GET /v2/types?options=values wiht offset=3, thus out of limits"
+echo "08. GET /v2/types?options=values with offset=3, thus out of limits"
 echo "=================================================================="
 orionCurl --url '/v2/types?offset=3&options=count,values'
 echo
@@ -199,7 +199,7 @@ Date: REGEX(.*)
 ]
 
 
-07. GET /v2/types?options=values wiht limit, getting 2 types but Fiware-Total-Count 3
+07. GET /v2/types?options=values with limit, getting 2 types but Fiware-Total-Count 3
 =====================================================================================
 HTTP/1.1 200 OK
 Content-Length: 9
@@ -214,7 +214,7 @@ Date: REGEX(.*)
 ]
 
 
-08. GET /v2/types?options=values wiht offset=3, thus out of limits
+08. GET /v2/types?options=values with offset=3, thus out of limits
 ==================================================================
 HTTP/1.1 200 OK
 Content-Length: 2

@@ -129,7 +129,7 @@ void EntityTypeVectorResponse::release(void)
 */
 std::string EntityTypeVectorResponse::toJson(ConnectionInfo* ciP)
 {
-  std::string  out = "["; 
+  std::string  out = "[";
 
   for (unsigned int ix = 0; ix < entityTypeVector.vec.size(); ++ix)
   {

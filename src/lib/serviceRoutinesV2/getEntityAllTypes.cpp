@@ -68,7 +68,7 @@ std::string getEntityAllTypes
   {
     TIMED_MONGO(mongoEntityTypesValues(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, totalTypesP));
   }
-  else  // defaul
+  else  // default
   {
     TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP));
   }

@@ -152,8 +152,8 @@ static long long countEntities(const std::string& tenant, const std::vector<std:
 * mongoEntityTypesValues -
 *
 * "Simplified" version of mongoEntityTypes(), using a simpler aggregation command
-* and the processing logic afterwards. Note hat apiVersion is not included in this
-* operation as it can be only used in NGSIv2
+* and the processing logic afterwards. Note that apiVersion is not included in this
+* operation as it can be used only in NGSIv2
 */
 HttpStatusCode mongoEntityTypesValues
 (
