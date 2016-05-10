@@ -149,6 +149,126 @@ static long long countEntities(const std::string& tenant, const std::vector<std:
 
 /* ****************************************************************************
 *
+* mongoEntityTypesValues -
+*
+* "Simplified" version of mongoEntityTypes(), using a simpler aggregation command
+* and the processing logic afterwards. Note that apiVersion is not included in this
+* operation as it can be used only in NGSIv2
+*/
+HttpStatusCode mongoEntityTypesValues
+(
+  EntityTypeVectorResponse*            responseP,
+  const std::string&                   tenant,
+  const std::vector<std::string>&      servicePathV,
+  std::map<std::string, std::string>&  uriParams,
+  unsigned int*                        totalTypesP
+)
+{
+  unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
+  unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
+  bool           reqSemTaken    = false;
+
+  LM_T(LmtMongo, ("Query Entity Types"));
+  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Count: %s", offset, limit, (totalTypesP != NULL)? "true" : "false"));
+
+  reqSemTake(__FUNCTION__, "query types request", SemReadOp, &reqSemTaken);
+
+  /* Compose query based on this aggregation command:
+   *
+   * db.runCommand({aggregate: "entities",
+   *                pipeline: [ {$match: { "_id.servicePath": /.../ } },
+   *                            {$group: {_id: "$_id.type"} },
+   *                            {$sort: {_id: 1} }
+   *                          ]
+   *                })
+   *
+   */
+
+  BSONObj result;
+  BSONObj spQuery = fillQueryServicePath(servicePathV);
+  BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
+                     "pipeline" << BSON_ARRAY(
+                                              BSON("$match" << BSON(C_ID_SERVICEPATH << spQuery)) <<
+                                              BSON("$group" << BSON("_id" << CS_ID_ENTITY)) <<
+                                              BSON("$sort" << BSON("_id" << 1))
+                                             )
+                     );
+
+  std::string err;
+  if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
+  {
+    responseP->statusCode.fill(SccReceiverInternalError, err);
+    reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
+    return SccOk;
+  }
+
+  // Processing result to build response
+  LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
+
+  std::vector<BSONElement> resultsArray = getFieldF(result, "result").Array();
+
+  if (resultsArray.size() == 0)
+  {
+    responseP->statusCode.fill(SccOk);
+    reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
+    return SccOk;
+  }
+
+  /* Null and "" (which can appear only in the case of creating entities using NGSIv1) are
+   * collapsed to the same type "". Due to sorting, they appear at the begining. In the case
+   * both appear, one have to be removed or the pagination logic would break
+   */
+  if ((resultsArray.size() > 1) &&
+      (getFieldF(resultsArray[0].embeddedObject(), "_id").isNull()) &&
+      (getStringFieldF(resultsArray[1].embeddedObject(), "_id") == ""))
+  {
+    resultsArray.erase(resultsArray.begin());
+  }
+
+
+  /* Another strategy to implement pagination is to use the $skip and $limit operators in the
+   * aggregation framework. However, doing so, we don't know the total number of results, which can
+   * be needed in the case of count request (using that approach, we need to do two queries: one to get
+   * the count and other to get the actual results with $skip and $limit, in the same "transaction" to
+   * avoid incoherence between both if some entity type is created or deleted in the process).
+   *
+   * However, considering that the number of types will be small compared with the number of entities,
+   * the current approach seems to be ok
+   *
+   */
+  if (totalTypesP != NULL)
+  {
+    *totalTypesP = resultsArray.size();
+  }
+
+  for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
+  {
+    BSONObj     resultItem = resultsArray[ix].embeddedObject();
+    std::string type;
+
+    LM_T(LmtMongo, ("result item[%d]: %s", ix, resultItem.toString().c_str()));
+
+    if (getFieldF(resultItem, "_id").isNull())
+    {
+      type = "";
+    }
+    else
+    {
+      type = getStringFieldF(resultItem, "_id");
+    }
+
+    responseP->entityTypeVector.push_back(new EntityType(type));
+  }
+
+  responseP->statusCode.fill(SccOk);
+  reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
+
+  return SccOk;
+}
+
+
+/* ****************************************************************************
+*
 * mongoEntityTypes -
 */
 HttpStatusCode mongoEntityTypes

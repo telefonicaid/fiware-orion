@@ -38,6 +38,7 @@ brokerStart CB
 # 06. GET /v2/types and get a list of three types, each with one entity
 # 07. Create E4/T3/A4+A3
 # 08. GET /v2/types and get a list of three types, T3 now has two entities
+# 09. GET /v2/types with limit, getting 2 types but Fiware-Total-Count 3
 #
 
 echo "01. GET /v2/types and get an empty list"
@@ -121,7 +122,7 @@ echo
 echo
 
 
-echo "09. GET /v2/types wiht limit, getting 2 types but Fiware-Total-Count 3"
+echo "09. GET /v2/types with limit, getting 2 types but Fiware-Total-Count 3"
 echo "================================================================="
 orionCurl --url '/v2/types?limit=2&options=count'
 echo
@@ -334,7 +335,7 @@ Date: REGEX(.*)
 ]
 
 
-09. GET /v2/types wiht limit, getting 2 types but Fiware-Total-Count 3
+09. GET /v2/types with limit, getting 2 types but Fiware-Total-Count 3
 =================================================================
 HTTP/1.1 200 OK
 Content-Length: 168
