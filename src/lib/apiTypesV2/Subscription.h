@@ -31,6 +31,8 @@
 #include "ngsi/Duration.h"
 #include "ngsi/Throttling.h"
 #include "apiTypesV2/HttpInfo.h"
+#include "apiTypesV2/SubscriptionExpression.h"
+#include "ngsi/Restriction.h"
 
 namespace ngsiv2
 {
@@ -41,7 +43,20 @@ struct EntID
   std::string idPattern;
   std::string type;
   std::string toJson();
+
+  EntID(std::string idA, std::string idPatternA, std::string typeA):
+    id(idA),
+    idPattern(idPatternA),
+    type(typeA)
+  {}
 };
+
+inline bool operator==(const EntID& lhs, const EntID& rhs)
+{
+  return lhs.id == rhs.id && lhs.idPattern == rhs.idPattern && lhs.type == rhs.type;
+}
+
+inline bool operator!=(const EntID& lhs, const EntID& rhs){ return !(lhs == rhs); }
 
 struct Notification
 {
@@ -57,12 +72,7 @@ struct Notification
 struct Condition
 {
   std::vector<std::string> attributes;
-  struct {
-    std::string q;
-    std::string geometry;
-    std::string coords;
-    std::string georel;
-  }                        expression;
+  SubscriptionExpression   expression;
   std::string toJson();
 };
 
@@ -80,12 +90,17 @@ struct Subscription
 {
   std::string  id;
   std::string  description;
+  bool         descriptionProvided;
   Subject      subject;
   long long    expires;
   std::string  status;
   Notification notification;
   long long    throttling;
+  std::string  attrsFormat;
+  Restriction  restriction;
   std::string  toJson();
+
+  ~Subscription();
 };
 
 
