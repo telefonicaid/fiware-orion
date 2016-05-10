@@ -64,7 +64,14 @@ std::string getEntityAllTypes
     totalTypesP = &totalTypes;
   }
 
-  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP));
+  if (ciP->uriParamOptions["values"])
+  {
+    TIMED_MONGO(mongoEntityTypesValues(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, totalTypesP));
+  }
+  else  // defaul
+  {
+    TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP));
+  }
   TIMED_RENDER(answer = response.toJson(ciP));
 
   if (ciP->uriParamOptions["count"])
