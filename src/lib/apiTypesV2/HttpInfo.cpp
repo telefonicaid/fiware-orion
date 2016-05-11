@@ -49,7 +49,7 @@ HttpInfo::HttpInfo() : verb(NOVERB), extended(false)
 *
 * HttpInfo::HttpInfo - 
 */
-HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(POST)
+HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(POST), extended(false)
 {
 }
 
