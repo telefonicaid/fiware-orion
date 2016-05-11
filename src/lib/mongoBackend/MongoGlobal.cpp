@@ -1848,7 +1848,7 @@ static bool processOnChangeConditionForSubscription
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
-  Restriction*                     resP,
+  const Restriction*               resP,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder
 )
@@ -1939,7 +1939,7 @@ BSONArray processConditionVector
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
-  Restriction*                     resP,
+  const Restriction*               resP,
   const std::string&               status,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder
@@ -2015,7 +2015,7 @@ BSONArray processConditionVectorX
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
-  Restriction*                     resP,
+  const Restriction*               resP,
   const std::string&               status,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder

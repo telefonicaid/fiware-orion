@@ -241,7 +241,7 @@ static void setCondsAndInitialNotify
                                             tenant,
                                             xauthToken,
                                             servicePathV,
-                                            sub.restriction,
+                                            &(sub.restriction),
                                             sub.status,
                                             fiwareCorrelator,
                                             sub.notification.attributes); // requestP->attributeList.attributeV);
