@@ -373,6 +373,8 @@ extern BSONArray processConditionVector
 *
 * processConditionVector -
 *
+* NGSIv2 wrapper
+*
 */
 extern BSONArray processConditionVector
 (
@@ -382,11 +384,11 @@ extern BSONArray processConditionVector
   const std::string&                 subId,
   const std::string&                 url,
   bool*                              notificationDone,
-  //RenderFormat                     renderFormat,
+  RenderFormat                       renderFormat,
   const std::string&                 tenant,
   const std::string&                 xauthToken,
   const std::vector<std::string>&    servicePathV,
-  //Restriction                      resP,
+  Restriction                        resP,
   const std::string&                 status,
   const std::string&                 fiwareCorrelator,
   const std::vector<std::string>&    attrsOrder

@@ -2011,11 +2011,11 @@ BSONArray processConditionVector
   const std::string&               subId,
   const std::string&               url,
   bool*                            notificationDone,
-  //RenderFormat                     renderFormat,
+  RenderFormat                     renderFormat,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
-  //Restriction*                     resP,
+  Restriction*                     resP,
   const std::string&               status,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder
@@ -2055,20 +2055,17 @@ BSONArray processConditionVector
     attrL.push_back(notifAttributesV[ix]);
   }
 
-  // FIXME: just a stub. Remove!!
-  Restriction* resPX = NULL;
-
   return processConditionVector(&ncV,
                                 enV,
                                 attrL,
                                 subId,
                                 url,
                                 notificationDone,
-                                NGSI_V1_LEGACY, //renderFormat,
+                                renderFormat,
                                 tenant,
                                 xauthToken,
                                 servicePathV,
-                                resPX, // resP,
+                                resP,
                                 status,
                                 fiwareCorrelator,
                                 attrsOrder);

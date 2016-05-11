@@ -234,11 +234,11 @@ static void setCondsAndInitialNotify
                                             subId,
                                             sub.notification.httpInfo.url,
                                             &notificationDone,
-                                            //requestP->attrsFormat, -> sub.notification.attrsFormat
+                                            sub.attrsFormat,
                                             tenant,
                                             xauthToken,
                                             servicePathV,
-                                            //&requestP->restriction, -> sub.restriction ??
+                                            sub.restriction,
                                             sub.status,
                                             fiwareCorrelator,
                                             sub.notification.attributes); // requestP->attributeList.attributeV);
@@ -286,8 +286,7 @@ static void setExpression(const Subscription& sub, BSONObjBuilder* b)
 */
 static void setFormat(const Subscription& sub, BSONObjBuilder* b)
 {
-  //std::string format = renderFormatToString(sub.notification.attrsFormat);
-  std::string format = "";
+  std::string format = renderFormatToString(sub.attrsFormat);
   b->append(CSUB_FORMAT, format);
   LM_T(LmtMongo, ("Subscription format: %s", format.c_str()));
 }
