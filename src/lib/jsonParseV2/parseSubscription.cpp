@@ -32,22 +32,24 @@
 #include "common/RenderFormat.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
-#include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/jsonRequestTreat.h"
+
+
 #include "jsonParseV2/parseSubscription.h"
 
 using namespace rapidjson;
 
-
+using ngsiv2::SubscriptionUpdate;
+using ngsiv2::EntID;
 
 /* Prototypes */
 static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::string>* vec, const Value& attributes);
-static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& notification);
-static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& subject);
-static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP, const Value& entities);
-static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& condition);
+static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& notification);
+static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& subject);
+static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* eivP, const Value& entities);
+static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& condition);
 
 
 
@@ -56,23 +58,11 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
 * parseSubscription -
 *
 */
-std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDelayedRelease* releaseP, bool update)
+std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bool update)
 {
   Document                  document;
-  SubscribeContextRequest*  destination;
 
   document.Parse(ciP->payload);
-
-  if (update)
-  {
-    destination     = &parseDataP->ucsr.res;
-    releaseP->ucsrP = &parseDataP->ucsr.res;
-  }
-  else
-  {
-    destination    = &parseDataP->scr.res;
-    releaseP->scrP = &parseDataP->scr.res;
-  }
 
   if (document.HasParseError())
   {
@@ -103,7 +93,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
 
 
   // Description field
-  destination->descriptionProvided = false;
+
   if (document.HasMember("description"))
   {
     const Value& description      = document["description"];
@@ -126,8 +116,8 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
       return oe.render(ciP, "");
     }
 
-    destination->descriptionProvided = true;
-    destination->description = descriptionString;
+    subsP->descriptionProvided = true;
+    subsP->description = descriptionString;
   }
 
 
@@ -135,7 +125,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
   if (document.HasMember("subject"))
   {
     const Value&  subject = document["subject"];
-    std::string   r       = parseSubject(ciP, destination, subject);
+    std::string   r       = parseSubject(ciP, subsP, subject);
 
     if (r != "")
     {
@@ -155,7 +145,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
   if (document.HasMember("notification"))
   {
     const Value&  notification = document["notification"];
-    std::string   r            = parseNotification(ciP, destination, notification);
+    std::string   r            = parseNotification(ciP, subsP, notification);
 
     if (r != "")
     {
@@ -184,6 +174,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
       return oe.render(ciP, "");
     }
 
+
     int64_t eT = -1;
 
     if (expires.GetStringLength() == 0)
@@ -202,11 +193,12 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
       }
     }
 
-    destination->expires = eT;
+    subsP->expiresProvided = true;
+    subsP->expires = eT;
   }
   else if (!update)
   {
-    destination->expires = PERMANENT_SUBS_DATETIME;
+    subsP->expires = PERMANENT_SUBS_DATETIME;
   }
 
 
@@ -232,8 +224,8 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
       alarmMgr.badInput(clientIp, "status is not valid (it has to be either active or inactive)");
       return oe.render(ciP, "");
     }
-
-    destination->status = statusString;
+    subsP->statusProvided = true;
+    subsP->status = statusString;
   }
 
 
@@ -248,17 +240,19 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
 
       return oe.render(ciP, "");
     }
-    destination->throttling.seconds = throttling.GetInt64();
+    subsP->throttlingProvided = true;
+    subsP->throttling = throttling.GetInt64();
   }
   else if (!update) // throttling was not set and it is not update
   {
-    destination->throttling.seconds = 0;
+    subsP->throttling = 0; // Default value if not provided at creation => no throttling
   }
 
 
   // attrsFormat field
   if (document.HasMember("attrsFormat"))
   {
+
     const Value& attrsFormat = document["attrsFormat"];
 
     if (!attrsFormat.IsString())
@@ -268,6 +262,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
       alarmMgr.badInput(clientIp, "attrsFormat is not a string");
       return oe.render(ciP, "");
     }
+
 
     std::string   attrsFormatString = attrsFormat.GetString();
     RenderFormat  nFormat           = stringToRenderFormat(attrsFormatString, true);
@@ -280,12 +275,12 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
       alarmMgr.badInput(clientIp, details);
       return oe.render(ciP, "");
     }
-
-    destination->attrsFormat = nFormat;
+    subsP->attrsFormatProvided = true;
+    subsP->attrsFormat = nFormat;
   }
-  else if (destination->attrsFormat == NO_FORMAT)
+  else if (!update) // Default value for creation
   {
-    destination->attrsFormat = DEFAULT_RENDER_FORMAT;  // Default format for NGSIv2: normalized
+    subsP->attrsFormat = DEFAULT_RENDER_FORMAT;  // Default format for NGSIv2: normalized
   }
 
   return "OK";
@@ -298,9 +293,11 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
 * parseSubject -
 *
 */
-static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& subject)
+static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& subject)
 {
   std::string r;
+
+  subsP->subjectProvided  = true;
 
   if (!subject.IsObject())
   {
@@ -310,6 +307,7 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* sc
     return oe.render(ciP, "");
 
   }
+
   // Entities
   if (!subject.HasMember("entities"))
   {
@@ -319,7 +317,7 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* sc
     return oe.render(ciP, "");
   }
 
-  r = parseEntitiesVector(ciP, &scrP->entityIdVector, subject["entities"] );
+  r = parseEntitiesVector(ciP, &subsP->subject.entities, subject["entities"] );
   if (r != "")
   {
     return r;
@@ -343,7 +341,7 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* sc
     alarmMgr.badInput(clientIp, "condition is not an object");
     return oe.render(ciP, "");
   }
-  r = parseNotifyConditionVector(ciP, scrP, condition);
+  r = parseNotifyConditionVector(ciP, subsP, condition);
 
   return r;
 }
@@ -355,7 +353,7 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* sc
 * parseEntitiesVector -
 *
 */
-static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP, const Value& entities)
+static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* eivP, const Value& entities)
 {
   if (!entities.IsArray())
   {
@@ -425,7 +423,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
 
       isPattern = "true";
     }
-    if (id == "")  // Only type was provided
+    if (id.empty())  // Only type was provided
     {
       id        = ".*";
       isPattern = "true";
@@ -447,9 +445,12 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
       }
     }
 
-    EntityId*  eiP = new EntityId(id, type, isPattern);
+    EntID  eid(id, type, isPattern);
 
-    eivP->push_back_if_absent(eiP);
+    if (std::find(eivP->begin(), eivP->end(), eid) == eivP->end()) // if not already included
+    {
+      eivP->push_back(eid);
+    }
   }
 
   return "";
@@ -462,8 +463,11 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
 * parseNotification -
 *
 */
-static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& notification)
+static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& notification)
 {
+
+  subsP->notificationProvided = true;
+
   if (!notification.IsObject())
   {
     OrionError oe(SccBadRequest, "notitication is not an object");
@@ -472,6 +476,18 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
     return oe.render(ciP, "");
 
   }
+
+
+/*
+ *
+ * XOR de http/httpExtended. En funcion de como se defina
+ *  Ver si tiene sentido chequear la URL, si es que se puede
+ * templatizar en la llamada tradicional
+ *
+ *
+ */
+
+
 
   // Callback
   if (notification.HasMember("http"))
@@ -501,8 +517,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
 
       return oe.render(ciP, "");
     }
-    scrP->reference.string = url.GetString();
 
+    subsP->notification.httpInfo.url = url.GetString();
+
+    /*
     std::string refError = scrP->reference.check(SubscribeContext, "" ,"", 0);
     if (refError != "OK")
     {
@@ -511,6 +529,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
 
       return oe.render(ciP, "");
     }
+    */
   }
   else  // missing callback field
   {
@@ -520,10 +539,11 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
     return oe.render(ciP, "");
   }
 
+
   // Attributes
   if (notification.HasMember("attrs"))
   {
-    std::string r = parseAttributeList(ciP, &scrP->attributeList.attributeV, notification["attrs"]);
+    std::string r = parseAttributeList(ciP, &subsP->notification.attributes, notification["attrs"]);
 
     if (r != "")
     {
@@ -541,9 +561,9 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
 * parseNotifyConditionVector -
 *
 */
-static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& condition)
+static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::SubscriptionUpdate* subsP, const Value& condition)
 {
-  NotifyConditionVector* ncvP = &scrP->notifyConditionVector;
+
 
   if (!condition.IsObject())
   {
@@ -561,11 +581,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
     return oe.render(ciP, "");
   }
 
-  NotifyCondition* nc = new NotifyCondition();
-  nc->type = ON_CHANGE_CONDITION;
-  ncvP->push_back(nc);
-
-  std::string r = parseAttributeList(ciP, &nc->condValueList.vec, condition["attrs"]);
+  std::string r = parseAttributeList(ciP, &subsP->subject.condition.attributes, condition["attrs"]);
 
   if (r != "")
   {
@@ -584,7 +600,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
       return oe.render(ciP, "");
     }
 
-    scrP->expression.isSet = true;
+    subsP->subject.condition.expression.isSet = true;
 
     if (expression.HasMember("q"))
     {
@@ -596,7 +612,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
 
         return oe.render(ciP, "");
       }
-      scrP->expression.q = q.GetString();
+      subsP->subject.condition.expression.q = q.GetString();
 
       std::string  errorString;
       Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, expression["q"].GetString());
@@ -609,7 +625,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
         return errorString;
       }
 
-      scrP->restriction.scopeVector.push_back(scopeP);
+      subsP->restriction.scopeVector.push_back(scopeP);
     }
     if (expression.HasMember("geometry"))
     {
@@ -621,7 +637,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
 
         return oe.render(ciP, "");
       }
-      scrP->expression.geometry = geometry.GetString();
+      subsP->subject.condition.expression.geometry = geometry.GetString();
     }
     if (expression.HasMember("coords"))
     {
@@ -633,7 +649,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
 
         return oe.render(ciP, "");
       }
-      scrP->expression.coords = coords.GetString();
+      subsP->subject.condition.expression.coords = coords.GetString();
     }
     if (expression.HasMember("georel"))
     {
@@ -645,7 +661,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
 
         return oe.render(ciP, "");
       }
-      scrP->expression.georel = georel.GetString();
+      subsP->subject.condition.expression.georel = georel.GetString();
     }
   }
 
