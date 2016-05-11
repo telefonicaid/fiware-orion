@@ -518,8 +518,8 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       return oe.render(ciP, "");
     }
 
-    subsP->notification.httpInfo.url = url.GetString();
-
+    subsP->notification.httpInfo.url =      url.GetString();
+    subsP->notification.httpInfo.extended = false;
     /*
     std::string refError = scrP->reference.check(SubscribeContext, "" ,"", 0);
     if (refError != "OK")
@@ -530,6 +530,38 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       return oe.render(ciP, "");
     }
     */
+  }
+  else if (notification.HasMember("httpExtended"))
+  {
+    const Value& httpExt = notification["httpExtended"];
+    if (!httpExt.IsObject())
+    {
+      OrionError oe(SccBadRequest, "httpExtended notitication is not an object");
+
+      alarmMgr.badInput(clientIp, "httpExtended notification is not an object");
+      return oe.render(ciP, "");
+
+    }
+
+    if (!httpExt.HasMember("url"))
+    {
+      alarmMgr.badInput(clientIp, "url http notification is missing");
+      OrionError oe(SccBadRequest, "url http notification is missing");
+
+      return oe.render(ciP, "");
+    }
+    const Value& url = httpExt["url"];
+    if (!url.IsString())
+    {
+      alarmMgr.badInput(clientIp, "url http notification is not a string");
+      OrionError oe(SccBadRequest, "url http notification is not a string");
+
+      return oe.render(ciP, "");
+    }
+
+    subsP->notification.httpInfo.url =      url.GetString();
+    subsP->notification.httpInfo.extended = false;
+
   }
   else  // missing callback field
   {
