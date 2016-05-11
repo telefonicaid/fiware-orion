@@ -44,6 +44,7 @@
 #include "ngsi9/RegisterContextResponse.h"
 #include "ngsiNotify/Notifier.h"
 #include "rest/uriParamNames.h"
+#include "apiTypesV2/Subscription.h"
 
 #include "mongoBackend/TriggeredSubscription.h"
 
@@ -363,8 +364,35 @@ extern BSONArray processConditionVector
   Restriction*                     resP,
   const std::string&               status,
   const std::string&               fiwareCorrelator,
-  const std::vector<std::string>   attrsFilter
+  const std::vector<std::string>&  attrsFilter
 );
+
+
+
+/* ****************************************************************************
+*
+* processConditionVector -
+*
+*/
+extern BSONArray processConditionVector
+(
+  const std::vector<std::string>&    condAttributesV,
+  const std::vector<ngsiv2::EntID>&  entitiesV,
+  const std::vector<std::string>&    notifAttributesV,
+  const std::string&                 subId,
+  const std::string&                 url,
+  bool*                              notificationDone,
+  //RenderFormat                     renderFormat,
+  const std::string&                 tenant,
+  const std::string&                 xauthToken,
+  const std::vector<std::string>&    servicePathV,
+  //Restriction                      resP,
+  const std::string&                 status,
+  const std::string&                 fiwareCorrelator,
+  const std::vector<std::string>&    attrsOrder
+);
+
+
 
 /* ****************************************************************************
 *
