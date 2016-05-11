@@ -46,7 +46,7 @@ struct HttpInfo
   std::map<std::string, std::string>  qs;      // URI parameters
   std::map<std::string, std::string>  headers; 
   std::string                         payload;
-
+  bool                                isExtended;
   HttpInfo();
 
   std::string toJson();
