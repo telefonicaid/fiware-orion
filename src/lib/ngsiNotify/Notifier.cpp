@@ -109,7 +109,8 @@ static bool templateNotify
   //
   if (httpInfo.payload == "")
   {
-    payload = ce.toJson(renderFormat, attrsOrder);
+    payload = "{" + ce.toJson(renderFormat, attrsOrder) + "}";
+    LM_W(("KZ: payload: %s", payload.c_str()));
   }
   else
   {
@@ -244,7 +245,7 @@ void* sendNotifyContextRequestAsPerTemplate(void* p)
 {
   NotificationAsTemplateParams* paramP = (NotificationAsTemplateParams*) p;
 
-  LM_W(("KZ: In sendNotifyContextRequestAsPerTemplate"));
+  LM_W(("KZ: In sendNotifyContextRequestAsPerTemplate (%d contextElementResponses)", paramP->ncrP->contextElementResponseVector.size()));
 
   for (unsigned int ix = 0; ix < paramP->ncrP->contextElementResponseVector.size(); ++ix)
   {

@@ -120,7 +120,10 @@ std::string ContextElement::toJson(RenderFormat renderFormat, const std::vector<
   if (renderFormat != NGSI_V2_VALUES)
   {
     out += entityId.toJson();
-    out += ",";
+    if (contextAttributeVector.size() != 0)
+    {
+      out += ",";
+    }
   }
 
   if (contextAttributeVector.size() != 0)
