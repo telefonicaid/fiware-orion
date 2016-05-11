@@ -376,7 +376,7 @@ extern BSONArray processConditionVector
 * NGSIv2 wrapper
 *
 */
-extern BSONArray processConditionVectorX
+extern BSONArray processConditionVector
 (
   const std::vector<std::string>&    condAttributesV,
   const std::vector<ngsiv2::EntID>&  entitiesV,

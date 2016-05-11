@@ -231,7 +231,7 @@ static void setCondsAndInitialNotify
 {
   /* Conds vector (and maybe and initial notification) */
   bool       notificationDone = false;
-  BSONArray  conds = processConditionVectorX(sub.subject.condition.attributes, //&requestP->notifyConditionVector,
+  BSONArray  conds = processConditionVector(sub.subject.condition.attributes, //&requestP->notifyConditionVector,
                                             sub.subject.entities, //requestP->entityIdVector,
                                             sub.notification.attributes, //requestP->attributeList,
                                             subId,

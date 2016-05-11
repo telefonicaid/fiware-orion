@@ -2003,7 +2003,7 @@ BSONArray processConditionVector
 * gets removed.
 *
 */
-BSONArray processConditionVectorX
+BSONArray processConditionVector
 (
   const std::vector<std::string>&  condAttributesV,
   const std::vector<EntID>&        entitiesV,
@@ -2036,16 +2036,16 @@ BSONArray processConditionVectorX
   EntityIdVector enV;
   for (unsigned int ix = 0; ix < entitiesV.size(); ix++)
   {
-    EntityId en;
+    EntityId* enP = new EntityId();
     if (entitiesV[ix].id != "")
     {
-      en.fill(entitiesV[ix].id, entitiesV[ix].type, "false");
+      enP->fill(entitiesV[ix].id, entitiesV[ix].type, "false");
     }
     else // idPattern
     {
-      en.fill(entitiesV[ix].idPattern, entitiesV[ix].type, "false");
+      enP->fill(entitiesV[ix].idPattern, entitiesV[ix].type, "false");
     }
-    enV.push_back(&en);
+    enV.push_back(enP);
   }
 
   // Convert std::vector<std::string> to AttributeList
@@ -2055,20 +2055,23 @@ BSONArray processConditionVectorX
     attrL.push_back(notifAttributesV[ix]);
   }
 
-  return processConditionVector(&ncV,
-                                enV,
-                                attrL,
-                                subId,
-                                url,
-                                notificationDone,
-                                renderFormat,
-                                tenant,
-                                xauthToken,
-                                servicePathV,
-                                resP,
-                                status,
-                                fiwareCorrelator,
-                                attrsOrder);
+  BSONArray arr = processConditionVector(&ncV,
+                                         enV,
+                                         attrL,
+                                         subId,
+                                         url,
+                                         notificationDone,
+                                         renderFormat,
+                                         tenant,
+                                         xauthToken,
+                                         servicePathV,
+                                         resP,
+                                         status,
+                                         fiwareCorrelator,
+                                         attrsOrder);
+
+  enV.release();
+  return arr;
 }
 
 

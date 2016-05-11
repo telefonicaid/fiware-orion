@@ -78,8 +78,8 @@ TEST(mongoCreateSubscriptions, createSubscriptionNotExtendedOK)
   std::string result = mongoCreateSubscription(sub, &oe, uriParams, "", servicePathVector, "", "");
 
   /* Check response is as expected */  
-  EXPECT_EQ(SccOk, oe.code);
-  EXPECT_EQ("OK", oe.reasonPhrase);
+  EXPECT_EQ(SccNone, oe.code);
+  EXPECT_EQ("", oe.reasonPhrase);
   EXPECT_EQ("", oe.details);
 
   DBClientBase* connection = getMongoConnection();
@@ -102,7 +102,7 @@ TEST(mongoCreateSubscriptions, createSubscriptionNotExtendedOK)
   EXPECT_STREQ("temperature<=20", C_STR_FIELD(expression, "q"));
   EXPECT_STREQ("-40.4,-3.5;0,0", C_STR_FIELD(expression, "coords"));
   EXPECT_STREQ("coveredBy", C_STR_FIELD(expression, "georel"));
-  EXPECT_STREQ("box", C_STR_FIELD(expression, "box"));
+  EXPECT_STREQ("box", C_STR_FIELD(expression, "geometry"));
 
   std::vector<BSONElement> entities = doc.getField("entities").Array();
   ASSERT_EQ(2, entities.size());
@@ -127,7 +127,7 @@ TEST(mongoCreateSubscriptions, createSubscriptionNotExtendedOK)
   std::vector<BSONElement> condValues = cond0.getField("value").Array();
   ASSERT_EQ(2, condValues.size());
   EXPECT_EQ("A", condValues[0].String());
-  EXPECT_EQ("B", condValues[0].String());
+  EXPECT_EQ("B", condValues[1].String());
 
   utExit();
 }
