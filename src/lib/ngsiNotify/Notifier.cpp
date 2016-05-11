@@ -301,9 +301,10 @@ void Notifier::sendNotifyContextRequest
     //   - if 'headers' is non-empty, perform eventual substitutions and make sure the information is added as HTTP headers for the notification
     //   - if 'payload' is given, use that string as template instead of the default payload string, substituting all fields that are to be substituted
     //
-    // Redirect to the method sendNotifyContextRequestAsPerTemplate() when ...
+    // Redirect to the method sendNotifyContextRequestAsPerTemplate() when 'httpInfo.extended' is TRUE.
+    // 'httpInfo.extended' is FALSE by default and set to TRUE by the json parser.
     //
-    if ((httpInfo.qs.size() != 0) || (httpInfo.headers.size() != 0) || (httpInfo.payload != "") || (httpInfo.verb != NOVERB))
+    if (httpInfo.extended)
     {
       LM_W(("KZ: Calling sendNotifyContextRequestAsPerTemplate"));
 
