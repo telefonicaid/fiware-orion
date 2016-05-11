@@ -922,6 +922,7 @@ TEST(mongoNotifyContextRequest, templateNotificationVerb)
   ncr.contextElementResponseVector.push_back(&cer2);
   ncr.contextElementResponseVector.push_back(&cer3);
 
+  httpInfo.extended      = true; 
   httpInfo.verb          = PUT;
   httpInfo.payload       = "{ \"Template\": \"payload\" }";
   httpInfo.qs["qs1"]     = "q1";
@@ -965,6 +966,7 @@ TEST(mongoNotifyContextRequest, templateNotificationStdPayload)
   ncr.contextElementResponseVector.push_back(&cer1);
   ncr.contextElementResponseVector.push_back(&cer2);
 
+  httpInfo.extended      = true; 
   httpInfo.verb          = NOVERB;
   httpInfo.payload       = "";
 
