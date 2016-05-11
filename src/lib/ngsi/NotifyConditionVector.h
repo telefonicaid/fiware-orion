@@ -45,9 +45,9 @@ typedef struct NotifyConditionVector
   std::string       render(const std::string& indent, bool comma);
   void              present(const std::string& indent);
   void              push_back(NotifyCondition* item);
-  unsigned int      size(void);
+  unsigned int      size(void) const;
   void              release(void);
-  void              fill(NotifyConditionVector& nv);
+  void              fill(const NotifyConditionVector& nv);
 
   std::string       check(RequestType         requestType,
                           const std::string&  indent,

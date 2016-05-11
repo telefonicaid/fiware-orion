@@ -666,21 +666,24 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 */
 void subCacheItemInsert
 (
-  const char*               tenant,
-  const char*               servicePath,
-  SubscribeContextRequest*  scrP,
-  const char*               subscriptionId,
-  int64_t                   expirationTime,
-  int64_t                   throttling,
-  RenderFormat              renderFormat,
-  bool                      notificationDone,
-  int64_t                   lastNotificationTime,
-  StringFilter*             stringFilterP,
-  const std::string&        status,
-  const std::string&        q,
-  const std::string&        geometry,
-  const std::string&        coords,
-  const std::string&        georel
+  const char*                   tenant,
+  const char*                   servicePath,
+  const std::string&            url,
+  const EntityIdVector&         entityIdVector,
+  const AttributeList&          attributeList,
+  const NotifyConditionVector&  notifyConditionVector,
+  const char*                   subscriptionId,
+  int64_t                       expirationTime,
+  int64_t                       throttling,
+  RenderFormat                  renderFormat,
+  bool                          notificationDone,
+  int64_t                       lastNotificationTime,
+  StringFilter*                 stringFilterP,
+  const std::string&            status,
+  const std::string&            q,
+  const std::string&            geometry,
+  const std::string&            coords,
+  const std::string&            georel
 )
 {
   //
@@ -694,9 +697,9 @@ void subCacheItemInsert
   //
   bool onchange = false;
 
-  for (unsigned int ix = 0; ix < scrP->notifyConditionVector.size(); ++ix)
+  for (unsigned int ix = 0; ix < notifyConditionVector.size(); ++ix)
   {
-    if (strcasecmp(scrP->notifyConditionVector[ix]->type.c_str(), ON_CHANGE_CONDITION) == 0)
+    if (strcasecmp(notifyConditionVector[ix]->type.c_str(), ON_CHANGE_CONDITION) == 0)
     {
       onchange = true;
       break;
@@ -722,7 +725,7 @@ void subCacheItemInsert
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->servicePath           = strdup(servicePath);
   cSubP->subscriptionId        = strdup(subscriptionId);
-  cSubP->reference             = strdup(scrP->reference.get().c_str());
+  cSubP->reference             = strdup(url.c_str());
   cSubP->expirationTime        = expirationTime;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
@@ -757,17 +760,17 @@ void subCacheItemInsert
   //
   // 2. Then the values that have functions/methods for filling/parsing
   //
-  cSubP->notifyConditionVector.fill(scrP->notifyConditionVector);
+  cSubP->notifyConditionVector.fill(notifyConditionVector);
 
 
   //
   // 3. Convert all EntityIds to EntityInfo
   //
-  for (unsigned int ix = 0; ix < scrP->entityIdVector.vec.size(); ++ix)
+  for (unsigned int ix = 0; ix < entityIdVector.vec.size(); ++ix)
   {
     EntityId* eIdP;
 
-    eIdP = scrP->entityIdVector.vec[ix];
+    eIdP = entityIdVector.vec[ix];
 
     EntityInfo* eP = new EntityInfo(eIdP->id, eIdP->type, eIdP->isPattern);
     
@@ -778,9 +781,9 @@ void subCacheItemInsert
   //
   // 4. Insert all attributes 
   //
-  for (unsigned int ix = 0; ix < scrP->attributeList.attributeV.size(); ++ix)
+  for (unsigned int ix = 0; ix < attributeList.attributeV.size(); ++ix)
   {
-    cSubP->attributes.push_back(scrP->attributeList.attributeV[ix]);
+    cSubP->attributes.push_back(attributeList.attributeV[ix]);
   }
 
 
