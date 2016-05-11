@@ -54,3 +54,4 @@ pages:
       - 'Upgrading from previous to 0.21.0': 'admin/upgrading_crossing_0-21-0.md'
       - 'Sanity check procedures': 'admin/sanity_check.md'
       - 'Diagnosis procedures': 'admin/diagnosis.md'
+  - 'Deprecated functionality': 'deprecated.md'

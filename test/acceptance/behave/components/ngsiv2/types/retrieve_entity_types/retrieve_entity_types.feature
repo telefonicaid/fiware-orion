@@ -153,9 +153,9 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | offset    | 1     |
     Then verify that receive an "OK" http code
     And verify headers in response
-      | parameter         | value      |
-      | x-total-count     | 4          |
-      | fiware-correlator | [a-f0-9-]* |
+      | parameter          | value      |
+      | fiware-total-count | 4          |
+      | fiware-correlator  | [a-f0-9-]* |
     And verify that entity types returned in response are: "house,home"
     And verify that attributes types are returned in response based on the info in the recorder
 
@@ -485,8 +485,8 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | options   | count |
     Then verify that receive an "OK" http code
     And verify headers in response
-      | parameter     | value    |
-      | x-total-count | <number> |
+      | parameter          | value    |
+      | fiware-total-count | <number> |
     And verify that attributes types are returned in response based on the info in the recorder
     Examples:
       | number |
@@ -549,8 +549,8 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | options   | count |
     Then verify that receive an "OK" http code
     And verify headers in response
-      | parameter     | value |
-      | x-total-count | 1     |
+      | parameter          | value |
+      | fiware-total-count | 1     |
     And verify that entity types returned in response are: "home"
     And verify that attributes types are returned in response based on the info in the recorder
 
@@ -567,9 +567,9 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | options   | count |
     Then verify that receive an "OK" http code
     And verify headers in response
-      | parameter         | value      |
-      | x-total-count     | 0          |
-      | fiware-correlator | [a-f0-9-]* |
+      | parameter          | value      |
+      | fiware-total-count | 0          |
+      | fiware-correlator  | [a-f0-9-]* |
     And verify that entity types returned in response are: "home"
 
   # ------------------ queries parameters -------------------------------
@@ -1137,8 +1137,8 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     And verify that entity types returned in response are: "house,home,none,car"
     And verify that attributes types are returned in response based on the info in the recorder
     And verify headers in response
-      | parameter     | value |
-      | x-total-count | 4     |
+      | parameter          | value |
+      | fiware-total-count | 4     |
 
   @limit_offset_count.row<row.id>
   @limit_offset_count @BUG_2046
@@ -1233,8 +1233,8 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     And verify that entity types returned in response are: "<types>"
     And verify that attributes types are returned in response based on the info in the recorder
     And verify headers in response
-      | parameter     | value |
-      | x-total-count | 4     |
+      | parameter          | value |
+      | fiware-total-count | 4     |
     Examples:
       | limit | offset | types               |
       | 1     | 0      | car                 |

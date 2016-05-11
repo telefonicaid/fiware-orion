@@ -15,6 +15,8 @@ not mantained or evolved any longer. In particular:
 
 A list of deprecated features and the version in which they were deprecated follows:
 
+* `/ngsi10` and `/ngsi9` as URL path prefixes are deprecated in Orion 1.2.0. Please,
+  use `/v1` and `/v1/registry` instead.
 * `location` metadata to specify entity location is deprecated in Orion 1.1.0. The new way
   of specifying entity location is to use `geo:point` type for the attribute (see details in
   [the corresponding section of the user manual](user/geolocation.md).
@@ -59,6 +61,7 @@ The following table provides information about the last Orion version supporting
 
 | **Removed feature**                                                        | **Last Orion version supporting feature** | **That version release date**   |
 |----------------------------------------------------------------------------|-------------------------------------------|---------------------------------|
+| `/ngsi10` and `/ngsi9` URL prefixes                                        | Not yet defined                           | Not yet defined                 |
 | `location` metadata to specify entity location                             | Not yet defined                           | Not yet defined                 |
 | XML API                                                                    | 0.28.0                                    | February 29th, 2016             |
 | ONTIMEINTERVAL subscription                                                | 0.28.0                                    | February 29th, 2016             |

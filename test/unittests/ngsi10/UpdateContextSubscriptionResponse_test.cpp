@@ -33,36 +33,6 @@
 
 /* ****************************************************************************
 *
-* constructors - 
-*
-* FIXME P5 #1862: _json countepart?
-*/
-TEST(UpdateContextSubscriptionResponse, DISABLED_constructors)
-{
-  UpdateContextSubscriptionResponse  ucsr1;
-  StatusCode                         ec(SccBadRequest, "D");
-  UpdateContextSubscriptionResponse  ucsr2(ec);
-  std::string                        out;
-  const char*                        outfile1 = "ngsi10.updateContextSubscriptionResponse.empty.valid.xml";
-  const char*                        outfile2 = "ngsi10.updateContextSubscriptionResponse.badRequest.valid.xml";
-  
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out = ucsr1.render(UpdateContextSubscription, "");
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  out = ucsr2.render(UpdateContextSubscription, "");
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * jsonRender - 
 */
 TEST(UpdateContextSubscriptionResponse, json_render)

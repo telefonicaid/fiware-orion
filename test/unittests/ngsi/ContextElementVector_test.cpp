@@ -36,15 +36,13 @@
 *
 * render - 
 *
-* FIXME P5 #1862: _json counterpart?
 */
-TEST(ContextElementVector, DISABLED_render)
+TEST(ContextElementVector, render)
 {
   ContextElement*       ceP = new ContextElement();
   EntityId              eId("E_ID", "E_TYPE");
   std::string           rendered;
   ContextElementVector  ceV;
-  const char*           outfile = "ngsi.contextElementVector.render.middle.xml";
   ConnectionInfo        ci(JSON);
 
   rendered = ceV.render(&ci, UpdateContextElement, "", false);
@@ -54,8 +52,6 @@ TEST(ContextElementVector, DISABLED_render)
   ceV.push_back(ceP);
 
   rendered = ceV.render(&ci, UpdateContextElement, "", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   ceV.release();
 }

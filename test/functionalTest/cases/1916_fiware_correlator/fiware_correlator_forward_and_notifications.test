@@ -269,9 +269,9 @@ Date: REGEX(.*)
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 140
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
-X-Ngsiv2-Attrsformat: normalized
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: CORRELATOR1
 
@@ -293,9 +293,9 @@ Fiware-Correlator: CORRELATOR1
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 142
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
-X-Ngsiv2-Attrsformat: normalized
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: CORRELATOR2
 
@@ -317,9 +317,9 @@ Fiware-Correlator: CORRELATOR2
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 140
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
-X-Ngsiv2-Attrsformat: normalized
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: CORRELATOR3
 

@@ -132,36 +132,6 @@ TEST(SubscribeContextRequest, invalidDuration_json)
 
 /* ****************************************************************************
 *
-* invalidEntityIdAttribute_xml - 
-*
-* FIXME P5: invalid attributes in EntityId are found but not reported
-* FIXME P5 #1862: _json counterpart?
-*/
-TEST(SubscribeContextRequest, DISABLED_invalidEntityIdAttribute_xml)
-{
-#if 0
-  ParseData       parseData;
-  ConnectionInfo  ci("", "POST", "1.1");
-  const char*     infile = "ngsi10.subscribeContextRequest.entityIdAttribute.invalid.xml";
-  const char*     expected = "OK";
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-
-  std::string result = xmlTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", &reqP);
-
-  reqP->release(&parseData);
-  EXPECT_STREQ(expected, result.c_str());
-
-  utExit();
-#endif
-}
-
-
-
-/* ****************************************************************************
-*
 * scopeGeolocationCircleOkJson - 
 */
 TEST(SubscribeContextRequest, scopeGeolocationCircleOkJson)

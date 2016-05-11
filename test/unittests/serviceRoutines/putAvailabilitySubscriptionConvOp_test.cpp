@@ -60,74 +60,24 @@ static RestService rs[] =
 *
 * put - 
 *
-* FIXME P5 #1862: _json countepart?
 */
-TEST(putAvailabilitySubscriptionConvOp, DISABLED_put)
-{
-  ConnectionInfo ci1("/ngsi9/contextAvailabilitySubscriptions",  "POST", "1.1");
-  ConnectionInfo ci2("/ngsi9/contextAvailabilitySubscriptions",  "GET",  "1.1");
-  ConnectionInfo ci3("/ngsi9/contextAvailabilitySubscriptions/111222333444555666777888",  "PUT",     "1.1");
-  ConnectionInfo ci4("/ngsi9/contextAvailabilitySubscriptions/111222333444555666777888",  "DELETE",  "1.1");
-  ConnectionInfo ci5("/ngsi9/contextAvailabilitySubscriptions/111222333444555666777881",  "PUT",     "1.1");
-  ConnectionInfo ci6("/ngsi9/contextAvailabilitySubscriptions/012345678901234567890123",  "XVERB",   "1.1");
-  const char*    infile1      = "ngsi9.subscribeContextAvailabilityRequest.ok.valid.xml";
-  const char*    infile2      = "ngsi9.updateContextAvailabilitySubscriptionRequest.withSubId.valid.xml";
-  const char*    outfile1     = "ngsi9.subscribeContextAvailabilityResponse.ok.middle.xml";
-  const char*    outfile3     = "ngsi9.updateContextAvailabilitySubscriptionResponse.putAvailabilitySubscriptionConvOp.notFound.valid.xml";
-  const char*    outfile4     = "ngsi9.unsubscribeContextAvailabilityResponse.putAvailabilitySubscriptionConvOp.notFound2.valid.xml";
-  const char*    outfile5     = "ngsi9.updateContextAvailabilitySubscriptionResponse.putAvailabilitySubscriptionConvOp.unmatchingSubscriptionId.valid.xml";
+TEST(putAvailabilitySubscriptionConvOp, put)
+{  
+  ConnectionInfo ci1("/ngsi9/contextAvailabilitySubscriptions",  "GET",  "1.1");
+  ConnectionInfo ci2("/ngsi9/contextAvailabilitySubscriptions/012345678901234567890123",  "XVERB",   "1.1");
   std::string    out;
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-
-  ci1.payload      = testBuf;
-  ci1.payloadSize  = strlen(testBuf);
-  out              = restService(&ci1, rs);
-
-  char* outStart   = (char*) out.c_str();
-  // Remove last char in expectedBuf
-  expectedBuf[strlen(expectedBuf) - 1] = 0;
-
-  // Shorten'out' to be of same length as expectedBuf
-  outStart[strlen(expectedBuf)]    = 0;
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
+  out = restService(&ci1, rs);
+  EXPECT_EQ("", out);
+  EXPECT_EQ("Allow", ci1.httpHeader[0]);
+  EXPECT_EQ("POST",  ci1.httpHeaderValue[0]);
 
   out = restService(&ci2, rs);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci2.httpHeader[0]);
-  EXPECT_EQ("POST",  ci2.httpHeaderValue[0]);
-
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
-
-  ci3.payload      = testBuf;
-  ci3.payloadSize  = strlen(testBuf);
-  out              = restService(&ci3, rs);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
-  out = restService(&ci4, rs);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile5)) << "Error getting test data from '" << outfile5 << "'";
-  ci5.payload      = testBuf;
-  ci5.payloadSize  = strlen(testBuf);
-  out              = restService(&ci5, rs);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-
-  out = restService(&ci6, rs);
-  EXPECT_EQ("", out);
-  EXPECT_EQ("Allow", ci6.httpHeader[0]);
-  EXPECT_EQ("PUT, DELETE", ci6.httpHeaderValue[0]);
+  EXPECT_EQ("PUT, DELETE", ci2.httpHeaderValue[0]);
 
   utExit();
 }

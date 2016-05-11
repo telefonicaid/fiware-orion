@@ -32,25 +32,19 @@
 *
 * constructorsAndRender - 
 *
-* FIXME P5 #1862: _json countepart?
 */
-TEST(SubscribeContextResponse, DISABLED_constructorsAndRender)
+TEST(SubscribeContextResponse, constructorsAndRender)
 {
   SubscribeContextResponse  scr1;
   StatusCode                ec(SccOk, "D");
   SubscribeContextResponse  scr2(ec);
   std::string               out;
-  const char*               outfile = "ngsi10.subscribeContextResponse.ok.valid.xml";
 
   utInit();
 
   EXPECT_STREQ("000000000000000000000000", scr1.subscribeError.subscriptionId.get().c_str());
   EXPECT_STREQ("000000000000000000000000", scr2.subscribeError.subscriptionId.get().c_str());
   EXPECT_STREQ("OK", scr2.subscribeError.errorCode.reasonPhrase.c_str());
-
-  out = scr2.render(SubscribeContext, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

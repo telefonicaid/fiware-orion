@@ -33,9 +33,8 @@
 *
 * constructorsAndRender - 
 *
-* FIXME P5 #1862: _json counterpart?
 */
-TEST(UnsubscribeContextResponse, DISABLED_constructorsAndRender)
+TEST(UnsubscribeContextResponse, constructorsAndRender)
 {
   UnsubscribeContextResponse  uncr1;
   StatusCode                  sc(SccOk, "D");
@@ -43,17 +42,12 @@ TEST(UnsubscribeContextResponse, DISABLED_constructorsAndRender)
   StatusCode                  ec(SccBadRequest, "D");
   UnsubscribeContextResponse  uncr3(ec);
   std::string                 out;
-  const char*                 outfile = "ngsi10.unsubscribeContextResponse.constructorsAndRender.ok.valid.xml";
 
   utInit();
 
   EXPECT_EQ(0,             uncr1.statusCode.code);
   EXPECT_EQ(SccOk,         uncr2.statusCode.code);
   EXPECT_EQ(SccBadRequest, uncr3.statusCode.code);
-
-  out = uncr3.render(UnsubscribeContext, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
 
   uncr1.release();
 

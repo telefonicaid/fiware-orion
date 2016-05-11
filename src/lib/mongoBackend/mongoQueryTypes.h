@@ -59,6 +59,23 @@ extern HttpStatusCode mongoEntityTypes
   unsigned int*                        totalTypesP
 );
 
+
+
+/* ****************************************************************************
+*
+* mongoEntityTypesValues -
+*/
+extern HttpStatusCode mongoEntityTypesValues
+(
+  EntityTypeVectorResponse*            responseP,
+  const std::string&                   tenant,
+  const std::vector<std::string>&      servicePathV,
+  std::map<std::string, std::string>&  uriParams,
+  unsigned int*                        totalTypesP
+);
+
+
+
 /* ****************************************************************************
 *
 * mongoAttributesForEntityType -

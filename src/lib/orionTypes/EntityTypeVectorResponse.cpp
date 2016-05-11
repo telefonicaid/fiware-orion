@@ -133,12 +133,20 @@ std::string EntityTypeVectorResponse::toJson(ConnectionInfo* ciP)
 
   for (unsigned int ix = 0; ix < entityTypeVector.vec.size(); ++ix)
   {
-    out += entityTypeVector.vec[ix]->toJson(ciP, true);
+    if (ciP->uriParamOptions["values"])
+    {
+      out += JSON_STR(entityTypeVector.vec[ix]->type);
+    }
+    else  // default
+    {
+      out += entityTypeVector.vec[ix]->toJson(ciP, true);
+    }
 
     if (ix != entityTypeVector.vec.size() - 1)
     {
       out += ",";
     }
+
   }
 
   out += "]";

@@ -1107,6 +1107,7 @@ static bool addTriggeredSubscriptions_withCache
     {
       LM_E(("Runtime Error (error setting string filter: %s)", errorString.c_str()));
       delete subP;
+      cacheSemGive(__FUNCTION__, "match subs for notifications");
       return false;
     }
 
@@ -2923,7 +2924,9 @@ void processContextElement
       alarmMgr.dbError(details);
       continue;
     }
-    results.push_back(r);
+    // we need to use getOwned() here, otherwise we have empirically found that bad things may happen with long BSONObjs
+    // (see http://stackoverflow.com/questions/36917731/context-broker-crashing-with-certain-update-queries)
+    results.push_back(r.getOwned());
   }
   releaseMongoConnection(connection);
 

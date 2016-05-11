@@ -622,7 +622,11 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
       {
         delete scopeP->stringFilterP;
         delete scopeP;
-        return errorString;
+
+        alarmMgr.badInput(clientIp, errorString);
+        OrionError oe(SccBadRequest, errorString);
+
+        return oe.render(ciP, "");
       }
 
       subsP->restriction.scopeVector.push_back(scopeP);

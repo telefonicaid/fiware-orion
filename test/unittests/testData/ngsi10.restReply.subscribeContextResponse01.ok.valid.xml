@@ -1,9 +1,0 @@
-<subscribeContextResponse>
-  <subscribeError>
-    <errorCode>
-      <code>200</code>
-      <reasonPhrase>OK</reasonPhrase>
-      <details>detail</details>
-    </errorCode>
-  </subscribeError>
-</subscribeContextResponse>

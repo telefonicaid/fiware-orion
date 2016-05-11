@@ -76,7 +76,7 @@ std::string getAllSubscriptions
 
   if ((ciP->uriParamOptions["count"]))
   {
-    ciP->httpHeader.push_back("X-Total-Count");
+    ciP->httpHeader.push_back("Fiware-Total-Count");
     ciP->httpHeaderValue.push_back(toString(count));
   }
 

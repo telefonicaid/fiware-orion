@@ -168,7 +168,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 721
 Content-Type: application/json
-X-Total-Count: 2
+Fiware-Total-Count: 2
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
