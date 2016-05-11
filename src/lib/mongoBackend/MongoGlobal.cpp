@@ -61,8 +61,10 @@
 #include "ngsi/Restriction.h"
 #include "ngsiNotify/Notifier.h"
 #include "rest/StringFilter.h"
+#include "apiTypesV2/Subscription.h"
 
 using namespace mongo;
+using namespace ngsiv2;
 using std::auto_ptr;
 
 
@@ -1846,7 +1848,7 @@ static bool processOnChangeConditionForSubscription
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
-  Restriction*                     resP,
+  const Restriction*               resP,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder
 )
@@ -1937,10 +1939,10 @@ BSONArray processConditionVector
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
-  Restriction*                     resP,
+  const Restriction*               resP,
   const std::string&               status,
   const std::string&               fiwareCorrelator,
-  const std::vector<std::string>   attrsOrder
+  const std::vector<std::string>&  attrsOrder
 )
 {
   BSONArrayBuilder conds;
@@ -1989,6 +1991,87 @@ BSONArray processConditionVector
   }
 
   return conds.arr();
+}
+
+
+/* ****************************************************************************
+*
+* processConditionVector -
+*
+* This is a wrapper for the other vesion of processConditionVector(), aimed at
+* NGSIv2. At the end, this version should be come the actual one, once NGSIv1
+* gets removed.
+*
+*/
+BSONArray processConditionVector
+(
+  const std::vector<std::string>&  condAttributesV,
+  const std::vector<EntID>&        entitiesV,
+  const std::vector<std::string>&  notifAttributesV,
+  const std::string&               subId,
+  const std::string&               url,
+  bool*                            notificationDone,
+  RenderFormat                     renderFormat,
+  const std::string&               tenant,
+  const std::string&               xauthToken,
+  const std::vector<std::string>&  servicePathV,
+  const Restriction*               resP,
+  const std::string&               status,
+  const std::string&               fiwareCorrelator,
+  const std::vector<std::string>&  attrsOrder
+)
+{
+
+  // Convert std::vector<std::string> to NotifyConditionVector
+  NotifyConditionVector ncV;
+  NotifyCondition nc;
+  for (unsigned int ix = 0; ix < condAttributesV.size(); ix++)
+  {
+    nc.condValueList.push_back(condAttributesV[ix]);
+  }
+  nc.type = ON_CHANGE_CONDITION;
+  ncV.push_back(&nc);
+
+  // Convert std::vector<EntID> to EntityIdVector
+  EntityIdVector enV;
+  for (unsigned int ix = 0; ix < entitiesV.size(); ix++)
+  {
+    EntityId* enP = new EntityId();
+    if (entitiesV[ix].id != "")
+    {
+      enP->fill(entitiesV[ix].id, entitiesV[ix].type, "false");
+    }
+    else // idPattern
+    {
+      enP->fill(entitiesV[ix].idPattern, entitiesV[ix].type, "false");
+    }
+    enV.push_back(enP);
+  }
+
+  // Convert std::vector<std::string> to AttributeList
+  AttributeList attrL;
+  for (unsigned int ix = 0; ix < notifAttributesV.size(); ix++)
+  {
+    attrL.push_back(notifAttributesV[ix]);
+  }
+
+  BSONArray arr = processConditionVector(&ncV,
+                                         enV,
+                                         attrL,
+                                         subId,
+                                         url,
+                                         notificationDone,
+                                         renderFormat,
+                                         tenant,
+                                         xauthToken,
+                                         servicePathV,
+                                         resP,
+                                         status,
+                                         fiwareCorrelator,
+                                         attrsOrder);
+
+  enV.release();
+  return arr;
 }
 
 

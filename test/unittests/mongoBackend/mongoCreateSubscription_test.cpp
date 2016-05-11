@@ -40,107 +40,94 @@
 using namespace ngsiv2;
 
 /* ****************************************************************************
- *  Subscrptions IDs
-*/
-static const std::string SUB_OID1 = "51307b66f481db11bf860001";
-
-
-/* ****************************************************************************
 *
-* x -
+* createSubscriptionNotExtendedOK -
 */
-TEST(mongoCreateSubscriptions, x)
+TEST(mongoCreateSubscriptions, createSubscriptionNotExtendedOK)
 {
   OrionError  oe;
 
+  utInit();
+
   /* Forge input subscription */
   Subscription sub;
-  sub.id = SUB_OID1;
+  sub.description = "this is the sub";
+  sub.expires     = 1360236300;
+  sub.status      = "active";
+  sub.throttling  = 5;
+  sub.attrsFormat = NGSI_V2_NORMALIZED;
+
+  EntID en1("E1", "", "T1");
+  EntID en2("", "E.*", "T2");
+  sub.subject.entities.push_back(en1);
+  sub.subject.entities.push_back(en2);
+  sub.subject.condition.attributes.push_back("A");
+  sub.subject.condition.attributes.push_back("B");
+
+  sub.subject.condition.expression.q        = "temperature<=20";
+  sub.subject.condition.expression.coords   = "-40.4,-3.5;0,0";
+  sub.subject.condition.expression.georel   = "coveredBy";
+  sub.subject.condition.expression.geometry = "box";
+
+  sub.notification.attributes.push_back("C");
+  sub.notification.attributes.push_back("D");
+  sub.notification.httpInfo.url      = "http://foo.bar";
+  sub.notification.httpInfo.extended = false;
 
   /* Invoke the function in mongoBackend library */
-  bool result = mongoCreateSubscription(sub, &oe, uriParams, "", servicePathVector, "", "");
+  std::string result = mongoCreateSubscription(sub, &oe, uriParams, "", servicePathVector, "", "");
 
-  /* Check response is as expected */
-  EXPECT_TRUE(result);
-
-#if 0
-  EXPECT_EQ(SccOk, oe.code);
-  EXPECT_EQ("OK", oe.reasonPhrase);
+  /* Check response is as expected */  
+  EXPECT_EQ(SccNone, oe.code);
+  EXPECT_EQ("", oe.reasonPhrase);
   EXPECT_EQ("", oe.details);
 
-  // I keep this by the moment, as a reminder on how to check DB
+  DBClientBase* connection = getMongoConnection();
 
-  /* Subscription #1 */
-  s = subs[0];
-  EXPECT_EQ(SUB_OID1, s.id);
-  ents = s.subject.entities;
-  ASSERT_EQ(1, ents.size());
-  EXPECT_EQ("E1", ents[0].id);
-  EXPECT_EQ("T1", ents[0].type);
-  EXPECT_EQ("", ents[0].idPattern);
-  attrs = s.subject.condition.attributes;
-  ASSERT_EQ(2, attrs.size());
-  EXPECT_EQ("AX1", attrs[0]);
-  EXPECT_EQ("AY1", attrs[1]);
-  EXPECT_EQ("", s.subject.condition.expression.q);
-  EXPECT_EQ("", s.subject.condition.expression.geometry);
-  EXPECT_EQ("", s.subject.condition.expression.coords);
-  attrs = s.notification.attributes;
-  ASSERT_EQ(0, attrs.size());
-  EXPECT_EQ("http://notify1.me", s.notification.httpInfo.url);
-  EXPECT_EQ(-1, s.notification.timesSent);
-  EXPECT_EQ(-1, s.notification.lastNotification);
-  EXPECT_EQ(-1, s.throttling);
-  EXPECT_EQ(10000000, s.expires);
+  ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
+  BSONObj doc = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-  /* Subscription #2 */
-  s = subs[1];
-  EXPECT_EQ(SUB_OID2, s.id);
-  ents = s.subject.entities;
-  ASSERT_EQ(1, ents.size());
-  EXPECT_EQ("", ents[0].id);
-  EXPECT_EQ("T2", ents[0].type);
-  EXPECT_EQ("E.*", ents[0].idPattern);
-  attrs = s.subject.condition.attributes;
-  ASSERT_EQ(2, attrs.size());
-  EXPECT_EQ("AX2", attrs[0]);
-  EXPECT_EQ("AY2", attrs[1]);
-  EXPECT_EQ("", s.subject.condition.expression.q);
-  EXPECT_EQ("", s.subject.condition.expression.geometry);
-  EXPECT_EQ("", s.subject.condition.expression.coords);
-  attrs = s.notification.attributes;
-  ASSERT_EQ(2, attrs.size());
-  EXPECT_EQ("A1", attrs[0]);
-  EXPECT_EQ("A2", attrs[1]);
-  EXPECT_EQ("http://notify2.me", s.notification.httpInfo.url);
-  EXPECT_EQ(24, s.notification.timesSent);;
-  EXPECT_EQ(20000000, s.notification.lastNotification);
-  EXPECT_EQ(5, s.throttling);
-  EXPECT_EQ(25000000, s.expires);
+  EXPECT_EQ(result, doc.getField("_id").OID().toString());
+  EXPECT_EQ(1360236300, doc.getIntField("expiration"));
+  EXPECT_FALSE(doc.hasField("lastNotification"));
+  EXPECT_EQ(5, doc.getIntField("throttling"));
+  EXPECT_STREQ("http://foo.bar", C_STR_FIELD(doc, "reference"));
+  EXPECT_STREQ("normalized", C_STR_FIELD(doc, "format"));
 
-  /* Subscription #3 */
-  s = subs[2];
-  EXPECT_EQ(SUB_OID3, s.id);
-  ents = s.subject.entities;
-  ASSERT_EQ(1, ents.size());
-  EXPECT_EQ("", ents[0].id);
-  EXPECT_EQ("T2", ents[0].type);
-  EXPECT_EQ("E.*", ents[0].idPattern);
-  attrs = s.subject.condition.attributes;
-  ASSERT_EQ(2, attrs.size());
-  EXPECT_EQ("ZZ2", attrs[0]);
-  EXPECT_EQ("WW2", attrs[1]);
-  EXPECT_EQ("", s.subject.condition.expression.q);
-  EXPECT_EQ("", s.subject.condition.expression.geometry);
-  EXPECT_EQ("", s.subject.condition.expression.coords);
-  attrs = s.notification.attributes;
-  ASSERT_EQ(2, attrs.size());
-  EXPECT_EQ("A1", attrs[0]);
-  EXPECT_EQ("A2", attrs[1]);
-  EXPECT_EQ("http://notify2.me", s.notification.httpInfo.url);
-  EXPECT_EQ(-1, s.notification.timesSent);;
-  EXPECT_EQ(25000000, s.notification.lastNotification);
-  EXPECT_EQ(-1, s.throttling);
-  EXPECT_EQ(20000000, s.expires);
-#endif
+  EXPECT_STREQ("this is the sub", C_STR_FIELD(doc, "description"));
+  EXPECT_STREQ("active", C_STR_FIELD(doc, "status"));
+  EXPECT_FALSE(doc.getBoolField("extended"));
+
+  BSONObj expression = doc.getField("expression").embeddedObject();
+  EXPECT_STREQ("temperature<=20", C_STR_FIELD(expression, "q"));
+  EXPECT_STREQ("-40.4,-3.5;0,0", C_STR_FIELD(expression, "coords"));
+  EXPECT_STREQ("coveredBy", C_STR_FIELD(expression, "georel"));
+  EXPECT_STREQ("box", C_STR_FIELD(expression, "geometry"));
+
+  std::vector<BSONElement> entities = doc.getField("entities").Array();
+  ASSERT_EQ(2, entities.size());
+  BSONObj ent0 = entities[0].embeddedObject();
+  EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
+  EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
+  EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
+  BSONObj ent1 = entities[1].embeddedObject();
+  EXPECT_STREQ("E.*", C_STR_FIELD(ent1, "id"));
+  EXPECT_STREQ("T2", C_STR_FIELD(ent1, "type"));
+  EXPECT_STREQ("true", C_STR_FIELD(ent1, "isPattern"));
+
+  std::vector<BSONElement> attrs = doc.getField("attrs").Array();
+  EXPECT_EQ(2, attrs.size());
+  EXPECT_EQ("C", attrs[0].String());
+  EXPECT_EQ("D", attrs[1].String());
+
+  std::vector<BSONElement> conds = doc.getField("conditions").Array();
+  ASSERT_EQ(1, conds.size());
+  BSONObj cond0 = conds[0].embeddedObject();
+  EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
+  std::vector<BSONElement> condValues = cond0.getField("value").Array();
+  ASSERT_EQ(2, condValues.size());
+  EXPECT_EQ("A", condValues[0].String());
+  EXPECT_EQ("B", condValues[1].String());
+
+  utExit();
 }
