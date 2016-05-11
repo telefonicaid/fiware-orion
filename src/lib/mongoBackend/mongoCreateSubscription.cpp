@@ -49,14 +49,14 @@ using namespace ngsiv2;
 * setSubscriptionId -
 *
 */
-static const char* setSubscriptionId(const Subscription& sub, BSONObjBuilder* b)
+static std::string setSubscriptionId(BSONObjBuilder* b)
 {
   OID  oid;
   oid.init();
   b->append("_id", oid);
 
   LM_T(LmtMongo, ("Subscription _id: %s", oid.toString().c_str()));
-  return oid.toString().c_str();
+  return oid.toString();
 }
 
 
@@ -76,13 +76,16 @@ static void setExpiration(const Subscription& sub, BSONObjBuilder* b)
 
 /* ****************************************************************************
 *
-* setReference -
+* setHttpInfo -
 *
 */
-static void setReference(const Subscription& sub, BSONObjBuilder* b)
+static void setHttpInfo(const Subscription& sub, BSONObjBuilder* b)
 {
   b->append(CSUB_REFERENCE, sub.notification.httpInfo.url);
+  b->append(CSUB_EXTENDED,  sub.notification.httpInfo.extended);
+
   LM_T(LmtMongo, ("Subscription reference: %s", sub.notification.httpInfo.url.c_str()));
+  LM_T(LmtMongo, ("Subscription extended: %s", sub.notification.httpInfo.extended? "true" : "false"));
 }
 
 
@@ -228,7 +231,7 @@ static void setCondsAndInitialNotify
 {
   /* Conds vector (and maybe and initial notification) */
   bool       notificationDone = false;
-  BSONArray  conds = processConditionVector(sub.subject.condition.attributes, //&requestP->notifyConditionVector,
+  BSONArray  conds = processConditionVectorX(sub.subject.condition.attributes, //&requestP->notifyConditionVector,
                                             sub.subject.entities, //requestP->entityIdVector,
                                             sub.notification.attributes, //requestP->attributeList,
                                             subId,
@@ -298,10 +301,11 @@ static void setFormat(const Subscription& sub, BSONObjBuilder* b)
 * mongoCreateSubscription -
 *
 * Returns:
-* - true: subscription susscessfully created ('oe' must be ignored)
-* - false: subscription creation fail (look to 'oe')
+* - subId: subscription susscessfully created ('oe' must be ignored), the subId
+*   must be used to fill Location header
+* - "": subscription creation fail (look to 'oe')
 */
-bool mongoCreateSubscription
+std::string mongoCreateSubscription
 (
   const Subscription&                  sub,
   OrionError*                          oe,
@@ -319,9 +323,9 @@ bool mongoCreateSubscription
   // Build the BSON object to insert
   BSONObjBuilder b;
 
-  const std::string subId = setSubscriptionId(sub, &b);
+  const std::string subId = setSubscriptionId(&b);
   setExpiration(sub, &b);
-  setReference(sub, &b);
+  setHttpInfo(sub, &b);
   setThrottling(sub, &b);
   setServicePath(servicePathV, &b);
   setDescription(sub, &b);
@@ -340,7 +344,7 @@ bool mongoCreateSubscription
   {
     reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);
     oe->fill(SccReceiverInternalError, err);
-    return false;
+    return "";
   }
 
   // Insert in csub cache
@@ -390,5 +394,5 @@ bool mongoCreateSubscription
 
   reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);
 
-  return true;
+  return subId;
 }

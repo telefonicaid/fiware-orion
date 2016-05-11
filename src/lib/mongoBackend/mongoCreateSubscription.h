@@ -40,10 +40,11 @@
 * mongoCreateSubscription -
 *
 * Returns:
-* - true: subscription susscessfully created ('oe' must be ignored)
-* - false: subscription creation fail (look to 'oe')
+* - subId: subscription susscessfully created ('oe' must be ignored), the subId
+*   must be used to fill Location header
+* - "": subscription creation fail (look to 'oe')
 */
-extern bool mongoCreateSubscription
+extern std::string mongoCreateSubscription
 (
   const ngsiv2::Subscription&          sub,
   OrionError*                          oe,

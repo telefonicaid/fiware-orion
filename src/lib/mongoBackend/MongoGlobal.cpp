@@ -2003,7 +2003,7 @@ BSONArray processConditionVector
 * gets removed.
 *
 */
-BSONArray processConditionVector
+BSONArray processConditionVectorX
 (
   const std::vector<std::string>&  condAttributesV,
   const std::vector<EntID>&        entitiesV,
