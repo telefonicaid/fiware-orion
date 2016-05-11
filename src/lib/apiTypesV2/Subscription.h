@@ -50,6 +50,13 @@ struct EntID
     idPattern(idPatternA),
     type(typeA)
   {}
+
+  EntID():
+    id(),
+    idPattern(),
+    type()
+  {}
+
 };
 
 inline bool operator==(const EntID& lhs, const EntID& rhs)
