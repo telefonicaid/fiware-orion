@@ -26,9 +26,9 @@
 * Author: Orion dev team
 */
 #include "rest/ConnectionInfo.h"
-#include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
 #include "jsonParseV2/jsonRequestTreat.h"
+#include "apiTypesV2/SubscriptionUpdate.h"
 
 
 
@@ -36,6 +36,6 @@
 *
 * parseSubscription -
 */
-extern std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDelayedRelease* releaseP, bool partial = false);
+extern std::string parseSubscription(ConnectionInfo* ciP, ngsiv2::SubscriptionUpdate* subsP, bool partial = false);
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSESUBSCRIPTION_H_

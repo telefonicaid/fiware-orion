@@ -78,6 +78,12 @@ static void delayedRelease(JsonDelayedRelease* releaseP)
     releaseP->ucsrP->release();
     releaseP->ucsrP = NULL;
   }
+
+  if (releaseP->subsP != NULL)
+  {
+    delete releaseP->subsP;
+    releaseP->subsP = NULL;
+  }
 }
 
 

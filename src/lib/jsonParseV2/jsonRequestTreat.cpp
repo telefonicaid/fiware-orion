@@ -39,6 +39,7 @@
 #include "jsonParseV2/parseBatchQuery.h"
 #include "jsonParseV2/parseBatchUpdate.h"
 #include "jsonParseV2/jsonRequestTreat.h"
+#include "apiTypesV2/SubscriptionUpdate.h"
 
 
 
@@ -122,25 +123,35 @@ std::string jsonRequestTreat
     break;
 
   case SubscriptionsRequest:
-    
-    answer = parseSubscription(ciP, parseDataP, releaseP);
-    if (answer != "OK")
     {
-      return answer;
-    }
-    
-    if ((answer = parseDataP->scr.res.check(ciP, SubscribeContext, "", "", 0)) != "OK")
-    {
-      alarmMgr.badInput(clientIp, "invalid subscription");
-      return answer;
+      ngsiv2::SubscriptionUpdate* subsP = new ngsiv2::SubscriptionUpdate();
+
+      releaseP->subsP = subsP;
+      answer = parseSubscription(ciP, subsP);
+      if (answer != "OK")
+      {
+        return answer;
+      }
+      /*
+      if ((answer = parseDataP->scr.res.check(ciP, SubscribeContext, "", "", 0)) != "OK")
+      {
+        alarmMgr.badInput(clientIp, "invalid subscription");
+        return answer;
+      }
+      */
     }
     break;
 
   case IndividualSubscriptionRequest:
-    answer = parseSubscription(ciP, parseDataP, releaseP, true);  // NOTE: partial == true
-    if (answer != "OK")
     {
-      return answer;
+      ngsiv2::SubscriptionUpdate* subsP = new ngsiv2::SubscriptionUpdate();
+
+      releaseP->subsP = subsP;
+      answer = parseSubscription(ciP, subsP, true);  // NOTE: partial == true
+      if (answer != "OK")
+      {
+        return answer;
+      }
     }
     break;
 
