@@ -64,165 +64,180 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
 {
   Document document;
 
-  try
+  document.Parse(ciP->payload);
+
+  if (document.HasParseError())
   {
-    document.Parse(ciP->payload);
-
-    if (document.HasParseError())
-    {
-      OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
-      alarmMgr.badInput(clientIp, "JSON parse error");
-      return oe.render(ciP, "");
-    }
-
-    if (!document.IsObject())
-    {
-      OrionError oe(SccBadRequest, "Error parsing incoming JSON buffer", ERROR_STRING_PARSERROR);
-      alarmMgr.badInput(clientIp, "JSON parse error");
-      return oe.render(ciP, "");
-    }
-
-    if (document.ObjectEmpty())
-    {
-      //
-      // Initially we used the method "Empty". As the broker crashed inside that method, some
-      // research was made and "ObjectEmpty" was found. As the broker stopped crashing and complaints
-      // about crashes with small docs and "Empty()" were found on the internet, we opted to use ObjectEmpty
-      //
-      return error(ciP, "empty payload");
-    }
-
-
-    // Description field
-
-    Opt<std::string> description = getStringOpt(document, "description");
-    if (description.given) {
-      std::string descriptionString = description.value;
-
-      if (descriptionString.length() > MAX_DESCRIPTION_LENGTH)
-      {
-        return error(ciP, "max description length exceeded");
-      }
-
-      subsP->descriptionProvided = true;
-      subsP->description = descriptionString;
-    }
-
-
-    // Subject field
-    if (document.HasMember("subject"))
-    {
-      const Value&  subject = document["subject"];
-      std::string   r       = parseSubject(ciP, subsP, subject);
-
-      if (r != "")
-      {
-        return r;
-      }
-    }
-    else if (!update)
-    {
-      return error(ciP, "no subject for subscription specified");
-    }
-
-
-    // Notification field
-    if (document.HasMember("notification"))
-    {
-      const Value&  notification = document["notification"];
-      std::string   r            = parseNotification(ciP, subsP, notification);
-
-      if (r != "")
-      {
-        return r;
-      }
-    }
-    else if (!update)
-    {
-      return error(ciP, "no notification for subscription specified");
-    }
-
-
-    // Expires field
-    Opt<std::string> expiresOpt = getStringOpt(document, "expires");
-
-    if (expiresOpt.given)
-    {
-      std::string expires = expiresOpt.value;
-
-      int64_t eT = -1;
-
-      if (expires.empty())
-      {
-          eT = PERMANENT_SUBS_DATETIME;
-      }
-      else
-      {
-        eT = parse8601Time(expires);
-        if (eT == -1)
-        {
-          return error(ciP, "expires has an invalid format");
-        }
-      }
-
-      subsP->expiresProvided = true;
-      subsP->expires = eT;
-    }
-    else if (!update)
-    {
-      subsP->expires = PERMANENT_SUBS_DATETIME;
-    }
-
-
-    // Status field
-    Opt<std::string> statusOpt =  getStringOpt(document, "status");
-    if (statusOpt.given) {
-      std::string statusString = statusOpt.value;
-
-      if ((statusString != "active") && (statusString != "inactive"))
-      {
-        return error(ciP, "status is not valid (it has to be either active or inactive)");
-      }
-      subsP->statusProvided = true;
-      subsP->status = statusString;
-    }
-
-
-    // Throttling
-    Opt<int64_t> throttlingOpt = getInt64Opt(document, "throttling");
-    if (throttlingOpt.given)
-    {
-      subsP->throttlingProvided = true;
-      subsP->throttling = throttlingOpt.value;
-    }
-    else if (!update) // throttling was not set and it is not update
-    {
-      subsP->throttling = 0; // Default value if not provided at creation => no throttling
-    }
-
-
-    // attrsFormat field
-    Opt<std::string>  attrsFormatOpt = getStringOpt(document, "attrsFormat");
-    if (attrsFormatOpt.given)
-    {
-      std::string   attrsFormatString = attrsFormatOpt.value;
-      RenderFormat  nFormat           = stringToRenderFormat(attrsFormatString, true);
-
-      if (nFormat == NO_FORMAT)
-      {
-        return error(ciP, "invalid attrsFormat (accepted values: legacy, normalized, keyValues, values)");
-      }
-      subsP->attrsFormatProvided = true;
-      subsP->attrsFormat = nFormat;
-    }
-    else if (!update) // Default value for creation
-    {
-      subsP->attrsFormat = DEFAULT_RENDER_FORMAT;  // Default format for NGSIv2: normalized
-    }
-
+    OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
+    alarmMgr.badInput(clientIp, "JSON parse error");
+    return oe.render(ciP, "");
   }
-  catch (const ParseError& pe) {
-    return error(ciP, pe.what());
+
+  if (!document.IsObject())
+  {
+    OrionError oe(SccBadRequest, "Error parsing incoming JSON buffer", ERROR_STRING_PARSERROR);
+    alarmMgr.badInput(clientIp, "JSON parse error");
+    return oe.render(ciP, "");
+  }
+
+  if (document.ObjectEmpty())
+  {
+    //
+    // Initially we used the method "Empty". As the broker crashed inside that method, some
+    // research was made and "ObjectEmpty" was found. As the broker stopped crashing and complaints
+    // about crashes with small docs and "Empty()" were found on the internet, we opted to use ObjectEmpty
+    //
+    return error(ciP, "empty payload");
+  }
+
+
+  // Description field
+
+  Opt<std::string> description = getStringOpt(document, "description");
+  if (!description.ok())
+  {
+    return description.error;
+  }
+  else if (description.given)
+  {
+    std::string descriptionString = description.value;
+
+    if (descriptionString.length() > MAX_DESCRIPTION_LENGTH)
+    {
+      return error(ciP, "max description length exceeded");
+    }
+
+    subsP->descriptionProvided = true;
+    subsP->description = descriptionString;
+  }
+
+
+  // Subject field
+  if (document.HasMember("subject"))
+  {
+    const Value&  subject = document["subject"];
+    std::string   r       = parseSubject(ciP, subsP, subject);
+
+    if (r != "")
+    {
+      return r;
+    }
+  }
+  else if (!update)
+  {
+    return error(ciP, "no subject for subscription specified");
+  }
+
+
+  // Notification field
+  if (document.HasMember("notification"))
+  {
+    const Value&  notification = document["notification"];
+    std::string   r            = parseNotification(ciP, subsP, notification);
+
+    if (r != "")
+    {
+      return r;
+    }
+  }
+  else if (!update)
+  {
+    return error(ciP, "no notification for subscription specified");
+  }
+
+
+  // Expires field
+  Opt<std::string> expiresOpt = getStringOpt(document, "expires");
+
+  if (!expiresOpt.ok())
+  {
+    return expiresOpt.error;
+  }
+  else if (expiresOpt.given)
+  {
+    std::string expires = expiresOpt.value;
+
+    int64_t eT = -1;
+
+    if (expires.empty())
+    {
+        eT = PERMANENT_SUBS_DATETIME;
+    }
+    else
+    {
+      eT = parse8601Time(expires);
+      if (eT == -1)
+      {
+        return error(ciP, "expires has an invalid format");
+      }
+    }
+
+    subsP->expiresProvided = true;
+    subsP->expires = eT;
+  }
+  else if (!update)
+  {
+    subsP->expires = PERMANENT_SUBS_DATETIME;
+  }
+
+
+  // Status field
+  Opt<std::string> statusOpt =  getStringOpt(document, "status");
+  if (!statusOpt.ok())
+  {
+    return statusOpt.error;
+  }
+  else if (statusOpt.given)
+  {
+    std::string statusString = statusOpt.value;
+
+    if ((statusString != "active") && (statusString != "inactive"))
+    {
+      return error(ciP, "status is not valid (it has to be either active or inactive)");
+    }
+    subsP->statusProvided = true;
+    subsP->status = statusString;
+  }
+
+
+  // Throttling
+  Opt<int64_t> throttlingOpt = getInt64Opt(document, "throttling");
+  if (!throttlingOpt.ok())
+  {
+    return throttlingOpt.error;
+  }
+  else if (throttlingOpt.given)
+  {
+    subsP->throttlingProvided = true;
+    subsP->throttling = throttlingOpt.value;
+  }
+  else if (!update) // throttling was not set and it is not update
+  {
+    subsP->throttling = 0; // Default value if not provided at creation => no throttling
+  }
+
+
+  // attrsFormat field
+  Opt<std::string>  attrsFormatOpt = getStringOpt(document, "attrsFormat");
+  if (!attrsFormatOpt.ok())
+  {
+    return attrsFormatOpt.error;
+  }
+  else if (attrsFormatOpt.given)
+  {
+    std::string   attrsFormatString = attrsFormatOpt.value;
+    RenderFormat  nFormat           = stringToRenderFormat(attrsFormatString, true);
+
+    if (nFormat == NO_FORMAT)
+    {
+      return error(ciP, "invalid attrsFormat (accepted values: legacy, normalized, keyValues, values)");
+    }
+    subsP->attrsFormatProvided = true;
+    subsP->attrsFormat = nFormat;
+  }
+  else if (!update) // Default value for creation
+  {
+    subsP->attrsFormat = DEFAULT_RENDER_FORMAT;  // Default format for NGSIv2: normalized
   }
 
   return "OK";
@@ -343,6 +358,10 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
 
 
     Opt<std::string> typeOpt = getStringOpt(*iter, "type", "subject entities element type");
+    if (!typeOpt.ok())
+    {
+      return typeOpt.error;
+    }
     if (typeOpt.given)
     {
       type = typeOpt.value;
@@ -531,7 +550,11 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
     // geometry
     Opt<std::string> geometryOpt = getStringOpt(expression, "geometry");
 
-    if (geometryOpt.given)
+    if (!geometryOpt.ok())
+    {
+      return geometryOpt.error;
+    }
+    else if (geometryOpt.given)
     {
       subsP->subject.condition.expression.geometry = geometryOpt.value;
     }
@@ -539,14 +562,21 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
     // coords
     Opt<std::string> coordsOpt = getStringOpt(expression, "coords");
 
-    if (coordsOpt.given)
+    if (!coordsOpt.ok())
+    {
+        return coordsOpt.error;
+    }
+    else if (coordsOpt.given)
     {
       subsP->subject.condition.expression.coords = coordsOpt.value;
     }
 
     // georel
     Opt<std::string> georelOpt = getStringOpt(expression, "georel");
-
+    if (!geometryOpt.ok())
+    {
+      return geometryOpt.error;
+    }
     if (georelOpt.given)
     {
       subsP->subject.condition.expression.georel = georelOpt.value;

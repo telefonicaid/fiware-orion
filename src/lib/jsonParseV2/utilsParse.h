@@ -26,30 +26,16 @@
 * Author: Orion dev team
 */
 
-#include <exception>
-
 #include "rapidjson/document.h"
-
-class ParseError: public std::exception
-{
-public:
-
-  ParseError(const std::string& msg): message(msg) {}
-  virtual ~ParseError() throw () {}
-
-  virtual const char* what() const throw ()
-  {
-    return message.c_str();
-  }
-private:
-  std::string message;
-};
 
 template <typename T>
 struct Opt {
-  T    value;
-  bool given;
-  Opt(T v, bool g): value(v), given(g) {}
+  T           value;
+  bool        given;
+  std::string error;
+  Opt(T v, bool g): value(v), given(g), error() {}
+  Opt(std::string err): value(), given(true), error(err) {}
+  bool ok() { return error.empty(); }
 };
 
 std::string getString(const rapidjson::Value& parent, const char* field,const std::string& description = "");
