@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_APITYPESV2_HTTPINFO_H
-#define SRC_LIB_APITYPESV2_HTTPINFO_H
-
 /*
 *
 * Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,34 +22,9 @@
 *
 * Author: Orion dev team
 */
-#include <string>
-#include <map>
 
-#include "rest/Verb.h"
+#include "SubscriptionUpdate.h"
 
-
-
-namespace ngsiv2
+SubscriptionUpdate::SubscriptionUpdate()
 {
-
-/* ****************************************************************************
-*
-* HttpInfo - 
-*/
-struct HttpInfo
-{
-  std::string                         url;
-  Verb                                verb;
-  std::map<std::string, std::string>  qs;      // URI parameters
-  std::map<std::string, std::string>  headers; 
-  std::string                         payload;
-  bool                                isExtended;
-  HttpInfo();
-
-  std::string toJson();
-};
-
-
 }
-
-#endif // SRC_LIB_APITYPESV2_HTTPINFO_H
