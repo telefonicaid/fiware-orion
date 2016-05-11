@@ -146,7 +146,7 @@ NotifyCondition* NotifyConditionVector::operator[] (unsigned int ix) const
 *
 * NotifyConditionVector::size -
 */
-unsigned int NotifyConditionVector::size(void)
+unsigned int NotifyConditionVector::size(void) const
 {
   return vec.size();
 }
@@ -174,7 +174,7 @@ void NotifyConditionVector::release(void)
 *
 * NotifyConditionVector::fill - 
 */
-void NotifyConditionVector::fill(NotifyConditionVector& nv)
+void NotifyConditionVector::fill(const NotifyConditionVector& nv)
 {
   for (unsigned int ncIx = 0; ncIx < nv.size(); ++ncIx)
   {
