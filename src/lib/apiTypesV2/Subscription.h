@@ -33,6 +33,7 @@
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 #include "ngsi/Restriction.h"
+#include "common/RenderFormat.h"
 
 namespace ngsiv2
 {
@@ -96,7 +97,7 @@ struct Subscription
   std::string  status;
   Notification notification;
   long long    throttling;
-  std::string  attrsFormat;
+  RenderFormat attrsFormat;
   Restriction  restriction;
   std::string  toJson();
 
