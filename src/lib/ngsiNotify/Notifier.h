@@ -53,17 +53,6 @@ public:
                                         RenderFormat                               renderFormat,
                                         const std::vector<std::string>&            attrsOrder);
 
-  virtual void sendNotifyContextRequestAsPerTemplate
-  (
-    NotifyContextRequest*                      ncr,
-    const ngsiv2::HttpInfo&                    httpInfo,
-    const std::string&                         tenant,
-    const std::string&                         xauthToken,
-    const std::string&                         fiwareCorrelator,
-    RenderFormat                               renderFormat,
-    const std::vector<std::string>&            attrsOrder
-  );
-
   virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr,
                                                     const std::string&                url,
                                                     const std::string&                tenant,

@@ -156,24 +156,25 @@ static char* curlVersionGet(char* buf, int bufLen)
 */
 int httpRequestSendWithCurl
 (
-   CURL                   *curl,
-   const std::string&     _ip,
-   unsigned short         port,
-   const std::string&     protocol,
-   const std::string&     verb,
-   const std::string&     tenant,
-   const std::string&     servicePath,
-   const std::string&     xauthToken,
-   const std::string&     resource,
-   const std::string&     orig_content_type,
-   const std::string&     content,
-   const std::string&     fiwareCorrelation,
-   const std::string&     ngisv2AttrFormat,
-   bool                   useRush,
-   bool                   waitForResponse,
-   std::string*           outP,
-   const std::string&     acceptFormat,
-   long                   timeoutInMilliseconds
+   CURL*                                      curl,
+   const std::string&                         _ip,
+   unsigned short                             port,
+   const std::string&                         protocol,
+   const std::string&                         verb,
+   const std::string&                         tenant,
+   const std::string&                         servicePath,
+   const std::string&                         xauthToken,
+   const std::string&                         resource,
+   const std::string&                         orig_content_type,
+   const std::string&                         content,
+   const std::string&                         fiwareCorrelation,
+   const std::string&                         ngisv2AttrFormat,
+   bool                                       useRush,
+   bool                                       waitForResponse,
+   std::string*                               outP,
+   const std::map<std::string, std::string>&  extraHeaders,
+   const std::string&                         acceptFormat,
+   long                                       timeoutInMilliseconds
 )
 {
   char                       portAsString[STRING_SIZE_FOR_INT];
@@ -385,6 +386,15 @@ int httpRequestSendWithCurl
     outgoingMsgSize += nFormat.size();
   }
 
+  // Extra headers - FIXME PR: what it an 'extra header' is the same as one already present?
+  for (std::map<std::string, std::string>::const_iterator it = extraHeaders.begin(); it != extraHeaders.end(); ++it)
+  {
+    std::string header = it->first + ": " + it->second;
+    headers = curl_slist_append(headers, header.c_str());
+    outgoingMsgSize += header.size();
+  }  
+
+
   // Check if total outgoing message size is too big
   if (outgoingMsgSize > MAX_DYN_MSG_SIZE)
   {
@@ -496,23 +506,24 @@ int httpRequestSendWithCurl
 */
 int httpRequestSend
 (
-   const std::string&     _ip,
-   unsigned short         port,
-   const std::string&     protocol,
-   const std::string&     verb,
-   const std::string&     tenant,
-   const std::string&     servicePath,
-   const std::string&     xauthToken,
-   const std::string&     resource,
-   const std::string&     orig_content_type,
-   const std::string&     content,
-   const std::string&     fiwareCorrelation,
-   const std::string&     ngisv2AttrFormat,
-   bool                   useRush,
-   bool                   waitForResponse,
-   std::string*           outP,
-   const std::string&     acceptFormat,
-   long                   timeoutInMilliseconds
+   const std::string&                         _ip,
+   unsigned short                             port,
+   const std::string&                         protocol,
+   const std::string&                         verb,
+   const std::string&                         tenant,
+   const std::string&                         servicePath,
+   const std::string&                         xauthToken,
+   const std::string&                         resource,
+   const std::string&                         orig_content_type,
+   const std::string&                         content,
+   const std::string&                         fiwareCorrelation,
+   const std::string&                         ngisv2AttrFormat,
+   bool                                       useRush,
+   bool                                       waitForResponse,
+   std::string*                               outP,
+   const std::map<std::string, std::string>&  extraHeaders,
+   const std::string&                         acceptFormat,
+   long                                       timeoutInMilliseconds
 )
 {
   struct curl_context  cc;
@@ -545,8 +556,10 @@ int httpRequestSend
                                      useRush,
                                      waitForResponse,
                                      outP,
+                                     extraHeaders,
                                      acceptFormat,
                                      timeoutInMilliseconds);
+
   release_curl_context(&cc);
   return response;
 }

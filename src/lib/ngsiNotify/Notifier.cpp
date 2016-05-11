@@ -54,43 +54,23 @@ Notifier::~Notifier (void)
 
 /* ****************************************************************************
 *
-* templateNotify - 
+* substitute - 
 */
-static void templateNotify
-(
-  const SubscriptionId&            subscriptionId,
-  const ContextElemen&             ce,
-  const ngsiv2::HttpInfo&          httpInfo,
-  const std::string&               tenant,
-  const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator,
-  RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsOrder
-)
+static void substitute(std::string* sP, const std::string& in, const ContextElement& ce)
 {
-  //
-  //
-  //
-  Verb            verb = httpInfo.verb;
-
-  if (verb == NOVERB)
-  {
-    // Default verb/method is POST
-    verb = POST;
-  }
-
-  
+  *sP = in;
 }
 
 
 
 /* ****************************************************************************
 *
-* Notifier::sendNotifyContextRequestAsPerTemplate -
+* templateNotify - 
 */
-void Notifier::sendNotifyContextRequestAsPerTemplate
+static bool templateNotify
 (
-  NotifyContextRequest*            ncrP,
+  const SubscriptionId&            subscriptionId,
+  const ContextElement&            ce,
   const ngsiv2::HttpInfo&          httpInfo,
   const std::string&               tenant,
   const std::string&               xauthToken,
@@ -99,12 +79,188 @@ void Notifier::sendNotifyContextRequestAsPerTemplate
   const std::vector<std::string>&  attrsOrder
 )
 {
+  Verb                                verb = httpInfo.verb;
+  std::string                         method;
+  std::string                         url;
+  std::string                         payload;
+  std::map<std::string, std::string>  qs;
+  std::map<std::string, std::string>  headers;
+
+  LM_W(("KZ: In templateNotify"));
+  //
+  // 1. Verb/Method
+  //
+  if (verb == NOVERB)
+  {
+    // Default verb/method is POST
+    verb = POST;
+  }
+  method = verbName(verb);
+
+
+  //
+  // 2. URL
+  //
+  substitute(&url, httpInfo.url, ce);
+
+
+  //
+  // 3. Payload
+  //
+  if (httpInfo.payload == "")
+  {
+    payload = ce.toJson(renderFormat, attrsOrder);
+  }
+  else
+  {
+    substitute(&payload, httpInfo.payload, ce);
+  }
+
+
+  //
+  // 4. URI Params (Query Strings)
+  //
+  for (std::map<std::string, std::string>::const_iterator it = httpInfo.qs.begin(); it != httpInfo.qs.end(); ++it)
+  {
+    std::string key   = it->first;
+    std::string value = it->second;
+
+    substitute(&value, it->second, ce);
+    qs[key] = value;
+  }
+
+
+  //
+  // 5. HTTP Headers
+  //
+  for (std::map<std::string, std::string>::const_iterator it = httpInfo.headers.begin(); it != httpInfo.headers.end(); ++it)
+  {
+    std::string key   = it->first;
+    std::string value = it->second;
+
+    substitute(&value, it->second, ce);
+    headers[key] = value;
+  }
+
+
+  //
+  // 6. Split URI in protocol, host, port and path
+  //
+  std::string  protocol;
+  std::string  host;
+  int          port;
+  std::string  uriPath;
+
+  if (!parseUrl(url, host, port, uriPath, protocol))
+  {
+    LM_E(("Runtime Error (not sending NotifyContextRequest: malformed URL: '%s')", httpInfo.url.c_str()));
+    return false;
+  }
+
+
+  //
+  // 7. Add URI params from template to uriPath
+  //
+  std::string  uri = uriPath;
+
+  if (headers.size() != 0)
+  {
+    uri += "?";
+
+    int ix = 0;
+    for (std::map<std::string, std::string>::iterator it = qs.begin(); it != qs.end(); ++it)
+    {
+      if (ix != 0)
+      {
+        uri += "&";
+      }
+
+      uri += it->first + "=" + it->second;
+      ++ix;
+    }
+  }
+
+
+  //
+  // 8. HTTP headers - to httpRequestSend via parameter 'extraHeaders'
+  //
+  std::string  out;
+  int          r;
+
+  LM_W(("KZ: Sending notification: %s [%s]", uri.c_str(), payload.c_str()));
+  r = httpRequestSend(host,
+                      port,
+                      protocol,
+                      method,
+                      tenant,
+                      ce.entityId.servicePath,
+                      xauthToken,
+                      uri,
+                      "application/json",
+                      payload,
+                      fiwareCorrelator,
+                      "",                  // ngisv2AttrFormat
+                      false,               // don't use rush ... ?
+                      true,                // wait for response
+                      &out,
+                      headers,
+                      "application/json",  // Accept Format
+                      5000);               // Timeout in milliseconds: FIXME PR: unhardwire
+
+  if (r == 0)
+  {
+    statisticsUpdate(NotifyContextSent, JSON);
+    alarmMgr.notificationErrorReset(url);
+    return true;
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* NotificationAsTemplateParams - 
+*/
+typedef struct NotificationAsTemplateParams
+{
+  NotifyContextRequest*            ncrP;
+  ngsiv2::HttpInfo                 httpInfo;
+  std::string                      tenant;
+  std::string                      xauthToken;
+  std::string                      fiwareCorrelator;
+  RenderFormat                     renderFormat;
+  std::vector<std::string>         attrsOrder;
+} NotificationAsTemplateParams;
+
+
+
+/* ****************************************************************************
+*
+* sendNotifyContextRequestAsPerTemplate -
+*/
+void* sendNotifyContextRequestAsPerTemplate(void* p)
+{
+  NotificationAsTemplateParams* paramP = (NotificationAsTemplateParams*) p;
+
   LM_W(("KZ: In sendNotifyContextRequestAsPerTemplate"));
 
-  for (unsigned int ix = 0; ix < ncrP->contextElementResponseVector.size(); ++ix)
+  for (unsigned int ix = 0; ix < paramP->ncrP->contextElementResponseVector.size(); ++ix)
   {
-    templateNotify(ncrP->subscriptionId, ncrP->contextElementResponseVector[ix]->contextElement, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
+    LM_W(("KZ: calling templateNotify (%d)", ix));
+    templateNotify(paramP->ncrP->subscriptionId,
+                   paramP->ncrP->contextElementResponseVector[ix]->contextElement,
+                   paramP->httpInfo,
+                   paramP->tenant,
+                   paramP->xauthToken,
+                   paramP->fiwareCorrelator,
+                   paramP->renderFormat,
+                   paramP->attrsOrder);
   }
+
+  delete paramP;
+  return NULL;
 }
 
 
@@ -115,7 +271,7 @@ void Notifier::sendNotifyContextRequestAsPerTemplate
 */
 void Notifier::sendNotifyContextRequest
 (
-  NotifyContextRequest*            ncr,
+  NotifyContextRequest*            ncrP,
   const ngsiv2::HttpInfo&          httpInfo,
   const std::string&               tenant,
   const std::string&               xauthToken,
@@ -127,6 +283,7 @@ void Notifier::sendNotifyContextRequest
     ConnectionInfo  ci;
     Verb            verb = httpInfo.verb;
 
+    LM_W(("KZ: In sendNotifyContextRequest"));
     if (verb == NOVERB)
     {
       // Default verb/method is POST
@@ -144,11 +301,36 @@ void Notifier::sendNotifyContextRequest
     //   - if 'headers' is non-empty, perform eventual substitutions and make sure the information is added as HTTP headers for the notification
     //   - if 'payload' is given, use that string as template instead of the default payload string, substituting all fields that are to be substituted
     //
-    // Redirect to the method sendNotifyContextRequestAsPerTemplate()
+    // Redirect to the method sendNotifyContextRequestAsPerTemplate() when ...
     //
     if ((httpInfo.qs.size() != 0) || (httpInfo.headers.size() != 0) || (httpInfo.payload != "") || (httpInfo.verb != NOVERB))
     {
-        return sendNotifyContextRequestAsPerTemplate(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
+      LM_W(("KZ: Calling sendNotifyContextRequestAsPerTemplate"));
+
+      NotificationAsTemplateParams* paramP = new NotificationAsTemplateParams();
+
+      paramP->ncrP             = ncrP->clone();
+      paramP->httpInfo         = httpInfo;
+      paramP->tenant           = tenant;
+      paramP->xauthToken       = xauthToken;
+      paramP->fiwareCorrelator = fiwareCorrelator;
+      paramP->renderFormat     = renderFormat;
+      paramP->attrsOrder       = attrsOrder;
+
+#if 0
+      sendNotifyContextRequestAsPerTemplate(paramP);
+#else
+      pthread_t  tid;
+      int        r = pthread_create(&tid, NULL, sendNotifyContextRequestAsPerTemplate, (void*) paramP);
+      if (r != 0)
+      {
+        delete paramP;
+        LM_E(("Runtime Error (error creating thread for notifications: %d)", r));
+        return;
+      }
+      pthread_detach(tid);
+#endif
+      return;
     }
 
 
@@ -159,9 +341,9 @@ void Notifier::sendNotifyContextRequest
     std::string spathList;
     bool        atLeastOneNotDefault = false;
 
-    for (unsigned int ix = 0; ix < ncr->contextElementResponseVector.size(); ++ix)
+    for (unsigned int ix = 0; ix < ncrP->contextElementResponseVector.size(); ++ix)
     {
-      EntityId* eP = &ncr->contextElementResponseVector[ix]->contextElement.entityId;
+      EntityId* eP = &ncrP->contextElementResponseVector[ix]->contextElement.entityId;
 
       if (spathList != "")
       {
@@ -190,11 +372,11 @@ void Notifier::sendNotifyContextRequest
     std::string payloadString;
     if (renderFormat == NGSI_V1_LEGACY)
     {
-      payloadString = ncr->render(&ci, NotifyContext, "");
+      payloadString = ncrP->render(&ci, NotifyContext, "");
     }
     else
     {
-      payloadString = ncr->toJson(&ci, renderFormat, attrsOrder);
+      payloadString = ncrP->toJson(&ci, renderFormat, attrsOrder);
     }
 
     /* Parse URL */

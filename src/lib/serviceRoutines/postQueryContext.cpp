@@ -122,6 +122,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
 
   LM_T(LmtCPrForwardRequestPayload, ("forward queryContext request payload: %s", payload.c_str()));
 
+  std::map<std::string, std::string> noHeaders;
   r = httpRequestSend(ip,
                       port,
                       protocol,
@@ -137,6 +138,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
                       false,
                       true,
                       &out,
+                      noHeaders,
                       mimeType);
 
   if (r != 0)
