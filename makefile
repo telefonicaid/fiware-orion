@@ -60,8 +60,8 @@ ifndef MOCK_CONFIG
     MOCK_CONFIG=epel-6-tid
 endif
 
-ifndef XSD_DIR
-    XSD_DIR=/tmp/xsd
+ifndef MONGO_HOST
+    MONGO_HOST=localhost
 endif
 
 all: prepare_release release
@@ -279,9 +279,9 @@ build_unit_test: prepare_unit_test
 unit_test: build_unit_test
 	@echo '------------------------------- unit_test starts ---------------------------------'
 	if [ -z "${TEST_FILTER}" ]; then \
-	   BUILD_UNITTEST/test/unittests/unitTest -t 0-255 --gtest_output=xml:BUILD_UNITTEST/unit_test.xml; \
+	   BUILD_UNITTEST/test/unittests/unitTest -t 0-255 -dbhost ${MONGO_HOST} --gtest_output=xml:BUILD_UNITTEST/unit_test.xml; \
         else \
-	   BUILD_UNITTEST/test/unittests/unitTest -t 0-255 --gtest_output=xml:BUILD_UNITTEST/unit_test.xml --gtest_filter=${TEST_FILTER}; \
+	   BUILD_UNITTEST/test/unittests/unitTest -t 0-255 -dbhost ${MONGO_HOST} --gtest_output=xml:BUILD_UNITTEST/unit_test.xml --gtest_filter=${TEST_FILTER}; \
         fi
 	@echo '------------------------------- unit_test ended ---------------------------------'
 
@@ -392,20 +392,10 @@ valgrind: install_debug
 files_compliance:
 	scripts/check_files_compliance.py .
 
-xml_check:
-	test/xmlCheck/xmlCheck.sh --xsd-dir $(XSD_DIR)
-
 json_check:
 	test/jsonCheck/jsonCheck.sh
 
-check_delimiter:
-	@echo
-	@echo
-	@echo
-	@echo "==========================  JSON PAYLOAD CHECK ============================================="
-	@echo
-
-payload_check: xml_check check_delimiter json_check
+payload_check: json_check
 
 cppcheck:
 	cppcheck --xml -j 8 --enable=all -I src/lib/ src/ 2> cppcheck-result.xml

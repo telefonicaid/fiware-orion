@@ -1,7 +1,0 @@
-<queryContextResponse>
-  <errorCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
-    <details>detail</details>
-  </errorCode>
-</queryContextResponse>

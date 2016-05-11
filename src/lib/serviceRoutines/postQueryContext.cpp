@@ -276,7 +276,7 @@ std::string postQueryContext
   std::string                 answer;
   QueryContextRequestVector   requestV;
   QueryContextResponseVector  responseV;
-  long long                   count;
+  long long                   count = 0;
   long long*                  countP = NULL;
 
 
@@ -287,7 +287,7 @@ std::string postQueryContext
   // entities is returned in the errorCode of the payload.
   //
   // In API version 2, this has changed completely. Here, the total count of local entities is returned
-  // if the URI parameter 'count' is set to 'true', and it is returned in the HTTP header X-Total-Count.
+  // if the URI parameter 'count' is set to 'true', and it is returned in the HTTP header Fiware-Total-Count.
   //
   if ((ciP->apiVersion == "v2") && (ciP->uriParamOptions["count"]))
   {
@@ -326,14 +326,14 @@ std::string postQueryContext
 
 
   //
-  // If API version 2, add count, if asked for, in HTTP header X-Total-Count
+  // If API version 2, add count, if asked for, in HTTP header Fiware-Total-Count
   //
   if ((ciP->apiVersion == "v2") && (countP != NULL))
   {
     char cV[32];
 
     snprintf(cV, sizeof(cV), "%llu", *countP);
-    ciP->httpHeader.push_back("X-Total-Count");
+    ciP->httpHeader.push_back("Fiware-Total-Count");
     ciP->httpHeaderValue.push_back(cV);
   }
 

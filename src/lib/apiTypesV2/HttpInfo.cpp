@@ -39,7 +39,7 @@ namespace ngsiv2
 *
 * HttpInfo::HttpInfo - 
 */
-HttpInfo::HttpInfo() : verb(NOVERB)
+HttpInfo::HttpInfo() : verb(NOVERB), extended(false)
 {
 }
 

@@ -72,51 +72,12 @@ SET (SOURCES
     serviceRoutines/badVerbGetPostDeleteOnly_test.cpp
     serviceRoutines/badVerbGetDeleteOnly_test.cpp
     serviceRoutines/badVerbGetPutDeleteOnly_test.cpp
-    serviceRoutines/deleteIndividualContextEntity_test.cpp
-    serviceRoutines/deleteIndividualContextEntityAttribute_test.cpp
-    serviceRoutines/getContextEntitiesByEntityId_test.cpp
-    serviceRoutines/getEntityByIdAttributeByName_test.cpp
-    serviceRoutines/getContextEntityTypes_test.cpp
-    serviceRoutines/postContextEntityTypes_test.cpp
-    serviceRoutines/getContextEntityTypeAttributeContainer_test.cpp
-    serviceRoutines/postContextEntityTypeAttributeContainer_test.cpp
-    serviceRoutines/getContextEntityTypeAttribute_test.cpp
-    serviceRoutines/postContextEntityTypeAttribute_test.cpp
-    serviceRoutines/getIndividualContextEntity_test.cpp
-    serviceRoutines/getContextEntityAttributes_test.cpp
-    serviceRoutines/getIndividualContextEntityAttribute_test.cpp
-    serviceRoutines/postContextEntitiesByEntityId_test.cpp
-    serviceRoutines/postContextEntityAttributes_test.cpp
-    serviceRoutines/postDiscoverContextAvailability_test.cpp
-    serviceRoutines/postEntityByIdAttributeByName_test.cpp
-    serviceRoutines/postIndividualContextEntity_test.cpp
-    serviceRoutines/postIndividualContextEntityAttribute_test.cpp
-    serviceRoutines/logTraceTreat_test.cpp
-    serviceRoutines/postRegisterContext_test.cpp
-    serviceRoutines/postSubscribeContext_test.cpp
-    serviceRoutines/postSubscribeContextAvailability_test.cpp
-    serviceRoutines/postUnsubscribeContext_test.cpp
-    serviceRoutines/postUnsubscribeContextAvailability_test.cpp
-    serviceRoutines/postUpdateContext_test.cpp
-    serviceRoutines/postUpdateContextAvailabilitySubscription_test.cpp
-    serviceRoutines/postUpdateContextSubscription_test.cpp
-    serviceRoutines/putIndividualContextEntity_test.cpp
     serviceRoutines/putIndividualContextEntityAttribute_test.cpp
-    serviceRoutines/postQueryContext_test.cpp
-    serviceRoutines/getNgsi10ContextEntityTypes_test.cpp
-    serviceRoutines/getNgsi10ContextEntityTypesAttribute_test.cpp
     serviceRoutines/putSubscriptionConvOp_test.cpp
-    serviceRoutines/badNgsi10Request_test.cpp
-    serviceRoutines/badNgsi9Request_test.cpp
-    serviceRoutines/badRequest_test.cpp
     serviceRoutines/versionTreat_test.cpp
     serviceRoutines/exitTreat_test.cpp
-    serviceRoutines/leakTreat_test.cpp
     serviceRoutines/statisticsTreat_test.cpp
     serviceRoutines/putAvailabilitySubscriptionConvOp_test.cpp
-    serviceRoutines/deleteAttributeValueInstance_test.cpp
-    serviceRoutines/putAttributeValueInstance_test.cpp
-    serviceRoutines/getAttributeValueInstance_test.cpp
 
     convenience/Convenience_test.cpp
     convenience/AppendContextElementRequest_test.cpp
@@ -232,6 +193,7 @@ SET (SOURCES
     mongoBackend/mongoQueryTypes_test.cpp
     mongoBackend/mongoQueryContextFilterExistEntity_test.cpp
     mongoBackend/mongoGetSubscriptions_test.cpp
+    mongoBackend/mongoCreateSubscription_test.cpp
 
     parse/CompoundValueNode_test.cpp
     parse/compoundValue_test.cpp

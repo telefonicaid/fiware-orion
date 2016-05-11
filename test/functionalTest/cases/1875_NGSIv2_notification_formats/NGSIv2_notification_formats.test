@@ -360,9 +360,9 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 170
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
-X-Ngsiv2-Attrsformat: normalized
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
@@ -389,9 +389,9 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 170
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
-X-Ngsiv2-Attrsformat: normalized
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
@@ -418,9 +418,9 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 94
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: keyValues
 Host: localhost:REGEX(\d+)
 Accept: application/json
-X-Ngsiv2-Attrsformat: keyValues
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
@@ -439,9 +439,9 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 60
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: values
 Host: localhost:REGEX(\d+)
 Accept: application/json
-X-Ngsiv2-Attrsformat: values
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
@@ -484,9 +484,9 @@ Date: REGEX(.*)
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 95
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: keyValues
 Host: localhost:REGEX(\d+)
 Accept: application/json
-X-Ngsiv2-Attrsformat: keyValues
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 

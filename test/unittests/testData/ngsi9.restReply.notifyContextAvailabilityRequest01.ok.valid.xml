@@ -1,7 +1,0 @@
-<notifyContextAvailabilityResponse>
-  <responseCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
-    <details>detail</details>
-  </responseCode>
-</notifyContextAvailabilityResponse>

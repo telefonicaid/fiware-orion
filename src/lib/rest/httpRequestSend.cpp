@@ -381,7 +381,7 @@ int httpRequestSendWithCurl
   // Notify Format
   if ((ngisv2AttrFormat != "") && (ngisv2AttrFormat != "JSON") && (ngisv2AttrFormat != "legacy"))
   {
-    std::string nFormat = "X-Ngsiv2-AttrsFormat: " + ngisv2AttrFormat;
+    std::string nFormat = "Ngsiv2-AttrsFormat: " + ngisv2AttrFormat;
     headers = curl_slist_append(headers, nFormat.c_str());
     outgoingMsgSize += nFormat.size();
   }

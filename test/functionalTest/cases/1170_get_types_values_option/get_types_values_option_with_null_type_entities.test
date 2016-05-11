@@ -1,0 +1,258 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET Entity Types with options values (including null type entities)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. GET /v2/types?options=values and get an empty list
+# 02. Create E1/T1/A1+A2
+# 03. GET /v2/types?options=values and get a list with one element
+# 04. Create E2/<null>/A1+A3 (using NGSIv1)
+# 05. Create E3/T3/A2+A4
+# 06. GET /v2/types?options=values and get a list of three types
+# 07. GET /v2/types?options=values with limit, getting 2 types but Fiware-Total-Count 3
+# 08. GET /v2/types?options=values with offset=3, thus out of limits
+#
+
+echo "01. GET /v2/types?options=values and get an empty list"
+echo "======================================================"
+orionCurl --url '/v2/types?options=values'
+echo
+echo
+
+
+echo "02. Create E1/T1/A1+A2"
+echo "======================"
+payload='{
+  "type": "T1",
+  "id":   "E1",
+  "A1": { "type": "String", "value": "s" },
+  "A2": { "type": "Int", "value": 2 }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. GET /v2/types?options=values and get a non-empty list"
+echo "========================================================="
+orionCurl --url '/v2/types?options=values'
+echo
+echo
+
+
+echo "04. Create E2/<null>/A1+A3 (using NGSIv1)"
+echo "========================================="
+payload='{
+  "contextElements": [
+    {
+      "isPattern": "false",
+      "id": "E2",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "String",
+          "value": "s"
+        },
+        {
+          "name": "A3",
+          "type": "Bool",
+          "value": "true"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "${payload}"
+echo
+echo
+
+
+echo "05. Create E3/T3/A2+A4"
+echo "======================"
+payload='{
+  "type": "T3",
+  "id":   "E3",
+  "A2": { "type": "Int", "value": 2 },
+  "A4": { "type": "String", "value": "a4" }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. GET /v2/types?options=values and get a list of three types"
+echo "=============================================================="
+orionCurl --url '/v2/types?options=values'
+echo
+echo
+
+
+echo "07. GET /v2/types?options=values with limit, getting 2 types but Fiware-Total-Count 3"
+echo "====================================================================================="
+orionCurl --url '/v2/types?limit=2&options=count,values'
+echo
+echo
+
+
+echo "08. GET /v2/types?options=values with offset=3, thus out of limits"
+echo "=================================================================="
+orionCurl --url '/v2/types?offset=3&options=count,values'
+echo
+echo
+
+
+--REGEXPECT--
+01. GET /v2/types?options=values and get an empty list
+======================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+02. Create E1/T1/A1+A2
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. GET /v2/types?options=values and get a non-empty list
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 6
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    "T1"
+]
+
+
+04. Create E2/<null>/A1+A3 (using NGSIv1)
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 487
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "String",
+                        "value": ""
+                    },
+                    {
+                        "name": "A3",
+                        "type": "Bool",
+                        "value": ""
+                    }
+                ],
+                "id": "E2",
+                "isPattern": "false",
+                "type": ""
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+05. Create E3/T3/A2+A4
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=T3
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. GET /v2/types?options=values and get a list of three types
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 14
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    "",
+    "T1",
+    "T3"
+]
+
+
+07. GET /v2/types?options=values with limit, getting 2 types but Fiware-Total-Count 3
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 9
+Content-Type: application/json
+Fiware-Total-Count: 3
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    "",
+    "T1"
+]
+
+
+08. GET /v2/types?options=values with offset=3, thus out of limits
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Total-Count: 3
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

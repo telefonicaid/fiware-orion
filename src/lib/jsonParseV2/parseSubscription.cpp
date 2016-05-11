@@ -606,7 +606,11 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
       {
         delete scopeP->stringFilterP;
         delete scopeP;
-        return errorString;
+
+        alarmMgr.badInput(clientIp, errorString);
+        OrionError oe(SccBadRequest, errorString);
+
+        return oe.render(ciP, "");
       }
 
       scrP->restriction.scopeVector.push_back(scopeP);

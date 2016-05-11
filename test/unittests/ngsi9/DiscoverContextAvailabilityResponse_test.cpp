@@ -44,27 +44,20 @@
 *
 * render - 
 *
-* FIXME P5 #1862: _json countepart?
 */
-TEST(DiscoverContextAvailabilityResponse, DISABLED_render)
+TEST(DiscoverContextAvailabilityResponse, render)
 {
   DiscoverContextAvailabilityResponse  dcar1;
   std::string                          out;
-  const char*                          outfile1 = "ngsi9.discoverContextAvailabilityResponse.empty.valid.xml";
-  const char*                          outfile2 = "ngsi9.discoverContextAvailabilityResponse.error.valid.xml";
   StatusCode                           ec(SccBadRequest, "Detail");
   DiscoverContextAvailabilityResponse  dcar2(ec);
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   out = dcar1.render(DiscoverContextAvailability, "");
-  EXPECT_STREQ(expectedBuf, out.c_str());
   EXPECT_EQ(SccReceiverInternalError, dcar1.errorCode.code);
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   out = dcar2.render(DiscoverContextAvailability, "");
-  EXPECT_STREQ(expectedBuf, out.c_str());
   EXPECT_EQ(SccBadRequest, dcar2.errorCode.code);
 
   utExit();

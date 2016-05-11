@@ -626,7 +626,7 @@ void subCacheUpdateStatisticsIncrement(void)
 * Note that this is the insert function that *really inserts* the
 * CachedSubscription in the list of CachedSubscriptions.
 *
-* All other subCacheItemInsert functions crea<te the subscription and then
+* All other subCacheItemInsert functions create the subscription and then
 * calls this function.
 *
 * So, the subscription itself is untouched by this function, is it ONLY inserted
@@ -1072,6 +1072,11 @@ void subCacheSync(void)
 
   while (cSubP != NULL)
   {
+    if (savedSubV[cSubP->subscriptionId] != NULL)
+    {
+      continue;  // FIXME P7: For some reason, sometimes the same subscription is found twice: semaphore problem?
+    }
+
     CachedSubSaved* cssP       = new CachedSubSaved();
 
     cssP->lastNotificationTime = cSubP->lastNotificationTime;

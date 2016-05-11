@@ -42,9 +42,8 @@
 *
 * constructorsAndCheck -
 *
-* FIXME P5 #1862: _json countepart?
 */
-TEST(UnsubscribeContextAvailabilityRequest, DISABLED_constructorAndCheck)
+TEST(UnsubscribeContextAvailabilityRequest, constructorAndCheck)
 {
   UnsubscribeContextAvailabilityRequest ucar1;
   SubscriptionId                        subId("012345678901234567890123");
@@ -55,18 +54,7 @@ TEST(UnsubscribeContextAvailabilityRequest, DISABLED_constructorAndCheck)
   EXPECT_EQ("", ucar1.subscriptionId.get());
   EXPECT_EQ("012345678901234567890123", ucar2.subscriptionId.get());
 
-  std::string   out;
-  const char*   outfile1 = "ngsi9.unsubscribeContextAvailabilityResponse.forcedError.valid.xml";
-  const char*   outfile2 = "ngsi9.unsubscribeContextAvailabilityResponse.invalidSubscriptionId.valid.xml";
-
-  out = ucar1.check(UnsubscribeContextAvailability, "", "Forced Error", 0);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  ucar1.subscriptionId.set("1");
-  out = ucar1.check(UnsubscribeContextAvailability, "", "", 0);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  std::string   out;  
 
   out = ucar2.check(UnsubscribeContextAvailability, "", "", 0);
   EXPECT_EQ("OK", out);

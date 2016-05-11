@@ -66,14 +66,12 @@ TEST(ContextElementResponseVector, check)
 *
 * render - 
 *
-* FIXME P5 #1862: _json counterpart?
 */
-TEST(ContextElementResponseVector, DISABLED_render)
+TEST(ContextElementResponseVector, render)
 {
   ContextElementResponseVector  cerv;
   ContextElementResponse        cer;
   std::string                   out;
-  const char*                   outfile = "ngsi.contextElementResponseVector.render.middle.xml";
   ConnectionInfo                ci(JSON);
 
   utInit();
@@ -85,11 +83,6 @@ TEST(ContextElementResponseVector, DISABLED_render)
   cer.contextElement.entityId.type       = "Type";
   cer.contextElement.entityId.isPattern  = "false";
   cer.statusCode.fill(SccOk, "details");
-
-  cerv.push_back(&cer);
-  out = cerv.render(&ci, UpdateContextElement, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

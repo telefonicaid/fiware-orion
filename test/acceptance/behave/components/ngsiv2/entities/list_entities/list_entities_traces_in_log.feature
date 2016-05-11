@@ -112,8 +112,8 @@ Feature: verify fields in log traces with list entities request using NGSI v2.
     Then verify that receive an "OK" http code
     And verify that "1" entities are returned
     And verify headers in response
-      | parameter     | value |
-      | x-total-count | 1     |
+      | parameter          | value |
+      | fiware-total-count | 1     |
     And check in log, label "INFO" and message "Starting transaction from"
       | trace    | value              |
       | time     | ignored            |

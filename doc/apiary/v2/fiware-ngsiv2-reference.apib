@@ -548,6 +548,8 @@ The list of operators (and the format of the values they use) is as follows:
 + **Match pattern**: `~=`. The value matches a given pattern, expressed as a regular expression, e.g.
   `color=ow` matches `brown` or `yellow`. It only makes sense when used with attributes which contain strings.
 
+The symbol `:` can be used as synonym of `==`.
+
 In the case of equal or unequal, if the value to match include a `,`, you can use simple quote
 (`'`), e.g: `color=='light,green','deep,blue'`.
 
@@ -708,7 +710,7 @@ If `attrsFormat` is `values` then values entity partial representation mode is u
 }
 ```
 
-Notifications must include a `X-Ngsiv2-AttrsFormat` header with the value of `attrsFormat` of the associated subscription,
+Notifications must include a `Ngsiv2-AttrsFormat` header with the value of `attrsFormat` of the associated subscription,
 so notification receiver can know the format used without needing processing notification payload.
 
 ### Notification templates
@@ -788,7 +790,7 @@ Response code:
     
     + options (optional, string) - Options dictionary
       + Members
-          + count - when used, the total number of entities is returned in the response as a HTTP header named `X-Total-Count`.
+          + count - when used, the total number of entities is returned in the response as a HTTP header named `Fiware-Total-Count`.
           + keyValues - when used, the response payload uses `keyValues` simplified entity representation. See corresponding 
           section for details.
           + values - when used, the response payload uses `values` simplified entity representation. See corresponding 
@@ -1309,7 +1311,7 @@ Response code:
     + offset: 20 (optional, number) - Skip a number of records
     + options (optional, string) - Options dictionary
       + Members
-          + count - when used, the total types number is returned as a HTTP in the response named `X-Total-Count`
+          + count - when used, the total types number is returned as a HTTP in the response named `Fiware-Total-Count`
           + values - when used, the response payload is a JSON array with a list of entity types
 
 + Response 200 (application/json)
@@ -1458,7 +1460,7 @@ Response:
     + offset: 20 (optional, number) - Skip a number of records
     + options (optional, string) - Options dictionary
       + Members
-          + count - when used, the total subscriptions number is returned as a HTTP in the response named `X-Total-Count`
+          + count - when used, the total subscriptions number is returned as a HTTP in the response named `Fiware-Total-Count`
 
 + Response 200
 
@@ -1872,7 +1874,7 @@ Response code:
     + options (optional, string) - Options dictionary
       + Members
           + count - the total number of entities is returned in the response as an
-          HTTP header named `X-Total-Count`.
+          HTTP header named `Fiware-Total-Count`.
           + keyValues - when used, the response payload uses `keyValues` simplified entity representation. See corresponding
           section for details.
           + values - when used, the response payload uses `values` simplified entity representation. See corresponding
@@ -2027,7 +2029,7 @@ Response code:
     + offset: 22 (optional, number) - Skip a number of registrations
     + options (optional, string) - Options dictionary
         + Members
-          + count - when used, the total number of registrations is returned in the response as a HTTP header named `X-Total-Count`
+          + count - when used, the total number of registrations is returned in the response as a HTTP header named `Fiware-Total-Count`
 
 
 + Request (application/json)
