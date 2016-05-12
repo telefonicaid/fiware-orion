@@ -294,7 +294,7 @@ static void setCondsAndInitialNotify
                                             xauthToken,
                                             servicePathV,
                                             &(sub.restriction),
-                                            sub.status,
+                                            sub.status == ""?  STATUS_ACTIVE : sub.status,
                                             fiwareCorrelator,
                                             sub.notification.attributes); // requestP->attributeList.attributeV);
 
