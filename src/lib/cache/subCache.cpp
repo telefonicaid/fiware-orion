@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 #include "common/sem.h"
 #include "common/string.h"
+#include "apiTypesV2/HttpInfo.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/SubscribeContextRequest.h"
@@ -668,7 +669,7 @@ void subCacheItemInsert
 (
   const char*                   tenant,
   const char*                   servicePath,
-  const std::string&            url,
+  const ngsiv2::HttpInfo&       httpInfo,
   const EntityIdVector&         entityIdVector,
   const AttributeList&          attributeList,
   const NotifyConditionVector&  notifyConditionVector,
@@ -725,7 +726,7 @@ void subCacheItemInsert
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->servicePath           = strdup(servicePath);
   cSubP->subscriptionId        = strdup(subscriptionId);
-  cSubP->reference             = strdup(url.c_str());
+  cSubP->reference             = strdup(httpInfo.url.c_str());  // FIXME: CachedSubscription soon will have HttpInfo as well
   cSubP->expirationTime        = expirationTime;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
