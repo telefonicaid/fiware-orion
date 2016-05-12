@@ -33,6 +33,7 @@ SET (SOURCES
     statistics.cpp
     clockFunctions.cpp
     JsonHelper.cpp
+    substitute.cpp
 )
 
 SET (HEADERS
@@ -49,6 +50,7 @@ SET (HEADERS
     JsonHelper.h
     SyncQOverflow.h
     errorMessages.h
+    substitute.h
 )
 
 

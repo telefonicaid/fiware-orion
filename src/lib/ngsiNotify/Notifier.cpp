@@ -29,6 +29,7 @@
 #include "common/statistics.h"
 #include "common/limits.h"
 #include "common/RenderFormat.h"
+#include "common/substitute.h"
 #include "alarmMgr/alarmMgr.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "ngsi10/NotifyContextRequest.h"
@@ -48,17 +49,6 @@ Notifier::~Notifier (void)
   // Compilation fails when a warning occurs, and it is enabled 
   // compilation option -Werror "warnings being treated as errors" 
   LM_T(LmtNotImplemented, ("Notifier destructor is not implemented"));
-}
-
-
-
-/* ****************************************************************************
-*
-* substitute - 
-*/
-static void substitute(std::string* sP, const std::string& in, const ContextElement& ce)
-{
-  *sP = in;
 }
 
 
@@ -202,13 +192,13 @@ static bool templateNotify
                       "application/json",
                       payload,
                       fiwareCorrelator,
-                      "",                  // ngisv2AttrFormat
-                      false,               // don't use rush ... ?
+                      renderFormatToString(renderFormat),
+                      true,                // Use Rush if CLI '--rush' allows it
                       true,                // wait for response
                       &out,
                       headers,
                       "application/json",  // Accept Format
-                      5000);               // Timeout in milliseconds: FIXME PR: unhardwire
+                      -1);                 // Timeout in milliseconds, depends on CLI '--httpTimeout'
 
   if (r == 0)
   {
@@ -242,6 +232,17 @@ typedef struct NotificationAsTemplateParams
 /* ****************************************************************************
 *
 * sendNotifyContextRequestAsPerTemplate -
+*
+* This function splits the contextElementResponseVector for the notification
+* into N notifications, one per item in the vector.
+* This is done like this as otherwise the substitutions in the template would
+* not be possible.
+*
+* Note as well that sendNotifyContextRequestAsPerTemplate runs in a separate thread and all
+* N notifications are sent in a serialized manner, awaiting an ACK from the notification-receiver
+* before continuing with the next notification.
+* Actually, awaiting an ACK or a timeout (which is 5 seconds by default and configurable using the CLI
+* option '--httpTimeout').
 */
 void* sendNotifyContextRequestAsPerTemplate(void* p)
 {
@@ -262,7 +263,10 @@ void* sendNotifyContextRequestAsPerTemplate(void* p)
                    paramP->attrsOrder);
   }
 
+  paramP->ncrP->release();
+  delete paramP->ncrP;
   delete paramP;
+
   return NULL;
 }
 
@@ -303,6 +307,7 @@ void Notifier::sendNotifyContextRequest
     //   - if 'qs' contains query strings, add this to 'url', with the proper substitutions done
     //   - if 'headers' is non-empty, perform eventual substitutions and make sure the information is added as HTTP headers for the notification
     //   - if 'payload' is given, use that string as template instead of the default payload string, substituting all fields that are to be substituted
+    //   - if 'method' is given, then a custom HTTP method is used (instead of POST, which is default)
     //
     // Redirect to the method sendNotifyContextRequestAsPerTemplate() when 'httpInfo.extended' is TRUE.
     // 'httpInfo.extended' is FALSE by default and set to TRUE by the json parser.
@@ -321,19 +326,17 @@ void Notifier::sendNotifyContextRequest
       paramP->renderFormat     = renderFormat;
       paramP->attrsOrder       = attrsOrder;
 
-#if 0
-      sendNotifyContextRequestAsPerTemplate(paramP);
-#else
       pthread_t  tid;
       int        r = pthread_create(&tid, NULL, sendNotifyContextRequestAsPerTemplate, (void*) paramP);
+
       if (r != 0)
       {
         delete paramP;
         LM_E(("Runtime Error (error creating thread for notifications: %d)", r));
         return;
       }
+
       pthread_detach(tid);
-#endif
       return;
     }
 

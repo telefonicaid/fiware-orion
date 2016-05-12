@@ -902,6 +902,12 @@ TEST(mongoNotifyContextRequest, createEntity)
 
 
 
+//
+// FIXME: All following tests (templateNotification*) must be removed before
+//        merging into develop.
+//
+//
+
 /* ****************************************************************************
 *
 * templateNotificationVerb -
