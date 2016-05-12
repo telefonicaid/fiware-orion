@@ -131,6 +131,42 @@ static char* curlVersionGet(char* buf, int bufLen)
   return buf;
 }
 
+
+
+/* ****************************************************************************
+*
+* httpHeaderAdd - 
+*/
+static void httpHeaderAdd
+(
+  struct curl_slist**                        headersP,
+  const std::string&                         headerName,
+  const std::string&                         headerString,
+  int*                                       headerTotalSizeP,
+  const std::map<std::string, std::string>&  extraHeaders,
+  std::map<std::string, bool>&               usedExtraHeaders
+)
+{
+  std::string  h = headerString;
+
+  std::map<std::string, std::string>::const_iterator it;
+  it = extraHeaders.find(headerName);
+  if (it == extraHeaders.end())  // headerName NOT found in extraHeaders, use headerString
+  {
+    h = headerString;
+  }
+  else
+  {
+    h = headerName + ": " + it->second;
+    usedExtraHeaders[headerName.c_str()] = true;
+  }
+
+  *headersP           = curl_slist_append(*headersP, h.c_str());
+  *headerTotalSizeP  += h.size();
+}
+
+
+
 /* ****************************************************************************
 *
 * httpRequestSendWithCurl -
@@ -177,15 +213,16 @@ int httpRequestSendWithCurl
    long                                       timeoutInMilliseconds
 )
 {
-  char                       portAsString[STRING_SIZE_FOR_INT];
-  static unsigned long long  callNo             = 0;
-  std::string                result;
-  std::string                ip                 = _ip;
-  struct curl_slist*         headers            = NULL;
-  MemoryStruct*              httpResponse       = NULL;
-  CURLcode                   res;
-  int                        outgoingMsgSize       = 0;
-  std::string                content_type(orig_content_type);
+  char                            portAsString[STRING_SIZE_FOR_INT];
+  static unsigned long long       callNo             = 0;
+  std::string                     result;
+  std::string                     ip                 = _ip;
+  struct curl_slist*              headers            = NULL;
+  MemoryStruct*                   httpResponse       = NULL;
+  CURLcode                        res;
+  int                             outgoingMsgSize       = 0;
+  std::string                     content_type(orig_content_type);
+  std::map<std::string, bool>     usedExtraHeaders;
 
   ++callNo;
 
@@ -293,15 +330,18 @@ int httpRequestSendWithCurl
     snprintf(rushHeaderPortAsString, sizeof(rushHeaderPortAsString), "%d", rushHeaderPort);
     headerRushHttp = "X-relayer-host: " + rushHeaderIP + ":" + rushHeaderPortAsString;
     LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerRushHttp.c_str()));
-    headers = curl_slist_append(headers, headerRushHttp.c_str());
-    outgoingMsgSize += headerRushHttp.size();
+    httpHeaderAdd(&headers,
+                  "X-relayer-host",
+                  headerRushHttp,
+                  &outgoingMsgSize,
+                  extraHeaders,
+                  usedExtraHeaders);
 
     if (protocol == "https:")
     {
       headerRushHttp = "X-relayer-protocol: https";
       LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerRushHttp.c_str()));
-      headers = curl_slist_append(headers, headerRushHttp.c_str());
-      outgoingMsgSize += headerRushHttp.size();
+      httpHeaderAdd(&headers, "X-relayer-protocol", headerRushHttp, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
     }
   }
 
@@ -313,36 +353,34 @@ int httpRequestSendWithCurl
 
   snprintf(headerUserAgent, sizeof(headerUserAgent), "User-Agent: orion/%s libcurl/%s", versionGet(), curlVersionGet(cvBuf, sizeof(cvBuf)));
   LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerUserAgent));
-  headers = curl_slist_append(headers, headerUserAgent);
-  outgoingMsgSize += strlen(headerUserAgent) + 1;
+  httpHeaderAdd(&headers, "User-Agent", headerUserAgent, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Host
   char headerHost[HTTP_HEADER_HOST_MAX_LENGTH];
 
   snprintf(headerHost, sizeof(headerHost), "Host: %s:%d", ip.c_str(), (int) port);
   LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerHost));
-  headers = curl_slist_append(headers, headerHost);
-  outgoingMsgSize += strlen(headerHost) + 1;
+  httpHeaderAdd(&headers, "Host", headerHost, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Tenant
   if (tenant != "")
   {
-    headers = curl_slist_append(headers, ("fiware-service: " + tenant).c_str());
-    outgoingMsgSize += tenant.size() + 16; // "fiware-service: "
+    std::string fiwareService = std::string("fiware-service: ") + tenant;
+    httpHeaderAdd(&headers, "fiware-service", fiwareService, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
   }
 
   // ----- Service-Path
   if (servicePath != "")
   {
-    headers = curl_slist_append(headers, ("Fiware-ServicePath: " + servicePath).c_str());
-    outgoingMsgSize += servicePath.size() + strlen("Fiware-ServicePath: ");
+    std::string fiwareServicePath = std::string("Fiware-ServicePath: ") + servicePath;
+    httpHeaderAdd(&headers, "Fiware-ServicePath", fiwareServicePath, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
   }
 
   // ----- X-Auth-Token
   if (xauthToken != "")
   {
-    headers = curl_slist_append(headers, ("X-Auth-Token: " + xauthToken).c_str());
-    outgoingMsgSize += xauthToken.size() + strlen("X-Auth-Token: ");
+    std::string xauthTokenString = std::string("X-Auth-Token: ") + xauthToken;
+    httpHeaderAdd(&headers, "X-Auth-Token", xauthTokenString, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
   }
 
   // ----- Accept
@@ -353,46 +391,48 @@ int httpRequestSendWithCurl
   }
 
   std::string acceptString = "Accept: " + acceptedFormats;
-  headers = curl_slist_append(headers, acceptString.c_str());
-  outgoingMsgSize += acceptString.size();
+  httpHeaderAdd(&headers, "Accept", acceptString, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Expect
-  headers = curl_slist_append(headers, "Expect: ");
-  outgoingMsgSize += 8; // from "Expect: "
+  httpHeaderAdd(&headers, "Expect", "Expect: ", &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Content-length
   std::stringstream contentLengthStringStream;
   contentLengthStringStream << content.size();
   std::string headerContentLength = "Content-length: " + contentLengthStringStream.str();
   LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerContentLength.c_str()));
-  headers = curl_slist_append(headers, headerContentLength.c_str());
-  outgoingMsgSize += contentLengthStringStream.str().size() + 16; // from "Content-length: "
+  httpHeaderAdd(&headers, "Content-length", headerContentLength, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+
+  // Add the size of the actual payload
   outgoingMsgSize += content.size();
 
   // ----- Content-type
-  headers = curl_slist_append(headers, ("Content-type: " + content_type).c_str());
-  outgoingMsgSize += content_type.size() + 14; // from "Content-type: "
+  std::string contentTypeString = std::string("Content-type: ") + content_type;
+  httpHeaderAdd(&headers, "Content-type", contentTypeString, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // Fiware-Correlator
   std::string correlation = "Fiware-Correlator: " + fiwareCorrelation;
-  headers = curl_slist_append(headers, correlation.c_str());
-  outgoingMsgSize += correlation.size();
+  httpHeaderAdd(&headers, "Fiware-Correlator", correlation, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // Notify Format
   if ((ngisv2AttrFormat != "") && (ngisv2AttrFormat != "JSON") && (ngisv2AttrFormat != "legacy"))
   {
     std::string nFormat = "Ngsiv2-AttrsFormat: " + ngisv2AttrFormat;
-    headers = curl_slist_append(headers, nFormat.c_str());
-    outgoingMsgSize += nFormat.size();
+
+    httpHeaderAdd(&headers, "Ngsiv2-AttrsFormat", nFormat, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
   }
 
-  // Extra headers - FIXME PR: what it an 'extra header' is the same as one already present?
+  // Extra headers
   for (std::map<std::string, std::string>::const_iterator it = extraHeaders.begin(); it != extraHeaders.end(); ++it)
   {
-    std::string header = it->first + ": " + it->second;
-    headers = curl_slist_append(headers, header.c_str());
-    outgoingMsgSize += header.size();
-  }  
+    if (!usedExtraHeaders[it->first])
+    {
+      std::string header = it->first + ": " + it->second;
+      
+      headers = curl_slist_append(headers, header.c_str());
+      outgoingMsgSize += header.size();
+    }  
+  }
 
 
   // Check if total outgoing message size is too big

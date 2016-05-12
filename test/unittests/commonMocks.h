@@ -244,6 +244,31 @@ MATCHER_P(MatchHttpInfo, expected, "")
     return false;
   }
 
+  if (expectedP->verb != argP->verb)
+  {
+    return false;
+  }
+
+  if (expectedP->qs != argP->qs)
+  {
+    return false;
+  }
+
+  if (expectedP->headers != argP->headers)
+  {
+    return false;
+  }
+
+  if (expectedP->payload != argP->payload)
+  {
+    return false;
+  }
+
+  if (expectedP->extended != argP->extended)
+  {
+    return false;
+  }
+
   return true;
 }
 

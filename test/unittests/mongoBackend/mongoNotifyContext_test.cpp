@@ -902,6 +902,12 @@ TEST(mongoNotifyContextRequest, createEntity)
 
 
 
+//
+// FIXME: All following tests (templateNotification*) must be removed before
+//        merging into develop.
+//
+//
+
 /* ****************************************************************************
 *
 * templateNotificationVerb -
@@ -969,6 +975,37 @@ TEST(mongoNotifyContextRequest, templateNotificationStdPayload)
   httpInfo.extended      = true; 
   httpInfo.verb          = NOVERB;
   httpInfo.payload       = "";
+
+  notifier.sendNotifyContextRequest(&ncr, httpInfo, "", "", "", NGSI_V2_NORMALIZED, attrsOrder);
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* templateNotificationOverrideStdHeader -
+*/
+TEST(mongoNotifyContextRequest, templateNotificationOverrideStdHeader)
+{
+  utInit();
+
+  ngsiv2::HttpInfo          httpInfo("http://localhost:1028/notify");
+  Notifier                  notifier;
+  std::vector<std::string>  attrsOrder;
+  NotifyContextRequest      ncr;
+  ContextElementResponse    cer1;
+  
+  ncr.contextElementResponseVector.push_back(&cer1);
+
+  httpInfo.extended      = true; 
+  httpInfo.payload       = "{ \"Template\": \"payload\" }";
+  httpInfo.qs["qs1"]     = "q1";
+
+  httpInfo.headers["Content-Length"] = "1234";  // Override the 'real' Content-Length and must appear only once
+  httpInfo.headers["dup"]            = "DUP1";
+  httpInfo.headers["dup"]            = "DUP2";  // This header should appear TWICE - the user asked for it ...
 
   notifier.sendNotifyContextRequest(&ncr, httpInfo, "", "", "", NGSI_V2_NORMALIZED, attrsOrder);
 
