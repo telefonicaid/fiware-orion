@@ -357,7 +357,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
       type = typeOpt.value;
     }
 
-    EntID  eid(id, type, isPattern);
+    EntID  eid(id, isPattern, type);
 
     if (std::find(eivP->begin(), eivP->end(), eid) == eivP->end()) // if not already included
     {
