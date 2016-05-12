@@ -124,10 +124,8 @@ std::string jsonRequestTreat
 
   case SubscriptionsRequest:
     {
-      ngsiv2::SubscriptionUpdate* subsP = new ngsiv2::SubscriptionUpdate();
 
-      releaseP->subsP = subsP;
-      answer = parseSubscription(ciP, subsP);
+      answer = parseSubscription(ciP, &parseDataP->subsV2);
       if (answer != "OK")
       {
         return answer;
@@ -144,10 +142,7 @@ std::string jsonRequestTreat
 
   case IndividualSubscriptionRequest:
     {
-      ngsiv2::SubscriptionUpdate* subsP = new ngsiv2::SubscriptionUpdate();
-
-      releaseP->subsP = subsP;
-      answer = parseSubscription(ciP, subsP, true);  // NOTE: partial == true
+      answer = parseSubscription(ciP, &parseDataP->subsV2, true);  // NOTE: partial == true
       if (answer != "OK")
       {
         return answer;

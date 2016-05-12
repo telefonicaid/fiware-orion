@@ -37,19 +37,19 @@ static Opt<string> getStringAux(const Value& parent, const char* field, const st
     const Value& value = parent[field];
     if (!value.IsString())
     {
-      return Opt<string>((!description.empty() ? description : field) + "is not a string");
+      return Opt<string>((!description.empty() ? description : field) + " is not a string");
     }
 
     return Opt<string>(value.GetString(), true);
   }
   else if (!optional)
   {
-     return Opt<string>((!description.empty() ? description : field) + "is missing");
+     return Opt<string>((!description.empty() ? description : field) + " is missing");
   }
   return Opt<string>("", false);
 }
 
-std::string getString(const rapidjson::Value& parent, const char* field, const std::string& description) {
+string getString(const rapidjson::Value& parent, const char* field, const std::string& description) {
   Opt<string> os = getStringAux(parent, field, description, false);
   return os.value;
 }
@@ -65,14 +65,14 @@ static Opt<int64_t> getInt64Aux(const Value& parent, const char* field, const st
     const Value& value = parent[field];
     if (!value.IsInt64())
     {
-      return Opt<int64_t>((!description.empty() ? description : field) + "is not an int");
+      return Opt<int64_t>((!description.empty() ? description : field) + " is not an int");
     }
 
     return Opt<int64_t>(value.GetInt64(), true);
   }
   else if (!optional)
   {
-     return Opt<int64_t>((!description.empty() ? description : field) + "is missing");
+     return Opt<int64_t>((!description.empty() ? description : field) + " is missing");
   }
   return Opt<int64_t>(0, false);
 }

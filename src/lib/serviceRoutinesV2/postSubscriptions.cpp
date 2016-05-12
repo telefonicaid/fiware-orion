@@ -24,7 +24,7 @@
 */
 
 #include "alarmMgr/alarmMgr.h"
-#include "mongoBackend/mongoSubscribeContext.h"
+#include "mongoBackend/mongoCreateSubscription.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "common/statistics.h"
@@ -62,21 +62,25 @@ extern std::string postSubscriptions
     return answer;
   }
 
-  if (parseDataP->scr.res.attrsFormat == NO_FORMAT)
+  OrionError  beError;
+  std::string subsID;
+
+  TIMED_MONGO(subsID = mongoCreateSubscription(
+                          parseDataP->subsV2,
+                          &beError,
+                          ciP->uriParam,
+                          ciP->tenant,
+                          ciP->servicePathV,
+                          ciP->httpHeaders.xauthToken,
+                          ciP->httpHeaders.correlator));
+
+
+  if (beError.code != SccNone )
   {
-    parseDataP->scr.res.attrsFormat = NGSI_V2_NORMALIZED;
-  }
-
-  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV, ciP->httpHeaders.correlator));
-
-  parseDataP->scr.res.release();
-
-  if (scr.subscribeError.errorCode.code != SccNone )
-  {
-    TIMED_RENDER(answer = scr.render(SubscribeContext, ""));
+    TIMED_RENDER(answer = beError.render(ciP, ""));
     return answer;
   }
-  std::string location = "/v2/subscriptions/" + scr.subscribeResponse.subscriptionId.string;
+  std::string location = "/v2/subscriptions/" + subsID;
   ciP->httpHeader.push_back("Location");
   ciP->httpHeaderValue.push_back(location);
 
