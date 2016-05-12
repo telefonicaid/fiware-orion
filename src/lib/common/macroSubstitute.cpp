@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_COMMON_SUBSTITUTE_H_
-#define SRC_LIB_COMMON_SUBSTITUTE_H_
-
 /*
 *
 * Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
@@ -28,13 +25,15 @@
 #include <string>
 
 #include "ngsi/ContextElement.h"
+#include "common/macroSubstitute.h"
 
 
 
 /* ****************************************************************************
 *
-* substitute - 
+* macroSubstitute - 
 */
-extern void substitute(std::string* sP, const std::string& in, const ContextElement& ce);
-
-#endif  // SRC_LIB_COMMON_SUBSTITUTE_H_
+void macroSubstitute(std::string* sP, const std::string& in, const ContextElement& ce)
+{
+  *sP = in;
+}

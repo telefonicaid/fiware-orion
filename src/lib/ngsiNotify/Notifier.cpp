@@ -29,7 +29,7 @@
 #include "common/statistics.h"
 #include "common/limits.h"
 #include "common/RenderFormat.h"
-#include "common/substitute.h"
+#include "common/macroSubstitute.h"
 #include "alarmMgr/alarmMgr.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "ngsi10/NotifyContextRequest.h"
@@ -97,7 +97,7 @@ static bool templateNotify
   //
   // 2. URL
   //
-  substitute(&url, httpInfo.url, ce);
+  macroSubstitute(&url, httpInfo.url, ce);
 
 
   //
@@ -110,7 +110,7 @@ static bool templateNotify
   }
   else
   {
-    substitute(&payload, httpInfo.payload, ce);
+    macroSubstitute(&payload, httpInfo.payload, ce);
   }
 
 
@@ -122,7 +122,7 @@ static bool templateNotify
     std::string key   = it->first;
     std::string value = it->second;
 
-    substitute(&value, it->second, ce);
+    macroSubstitute(&value, it->second, ce);
     qs[key] = value;
   }
 
@@ -135,7 +135,7 @@ static bool templateNotify
     std::string key   = it->first;
     std::string value = it->second;
 
-    substitute(&value, it->second, ce);
+    macroSubstitute(&value, it->second, ce);
     headers[key] = value;
   }
 
