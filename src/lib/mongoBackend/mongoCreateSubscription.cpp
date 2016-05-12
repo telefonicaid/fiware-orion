@@ -76,6 +76,53 @@ static void setExpiration(const Subscription& sub, BSONObjBuilder* b)
 
 /* ****************************************************************************
 *
+* setExtendedHttpInfo -
+*
+*/
+static void setExtendedHttpInfo(const HttpInfo& httpInfo, BSONObjBuilder* b)
+{
+  if (httpInfo.verb != NOVERB)
+  {
+    std::string method = verbName(httpInfo.verb);
+    b->append(CSUB_METHOD, method);
+    LM_T(LmtMongo, ("Subscription method: %s", method.c_str()));
+  }
+
+  if (httpInfo.headers.size() > 0)
+  {
+    BSONObjBuilder headersBuilder;
+    for (std::map<std::string, std::string>::const_iterator it = httpInfo.headers.begin(); it != httpInfo.headers.end(); ++it)
+    {
+      headersBuilder.append(it->first, it->second);
+    }
+    BSONObj headersObj = headersBuilder.obj();
+
+    b->append(CSUB_HEADERS, headersObj);
+    LM_T(LmtMongo, ("Subscription headers: %s", headersObj.toString().c_str()));
+  }
+
+  if (httpInfo.qs.size() > 0)
+  {
+    BSONObjBuilder qsBuilder;
+    for (std::map<std::string, std::string>::const_iterator it = httpInfo.qs.begin(); it != httpInfo.qs.end(); ++it)
+    {
+      qsBuilder.append(it->first, it->second);
+    }
+    BSONObj qsObj = qsBuilder.obj();
+
+    b->append(CSUB_QS, qsObj);
+    LM_T(LmtMongo, ("Subscription qs: %s", qsObj.toString().c_str()));
+  }
+
+  if (httpInfo.payload != "")
+  {
+    b->append(CSUB_PAYLOAD, httpInfo.payload);
+    LM_T(LmtMongo, ("Subscription payload: %s", httpInfo.payload.c_str()));
+  }
+}
+
+/* ****************************************************************************
+*
 * setHttpInfo -
 *
 */
@@ -86,6 +133,11 @@ static void setHttpInfo(const Subscription& sub, BSONObjBuilder* b)
 
   LM_T(LmtMongo, ("Subscription reference: %s", sub.notification.httpInfo.url.c_str()));
   LM_T(LmtMongo, ("Subscription extended: %s", sub.notification.httpInfo.extended? "true" : "false"));
+
+  if (sub.notification.httpInfo.extended)
+  {
+    setExtendedHttpInfo(sub.notification.httpInfo, b);
+  }
 }
 
 
