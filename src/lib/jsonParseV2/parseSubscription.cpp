@@ -324,31 +324,20 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
     std::string  type;
     std::string  isPattern  = "false";
 
-    if (iter->HasMember("id"))
+    Opt<std::string> idOpt = getStringOpt(*iter,"id", "subject entities element id");
+    if (!idOpt.ok())
     {
-      if ((*iter)["id"].IsString())
-      {
-        id = (*iter)["id"].GetString();
-      }
-      else
-      {
-        return error(ciP, "subject entities element id is not a string");
-      }
+      return idOpt.error;
     }
+    id = idOpt.value;
 
-    if (iter->HasMember("idPattern"))
+    Opt<std::string> idPatOpt = getStringOpt(*iter,"idPattern", "subject entities element idPattern");
+    if (!idPatOpt.ok())
     {
-      if ((*iter)["idPattern"].IsString())
-      {
-        id = (*iter)["idPattern"].GetString();
-      }
-      else
-      {
-        return error(ciP, "subject entities element idPattern is not a string");
-      }
-
-      isPattern = "true";
+      return idOpt.error;
     }
+    id = idPatOpt.value;
+    isPattern = "true";
 
     if (id.empty())  // Only type was provided
     {
