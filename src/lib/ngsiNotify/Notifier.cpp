@@ -29,6 +29,7 @@
 #include "common/statistics.h"
 #include "common/limits.h"
 #include "common/RenderFormat.h"
+#include "common/macroSubstitute.h"
 #include "alarmMgr/alarmMgr.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "ngsi10/NotifyContextRequest.h"
@@ -54,18 +55,13 @@ Notifier::~Notifier (void)
 
 /* ****************************************************************************
 *
-* substitute - 
-*/
-static void substitute(std::string* sP, const std::string& in, const ContextElement& ce)
-{
-  *sP = in;
-}
-
-
-
-/* ****************************************************************************
-*
 * templateNotify - 
+*
+* This function performs the necessary substitutions according to the template of
+* subscription to form the desired notification and send it to the endpoint specified
+* in the subscription.
+* 
+* 
 */
 static bool templateNotify
 (
@@ -101,7 +97,7 @@ static bool templateNotify
   //
   // 2. URL
   //
-  substitute(&url, httpInfo.url, ce);
+  macroSubstitute(&url, httpInfo.url, ce);
 
 
   //
@@ -114,7 +110,7 @@ static bool templateNotify
   }
   else
   {
-    substitute(&payload, httpInfo.payload, ce);
+    macroSubstitute(&payload, httpInfo.payload, ce);
   }
 
 
@@ -126,7 +122,7 @@ static bool templateNotify
     std::string key   = it->first;
     std::string value = it->second;
 
-    substitute(&value, it->second, ce);
+    macroSubstitute(&value, it->second, ce);
     qs[key] = value;
   }
 
@@ -139,7 +135,7 @@ static bool templateNotify
     std::string key   = it->first;
     std::string value = it->second;
 
-    substitute(&value, it->second, ce);
+    macroSubstitute(&value, it->second, ce);
     headers[key] = value;
   }
 
@@ -273,7 +269,10 @@ void* sendNotifyContextRequestAsPerTemplate(void* p)
                    paramP->attrsOrder);
   }
 
+  paramP->ncrP->release();
+  delete paramP->ncrP;
   delete paramP;
+
   return NULL;
 }
 
@@ -333,19 +332,17 @@ void Notifier::sendNotifyContextRequest
       paramP->renderFormat     = renderFormat;
       paramP->attrsOrder       = attrsOrder;
 
-#if 0
-      sendNotifyContextRequestAsPerTemplate(paramP);
-#else
       pthread_t  tid;
       int        r = pthread_create(&tid, NULL, sendNotifyContextRequestAsPerTemplate, (void*) paramP);
+
       if (r != 0)
       {
         delete paramP;
         LM_E(("Runtime Error (error creating thread for notifications: %d)", r));
         return;
       }
+
       pthread_detach(tid);
-#endif
       return;
     }
 

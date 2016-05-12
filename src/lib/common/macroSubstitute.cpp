@@ -1,9 +1,6 @@
-#ifndef VERB_H
-#define VERB_H
-
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -27,42 +24,16 @@
 */
 #include <string>
 
+#include "ngsi/ContextElement.h"
+#include "common/macroSubstitute.h"
+
 
 
 /* ****************************************************************************
 *
-* Verb - 
-*   The list ist of verbs taken from https://tools.ietf.org/html/rfc7231, section 4.3
-*   and PATCH was added to that list (RFC 5789).
+* macroSubstitute - 
 */
-typedef enum Verb
+void macroSubstitute(std::string* sP, const std::string& in, const ContextElement& ce)
 {
-  GET,
-  PUT,
-  POST,
-  DELETE,
-  PATCH,
-  HEAD,
-  OPTIONS,
-  TRACE,
-  CONNECT,
-  NOVERB
-} Verb;
-
-
-
-/* ****************************************************************************
-*
-* verbName - 
-*/
-extern const char* verbName(Verb verb);
-
-
-
-/* ****************************************************************************
-*
-* stringToVerb - 
-*/
-extern Verb stringToVerb(const std::string& str);
-
-#endif
+  *sP = in;
+}
