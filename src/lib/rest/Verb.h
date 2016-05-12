@@ -26,7 +26,7 @@
 * Author: Ken Zangelin
 */
 
-
+#include <string>
 
 /* ****************************************************************************
 *
@@ -43,7 +43,8 @@ typedef enum Verb
   OPTIONS,
   TRACE,
   CONNECT,
-  NOVERB
+  NOVERB,
+  UNKOWNVERB
 } Verb;
 
 
@@ -53,5 +54,11 @@ typedef enum Verb
 * verbName - 
 */
 extern const char* verbName(Verb verb);
+
+/* ****************************************************************************
+*
+* verbName -
+*/
+extern Verb str2Verb(const std::string& str);
 
 #endif

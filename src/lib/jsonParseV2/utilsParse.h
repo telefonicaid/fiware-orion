@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_JSONPARSEV2_UTILSPARSE_H_
+#define SRC_LIB_JSONPARSEV2_UTILSPARSE_H_
+
 /*
 *
 * Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
@@ -23,8 +26,22 @@
 * Author: Orion dev team
 */
 
-#include "SubscriptionUpdate.h"
+#include "rapidjson/document.h"
 
-SubscriptionUpdate::SubscriptionUpdate()
-{
-}
+template <typename T>
+struct Opt {
+  T           value;
+  bool        given;
+  std::string error;
+  Opt(T v, bool g): value(v), given(g), error() {}
+  Opt(std::string err): value(), given(true), error(err) {}
+  bool ok() { return error.empty(); }
+};
+
+std::string getString(const rapidjson::Value& parent, const char* field,const std::string& description = "");
+Opt<std::string> getStringOpt(const rapidjson::Value& parent, const char* field, const std::string& description = "");
+
+int64_t getInt64(const rapidjson::Value& parent, const char* field, const std::string& description = "");
+Opt<int64_t> getInt64Opt(const rapidjson::Value& parent, const char* field, const std::string& description = "");
+
+#endif // SRC_LIB_JSONPARSEV2_UTILSPARSE_H

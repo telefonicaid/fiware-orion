@@ -225,7 +225,10 @@ HttpStatusCode mongoSubscribeContext
     cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
     subCacheItemInsert(tenant.c_str(),
                        servicePath.c_str(),
-                       requestP,
+                       requestP->reference.get(),
+                       requestP->entityIdVector,
+                       requestP->attributeList,
+                       requestP->notifyConditionVector,
                        oidString.c_str(),
                        expiration,
                        throttling,

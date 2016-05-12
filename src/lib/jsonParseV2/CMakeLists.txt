@@ -37,6 +37,7 @@ SET (SOURCES
     parseScopeVector.cpp
     parseScope.cpp
     parseBatchUpdate.cpp
+    utilsParse.cpp
 )
 
 SET (HEADERS
@@ -56,6 +57,7 @@ SET (HEADERS
     parseScopeVector.h
     parseScope.h
     parseBatchUpdate.h
+    utilsParse.h
 )
 
 

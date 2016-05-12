@@ -33,10 +33,12 @@
 
 #include "common/RenderFormat.h"
 #include "ngsi/NotifyConditionVector.h"
-#include "ngsi10/SubscribeContextRequest.h"
+#include "ngsi/EntityIdVector.h"
+#include "ngsi/AttributeList.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 
 using namespace mongo;
+
 
 
 /* ****************************************************************************
@@ -169,21 +171,24 @@ extern void subCachePresent(const char* title);
 */
 extern void subCacheItemInsert
 (
-  const char*               tenant,
-  const char*               servicePath,
-  SubscribeContextRequest*  scrP,
-  const char*               subscriptionId,
-  int64_t                   expiration,
-  int64_t                   throttling,
-  RenderFormat              renderFormat,
-  bool                      notificationDone,
-  int64_t                   lastNotificationTime,
-  StringFilter*             stringFilterP,
-  const std::string&        status,
-  const std::string&        q,
-  const std::string&        geometry,
-  const std::string&        coords,
-  const std::string&        georel
+  const char*                   tenant,
+  const char*                   servicePath,
+  const std::string&            url,
+  const EntityIdVector&         entityIdVector,
+  const AttributeList&          attributeList,
+  const NotifyConditionVector&  notifyConditionVector,
+  const char*                   subscriptionId,
+  int64_t                       expiration,
+  int64_t                       throttling,
+  RenderFormat                  renderFormat,
+  bool                          notificationDone,
+  int64_t                       lastNotificationTime,
+  StringFilter*                 stringFilterP,
+  const std::string&            status,
+  const std::string&            q,
+  const std::string&            geometry,
+  const std::string&            coords,
+  const std::string&            georel
 );
 
 

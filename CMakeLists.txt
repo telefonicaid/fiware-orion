@@ -133,6 +133,7 @@ SET (ORION_LIBS
     rest
     jsonParse
     jsonParseV2
+    rest
     apiTypesV2
     convenience
     ngsi9

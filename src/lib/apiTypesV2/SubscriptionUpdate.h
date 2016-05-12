@@ -1,6 +1,8 @@
 #ifndef SRC_LIB_APITYPESV2_SUBSCRIPTIONUPDATE_H_
 #define SRC_LIB_APITYPESV2_SUBSCRIPTIONUPDATE_H_
 
+#include "apiTypesV2/Subscription.h"
+
 namespace ngsiv2
 {
 
