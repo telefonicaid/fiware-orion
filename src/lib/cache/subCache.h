@@ -35,6 +35,7 @@
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/AttributeList.h"
+#include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 
 using namespace mongo;
@@ -173,7 +174,7 @@ extern void subCacheItemInsert
 (
   const char*                   tenant,
   const char*                   servicePath,
-  const std::string&            url,
+  const ngsiv2::HttpInfo&       httpInfo,
   const EntityIdVector&         entityIdVector,
   const AttributeList&          attributeList,
   const NotifyConditionVector&  notifyConditionVector,
