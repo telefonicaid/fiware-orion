@@ -56,6 +56,12 @@ Notifier::~Notifier (void)
 /* ****************************************************************************
 *
 * templateNotify - 
+*
+* This function performs the necessary substitutions according to the template of
+* subscription to form the desired notification and send it to the endpoint specified
+* in the subscription.
+* 
+* 
 */
 static bool templateNotify
 (
