@@ -183,7 +183,9 @@ static bool templateNotify
 
 
   //
-  // 8. HTTP headers - to httpRequestSend via parameter 'extraHeaders'
+  // 8. Send the request
+  //
+  //    NOTE: the HTTP headers are sent to httpRequestSend via parameter 'extraHeaders'
   //
   std::string  out;
   int          r;
