@@ -31,7 +31,7 @@
 #include "ngsi/ParseData.h"
 #include "rest/OrionError.h"
 #include "apiTypesV2/ErrorCode.h"
-#include "mongoBackend/mongoUpdateContextSubscription.h"
+#include "mongoBackend/mongoUpdateSubscription.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 #include "serviceRoutinesV2/patchSubscription.h"
 
@@ -59,47 +59,34 @@ std::string patchSubscription
 {
   std::string                        answer;
   std::string                        subscriptionId =  compV[2];
-  UpdateContextSubscriptionResponse  ucsr;
+
+  // 'Fill In' SusbcriptionUpdate
+  parseDataP->subsV2.id = subscriptionId;
 
 
-  // 'Fill In' UpdateContextSubscriptionRequest
-  parseDataP->ucsr.res.subscriptionId.set(subscriptionId);
-
+  OrionError beError;
   //
   // If a string-filter is present, it is parsed in 
   // jsonParseV2/parseSubscription.cpp, function parseNotifyConditionVector() and
-  // the resulting StringFilter object resides in a Scope in parseDataP->ucsr.res.restriction.scopeVector
+  // the resulting StringFilter object resides in a Scope in parseDataP->subsV2.restriction.scopeVector
   //
-  TIMED_MONGO(ciP->httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
-                                                                   &ucsr,
-                                                                   ciP->tenant,
-                                                                   ciP->httpHeaders.xauthToken,
-                                                                   ciP->servicePathV,
-                                                                   ciP->httpHeaders.correlator,
-                                                                   ciP->apiVersion));
+  TIMED_MONGO(mongoUpdateSubscription(parseDataP->subsV2,
+                                      &beError,
+                                      ciP->uriParam,
+                                      ciP->tenant,
+                                      ciP->servicePathV,
+                                      ciP->httpHeaders.xauthToken,
+                                      ciP->httpHeaders.correlator));
 
-  if (ciP->httpStatusCode != SccOk)
+
+  if (beError.code != SccNone)
   {
-    OrionError oe(ciP->httpStatusCode);
-
-    TIMED_RENDER(answer = oe.render(ciP, ""));
-
-    return answer;
-  }
-  else if (ucsr.subscribeError.errorCode.code != SccNone)
-  {
-    OrionError oe(ucsr.subscribeError.errorCode.code);
-
-    ciP->httpStatusCode = ucsr.subscribeError.errorCode.code;
-
-    oe.reasonPhrase = ucsr.subscribeError.errorCode.reasonPhrase;
-
-    if (ucsr.subscribeError.errorCode.code == SccContextElementNotFound)
+    if (beError.code == SccContextElementNotFound)
     {
-      oe.details = "The requested subscription has not been found. Check id";
+      beError.details = "The requested subscription has not been found. Check id";
     }
 
-    TIMED_RENDER(answer = oe.render(ciP, ""));
+    TIMED_RENDER(answer = beError.render(ciP, ""));
 
     return answer;
   }

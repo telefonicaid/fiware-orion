@@ -322,42 +322,46 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
     }
 
     std::string  id;
+    std::string  idPattern;
     std::string  type;
-    std::string  isPattern  = "false";
 
-    Opt<std::string> idOpt = getStringOpt(*iter,"id", "subject entities element id");
-    if (!idOpt.ok())
     {
-      return idOpt.error;
-    }
-    id = idOpt.value;
+      Opt<std::string> idOpt = getStringOpt(*iter,"id", "subject entities element id");
+      if (!idOpt.ok())
+      {
+        return idOpt.error;
+      }
+      id = idOpt.value;
 
-    Opt<std::string> idPatOpt = getStringOpt(*iter,"idPattern", "subject entities element idPattern");
-    if (!idPatOpt.ok())
-    {
-      return idOpt.error;
-    }
-    id = idPatOpt.value;
-    isPattern = "true";
-
-    if (id.empty())  // Only type was provided
-    {
-      id        = ".*";
-      isPattern = "true";
+      if (id.empty())
+      {
+        idPattern = ".*";
+      }
     }
 
+    {
+      Opt<std::string> idPatOpt = getStringOpt(*iter,"idPattern", "subject entities element idPattern");
+      if (!idPatOpt.ok())
+      {
+        return idPatOpt.error;
+      }
+      else if (idPatOpt.given)
+      {
+        idPattern = idPatOpt.value;
+      }
+    }
 
     Opt<std::string> typeOpt = getStringOpt(*iter, "type", "subject entities element type");
     if (!typeOpt.ok())
     {
       return typeOpt.error;
     }
-    if (typeOpt.given)
+    else if (typeOpt.given)
     {
       type = typeOpt.value;
     }
 
-    EntID  eid(id, isPattern, type);
+    EntID  eid(id, idPattern, type);
 
     if (std::find(eivP->begin(), eivP->end(), eid) == eivP->end()) // if not already included
     {
