@@ -223,7 +223,6 @@ HttpStatusCode mongoSubscribeContext
 
     LM_T(LmtSubCache, ("inserting a new sub in cache (%s)", oidString.c_str()));
 
-    // FIXME Px: In the near future, the subscription carries the HttpInfo
     ngsiv2::HttpInfo httpInfo;
 
     httpInfo.url = requestP->reference.get();
