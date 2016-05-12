@@ -30,6 +30,7 @@
 #include "alarmMgr/alarmMgr.h"
 #include "common/globals.h"
 #include "common/RenderFormat.h"
+#include "common/string.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "ngsi/Request.h"
@@ -408,18 +409,21 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     // http - url
     std::string url = getString(http, "url", "url http notification");
 
+    {
+       std::string  host;
+       int          port;
+       std::string  path;
+       std::string  protocol;
+
+       if (parseUrl(url, host, port, path, protocol) == false)
+       {
+          return error(ciP, "Invalid URL parsing notification url");
+       }
+    }
+
     subsP->notification.httpInfo.url =      url;
     subsP->notification.httpInfo.extended = false;
-    /*
-    std::string refError = scrP->reference.check(SubscribeContext, "" ,"", 0);
-    if (refError != "OK")
-    {
-      alarmMgr.badInput(clientIp, refError);
-      OrionError oe(SccBadRequest, refError + " parsing notification url");
 
-      return oe.render(ciP, "");
-    }
-    */
   }
   else if (notification.HasMember("httpExtended"))
   {
