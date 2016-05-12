@@ -152,7 +152,7 @@ void setThrottling(const Subscription& sub, BSONObjBuilder* b)
 */
 void setServicePath(const std::vector<std::string>& servicePathV, BSONObjBuilder* b)
 {
-  std::string servicePath = servicePathV[0] == ""? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
+  std::string servicePath = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
   b->append(CSUB_SERVICE_PATH, servicePath);
   LM_T(LmtMongo, ("Subscription servicePath: %s", servicePath.c_str()));
 }

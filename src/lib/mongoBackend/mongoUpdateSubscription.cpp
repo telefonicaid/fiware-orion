@@ -221,7 +221,7 @@ static void setEntities(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
 */
 static void setAttrs(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
 {
-  if (subUp.subjectProvided)
+  if (subUp.notificationProvided)
   {
     setAttrs(subUp, b);
   }
