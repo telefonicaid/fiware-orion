@@ -30,6 +30,7 @@
 #include "common/sem.h"
 #include "common/string.h"
 #include "apiTypesV2/HttpInfo.h"
+#include "apiTypesV2/ngsiWrappers.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/SubscribeContextRequest.h"
@@ -803,65 +804,6 @@ void subCacheItemInsert
 
 
 
-#if 1
-/* ****************************************************************************
-*
-* attrsStdVector2NotifyConditionVector -
-*
-*/
-static void attrsStdVector2NotifyConditionVector(const std::vector<std::string>& attrs, NotifyConditionVector* ncVP)
-{
-  NotifyCondition* nc = new NotifyCondition;
-  for (unsigned int ix = 0; ix < attrs.size(); ix++)
-  {
-    nc->condValueList.push_back(attrs[ix]);
-  }
-  nc->type = ON_CHANGE_CONDITION;
-  ncVP->push_back(nc);
-}
-
-
-/* ****************************************************************************
-*
-* attrsStdVector2AttributeList -
-*
-*/
-static void attrsStdVector2AttributeList(const std::vector<std::string>& attrs, AttributeList* attrLP)
-{
-  for (unsigned int ix = 0; ix < attrs.size(); ix++)
-  {
-    attrLP->push_back(attrs[ix]);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* entIdStdVector2EntityIdVector -
-*
-*/
-static void entIdStdVector2EntityIdVector(const std::vector<EntID>& entitiesV, EntityIdVector* enVP)
-{
-  for (unsigned int ix = 0; ix < entitiesV.size(); ix++)
-  {
-    EntityId* enP = new EntityId();
-    if (entitiesV[ix].id != "")
-    {
-      enP->fill(entitiesV[ix].id, entitiesV[ix].type, "false");
-    }
-    else // idPattern
-    {
-      enP->fill(entitiesV[ix].idPattern, entitiesV[ix].type, "true");
-    }
-    enVP->push_back(enP);
-  }
-}
-
-#endif
-
-
-
 /* ****************************************************************************
 *
 * subCacheItemInsert -
@@ -898,7 +840,7 @@ void subCacheItemInsert
 
   attrsStdVector2NotifyConditionVector(condAttributes, &ncV);
   entIdStdVector2EntityIdVector(entities, &enV);
-  attrsStdVector2AttributeList(notifAttributes, &attrL);
+  attrL.fill(notifAttributes);
 
   subCacheItemInsert(tenant,
                      servicePath,

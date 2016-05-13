@@ -2029,7 +2029,7 @@ BSONArray processConditionVector
 
   attrsStdVector2NotifyConditionVector(condAttributesV, &ncV);
   entIdStdVector2EntityIdVector(entitiesV, &enV);
-  attrsStdVector2AttributeList(notifAttributesV, &attrL);
+  attrL.fill(notifAttributesV);
 
   BSONArray arr = processConditionVector(&ncV,
                                          enV,
