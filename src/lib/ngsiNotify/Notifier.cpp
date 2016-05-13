@@ -204,7 +204,7 @@ static bool templateNotify
                       &out,
                       headers,
                       "application/json",  // Accept Format
-                      -1);                 // Timeout in milliseconds, depends on CLI '--httpTimeout'
+                      -1);                 // Timeout in milliseconds, depends on CLI '-httpTimeout'
 
   if (r == 0)
   {
@@ -248,7 +248,7 @@ typedef struct NotificationAsTemplateParams
 * N notifications are sent in a serialized manner, awaiting an ACK from the notification-receiver
 * before continuing with the next notification.
 * Actually, awaiting an ACK or a timeout (which is 5 seconds by default and configurable using the CLI
-* option '--httpTimeout').
+* option '-httpTimeout').
 */
 void* sendNotifyContextRequestAsPerTemplate(void* p)
 {
