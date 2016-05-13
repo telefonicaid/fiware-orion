@@ -263,6 +263,9 @@ void setCondsAndInitialNotify
 (
   const Subscription&              sub,
   const std::string&               subId,
+  const std::string&               status,
+  const std::string&               url,
+  RenderFormat                     attrsFormat,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
@@ -271,20 +274,24 @@ void setCondsAndInitialNotify
   bool*                            notificationDone
 )
 {
+  // Note that we cannot use status, url and attrsFormat from sub.status, as sub object
+  // could correspond to an update and the fields be missing (in which case the one from
+  // the original subscription has to be taken; the caller deal with that)
+
   /* Conds vector (and maybe and initial notification) */
   *notificationDone = false;
   BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             sub.subject.entities,
                                             sub.notification.attributes,
                                             subId,
-                                            sub.notification.httpInfo.url,
+                                            url,
                                             notificationDone,
-                                            sub.attrsFormat,
+                                            attrsFormat,
                                             tenant,
                                             xauthToken,
                                             servicePathV,
                                             &(sub.restriction),
-                                            sub.status == ""?  STATUS_ACTIVE : sub.status,
+                                            status,
                                             fiwareCorrelator,
                                             sub.notification.attributes);
 

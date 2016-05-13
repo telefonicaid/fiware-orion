@@ -34,6 +34,7 @@
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonSubscription.h"
+#include "mongoBackend/dbConstants.h"
 #include "common/defaultValues.h"
 #include "cache/subCache.h"
 
@@ -82,7 +83,10 @@ std::string mongoCreateSubscription
   setStatus(sub, &b);
   setEntities(sub, &b);
   setAttrs(sub, &b);
-  setCondsAndInitialNotify(sub, subId, tenant, servicePathV, xauthToken, fiwareCorrelator,
+
+  std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
+  setCondsAndInitialNotify(sub, subId, status, sub.notification.httpInfo.url, sub.attrsFormat,
+                           tenant, servicePathV, xauthToken, fiwareCorrelator,
                            &b, &notificationDone);
   if (notificationDone)
   {
@@ -110,7 +114,7 @@ std::string mongoCreateSubscription
   //
   // StringFilter in Scope?
   //
-  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in requestP->restriction.scopeVector?
+  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY sub.restriction.scopeVector?
   // If so, set it as string filter to the sub-cache item
   //
   StringFilter*  stringFilterP = NULL;

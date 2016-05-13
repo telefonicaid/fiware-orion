@@ -260,8 +260,39 @@ static void setCondsAndInitialNotify
 
   if (subUp.subjectProvided)
   {
-    bool      notificationDone;
-    setCondsAndInitialNotify(subUp, subUp.id, tenant, servicePathV, xauthToken, fiwareCorrelator,
+    std::string status;
+    if (subUp.statusProvided)
+    {
+      status = subUp.status;
+    }
+    else
+    {
+      status = subOrig.hasField(CSUB_STATUS)? getStringFieldF(subOrig, CSUB_STATUS) : STATUS_ACTIVE;
+    }
+
+    std::string url;
+    if (subUp.notificationProvided)
+    {
+      url = subUp.notification.httpInfo.url;
+    }
+    else
+    {
+      url = getStringFieldF(subOrig, CSUB_REFERENCE);
+    }
+
+    RenderFormat attrsFormat;
+    if (subUp.attrsFormatProvided)
+    {
+      attrsFormat = subUp.attrsFormat;
+    }
+    else
+    {
+      attrsFormat = subOrig.hasField(CSUB_ATTRS)? stringToRenderFormat(getStringFieldF(subOrig, CSUB_ATTRS)) : NGSI_V2_NORMALIZED;
+    }
+
+    bool notificationDone;
+    setCondsAndInitialNotify(subUp, subUp.id, status, url, attrsFormat,
+                             tenant, servicePathV, xauthToken, fiwareCorrelator,
                              b, &notificationDone);
   }
   else
@@ -494,7 +525,7 @@ std::string mongoUpdateSubscription
   //
   // StringFilter in Scope?
   //
-  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in requestP->restriction.scopeVector?
+  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in subUp.restriction.scopeVector?
   // If so, set it as string filter to the sub-cache item
   //
   StringFilter*  stringFilterP = NULL;
@@ -549,7 +580,7 @@ std::string mongoUpdateSubscription
                                           servicePathCache,
                                           lastNotification,
                                           doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
-                                          doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_EXPIRATION) : STATUS_ACTIVE,
+                                          doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_STATUS) : STATUS_ACTIVE,
                                           doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_Q) : "",
                                           doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_GEOM) : "",
                                           doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_COORDS) : "",
