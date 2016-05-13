@@ -467,6 +467,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
 
   // Attributes
+  if (notification.HasMember("attrs") && notification.HasMember("exceptAttrs"))
+  {
+    return error(ciP, "http notification has attrs and exceptAttrs");
+  }
   if (notification.HasMember("attrs"))
   {
     std::string r = parseAttributeList(ciP, &subsP->notification.attributes, notification["attrs"]);
@@ -475,6 +479,19 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     {
       return r;
     }
+
+    subsP->notification.blackList = false;
+  }
+  else if (notification.HasMember("exceptAttrs"))
+  {
+    std::string r = parseAttributeList(ciP, &subsP->notification.attributes, notification["exceptAttrs"]);
+
+    if (r != "")
+    {
+      return r;
+    }
+
+    subsP->notification.blackList = true;
   }
 
    return "";
