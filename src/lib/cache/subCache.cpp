@@ -36,6 +36,12 @@
 #include "cache/subCache.h"
 #include "alarmMgr/alarmMgr.h"
 
+#include "apiTypesV2/Subscription.h" // FIXME PR: remove after moving things to ngsiWrapper
+#include "ngsi/ConditionValueList.h" // FIXME PR: remove after moving things to ngsiWrapper
+#include "ngsi/EntityIdVector.h"     // FIXME PR: remove after moving things to ngsiWrapper
+#include "ngsi/AttributeList.h"      // FIXME PR: remove after moving things to ngsiWrapper
+using namespace ngsiv2;              // FIXME PR: remove after moving things to ngsiWrapper
+
 using std::map;
 
 
@@ -803,7 +809,7 @@ void subCacheItemInsert
 * attrsStdVector2NotifyConditionVector -
 *
 */
-void attrsStdVector2NotifyConditionVector(const std::vector<std::string>& attrs, NotifyConditionVector* ncVP)
+static void attrsStdVector2NotifyConditionVector(const std::vector<std::string>& attrs, NotifyConditionVector* ncVP)
 {
   NotifyCondition* nc = new NotifyCondition;
   for (unsigned int ix = 0; ix < attrs.size(); ix++)
@@ -820,7 +826,7 @@ void attrsStdVector2NotifyConditionVector(const std::vector<std::string>& attrs,
 * attrsStdVector2AttributeList -
 *
 */
-void attrsStdVector2AttributeList(const std::vector<std::string>& attrs, AttributeList* attrLP)
+static void attrsStdVector2AttributeList(const std::vector<std::string>& attrs, AttributeList* attrLP)
 {
   for (unsigned int ix = 0; ix < attrs.size(); ix++)
   {
@@ -835,7 +841,7 @@ void attrsStdVector2AttributeList(const std::vector<std::string>& attrs, Attribu
 * entIdStdVector2EntityIdVector -
 *
 */
-void entIdStdVector2EntityIdVector(const std::vector<EntID>& entitiesV, EntityIdVector* enVP)
+static void entIdStdVector2EntityIdVector(const std::vector<EntID>& entitiesV, EntityIdVector* enVP)
 {
   for (unsigned int ix = 0; ix < entitiesV.size(); ix++)
   {
@@ -869,7 +875,7 @@ void subCacheItemInsert
   const char*                        servicePath,
   const ngsiv2::HttpInfo&            httpInfo,
   const std::vector<ngsiv2::EntID>&  entities,
-  const std::vector<std::string>&    attributes,
+  const std::vector<std::string>&    notifAttributes,
   const std::vector<std::string>&    condAttributes,
   const char*                        subscriptionId,
   int64_t                            expiration,
@@ -890,15 +896,15 @@ void subCacheItemInsert
   EntityIdVector        enV;
   AttributeList         attrL;
 
-  attrsStdVector2NotifyConditionVector(condAttributesV, &ncV);
-  entIdStdVector2EntityIdVector(entitiesV, &enV);
-  attrsStdVector2AttributeList(notifAttributesV, &attrL);
+  attrsStdVector2NotifyConditionVector(condAttributes, &ncV);
+  entIdStdVector2EntityIdVector(entities, &enV);
+  attrsStdVector2AttributeList(notifAttributes, &attrL);
 
   subCacheItemInsert(tenant,
                      servicePath,
                      httpInfo,
                      enV,
-                     attributeL,
+                     attrL,
                      ncV,
                      subscriptionId,
                      expiration,

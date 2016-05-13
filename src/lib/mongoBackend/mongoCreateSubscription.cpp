@@ -70,8 +70,8 @@ std::string mongoCreateSubscription
   // Build the BSON object to insert
   BSONObjBuilder b;
   std::string    servicePath = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
-  bool           notificationDone;
-  long long      lastNotification;
+  bool           notificationDone = false;
+  long long      lastNotification = 0;
 
   const std::string subId = setNewSubscriptionId(&b);
   setExpiration(sub, &b);
@@ -82,8 +82,15 @@ std::string mongoCreateSubscription
   setStatus(sub, &b);
   setEntities(sub, &b);
   setAttrs(sub, &b);
-  setCondsAndInitialNotify(sub, subId, tenant, servicePathV, xauthToken, fiwareCorrelator, true,
-                           &b, &notificationDone, &lastNotification);
+  setCondsAndInitialNotify(sub, subId, tenant, servicePathV, xauthToken, fiwareCorrelator,
+                           &b, &notificationDone);
+  if (notificationDone)
+  {
+    long long lastNotification = (long long) getCurrentTime();
+    setLastNotification(lastNotification, &b);
+    setCount(1, &b);
+  }
+
   setExpression(sub, &b);
   setFormat(sub, &b);
 
@@ -99,7 +106,7 @@ std::string mongoCreateSubscription
   }
 
   // Insert in csub cache
-#if 0
+
   //
   // StringFilter in Scope?
   //
@@ -120,15 +127,15 @@ std::string mongoCreateSubscription
   subCacheItemInsert(tenant.c_str(),
                      servicePath.c_str(),
                      sub.notification.httpInfo,
-                     sub.subject.entities, //requestP->entityIdVector,
-                     sub.notification.attributes, //requestP->attributeList,
-                     sub.subject.condition.attributes, //requestP->notifyConditionVector,
+                     sub.subject.entities,
+                     sub.notification.attributes,
+                     sub.subject.condition.attributes,
                      subId.c_str(),
                      sub.expires,
                      sub.throttling,
                      sub.attrsFormat,
                      notificationDone,
-                     lastNotificationTime,
+                     lastNotification,
                      stringFilterP,
                      sub.status,
                      sub.subject.condition.expression.q,
@@ -137,7 +144,6 @@ std::string mongoCreateSubscription
                      sub.subject.condition.expression.georel);
 
   cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
-#endif
 
   reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);
 

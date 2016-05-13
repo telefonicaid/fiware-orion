@@ -2000,7 +2000,7 @@ BSONArray processConditionVector
 * attrsStdVector2NotifyConditionVector -
 *
 */
-void attrsStdVector2NotifyConditionVector(const std::vector<std::string>& attrs, NotifyConditionVector* ncVP)
+static void attrsStdVector2NotifyConditionVector(const std::vector<std::string>& attrs, NotifyConditionVector* ncVP)
 {
   NotifyCondition* nc = new NotifyCondition;
   for (unsigned int ix = 0; ix < attrs.size(); ix++)
@@ -2017,7 +2017,7 @@ void attrsStdVector2NotifyConditionVector(const std::vector<std::string>& attrs,
 * attrsStdVector2AttributeList -
 *
 */
-void attrsStdVector2AttributeList(const std::vector<std::string>& attrs, AttributeList* attrLP)
+static void attrsStdVector2AttributeList(const std::vector<std::string>& attrs, AttributeList* attrLP)
 {
   for (unsigned int ix = 0; ix < attrs.size(); ix++)
   {
@@ -2032,7 +2032,7 @@ void attrsStdVector2AttributeList(const std::vector<std::string>& attrs, Attribu
 * entIdStdVector2EntityIdVector -
 *
 */
-void entIdStdVector2EntityIdVector(const std::vector<EntID>& entitiesV, EntityIdVector* enVP)
+static void entIdStdVector2EntityIdVector(const std::vector<EntID>& entitiesV, EntityIdVector* enVP)
 {
   for (unsigned int ix = 0; ix < entitiesV.size(); ix++)
   {

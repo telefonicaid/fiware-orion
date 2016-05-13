@@ -266,11 +266,9 @@ void setCondsAndInitialNotify
   const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator,
-  bool                             newCount,
+  const std::string&               fiwareCorrelator,  
   BSONObjBuilder*                  b,
-  bool*                            notificationDone,
-  long long*                       lastNotification
+  bool*                            notificationDone
 )
 {
   /* Conds vector (and maybe and initial notification) */
@@ -292,29 +290,32 @@ void setCondsAndInitialNotify
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
+}
 
-  /* Last notification */
-  *lastNotification = 0;
-  if (notificationDone)
-  {
-    *lastNotification = (long long) getCurrentTime();
 
-    b->append(CSUB_LASTNOTIFICATION, *lastNotification);
-    LM_T(LmtMongo, ("Subscription lastNotification: %lu", *lastNotification));
 
-    if (newCount)
-    {
-      // for new subscriptions
-      b->append(CSUB_COUNT, (long long) 1);
-      LM_T(LmtMongo, ("Subscription count: 1"));
-    }
-    else
-    {
-      // for updated subscriptions
-      b->append(CSUB_COUNT, BSON("$inc" << (long long) 1));
-      LM_T(LmtMongo, ("Subscription count: +1"));
-    }
-  }
+/* ****************************************************************************
+*
+* setLastNotification -
+*
+*/
+void setLastNotification(long long lastNotification, BSONObjBuilder* b)
+{
+  b->append(CSUB_LASTNOTIFICATION, lastNotification);
+  LM_T(LmtMongo, ("Subscription lastNotification: %lu", lastNotification));
+}
+
+
+
+/* ****************************************************************************
+*
+* setCount -
+*
+*/
+void setCount(long long count, BSONObjBuilder* b)
+{
+  b->append(CSUB_COUNT, count);
+  LM_T(LmtMongo, ("Subscription count: %lu", count));
 }
 
 

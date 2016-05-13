@@ -124,11 +124,27 @@ extern void setCondsAndInitialNotify
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
-  bool                             newCount,
   BSONObjBuilder*                  b,
-  bool*                            notificationDone,
-  long long*                       lastNotification
+  bool*                            notificationDone
 );
+
+
+
+/* ****************************************************************************
+*
+* setLastNotification -
+*
+*/
+void setLastNotification(long long lastNotification, BSONObjBuilder* b);
+
+
+
+/* ****************************************************************************
+*
+* setCount -
+*
+*/
+void setCount(long long count, BSONObjBuilder* b);
 
 
 

@@ -37,7 +37,10 @@
 #include "mongoBackend/MongoCommonSubscription.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
+#include "mongoBackend/mongoSubCache.h"
 #include "common/defaultValues.h"
+
+#include "cache/subCache.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -248,38 +251,81 @@ static void setCondsAndInitialNotify
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
-  BSONObjBuilder*                  b
+  BSONObjBuilder*                  b,
+  bool*                            notificationDone
 )
 {
+  // notification can be changed by true by setCondsAndInitialNotify()
+  *notificationDone = false;
+
   if (subUp.subjectProvided)
   {
-    long long lastNotification;  // FIXME
-    bool      notificationDone;  // FIXME
-    setCondsAndInitialNotify(subUp, subUp.id, tenant, servicePathV, xauthToken, fiwareCorrelator, false,
-                             b, &notificationDone, &lastNotification);
+    bool      notificationDone;
+    setCondsAndInitialNotify(subUp, subUp.id, tenant, servicePathV, xauthToken, fiwareCorrelator,
+                             b, &notificationDone);
   }
   else
-  {
+  {    
     BSONArray conds = getArrayFieldF(subOrig, CSUB_CONDITIONS);
     b->append(CSUB_CONDITIONS, conds);
     LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
+  }
+}
 
-    if (subOrig.hasField(CSUB_LASTNOTIFICATION))
-    {
-      long long lastNotification = getLongFieldF(subOrig, CSUB_LASTNOTIFICATION);
-      b->append(CSUB_LASTNOTIFICATION, lastNotification);
-      LM_T(LmtMongo, ("Subscription lastNotification: %lu", lastNotification));
-    }
 
-    if (subOrig.hasField(CSUB_COUNT))
+
+/* ****************************************************************************
+*
+* setCount -
+*
+*/
+static void setCount(long long inc, const BSONObj& subOrig, BSONObjBuilder* b)
+{
+  if (subOrig.hasField(CSUB_COUNT))
+  {
+    long long count = getIntOrLongFieldAsLongF(subOrig, CSUB_COUNT);
+    setCount(count + inc, b);
+  }
+  else
+  {
+    // In this case we only add if inc is different from 0
+    if (inc > 0)
     {
-      long long count = getLongFieldF(subOrig, CSUB_COUNT);
-      b->append(CSUB_COUNT, count);
-      LM_T(LmtMongo, ("Subscription lastNotification: %lu", count));
+      setCount(inc, b);
     }
   }
 }
 
+
+
+/* ****************************************************************************
+*
+* setLastNotification -
+*
+*/
+static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
+{
+  // FIXME P1: if CSUB_LASTNOTIFICATION is not in the original doc, it will also not be in the new doc.
+  //           Is this necessary?
+  //           The implementation would get a lot simpler if we ALWAYS add CSUB_LASTNOTIFICATION and CSUB_COUNT
+  //           to 'newSub'
+  if (subOrig.hasField(CSUB_LASTNOTIFICATION))
+  {
+    long long lastNotification = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTNOTIFICATION);
+
+    //
+    // Compare with 'lastNotificationTime', that might come from the sub-cache.
+    // If the cached value of lastNotificationTime is higher, then use it.
+    //
+    if (subCacheP != NULL && (subCacheP->lastNotificationTime > lastNotification))
+    {
+      lastNotification = subCacheP->lastNotificationTime;
+    }
+
+    setLastNotification(lastNotification, b);
+  }
+
+}
 
 
 /* ****************************************************************************
@@ -387,9 +433,12 @@ std::string mongoUpdateSubscription
     return "";
   }
 
-  // Build the BSON object (using subOrig as starting point)
+  // Build the BSON object (using subOrig as starting point plus some info from cache)
   BSONObjBuilder b;
-  std::string servicePath = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
+  std::string         servicePath  = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
+  CachedSubscription* subCacheP    = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
+  bool                notificationDone = false;
+  long long           lastNotification = 0;
 
   setExpiration(subUp, subOrig, &b);
   setHttpInfo(subUp, subOrig, &b);
@@ -399,7 +448,34 @@ std::string mongoUpdateSubscription
   setStatus(subUp, subOrig, &b);
   setEntities(subUp, subOrig, &b);
   setAttrs(subUp, subOrig, &b);
-  setCondsAndInitialNotify(subUp, subOrig, tenant, servicePathV, xauthToken, fiwareCorrelator, &b);
+  setCondsAndInitialNotify(subUp, subOrig, tenant, servicePathV, xauthToken, fiwareCorrelator,
+                           &b, &notificationDone);
+
+  if (notificationDone)
+  {
+    lastNotification = (long long) getCurrentTime();
+    long long countInc         = 1;
+
+    // Update sub-cache
+    // FIXME PR: this is safe without sem?
+    //
+    if (subCacheP != NULL)
+    {
+      subCacheP->count                 += 1; // 'count' to be reset later if DB operation OK
+      subCacheP->lastNotificationTime  = lastNotification;
+
+      countInc = subCacheP->count;     // already inc with +1
+    }
+
+    setLastNotification(lastNotification, &b);
+    setCount(countInc, subOrig, &b);
+  }
+  else
+  {
+    setLastNotification(subOrig, subCacheP, &b);
+    setCount(0, subOrig, &b);
+  }
+
   setExpression(subUp, subOrig, &b);
   setFormat(subUp, subOrig, &b);
 
@@ -414,7 +490,86 @@ std::string mongoUpdateSubscription
   }
 
   // Update in cache
-  // TBD
+
+  //
+  // StringFilter in Scope?
+  //
+  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in requestP->restriction.scopeVector?
+  // If so, set it as string filter to the sub-cache item
+  //
+  StringFilter*  stringFilterP = NULL;
+
+  for (unsigned int ix = 0; ix < subUp.restriction.scopeVector.size(); ++ix)
+  {
+    if (subUp.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
+    {
+      stringFilterP = subUp.restriction.scopeVector[ix]->stringFilterP;
+    }
+  }
+
+  //
+  // Modification of the subscription cache
+  //
+  // The subscription "before this update" is looked up in cache and referenced by 'cSubP'.
+  // The "updated subscription information" is in 'newSubObject' (mongo BSON object format).
+  //
+  // All we need to do now for the cache is to:
+  //   1. Remove 'cSubP' from sub-cache (if present)
+  //   2. Create 'newSubObject' in sub-cache (if applicable)
+  //
+  // The subscription is already updated in mongo.
+  //
+  //
+  // There are four different scenarios here:
+  //   1. Old sub was in cache, new sub enters cache
+  //   2. Old sub was NOT in cache, new sub enters cache
+  //   3. Old subwas in cache, new sub DOES NOT enter cache
+  //   4. Old sub was NOT in cache, new sub DOES NOT enter cache
+  //
+  // This is resolved by two separate functions, one that removes the old one, if found (subCacheItemLookup+subCacheItemRemove),
+  // and the other one that inserts the sub, IF it should be inserted (subCacheItemInsert).
+  // If inserted, subCacheUpdateStatisticsIncrement is called to update the statistics counter of insertions.
+  //
+
+
+  // 0. Lookup matching subscription in subscription-cache
+
+  cacheSemTake(__FUNCTION__, "Updating cached subscription");
+
+  // FIXME PR: second lookup for the same in the same function? We already got this some lines ago...
+  subCacheP = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
+
+  char* servicePathCache = (char*) ((subCacheP == NULL)? "" : subCacheP->servicePath);
+
+  LM_T(LmtSubCache, ("update: %s", doc.toString().c_str()));
+
+  int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
+                                          doc,
+                                          subUp.id.c_str(),
+                                          servicePathCache,
+                                          lastNotification,
+                                          subUp.expires,
+                                          subUp.status,
+                                          subUp.subject.condition.expression.q,
+                                          subUp.subject.condition.expression.geometry,
+                                          subUp.subject.condition.expression.coords,
+                                          subUp.subject.condition.expression.georel,
+                                          stringFilterP,
+                                          subUp.attrsFormat);
+
+  if (subCacheP != NULL)
+  {
+    LM_T(LmtSubCache, ("Calling subCacheItemRemove"));
+    subCacheItemRemove(subCacheP);
+  }
+
+  if (mscInsert == 0)  // 0: Insertion was really made
+  {
+    subCacheUpdateStatisticsIncrement();
+  }
+
+  cacheSemGive(__FUNCTION__, "Updating cached subscription");
+
 
   reqSemGive(__FUNCTION__, "ngsiv2 update subscription request", reqSemTaken);
 
