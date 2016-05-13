@@ -30,8 +30,10 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "apiTypesV2/HttpInfo.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoNotifyContext.h"
+#include "ngsi10/NotifyContextRequest.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -898,3 +900,83 @@ TEST(mongoNotifyContextRequest, createEntity)
     utExit();
 }
 
+
+
+//
+// FIXME: All following tests (templateNotification*) must be removed before
+//        merging into develop.
+//
+//
+
+/* ****************************************************************************
+*
+* templateNotificationVerb -
+*/
+TEST(mongoNotifyContextRequest, templateNotificationVerb)
+{
+  utInit();
+
+  ngsiv2::HttpInfo          httpInfo("http://localhost:1028/notify");
+  Notifier                  notifier;
+  std::vector<std::string>  attrsOrder;
+  NotifyContextRequest      ncr;
+  ContextElementResponse    cer1;
+  ContextElementResponse    cer2;
+  ContextElementResponse    cer3;
+  
+  ncr.contextElementResponseVector.push_back(&cer1);
+  ncr.contextElementResponseVector.push_back(&cer2);
+  ncr.contextElementResponseVector.push_back(&cer3);
+
+  httpInfo.extended      = true; 
+  httpInfo.verb          = PUT;
+  httpInfo.payload       = "{ \"Template\": \"payload\" }";
+  httpInfo.qs["qs1"]     = "q1";
+  httpInfo.qs["qs2"]     = "q2";
+  httpInfo.headers["h1"] = "h1";
+  httpInfo.headers["h2"] = "h2";
+  httpInfo.headers["h3"] = "h3";
+
+  notifier.sendNotifyContextRequest(&ncr, httpInfo, "", "", "", NGSI_V2_NORMALIZED, attrsOrder);
+
+  utExit();
+}
+
+
+/* ****************************************************************************
+*
+* templateNotificationStdPayload -
+*/
+TEST(mongoNotifyContextRequest, templateNotificationStdPayload)
+{
+  utInit();
+
+  ngsiv2::HttpInfo          httpInfo("http://localhost:1028/notify");
+  Notifier                  notifier;
+  std::vector<std::string>  attrsOrder;
+  NotifyContextRequest      ncr;
+  ContextElementResponse    cer0;
+  ContextElementResponse    cer1;
+  ContextElementResponse    cer2;
+
+  prepareDatabase();
+
+  ncr.subscriptionId.set("51307b66f481db11bf860001");
+  ncr.originator.set("localhost");
+
+  cer0.contextElement.entityId.fill("E.*", "", "true");
+  cer1.contextElement.entityId.fill("E1",  "", "false");
+  cer2.contextElement.entityId.fill("E2",  "", "false");
+
+  ncr.contextElementResponseVector.push_back(&cer0);
+  ncr.contextElementResponseVector.push_back(&cer1);
+  ncr.contextElementResponseVector.push_back(&cer2);
+
+  httpInfo.extended      = true; 
+  httpInfo.verb          = NOVERB;
+  httpInfo.payload       = "";
+
+  notifier.sendNotifyContextRequest(&ncr, httpInfo, "", "", "", NGSI_V2_NORMALIZED, attrsOrder);
+
+  utExit();
+}

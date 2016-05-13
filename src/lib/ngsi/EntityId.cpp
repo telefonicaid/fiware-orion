@@ -137,7 +137,7 @@ std::string EntityId::render
 *
 * EntityId::toJson - 
 */
-std::string EntityId::toJson(void)
+std::string EntityId::toJson(void) const
 {
   std::string  out;
   char*        typeEscaped  = htmlEscape(type.c_str());

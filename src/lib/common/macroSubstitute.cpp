@@ -20,52 +20,20 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Orion dev team
+* Author: Ken Zangelin
 */
 #include <string>
-#include <map>
 
-#include "logMsg/logMsg.h"
-
-#include "common/JsonHelper.h"
-#include "apiTypesV2/HttpInfo.h"
-
-
-
-namespace ngsiv2
-{
-
-/* ****************************************************************************
-*
-* HttpInfo::HttpInfo - 
-*/
-HttpInfo::HttpInfo() : verb(NOVERB), extended(false)
-{
-}
+#include "ngsi/ContextElement.h"
+#include "common/macroSubstitute.h"
 
 
 
 /* ****************************************************************************
 *
-* HttpInfo::HttpInfo - 
+* macroSubstitute - 
 */
-HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(POST), extended(false)
+void macroSubstitute(std::string* sP, const std::string& in, const ContextElement& ce)
 {
-}
-
-
-
-/* ****************************************************************************
-*
-* HttpInfo::toJson -
-*/
-std::string HttpInfo::toJson()
-{
-  JsonHelper jh;
-
-  jh.addString("url", this->url);
-
-  return jh.str();
-}
-
+  *sP = in;
 }

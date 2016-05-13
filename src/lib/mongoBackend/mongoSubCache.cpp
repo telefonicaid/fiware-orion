@@ -111,6 +111,8 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
   cSubP->status                = sub.hasField(CSUB_STATUS)?           getFieldF(sub, CSUB_STATUS).String().c_str()         : "active";
   cSubP->count                 = 0;
+  cSubP->httpInfo.url          = cSubP->reference;
+  cSubP->httpInfo.verb         = POST;  // FIXME PR: unhardwire
   cSubP->next                  = NULL;
 
   LM_T(LmtSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));

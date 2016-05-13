@@ -37,6 +37,7 @@
 #include "ngsi/AttributeList.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
+#include "apiTypesV2/HttpInfo.h"
 
 using namespace mongo;
 
@@ -103,6 +104,7 @@ struct CachedSubscription
   RenderFormat                renderFormat;
   char*                       reference;
   SubscriptionExpression      expression;
+  ngsiv2::HttpInfo            httpInfo;
 
   struct CachedSubscription*  next;
 };
