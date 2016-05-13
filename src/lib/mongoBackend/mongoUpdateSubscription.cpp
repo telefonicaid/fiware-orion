@@ -548,14 +548,14 @@ std::string mongoUpdateSubscription
                                           subUp.id.c_str(),
                                           servicePathCache,
                                           lastNotification,
-                                          subUp.expires,
-                                          subUp.status,
-                                          subUp.subject.condition.expression.q,
-                                          subUp.subject.condition.expression.geometry,
-                                          subUp.subject.condition.expression.coords,
-                                          subUp.subject.condition.expression.georel,
+                                          doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
+                                          doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_EXPIRATION) : STATUS_ACTIVE,
+                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_Q) : "",
+                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_GEOM) : "",
+                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_COORDS) : "",
+                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_GEOREL) : "",
                                           stringFilterP,
-                                          subUp.attrsFormat);
+                                          doc.hasField(CSUB_ATTRS)? stringToRenderFormat(getStringFieldF(doc, CSUB_ATTRS)) : NGSI_V2_NORMALIZED);
 
   if (subCacheP != NULL)
   {
