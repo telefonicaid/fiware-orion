@@ -54,6 +54,7 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
 static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* eivP, const Value& entities);
 static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& condition);
 static std::string error(ConnectionInfo* ciP, const std::string& msg);
+static std::string parseDictionary(ConnectionInfo* ciP, std::map<std::string, std::string>& dict, const Value& object, const std::string& name);
 
 
 /* ****************************************************************************
@@ -386,28 +387,21 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
   if (!notification.IsObject())
   {
-    return error(ciP, "notitication is not an object");
+    return error(ciP, "notification is not an object");
   }
 
 
-/*
- *
- * XOR de http/httpExtended. En funcion de como se defina
- *  Ver si tiene sentido chequear la URL, si es que se puede
- * templatizar en la llamada tradicional
- *
- *
- */
-
-
-
   // Callback
-  if (notification.HasMember("http"))
+  if (notification.HasMember("http") && notification.HasMember("httpExtended"))
+  {
+    return error(ciP, "notification has http and httpExtended");
+  }
+  else if (notification.HasMember("http"))
   {
     const Value& http = notification["http"];
     if (!http.IsObject())
     {
-      return error(ciP, "http notitication is not an object");
+      return error(ciP, "http notification is not an object");
     }
 
     // http - url
@@ -434,17 +428,17 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     const Value& httpExt = notification["httpExtended"];
     if (!httpExt.IsObject())
     {
-      return error(ciP, "httpExtended notitication is not an object");
+      return error(ciP, "httpExtended notification is not an object");
     }
 
     // URL
-    std::string url = getString(httpExt, "url", "url http notification");
+    std::string url = getString(httpExt, "url", "url httpExtended notification");
 
     subsP->notification.httpInfo.url = url;
 
 
     // method -> verb
-    std::string method = getString(httpExt, "method", "method http notification");
+    std::string method = getString(httpExt, "method", "method httpExtended notification");
     Verb  verb         = str2Verb(method);
     /*
      *  CHECK IT IS VALID
@@ -453,9 +447,43 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     subsP->notification.httpInfo.verb = verb;
 
     // payload
-    std::string payload = getString(httpExt, "payload", "payload http notification");
+    std::string payload = getString(httpExt, "payload", "payload httpExtended notification");
     subsP->notification.httpInfo.payload = payload;
 
+
+    // qs
+    if (httpExt.HasMember("qs"))
+    {
+      const Value& qs = notification["qs"];
+      if (!qs.IsObject())
+      {
+        return error(ciP, "notificaction httpExt qs is not an object");
+      }
+
+      std::string r = parseDictionary(ciP, subsP->notification.httpInfo.qs, qs, "notification httpExt qs");
+
+      if (r != "")
+      {
+        return r;
+      }
+    }
+
+    // headers
+    if (httpExt.HasMember("headers"))
+    {
+      const Value& headers = notification["headers"];
+      if (!headers.IsObject())
+      {
+        return error(ciP, "notification httpExt headers is not an object");
+      }
+
+      std::string r = parseDictionary(ciP, subsP->notification.httpInfo.headers, headers, "notification httpExt headers");
+
+      if (r != "")
+      {
+        return r;
+      }
+    }
 
     subsP->notification.httpInfo.extended = true;
 
@@ -621,6 +649,31 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
     }
 
     vec->push_back(iter->GetString());
+  }
+
+  return "";
+}
+
+/* ****************************************************************************
+*
+* parseDictionary -
+*
+*/
+static std::string parseDictionary(ConnectionInfo* ciP, std::map<std::string, std::string>& dict, const Value& object, const std::string& name)
+{
+  if (!object.IsObject())
+  {
+    return error(ciP, name + " is not an object");
+  }
+
+  for (Value::ConstMemberIterator iter = object.MemberBegin(); iter != object.MemberEnd(); ++iter)
+  {
+    if (!iter->value.IsString())
+    {
+      return error(ciP, name + " element is not an string");
+    }
+
+    dict[iter->name.GetString()] = iter->value.GetString();
   }
 
   return "";
