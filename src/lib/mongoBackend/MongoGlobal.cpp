@@ -62,6 +62,7 @@
 #include "ngsiNotify/Notifier.h"
 #include "rest/StringFilter.h"
 #include "apiTypesV2/Subscription.h"
+//#include "apiTypesV2/ngsiWrappers.h"
 
 using namespace mongo;
 using namespace ngsiv2;
@@ -1993,6 +1994,63 @@ BSONArray processConditionVector
   return conds.arr();
 }
 
+#if 1
+/* ****************************************************************************
+*
+* attrsStdVector2NotifyConditionVector -
+*
+*/
+void attrsStdVector2NotifyConditionVector(const std::vector<std::string>& attrs, NotifyConditionVector* ncVP)
+{
+  NotifyCondition* nc = new NotifyCondition;
+  for (unsigned int ix = 0; ix < attrs.size(); ix++)
+  {
+    nc->condValueList.push_back(attrs[ix]);
+  }
+  nc->type = ON_CHANGE_CONDITION;
+  ncVP->push_back(nc);
+}
+
+
+/* ****************************************************************************
+*
+* attrsStdVector2AttributeList -
+*
+*/
+void attrsStdVector2AttributeList(const std::vector<std::string>& attrs, AttributeList* attrLP)
+{
+  for (unsigned int ix = 0; ix < attrs.size(); ix++)
+  {
+    attrLP->push_back(attrs[ix]);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* entIdStdVector2EntityIdVector -
+*
+*/
+void entIdStdVector2EntityIdVector(const std::vector<EntID>& entitiesV, EntityIdVector* enVP)
+{
+  for (unsigned int ix = 0; ix < entitiesV.size(); ix++)
+  {
+    EntityId* enP = new EntityId();
+    if (entitiesV[ix].id != "")
+    {
+      enP->fill(entitiesV[ix].id, entitiesV[ix].type, "false");
+    }
+    else // idPattern
+    {
+      enP->fill(entitiesV[ix].idPattern, entitiesV[ix].type, "true");
+    }
+    enVP->push_back(enP);
+  }
+}
+
+#endif
+
 
 /* ****************************************************************************
 *
@@ -2021,39 +2079,13 @@ BSONArray processConditionVector
   const std::vector<std::string>&  attrsOrder
 )
 {
-
-  // Convert std::vector<std::string> to NotifyConditionVector
   NotifyConditionVector ncV;
-  NotifyCondition nc;
-  for (unsigned int ix = 0; ix < condAttributesV.size(); ix++)
-  {
-    nc.condValueList.push_back(condAttributesV[ix]);
-  }
-  nc.type = ON_CHANGE_CONDITION;
-  ncV.push_back(&nc);
+  EntityIdVector        enV;
+  AttributeList         attrL;
 
-  // Convert std::vector<EntID> to EntityIdVector
-  EntityIdVector enV;
-  for (unsigned int ix = 0; ix < entitiesV.size(); ix++)
-  {
-    EntityId* enP = new EntityId();
-    if (entitiesV[ix].id != "")
-    {
-      enP->fill(entitiesV[ix].id, entitiesV[ix].type, "false");
-    }
-    else // idPattern
-    {
-      enP->fill(entitiesV[ix].idPattern, entitiesV[ix].type, "true");
-    }
-    enV.push_back(enP);
-  }
-
-  // Convert std::vector<std::string> to AttributeList
-  AttributeList attrL;
-  for (unsigned int ix = 0; ix < notifAttributesV.size(); ix++)
-  {
-    attrL.push_back(notifAttributesV[ix]);
-  }
+  attrsStdVector2NotifyConditionVector(condAttributesV, &ncV);
+  entIdStdVector2EntityIdVector(entitiesV, &enV);
+  attrsStdVector2AttributeList(notifAttributesV, &attrL);
 
   BSONArray arr = processConditionVector(&ncV,
                                          enV,
@@ -2071,6 +2103,8 @@ BSONArray processConditionVector
                                          attrsOrder);
 
   enV.release();
+  ncV.release();
+
   return arr;
 }
 

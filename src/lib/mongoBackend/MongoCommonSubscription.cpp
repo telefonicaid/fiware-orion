@@ -150,9 +150,8 @@ void setThrottling(const Subscription& sub, BSONObjBuilder* b)
 * setServicePath -
 *
 */
-void setServicePath(const std::vector<std::string>& servicePathV, BSONObjBuilder* b)
+void setServicePath(const std::string servicePath, BSONObjBuilder* b)
 {
-  std::string servicePath = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
   b->append(CSUB_SERVICE_PATH, servicePath);
   LM_T(LmtMongo, ("Subscription servicePath: %s", servicePath.c_str()));
 }
@@ -269,17 +268,19 @@ void setCondsAndInitialNotify
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   bool                             newCount,
-  BSONObjBuilder*                  b
+  BSONObjBuilder*                  b,
+  bool*                            notificationDone,
+  long long*                       lastNotification
 )
 {
   /* Conds vector (and maybe and initial notification) */
-  bool       notificationDone = false;
+  *notificationDone = false;
   BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             sub.subject.entities,
                                             sub.notification.attributes,
                                             subId,
                                             sub.notification.httpInfo.url,
-                                            &notificationDone,
+                                            notificationDone,
                                             sub.attrsFormat,
                                             tenant,
                                             xauthToken,
@@ -293,13 +294,13 @@ void setCondsAndInitialNotify
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
 
   /* Last notification */
-  long long lastNotificationTime = 0;
+  *lastNotification = 0;
   if (notificationDone)
   {
-    lastNotificationTime = (long long) getCurrentTime();
+    *lastNotification = (long long) getCurrentTime();
 
-    b->append(CSUB_LASTNOTIFICATION, lastNotificationTime);
-    LM_T(LmtMongo, ("Subscription lastNotification: %lu", lastNotificationTime));
+    b->append(CSUB_LASTNOTIFICATION, *lastNotification);
+    LM_T(LmtMongo, ("Subscription lastNotification: %lu", *lastNotification));
 
     if (newCount)
     {

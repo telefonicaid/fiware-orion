@@ -34,6 +34,8 @@
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonSubscription.h"
+#include "common/defaultValues.h"
+#include "cache/subCache.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -67,17 +69,21 @@ std::string mongoCreateSubscription
 
   // Build the BSON object to insert
   BSONObjBuilder b;
+  std::string    servicePath = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
+  bool           notificationDone;
+  long long      lastNotification;
 
   const std::string subId = setNewSubscriptionId(&b);
   setExpiration(sub, &b);
   setHttpInfo(sub, &b);
   setThrottling(sub, &b);
-  setServicePath(servicePathV, &b);
+  setServicePath(servicePath, &b);
   setDescription(sub, &b);
   setStatus(sub, &b);
   setEntities(sub, &b);
   setAttrs(sub, &b);
-  setCondsAndInitialNotify(sub, subId, tenant, servicePathV, xauthToken, fiwareCorrelator, true, &b);
+  setCondsAndInitialNotify(sub, subId, tenant, servicePathV, xauthToken, fiwareCorrelator, true,
+                           &b, &notificationDone, &lastNotification);
   setExpression(sub, &b);
   setFormat(sub, &b);
 
@@ -94,7 +100,6 @@ std::string mongoCreateSubscription
 
   // Insert in csub cache
 #if 0
-
   //
   // StringFilter in Scope?
   //
@@ -103,39 +108,36 @@ std::string mongoCreateSubscription
   //
   StringFilter*  stringFilterP = NULL;
 
-  for (unsigned int ix = 0; ix < requestP->restriction.scopeVector.size(); ++ix)
+  for (unsigned int ix = 0; ix < sub.restriction.scopeVector.size(); ++ix)
   {
-    if (requestP->restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
+    if (sub.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
-      stringFilterP = requestP->restriction.scopeVector[ix]->stringFilterP;
+      stringFilterP = sub.restriction.scopeVector[ix]->stringFilterP;
     }
   }
-
-
-  std::string oidString = oid.toString();
-
-  LM_T(LmtSubCache, ("inserting a new sub in cache (%s)", oidString.c_str()));
 
   cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
   subCacheItemInsert(tenant.c_str(),
                      servicePath.c_str(),
-                     requestP,
-                     oidString.c_str(),
-                     expiration,
-                     throttling,
-                     requestP->attrsFormat,
+                     sub.notification.httpInfo,
+                     sub.subject.entities, //requestP->entityIdVector,
+                     sub.notification.attributes, //requestP->attributeList,
+                     sub.subject.condition.attributes, //requestP->notifyConditionVector,
+                     subId.c_str(),
+                     sub.expires,
+                     sub.throttling,
+                     sub.attrsFormat,
                      notificationDone,
                      lastNotificationTime,
                      stringFilterP,
-                     status,
-                     requestP->expression.q,
-                     requestP->expression.geometry,
-                     requestP->expression.coords,
-                     requestP->expression.georel);
+                     sub.status,
+                     sub.subject.condition.expression.q,
+                     sub.subject.condition.expression.geometry,
+                     sub.subject.condition.expression.coords,
+                     sub.subject.condition.expression.georel);
 
   cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
 #endif
-
 
   reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);
 

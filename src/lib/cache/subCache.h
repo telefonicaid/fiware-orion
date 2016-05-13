@@ -37,6 +37,7 @@
 #include "ngsi/AttributeList.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
+#include "apiTypesV2/Subscription.h"
 
 using namespace mongo;
 
@@ -190,6 +191,36 @@ extern void subCacheItemInsert
   const std::string&            geometry,
   const std::string&            coords,
   const std::string&            georel
+);
+
+
+/* ****************************************************************************
+*
+* subCacheItemInsert -
+*
+* NGSIv2 wrapper
+*
+*/
+extern void subCacheItemInsert
+(
+  const char*                        tenant,
+  const char*                        servicePath,
+  const ngsiv2::HttpInfo&            httpInfo,
+  const std::vector<ngsiv2::EntID>&  entities,
+  const std::vector<std::string>&    attributes,
+  const std::vector<std::string>&    condAttributes,
+  const char*                        subscriptionId,
+  int64_t                            expiration,
+  int64_t                            throttling,
+  RenderFormat                       renderFormat,
+  bool                               notificationDone,
+  int64_t                            lastNotificationTime,
+  StringFilter*                      stringFilterP,
+  const std::string&                 status,
+  const std::string&                 q,
+  const std::string&                 geometry,
+  const std::string&                 coords,
+  const std::string&                 georel
 );
 
 

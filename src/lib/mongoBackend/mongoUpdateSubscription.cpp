@@ -37,6 +37,7 @@
 #include "mongoBackend/MongoCommonSubscription.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
+#include "common/defaultValues.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -252,7 +253,10 @@ static void setCondsAndInitialNotify
 {
   if (subUp.subjectProvided)
   {
-    setCondsAndInitialNotify(subUp, subUp.id, tenant, servicePathV, xauthToken, fiwareCorrelator, false, b);
+    long long lastNotification;  // FIXME
+    bool      notificationDone;  // FIXME
+    setCondsAndInitialNotify(subUp, subUp.id, tenant, servicePathV, xauthToken, fiwareCorrelator, false,
+                             b, &notificationDone, &lastNotification);
   }
   else
   {
@@ -385,11 +389,12 @@ std::string mongoUpdateSubscription
 
   // Build the BSON object (using subOrig as starting point)
   BSONObjBuilder b;
+  std::string servicePath = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
 
   setExpiration(subUp, subOrig, &b);
   setHttpInfo(subUp, subOrig, &b);
   setThrottling(subUp, subOrig, &b);
-  setServicePath(servicePathV, &b);
+  setServicePath(servicePath, &b);
   setDescription(subUp, subOrig, &b);
   setStatus(subUp, subOrig, &b);
   setEntities(subUp, subOrig, &b);

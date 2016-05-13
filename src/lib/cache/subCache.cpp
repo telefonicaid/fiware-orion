@@ -797,6 +797,130 @@ void subCacheItemInsert
 
 
 
+#if 1
+/* ****************************************************************************
+*
+* attrsStdVector2NotifyConditionVector -
+*
+*/
+void attrsStdVector2NotifyConditionVector(const std::vector<std::string>& attrs, NotifyConditionVector* ncVP)
+{
+  NotifyCondition* nc = new NotifyCondition;
+  for (unsigned int ix = 0; ix < attrs.size(); ix++)
+  {
+    nc->condValueList.push_back(attrs[ix]);
+  }
+  nc->type = ON_CHANGE_CONDITION;
+  ncVP->push_back(nc);
+}
+
+
+/* ****************************************************************************
+*
+* attrsStdVector2AttributeList -
+*
+*/
+void attrsStdVector2AttributeList(const std::vector<std::string>& attrs, AttributeList* attrLP)
+{
+  for (unsigned int ix = 0; ix < attrs.size(); ix++)
+  {
+    attrLP->push_back(attrs[ix]);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* entIdStdVector2EntityIdVector -
+*
+*/
+void entIdStdVector2EntityIdVector(const std::vector<EntID>& entitiesV, EntityIdVector* enVP)
+{
+  for (unsigned int ix = 0; ix < entitiesV.size(); ix++)
+  {
+    EntityId* enP = new EntityId();
+    if (entitiesV[ix].id != "")
+    {
+      enP->fill(entitiesV[ix].id, entitiesV[ix].type, "false");
+    }
+    else // idPattern
+    {
+      enP->fill(entitiesV[ix].idPattern, entitiesV[ix].type, "true");
+    }
+    enVP->push_back(enP);
+  }
+}
+
+#endif
+
+
+
+/* ****************************************************************************
+*
+* subCacheItemInsert -
+*
+* NGSIv2 wrapper
+*
+*/
+void subCacheItemInsert
+(
+  const char*                        tenant,
+  const char*                        servicePath,
+  const ngsiv2::HttpInfo&            httpInfo,
+  const std::vector<ngsiv2::EntID>&  entities,
+  const std::vector<std::string>&    attributes,
+  const std::vector<std::string>&    condAttributes,
+  const char*                        subscriptionId,
+  int64_t                            expiration,
+  int64_t                            throttling,
+  RenderFormat                       renderFormat,
+  bool                               notificationDone,
+  int64_t                            lastNotificationTime,
+  StringFilter*                      stringFilterP,
+  const std::string&                 status,
+  const std::string&                 q,
+  const std::string&                 geometry,
+  const std::string&                 coords,
+  const std::string&                 georel
+)
+{
+
+  NotifyConditionVector ncV;
+  EntityIdVector        enV;
+  AttributeList         attrL;
+
+  attrsStdVector2NotifyConditionVector(condAttributesV, &ncV);
+  entIdStdVector2EntityIdVector(entitiesV, &enV);
+  attrsStdVector2AttributeList(notifAttributesV, &attrL);
+
+  subCacheItemInsert(tenant,
+                     servicePath,
+                     httpInfo,
+                     enV,
+                     attributeL,
+                     ncV,
+                     subscriptionId,
+                     expiration,
+                     throttling,
+                     renderFormat,
+                     notificationDone,
+                     lastNotificationTime,
+                     stringFilterP,
+                     status,
+                     q,
+                     geometry,
+                     coords,
+                     georel);
+
+  enV.release();
+  ncV.release();
+
+}
+
+
+
+
 /* ****************************************************************************
 *
 * subCacheStatisticsGet - 

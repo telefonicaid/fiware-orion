@@ -72,7 +72,7 @@ extern void setThrottling(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder
 * setServicePath -
 *
 */
-extern void setServicePath(const std::vector<std::string>& servicePathV, mongo::BSONObjBuilder* b);
+extern void setServicePath(std::string servicePath, mongo::BSONObjBuilder* b);
 
 
 
@@ -125,7 +125,9 @@ extern void setCondsAndInitialNotify
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   bool                             newCount,
-  BSONObjBuilder*                  b
+  BSONObjBuilder*                  b,
+  bool*                            notificationDone,
+  long long*                       lastNotification
 );
 
 
