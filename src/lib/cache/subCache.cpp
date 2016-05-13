@@ -738,8 +738,8 @@ void subCacheItemInsert
   cSubP->expression.geometry   = geometry;
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
-  cSubP->httpInfo.url          = url.c_str();
-  cSubP->httpInfo.verb         = POST;  // FIXME PR: Unhardwire
+  cSubP->httpInfo.url          = httpInfo.url;
+  cSubP->httpInfo.verb         = httpInfo.verb;
 
   if (stringFilterP != NULL)
   {
