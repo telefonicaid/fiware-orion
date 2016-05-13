@@ -34,10 +34,12 @@
 #include <vector>
 #include <string>
 
-#include "apiTypesV2/Subscription.h"
+#include "apiTypesV2/Subscription.h"  // EntID
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/AttributeList.h"
 #include "ngsi/NotifyConditionVector.h"
+
+
 
 /* ****************************************************************************
 *
@@ -65,4 +67,3 @@ extern void attrsStdVector2AttributeList(const std::vector<std::string>& attrs, 
 extern void entIdStdVector2EntityIdVector(const std::vector<ngsiv2::EntID>& entitiesV, EntityIdVector* enVP);
 
 #endif // SRC_LIB_APITYPESV2_NGSIWRAPPERS_H
-

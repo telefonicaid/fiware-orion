@@ -134,7 +134,6 @@ SET (ORION_LIBS
     jsonParse
     jsonParseV2
     rest
-    apiTypesV2
     convenience
     ngsi9
     ngsi10
@@ -142,6 +141,7 @@ SET (ORION_LIBS
     cache
     mongoBackend
     parse
+    apiTypesV2
     orionTypes
     common
     alarmMgr

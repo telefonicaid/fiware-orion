@@ -62,7 +62,7 @@
 #include "ngsiNotify/Notifier.h"
 #include "rest/StringFilter.h"
 #include "apiTypesV2/Subscription.h"
-//#include "apiTypesV2/ngsiWrappers.h"
+#include "apiTypesV2/ngsiWrappers.h"
 
 using namespace mongo;
 using namespace ngsiv2;
@@ -1994,62 +1994,6 @@ BSONArray processConditionVector
   return conds.arr();
 }
 
-#if 1
-/* ****************************************************************************
-*
-* attrsStdVector2NotifyConditionVector -
-*
-*/
-static void attrsStdVector2NotifyConditionVector(const std::vector<std::string>& attrs, NotifyConditionVector* ncVP)
-{
-  NotifyCondition* nc = new NotifyCondition;
-  for (unsigned int ix = 0; ix < attrs.size(); ix++)
-  {
-    nc->condValueList.push_back(attrs[ix]);
-  }
-  nc->type = ON_CHANGE_CONDITION;
-  ncVP->push_back(nc);
-}
-
-
-/* ****************************************************************************
-*
-* attrsStdVector2AttributeList -
-*
-*/
-static void attrsStdVector2AttributeList(const std::vector<std::string>& attrs, AttributeList* attrLP)
-{
-  for (unsigned int ix = 0; ix < attrs.size(); ix++)
-  {
-    attrLP->push_back(attrs[ix]);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* entIdStdVector2EntityIdVector -
-*
-*/
-static void entIdStdVector2EntityIdVector(const std::vector<EntID>& entitiesV, EntityIdVector* enVP)
-{
-  for (unsigned int ix = 0; ix < entitiesV.size(); ix++)
-  {
-    EntityId* enP = new EntityId();
-    if (entitiesV[ix].id != "")
-    {
-      enP->fill(entitiesV[ix].id, entitiesV[ix].type, "false");
-    }
-    else // idPattern
-    {
-      enP->fill(entitiesV[ix].idPattern, entitiesV[ix].type, "true");
-    }
-    enVP->push_back(enP);
-  }
-}
-
-#endif
 
 
 /* ****************************************************************************
