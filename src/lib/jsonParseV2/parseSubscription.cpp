@@ -54,6 +54,7 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
 static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* eivP, const Value& entities);
 static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& condition);
 static std::string error(ConnectionInfo* ciP, const std::string& msg);
+static std::string parseDictionary(ConnectionInfo* ciP, std::map<std::string, std::string>& dict, const Value& object, const std::string& name);
 
 
 /* ****************************************************************************
@@ -97,7 +98,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   Opt<std::string> description = getStringOpt(document, "description");
   if (!description.ok())
   {
-    return description.error;
+    return error(ciP, description.error);
   }
   else if (description.given)
   {
@@ -152,7 +153,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
 
   if (!expiresOpt.ok())
   {
-    return expiresOpt.error;
+    return error(ciP, expiresOpt.error);
   }
   else if (expiresOpt.given)
   {
@@ -186,7 +187,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   Opt<std::string> statusOpt =  getStringOpt(document, "status");
   if (!statusOpt.ok())
   {
-    return statusOpt.error;
+    return error(ciP, statusOpt.error);
   }
   else if (statusOpt.given)
   {
@@ -205,7 +206,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   Opt<int64_t> throttlingOpt = getInt64Opt(document, "throttling");
   if (!throttlingOpt.ok())
   {
-    return throttlingOpt.error;
+    return error(ciP, throttlingOpt.error);
   }
   else if (throttlingOpt.given)
   {
@@ -222,7 +223,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   Opt<std::string>  attrsFormatOpt = getStringOpt(document, "attrsFormat");
   if (!attrsFormatOpt.ok())
   {
-    return attrsFormatOpt.error;
+    return error(ciP, attrsFormatOpt.error);
   }
   else if (attrsFormatOpt.given)
   {
@@ -329,7 +330,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
       Opt<std::string> idOpt = getStringOpt(*iter,"id", "subject entities element id");
       if (!idOpt.ok())
       {
-        return idOpt.error;
+        return error(ciP, idOpt.error);
       }
       id = idOpt.value;
 
@@ -343,7 +344,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
       Opt<std::string> idPatOpt = getStringOpt(*iter,"idPattern", "subject entities element idPattern");
       if (!idPatOpt.ok())
       {
-        return idPatOpt.error;
+        return error(ciP, idPatOpt.error);
       }
       else if (idPatOpt.given)
       {
@@ -354,7 +355,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
     Opt<std::string> typeOpt = getStringOpt(*iter, "type", "subject entities element type");
     if (!typeOpt.ok())
     {
-      return typeOpt.error;
+      return error(ciP, typeOpt.error);
     }
     else if (typeOpt.given)
     {
@@ -386,47 +387,46 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
   if (!notification.IsObject())
   {
-    return error(ciP, "notitication is not an object");
+    return error(ciP, "notification is not an object");
   }
 
 
-/*
- *
- * XOR de http/httpExtended. En funcion de como se defina
- *  Ver si tiene sentido chequear la URL, si es que se puede
- * templatizar en la llamada tradicional
- *
- *
- */
-
-
-
   // Callback
-  if (notification.HasMember("http"))
+  if (notification.HasMember("http") && notification.HasMember("httpExtended"))
+  {
+    return error(ciP, "notification has http and httpExtended");
+  }
+  else if (notification.HasMember("http"))
   {
     const Value& http = notification["http"];
     if (!http.IsObject())
     {
-      return error(ciP, "http notitication is not an object");
+      return error(ciP, "http notification is not an object");
     }
 
     // http - url
-    std::string url = getString(http, "url", "url http notification");
-
     {
-       std::string  host;
-       int          port;
-       std::string  path;
-       std::string  protocol;
+      Opt<std::string> urlOpt = getStringMust(http, "url", "url http notification");
 
-       if (parseUrl(url, host, port, path, protocol) == false)
-       {
+      if (!urlOpt.ok())
+      {
+        return error(ciP, urlOpt.error);
+      }
+
+      {
+        std::string  host;
+        int          port;
+        std::string  path;
+        std::string  protocol;
+
+        if (parseUrl(urlOpt.value, host, port, path, protocol) == false)
+        {
           return error(ciP, "Invalid URL parsing notification url");
-       }
+        }
+      }
+      subsP->notification.httpInfo.url =      urlOpt.value;
+      subsP->notification.httpInfo.extended = false;
     }
-
-    subsP->notification.httpInfo.url =      url;
-    subsP->notification.httpInfo.extended = false;
 
   }
   else if (notification.HasMember("httpExtended"))
@@ -434,28 +434,82 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     const Value& httpExt = notification["httpExtended"];
     if (!httpExt.IsObject())
     {
-      return error(ciP, "httpExtended notitication is not an object");
+      return error(ciP, "httpExtended notification is not an object");
     }
 
     // URL
-    std::string url = getString(httpExt, "url", "url http notification");
+    {
+      Opt<std::string> urlOpt = getStringMust(httpExt, "url", "url httpExtended notification");
 
-    subsP->notification.httpInfo.url = url;
+      if (!urlOpt.ok())
+      {
+        return error(ciP, urlOpt.error);
+      }
 
+      subsP->notification.httpInfo.url = urlOpt.value;
+    }
 
     // method -> verb
-    std::string method = getString(httpExt, "method", "method http notification");
-    Verb  verb         = str2Verb(method);
-    /*
-     *  CHECK IT IS VALID
-     */
+    {
 
-    subsP->notification.httpInfo.verb = verb;
+      Opt<std::string> methodOpt = getStringMust(httpExt, "method", "method httpExtended notification");
+
+      if (!methodOpt.ok())
+      {
+        return error(ciP, methodOpt.error);
+      }
+      Verb  verb         = str2Verb(methodOpt.value);
+      /*
+       *  CHECK IT IS VALID
+       */
+
+      subsP->notification.httpInfo.verb = verb;
+    }
 
     // payload
-    std::string payload = getString(httpExt, "payload", "payload http notification");
-    subsP->notification.httpInfo.payload = payload;
+    {
+      Opt<std::string> payloadOpt = getStringMust(httpExt, "payload", "payload httpExtended notification");
+      if (!payloadOpt.ok())
+      {
+        return error(ciP, payloadOpt.error);
+      }
+      subsP->notification.httpInfo.payload = payloadOpt.value;
+    }
 
+
+    // qs
+    if (httpExt.HasMember("qs"))
+    {
+      const Value& qs = notification["qs"];
+      if (!qs.IsObject())
+      {
+        return error(ciP, "notificaction httpExt qs is not an object");
+      }
+
+      std::string r = parseDictionary(ciP, subsP->notification.httpInfo.qs, qs, "notification httpExt qs");
+
+      if (r != "")
+      {
+        return r;
+      }
+    }
+
+    // headers
+    if (httpExt.HasMember("headers"))
+    {
+      const Value& headers = notification["headers"];
+      if (!headers.IsObject())
+      {
+        return error(ciP, "notification httpExt headers is not an object");
+      }
+
+      std::string r = parseDictionary(ciP, subsP->notification.httpInfo.headers, headers, "notification httpExt headers");
+
+      if (r != "")
+      {
+        return r;
+      }
+    }
 
     subsP->notification.httpInfo.extended = true;
 
@@ -467,6 +521,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
 
   // Attributes
+  if (notification.HasMember("attrs") && notification.HasMember("exceptAttrs"))
+  {
+    return error(ciP, "http notification has attrs and exceptAttrs");
+  }
   if (notification.HasMember("attrs"))
   {
     std::string r = parseAttributeList(ciP, &subsP->notification.attributes, notification["attrs"]);
@@ -475,6 +533,19 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     {
       return r;
     }
+
+    subsP->notification.blackList = false;
+  }
+  else if (notification.HasMember("exceptAttrs"))
+  {
+    std::string r = parseAttributeList(ciP, &subsP->notification.attributes, notification["exceptAttrs"]);
+
+    if (r != "")
+    {
+      return r;
+    }
+
+    subsP->notification.blackList = true;
   }
 
    return "";
@@ -545,38 +616,44 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
     }
 
     // geometry
-    Opt<std::string> geometryOpt = getStringOpt(expression, "geometry");
+    {
+      Opt<std::string> geometryOpt = getStringOpt(expression, "geometry");
 
-    if (!geometryOpt.ok())
-    {
-      return geometryOpt.error;
-    }
-    else if (geometryOpt.given)
-    {
-      subsP->subject.condition.expression.geometry = geometryOpt.value;
+      if (!geometryOpt.ok())
+      {
+        return error(ciP, geometryOpt.error);
+      }
+      else if (geometryOpt.given)
+      {
+        subsP->subject.condition.expression.geometry = geometryOpt.value;
+      }
     }
 
     // coords
-    Opt<std::string> coordsOpt = getStringOpt(expression, "coords");
+    {
+      Opt<std::string> coordsOpt = getStringOpt(expression, "coords");
 
-    if (!coordsOpt.ok())
-    {
-        return coordsOpt.error;
-    }
-    else if (coordsOpt.given)
-    {
-      subsP->subject.condition.expression.coords = coordsOpt.value;
+      if (!coordsOpt.ok())
+      {
+          return error(ciP, coordsOpt.error);
+      }
+      else if (coordsOpt.given)
+      {
+        subsP->subject.condition.expression.coords = coordsOpt.value;
+      }
     }
 
     // georel
-    Opt<std::string> georelOpt = getStringOpt(expression, "georel");
-    if (!geometryOpt.ok())
     {
-      return geometryOpt.error;
-    }
-    if (georelOpt.given)
-    {
-      subsP->subject.condition.expression.georel = georelOpt.value;
+      Opt<std::string> georelOpt = getStringOpt(expression, "georel");
+      if (!georelOpt.ok())
+      {
+        return error(ciP, georelOpt.error);
+      }
+      if (georelOpt.given)
+      {
+        subsP->subject.condition.expression.georel = georelOpt.value;
+      }
     }
   }
   return "";
@@ -604,6 +681,31 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
     }
 
     vec->push_back(iter->GetString());
+  }
+
+  return "";
+}
+
+/* ****************************************************************************
+*
+* parseDictionary -
+*
+*/
+static std::string parseDictionary(ConnectionInfo* ciP, std::map<std::string, std::string>& dict, const Value& object, const std::string& name)
+{
+  if (!object.IsObject())
+  {
+    return error(ciP, name + " is not an object");
+  }
+
+  for (Value::ConstMemberIterator iter = object.MemberBegin(); iter != object.MemberEnd(); ++iter)
+  {
+    if (!iter->value.IsString())
+    {
+      return error(ciP, name + " element is not an string");
+    }
+
+    dict[iter->name.GetString()] = iter->value.GetString();
   }
 
   return "";

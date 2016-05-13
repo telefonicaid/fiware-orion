@@ -573,13 +573,13 @@ Date: REGEX(.*)
 12. Update second subscription with no string description (fail)
 ================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 67
+Content-Length: 66
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "description must be a string",
+    "description": "description is not a string",
     "error": "BadRequest"
 }
 

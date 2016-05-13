@@ -244,9 +244,9 @@ Date: REGEX(.*)
 
 04. Check log-file to make sure the Bad Input alarm is active
 =============================================================
- Raising alarm BadInput 0.0.0.0: Invalid URL
- Repeated BadInput 0.0.0.0: Invalid URL
- Repeated BadInput 0.0.0.0: Invalid URL
+ Raising alarm BadInput 0.0.0.0: Invalid URL parsing notification url
+ Repeated BadInput 0.0.0.0: Invalid URL parsing notification url
+ Repeated BadInput 0.0.0.0: Invalid URL parsing notification url
 
 
 05. Create a valid subscription for E1/A1
@@ -261,9 +261,9 @@ Date: REGEX(.*)
 
 06. Check log-file to make sure the Bad Input alarm is reset
 ============================================================
- Raising alarm BadInput 0.0.0.0: Invalid URL
- Repeated BadInput 0.0.0.0: Invalid URL
- Repeated BadInput 0.0.0.0: Invalid URL
+ Raising alarm BadInput 0.0.0.0: Invalid URL parsing notification url
+ Repeated BadInput 0.0.0.0: Invalid URL parsing notification url
+ Repeated BadInput 0.0.0.0: Invalid URL parsing notification url
  Releasing alarm BadInput 0.0.0.0
 
 
