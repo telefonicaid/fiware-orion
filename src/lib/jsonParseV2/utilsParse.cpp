@@ -49,9 +49,8 @@ static Opt<string> getStringAux(const Value& parent, const char* field, const st
   return Opt<string>("", false);
 }
 
-string getString(const rapidjson::Value& parent, const char* field, const std::string& description) {
-  Opt<string> os = getStringAux(parent, field, description, false);
-  return os.value;
+Opt<string> getStringMust(const rapidjson::Value& parent, const char* field, const std::string& description) {
+  return getStringAux(parent, field, description, false);
 }
 
 Opt<string> getStringOpt(const rapidjson::Value& parent, const char* field, const std::string& description) {
@@ -77,9 +76,8 @@ static Opt<int64_t> getInt64Aux(const Value& parent, const char* field, const st
   return Opt<int64_t>(0, false);
 }
 
-int64_t getInt64(const rapidjson::Value& parent, const char* field, const std::string& description) {
-  Opt<int64_t> oi = getInt64Aux(parent, field, description, false);
-  return oi.value;
+Opt<int64_t> getInt64Must(const rapidjson::Value& parent, const char* field, const std::string& description) {
+  return getInt64Aux(parent, field, description, false);
 }
 
 Opt<int64_t> getInt64Opt(const rapidjson::Value& parent, const char* field, const std::string& description) {

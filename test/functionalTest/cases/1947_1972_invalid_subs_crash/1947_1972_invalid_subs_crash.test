@@ -674,7 +674,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "notitication is not an object",
+    "description": "notification is not an object",
     "error": "BadRequest"
 }
 

@@ -98,7 +98,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   Opt<std::string> description = getStringOpt(document, "description");
   if (!description.ok())
   {
-    return description.error;
+    return error(ciP, description.error);
   }
   else if (description.given)
   {
@@ -153,7 +153,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
 
   if (!expiresOpt.ok())
   {
-    return expiresOpt.error;
+    return error(ciP, expiresOpt.error);
   }
   else if (expiresOpt.given)
   {
@@ -187,7 +187,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   Opt<std::string> statusOpt =  getStringOpt(document, "status");
   if (!statusOpt.ok())
   {
-    return statusOpt.error;
+    return error(ciP, statusOpt.error);
   }
   else if (statusOpt.given)
   {
@@ -206,7 +206,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   Opt<int64_t> throttlingOpt = getInt64Opt(document, "throttling");
   if (!throttlingOpt.ok())
   {
-    return throttlingOpt.error;
+    return error(ciP, throttlingOpt.error);
   }
   else if (throttlingOpt.given)
   {
@@ -223,7 +223,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   Opt<std::string>  attrsFormatOpt = getStringOpt(document, "attrsFormat");
   if (!attrsFormatOpt.ok())
   {
-    return attrsFormatOpt.error;
+    return error(ciP, attrsFormatOpt.error);
   }
   else if (attrsFormatOpt.given)
   {
@@ -330,7 +330,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
       Opt<std::string> idOpt = getStringOpt(*iter,"id", "subject entities element id");
       if (!idOpt.ok())
       {
-        return idOpt.error;
+        return error(ciP, idOpt.error);
       }
       id = idOpt.value;
 
@@ -344,7 +344,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
       Opt<std::string> idPatOpt = getStringOpt(*iter,"idPattern", "subject entities element idPattern");
       if (!idPatOpt.ok())
       {
-        return idPatOpt.error;
+        return error(ciP, idPatOpt.error);
       }
       else if (idPatOpt.given)
       {
@@ -355,7 +355,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
     Opt<std::string> typeOpt = getStringOpt(*iter, "type", "subject entities element type");
     if (!typeOpt.ok())
     {
-      return typeOpt.error;
+      return error(ciP, typeOpt.error);
     }
     else if (typeOpt.given)
     {
@@ -405,22 +405,28 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     // http - url
-    std::string url = getString(http, "url", "url http notification");
-
     {
-       std::string  host;
-       int          port;
-       std::string  path;
-       std::string  protocol;
+      Opt<std::string> urlOpt = getStringMust(http, "url", "url http notification");
 
-       if (parseUrl(url, host, port, path, protocol) == false)
-       {
+      if (!urlOpt.ok())
+      {
+        return error(ciP, urlOpt.error);
+      }
+
+      {
+        std::string  host;
+        int          port;
+        std::string  path;
+        std::string  protocol;
+
+        if (parseUrl(urlOpt.value, host, port, path, protocol) == false)
+        {
           return error(ciP, "Invalid URL parsing notification url");
-       }
+        }
+      }
+      subsP->notification.httpInfo.url =      urlOpt.value;
+      subsP->notification.httpInfo.extended = false;
     }
-
-    subsP->notification.httpInfo.url =      url;
-    subsP->notification.httpInfo.extended = false;
 
   }
   else if (notification.HasMember("httpExtended"))
@@ -432,23 +438,43 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     // URL
-    std::string url = getString(httpExt, "url", "url httpExtended notification");
+    {
+      Opt<std::string> urlOpt = getStringMust(httpExt, "url", "url httpExtended notification");
 
-    subsP->notification.httpInfo.url = url;
+      if (!urlOpt.ok())
+      {
+        return error(ciP, urlOpt.error);
+      }
 
+      subsP->notification.httpInfo.url = urlOpt.value;
+    }
 
     // method -> verb
-    std::string method = getString(httpExt, "method", "method httpExtended notification");
-    Verb  verb         = str2Verb(method);
-    /*
-     *  CHECK IT IS VALID
-     */
+    {
 
-    subsP->notification.httpInfo.verb = verb;
+      Opt<std::string> methodOpt = getStringMust(httpExt, "method", "method httpExtended notification");
+
+      if (!methodOpt.ok())
+      {
+        return error(ciP, methodOpt.error);
+      }
+      Verb  verb         = str2Verb(methodOpt.value);
+      /*
+       *  CHECK IT IS VALID
+       */
+
+      subsP->notification.httpInfo.verb = verb;
+    }
 
     // payload
-    std::string payload = getString(httpExt, "payload", "payload httpExtended notification");
-    subsP->notification.httpInfo.payload = payload;
+    {
+      Opt<std::string> payloadOpt = getStringMust(httpExt, "payload", "payload httpExtended notification");
+      if (!payloadOpt.ok())
+      {
+        return error(ciP, payloadOpt.error);
+      }
+      subsP->notification.httpInfo.payload = payloadOpt.value;
+    }
 
 
     // qs
@@ -590,38 +616,44 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
     }
 
     // geometry
-    Opt<std::string> geometryOpt = getStringOpt(expression, "geometry");
+    {
+      Opt<std::string> geometryOpt = getStringOpt(expression, "geometry");
 
-    if (!geometryOpt.ok())
-    {
-      return geometryOpt.error;
-    }
-    else if (geometryOpt.given)
-    {
-      subsP->subject.condition.expression.geometry = geometryOpt.value;
+      if (!geometryOpt.ok())
+      {
+        return error(ciP, geometryOpt.error);
+      }
+      else if (geometryOpt.given)
+      {
+        subsP->subject.condition.expression.geometry = geometryOpt.value;
+      }
     }
 
     // coords
-    Opt<std::string> coordsOpt = getStringOpt(expression, "coords");
+    {
+      Opt<std::string> coordsOpt = getStringOpt(expression, "coords");
 
-    if (!coordsOpt.ok())
-    {
-        return coordsOpt.error;
-    }
-    else if (coordsOpt.given)
-    {
-      subsP->subject.condition.expression.coords = coordsOpt.value;
+      if (!coordsOpt.ok())
+      {
+          return error(ciP, coordsOpt.error);
+      }
+      else if (coordsOpt.given)
+      {
+        subsP->subject.condition.expression.coords = coordsOpt.value;
+      }
     }
 
     // georel
-    Opt<std::string> georelOpt = getStringOpt(expression, "georel");
-    if (!geometryOpt.ok())
     {
-      return geometryOpt.error;
-    }
-    if (georelOpt.given)
-    {
-      subsP->subject.condition.expression.georel = georelOpt.value;
+      Opt<std::string> georelOpt = getStringOpt(expression, "georel");
+      if (!georelOpt.ok())
+      {
+        return error(ciP, georelOpt.error);
+      }
+      if (georelOpt.given)
+      {
+        subsP->subject.condition.expression.georel = georelOpt.value;
+      }
     }
   }
   return "";
