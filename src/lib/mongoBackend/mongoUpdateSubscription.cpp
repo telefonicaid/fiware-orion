@@ -287,7 +287,7 @@ static void setCondsAndInitialNotify
     }
     else
     {
-      attrsFormat = subOrig.hasField(CSUB_ATTRS)? stringToRenderFormat(getStringFieldF(subOrig, CSUB_ATTRS)) : NGSI_V2_NORMALIZED;
+      attrsFormat = subOrig.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(subOrig, CSUB_FORMAT)) : NGSI_V2_NORMALIZED;
     }
 
     bool notificationDone;
@@ -586,7 +586,7 @@ std::string mongoUpdateSubscription
                                           doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_COORDS) : "",
                                           doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_GEOREL) : "",
                                           stringFilterP,
-                                          doc.hasField(CSUB_ATTRS)? stringToRenderFormat(getStringFieldF(doc, CSUB_ATTRS)) : NGSI_V2_NORMALIZED);
+                                          doc.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(doc, CSUB_FORMAT)) : NGSI_V2_NORMALIZED);
 
   if (subCacheP != NULL)
   {
