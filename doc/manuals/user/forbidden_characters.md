@@ -64,17 +64,17 @@ enable them for NGSIv1, as described in [this section of the documentation](v1_v
 
 NGSIv2 allows a templating mechanism (see "Notification templates" section in
 the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/)). Forbidden
-characters restrictions apply to the `http.payload` field in NGSIv2 API operations, such as
+characters restrictions apply to the `httpExtended.payload` field in NGSIv2 API operations, such as
 POST /v2/subscription or GET /v2/subscriptions.
 
-However, at notification time, any URL encoded characters is `http.payload` is decoded.
+However, at notification time, any URL encoded characters in `httpExtended.payload` is decoded.
 
 Example:
 
-Let's consider the following `notification.http` object in a given subscription.
+Let's consider the following `notification.httpExtended` object in a given subscription.
 
 ```
-"http": {
+"httpExtended": {
   "url": "http://foo.com/entity/${id}",
   "headers": {
     "Content-Type": "aplication/json"
@@ -86,6 +86,9 @@ Let's consider the following `notification.http` object in a given subscription.
   "payload": "{ %22temperature%22: ${temperature}, %22asString%22: %22${temperature}%22 }"
 }
 ```
+
+Note that the above payload value is the URL encoded version of this string:
+`{ "temperature": ${temperature}, "asString": "${temperature}" }`.
 
 Now, let's consider that NGSIv2 implementation triggers a notification associated to this subscription.
 Notification data is for entity with id "DC_S1-D41" and type "Room", including an attribute named
