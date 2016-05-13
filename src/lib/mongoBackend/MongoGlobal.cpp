@@ -2043,7 +2043,7 @@ BSONArray processConditionVector
     }
     else // idPattern
     {
-      enP->fill(entitiesV[ix].idPattern, entitiesV[ix].type, "false");
+      enP->fill(entitiesV[ix].idPattern, entitiesV[ix].type, "true");
     }
     enV.push_back(enP);
   }

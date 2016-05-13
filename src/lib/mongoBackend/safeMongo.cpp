@@ -55,6 +55,33 @@ BSONObj getObjectField(const BSONObj& b, const std::string& field, const std::st
   return BSONObj();
 }
 
+
+/* ****************************************************************************
+*
+* getArrayField -
+*/
+BSONArray getArrayField(const BSONObj& b, const std::string& field, const std::string& caller, int line)
+{
+  if (b.hasField(field) && b.getField(field).type() == Array)
+  {
+    // See http://stackoverflow.com/questions/36307126/getting-bsonarray-from-bsonelement-in-an-direct-way
+    return (BSONArray) b.getObjectField(field);
+  }
+
+  // Detect error
+  if (!b.hasField(field))
+  {
+    LM_E(("Runtime Error (object field '%s' is missing in BSONObj <%s> from caller %s:%d)", field.c_str(), b.toString().c_str(), caller.c_str(), line));
+  }
+  else
+  {
+    LM_E(("Runtime Error (field '%s' was supposed to be an array but type=%d in BSONObj <%s> from caller %s:%d)",
+          field.c_str(), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
+  }
+  return BSONArray();
+}
+
+
 /* ****************************************************************************
 *
 * getStringField -

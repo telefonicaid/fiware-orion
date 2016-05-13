@@ -24,6 +24,7 @@ SET (SOURCES
     MongoGlobal.cpp
     MongoCommonUpdate.cpp
     MongoCommonRegister.cpp
+    MongoCommonSubscription.cpp
     mongoRegisterContext.cpp
     mongoDiscoverContextAvailability.cpp
     mongoSubscribeContextAvailability.cpp
@@ -54,6 +55,7 @@ SET (HEADERS
     MongoGlobal.h
     MongoCommonUpdate.h
     MongoCommonRegister.h
+    MongoCommonSubscription.h
     mongoRegisterContext.h
     mongoDiscoverContextAvailability.h
     mongoSubscribeContextAvailability.h

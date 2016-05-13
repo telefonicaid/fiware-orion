@@ -47,7 +47,7 @@ using namespace ngsiv2;
 *
 * setSubscriptionId -
 */
-static void setSubscriptionId(Subscription* s, const BSONObj& r)
+static void setNewSubscriptionId(Subscription* s, const BSONObj& r)
 {
   s->id = getFieldF(r, "_id").OID().toString();
 }
@@ -271,7 +271,7 @@ void mongoListSubscriptions
 
     Subscription  s;
 
-    setSubscriptionId(&s, r);
+    setNewSubscriptionId(&s, r);
     setDescription(&s, r);
     setSubject(&s, r);
     setStatus(&s, r);
@@ -346,7 +346,7 @@ void mongoGetSubscription
     }
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", n, r.toString().c_str()));
 
-    setSubscriptionId(sub, r);
+    setNewSubscriptionId(sub, r);
     setDescription(sub, r);
     setSubject(sub, r);
     setNotification(sub, r, tenant);
