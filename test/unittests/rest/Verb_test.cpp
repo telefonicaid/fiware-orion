@@ -42,6 +42,6 @@ TEST(Verb, all)
    EXPECT_STREQ("OPTIONS",      verbName(OPTIONS));
    EXPECT_STREQ("TRACE",        verbName(TRACE));
    EXPECT_STREQ("CONNECT",      verbName(CONNECT));
-   EXPECT_STREQ("NOVERB",       verbName(NOVERB));
+   EXPECT_STREQ("",             verbName(NOVERB));
    EXPECT_STREQ("Unknown verb", verbName((Verb) 1234));
 }
