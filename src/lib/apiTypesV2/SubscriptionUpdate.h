@@ -5,11 +5,9 @@
 
 namespace ngsiv2
 {
-
   class SubscriptionUpdate : public Subscription
   {
   public:
-
     bool  descriptionProvided;
     bool  subjectProvided;
     bool  expiresProvided;
@@ -27,9 +25,7 @@ namespace ngsiv2
       attrsFormatProvided  (false),
       throttlingProvided   (false)
       {}
-
   };
-
 }
 
 #endif // SRC_LIB_APITYPESV2_SUBSCRIPTIONUPDATE_H_
