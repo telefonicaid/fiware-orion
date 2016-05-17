@@ -489,7 +489,7 @@ std::string mongoUpdateSubscription
     long long countInc         = 1;
 
     // Update sub-cache
-    // FIXME PR: this is safe without sem?
+    // FIXME #2146: this is safe without sem?
     //
     if (subCacheP != NULL)
     {
@@ -568,7 +568,8 @@ std::string mongoUpdateSubscription
 
   cacheSemTake(__FUNCTION__, "Updating cached subscription");
 
-  // FIXME PR: second lookup for the same in the same function? We already got this some lines ago...
+  // Second lookup for the same in the same function. However, we have to do it, as the item in the cache could have been changed
+  // in the meanwhile.
   subCacheP = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
 
   char* servicePathCache = (char*) ((subCacheP == NULL)? "" : subCacheP->servicePath);
