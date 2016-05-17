@@ -306,7 +306,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
     }
     if (!iter->HasMember("id") && !iter->HasMember("idPattern") && !iter->HasMember("type"))
     {
-      return error(ciP, "subject entities element has not id/idPattern nor type");
+      return error(ciP, "subject entities element has no id/idPattern nor type");
     }
 
     if (iter->HasMember("id") && iter->HasMember("idPattern"))
@@ -319,7 +319,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
     std::string  type;
 
     {
-      Opt<std::string> idOpt = getStringOpt(*iter,"id", "subject entities element id");
+      Opt<std::string> idOpt = getStringOpt(*iter, "id", "subject entities element id");
       if (!idOpt.ok())
       {
         return error(ciP, idOpt.error);
@@ -333,7 +333,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
     }
 
     {
-      Opt<std::string> idPatOpt = getStringOpt(*iter,"idPattern", "subject entities element idPattern");
+      Opt<std::string> idPatOpt = getStringOpt(*iter, "idPattern", "subject entities element idPattern");
       if (!idPatOpt.ok())
       {
         return error(ciP, idPatOpt.error);
@@ -469,10 +469,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       const Value& qs = notification["qs"];
       if (!qs.IsObject())
       {
-        return error(ciP, "notificaction httpExt qs is not an object");
+        return error(ciP, "notification httpExtended qs is not an object");
       }
 
-      std::string r = parseDictionary(ciP, subsP->notification.httpInfo.qs, qs, "notification httpExt qs");
+      std::string r = parseDictionary(ciP, subsP->notification.httpInfo.qs, qs, "notification httpExtended qs");
 
       if (r != "")
       {
@@ -486,10 +486,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       const Value& headers = notification["headers"];
       if (!headers.IsObject())
       {
-        return error(ciP, "notification httpExt headers is not an object");
+        return error(ciP, "notification httpExtended headers is not an object");
       }
 
-      std::string r = parseDictionary(ciP, subsP->notification.httpInfo.headers, headers, "notification httpExt headers");
+      std::string r = parseDictionary(ciP, subsP->notification.httpInfo.headers, headers, "notification httpExtended headers");
 
       if (r != "")
       {

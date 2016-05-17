@@ -243,13 +243,13 @@ echo
 01. POST /v2/subscriptions (without id/idpattern)
 =================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 93
+Content-Length: 92
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "subject entities element has not id/idPattern nor type",
+    "description": "subject entities element has no id/idPattern nor type",
     "error": "BadRequest"
 }
 
