@@ -37,12 +37,6 @@
 #include "cache/subCache.h"
 #include "alarmMgr/alarmMgr.h"
 
-#include "apiTypesV2/Subscription.h" // FIXME PR: remove after moving things to ngsiWrapper
-#include "ngsi/ConditionValueList.h" // FIXME PR: remove after moving things to ngsiWrapper
-#include "ngsi/EntityIdVector.h"     // FIXME PR: remove after moving things to ngsiWrapper
-#include "ngsi/AttributeList.h"      // FIXME PR: remove after moving things to ngsiWrapper
-using namespace ngsiv2;              // FIXME PR: remove after moving things to ngsiWrapper
-
 using std::map;
 
 
@@ -863,9 +857,7 @@ void subCacheItemInsert
 
   enV.release();
   ncV.release();
-
 }
-
 
 
 

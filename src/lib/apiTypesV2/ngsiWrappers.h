@@ -52,15 +52,6 @@ extern void attrsStdVector2NotifyConditionVector(const std::vector<std::string>&
 
 /* ****************************************************************************
 *
-* attrsStdVector2AttributeList -
-*
-*/
-extern void attrsStdVector2AttributeList(const std::vector<std::string>& attrs, AttributeList* attrLP);
-
-
-
-/* ****************************************************************************
-*
 * entIdStdVector2EntityIdVector -
 *
 */

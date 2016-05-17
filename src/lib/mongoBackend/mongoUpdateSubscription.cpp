@@ -42,10 +42,10 @@
 
 #include "cache/subCache.h"
 
-#include "mongo/client/dbclient.h"
-
 using namespace mongo;
 using namespace ngsiv2;
+
+
 
 /* ****************************************************************************
 *
@@ -255,7 +255,7 @@ static void setCondsAndInitialNotify
   bool*                            notificationDone
 )
 {
-  // notification can be changed by true by setCondsAndInitialNotify()
+  // notification can be changed to true by setCondsAndInitialNotify()
   *notificationDone = false;
 
   if (subUp.subjectProvided)
@@ -340,22 +340,23 @@ static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subC
   //           Is this necessary?
   //           The implementation would get a lot simpler if we ALWAYS add CSUB_LASTNOTIFICATION and CSUB_COUNT
   //           to 'newSub'
-  if (subOrig.hasField(CSUB_LASTNOTIFICATION))
+  if (!subOrig.hasField(CSUB_LASTNOTIFICATION))
   {
-    long long lastNotification = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTNOTIFICATION);
-
-    //
-    // Compare with 'lastNotificationTime', that might come from the sub-cache.
-    // If the cached value of lastNotificationTime is higher, then use it.
-    //
-    if (subCacheP != NULL && (subCacheP->lastNotificationTime > lastNotification))
-    {
-      lastNotification = subCacheP->lastNotificationTime;
-    }
-
-    setLastNotification(lastNotification, b);
+    return;
   }
 
+  long long lastNotification = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTNOTIFICATION);
+
+  //
+  // Compare with 'lastNotificationTime', that might come from the sub-cache.
+  // If the cached value of lastNotificationTime is higher, then use it.
+  //
+  if (subCacheP != NULL && (subCacheP->lastNotificationTime > lastNotification))
+  {
+    lastNotification = subCacheP->lastNotificationTime;
+  }
+
+  setLastNotification(lastNotification, b);
 }
 
 

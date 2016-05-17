@@ -57,20 +57,6 @@ void attrsStdVector2NotifyConditionVector(const std::vector<std::string>& attrs,
 }
 
 
-/* ****************************************************************************
-*
-* attrsStdVector2AttributeList -
-*
-*/
-void attrsStdVector2AttributeList(const std::vector<std::string>& attrs, AttributeList* attrLP)
-{
-  for (unsigned int ix = 0; ix < attrs.size(); ix++)
-  {
-    attrLP->push_back(attrs[ix]);
-  }
-}
-
-
 
 /* ****************************************************************************
 *

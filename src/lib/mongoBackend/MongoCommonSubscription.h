@@ -138,7 +138,7 @@ extern void setCondsAndInitialNotify
 * setLastNotification -
 *
 */
-void setLastNotification(long long lastNotification, BSONObjBuilder* b);
+extern void setLastNotification(long long lastNotification, BSONObjBuilder* b);
 
 
 
@@ -147,7 +147,7 @@ void setLastNotification(long long lastNotification, BSONObjBuilder* b);
 * setCount -
 *
 */
-void setCount(long long count, BSONObjBuilder* b);
+extern void setCount(long long count, BSONObjBuilder* b);
 
 
 
@@ -169,4 +169,3 @@ extern void setFormat(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b)
 
 
 #endif // SRC_LIB_MONGO_BACKEND_MONGOCOMMONSUBSCRIPTION_H
-

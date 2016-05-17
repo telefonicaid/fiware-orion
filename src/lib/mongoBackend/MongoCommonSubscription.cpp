@@ -34,6 +34,8 @@
 using namespace ngsiv2;
 using namespace mongo;
 
+
+
 /* ****************************************************************************
 *
 * setNewSubscriptionId -
@@ -110,6 +112,8 @@ static void setExtendedHttpInfo(const HttpInfo& httpInfo, BSONObjBuilder* b)
     LM_T(LmtMongo, ("Subscription payload: %s", httpInfo.payload.c_str()));
   }
 }
+
+
 
 /* ****************************************************************************
 *
@@ -205,7 +209,6 @@ void setEntities(const Subscription& sub, BSONObjBuilder* b)
       if (en.id != "")
       {
         entities.append(BSON(CSUB_ENTITY_ID << en.id << CSUB_ENTITY_ISPATTERN << "false"));
-
       }
       else // idPattern
       {
