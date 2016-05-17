@@ -34,58 +34,40 @@ const char* verbName(Verb verb)
 {
   switch (verb)
   {
-  case GET:        return "GET";
-  case PUT:        return "PUT";
-  case POST:       return "POST";
-  case DELETE:     return "DELETE";
-  case PATCH:      return "PATCH";
-  case HEAD:       return "HEAD";
-  case OPTIONS:    return "OPTIONS";
-  case TRACE:      return "TRACE";
-  case CONNECT:    return "CONNECT";
-  case NOVERB:     return "NOVERB";
-  case UNKOWNVERB: return "UNKONWVERB";
+  case GET:         return "GET";
+  case PUT:         return "PUT";
+  case POST:        return "POST";
+  case DELETE:      return "DELETE";
+  case PATCH:       return "PATCH";
+  case HEAD:        return "HEAD";
+  case OPTIONS:     return "OPTIONS";
+  case TRACE:       return "TRACE";
+  case CONNECT:     return "CONNECT";
+  case NOVERB:      return "NOVERB";
+  case UNKNOWNVERB: return "UNKNOWNVERB";
   }
 
   return "Unknown verb";
 }
+
+
 
 /* ****************************************************************************
 *
 * str2Verb -
 */
 Verb str2Verb(const std::string& str) {
-  if (str == "GET") {
-    return GET;
-  }
-  else if (str == "PUT") {
-    return PUT;
-  }
-  else if (str == "POST") {
-    return POST;
-  }
-  else if (str == "DELETE") {
-    return DELETE;
-  }
-  else if (str == "PATCH") {
-    return PATCH;
-  }
-  else if (str == "HEAD") {
-    return HEAD;
-  }
-  else if (str == "OPTIONS") {
-    return OPTIONS;
-  }
-  else if (str == "TRACE") {
-    return TRACE;
-  }
-  else if (str == "CONNECT") {
-    return CONNECT;
-  }
-  else if (str == "NOVERB") {
-    return NOVERB;
-  }
+  if (str == "GET") return GET;
+  else if (str == "PUT")     return PUT;
+  else if (str == "POST")    return POST;
+  else if (str == "DELETE")  return DELETE;
+  else if (str == "PATCH")   return PATCH;
+  else if (str == "HEAD")    return HEAD;
+  else if (str == "OPTIONS") return OPTIONS;
+  else if (str == "TRACE")   return TRACE;
+  else if (str == "CONNECT") return CONNECT;
+  else if (str == "NOVERB")  return NOVERB;
 
-  return UNKOWNVERB;
+  return UNKNOWNVERB;
 
 }
