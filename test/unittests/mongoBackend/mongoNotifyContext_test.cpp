@@ -1014,6 +1014,16 @@ TEST(mongoNotifyContextRequest, templateNotificationOverrideStdHeader)
 
 
 
+#define CREATE_COMPOUND_VEC(cv)                                          \
+    cv.add(orion::ValueTypeString,          "",  "a");                   \
+    cv.add(orion::ValueTypeString,          "",  "b");                   \
+    cv.add(orion::ValueTypeString,          "",  "c");
+
+#define CREATE_COMPOUND_OBJ(cv)                                          \
+    cv.add(orion::ValueTypeString,          "A",  "a");                  \
+    cv.add(orion::ValueTypeString,          "B",  "b");                  \
+    cv.add(orion::ValueTypeString,          "N",  "c");
+
 /* ****************************************************************************
 *
 * templateNotificationSubstitutionInPayload -
@@ -1034,22 +1044,16 @@ TEST(mongoNotifyContextRequest, templateNotificationSubstitutionInPayload)
   ContextAttribute          a4("A4", "false",  false);
   ContextAttribute          a5("A5", "null",   0.0);
   ContextAttribute          a6("A6", "pi",     3.14);
-  orion::CompoundValueNode  compObject;
-  orion::CompoundValueNode  compVector;
-  ContextAttribute          a7("A7", "compObject", &compObject);
+  orion::CompoundValueNode  compVector(orion::ValueTypeVector);
+  orion::CompoundValueNode  compObject(orion::ValueTypeObject);
+
+  CREATE_COMPOUND_VEC(compVector);
+  CREATE_COMPOUND_OBJ(compObject);
+
   ContextAttribute          a8("A8", "compVector", &compVector);
+  ContextAttribute          a7("A7", "compObject", &compObject);
 
   a5.valueType = orion::ValueTypeNone;
-
-  compObject.add(orion::ValueTypeNumber, "A", "a");
-  compObject.add(orion::ValueTypeNumber, "B", "b");
-  compObject.add(orion::ValueTypeNumber, "C", "c");
-  compObject.add(orion::ValueTypeNumber, "D", "d");
-
-  compVector.add(orion::ValueTypeNumber, "X", 1.0);
-  compVector.add(orion::ValueTypeNumber, "X", 2.0);
-  compVector.add(orion::ValueTypeNumber, "X", 3.0);
-  compVector.add(orion::ValueTypeNumber, "X", 4.0);
   
   cer1.contextElement.entityId.id   = "EID";
   cer1.contextElement.entityId.type = "ETYPE";
@@ -1059,10 +1063,8 @@ TEST(mongoNotifyContextRequest, templateNotificationSubstitutionInPayload)
   cer1.contextElement.contextAttributeVector.push_back(&a4);
   cer1.contextElement.contextAttributeVector.push_back(&a5);
   cer1.contextElement.contextAttributeVector.push_back(&a6);
-//  cer1.contextElement.contextAttributeVector.push_back(&a7);
-//  cer1.contextElement.contextAttributeVector.push_back(&a8);
-
-  
+  cer1.contextElement.contextAttributeVector.push_back(&a7);
+  cer1.contextElement.contextAttributeVector.push_back(&a8);
 
   ncr.contextElementResponseVector.push_back(&cer1);
 
@@ -1076,6 +1078,8 @@ TEST(mongoNotifyContextRequest, templateNotificationSubstitutionInPayload)
      \"A4\":     ${A4},       \
      \"A5\":     ${A5},       \
      \"A6\":     ${A6},       \
+     \"A7\":     ${A7},       \
+     \"A8\":     ${A8},       \
      \"attr-values\": [ \"${A1}\", ${A2}, ${A3}, ${A4}, ${A5}, ${A6} ] }";
 
   httpInfo.qs["qs1"]     = "${A1}";

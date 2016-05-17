@@ -82,7 +82,7 @@ static bool templateNotify
   std::map<std::string, std::string>  qs;
   std::map<std::string, std::string>  headers;
 
-  LM_W(("KZ: In templateNotify"));
+
   //
   // 1. Verb/Method
   //
@@ -106,7 +106,6 @@ static bool templateNotify
   if (httpInfo.payload == "")
   {
     payload = "{" + ce.toJson(renderFormat, attrsOrder) + "}";
-    LM_W(("KZ: payload: %s", payload.c_str()));
   }
   else
   {
@@ -186,7 +185,6 @@ static bool templateNotify
   std::string  out;
   int          r;
 
-  LM_W(("KZ: Sending notification: %s [%s]", uri.c_str(), payload.c_str()));
   r = httpRequestSend(host,
                       port,
                       protocol,
@@ -254,11 +252,8 @@ void* sendNotifyContextRequestAsPerTemplate(void* p)
 {
   NotificationAsTemplateParams* paramP = (NotificationAsTemplateParams*) p;
 
-  LM_W(("KZ: In sendNotifyContextRequestAsPerTemplate (%d contextElementResponses)", paramP->ncrP->contextElementResponseVector.size()));
-
   for (unsigned int ix = 0; ix < paramP->ncrP->contextElementResponseVector.size(); ++ix)
   {
-    LM_W(("KZ: calling templateNotify (%d)", ix));
     templateNotify(paramP->ncrP->subscriptionId,
                    paramP->ncrP->contextElementResponseVector[ix]->contextElement,
                    paramP->httpInfo,
@@ -296,7 +291,6 @@ void Notifier::sendNotifyContextRequest
     ConnectionInfo  ci;
     Verb            verb = httpInfo.verb;
 
-    LM_W(("KZ: In sendNotifyContextRequest"));
     if (verb == NOVERB)
     {
       // Default verb/method is POST
@@ -320,8 +314,6 @@ void Notifier::sendNotifyContextRequest
     //
     if (httpInfo.extended)
     {
-      LM_W(("KZ: Calling sendNotifyContextRequestAsPerTemplate"));
-
       NotificationAsTemplateParams* paramP = new NotificationAsTemplateParams();
 
       paramP->ncrP             = ncrP->clone();

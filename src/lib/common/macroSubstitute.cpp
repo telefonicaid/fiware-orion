@@ -61,13 +61,31 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
     {
       *valueP = "null";
     }
-    else if (vec[ix]->valueType == orion::ValueTypeVector)
+    else if (vec[ix]->valueType == orion::ValueTypeObject)  // meaning: Compound Value
     {
-      *valueP = vec[ix]->compoundValueP->toJson(true);
+      if (vec[ix]->compoundValueP)
+      {
+        if (vec[ix]->compoundValueP->valueType == orion::ValueTypeVector)
+        {
+          *valueP = "[" + vec[ix]->compoundValueP->toJson(true) + "]";
+        }
+        else if (vec[ix]->compoundValueP->valueType == orion::ValueTypeObject)
+        {
+          *valueP = "{" + vec[ix]->compoundValueP->toJson(true) + "}";
+        }
+        else
+        {
+          *valueP = "";
+        }
+      }
+      else
+      {
+        *valueP = "";
+      }
     }
     else if (vec[ix]->valueType == orion::ValueTypeObject)
     {
-      *valueP = vec[ix]->compoundValueP->toJson(true);
+      *valueP = "{" + vec[ix]->compoundValueP->toJson(true) + "}";
     }
     else
     {
@@ -123,7 +141,6 @@ void macroSubstitute(std::string* to, const std::string& from, const ContextElem
       ++fromP;
 
       // Variable found, get its value
-      LM_W(("KZ: Got a var, so substitute: '%s'", varP));
       char* substitute    = NULL;
       int   substituteLen = 0;
 
