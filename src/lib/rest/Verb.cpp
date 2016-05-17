@@ -43,8 +43,8 @@ const char* verbName(Verb verb)
   case OPTIONS:     return "OPTIONS";
   case TRACE:       return "TRACE";
   case CONNECT:     return "CONNECT";
-  case NOVERB:      return "NOVERB";
-  case UNKNOWNVERB: return "UNKNOWNVERB";
+  case NOVERB:      return "";            // Should not be rendered at all
+  case UNKNOWNVERB: return "UNKNOWNVERB"; // Should not progress away parsing
   }
 
   return "Unknown verb";
@@ -66,7 +66,7 @@ Verb str2Verb(const std::string& str) {
   else if (str == "OPTIONS") return OPTIONS;
   else if (str == "TRACE")   return TRACE;
   else if (str == "CONNECT") return CONNECT;
-  else if (str == "NOVERB")  return NOVERB;
+  else if (str == "")        return NOVERB;
 
   return UNKNOWNVERB;
 

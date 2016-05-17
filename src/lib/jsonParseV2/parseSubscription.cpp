@@ -439,16 +439,28 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // method -> verb
     {
-      Opt<std::string> methodOpt = getStringMust(httpExt, "method", "method httpExtended notification");
+      Opt<std::string> methodOpt = getStringOpt(httpExt, "method", "method httpExtended notification");
 
       if (!methodOpt.ok())
       {
         return error(ciP, methodOpt.error);
       }
-      Verb  verb         = str2Verb(methodOpt.value);
-      /*
-       *  CHECK IT IS VALID
-       */
+
+      Verb  verb;
+
+      if (methodOpt.given)
+      {
+        verb = str2Verb(methodOpt.value);
+
+        if (verb == UNKNOWNVERB)
+        {
+          return error(ciP, "unknown method httpExtended notification");
+        }
+      }
+      else // not given by user, the default one will be used
+      {
+        verb = NOVERB;
+      }
 
       subsP->notification.httpInfo.verb = verb;
     }
