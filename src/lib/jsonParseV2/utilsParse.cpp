@@ -34,7 +34,8 @@ using std::string;
 /*
  * getStringAux
  */
-static Opt<string> getStringAux(const Value& parent, const char* field, const string& description, bool optional) {
+static Opt<string> getStringAux(const Value& parent, const char* field, const string& description, bool optional)
+{
   if (parent.HasMember(field))
   {
     const Value& value = parent[field];
@@ -57,7 +58,8 @@ static Opt<string> getStringAux(const Value& parent, const char* field, const st
 /*
  * getStringMust -  get a mandatory string from the rapidjson node
  */
-extern Opt<string> getStringMust(const rapidjson::Value& parent, const char* field, const std::string& description) {
+extern Opt<string> getStringMust(const rapidjson::Value& parent, const char* field, const std::string& description)
+{
   return getStringAux(parent, field, description, false);
 }
 
@@ -66,7 +68,8 @@ extern Opt<string> getStringMust(const rapidjson::Value& parent, const char* fie
 /*
  * getStringOpt - get a optional string from the rapidjson node
  */
-extern Opt<string> getStringOpt(const rapidjson::Value& parent, const char* field, const std::string& description) {
+extern Opt<string> getStringOpt(const rapidjson::Value& parent, const char* field, const std::string& description)
+{
   return  getStringAux(parent, field, description, true);
 }
 
@@ -75,7 +78,8 @@ extern Opt<string> getStringOpt(const rapidjson::Value& parent, const char* fiel
 /*
  * getInt64Aux
  */
-static Opt<int64_t> getInt64Aux(const Value& parent, const char* field, const string& description, bool optional) {
+static Opt<int64_t> getInt64Aux(const Value& parent, const char* field, const string& description, bool optional)
+{
   if (parent.HasMember(field))
   {
     const Value& value = parent[field];
@@ -98,7 +102,8 @@ static Opt<int64_t> getInt64Aux(const Value& parent, const char* field, const st
 /*
  * getInt64Must - get a mandatory int64_t from the rapidjson node
  */
-extern Opt<int64_t> getInt64Must(const rapidjson::Value& parent, const char* field, const std::string& description) {
+extern Opt<int64_t> getInt64Must(const rapidjson::Value& parent, const char* field, const std::string& description)
+{
   return getInt64Aux(parent, field, description, false);
 }
 
