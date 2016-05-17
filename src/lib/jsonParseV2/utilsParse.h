@@ -38,10 +38,29 @@ struct Opt {
   bool ok() { return error.empty(); }
 };
 
+/*
+ * getStringMust -  get a mandatory string from the rapidjson node
+ */
 Opt<std::string> getStringMust(const rapidjson::Value& parent, const char* field,const std::string& description = "");
+
+
+/*
+ * getStringOpt - get a optional string from the rapidjson node
+ */
 Opt<std::string> getStringOpt(const rapidjson::Value& parent, const char* field, const std::string& description = "");
 
+
+
+/*
+ * getInt64Must - get a mandatory int64_t from the rapidjson node
+ */
 Opt<int64_t> getInt64Must(const rapidjson::Value& parent, const char* field, const std::string& description = "");
+
+
+
+/*
+ * getInt64Opt - get a optional int64_t from the rapidjson node
+ */
 Opt<int64_t> getInt64Opt(const rapidjson::Value& parent, const char* field, const std::string& description = "");
 
 #endif // SRC_LIB_JSONPARSEV2_UTILSPARSE_H
