@@ -135,7 +135,18 @@ static char* curlVersionGet(char* buf, int bufLen)
 
 /* ****************************************************************************
 *
-* httpHeaderAdd - 
+* httpHeaderAdd - add HTTP header to the list of HTTP headers for curl
+*
+* PARAMETERS
+*   o headersP            pointer to the list of HTTP headers, to be used by curl
+*   o headerName          The name of the neader, e.g. "Content-Type"
+*   o headerString        The complete header, e.g. "Content-Type: application/json"
+*   o headerTotalSizeP    Pointer to a variaqble holding the total size of the list of headers,
+*                         the string length of the list. To this variable, the string length of the added header must be added.
+*   o extraHeaders        list of extra headers that were asked for when creating the subscription.
+*                         We need this variable here in case the user overloaded any standard header.
+*   o usedExtraHeaders    list of headers already used, so that any overloaded standard header are not present twice in the notification.
+*
 */
 static void httpHeaderAdd
 (
