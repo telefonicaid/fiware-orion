@@ -169,7 +169,10 @@ static void httpHeaderAdd
   else
   {
     h = headerName + ": " + it->second;
-    usedExtraHeaders[headerName.c_str()] = true;
+
+    std::string headerNameLowerCase = headerName;
+    std::transform(headerNameLowerCase.begin(), headerNameLowerCase.end(), headerNameLowerCase.begin(), ::tolower);
+    usedExtraHeaders[headerNameLowerCase.c_str()] = true;
   }
 
   *headersP           = curl_slist_append(*headersP, h.c_str());
@@ -436,7 +439,10 @@ int httpRequestSendWithCurl
   // Extra headers
   for (std::map<std::string, std::string>::const_iterator it = extraHeaders.begin(); it != extraHeaders.end(); ++it)
   {
-    if (!usedExtraHeaders[it->first])
+    std::string headerNameLowerCase = it->first;
+    transform(headerNameLowerCase.begin(), headerNameLowerCase.end(), headerNameLowerCase.begin(), ::tolower);
+
+    if (!usedExtraHeaders[headerNameLowerCase])
     {
       std::string header = it->first + ": " + it->second;
       
