@@ -130,10 +130,11 @@ SET (ORION_LIBS
     serviceRoutines
     serviceRoutinesV2
     ngsiNotify
-    rest
+    rest          # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o; jsonRequestTreat from payloadParse@RestService.cpp.o;
     jsonParse
     jsonParseV2
-    apiTypesV2
+    rest          # this is repeated for linking str2Verb from parseSubscription@parseSubscription.cpp.o;
+                  # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o
     convenience
     ngsi9
     ngsi10
@@ -141,6 +142,7 @@ SET (ORION_LIBS
     cache
     mongoBackend
     parse
+    apiTypesV2
     orionTypes
     common
     alarmMgr

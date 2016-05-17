@@ -30,6 +30,7 @@
 #include "common/sem.h"
 #include "common/string.h"
 #include "apiTypesV2/HttpInfo.h"
+#include "apiTypesV2/ngsiWrappers.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/SubscribeContextRequest.h"
@@ -793,6 +794,69 @@ void subCacheItemInsert
   //
   LM_T(LmtSubCache, ("Inserting NEW sub '%s', lastNotificationTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
   subCacheItemInsert(cSubP);
+}
+
+
+
+/* ****************************************************************************
+*
+* subCacheItemInsert -
+*
+* NGSIv2 wrapper
+*
+*/
+void subCacheItemInsert
+(
+  const char*                        tenant,
+  const char*                        servicePath,
+  const ngsiv2::HttpInfo&            httpInfo,
+  const std::vector<ngsiv2::EntID>&  entities,
+  const std::vector<std::string>&    notifAttributes,
+  const std::vector<std::string>&    condAttributes,
+  const char*                        subscriptionId,
+  int64_t                            expiration,
+  int64_t                            throttling,
+  RenderFormat                       renderFormat,
+  bool                               notificationDone,
+  int64_t                            lastNotificationTime,
+  StringFilter*                      stringFilterP,
+  const std::string&                 status,
+  const std::string&                 q,
+  const std::string&                 geometry,
+  const std::string&                 coords,
+  const std::string&                 georel
+)
+{
+
+  NotifyConditionVector ncV;
+  EntityIdVector        enV;
+  AttributeList         attrL;
+
+  attrsStdVector2NotifyConditionVector(condAttributes, &ncV);
+  entIdStdVector2EntityIdVector(entities, &enV);
+  attrL.fill(notifAttributes);
+
+  subCacheItemInsert(tenant,
+                     servicePath,
+                     httpInfo,
+                     enV,
+                     attrL,
+                     ncV,
+                     subscriptionId,
+                     expiration,
+                     throttling,
+                     renderFormat,
+                     notificationDone,
+                     lastNotificationTime,
+                     stringFilterP,
+                     status,
+                     q,
+                     geometry,
+                     coords,
+                     georel);
+
+  enV.release();
+  ncV.release();
 }
 
 

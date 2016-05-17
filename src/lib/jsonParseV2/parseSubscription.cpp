@@ -30,49 +30,41 @@
 #include "alarmMgr/alarmMgr.h"
 #include "common/globals.h"
 #include "common/RenderFormat.h"
+#include "common/string.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
-#include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/jsonRequestTreat.h"
+#include "jsonParseV2/utilsParse.h"
+#include "rest/Verb.h"
+
 #include "jsonParseV2/parseSubscription.h"
 
 using namespace rapidjson;
 
-
+using ngsiv2::SubscriptionUpdate;
+using ngsiv2::EntID;
 
 /* Prototypes */
 static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::string>* vec, const Value& attributes);
-static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& notification);
-static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& subject);
-static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP, const Value& entities);
-static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& condition);
-
-
+static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& notification);
+static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& subject);
+static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* eivP, const Value& entities);
+static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& condition);
+static std::string badInput(ConnectionInfo* ciP, const std::string& msg);
+static std::string parseDictionary(ConnectionInfo* ciP, std::map<std::string, std::string>& dict, const Value& object, const std::string& name);
 
 /* ****************************************************************************
 *
 * parseSubscription -
 *
 */
-std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDelayedRelease* releaseP, bool update)
+std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bool update)
 {
-  Document                  document;
-  SubscribeContextRequest*  destination;
+  Document document;
 
   document.Parse(ciP->payload);
-
-  if (update)
-  {
-    destination     = &parseDataP->ucsr.res;
-    releaseP->ucsrP = &parseDataP->ucsr.res;
-  }
-  else
-  {
-    destination    = &parseDataP->scr.res;
-    releaseP->scrP = &parseDataP->scr.res;
-  }
 
   if (document.HasParseError())
   {
@@ -95,39 +87,28 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
     // research was made and "ObjectEmpty" was found. As the broker stopped crashing and complaints
     // about crashes with small docs and "Empty()" were found on the internet, we opted to use ObjectEmpty
     //
-    OrionError oe(SccBadRequest, "empty payload");
-
-    alarmMgr.badInput(clientIp, "empty payload");
-    return oe.render(ciP, "");
+    return badInput(ciP, "empty payload");
   }
 
 
   // Description field
-  destination->descriptionProvided = false;
-  if (document.HasMember("description"))
+
+  Opt<std::string> description = getStringOpt(document, "description");
+  if (!description.ok())
   {
-    const Value& description      = document["description"];
-
-    if (!description.IsString())
-    {
-      OrionError oe(SccBadRequest, "description must be a string");
-
-      alarmMgr.badInput(clientIp, "description must be a string");
-      return oe.render(ciP, "");
-    }
-
-    std::string descriptionString = description.GetString();
+    return badInput(ciP, description.error);
+  }
+  else if (description.given)
+  {
+    std::string descriptionString = description.value;
 
     if (descriptionString.length() > MAX_DESCRIPTION_LENGTH)
     {
-      OrionError oe(SccBadRequest, "max description length exceeded");
-
-      alarmMgr.badInput(clientIp, "max description length exceeded");
-      return oe.render(ciP, "");
+      return badInput(ciP, "max description length exceeded");
     }
 
-    destination->descriptionProvided = true;
-    destination->description = descriptionString;
+    subsP->descriptionProvided = true;
+    subsP->description = descriptionString;
   }
 
 
@@ -135,7 +116,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
   if (document.HasMember("subject"))
   {
     const Value&  subject = document["subject"];
-    std::string   r       = parseSubject(ciP, destination, subject);
+    std::string   r       = parseSubject(ciP, subsP, subject);
 
     if (r != "")
     {
@@ -144,18 +125,14 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
   }
   else if (!update)
   {
-    OrionError oe(SccBadRequest, "no subject for subscription specified");
-
-    alarmMgr.badInput(clientIp, "no subject specified");
-    return oe.render(ciP, "");
+    return badInput(ciP, "no subject for subscription specified");
   }
-
 
   // Notification field
   if (document.HasMember("notification"))
   {
     const Value&  notification = document["notification"];
-    std::string   r            = parseNotification(ciP, destination, notification);
+    std::string   r            = parseNotification(ciP, subsP, notification);
 
     if (r != "")
     {
@@ -164,128 +141,98 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
   }
   else if (!update)
   {
-    OrionError oe(SccBadRequest, "no notification for subscription specified");
-
-    alarmMgr.badInput(clientIp, "no notification specified");
-    return oe.render(ciP, "");
+    return badInput(ciP, "no notification for subscription specified");
   }
 
-
   // Expires field
-  if (document.HasMember("expires"))
+  Opt<std::string> expiresOpt = getStringOpt(document, "expires");
+
+  if (!expiresOpt.ok())
   {
-    const Value& expires = document["expires"];
-
-    if (!expires.IsString())
-    {
-      OrionError oe(SccBadRequest, "expires is not a string");
-
-      alarmMgr.badInput(clientIp, "expires is not a string");
-      return oe.render(ciP, "");
-    }
+    return badInput(ciP, expiresOpt.error);
+  }
+  else if (expiresOpt.given)
+  {
+    std::string expires = expiresOpt.value;
 
     int64_t eT = -1;
 
-    if (expires.GetStringLength() == 0)
+    if (expires.empty())
     {
         eT = PERMANENT_SUBS_DATETIME;
     }
     else
     {
-      eT = parse8601Time(expires.GetString());
+      eT = parse8601Time(expires);
       if (eT == -1)
       {
-        OrionError oe(SccBadRequest, "expires has an invalid format");
-
-        alarmMgr.badInput(clientIp, "expires has an invalid format");
-        return oe.render(ciP, "");
+        return badInput(ciP, "expires has an invalid format");
       }
     }
 
-    destination->expires = eT;
+    subsP->expiresProvided = true;
+    subsP->expires = eT;
   }
   else if (!update)
   {
-    destination->expires = PERMANENT_SUBS_DATETIME;
+    subsP->expires = PERMANENT_SUBS_DATETIME;
   }
 
-
   // Status field
-  if (document.HasMember("status"))
+  Opt<std::string> statusOpt =  getStringOpt(document, "status");
+  if (!statusOpt.ok())
   {
-    const Value& status = document["status"];
-
-    if (!status.IsString())
-    {
-      OrionError oe(SccBadRequest, "status is not a string");
-
-      alarmMgr.badInput(clientIp, "status is not a string");
-      return oe.render(ciP, "");
-    }
-
-    std::string statusString = status.GetString();
+    return badInput(ciP, statusOpt.error);
+  }
+  else if (statusOpt.given)
+  {
+    std::string statusString = statusOpt.value;
 
     if ((statusString != "active") && (statusString != "inactive"))
     {
-      OrionError oe(SccBadRequest, "status is not valid (it has to be either active or inactive)");
-
-      alarmMgr.badInput(clientIp, "status is not valid (it has to be either active or inactive)");
-      return oe.render(ciP, "");
+      return badInput(ciP, "status is not valid (it has to be either active or inactive)");
     }
-
-    destination->status = statusString;
+    subsP->statusProvided = true;
+    subsP->status = statusString;
   }
 
-
   // Throttling
-  if (document.HasMember("throttling"))
+  Opt<int64_t> throttlingOpt = getInt64Opt(document, "throttling");
+  if (!throttlingOpt.ok())
   {
-    const Value& throttling = document["throttling"];
-    if (!throttling.IsInt64())
-    {
-      alarmMgr.badInput(clientIp, "throttling is not an int");
-      OrionError oe(SccBadRequest, "throttling is not an int");
-
-      return oe.render(ciP, "");
-    }
-    destination->throttling.seconds = throttling.GetInt64();
+    return badInput(ciP, throttlingOpt.error);
+  }
+  else if (throttlingOpt.given)
+  {
+    subsP->throttlingProvided = true;
+    subsP->throttling = throttlingOpt.value;
   }
   else if (!update) // throttling was not set and it is not update
   {
-    destination->throttling.seconds = 0;
+    subsP->throttling = 0; // Default value if not provided at creation => no throttling
   }
 
-
   // attrsFormat field
-  if (document.HasMember("attrsFormat"))
+  Opt<std::string>  attrsFormatOpt = getStringOpt(document, "attrsFormat");
+  if (!attrsFormatOpt.ok())
   {
-    const Value& attrsFormat = document["attrsFormat"];
-
-    if (!attrsFormat.IsString())
-    {
-      OrionError oe(SccBadRequest, "attrsFormat is not a string");
-
-      alarmMgr.badInput(clientIp, "attrsFormat is not a string");
-      return oe.render(ciP, "");
-    }
-
-    std::string   attrsFormatString = attrsFormat.GetString();
+    return badInput(ciP, attrsFormatOpt.error);
+  }
+  else if (attrsFormatOpt.given)
+  {
+    std::string   attrsFormatString = attrsFormatOpt.value;
     RenderFormat  nFormat           = stringToRenderFormat(attrsFormatString, true);
 
     if (nFormat == NO_FORMAT)
     {
-      const char*  details  = "invalid attrsFormat (accepted values: legacy, normalized, keyValues, values)";
-      OrionError   oe(SccBadRequest, details);
-
-      alarmMgr.badInput(clientIp, details);
-      return oe.render(ciP, "");
+      return badInput(ciP, "invalid attrsFormat (accepted values: legacy, normalized, keyValues, values)");
     }
-
-    destination->attrsFormat = nFormat;
+    subsP->attrsFormatProvided = true;
+    subsP->attrsFormat = nFormat;
   }
-  else if (destination->attrsFormat == NO_FORMAT)
+  else if (!update) // Default value for creation
   {
-    destination->attrsFormat = DEFAULT_RENDER_FORMAT;  // Default format for NGSIv2: normalized
+    subsP->attrsFormat = DEFAULT_RENDER_FORMAT;  // Default format for NGSIv2: normalized
   }
 
   return "OK";
@@ -298,52 +245,41 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
 * parseSubject -
 *
 */
-static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& subject)
+static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& subject)
 {
   std::string r;
 
+  subsP->subjectProvided  = true;
+
   if (!subject.IsObject())
   {
-    OrionError oe(SccBadRequest, "subject is not an object");
-
-    alarmMgr.badInput(clientIp, "subject is not an object");
-    return oe.render(ciP, "");
-
+    return badInput(ciP, "subject is not an object");
   }
+
   // Entities
   if (!subject.HasMember("entities"))
   {
-    OrionError oe(SccBadRequest, "no subject entities specified");
-
-    alarmMgr.badInput(clientIp, "no subject entities specified");
-    return oe.render(ciP, "");
+    return badInput(ciP, "no subject entities specified");
   }
 
-  r = parseEntitiesVector(ciP, &scrP->entityIdVector, subject["entities"] );
+  r = parseEntitiesVector(ciP, &subsP->subject.entities, subject["entities"] );
   if (r != "")
   {
     return r;
   }
 
-
   // Condition
   if (!subject.HasMember("condition"))
   {
-    OrionError oe(SccBadRequest, "no subject condition specified");
-
-    alarmMgr.badInput(clientIp, "no subject condition specified");
-    return oe.render(ciP, "");
+    return badInput(ciP, "no subject condition specified");
   }
 
   const Value& condition = subject["condition"];
   if (!condition.IsObject())
   {
-    OrionError oe(SccBadRequest, "condition is not an object");
-
-    alarmMgr.badInput(clientIp, "condition is not an object");
-    return oe.render(ciP, "");
+    return badInput(ciP, "condition is not an object");
   }
-  r = parseNotifyConditionVector(ciP, scrP, condition);
+  r = parseNotifyConditionVector(ciP, subsP, condition);
 
   return r;
 }
@@ -355,217 +291,281 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* sc
 * parseEntitiesVector -
 *
 */
-static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP, const Value& entities)
+static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* eivP, const Value& entities)
 {
   if (!entities.IsArray())
   {
-    alarmMgr.badInput(clientIp, "subject entities is not an array");
-    OrionError oe(SccBadRequest, "subject entities is not an array");
-
-    return oe.render(ciP, "");
+    return badInput(ciP, "subject entities is not an array");
   }
 
   for (Value::ConstValueIterator iter = entities.Begin(); iter != entities.End(); ++iter)
   {
     if (!iter->IsObject())
     {
-      alarmMgr.badInput(clientIp, "subject entities element is not an object");
-      OrionError oe(SccBadRequest, "subject entities element is not an object");
-
-      return oe.render(ciP, "");
+     return badInput(ciP, "subject entities element is not an object");
     }
     if (!iter->HasMember("id") && !iter->HasMember("idPattern") && !iter->HasMember("type"))
     {
-      alarmMgr.badInput(clientIp, "subject entities element has not id/idPattern nor type");
-      OrionError oe(SccBadRequest, "subject entities element has not id/idPattern");
-
-      return oe.render(ciP, "");
+      return badInput(ciP, "subject entities element has no id/idPattern nor type");
     }
 
     if (iter->HasMember("id") && iter->HasMember("idPattern"))
     {
-      alarmMgr.badInput(clientIp, "subject entities element has id and idPattern");
-      OrionError oe(SccBadRequest, "subject entities element has id and idPattern");
-
-      return oe.render(ciP, "");
+      return badInput(ciP, "subject entities element has id and idPattern");
     }
-
 
     std::string  id;
+    std::string  idPattern;
     std::string  type;
-    std::string  isPattern  = "false";
 
-    if (iter->HasMember("id"))
     {
-      if ((*iter)["id"].IsString())
+      Opt<std::string> idOpt = getStringOpt(*iter, "id", "subject entities element id");
+      if (!idOpt.ok())
       {
-        id = (*iter)["id"].GetString();
+        return badInput(ciP, idOpt.error);
       }
-      else
+      id = idOpt.value;
+
+      if (id.empty())
       {
-        alarmMgr.badInput(clientIp, "subject entities element id is not a string");
-        OrionError oe(SccBadRequest, "subject entities element id is not a string");
-
-        return oe.render(ciP, "");
-      }
-    }
-    if (iter->HasMember("idPattern"))
-    {
-      if ((*iter)["idPattern"].IsString())
-      {
-        id = (*iter)["idPattern"].GetString();
-      }
-      else
-      {
-        alarmMgr.badInput(clientIp, "subject entities element idPattern is not a string");
-        OrionError oe(SccBadRequest, "subject entities element idPattern is not a string");
-
-        return oe.render(ciP, "");
-      }
-
-      isPattern = "true";
-    }
-    if (id == "")  // Only type was provided
-    {
-      id        = ".*";
-      isPattern = "true";
-    }
-
-
-    if (iter->HasMember("type"))
-    {
-      if ((*iter)["type"].IsString())
-      {
-        type = (*iter)["type"].GetString();
-      }
-      else
-      {
-        alarmMgr.badInput(clientIp, "subject entities element type is not a string");
-        OrionError oe(SccBadRequest, "subject entities element type is not a string");
-
-        return oe.render(ciP, "");
+        idPattern = ".*";
       }
     }
 
-    EntityId*  eiP = new EntityId(id, type, isPattern);
+    {
+      Opt<std::string> idPatOpt = getStringOpt(*iter, "idPattern", "subject entities element idPattern");
+      if (!idPatOpt.ok())
+      {
+        return badInput(ciP, idPatOpt.error);
+      }
+      else if (idPatOpt.given)
+      {
+        idPattern = idPatOpt.value;
+      }
+    }
 
-    eivP->push_back_if_absent(eiP);
+    Opt<std::string> typeOpt = getStringOpt(*iter, "type", "subject entities element type");
+    if (!typeOpt.ok())
+    {
+      return badInput(ciP, typeOpt.error);
+    }
+    else if (typeOpt.given)
+    {
+      type = typeOpt.value;
+    }
+
+    EntID  eid(id, idPattern, type);
+
+    if (std::find(eivP->begin(), eivP->end(), eid) == eivP->end()) // if not already included
+    {
+      eivP->push_back(eid);
+    }
   }
 
   return "";
 }
-
-
 
 /* ****************************************************************************
 *
 * parseNotification -
 *
 */
-static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& notification)
+static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& notification)
 {
+
+  subsP->notificationProvided = true;
+
   if (!notification.IsObject())
   {
-    OrionError oe(SccBadRequest, "notitication is not an object");
-
-    alarmMgr.badInput(clientIp, "notification is not an object");
-    return oe.render(ciP, "");
-
+    return badInput(ciP, "notification is not an object");
   }
 
   // Callback
-  if (notification.HasMember("http"))
+  if (notification.HasMember("http") && notification.HasMember("httpExtended"))
+  {
+    return badInput(ciP, "notification has http and httpExtended");
+  }
+  else if (notification.HasMember("http"))
   {
     const Value& http = notification["http"];
     if (!http.IsObject())
     {
-      OrionError oe(SccBadRequest, "http notitication is not an object");
-
-      alarmMgr.badInput(clientIp, "http notification is not an object");
-      return oe.render(ciP, "");
-
+      return badInput(ciP, "http notification is not an object");
     }
 
-    if (!http.HasMember("url"))
+    // http - url
     {
-      alarmMgr.badInput(clientIp, "url http notification is missing");
-      OrionError oe(SccBadRequest, "url http notification is missing");
+      Opt<std::string> urlOpt = getStringMust(http, "url", "url http notification");
 
-      return oe.render(ciP, "");
+      if (!urlOpt.ok())
+      {
+        return badInput(ciP, urlOpt.error);
+      }
+
+      {
+        std::string  host;
+        int          port;
+        std::string  path;
+        std::string  protocol;
+
+        if (parseUrl(urlOpt.value, host, port, path, protocol) == false)
+        {
+          return badInput(ciP, "Invalid URL parsing notification url");
+        }
+      }
+      subsP->notification.httpInfo.url =      urlOpt.value;
+      subsP->notification.httpInfo.extended = false;
     }
-    const Value& url = http["url"];
-    if (!url.IsString())
+  }
+  else if (notification.HasMember("httpExtended"))
+  {
+    const Value& httpExt = notification["httpExtended"];
+    if (!httpExt.IsObject())
     {
-      alarmMgr.badInput(clientIp, "url http notification is not a string");
-      OrionError oe(SccBadRequest, "url http notification is not a string");
-
-      return oe.render(ciP, "");
+      return badInput(ciP, "httpExtended notification is not an object");
     }
-    scrP->reference.string = url.GetString();
 
-    std::string refError = scrP->reference.check(SubscribeContext, "" ,"", 0);
-    if (refError != "OK")
+    // URL
     {
-      alarmMgr.badInput(clientIp, refError);
-      OrionError oe(SccBadRequest, refError + " parsing notification url");
+      Opt<std::string> urlOpt = getStringMust(httpExt, "url", "url httpExtended notification");
 
-      return oe.render(ciP, "");
+      if (!urlOpt.ok())
+      {
+        return badInput(ciP, urlOpt.error);
+      }
+
+      subsP->notification.httpInfo.url = urlOpt.value;
     }
+
+    // method -> verb
+    {
+      Opt<std::string> methodOpt = getStringOpt(httpExt, "method", "method httpExtended notification");
+
+      if (!methodOpt.ok())
+      {
+        return badInput(ciP, methodOpt.error);
+      }
+
+      Verb  verb;
+
+      if (methodOpt.given)
+      {
+        verb = str2Verb(methodOpt.value);
+
+        if (verb == UNKNOWNVERB)
+        {
+          return badInput(ciP, "unknown method httpExtended notification");
+        }
+      }
+      else // not given by user, the default one will be used
+      {
+        verb = NOVERB;
+      }
+
+      subsP->notification.httpInfo.verb = verb;
+    }
+
+    // payload
+    {
+      Opt<std::string> payloadOpt = getStringMust(httpExt, "payload", "payload httpExtended notification");
+      if (!payloadOpt.ok())
+      {
+        return badInput(ciP, payloadOpt.error);
+      }
+      subsP->notification.httpInfo.payload = payloadOpt.value;
+    }
+
+    // qs
+    if (httpExt.HasMember("qs"))
+    {
+      const Value& qs = notification["qs"];
+      if (!qs.IsObject())
+      {
+        return badInput(ciP, "notification httpExtended qs is not an object");
+      }
+
+      std::string r = parseDictionary(ciP, subsP->notification.httpInfo.qs, qs, "notification httpExtended qs");
+
+      if (r != "")
+      {
+        return r;
+      }
+    }
+
+    // headers
+    if (httpExt.HasMember("headers"))
+    {
+      const Value& headers = notification["headers"];
+      if (!headers.IsObject())
+      {
+        return badInput(ciP, "notification httpExtended headers is not an object");
+      }
+
+      std::string r = parseDictionary(ciP, subsP->notification.httpInfo.headers, headers, "notification httpExtended headers");
+
+      if (r != "")
+      {
+        return r;
+      }
+    }
+
+    subsP->notification.httpInfo.extended = true;
+
   }
   else  // missing callback field
   {
-    alarmMgr.badInput(clientIp, "http notification is missing");
-    OrionError oe(SccBadRequest, "http notification is missing");
-
-    return oe.render(ciP, "");
+    return badInput(ciP, "http notification is missing");
   }
 
   // Attributes
+  if (notification.HasMember("attrs") && notification.HasMember("exceptAttrs"))
+  {
+    return badInput(ciP, "http notification has attrs and exceptAttrs");
+  }
   if (notification.HasMember("attrs"))
   {
-    std::string r = parseAttributeList(ciP, &scrP->attributeList.attributeV, notification["attrs"]);
+    std::string r = parseAttributeList(ciP, &subsP->notification.attributes, notification["attrs"]);
 
     if (r != "")
     {
       return r;
     }
+
+    subsP->notification.blackList = false;
+  }
+  else if (notification.HasMember("exceptAttrs"))
+  {
+    std::string r = parseAttributeList(ciP, &subsP->notification.attributes, notification["exceptAttrs"]);
+
+    if (r != "")
+    {
+      return r;
+    }
+
+    subsP->notification.blackList = true;
   }
 
    return "";
 }
-
-
 
 /* ****************************************************************************
 *
 * parseNotifyConditionVector -
 *
 */
-static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& condition)
+static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::SubscriptionUpdate* subsP, const Value& condition)
 {
-  NotifyConditionVector* ncvP = &scrP->notifyConditionVector;
-
   if (!condition.IsObject())
   {
-    alarmMgr.badInput(clientIp, "condition is not an object");
-    OrionError oe(SccBadRequest, "condition is not an object");
-
-    return oe.render(ciP, "");
+   return badInput(ciP, "condition is not an object");
   }
   // Attributes
   if (!condition.HasMember("attrs"))
   {
-    alarmMgr.badInput(clientIp, "no condition attrs specified");
-    OrionError oe(SccBadRequest, "no condition attrs specified");
-
-    return oe.render(ciP, "");
+    return badInput(ciP, "no condition attrs specified");
   }
 
-  NotifyCondition* nc = new NotifyCondition();
-  nc->type = ON_CHANGE_CONDITION;
-  ncvP->push_back(nc);
-
-  std::string r = parseAttributeList(ciP, &nc->condValueList.vec, condition["attrs"]);
+  std::string r = parseAttributeList(ciP, &subsP->subject.condition.attributes, condition["attrs"]);
 
   if (r != "")
   {
@@ -578,25 +578,19 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
 
     if (!expression.IsObject())
     {
-      alarmMgr.badInput(clientIp, "expression is not an object");
-      OrionError oe(SccBadRequest, "expression is not an object");
-
-      return oe.render(ciP, "");
+      return badInput(ciP, "expression is not an object");
     }
 
-    scrP->expression.isSet = true;
+    subsP->subject.condition.expression.isSet = true;
 
     if (expression.HasMember("q"))
     {
       const Value& q = expression["q"];
       if (!q.IsString())
       {
-        alarmMgr.badInput(clientIp, "q is not a string");
-        OrionError oe(SccBadRequest, "q is not a string");
-
-        return oe.render(ciP, "");
+        return badInput(ciP, "q is not a string");
       }
-      scrP->expression.q = q.GetString();
+      subsP->subject.condition.expression.q = q.GetString();
 
       std::string  errorString;
       Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, expression["q"].GetString());
@@ -607,56 +601,55 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
         delete scopeP->stringFilterP;
         delete scopeP;
 
-        alarmMgr.badInput(clientIp, errorString);
-        OrionError oe(SccBadRequest, errorString);
-
-        return oe.render(ciP, "");
+        return badInput(ciP, errorString);
       }
 
-      scrP->restriction.scopeVector.push_back(scopeP);
+      subsP->restriction.scopeVector.push_back(scopeP);
     }
-    if (expression.HasMember("geometry"))
-    {
-      const Value& geometry = expression["geometry"];
-      if (!geometry.IsString())
-      {
-        alarmMgr.badInput(clientIp, "geometry is not a string");
-        OrionError oe(SccBadRequest, "geometry is not a string");
 
-        return oe.render(ciP, "");
+    // geometry
+    {
+      Opt<std::string> geometryOpt = getStringOpt(expression, "geometry");
+
+      if (!geometryOpt.ok())
+      {
+        return badInput(ciP, geometryOpt.error);
       }
-      scrP->expression.geometry = geometry.GetString();
+      else if (geometryOpt.given)
+      {
+        subsP->subject.condition.expression.geometry = geometryOpt.value;
+      }
     }
-    if (expression.HasMember("coords"))
-    {
-      const Value& coords = expression["coords"];
-      if (!coords.IsString())
-      {
-        alarmMgr.badInput(clientIp, "coords is not a string");
-        OrionError oe(SccBadRequest, "coords is not a string");
 
-        return oe.render(ciP, "");
+    // coords
+    {
+      Opt<std::string> coordsOpt = getStringOpt(expression, "coords");
+
+      if (!coordsOpt.ok())
+      {
+          return badInput(ciP, coordsOpt.error);
       }
-      scrP->expression.coords = coords.GetString();
+      else if (coordsOpt.given)
+      {
+        subsP->subject.condition.expression.coords = coordsOpt.value;
+      }
     }
-    if (expression.HasMember("georel"))
-    {
-      const Value& georel = expression["georel"];
-      if (!georel.IsString())
-      {
-        alarmMgr.badInput(clientIp, "georel is not a string");
-        OrionError oe(SccBadRequest, "georel is not a string");
 
-        return oe.render(ciP, "");
+    // georel
+    {
+      Opt<std::string> georelOpt = getStringOpt(expression, "georel");
+      if (!georelOpt.ok())
+      {
+        return badInput(ciP, georelOpt.error);
       }
-      scrP->expression.georel = georel.GetString();
+      if (georelOpt.given)
+      {
+        subsP->subject.condition.expression.georel = georelOpt.value;
+      }
     }
   }
-
   return "";
 }
-
-
 
 /* ****************************************************************************
 *
@@ -667,24 +660,56 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
 {
   if (!attributes.IsArray())
   {
-    alarmMgr.badInput(clientIp, "attrs is not an array");
-    OrionError oe(SccBadRequest, "attrs is not an array");
-
-    return oe.render(ciP, "");
+    return badInput(ciP, "attrs is not an array");
   }
 
   for (Value::ConstValueIterator iter = attributes.Begin(); iter != attributes.End(); ++iter)
   {
     if (!iter->IsString())
     {
-      alarmMgr.badInput(clientIp, "attrs element is not an string");
-      OrionError oe(SccBadRequest, "attrs element is not an string");
-
-      return oe.render(ciP, "");
+      return badInput(ciP, "attrs element is not an string");
     }
 
     vec->push_back(iter->GetString());
   }
 
   return "";
+}
+
+/* ****************************************************************************
+*
+* parseDictionary -
+*
+*/
+static std::string parseDictionary(ConnectionInfo* ciP, std::map<std::string, std::string>& dict, const Value& object, const std::string& name)
+{
+  if (!object.IsObject())
+  {
+    return badInput(ciP, name + " is not an object");
+  }
+
+  for (Value::ConstMemberIterator iter = object.MemberBegin(); iter != object.MemberEnd(); ++iter)
+  {
+    if (!iter->value.IsString())
+    {
+      return badInput(ciP, name + " element is not an string");
+    }
+
+    dict[iter->name.GetString()] = iter->value.GetString();
+  }
+
+  return "";
+}
+
+/* ****************************************************************************
+*
+* error -
+*
+*/
+static std::string badInput(ConnectionInfo* ciP, const std::string& msg)
+{
+  alarmMgr.badInput(clientIp, msg);
+  OrionError oe(SccBadRequest, msg);
+
+  return oe.render(ciP, "");
 }

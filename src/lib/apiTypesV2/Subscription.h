@@ -31,6 +31,9 @@
 #include "ngsi/Duration.h"
 #include "ngsi/Throttling.h"
 #include "apiTypesV2/HttpInfo.h"
+#include "apiTypesV2/SubscriptionExpression.h"
+#include "ngsi/Restriction.h"
+#include "common/RenderFormat.h"
 
 namespace ngsiv2
 {
@@ -41,15 +44,43 @@ struct EntID
   std::string idPattern;
   std::string type;
   std::string toJson();
+
+  EntID(const std::string& idA, const std::string& idPatternA, const std::string& typeA):
+    id(idA),
+    idPattern(idPatternA),
+    type(typeA)
+  {}
+
+  EntID():
+    id(),
+    idPattern(),
+    type()
+  {}
+
 };
+
+inline bool operator==(const EntID& lhs, const EntID& rhs)
+{
+  return (lhs.id == rhs.id) && (lhs.idPattern == rhs.idPattern) && (lhs.type == rhs.type);
+}
+
+inline bool operator!=(const EntID& lhs, const EntID& rhs){ return !(lhs == rhs); }
 
 struct Notification
 {
-  std::vector<std::string> attributes;  
+  std::vector<std::string> attributes;
+  bool                     blackList;
   long long                timesSent;
   long long                lastNotification;
   HttpInfo                 httpInfo;
   std::string              toJson();
+  Notification():
+    attributes(),
+    blackList(false),
+    timesSent(0),
+    lastNotification(-1),
+    httpInfo()
+  {}
 };
 
 
@@ -57,12 +88,7 @@ struct Notification
 struct Condition
 {
   std::vector<std::string> attributes;
-  struct {
-    std::string q;
-    std::string geometry;
-    std::string coords;
-    std::string georel;
-  }                        expression;
+  SubscriptionExpression   expression;
   std::string toJson();
 };
 
@@ -80,12 +106,17 @@ struct Subscription
 {
   std::string  id;
   std::string  description;
+  bool         descriptionProvided;
   Subject      subject;
   long long    expires;
   std::string  status;
   Notification notification;
   long long    throttling;
+  RenderFormat attrsFormat;
+  Restriction  restriction;
   std::string  toJson();
+
+  ~Subscription();
 };
 
 

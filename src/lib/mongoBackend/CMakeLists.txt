@@ -24,6 +24,7 @@ SET (SOURCES
     MongoGlobal.cpp
     MongoCommonUpdate.cpp
     MongoCommonRegister.cpp
+    MongoCommonSubscription.cpp
     mongoRegisterContext.cpp
     mongoDiscoverContextAvailability.cpp
     mongoSubscribeContextAvailability.cpp
@@ -38,6 +39,7 @@ SET (SOURCES
     mongoNotifyContextAvailability.cpp
     mongoQueryTypes.cpp
     mongoCreateSubscription.cpp
+    mongoUpdateSubscription.cpp
     TriggeredSubscription.cpp
     mongoConnectionPool.cpp
     mongoGetSubscriptions.cpp
@@ -53,6 +55,7 @@ SET (HEADERS
     MongoGlobal.h
     MongoCommonUpdate.h
     MongoCommonRegister.h
+    MongoCommonSubscription.h
     mongoRegisterContext.h
     mongoDiscoverContextAvailability.h
     mongoSubscribeContextAvailability.h
@@ -67,6 +70,7 @@ SET (HEADERS
     mongoNotifyContextAvailability.h
     mongoQueryTypes.h
     mongoCreateSubscription.h
+    mongoUpdateSubscription.h
     TriggeredSubscription.h
     mongoConnectionPool.h
     mongoGetSubscriptions.h

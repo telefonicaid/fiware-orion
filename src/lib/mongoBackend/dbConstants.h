@@ -93,6 +93,11 @@
 #define CSUB_FORMAT             "format"
 #define CSUB_STATUS             "status"
 #define CSUB_SERVICE_PATH       "servicePath"
+#define CSUB_EXTENDED           "extended"
+#define CSUB_METHOD             "method"
+#define CSUB_HEADERS            "headers"
+#define CSUB_QS                 "qs"
+#define CSUB_PAYLOAD            "payload"
 
 #define CASUB_EXPIRATION        "expiration"
 #define CASUB_REFERENCE         "reference"

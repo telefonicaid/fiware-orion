@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_MONGOBACKEND_MONGOCREATESUBSCRIPION_H
-#define SRC_LIB_MONGOBACKEND_MONGOCREATESUBSCRIPION_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOUPDATESUBSCRIPION_H
+#define SRC_LIB_MONGOBACKEND_MONGOUPDATESUBSCRIPION_H
 
 /*
 *
@@ -31,22 +31,22 @@
 #include <vector>
 
 #include "rest/OrionError.h"
-#include "apiTypesV2/Subscription.h"
+#include "apiTypesV2/SubscriptionUpdate.h"
 
 
 
 /* ****************************************************************************
 *
-* mongoCreateSubscription -
+* mongoUpdateSubscription -
 *
 * Returns:
-* - subId: subscription susscessfully created ('oe' must be ignored), the subId
+* - subId: subscription susscessfully updated ('oe' must be ignored), the subId
 *   must be used to fill Location header
 * - "": subscription creation fail (look to 'oe')
 */
-extern std::string mongoCreateSubscription
+extern std::string mongoUpdateSubscription
 (
-  const ngsiv2::Subscription&          sub,
+  const ngsiv2::SubscriptionUpdate&    sub,
   OrionError*                          oe,
   std::map<std::string, std::string>&  uriParams,
   const std::string&                   tenant,
@@ -55,4 +55,4 @@ extern std::string mongoCreateSubscription
   const std::string&                   fiwareCorrelator
 );
 
-#endif // SRC_LIB_MONGOBACKEND_MONGOCREATESUBSCRIPION_H
+#endif // SRC_LIB_MONGOBACKEND_MONGOUPDATESUBSCRIPION_H

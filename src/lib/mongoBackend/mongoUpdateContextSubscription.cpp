@@ -382,6 +382,7 @@ HttpStatusCode mongoUpdateContextSubscription
 
     //
     // Update sub-cache
+    // FIXME #2146: this is safe without sem?
     //
     if (cSubP != NULL)
     {

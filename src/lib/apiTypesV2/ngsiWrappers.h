@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_MONGOBACKEND_MONGOCREATESUBSCRIPION_H
-#define SRC_LIB_MONGOBACKEND_MONGOCREATESUBSCRIPION_H
+#ifndef SRC_LIB_APITYPESV2_NGSIWRAPPERS_H
+#define SRC_LIB_APITYPESV2_NGSIWRAPPERS_H
 
 /*
 *
@@ -26,33 +26,35 @@
 * Author: Fermin Galan
 */
 
-#include <map>
-#include <string>
-#include <vector>
+/* The aim of this module is to hold a set of wrapper functions needed
+ * for transforming NGSIv1 into NGSIv2 types and viceversa. We need this
+ * while both versions of the API coexist. However, at the end, this module
+ * should be removed */
 
-#include "rest/OrionError.h"
-#include "apiTypesV2/Subscription.h"
+#include <vector>
+#include <string>
+
+#include "apiTypesV2/Subscription.h"  // EntID
+#include "ngsi/EntityIdVector.h"
+#include "ngsi/AttributeList.h"
+#include "ngsi/NotifyConditionVector.h"
 
 
 
 /* ****************************************************************************
 *
-* mongoCreateSubscription -
+* attrsStdVector2NotifyConditionVector -
 *
-* Returns:
-* - subId: subscription susscessfully created ('oe' must be ignored), the subId
-*   must be used to fill Location header
-* - "": subscription creation fail (look to 'oe')
 */
-extern std::string mongoCreateSubscription
-(
-  const ngsiv2::Subscription&          sub,
-  OrionError*                          oe,
-  std::map<std::string, std::string>&  uriParams,
-  const std::string&                   tenant,
-  const std::vector<std::string>&      servicePathV,
-  const std::string&                   xauthToken,
-  const std::string&                   fiwareCorrelator
-);
+extern void attrsStdVector2NotifyConditionVector(const std::vector<std::string>& attrs, NotifyConditionVector* ncVP);
 
-#endif // SRC_LIB_MONGOBACKEND_MONGOCREATESUBSCRIPION_H
+
+
+/* ****************************************************************************
+*
+* entIdStdVector2EntityIdVector -
+*
+*/
+extern void entIdStdVector2EntityIdVector(const std::vector<ngsiv2::EntID>& entitiesV, EntityIdVector* enVP);
+
+#endif // SRC_LIB_APITYPESV2_NGSIWRAPPERS_H
