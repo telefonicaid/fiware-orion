@@ -44,7 +44,7 @@ typedef enum Verb
   TRACE,
   CONNECT,
   NOVERB,
-  UNKOWNVERB
+  UNKNOWNVERB
 } Verb;
 
 
@@ -54,6 +54,8 @@ typedef enum Verb
 * verbName - 
 */
 extern const char* verbName(Verb verb);
+
+
 
 /* ****************************************************************************
 *
