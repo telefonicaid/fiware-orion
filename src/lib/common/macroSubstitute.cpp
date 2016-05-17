@@ -109,7 +109,7 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
 * 1024 is set as CHUNK_SIZE and hopefully for most substitutions it will be enough with ONE allocation.
 * Allocation is very costly operations ...
 * This function could be a lot faster is we took the first 1024 bytes from the stack instead of using calloc.
-* However, the function gets a little more complicated like that as the first reallos would have to be a normal malloc and a memcpy.
+* However, the function gets a little more complicated like that as the first realloc would have to be a normal malloc and a memcpy.
 *
 * Variable used:
 *   - toP:     pointer to the beginning of the 'to string' where to add the new characters from the 'from string'
