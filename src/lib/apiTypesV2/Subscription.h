@@ -45,7 +45,7 @@ struct EntID
   std::string type;
   std::string toJson();
 
-  EntID(std::string idA, std::string idPatternA, std::string typeA):
+  EntID(const std::string& idA, const std::string& idPatternA, const std::string& typeA):
     id(idA),
     idPattern(idPatternA),
     type(typeA)
@@ -61,7 +61,7 @@ struct EntID
 
 inline bool operator==(const EntID& lhs, const EntID& rhs)
 {
-  return lhs.id == rhs.id && lhs.idPattern == rhs.idPattern && lhs.type == rhs.type;
+  return (lhs.id == rhs.id) && (lhs.idPattern == rhs.idPattern) && (lhs.type == rhs.type);
 }
 
 inline bool operator!=(const EntID& lhs, const EntID& rhs){ return !(lhs == rhs); }
