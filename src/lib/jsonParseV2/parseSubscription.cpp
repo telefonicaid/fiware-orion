@@ -39,7 +39,6 @@
 #include "jsonParseV2/utilsParse.h"
 #include "rest/Verb.h"
 
-
 #include "jsonParseV2/parseSubscription.h"
 
 using namespace rapidjson;
@@ -55,7 +54,6 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
 static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& condition);
 static std::string error(ConnectionInfo* ciP, const std::string& msg);
 static std::string parseDictionary(ConnectionInfo* ciP, std::map<std::string, std::string>& dict, const Value& object, const std::string& name);
-
 
 /* ****************************************************************************
 *
@@ -130,7 +128,6 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     return error(ciP, "no subject for subscription specified");
   }
 
-
   // Notification field
   if (document.HasMember("notification"))
   {
@@ -146,7 +143,6 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   {
     return error(ciP, "no notification for subscription specified");
   }
-
 
   // Expires field
   Opt<std::string> expiresOpt = getStringOpt(document, "expires");
@@ -182,7 +178,6 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     subsP->expires = PERMANENT_SUBS_DATETIME;
   }
 
-
   // Status field
   Opt<std::string> statusOpt =  getStringOpt(document, "status");
   if (!statusOpt.ok())
@@ -201,7 +196,6 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     subsP->status = statusString;
   }
 
-
   // Throttling
   Opt<int64_t> throttlingOpt = getInt64Opt(document, "throttling");
   if (!throttlingOpt.ok())
@@ -217,7 +211,6 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   {
     subsP->throttling = 0; // Default value if not provided at creation => no throttling
   }
-
 
   // attrsFormat field
   Opt<std::string>  attrsFormatOpt = getStringOpt(document, "attrsFormat");
@@ -274,7 +267,6 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
   {
     return r;
   }
-
 
   // Condition
   if (!subject.HasMember("condition"))
@@ -373,8 +365,6 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
   return "";
 }
 
-
-
 /* ****************************************************************************
 *
 * parseNotification -
@@ -389,7 +379,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   {
     return error(ciP, "notification is not an object");
   }
-
 
   // Callback
   if (notification.HasMember("http") && notification.HasMember("httpExtended"))
@@ -427,7 +416,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       subsP->notification.httpInfo.url =      urlOpt.value;
       subsP->notification.httpInfo.extended = false;
     }
-
   }
   else if (notification.HasMember("httpExtended"))
   {
@@ -451,7 +439,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // method -> verb
     {
-
       Opt<std::string> methodOpt = getStringMust(httpExt, "method", "method httpExtended notification");
 
       if (!methodOpt.ok())
@@ -475,7 +462,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       }
       subsP->notification.httpInfo.payload = payloadOpt.value;
     }
-
 
     // qs
     if (httpExt.HasMember("qs"))
@@ -519,7 +505,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     return error(ciP, "http notification is missing");
   }
 
-
   // Attributes
   if (notification.HasMember("attrs") && notification.HasMember("exceptAttrs"))
   {
@@ -551,8 +536,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
    return "";
 }
 
-
-
 /* ****************************************************************************
 *
 * parseNotifyConditionVector -
@@ -560,8 +543,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 */
 static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::SubscriptionUpdate* subsP, const Value& condition)
 {
-
-
   if (!condition.IsObject())
   {
    return error(ciP, "condition is not an object");
@@ -609,7 +590,6 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
         delete scopeP;
 
         return error(ciP, errorString);
-
       }
 
       subsP->restriction.scopeVector.push_back(scopeP);
@@ -658,8 +638,6 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
   }
   return "";
 }
-
-
 
 /* ****************************************************************************
 *
@@ -723,4 +701,3 @@ static std::string error(ConnectionInfo* ciP, const std::string& msg)
 
   return oe.render(ciP, "");
 }
-
