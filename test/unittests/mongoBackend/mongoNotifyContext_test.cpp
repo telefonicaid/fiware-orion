@@ -980,3 +980,112 @@ TEST(mongoNotifyContextRequest, templateNotificationStdPayload)
 
   utExit();
 }
+
+
+
+/* ****************************************************************************
+*
+* templateNotificationOverrideStdHeader -
+*/
+TEST(mongoNotifyContextRequest, templateNotificationOverrideStdHeader)
+{
+  utInit();
+
+  ngsiv2::HttpInfo          httpInfo("http://localhost:1028/notify");
+  Notifier                  notifier;
+  std::vector<std::string>  attrsOrder;
+  NotifyContextRequest      ncr;
+  ContextElementResponse    cer1;
+  
+  ncr.contextElementResponseVector.push_back(&cer1);
+
+  httpInfo.extended      = true;
+  httpInfo.payload       = "{ \"Template\": \"payload\" }";
+  httpInfo.qs["qs1"]     = "q1";
+
+  httpInfo.headers["Content-Length"] = "1234";  // Override the 'real' Content-Length and must appear only once
+  httpInfo.headers["dup"]            = "DUP1";
+  httpInfo.headers["dup"]            = "DUP2";  // This header should appear TWICE - the user asked for it ...
+
+  notifier.sendNotifyContextRequest(&ncr, httpInfo, "", "", "", NGSI_V2_NORMALIZED, attrsOrder);
+
+  utExit();
+}
+
+
+
+#define CREATE_COMPOUND_VEC(cv)                                          \
+    cv.add(orion::ValueTypeString,          "",  "a");                   \
+    cv.add(orion::ValueTypeString,          "",  "b");                   \
+    cv.add(orion::ValueTypeString,          "",  "c");
+
+#define CREATE_COMPOUND_OBJ(cv)                                          \
+    cv.add(orion::ValueTypeString,          "A",  "a");                  \
+    cv.add(orion::ValueTypeString,          "B",  "b");                  \
+    cv.add(orion::ValueTypeString,          "N",  "c");
+
+/* ****************************************************************************
+*
+* templateNotificationSubstitutionInPayload -
+*/
+TEST(mongoNotifyContextRequest, templateNotificationSubstitutionInPayload)
+{
+  utInit();
+
+  ngsiv2::HttpInfo          httpInfo("http://localhost:1028/notify");
+  Notifier                  notifier;
+  std::vector<std::string>  attrsOrder;
+  NotifyContextRequest      ncr;
+  ContextElementResponse    cer1;
+  
+  ContextAttribute          a1("A1", "string", "A1-value");
+  ContextAttribute          a2("A2", "int",    19.0);
+  ContextAttribute          a3("A3", "true",   true);
+  ContextAttribute          a4("A4", "false",  false);
+  ContextAttribute          a5("A5", "null",   0.0);
+  ContextAttribute          a6("A6", "pi",     3.14);
+  orion::CompoundValueNode  compVector(orion::ValueTypeVector);
+  orion::CompoundValueNode  compObject(orion::ValueTypeObject);
+
+  CREATE_COMPOUND_VEC(compVector);
+  CREATE_COMPOUND_OBJ(compObject);
+
+  ContextAttribute          a8("A8", "compVector", &compVector);
+  ContextAttribute          a7("A7", "compObject", &compObject);
+
+  a5.valueType = orion::ValueTypeNone;
+  
+  cer1.contextElement.entityId.id   = "EID";
+  cer1.contextElement.entityId.type = "ETYPE";
+  cer1.contextElement.contextAttributeVector.push_back(&a1);
+  cer1.contextElement.contextAttributeVector.push_back(&a2);
+  cer1.contextElement.contextAttributeVector.push_back(&a3);
+  cer1.contextElement.contextAttributeVector.push_back(&a4);
+  cer1.contextElement.contextAttributeVector.push_back(&a5);
+  cer1.contextElement.contextAttributeVector.push_back(&a6);
+  cer1.contextElement.contextAttributeVector.push_back(&a7);
+  cer1.contextElement.contextAttributeVector.push_back(&a8);
+
+  ncr.contextElementResponseVector.push_back(&cer1);
+
+  httpInfo.extended      = true;
+  httpInfo.payload       = "{ \
+     \"entity\": \"${id}\",   \
+     \"type\":   \"${type}\", \
+     \"A1\":     \"${A1}\",   \
+     \"A2\":     ${A2},       \
+     \"A3\":     ${A3},       \
+     \"A4\":     ${A4},       \
+     \"A5\":     ${A5},       \
+     \"A6\":     ${A6},       \
+     \"A7\":     ${A7},       \
+     \"A8\":     ${A8},       \
+     \"attr-values\": [ \"${A1}\", ${A2}, ${A3}, ${A4}, ${A5}, ${A6} ] }";
+
+  httpInfo.qs["qs1"]     = "${A1}";
+  httpInfo.headers["h1"] = "${A2}";
+
+  notifier.sendNotifyContextRequest(&ncr, httpInfo, "", "", "", NGSI_V2_NORMALIZED, attrsOrder);
+
+  utExit();
+}
