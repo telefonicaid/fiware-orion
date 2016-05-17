@@ -130,13 +130,6 @@ std::string jsonRequestTreat
       {
         return answer;
       }
-      /*
-      if ((answer = parseDataP->scr.res.check(ciP, SubscribeContext, "", "", 0)) != "OK")
-      {
-        alarmMgr.badInput(clientIp, "invalid subscription");
-        return answer;
-      }
-      */
     }
     break;
 
