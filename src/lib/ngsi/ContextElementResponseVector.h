@@ -48,7 +48,7 @@ typedef struct ContextElementResponseVector
                                   bool                comma               = false,
                                   bool                omitAttributeValues = false);
 
-  std::string              toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter);
+  std::string              toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist = false);
   void                     present(const std::string& indent);
   void                     push_back(ContextElementResponse* item);
   unsigned int             size(void);

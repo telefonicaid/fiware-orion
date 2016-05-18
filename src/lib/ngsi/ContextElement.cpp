@@ -113,7 +113,7 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
 *
 * ContextElement::toJson - 
 */
-std::string ContextElement::toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter)
+std::string ContextElement::toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist)
 {
   std::string out;
 

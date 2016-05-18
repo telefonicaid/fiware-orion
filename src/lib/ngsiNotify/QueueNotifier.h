@@ -58,7 +58,8 @@ public:
                                 const std::string&               xauthToken,
                                 const std::string&               fiwareCorrelator,
                                 RenderFormat                     renderFormat,
-                                const std::vector<std::string>&  attrsOrder);
+                                const std::vector<std::string>&  attrsOrder,
+                                bool                             blacklist = false);
   int start();
 
 private:

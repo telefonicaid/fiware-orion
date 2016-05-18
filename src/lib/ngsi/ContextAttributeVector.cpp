@@ -136,7 +136,7 @@ std::string ContextAttributeVector::toJsonTypes()
 * If anybody needs an attribute named 'id' or 'type', then API v1
 * will have to be used to retrieve that information.
 */
-std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat renderFormat, const std::vector<std::string>& attrsFilter)
+std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist)
 {
   if (vec.size() == 0)
   {
@@ -183,7 +183,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat rend
       }
     }
   }
-  else
+  else if (!blacklist)
   {
     for (std::vector<std::string>::const_iterator it = attrsFilter.begin(); it != attrsFilter.end(); ++it)
     {
@@ -191,6 +191,14 @@ std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat rend
       {
         ++validAttributes;
       }
+    }
+  }
+  else // attrsFilter is black list
+  {
+    for (unsigned ix = 0; ix < vec.size(); ++ix)
+    {
+      if ( std::find(attrsFilter.begin(), attrsFilter.end(), vec[ix]->name) == attrsFilter.end() )
+         ++validAttributes;
     }
   }
 
@@ -229,7 +237,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat rend
       }
     }
   }
-  else
+  else if (!blacklist)
   {
     for (std::vector<std::string>::const_iterator it = attrsFilter.begin(); it != attrsFilter.end(); ++it)
     {
@@ -241,7 +249,15 @@ std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat rend
       }
     }
   }
-
+  else // attrsFilter is black list
+  {
+    for (unsigned ix = 0; ix < vec.size(); ++ix)
+    {
+      if ( std::find(attrsFilter.begin(), attrsFilter.end(), vec[ix]->name) == attrsFilter.end() )
+        ++renderedAttributes;
+        out += vec[ix]->toJson(renderedAttributes == validAttributes, renderFormat);
+    }
+  }
   return out;
 }
 

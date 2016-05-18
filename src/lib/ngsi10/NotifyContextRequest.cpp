@@ -66,7 +66,7 @@ std::string NotifyContextRequest::render(ConnectionInfo* ciP, RequestType reques
 *
 * NotifyContextRequest::toJson -
 */
-std::string NotifyContextRequest::toJson(ConnectionInfo* ciP, RenderFormat renderFormat, const std::vector<std::string>& attrsFilter)
+std::string NotifyContextRequest::toJson(ConnectionInfo* ciP, RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist)
 {
   //
   // First, v1 rendering of notification?
@@ -93,7 +93,7 @@ std::string NotifyContextRequest::toJson(ConnectionInfo* ciP, RenderFormat rende
   out += ",";
   out += JSON_STR("data") + ":[";
 
-  out += contextElementResponseVector.toJson(renderFormat, attrsFilter);
+  out += contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist);
   out += "]";
   out += "}";
 
