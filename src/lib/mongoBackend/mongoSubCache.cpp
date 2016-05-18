@@ -104,7 +104,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);
   cSubP->subscriptionId        = strdup(idField.OID().toString().c_str());
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getFieldF(sub, CSUB_SERVICE_PATH).String().c_str() : "/");
-  cSubP->reference             = strdup(sub.hasField(CSUB_REFERENCE)?    getFieldF(sub, CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
+  cSubP->httpInfo.url          = strdup(sub.hasField(CSUB_REFERENCE)?    getFieldF(sub, CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       : 0;
@@ -315,7 +315,7 @@ int mongoSubCacheItemInsert
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->servicePath           = strdup(servicePath);
   cSubP->renderFormat          = renderFormat;
-  cSubP->reference             = strdup(sub.hasField(CSUB_REFERENCE)? getFieldF(sub, CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
+  cSubP->httpInfo.url          = strdup(sub.hasField(CSUB_REFERENCE)? getFieldF(sub, CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;

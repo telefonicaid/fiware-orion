@@ -67,6 +67,7 @@ void Notifier::sendNotifyContextRequest
 {
     ConnectionInfo ci;
 
+    LM_W(("KZ: Sending Notification"));
     //
     // Creating the value of the Fiware-ServicePath HTTP header.
     // This is a comma-separated list of the service-paths in the same order as the entities come in the payload

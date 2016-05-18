@@ -28,6 +28,8 @@
 
 #include <string>
 
+
+
 /* ****************************************************************************
 *
 * Verb - 
@@ -59,7 +61,7 @@ extern const char* verbName(Verb verb);
 
 /* ****************************************************************************
 *
-* verbName -
+* str2Verb -
 */
 extern Verb str2Verb(const std::string& str);
 
