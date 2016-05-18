@@ -330,7 +330,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_C1)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -417,7 +417,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_C1)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -507,7 +507,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_CN)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -523,17 +523,13 @@ TEST(mongoSubscribeContext, Ent1_Attr0_CN)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;   
-    ASSERT_EQ(2, conds.size());
+    ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A20", condValues[0].String());
+    EXPECT_EQ("A20", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -599,7 +595,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_CNbis)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -691,7 +687,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_CN)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -709,17 +705,13 @@ TEST(mongoSubscribeContext, Ent1_AttrN_CN)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
+    ASSERT_EQ(1, conds.size());
+    BSONObj cond0 = conds[0].embeddedObject();    
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A20", condValues[0].String());
+    EXPECT_EQ("A20", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -789,7 +781,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_CNbis)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -882,7 +874,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_C1)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -975,7 +967,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_C1)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -1071,7 +1063,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_CN)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -1091,17 +1083,13 @@ TEST(mongoSubscribeContext, EntN_Attr0_CN)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
+    ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A20", condValues[0].String());
+    ASSERT_EQ(2, condValues.size());
+    EXPECT_EQ("A10", condValues[0].String());    
+    EXPECT_EQ("A20", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -1169,7 +1157,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_CNbis)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -1266,7 +1254,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_CN)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -1288,17 +1276,13 @@ TEST(mongoSubscribeContext, EntN_AttrN_CN)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
+    ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A20", condValues[0].String());
+    EXPECT_EQ("A20", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -1368,7 +1352,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_CNbis)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -1476,7 +1460,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -1575,7 +1559,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1_JSON)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -1676,7 +1660,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -1780,7 +1764,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1_disjoint)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -1898,7 +1882,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -2016,7 +2000,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1_disjoint)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -2127,7 +2111,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -2238,7 +2222,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1_disjoint)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -2361,7 +2345,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -2484,7 +2468,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1_disjoint)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -2544,7 +2528,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN)
     std::vector<std::string>     attrsFilter;
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
-            .Times(2);
+            .Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2588,7 +2572,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -2604,17 +2588,13 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
+    ASSERT_EQ(1, conds.size());
+    BSONObj cond0 = conds[0].embeddedObject();   
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A2", condValues[0].String());
+    EXPECT_EQ("A2", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -2696,7 +2676,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN_partial)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -2712,17 +2692,13 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN_partial)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
+    ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A5", condValues[0].String());
+    EXPECT_EQ("A5", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -2803,7 +2779,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CNbis)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
@@ -2862,7 +2838,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_disjoint)
     attrsFilter.push_back("A2");
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
-            .Times(2);
+            .Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2908,7 +2884,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_disjoint)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -2926,17 +2902,13 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_disjoint)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
+    ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A3", condValues[0].String());
+    EXPECT_EQ("A3", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3021,7 +2993,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -3039,17 +3011,13 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
+    ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A5", condValues[0].String());
+    EXPECT_EQ("A5", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3134,7 +3102,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial_disjoint)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -3152,17 +3120,13 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial_disjoint)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
+    ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A3", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A5", condValues[0].String());
+    EXPECT_EQ("A5", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3245,7 +3209,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CNbis)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -3309,7 +3273,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN)
     attrsFilter.push_back("A2");
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
-            .Times(2);
+            .Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3355,7 +3319,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -3373,17 +3337,13 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
+    ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond1, "type"));
+    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond1, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A2", condValues[0].String());
+    ASSERT_EQ(2, condValues.size());
+    EXPECT_EQ("A1", condValues[0].String());   
+    EXPECT_EQ("A2", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3474,7 +3434,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_C1)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -3588,7 +3548,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_C1)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -3660,7 +3620,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CN)
     std::vector<std::string>     attrsFilter;
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
-            .Times(2);
+            .Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3706,7 +3666,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CN)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -3726,17 +3686,13 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CN)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
+    ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A2", condValues[0].String());
+    EXPECT_EQ("A2", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3826,7 +3782,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CNbis)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -3896,7 +3852,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CN)
     attrsFilter.push_back("A2");
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
-            .Times(2);
+            .Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3944,7 +3900,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CN)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -3966,17 +3922,13 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CN)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
+    ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A2", condValues[0].String());
+    EXPECT_EQ("A2", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -4065,7 +4017,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CNbis)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -4159,7 +4111,7 @@ TEST(mongoSubscribeContext, defaultDuration)
     EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360319100, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(-1, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -4239,7 +4191,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     std::string s2 = res.subscribeError.errorCode.details.substr(69+24, res.subscribeError.errorCode.details.size()-69-24);
     EXPECT_EQ("Database Error (collection: utest.csubs "
               "- insert(): { _id: ObjectId('", s1);
-    EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", servicePath: \"/#\", entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], conditions: [ { type: \"ONCHANGE\", value: [ \"A\" ] } ], format: \"JSON\" } "
+    EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", extended: false, throttling: -1, servicePath: \"/#\", status: \"active\", entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], conditions: [ { type: \"ONCHANGE\", value: [ \"A\" ] } ], expression: { q: \"\", geometry: \"\", coords: \"\", georel: \"\" }, format: \"JSON\" } "
               "- exception: boom!!)", s2);
 
     /* Restore real DB connection */

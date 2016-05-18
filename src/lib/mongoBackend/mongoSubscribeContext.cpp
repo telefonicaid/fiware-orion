@@ -61,7 +61,7 @@ HttpStatusCode mongoSubscribeContext
   const std::string&                   fiwareCorrelator
 )
 {
-#if 0
+#if 1
     OrionError   oe;
     Subscription sub;
 

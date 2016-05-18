@@ -197,7 +197,7 @@ void  SubscribeContextRequest::toNgsiv2Subscription(Subscription* sub)
     duration.set(DEFAULT_DURATION);
   }
 
-  sub->expires = duration.parse();
+  sub->expires = duration.parse() + getCurrentTime();
 
   // Convert restriction
   sub->restriction = restriction;
