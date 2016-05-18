@@ -31,11 +31,13 @@
 #include "rest/EntityTypeInfo.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi10/SubscribeContextRequest.h"
+#include "mongoBackend/dbConstants.h"
 #include "alarmMgr/alarmMgr.h"
 
 
 using namespace ngsiv2;
 
+#if 0
 /* ****************************************************************************
 *
 * SubscribeContextRequest::render - 
@@ -73,6 +75,7 @@ std::string SubscribeContextRequest::render(RequestType requestType, const std::
 
   return out;
 }
+#endif
 
 
 
@@ -154,22 +157,85 @@ void SubscribeContextRequest::fill(EntityTypeInfo typeInfo)
 }
 
 
-#if 0
 /* ****************************************************************************
 *
-* toNgsiv2Subscription::fill -
+* SubscribeContextRequest::toNgsiv2Subscription -
 */
-void  toNgsiv2Subscription(Subscription* sub)
+void  SubscribeContextRequest::toNgsiv2Subscription(Subscription* sub)
 {
   // Convert entityIdVector
-  // Convert attributeList
-  // Convert reference
-  // Convert duration
-  // Convert restriction
-  // Convert notifyConditionVector
-  // Convert throttling
+  for (unsigned int ix = 0; ix < entityIdVector.size(); ++ix)
+  {
+    EntityId* enP = entityIdVector[ix];
+    EntID en;
 
-  /* The number of restrictions */
-  int                    restrictions;
+    if (enP->isPatternIsTrue())
+    {
+      en.idPattern = enP->id;
+    }
+    else
+    {
+      en.id = enP->id;
+    }
+    en.type = enP->type;
+
+    sub->subject.entities.push_back(en);
+  }
+
+  // Convert attributeList
+  for (unsigned int ix = 0; ix < attributeList.size(); ++ix)
+  {
+    sub->notification.attributes.push_back(attributeList[ix]);
+  }
+
+  // Convert reference
+  sub->notification.httpInfo.url = reference.get();
+
+  // Convert duration
+  if (duration.isEmpty())
+  {
+    duration.set(DEFAULT_DURATION);
+  }
+
+  sub->expires = duration.parse();
+
+  // Convert restriction
+  sub->restriction = restriction;
+
+  // Convert notifyConditionVector
+  for (unsigned int ix = 0; ix < notifyConditionVector.size(); ++ix)
+  {
+      NotifyCondition* ncP = notifyConditionVector[ix];
+      if (ncP->type == ON_CHANGE_CONDITION)    // this is just a sanity measure: all types should be ONCHANGE
+      {
+        for (unsigned int jx = 0; jx < ncP->condValueList.size(); ++jx)
+        {
+          sub->subject.condition.attributes.push_back(ncP->condValueList[jx]);
+        }
+      }
+  }
+
+  // Convert throttling
+  sub->throttling = throttling.parse();
+
+  // Note we don't do anything with 'restrictions': it is not needed by the NGSIv2 logic
+
+  // Fill NGSIv2 fields not existing in NGSIv1 with default values
+
+  // status
+  sub->status = STATUS_ACTIVE;
+
+  // descriptionProvided
+  sub->descriptionProvided = false;
+
+  // attrsFormat
+  sub->attrsFormat = NGSI_V1_LEGACY;
+
+  // blaclist
+  sub->notification.blackList = false;
+
+  // extended
+  sub->notification.httpInfo.extended = false;
+
+  // description and expression are not touched, so default empty string provided by constructor will be used
 }
-#endif

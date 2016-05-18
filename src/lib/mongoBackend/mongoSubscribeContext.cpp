@@ -41,6 +41,9 @@
 #include "ngsi/StatusCode.h"
 #include "rest/uriParamNames.h"
 
+#include "mongoBackend/mongoCreateSubscription.h"
+
+using namespace ngsiv2;
 
 
 /* ****************************************************************************
@@ -58,6 +61,27 @@ HttpStatusCode mongoSubscribeContext
   const std::string&                   fiwareCorrelator
 )
 {
+    OrionError   oe;
+    Subscription sub;
+
+    requestP->toNgsiv2Subscription(&sub);
+    std::string subId = mongoCreateSubscription(sub, &oe, uriParam, tenant, servicePathV, xauthToken, fiwareCorrelator);
+
+    if (subId != "")
+    {
+      responseP->subscribeResponse.duration = requestP->duration;
+      responseP->subscribeResponse.subscriptionId.set(subId);
+      responseP->subscribeResponse.throttling = requestP->throttling;
+    }
+    else
+    {
+      // Check OrionError
+      responseP->subscribeError.errorCode.fill(oe.code, oe.details);
+    }
+
+    return SccOk;
+
+#if 0
     std::string servicePath = servicePathV[0] == ""? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
     bool        reqSemTaken = false;
 
@@ -232,4 +256,5 @@ HttpStatusCode mongoSubscribeContext
     responseP->subscribeResponse.throttling = requestP->throttling;
 
     return SccOk;
+#endif
 }
