@@ -34,6 +34,7 @@
 #include "alarmMgr/alarmMgr.h"
 
 
+using namespace ngsiv2;
 
 /* ****************************************************************************
 *
@@ -151,3 +152,24 @@ void SubscribeContextRequest::fill(EntityTypeInfo typeInfo)
     restriction.scopeVector.push_back(scopeP);
   }
 }
+
+
+#if 0
+/* ****************************************************************************
+*
+* toNgsiv2Subscription::fill -
+*/
+void  toNgsiv2Subscription(Subscription* sub)
+{
+  // Convert entityIdVector
+  // Convert attributeList
+  // Convert reference
+  // Convert duration
+  // Convert restriction
+  // Convert notifyConditionVector
+  // Convert throttling
+
+  /* The number of restrictions */
+  int                    restrictions;
+}
+#endif

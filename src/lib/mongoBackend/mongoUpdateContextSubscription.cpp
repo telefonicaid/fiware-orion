@@ -56,8 +56,7 @@ HttpStatusCode mongoUpdateContextSubscription
     const std::string&                  tenant,
     const std::string&                  xauthToken,
     const std::vector<std::string>&     servicePathV,
-    const std::string&                  fiwareCorrelator,
-    std::string                         version
+    const std::string&                  fiwareCorrelator
 )
 { 
   bool  reqSemTaken;
@@ -110,89 +109,20 @@ HttpStatusCode mongoUpdateContextSubscription
    */
   BSONObjBuilder newSub;
 
-  if (version != "v2")
-  {
-    /* Entities, attribute list and reference are not updatable, so they are appended directly */
-    newSub.appendArray(CSUB_ENTITIES, getFieldF(sub, CSUB_ENTITIES).Obj());
-    newSub.appendArray(CSUB_ATTRS, getFieldF(sub, CSUB_ATTRS).Obj());
-    newSub.append(CSUB_REFERENCE, getStringFieldF(sub, CSUB_REFERENCE));
-  }
-  else // v2
-  {
-    // Reference
-    std::string ref;
-    if (!requestP->reference.isEmpty())
-    {
-      ref = requestP->reference.get();
-    }
-    else
-    {
-      ref = getStringFieldF(sub, CSUB_REFERENCE);
-    }
-    newSub.append(CSUB_REFERENCE, ref);
-
-    // Entities
-    if (requestP->entityIdVector.size() > 0)
-    {
-      /* Build entities array */
-      BSONArrayBuilder entities;
-      for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix)
-      {
-        EntityId* en = requestP->entityIdVector[ix];
-
-        if (en->type == "")
-        {
-          entities.append(BSON(CSUB_ENTITY_ID << en->id <<
-                               CSUB_ENTITY_ISPATTERN << en->isPattern));
-        }
-        else
-        {
-          entities.append(BSON(CSUB_ENTITY_ID << en->id <<
-                               CSUB_ENTITY_TYPE << en->type <<
-                               CSUB_ENTITY_ISPATTERN << en->isPattern));
-        }
-      }
-      newSub.append(CSUB_ENTITIES, entities.arr());
-    }
-    else
-    {
-      newSub.appendArray(CSUB_ENTITIES, getFieldF(sub, CSUB_ENTITIES).Obj());
-    }
-
-    // Attributes
-    if (requestP->attributeList.size() > 0)
-    {
-      /* Build attributes array */
-      BSONArrayBuilder attrs;
-      for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix) {
-        attrs.append(requestP->attributeList[ix]);
-      }
-      newSub.append(CSUB_ATTRS, attrs.arr());
-    }
-    else
-    {
-      newSub.appendArray(CSUB_ATTRS, getFieldF(sub, CSUB_ATTRS).Obj());
-    }
-  }
+  /* Entities, attribute list and reference are not updatable, so they are appended directly */
+  newSub.appendArray(CSUB_ENTITIES, getFieldF(sub, CSUB_ENTITIES).Obj());
+  newSub.appendArray(CSUB_ATTRS, getFieldF(sub, CSUB_ATTRS).Obj());
+  newSub.append(CSUB_REFERENCE, getStringFieldF(sub, CSUB_REFERENCE));
 
   /* Expiration */
   long long expiration = sub.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION) : -1;
-  if (version == "v1")
+
+  // Based on duration
+  if (!requestP->duration.isEmpty())
   {
-    // Based on duration
-    if (!requestP->duration.isEmpty())
-    {
-      expiration = getCurrentTime() + requestP->duration.parse();
-    }
+    expiration = getCurrentTime() + requestP->duration.parse();
   }
-  else // v2
-  {
-    // Based on expires
-    if (requestP->expires > 0)
-    {
-      expiration = requestP->expires;
-    }
-  }
+
   newSub.append(CSUB_EXPIRATION, expiration);
   LM_T(LmtMongo, ("New subscription expiration: %ld", (long) expiration));
 
@@ -256,34 +186,9 @@ HttpStatusCode mongoUpdateContextSubscription
        * document, given the processConditionVector() signature */
        EntityIdVector enV;
        AttributeList attrL;
-       if (version == "v1")
-       {
-         enV   = subToEntityIdVector(sub);
-         attrL = subToAttributeList(sub);
-       }
-       else // v2
-       {
-         // In v2 entities and attribute are updatable (as part of subject or notification) so
-         // we have to check in order to know if we get the attribute from the request or from
-         // the subscription
-         if (requestP->entityIdVector.size() > 0)
-         {
-           enV = requestP->entityIdVector;
-         }
-         else
-         {
-           enV = subToEntityIdVector(sub);
-         }
 
-         if (requestP->attributeList.size() > 0)
-         {
-           attrL = requestP->attributeList;
-         }
-         else
-         {
-           attrL = subToAttributeList(sub);
-         }
-       }
+       enV   = subToEntityIdVector(sub);
+       attrL = subToAttributeList(sub);
 
        BSONArray conds = processConditionVector(&requestP->notifyConditionVector,
                                                 enV,
