@@ -711,35 +711,34 @@ If `attrsFormat` is `values` then values entity partial representation mode is u
 Notifications must include a `X-Ngsiv2-AttrsFormat` header with the value of `attrsFormat` of the associated subscription,
 so notification receiver can know the format used without needing processing notification payload.
 
-### Notification templates
+## Custom notifications
 
-At notification time, NGSIv2 implementations will send a notification based on the `notification.httpExtended`
-field of the associated subscription. These fields can be interpreted literally or use a
-templating mechanism, based in macros substitution, that is described in the present subsection.
-
-Only the following fields inside `notification.httpExtended` can be templatized:
+NGSIv2 clients can customize HTTP notification messages using a simple template mechanism. The
+`notification.httpCustom` field allows to specify the following fields subject to be templatized:
 
 * `url`
 * `headers` (both header names and values)
-* `qs` (both in parameters names and values)
+* `qs` (both in parameter names and values)
 * `payload`
 
-It is worth mentioning that `method` is not a template and it is always used literally.
+In addition the HTTP method to be used for delivering the notification can be customized as well using the `method` field,
+but it cannot be a template.
 
-Macro substitution is based on the syntax `${..}`. In particular:
+Macro substitution for templates is based on the syntax `${..}`. In particular:
 
 * `${id}` is replaced by entity id
 * `${type}` is replaced by entity type
 * Any other `${token}` is replaced by the value of attribute which name is `token` or with
-  an empty string if the attribute is not included in the notification. If the value is
-  not a string (i.e. it is a number, a bool, a JSON object or array) it is casted to a string.
+  an empty string if the attribute is not included in the notification. If the value is a number,
+  a bool or null then its string representation is used. If the value is a JSON array or object
+  then its JSON representation as string is used.
 
 Example:
 
-Let's consider the following `notification.httpExtended` object in a given subscription.
+Let's consider the following `notification.httpCustom` object in a given subscription.
 
 ```
-"httpExtended": {
+"httpCustom": {
   "url": "http://foo.com/entity/${id}",
   "headers": {
     "Content-Type": "text/plain"
@@ -766,12 +765,12 @@ The temperature is 23.4 degrees
 
 Some considerations to take into account:
 
-* It is user's responsability to ensure that after substitution the notification is a correct
+* It is the NGSIv2 client's responsability to ensure that after substitution the notification is a correct
   HTTP message (e.g. the Content-Type header is application/xml but the payload doesn't correspond to a
-  well-formed XML document). Specifically, if the resulting URL aftering appliying template is malformed,
-  then notification is skipped.
+  well-formed XML document). Specifically, if the resulting URL after appliying template is malformed,
+  then the notification is skipped.
 * In case the data to notify contains more than one entity, a separate notification (HTTP message) is sent
-  for each of the entities (contrary to default behaviour, which is to send all that in the same HTTP mesage).
+  for each of the entities (contrary to default behaviour, which is to send all entities in the same HTTP message).
 
 ## Group API Entry Point
 
@@ -1473,7 +1472,7 @@ A `notification` object contains the following subfields:
 + `attrs`: List of attributes to be included in the notification message. If not specified (or empty), all attributes are included
   in the notification. It also defines the order in which attributes will appear in notifications when `attrsFormat` `value` is used
   (see "Notification messages" section).
-+ `http` or `httpExtended` (one of both has to be used, but not both at the same time): It is used to convey parameters
++ `http` or `httpCustom` (one of them has to be used, but not both at the same time): It is used to convey parameters
   for notifications delivered through the HTTP protocol.
 + `attrsFormat` (optional): specifies how the entities will be represented in notifications. Accepted values are
   `normalized` (the one used if the field is omitted), `keyValues` or `values`. If `attrsFormat` takes any value different
@@ -1486,15 +1485,17 @@ An `http` object contains the following subfields:
 + `url` : URL referencing the service which is invoked when a notification is generated. A NGSIv2
   compliant server must support `http` URL schema, other schemas could also be supported.
 
-An `httpExtended` object conatins the following subfields. If `httpExtened` is used, then
-"Notification templates" will be used (see specific section).
+An `httpCustom` object contains the following subfields.
 
++ `url`: same as in `http` above.
 + `headers` (optional): a key-map of HTTP headers that are included in the notification messages.
 + `qs` (optional): a key-map of URL query parameters that are included in the notification message.
-+ `method` (optional): the method to use for sending the notification (default is POST). Only valid
-  HTTP methods are allowed, otherwise a 400 Bad Request error will be returned.
++ `method` (optional): the method to use for sending the notification (default is POST). Only valid HTTP methods are allowed.
+   On specifying an invalid HTTP method, a 400 Bad Request error is returned.
 + `payload` (optional): the payload to be used in the notification. If omitted, the default payload (see
   "Notification messages" sections) is used.
+
+If `httpCustom` is used, then the considerations described in "Custom notifications" section apply.
 
 Notification rules are as follow:
 
@@ -1544,7 +1545,7 @@ Response:
                     }
                 },
                 "notification": {
-                    "httpExtended": {
+                    "httpCustom": {
                       "url": "http://localhost:1234",
                       "headers": {
                         "X-MyHeader": "foo"
