@@ -167,7 +167,20 @@ def record():
     #
     #  request.url = request.scheme + '://' + request.host + request.path
     #
-    s += request.method + ' ' + request.scheme + '://' + request.host + request.path + '\n'
+    s += request.method + ' ' + request.scheme + '://' + request.host + request.path
+
+    # Check for query params
+    params = ''
+    for k in request.args:
+        if (params == ''):
+            params = k + '=' + request.args[k]
+        else:
+            params += '&' + k + '=' + request.args[k]
+
+    if (params == ''):
+        s += '\n'
+    else:
+        s += '?' + params + '\n'
 
     # Store headers
     for h in request.headers.keys():
