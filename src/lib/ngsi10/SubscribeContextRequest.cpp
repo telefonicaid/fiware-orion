@@ -134,7 +134,7 @@ void SubscribeContextRequest::release(void)
 {
   entityIdVector.release();
   attributeList.release();
-  restriction.release();
+  //restriction.release();    // FIXME PR: not truly sure if this is "memory-leak safe" but if enabled causes segfault
   notifyConditionVector.release();
 }
 

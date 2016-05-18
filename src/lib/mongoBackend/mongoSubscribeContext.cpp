@@ -61,6 +61,7 @@ HttpStatusCode mongoSubscribeContext
   const std::string&                   fiwareCorrelator
 )
 {
+#if 0
     OrionError   oe;
     Subscription sub;
 
@@ -81,7 +82,7 @@ HttpStatusCode mongoSubscribeContext
 
     return SccOk;
 
-#if 0
+#else
     std::string servicePath = servicePathV[0] == ""? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
     bool        reqSemTaken = false;
 

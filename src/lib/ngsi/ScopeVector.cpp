@@ -162,6 +162,7 @@ unsigned int ScopeVector::size(void) const
 */
 void ScopeVector::release(void)
 {
+  LM_W(("FGM: at ScopeVector release method"));
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     vec[ix]->release();
