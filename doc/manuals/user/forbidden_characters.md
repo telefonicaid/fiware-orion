@@ -60,14 +60,15 @@ or metadata name/type) which are described in the "Field syntax restrictions" se
 [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/). You can also
 enable them for NGSIv1, as described in [this section of the documentation](v1_v2_coexistence.md#checking-id-fields).
 
-### Notification payload template
+### Custom payload special treatment
 
-NGSIv2 allows a templating mechanism (see "Custom notifications" section in
+NGSIv2 provides a templating mechanism for subscriptions which allows to generate custom notifications
+(see "Custom notifications" section in
 the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/)). Forbidden
 characters restrictions apply to the `httpCustom.payload` field in NGSIv2 API operations, such as
 POST /v2/subscription or GET /v2/subscriptions.
 
-However, at notification time, any URL encoded characters in `httpCustom.payload` is decoded.
+However, at notification time, any URL encoded characters in `httpCustom.payload` are decoded.
 
 Example:
 
