@@ -38,6 +38,7 @@
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 #include "apiTypesV2/Subscription.h"
+#include "apiTypesV2/HttpInfo.h"
 
 using namespace mongo;
 

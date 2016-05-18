@@ -31,6 +31,7 @@
 #include "common/RenderFormat.h"
 #include "ngsi/AttributeList.h"
 #include "rest/StringFilter.h"
+#include "apiTypesV2/HttpInfo.h"
 
 
 
@@ -59,7 +60,6 @@ class TriggeredSubscription
   std::string         cacheSubId;
   std::string         tenant;
   StringFilter*       stringFilterP;
-
 
   // FIXME P5: This entire struct will be removed once geo-stuff is implemented the same way StringFilter was implemented (for Issue #1705)
   struct {

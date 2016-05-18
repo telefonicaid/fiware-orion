@@ -45,6 +45,7 @@
 #include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
+#include "apiTypesV2/HttpInfo.h"
 
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -1898,8 +1899,13 @@ static bool processOnChangeConditionForSubscription
 
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
+        //
+        // FIXME PR: HttpInfo should come from payload
+        //
+        ngsiv2::HttpInfo httpInfo(notifyUrl);
+
         /* Send notification */
-        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
+        getNotifier()->sendNotifyContextRequest(&ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
@@ -1910,7 +1916,12 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
-      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
+      //
+      // FIXME PR: HttpInfo should come from payload
+      //
+      ngsiv2::HttpInfo httpInfo(notifyUrl);
+
+      getNotifier()->sendNotifyContextRequest(&ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
       ncr.contextElementResponseVector.release();
 
       return true;

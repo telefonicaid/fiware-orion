@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-
 #include <string>
 
 
@@ -33,6 +32,9 @@
 /* ****************************************************************************
 *
 * Verb - 
+*
+*   The list ist of verbs taken from https://tools.ietf.org/html/rfc7231, section 4.3
+*   and PATCH was added to that list (RFC 5789).
 */
 typedef enum Verb
 {

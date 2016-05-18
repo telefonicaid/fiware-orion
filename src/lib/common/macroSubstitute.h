@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_COMMON_MACROSUBSTITUTE_H_
+#define SRC_LIB_COMMON_MACROSUBSTITUTE_H_
+
 /*
 *
 * Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
@@ -20,52 +23,18 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Orion dev team
+* Author: Ken Zangelin
 */
 #include <string>
-#include <map>
 
-#include "logMsg/logMsg.h"
-
-#include "common/JsonHelper.h"
-#include "apiTypesV2/HttpInfo.h"
-
-
-
-namespace ngsiv2
-{
-
-/* ****************************************************************************
-*
-* HttpInfo::HttpInfo - 
-*/
-HttpInfo::HttpInfo() : verb(NOVERB), extended(false)
-{
-}
+#include "ngsi/ContextElement.h"
 
 
 
 /* ****************************************************************************
 *
-* HttpInfo::HttpInfo - 
+* macroSubstitute - 
 */
-HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(POST), extended(false)
-{
-}
+extern void macroSubstitute(std::string* sP, const std::string& in, const ContextElement& ce);
 
-
-
-/* ****************************************************************************
-*
-* HttpInfo::toJson -
-*/
-std::string HttpInfo::toJson()
-{
-  JsonHelper jh;
-
-  jh.addString("url", this->url);
-
-  return jh.str();
-}
-
-}
+#endif  // SRC_LIB_COMMON_MACROSUBSTITUTE_H_

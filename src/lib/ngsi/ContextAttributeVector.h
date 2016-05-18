@@ -51,7 +51,7 @@ typedef struct ContextAttributeVector
   unsigned int             size(void) const;
   void                     release(void);
   void                     fill(struct ContextAttributeVector* cavP, bool useDefaultType = false);
-  ContextAttribute*        lookup(const std::string& attributeName);
+  ContextAttribute*        lookup(const std::string& attributeName) const;
   
   ContextAttribute*  operator[](unsigned int ix) const;
 
@@ -71,7 +71,7 @@ typedef struct ContextAttributeVector
 
   std::string        toJson(bool                             isLastElement,
                             RenderFormat                     renderFormat,
-                            const std::vector<std::string>&  attrsFilter);
+                            const std::vector<std::string>&  attrsFilter) const;
 
   std::string        toJsonTypes();
 
