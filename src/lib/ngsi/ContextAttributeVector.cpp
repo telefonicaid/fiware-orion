@@ -136,7 +136,7 @@ std::string ContextAttributeVector::toJsonTypes()
 * If anybody needs an attribute named 'id' or 'type', then API v1
 * will have to be used to retrieve that information.
 */
-std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat renderFormat, const std::vector<std::string>& attrsFilter)
+std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat renderFormat, const std::vector<std::string>& attrsFilter) const
 {
   if (vec.size() == 0)
   {
@@ -472,7 +472,7 @@ void ContextAttributeVector::fill(ContextAttributeVector* cavP, bool useDefaultT
 *
 * lookup -
 */
-ContextAttribute* ContextAttributeVector::lookup(const std::string& attributeName)
+ContextAttribute* ContextAttributeVector::lookup(const std::string& attributeName) const
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

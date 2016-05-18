@@ -43,6 +43,7 @@
 #include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
+#include "apiTypesV2/HttpInfo.h"
 
 #include "mongoBackend/MongoCommonUpdate.h"
 #include "mongoBackend/connectionOperations.h"
@@ -1373,12 +1374,13 @@ static bool processOnChangeConditionForUpdateContext
   ContextElementResponse*          notifyCerP,
   const AttributeList&             attrL,
   std::string                      subId,
-  std::string                      notifyUrl,
+  std::string                      notifyUrl,  // FIXME PR: Remove - this param is no longer used
   RenderFormat                     renderFormat,
   std::string                      tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
-  const std::vector<std::string>&  attrsOrder
+  const std::vector<std::string>&  attrsOrder,
+  const ngsiv2::HttpInfo&          httpInfo
 )
 {
   NotifyContextRequest   ncr;
@@ -1426,7 +1428,13 @@ static bool processOnChangeConditionForUpdateContext
   // FIXME: we use a proper origin name
   ncr.originator.set("localhost");
 
-  getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
+  getNotifier()->sendNotifyContextRequest(&ncr,
+                                          httpInfo,
+                                          tenant,
+                                          xauthToken,
+                                          fiwareCorrelator,
+                                          renderFormat,
+                                          attrsOrder);
   return true;
 }
 
@@ -1453,7 +1461,7 @@ static bool processSubscriptions
   for (std::map<string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
   {
     std::string             mapSubId  = it->first;
-    TriggeredSubscription*  trigs     = it->second;
+    TriggeredSubscription*  tSubP     = it->second;
 
 
     /* There are some checks to perform on TriggeredSubscription in order to see if the notification has to be actually sent. Note
@@ -1464,22 +1472,22 @@ static bool processSubscriptions
      */
 
     /* Check 1: timming (not expired and ok from throttling point of view) */
-    if (trigs->throttling != 1 && trigs->lastNotification != 1)
+    if (tSubP->throttling != 1 && tSubP->lastNotification != 1)
     {
       long long current = getCurrentTime();
-      long long sinceLastNotification = current - trigs->lastNotification;
+      long long sinceLastNotification = current - tSubP->lastNotification;
 
-      if (trigs->throttling > sinceLastNotification)
+      if (tSubP->throttling > sinceLastNotification)
       {
         LM_T(LmtMongo, ("blocked due to throttling, current time is: %l", current));
-        LM_T(LmtSubCache, ("ignored '%s' due to throttling, current time is: %l", trigs->cacheSubId.c_str(), current));
+        LM_T(LmtSubCache, ("ignored '%s' due to throttling, current time is: %l", tSubP->cacheSubId.c_str(), current));
 
         continue;
       }
     }
 
     /* Check 2: String Filter */
-    if ((trigs->stringFilterP != NULL) && (!trigs->stringFilterP->match(notifyCerP)))
+    if ((tSubP->stringFilterP != NULL) && (!tSubP->stringFilterP->match(notifyCerP)))
     {
       continue;
     }
@@ -1488,19 +1496,20 @@ static bool processSubscriptions
     // TBD (issue #1678)
 
     /* Send notification */
-    LM_T(LmtSubCache, ("NOT ignored: %s", trigs->cacheSubId.c_str()));
+    LM_T(LmtSubCache, ("NOT ignored: %s", tSubP->cacheSubId.c_str()));
 
-    bool                 notificationSent;
+    bool  notificationSent;
 
     notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
-                                                                trigs->attrL,
+                                                                tSubP->attrL,
                                                                 mapSubId,
-                                                                trigs->reference,
-                                                                trigs->renderFormat,
+                                                                tSubP->reference,
+                                                                tSubP->renderFormat,
                                                                 tenant,
                                                                 xauthToken,
                                                                 fiwareCorrelator,
-                                                                trigs->attrL.attributeV);
+                                                                tSubP->attrL.attributeV,
+                                                                tSubP->httpInfo);
 
     if (notificationSent)
     {
@@ -1523,11 +1532,11 @@ static bool processSubscriptions
       //
       // Saving lastNotificationTime and count for cached subscription
       //
-      if (trigs->cacheSubId != "")
+      if (tSubP->cacheSubId != "")
       {
         cacheSemTake(__FUNCTION__, "update lastNotificationTime for cached subscription");
 
-        CachedSubscription*  cSubP = subCacheItemLookup(trigs->tenant.c_str(), trigs->cacheSubId.c_str());
+        CachedSubscription*  cSubP = subCacheItemLookup(tSubP->tenant.c_str(), tSubP->cacheSubId.c_str());
 
         if (cSubP != NULL)
         {
@@ -1539,7 +1548,7 @@ static bool processSubscriptions
         else
         {
           LM_E(("Runtime Error (cached subscription '%s' for tenant '%s' not found)",
-                trigs->cacheSubId.c_str(), trigs->tenant.c_str()));
+                tSubP->cacheSubId.c_str(), tSubP->tenant.c_str()));
         }
 
         cacheSemGive(__FUNCTION__, "update lastNotificationTime for cached subscription");

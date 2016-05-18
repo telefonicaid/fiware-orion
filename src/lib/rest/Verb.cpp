@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "Verb.h"
 
 
@@ -56,8 +58,9 @@ const char* verbName(Verb verb)
 *
 * str2Verb -
 */
-Verb str2Verb(const std::string& str) {
-  if (str == "GET") return GET;
+Verb str2Verb(const std::string& str)
+{
+  if      (str == "GET")     return GET;
   else if (str == "PUT")     return PUT;
   else if (str == "POST")    return POST;
   else if (str == "DELETE")  return DELETE;
@@ -69,5 +72,4 @@ Verb str2Verb(const std::string& str) {
   else if (str == "")        return NOVERB;
 
   return UNKNOWNVERB;
-
 }

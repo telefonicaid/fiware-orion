@@ -152,3 +152,21 @@ void NotifyContextRequest::release(void)
 {
   contextElementResponseVector.release();
 }
+
+
+
+/* ****************************************************************************
+*
+* NotifyContextRequest::clone - 
+*/
+NotifyContextRequest* NotifyContextRequest::clone(void)
+{
+  NotifyContextRequest* ncrP = new NotifyContextRequest();
+
+  ncrP->subscriptionId = subscriptionId;
+  ncrP->originator     = originator;
+
+  ncrP->contextElementResponseVector.fill(contextElementResponseVector);
+
+  return ncrP;
+}

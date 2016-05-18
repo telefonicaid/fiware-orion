@@ -49,10 +49,10 @@ struct HttpInfo
   bool                                extended;
 
   HttpInfo();
+  HttpInfo(const std::string& _url);
 
   std::string toJson();
 };
-
 
 }
 

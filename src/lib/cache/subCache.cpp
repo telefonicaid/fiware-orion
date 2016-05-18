@@ -739,6 +739,8 @@ void subCacheItemInsert
   cSubP->expression.geometry   = geometry;
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
+  cSubP->httpInfo.url          = httpInfo.url;
+  cSubP->httpInfo.verb         = httpInfo.verb;
 
   if (stringFilterP != NULL)
   {
