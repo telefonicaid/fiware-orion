@@ -242,41 +242,6 @@ HttpStatusCode mongoUpdateContextSubscription
       stringFilterP = requestP->restriction.scopeVector[ix]->stringFilterP;
     }
   }
-  
-
-  /* Description */
-  if (requestP->descriptionProvided)
-  {
-    // Note that in the case of description "" the field is deleted
-    if (requestP->description != "")
-    {
-      newSub.append(CSUB_DESCRIPTION, requestP->description);
-    }
-  }
-  else
-  {
-    // Pass-through of the current subscription
-    if (sub.hasField(CSUB_DESCRIPTION))
-    {
-      newSub.append(CSUB_DESCRIPTION, getStringFieldF(sub, CSUB_DESCRIPTION));
-    }
-  }
-
-  /* Adding status */
-  std::string status;
-  if (requestP->status != "")
-  {
-    status = requestP->status;
-  }
-  else
-  {
-    // Note this code will make that subscriptions not using status field (typically, legacy
-    // subscriptions from pre-1.1.0 versions) will get status 'active' first time they get
-    // updated (either the status field is included in that update or not)
-    status = sub.hasField(CSUB_STATUS) ? getStringFieldF(sub, CSUB_STATUS) : STATUS_ACTIVE;
-  }
-  newSub.append(CSUB_STATUS, status);
-
 
   /* Notify conditions */
   bool notificationDone = false;
@@ -326,12 +291,12 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 requestP->subscriptionId.get(),
                                                 getStringFieldF(sub, CSUB_REFERENCE).c_str(),
                                                 &notificationDone,
-                                                requestP->attrsFormat,
+                                                NGSI_V1_LEGACY,
                                                 tenant,
                                                 xauthToken,
                                                 servicePathV,
                                                 &requestP->restriction,
-                                                status,
+                                                STATUS_ACTIVE,
                                                 fiwareCorrelator,
                                                 requestP->attributeList.attributeV);
 
@@ -341,24 +306,6 @@ HttpStatusCode mongoUpdateContextSubscription
        /* Remove EntityIdVector and AttributeList dynamic memory */
        enV.release();
        attrL.release();
-  }
-
-
-  // Expression
-  if (requestP->expression.isSet)
-  {
-    /* Build expression */
-    BSONObjBuilder expression;
-
-    expression << CSUB_EXPR_Q << requestP->expression.q
-             << CSUB_EXPR_GEOM << requestP->expression.geometry
-             << CSUB_EXPR_COORDS << requestP->expression.coords
-             << CSUB_EXPR_GEOREL << requestP->expression.georel;
-    newSub.append(CSUB_EXPR, expression.obj());
-  }
-  else if (sub.hasField(CSUB_EXPR))
-  {
-    newSub.append(CSUB_EXPR, getFieldF(sub, CSUB_EXPR).Obj());
   }
 
   long long count = sub.hasField(CSUB_COUNT) ? getIntOrLongFieldAsLongF(sub, CSUB_COUNT) : 0;
@@ -429,22 +376,8 @@ HttpStatusCode mongoUpdateContextSubscription
   //
   // Adding format to use in notifications
   //
-  std::string   renderFormatString  = "";
-  RenderFormat  renderFormat        = NO_FORMAT;
-
-  if (requestP->attrsFormat != NO_FORMAT)
-  {
-    renderFormat       = requestP->attrsFormat;
-    renderFormatString = renderFormatToString(renderFormat);
-    newSub.append(CSUB_FORMAT, renderFormatString.c_str());
-  }
-  else
-  {
-    renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : renderFormatToString(NGSI_V1_LEGACY);
-    renderFormat       = stringToRenderFormat(renderFormatString, false);
-    newSub.append(CSUB_FORMAT, renderFormatString);
-  }
-
+  std::string renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : renderFormatToString(NGSI_V1_LEGACY);
+  newSub.append(CSUB_FORMAT, renderFormatString);
 
   /* Update document in MongoDB */
   BSONObj  newSubObject = newSub.obj();
@@ -516,13 +449,13 @@ HttpStatusCode mongoUpdateContextSubscription
                                           servicePath,
                                           lastNotificationTime,
                                           expiration,
-                                          status,
-                                          requestP->expression.q,
-                                          requestP->expression.geometry,
-                                          requestP->expression.coords,
-                                          requestP->expression.georel,
+                                          STATUS_ACTIVE,
+                                          "",
+                                          "",
+                                          "",
+                                          "",
                                           stringFilterP,
-                                          renderFormat);
+                                          NGSI_V1_LEGACY);
 
   if (cSubP != NULL)
   {

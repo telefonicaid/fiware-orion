@@ -109,12 +109,6 @@ HttpStatusCode mongoSubscribeContext
 
     /* ServicePath (note that it cannot be empty, by construction) */
     sub.append(CSUB_SERVICE_PATH, servicePath);
-
-    /* Description */
-    if (requestP->description != "")
-    {
-      sub.append(CSUB_DESCRIPTION, requestP->description);
-    }
     
     /* Build entities array */
     BSONArrayBuilder entities;
@@ -161,10 +155,6 @@ HttpStatusCode mongoSubscribeContext
       }
     }
 
-    /* Adding status */
-    std::string status = requestP->status == ""?  STATUS_ACTIVE : requestP->status;
-    sub.append(CSUB_STATUS, status);
-
     /* Build conditions array (including side-effect notifications and threads creation) */
     bool       notificationDone = false;
     BSONArray  conds = processConditionVector(&requestP->notifyConditionVector,
@@ -173,25 +163,16 @@ HttpStatusCode mongoSubscribeContext
                                              oid.toString(),
                                              requestP->reference.get(),
                                              &notificationDone,
-                                             requestP->attrsFormat,
+                                             NGSI_V1_LEGACY,
                                              tenant,
                                              xauthToken,
                                              servicePathV,
                                              &requestP->restriction,
-                                             status,
+                                             STATUS_ACTIVE,
                                              fiwareCorrelator,
                                              requestP->attributeList.attributeV);
 
     sub.append(CSUB_CONDITIONS, conds);
-
-    /* Build expression */
-    BSONObjBuilder expression;
-
-    expression << CSUB_EXPR_Q << requestP->expression.q
-               << CSUB_EXPR_GEOM << requestP->expression.geometry
-               << CSUB_EXPR_COORDS << requestP->expression.coords
-               << CSUB_EXPR_GEOREL << requestP->expression.georel;
-    sub.append(CSUB_EXPR, expression.obj());
 
     /* Last notification */
     long long lastNotificationTime = 0;
@@ -204,7 +185,7 @@ HttpStatusCode mongoSubscribeContext
     }
 
     /* Adding format to use in notifications */
-    sub.append(CSUB_FORMAT, renderFormatToString(requestP->attrsFormat));
+    sub.append(CSUB_FORMAT, renderFormatToString(NGSI_V1_LEGACY));
 
     /* Insert document in database */
     std::string err;
@@ -237,15 +218,15 @@ HttpStatusCode mongoSubscribeContext
                        oidString.c_str(),
                        expiration,
                        throttling,
-                       requestP->attrsFormat,
+                       NGSI_V1_LEGACY,
                        notificationDone,
                        lastNotificationTime,
                        stringFilterP,
-                       status,
-                       requestP->expression.q,
-                       requestP->expression.geometry,
-                       requestP->expression.coords,
-                       requestP->expression.georel);
+                       STATUS_ACTIVE,
+                       "",
+                       "",
+                       "",
+                       "");
 
     cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
 

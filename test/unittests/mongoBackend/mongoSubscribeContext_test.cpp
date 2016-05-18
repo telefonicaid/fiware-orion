@@ -300,8 +300,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_C1)
     req.entityIdVector.push_back(&en);
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
-    req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
+    req.reference.set("http://notify.me");    
 
     /* Prepare database */
     prepareDatabase();
@@ -389,7 +388,6 @@ TEST(mongoSubscribeContext, Ent1_AttrN_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -480,7 +478,6 @@ TEST(mongoSubscribeContext, Ent1_Attr0_CN)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -573,7 +570,6 @@ TEST(mongoSubscribeContext, Ent1_Attr0_CNbis)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -666,7 +662,6 @@ TEST(mongoSubscribeContext, Ent1_AttrN_CN)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -765,7 +760,6 @@ TEST(mongoSubscribeContext, Ent1_AttrN_CNbis)
     req.notifyConditionVector.push_back(&nc3);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -859,7 +853,6 @@ TEST(mongoSubscribeContext, EntN_Attr0_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -953,7 +946,6 @@ TEST(mongoSubscribeContext, EntN_AttrN_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -1050,7 +1042,6 @@ TEST(mongoSubscribeContext, EntN_Attr0_CN)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -1149,7 +1140,6 @@ TEST(mongoSubscribeContext, EntN_Attr0_CNbis)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -1247,7 +1237,6 @@ TEST(mongoSubscribeContext, EntN_AttrN_CN)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -1350,7 +1339,6 @@ TEST(mongoSubscribeContext, EntN_AttrN_CNbis)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -1459,7 +1447,6 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -1559,7 +1546,6 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1_JSON)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -1661,7 +1647,6 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -1766,7 +1751,6 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1_disjoint)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -1885,7 +1869,6 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -2004,7 +1987,6 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1_disjoint)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -2116,7 +2098,6 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
@@ -2228,7 +2209,6 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1_disjoint)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
@@ -2351,8 +2331,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1)
     req.attributeList.push_back("A2");
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
-    req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
+    req.reference.set("http://notify.me");    
 
     /* Prepare database */
     prepareDatabasePatternTrue();
@@ -2476,7 +2455,6 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1_disjoint)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
@@ -2580,8 +2558,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN)
     req.notifyConditionVector.push_back(&nc1);
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
-    req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
+    req.reference.set("http://notify.me");  
 
     /* Prepare database */
     prepareDatabase();
@@ -2690,7 +2667,6 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN_partial)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -2798,7 +2774,6 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CNbis)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -2904,7 +2879,6 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_disjoint)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -3017,8 +2991,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial)
     req.notifyConditionVector.push_back(&nc1);
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
-    req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
+    req.reference.set("http://notify.me");    
 
     /* Prepare database */
     prepareDatabase();
@@ -3132,7 +3105,6 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial_disjoint)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -3243,8 +3215,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CNbis)
     req.attributeList.push_back("A2");
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
-    req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
+    req.reference.set("http://notify.me");   
 
     /* Prepare database */
     prepareDatabase();
@@ -3355,7 +3326,6 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN)
     req.notifyConditionVector.push_back(&nc4);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -3475,7 +3445,6 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -3590,7 +3559,6 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -3709,7 +3677,6 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CN)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -3830,7 +3797,6 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CNbis)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -3949,7 +3915,6 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CN)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -4071,7 +4036,6 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CNbis)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -4166,7 +4130,6 @@ TEST(mongoSubscribeContext, defaultDuration)
     req.entityIdVector.push_back(&en);
     req.notifyConditionVector.push_back(&nc);
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -4256,7 +4219,6 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Set MongoDB connection (prepare database first with the "actual" connection object).
      * The "actual" conneciton is preserved for later use */
@@ -4277,8 +4239,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     std::string s2 = res.subscribeError.errorCode.details.substr(69+24, res.subscribeError.errorCode.details.size()-69-24);
     EXPECT_EQ("Database Error (collection: utest.csubs "
               "- insert(): { _id: ObjectId('", s1);
-    EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", servicePath: \"/#\", entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], status: \"active\", conditions: [ { type: \"ONCHANGE\", value: [ \"A\" ] } ], "
-              "expression: { q: \"\", geometry: \"\", coords: \"\", georel: \"\" }, format: \"JSON\" } "
+    EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", servicePath: \"/#\", entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], conditions: [ { type: \"ONCHANGE\", value: [ \"A\" ] } ], format: \"JSON\" } "
               "- exception: boom!!)", s2);
 
     /* Restore real DB connection */

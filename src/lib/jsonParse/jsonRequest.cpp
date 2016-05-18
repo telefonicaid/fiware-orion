@@ -181,23 +181,6 @@ std::string jsonTreat
   JsonRequest*  reqP  = jsonRequestGet(request, ciP->method);
 
   //
-  // Set default attrsFormat to NGSI_V1_LEGACY when parsing
-  // SubscribeContext or UpdateContextSubscription in v1 JSON parsing
-  //
-  if (reqP != NULL)
-  {
-    if (reqP->type == SubscribeContext)
-    {
-      parseDataP->scr.res.attrsFormat = NGSI_V1_LEGACY;
-    }
-    else if (reqP->type == UpdateContextSubscription)
-    {
-      parseDataP->ucsr.res.attrsFormat = NGSI_V1_LEGACY;
-    }
-  }
-
-
-  //
   // FIXME P4 #1862:
   //
   // This check comes from the old XML days, as the the XML parsing library did an assert

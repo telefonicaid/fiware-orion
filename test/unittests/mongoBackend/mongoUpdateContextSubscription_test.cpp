@@ -1869,8 +1869,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
     NotifyCondition nc;
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
-    req.notifyConditionVector.push_back(&nc);
-    req.attrsFormat = NGSI_V1_LEGACY;
+    req.notifyConditionVector.push_back(&nc);    
 
     /* Prepare database */
     prepareDatabase();
@@ -1967,7 +1966,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1_JSON)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
     req.notifyConditionVector.push_back(&nc);
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -2061,7 +2059,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
     req.notifyConditionVector.push_back(&nc);    
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -2156,7 +2153,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1_disjoint)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A3");
     req.notifyConditionVector.push_back(&nc);    
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -2266,7 +2262,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
     req.notifyConditionVector.push_back(&nc);
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -2375,7 +2370,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1_disjoint)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A3");
     req.notifyConditionVector.push_back(&nc);
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -2478,7 +2472,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
     req.notifyConditionVector.push_back(&nc);
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
@@ -2581,7 +2574,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1_disjoint)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A3");
     req.notifyConditionVector.push_back(&nc);
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
@@ -2696,7 +2688,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
     req.notifyConditionVector.push_back(&nc);
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
@@ -2811,7 +2802,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1_disjoint)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A3");
     req.notifyConditionVector.push_back(&nc);
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
@@ -2911,8 +2901,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN)
     nc2.type = "ONCHANGE";
     nc2.condValueList.push_back("A2");
     req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);    
-    req.attrsFormat = NGSI_V1_LEGACY;
+    req.notifyConditionVector.push_back(&nc2);
 
     /* Prepare database */
     prepareDatabase();
@@ -3017,7 +3006,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
     nc2.condValueList.push_back("A5");
     req.notifyConditionVector.push_back(&nc1);
     req.notifyConditionVector.push_back(&nc2);    
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -3121,7 +3109,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CNbis)
     nc.condValueList.push_back("A1");
     nc.condValueList.push_back("A2");
     req.notifyConditionVector.push_back(&nc);    
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -3218,8 +3205,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_disjoint)
     nc2.type = "ONCHANGE";
     nc2.condValueList.push_back("A3");
     req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);    
-    req.attrsFormat = NGSI_V1_LEGACY;
+    req.notifyConditionVector.push_back(&nc2);
 
     /* Prepare database */
     prepareDatabase();
@@ -3323,8 +3309,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial)
     nc2.type = "ONCHANGE";
     nc2.condValueList.push_back("A5");
     req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);    
-    req.attrsFormat = NGSI_V1_LEGACY;
+    req.notifyConditionVector.push_back(&nc2);
 
     /* Prepare database */
     prepareDatabase();
@@ -3428,8 +3413,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial_disjoint)
     nc2.type = "ONCHANGE";
     nc2.condValueList.push_back("A5");
     req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);    
-    req.attrsFormat = NGSI_V1_LEGACY;
+    req.notifyConditionVector.push_back(&nc2);
 
     /* Prepare database */
     prepareDatabase();
@@ -3531,8 +3515,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CNbis)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
     nc.condValueList.push_back("A2");
-    req.notifyConditionVector.push_back(&nc);    
-    req.attrsFormat = NGSI_V1_LEGACY;
+    req.notifyConditionVector.push_back(&nc);
 
     /* Prepare database */
     prepareDatabase();
@@ -3636,8 +3619,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
     nc4.type = "ONCHANGE";
     nc4.condValueList.push_back("A2");
     req.notifyConditionVector.push_back(&nc3);
-    req.notifyConditionVector.push_back(&nc4);    
-    req.attrsFormat = NGSI_V1_LEGACY;
+    req.notifyConditionVector.push_back(&nc4);
 
     /* Prepare database */
     prepareDatabase();
@@ -3750,8 +3732,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_C1)
     NotifyCondition nc;
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
-    req.notifyConditionVector.push_back(&nc);    
-    req.attrsFormat = NGSI_V1_LEGACY;
+    req.notifyConditionVector.push_back(&nc);
 
     /* Prepare database */
     prepareDatabase();
@@ -3854,8 +3835,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_C1)
     NotifyCondition nc;
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
-    req.notifyConditionVector.push_back(&nc);    
-    req.attrsFormat = NGSI_V1_LEGACY;
+    req.notifyConditionVector.push_back(&nc);
 
     /* Prepare database */
     prepareDatabase();
@@ -3967,8 +3947,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CN)
     nc2.type = "ONCHANGE";
     nc2.condValueList.push_back("A2");
     req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);    
-    req.attrsFormat = NGSI_V1_LEGACY;
+    req.notifyConditionVector.push_back(&nc2);
 
     /* Prepare database */
     prepareDatabase();
@@ -4082,8 +4061,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CNbis)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
     nc.condValueList.push_back("A2");
-    req.notifyConditionVector.push_back(&nc);    
-    req.attrsFormat = NGSI_V1_LEGACY;
+    req.notifyConditionVector.push_back(&nc);
 
     /* Prepare database */
     prepareDatabase();
@@ -4190,8 +4168,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
     nc2.type = "ONCHANGE";
     nc2.condValueList.push_back("A2");
     req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);    
-    req.attrsFormat = NGSI_V1_LEGACY;
+    req.notifyConditionVector.push_back(&nc2);
 
     /* Prepare database */
     prepareDatabase();
@@ -4301,8 +4278,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CNbis)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
     nc.condValueList.push_back("A2");
-    req.notifyConditionVector.push_back(&nc);    
-    req.attrsFormat = NGSI_V1_LEGACY;
+    req.notifyConditionVector.push_back(&nc);
 
     /* Prepare database */
     prepareDatabase();
@@ -4393,7 +4369,6 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
     nc.condValueList.push_back("A");
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT5H");
-    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -4558,7 +4533,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
     EXPECT_EQ(SccReceiverInternalError, res.subscribeError.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.subscribeError.errorCode.reasonPhrase);
     EXPECT_EQ("Database Error (collection: utest.csubs "
-              "- update(): <{ _id: ObjectId('51307b66f481db11bf860001') },{ entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], reference: \"http://notify1.me\", expiration: 1360250700, servicePath: \"/#\", status: \"active\", conditions: [], lastNotification: 15000000, format: \"JSON\" }> "
+              "- update(): <{ _id: ObjectId('51307b66f481db11bf860001') },{ entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], reference: \"http://notify1.me\", expiration: 1360250700, servicePath: \"/#\", conditions: [], lastNotification: 15000000, format: \"JSON\" }> "
               "- exception: boom!!)", res.subscribeError.errorCode.details);
 
     /* Restore real DB connection */
