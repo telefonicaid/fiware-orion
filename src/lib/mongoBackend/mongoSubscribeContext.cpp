@@ -45,7 +45,6 @@ HttpStatusCode mongoSubscribeContext
   SubscribeContextRequest*             requestP,
   SubscribeContextResponse*            responseP,
   const std::string&                   tenant,
-  std::map<std::string, std::string>&  uriParam,
   const std::string&                   xauthToken,
   const std::vector<std::string>&      servicePathV,
   const std::string&                   fiwareCorrelator
@@ -55,7 +54,7 @@ HttpStatusCode mongoSubscribeContext
     Subscription sub;
 
     requestP->toNgsiv2Subscription(&sub);
-    std::string subId = mongoCreateSubscription(sub, &oe, uriParam, tenant, servicePathV, xauthToken, fiwareCorrelator);
+    std::string subId = mongoCreateSubscription(sub, &oe, tenant, servicePathV, xauthToken, fiwareCorrelator);
 
     if (subId != "")
     {      

@@ -68,7 +68,6 @@ extern std::string postSubscriptions
   TIMED_MONGO(subsID = mongoCreateSubscription(
                           parseDataP->subsV2,
                           &beError,
-                          ciP->uriParam,
                           ciP->tenant,
                           ciP->servicePathV,
                           ciP->httpHeaders.xauthToken,
