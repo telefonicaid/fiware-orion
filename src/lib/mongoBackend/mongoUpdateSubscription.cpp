@@ -301,7 +301,7 @@ static void setCondsAndInitialNotifyNgsiv1
   }
 
 
-  /* Conds vector (and maybe and initial notification) */
+  /* Conds vector (and maybe an initial notification) */
   *notificationDone = false;
   BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             entities,

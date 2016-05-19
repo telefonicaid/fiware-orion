@@ -39,7 +39,7 @@ namespace ngsiv2
     bool  attrsFormatProvided;
     bool  throttlingProvided;
 
-    bool  fromNgsiv1;          // to support an special case when the SubscriptionUpdate comes from NGSIv1
+    bool  fromNgsiv1;          // to support a special case when the SubscriptionUpdate comes from NGSIv1
 
     SubscriptionUpdate():
       subjectProvided      (false),

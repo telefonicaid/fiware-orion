@@ -114,7 +114,7 @@ void UpdateContextSubscriptionRequest::release(void)
 
 /* ****************************************************************************
 *
-* UpdateContextSubscriptionRequest::release -
+* UpdateContextSubscriptionRequest::toNgsiv2Subscription -
 */
 void UpdateContextSubscriptionRequest::toNgsiv2Subscription(SubscriptionUpdate* subUp)
 {
