@@ -316,7 +316,8 @@ static void setCondsAndInitialNotifyNgsiv1
                                             &(sub.restriction),
                                             status,
                                             fiwareCorrelator,
-                                            sub.notification.attributes);
+                                            sub.notification.attributes,
+                                            sub.notification.blacklist);
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
@@ -506,15 +507,15 @@ static void setFormat(const SubscriptionUpdate& subUp, const BSONObj& subOrig, B
 */
 static void setBlacklist(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
 {
-  if (subUp.blackListProvided)
+  if (subUp.blacklistProvided)
   {
-    setBlackList(subUp, isBL);
+    setBlacklist(subUp, b);
   }
   else
   {
     bool bl = getBoolFieldF(subOrig, CSUB_BLACKLIST);
     b->append(CSUB_BLACKLIST, bl);
-    LM_T(LmtMongo, ("Subscription blacklist: %s", bl?"TRUE":"FALSE"));
+    LM_T(LmtMongo, ("Subscription blacklist: %s", bl? "TRUE" : "FALSE"));
   }
 }
 
@@ -585,7 +586,7 @@ std::string mongoUpdateSubscription
   std::string         servicePath  = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
   CachedSubscription* subCacheP    = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
   bool                notificationDone = false;
-  long long           lastNotification = 0;Up
+  long long           lastNotification = 0;
 
   setExpiration(subUp, subOrig, &b);
   setHttpInfo(subUp, subOrig, &b);

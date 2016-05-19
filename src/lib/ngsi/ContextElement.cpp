@@ -125,7 +125,7 @@ std::string ContextElement::toJson(RenderFormat renderFormat, const std::vector<
 
   if (contextAttributeVector.size() != 0)
   {
-    out += contextAttributeVector.toJson(true, renderFormat, attrsFilter);
+    out += contextAttributeVector.toJson(true, renderFormat, attrsFilter, blacklist);
   }
 
   return out;

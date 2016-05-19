@@ -58,6 +58,7 @@ class TriggeredSubscription
   std::string         cacheSubId;
   std::string         tenant;
   StringFilter*       stringFilterP;
+  bool                blacklist;
 
 
   // FIXME P5: This entire struct will be removed once geo-stuff is implemented the same way StringFilter was implemented (for Issue #1705)

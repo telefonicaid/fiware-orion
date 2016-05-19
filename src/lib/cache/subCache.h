@@ -104,6 +104,7 @@ struct CachedSubscription
   RenderFormat                renderFormat;
   char*                       reference;
   SubscriptionExpression      expression;
+  bool                        blacklist;
 
   struct CachedSubscription*  next;
 };
@@ -190,7 +191,8 @@ extern void subCacheItemInsert
   const std::string&            q,
   const std::string&            geometry,
   const std::string&            coords,
-  const std::string&            georel
+  const std::string&            georel,
+  bool                          blacklist = false
 );
 
 
@@ -220,7 +222,8 @@ extern void subCacheItemInsert
   const std::string&                 q,
   const std::string&                 geometry,
   const std::string&                 coords,
-  const std::string&                 georel
+  const std::string&                 georel,
+  bool                               blacklist
 );
 
 

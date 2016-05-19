@@ -69,14 +69,14 @@ inline bool operator!=(const EntID& lhs, const EntID& rhs){ return !(lhs == rhs)
 struct Notification
 {
   std::vector<std::string> attributes;
-  bool                     blackList;
+  bool                     blacklist;
   long long                timesSent;
   long long                lastNotification;
   HttpInfo                 httpInfo;
   std::string              toJson();
   Notification():
     attributes(),
-    blackList(false),
+    blacklist(false),
     timesSent(0),
     lastNotification(-1),
     httpInfo()

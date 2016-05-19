@@ -1852,14 +1852,22 @@ static bool processOnChangeConditionForSubscription
   const Restriction*               resP,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
-  bool                             blackList = false
+  bool                             blacklist = false
 )
 {
   std::string                   err;
   NotifyContextRequest          ncr;
   ContextElementResponseVector  rawCerV;
+  AttributeList                 emptyList;
 
-  if (!entitiesQuery(enV, attrL, *resP, &rawCerV, &err, true, tenant, servicePathV))
+  if (!blacklist && !entitiesQuery(enV, attrL, *resP, &rawCerV, &err, true, tenant, servicePathV))
+  {
+    ncr.contextElementResponseVector.release();
+    rawCerV.release();
+
+    return false;
+  }
+  else if (blacklist && !entitiesQuery(enV, emptyList, *resP, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
@@ -1883,7 +1891,7 @@ static bool processOnChangeConditionForSubscription
       /* Check if some of the attributes in the NotifyCondition values list are in the entity.
        * Note that in this case we do a query for all the attributes, not restricted to attrV */
       ContextElementResponseVector  allCerV;
-      AttributeList                 emptyList;
+
 
       if (!entitiesQuery(enV, emptyList, *resP, &rawCerV, &err, false, tenant, servicePathV))
       {
@@ -1900,7 +1908,7 @@ static bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
-        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, blackList);
+        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, blacklist);
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
@@ -1911,7 +1919,7 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
-      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, blackList);
+      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, blacklist);
       ncr.contextElementResponseVector.release();
 
       return true;
@@ -1944,7 +1952,8 @@ BSONArray processConditionVector
   const Restriction*               resP,
   const std::string&               status,
   const std::string&               fiwareCorrelator,
-  const std::vector<std::string>&  attrsOrder
+  const std::vector<std::string>&  attrsOrder,
+  bool                             blacklist
 )
 {
   BSONArrayBuilder conds;
