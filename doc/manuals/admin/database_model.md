@@ -273,7 +273,7 @@ Fields:
 -   **lastNotification**: the time when last notification was sent. This
     is updated each time a notification is sent, to avoid
     violating throttling.
--   **throttling**: minimum interval between notifications.
+-   **throttling**: minimum interval between notifications. 0 or -1 means no throttling.
 -   **reference**: the URL for notifications
 -   **entities**: an array of entities (mandatory). The JSON for each
     entity contains **id**, **type** and **isPattern**.

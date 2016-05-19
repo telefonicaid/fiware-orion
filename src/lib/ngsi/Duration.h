@@ -30,7 +30,8 @@
 
 #include "ngsi/Request.h"
 
-#define DEFAULT_DURATION "PT24H"
+#define DEFAULT_DURATION            "PT24H"
+#define DEFAULT_DURATION_IN_SECONDS  86400
 
 
 /* ****************************************************************************

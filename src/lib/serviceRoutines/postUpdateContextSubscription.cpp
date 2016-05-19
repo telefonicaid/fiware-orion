@@ -54,18 +54,12 @@ std::string postUpdateContextSubscription
 
   ucsr.subscribeError.subscriptionId = parseDataP->ucsr.res.subscriptionId;  
 
-  if (ciP->version != "v2")
-  {
-    parseDataP->ucsr.res.attrsFormat = NGSI_V1_LEGACY;
-  }
-
   TIMED_MONGO(ciP->httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
                                                                    &ucsr,                                                                   
                                                                    ciP->tenant,
                                                                    ciP->httpHeaders.xauthToken,
                                                                    ciP->servicePathV,
-                                                                   ciP->httpHeaders.correlator,
-                                                                   ciP->apiVersion));
+                                                                   ciP->httpHeaders.correlator));
 
   TIMED_RENDER(answer = ucsr.render(UpdateContextSubscription, ""));
 
