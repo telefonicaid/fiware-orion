@@ -161,7 +161,7 @@ unsigned int ScopeVector::size(void) const
 * ScopeVector::release -
 */
 void ScopeVector::release(void)
-{  
+{
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     vec[ix]->release();
