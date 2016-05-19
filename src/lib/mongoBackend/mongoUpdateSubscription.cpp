@@ -503,6 +503,102 @@ static void setFormat(const SubscriptionUpdate& subUp, const BSONObj& subOrig, B
 
 /* ****************************************************************************
 *
+* updateInCache -
+*
+
+*/
+void updateInCache
+(
+  const BSONObj& doc,
+  const SubscriptionUpdate& subUp,
+  const std::string& tenant,
+  long long lastNotification
+)
+{
+  // StringFilter in Scope?
+  //
+  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in subUp.restriction.scopeVector?
+  // If so, set it as string filter to the sub-cache item
+  //
+  StringFilter*  stringFilterP = NULL;
+
+  for (unsigned int ix = 0; ix < subUp.restriction.scopeVector.size(); ++ix)
+  {
+    if (subUp.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
+    {
+      stringFilterP = subUp.restriction.scopeVector[ix]->stringFilterP;
+    }
+  }
+
+  //
+  // Modification of the subscription cache
+  //
+  // The subscription "before this update" is looked up in cache and referenced by 'cSubP'.
+  // The "updated subscription information" is in 'newSubObject' (mongo BSON object format).
+  //
+  // All we need to do now for the cache is to:
+  //   1. Remove 'cSubP' from sub-cache (if present)
+  //   2. Create 'newSubObject' in sub-cache (if applicable)
+  //
+  // The subscription is already updated in mongo.
+  //
+  //
+  // There are four different scenarios here:
+  //   1. Old sub was in cache, new sub enters cache
+  //   2. Old sub was NOT in cache, new sub enters cache
+  //   3. Old subwas in cache, new sub DOES NOT enter cache
+  //   4. Old sub was NOT in cache, new sub DOES NOT enter cache
+  //
+  // This is resolved by two separate functions, one that removes the old one, if found (subCacheItemLookup+subCacheItemRemove),
+  // and the other one that inserts the sub, IF it should be inserted (subCacheItemInsert).
+  // If inserted, subCacheUpdateStatisticsIncrement is called to update the statistics counter of insertions.
+  //
+
+
+  // 0. Lookup matching subscription in subscription-cache
+
+  cacheSemTake(__FUNCTION__, "Updating cached subscription");
+
+  // Second lookup for the same in the mongo update subscription process. However, we have to do it, as the item in the cache could have been changed
+  // in the meanwhile.
+  CachedSubscription* subCacheP = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
+
+  char* servicePathCache = (char*) ((subCacheP == NULL)? "" : subCacheP->servicePath);
+
+  LM_T(LmtSubCache, ("update: %s", doc.toString().c_str()));
+
+  int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
+                                          doc,
+                                          subUp.id.c_str(),
+                                          servicePathCache,
+                                          lastNotification,
+                                          doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
+                                          doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_STATUS) : STATUS_ACTIVE,
+                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_Q) : "",
+                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_GEOM) : "",
+                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_COORDS) : "",
+                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_GEOREL) : "",
+                                          stringFilterP,
+                                          doc.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(doc, CSUB_FORMAT)) : NGSI_V2_NORMALIZED);
+
+  if (subCacheP != NULL)
+  {
+    LM_T(LmtSubCache, ("Calling subCacheItemRemove"));
+    subCacheItemRemove(subCacheP);
+  }
+
+  if (mscInsert == 0)  // 0: Insertion was really made
+  {
+    subCacheUpdateStatisticsIncrement();
+  }
+
+  cacheSemGive(__FUNCTION__, "Updating cached subscription");
+}
+
+
+
+/* ****************************************************************************
+*
 * mongoUpdateSubscription -
 *
 * Returns:
@@ -565,10 +661,15 @@ std::string mongoUpdateSubscription
 
   // Build the BSON object (using subOrig as starting point plus some info from cache)
   BSONObjBuilder b;
-  std::string         servicePath  = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
-  CachedSubscription* subCacheP    = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
+  std::string         servicePath  = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];  
   bool                notificationDone = false;
   long long           lastNotification = 0;
+
+  CachedSubscription* subCacheP = NULL;
+  if (!noCache)
+  {
+    subCacheP = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
+  }
 
   setExpiration(subUp, subOrig, &b);
   setHttpInfo(subUp, subOrig, &b);
@@ -620,86 +721,10 @@ std::string mongoUpdateSubscription
   }
 
   // Update in cache
-
-  //
-  // StringFilter in Scope?
-  //
-  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in subUp.restriction.scopeVector?
-  // If so, set it as string filter to the sub-cache item
-  //
-  StringFilter*  stringFilterP = NULL;
-
-  for (unsigned int ix = 0; ix < subUp.restriction.scopeVector.size(); ++ix)
+  if (!noCache)
   {
-    if (subUp.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
-    {
-      stringFilterP = subUp.restriction.scopeVector[ix]->stringFilterP;
-    }
+    updateInCache(doc, subUp, tenant, lastNotification);
   }
-
-  //
-  // Modification of the subscription cache
-  //
-  // The subscription "before this update" is looked up in cache and referenced by 'cSubP'.
-  // The "updated subscription information" is in 'newSubObject' (mongo BSON object format).
-  //
-  // All we need to do now for the cache is to:
-  //   1. Remove 'cSubP' from sub-cache (if present)
-  //   2. Create 'newSubObject' in sub-cache (if applicable)
-  //
-  // The subscription is already updated in mongo.
-  //
-  //
-  // There are four different scenarios here:
-  //   1. Old sub was in cache, new sub enters cache
-  //   2. Old sub was NOT in cache, new sub enters cache
-  //   3. Old subwas in cache, new sub DOES NOT enter cache
-  //   4. Old sub was NOT in cache, new sub DOES NOT enter cache
-  //
-  // This is resolved by two separate functions, one that removes the old one, if found (subCacheItemLookup+subCacheItemRemove),
-  // and the other one that inserts the sub, IF it should be inserted (subCacheItemInsert).
-  // If inserted, subCacheUpdateStatisticsIncrement is called to update the statistics counter of insertions.
-  //
-
-
-  // 0. Lookup matching subscription in subscription-cache
-
-  cacheSemTake(__FUNCTION__, "Updating cached subscription");
-
-  // Second lookup for the same in the same function. However, we have to do it, as the item in the cache could have been changed
-  // in the meanwhile.
-  subCacheP = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
-
-  char* servicePathCache = (char*) ((subCacheP == NULL)? "" : subCacheP->servicePath);
-
-  LM_T(LmtSubCache, ("update: %s", doc.toString().c_str()));
-
-  int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
-                                          doc,
-                                          subUp.id.c_str(),
-                                          servicePathCache,
-                                          lastNotification,
-                                          doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
-                                          doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_STATUS) : STATUS_ACTIVE,
-                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_Q) : "",
-                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_GEOM) : "",
-                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_COORDS) : "",
-                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_GEOREL) : "",
-                                          stringFilterP,
-                                          doc.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(doc, CSUB_FORMAT)) : NGSI_V2_NORMALIZED);
-
-  if (subCacheP != NULL)
-  {
-    LM_T(LmtSubCache, ("Calling subCacheItemRemove"));
-    subCacheItemRemove(subCacheP);
-  }
-
-  if (mscInsert == 0)  // 0: Insertion was really made
-  {
-    subCacheUpdateStatisticsIncrement();
-  }
-
-  cacheSemGive(__FUNCTION__, "Updating cached subscription");
 
 
   reqSemGive(__FUNCTION__, "ngsiv2 update subscription request", reqSemTaken);

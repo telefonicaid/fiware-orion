@@ -81,7 +81,7 @@ std::string postSubscribeContext
     return answer;
   }
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV, ciP->httpHeaders.correlator));
+  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->httpHeaders.xauthToken, ciP->servicePathV, ciP->httpHeaders.correlator));
   TIMED_RENDER(answer = scr.render(SubscribeContext, ""));
 
   parseDataP->scr.res.release();
