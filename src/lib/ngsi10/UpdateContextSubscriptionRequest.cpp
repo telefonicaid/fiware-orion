@@ -30,6 +30,11 @@
 #include "ngsi/StatusCode.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
+#include "ngsi10/SubscribeContextRequest.h"
+
+using namespace ngsiv2;
+
+
 
 /* ****************************************************************************
 *
@@ -43,7 +48,7 @@ UpdateContextSubscriptionRequest::UpdateContextSubscriptionRequest()
   restrictions = 0;
 }
 
-
+#if 0
 /* ****************************************************************************
 *
 * UpdateContextSubscriptionRequest::render - 
@@ -74,6 +79,7 @@ std::string UpdateContextSubscriptionRequest::render(RequestType requestType, co
 
   return out;
 }
+#endif
 
 
 
@@ -129,6 +135,38 @@ void UpdateContextSubscriptionRequest::present(const std::string& indent)
 */
 void UpdateContextSubscriptionRequest::release(void)
 {
-  restriction.release();
+  //restriction.release();
   notifyConditionVector.release();
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextSubscriptionRequest::release -
+*/
+void UpdateContextSubscriptionRequest::toNgsiv2Subscription(SubscriptionUpdate* subUp)
+{
+  // Parent method will do most of the work
+  SubscribeContextRequest::toNgsiv2Subscription(subUp);
+
+  // Fill remaining fields in SubscriptionUpdate
+  subUp->id         = subscriptionId.get();
+  subUp->fromNgsiv1 = true;
+
+  // Fields that can be modified in a NGSIv1 subscription
+  // (See https://fiware-orion.readthedocs.io/en/develop/user/updating_regs_and_subs/index.html)
+  //
+  //  * notifyConditions (within subject in NGSIv2)
+  //  * throttling       (root field in NGSIv2)
+  //  * duration         (root field -as 'expires'- in NGSIv2)
+  //  * restriction      (already processed in the parent method)
+
+  subUp->subjectProvided      = (notifyConditionVector.size() > 0);
+  subUp->expiresProvided      = !duration.isEmpty();
+  subUp->statusProvided       = false;  // not supported in NGSIv1
+  subUp->notificationProvided = false;  // NGSIv1 doesn's allow changes in that parte
+  subUp->attrsFormatProvided  = true;   // updating in NGSIv1 involves and implicit change to NGSIv1 legacy format
+  subUp->throttlingProvided   = !throttling.isEmpty();
+
 }

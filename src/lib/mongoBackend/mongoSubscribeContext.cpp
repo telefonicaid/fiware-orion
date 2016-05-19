@@ -24,7 +24,7 @@
 */
 #include <string>
 
-#include "logMsg/logMsg.h"
+/*#include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
 #include "common/defaultValues.h"
@@ -32,14 +32,14 @@
 #include "apiTypesV2/HttpInfo.h"
 #include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/dbConstants.h"
+#include "mongoBackend/dbConstants.h"*/
 #include "mongoBackend/mongoSubscribeContext.h"
-#include "mongoBackend/connectionOperations.h"
+/*#include "mongoBackend/connectionOperations.h"
 #include "cache/subCache.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi/StatusCode.h"
-#include "rest/uriParamNames.h"
+#include "rest/uriParamNames.h"*/
 
 #include "mongoBackend/mongoCreateSubscription.h"
 
@@ -69,8 +69,15 @@ HttpStatusCode mongoSubscribeContext
     std::string subId = mongoCreateSubscription(sub, &oe, uriParam, tenant, servicePathV, xauthToken, fiwareCorrelator);
 
     if (subId != "")
-    {
-      responseP->subscribeResponse.duration = requestP->duration;
+    {      
+      if (requestP->duration.isEmpty())
+      {
+        responseP->subscribeResponse.duration.set(DEFAULT_DURATION);
+      }
+      else
+      {
+        responseP->subscribeResponse.duration = requestP->duration;
+      }
       responseP->subscribeResponse.subscriptionId.set(subId);
       responseP->subscribeResponse.throttling = requestP->throttling;
     }

@@ -62,7 +62,7 @@ static void setExpiration(const SubscriptionUpdate& subUp, const BSONObj& subOri
   {
     if (subOrig.hasField(CSUB_EXPIRATION))
     {
-      long long expires = getLongFieldF(subOrig, CSUB_EXPIRATION);
+      long long expires = getIntOrLongFieldAsLongF(subOrig, CSUB_EXPIRATION);
       b->append(CSUB_EXPIRATION, expires);
       LM_T(LmtMongo, ("Subscription expiration: %lu", expires));
     }
@@ -141,7 +141,7 @@ static void setThrottling(const SubscriptionUpdate& subUp, const BSONObj& subOri
   {
     if (subOrig.hasField(CSUB_THROTTLING))
     {
-      long long throttling = getLongFieldF(subOrig, CSUB_THROTTLING);
+      long long throttling = getIntOrLongFieldAsLongF(subOrig, CSUB_THROTTLING);
       b->append(CSUB_THROTTLING, throttling);
       LM_T(LmtMongo, ("Subscription throttling: %lu", throttling));
     }
@@ -205,8 +205,10 @@ static void setStatus(const SubscriptionUpdate& subUp, const BSONObj& subOrig, B
 */
 static void setEntities(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
 {
-  if (subUp.subjectProvided)
+  if (subUp.subjectProvided && !subUp.fromNgsiv1)
   {
+    // NGSIv1 doesn't allow to change entities,
+    // see https://fiware-orion.readthedocs.io/en/develop/user/updating_regs_and_subs/index.html
     setEntities(subUp, b);
   }
   else
@@ -235,6 +237,89 @@ static void setAttrs(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BS
     b->append(CSUB_ATTRS, attrs);
     LM_T(LmtMongo, ("Subscription attrs: %s", attrs.toString().c_str()));
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* setCondsAndInitialNotifyNgsiv1 -
+*
+* This method could be removed along with the rest of NGSIv1 stuff
+*
+*/
+static void setCondsAndInitialNotifyNgsiv1
+(
+  const Subscription&              sub,
+  const BSONObj&                   subOrig,
+  const std::string&               subId,
+  const std::string&               status,
+  const std::string&               url,
+  RenderFormat                     attrsFormat,
+  const std::string&               tenant,
+  const std::vector<std::string>&  servicePathV,
+  const std::string&               xauthToken,
+  const std::string&               fiwareCorrelator,
+  BSONObjBuilder*                  b,
+  bool*                            notificationDone
+)
+{
+  // Similar to setCondsAndInitialNotify() in MongoCommonSubscripion.cpp, but
+  // entities and notifications attributes are not taken from sub but from subOrig
+  //
+  // Most of the following code is copied from mongoGetSubscription logic but, given
+  // that this function is temporal, I don't worry too much about DRY-ness here
+
+  std::vector<EntID>       entities;
+  std::vector<BSONElement> ents = getFieldF(subOrig, CSUB_ENTITIES).Array();
+  for (unsigned int ix = 0; ix < ents.size(); ++ix)
+  {
+    BSONObj ent           = ents[ix].embeddedObject();
+    std::string id        = getStringFieldF(ent, CSUB_ENTITY_ID);
+    std::string type      = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
+    std::string isPattern = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
+
+    EntID en;
+    if (isFalse(isPattern))
+    {
+      en.id = id;
+    }
+    else
+    {
+      en.idPattern = id;
+    }
+    en.type = type;
+
+    entities.push_back(en);
+  }
+
+  std::vector<std::string> attributes;
+  std::vector<BSONElement> attrs = getFieldF(subOrig, CSUB_ATTRS).Array();
+  for (unsigned int ix = 0; ix < attrs.size(); ++ix)
+  {
+    attributes.push_back(attrs[ix].String());
+  }
+
+
+  /* Conds vector (and maybe and initial notification) */
+  *notificationDone = false;
+  BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
+                                            entities,
+                                            attributes,
+                                            subId,
+                                            url,
+                                            notificationDone,
+                                            attrsFormat,
+                                            tenant,
+                                            xauthToken,
+                                            servicePathV,
+                                            &(sub.restriction),
+                                            status,
+                                            fiwareCorrelator,
+                                            sub.notification.attributes);
+
+  b->append(CSUB_CONDITIONS, conds);
+  LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
 }
 
 
@@ -290,10 +375,24 @@ static void setCondsAndInitialNotify
       attrsFormat = subOrig.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(subOrig, CSUB_FORMAT)) : NGSI_V2_NORMALIZED;
     }
 
-    bool notificationDone;
-    setCondsAndInitialNotify(subUp, subUp.id, status, url, attrsFormat,
-                             tenant, servicePathV, xauthToken, fiwareCorrelator,
-                             b, &notificationDone);
+    if (subUp.fromNgsiv1)
+    {
+      // In NGSIv1 is legal updating conditions without updating entities, which is not possible
+      // in NGSIv2 (as both entities and coditions are part of 'subject' and they are updated as
+      // a whole). In addition, NGSIv1 doesn't allow to update notification attributes. Both
+      // (entities and notification attributes) are pased in subOrig
+      //
+      // See: https://fiware-orion.readthedocs.io/en/develop/user/updating_regs_and_subs/index.html
+      setCondsAndInitialNotifyNgsiv1(subUp, subOrig, subUp.id, status, url, attrsFormat,
+                                     tenant, servicePathV, xauthToken, fiwareCorrelator,
+                                     b, notificationDone);
+    }
+    else
+    {
+      setCondsAndInitialNotify(subUp, subUp.id, status, url, attrsFormat,
+                               tenant, servicePathV, xauthToken, fiwareCorrelator,
+                               b, notificationDone);
+    }
   }
   else
   {    
@@ -415,7 +514,6 @@ std::string mongoUpdateSubscription
 (
   const SubscriptionUpdate&            subUp,
   OrionError*                          oe,
-  std::map<std::string, std::string>&  uriParams,
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
   const std::string&                   xauthToken,

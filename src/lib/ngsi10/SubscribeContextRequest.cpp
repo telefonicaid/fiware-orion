@@ -193,11 +193,13 @@ void  SubscribeContextRequest::toNgsiv2Subscription(Subscription* sub)
 
   // Convert duration
   if (duration.isEmpty())
-  {
-    duration.set(DEFAULT_DURATION);
+  {    
+    sub->expires = DEFAULT_DURATION_IN_SECONDS + getCurrentTime();
   }
-
-  sub->expires = duration.parse() + getCurrentTime();
+  else
+  {
+    sub->expires = duration.parse() + getCurrentTime();
+  }
 
   // Convert restriction
   sub->restriction = restriction;
@@ -220,22 +222,11 @@ void  SubscribeContextRequest::toNgsiv2Subscription(Subscription* sub)
 
   // Note we don't do anything with 'restrictions': it is not needed by the NGSIv2 logic
 
-  // Fill NGSIv2 fields not existing in NGSIv1 with default values
-
-  // status
-  sub->status = STATUS_ACTIVE;
-
-  // descriptionProvided
-  sub->descriptionProvided = false;
-
-  // attrsFormat
-  sub->attrsFormat = NGSI_V1_LEGACY;
-
-  // blaclist
-  sub->notification.blackList = false;
-
-  // extended
-  sub->notification.httpInfo.extended = false;
-
+  // Fill NGSIv2 fields not used in NGSIv1 with default values
   // description and expression are not touched, so default empty string provided by constructor will be used
+  sub->status                         = STATUS_ACTIVE;
+  sub->descriptionProvided            = false;
+  sub->attrsFormat                    = NGSI_V1_LEGACY;
+  sub->notification.blackList         = false;
+  sub->notification.httpInfo.extended = false;  
 }

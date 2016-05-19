@@ -36,6 +36,7 @@
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi/Throttling.h"
 #include "ngsi10/SubscribeContextRequest.h"
+#include "apiTypesV2/SubscriptionUpdate.h"
 
 
 /* ****************************************************************************
@@ -47,10 +48,11 @@ struct UpdateContextSubscriptionRequest : public SubscribeContextRequest
   SubscriptionId                 subscriptionId;         // Mandatory 
 
   UpdateContextSubscriptionRequest();
-  std::string render(RequestType requestType, const std::string& indent);
+  //std::string render(RequestType requestType, const std::string& indent);
   std::string check(RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
   void        present(const std::string& indent);
   void        release(void);
+  void        toNgsiv2Subscription(ngsiv2::SubscriptionUpdate* subUp);
 };
 
 #endif

@@ -474,6 +474,8 @@ TEST(mongoUpdateContextSubscription, subscriptionNotFound)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
@@ -501,6 +503,8 @@ TEST(mongoUpdateContextSubscription, subscriptionNotFound)
 
     /* Release mock */
     delete notifierMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -727,7 +731,7 @@ TEST(mongoUpdateContextSubscription, clearThrottling)
     EXPECT_EQ("51307b66f481db11bf860005", sub.getField("_id").OID().toString());
     EXPECT_EQ(50000000, sub.getIntField("expiration"));
     EXPECT_EQ(55000000, sub.getField("lastNotification").Long());
-    EXPECT_FALSE(sub.hasField("throttling"));
+    EXPECT_EQ(0, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify5.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
@@ -1002,17 +1006,13 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_CN)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
+    ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A20", condValues[0].String());
+    ASSERT_EQ(2, condValues.size());
+    EXPECT_EQ("A10", condValues[0].String());   
+    EXPECT_EQ("A20", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -1182,17 +1182,13 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_CN)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
+    ASSERT_EQ(1, conds.size());
+    BSONObj cond0 = conds[0].embeddedObject();    
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A20", condValues[0].String());
+    EXPECT_EQ("A20", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -1543,17 +1539,13 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_CN)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
+    ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A20", condValues[0].String());
+    EXPECT_EQ("A20", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -1724,17 +1716,13 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_CN)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
+    ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A20", condValues[0].String());
+    EXPECT_EQ("A20", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -2890,7 +2878,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN)
     std::vector<std::string>     attrsFilter;
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
-            .Times(2);
+            .Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2946,17 +2934,13 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
+    ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A2", condValues[0].String());
+    EXPECT_EQ("A2", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3050,17 +3034,13 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
+    ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A5", condValues[0].String());
+    EXPECT_EQ("A5", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3194,7 +3174,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_disjoint)
     std::vector<std::string>     attrsFilter;
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
-            .Times(2);
+            .Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3252,17 +3232,13 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_disjoint)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
+    ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A3", condValues[0].String());
+    EXPECT_EQ("A3", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3356,17 +3332,13 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
+    ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A5", condValues[0].String());
+    EXPECT_EQ("A5", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3460,17 +3432,13 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial_disjoint)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
+    ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A3", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A5", condValues[0].String());
+    EXPECT_EQ("A5", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3605,7 +3573,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
     std::vector<std::string>     attrsFilter;
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
-            .Times(2);
+            .Times(1);
     setNotifier(notifierMock);
 
     attrsFilter.push_back("A1");
@@ -3666,17 +3634,13 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
+    ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond1, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A2", condValues[0].String());
+    EXPECT_EQ("A2", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3936,7 +3900,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CN)
     std::vector<std::string>     attrsFilter;
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
-            .Times(2);
+            .Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3996,17 +3960,13 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CN)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
+    ASSERT_EQ(1, conds.size());
+    BSONObj cond0 = conds[0].embeddedObject();    
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A2", condValues[0].String());
+    EXPECT_EQ("A2", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -4157,7 +4117,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
     std::vector<std::string>     attrsFilter;
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
-            .Times(2);
+            .Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -4219,17 +4179,13 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(2, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
+    ASSERT_EQ(1, conds.size());
+    BSONObj cond0 = conds[0].embeddedObject();    
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
     condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
+    ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond1.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A2", condValues[0].String());
+    EXPECT_EQ("A2", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -4533,8 +4489,10 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
     EXPECT_EQ(SccReceiverInternalError, res.subscribeError.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.subscribeError.errorCode.reasonPhrase);
     EXPECT_EQ("Database Error (collection: utest.csubs "
-              "- update(): <{ _id: ObjectId('51307b66f481db11bf860001') },{ entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], reference: \"http://notify1.me\", expiration: 1360250700, servicePath: \"/#\", conditions: [], lastNotification: 15000000, format: \"JSON\" }> "
+              "- update(): <{ _id: ObjectId('51307b66f481db11bf860001') },{ expiration: 1360250700, reference: \"http://notify1.me\", extended: false, servicePath: \"/#\", entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], conditions: [], lastNotification: 15000000, expression: {}, format: \"JSON\" }> "
               "- exception: boom!!)", res.subscribeError.errorCode.details);
+
+      //Actual: "Database Error (collection: utest.csubs - update(): <{ _id: ObjectId('51307b66f481db11bf860001') },{ expiration: 1360250700, reference: "http://notify1.me", extended: false, servicePath: "/#", entities: [ { id: "E1", type: "T1", isPattern: "false" } ], attrs: [], conditions: [], lastNotification: 15000000, expression: {}, format: "JSON" }> - exception: boom!!)"
 
     /* Restore real DB connection */
     setMongoConnectionForUnitTest(connectionDb);

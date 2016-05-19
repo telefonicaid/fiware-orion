@@ -24,6 +24,7 @@
 */
 #include <string>
 
+/*
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -35,14 +36,17 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
-#include "mongoBackend/dbConstants.h"
+#include "mongoBackend/dbConstants.h"*/
 #include "mongoBackend/mongoUpdateContextSubscription.h"
-#include "mongoBackend/mongoSubCache.h"
-#include "cache/subCache.h"
+//#include "mongoBackend/mongoSubCache.h"
+#include "mongoBackend/mongoUpdateSubscription.h"
+/*#include "cache/subCache.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/SubscribeContextRequest.h"
-#include "ngsi10/UpdateContextSubscriptionResponse.h"
+#include "ngsi10/UpdateContextSubscriptionResponse.h"*/
+#include "apiTypesV2/SubscriptionUpdate.h"
 
+using namespace ngsiv2;
 
 
 /* ****************************************************************************
@@ -59,6 +63,46 @@ HttpStatusCode mongoUpdateContextSubscription
     const std::string&                  fiwareCorrelator
 )
 { 
+
+#if 1
+  OrionError         oe;
+  SubscriptionUpdate sub;
+
+  requestP->toNgsiv2Subscription(&sub);
+  std::string subId = mongoUpdateSubscription(sub, &oe, tenant, servicePathV, xauthToken, fiwareCorrelator);
+
+  if (subId != "")
+  {
+    // Duration and throttling are optional parameters, they are only added in the case they were used for update
+    if (!requestP->duration.isEmpty())
+    {
+      responseP->subscribeResponse.duration = requestP->duration;
+    }
+
+    if (!requestP->throttling.isEmpty())
+    {
+      responseP->subscribeResponse.throttling = requestP->throttling;
+    }
+    responseP->subscribeResponse.subscriptionId = subId;
+  }
+  else
+  {
+    // Check OrionError. Depending the error kind, details are included or not in order
+    // to have a better backward compatiblity
+    // FIXME: should we? or it is better modify .test and provide more accurate errors with 'details'?
+    if (oe.code == SccContextElementNotFound)
+    {
+      responseP->subscribeError.errorCode.fill(oe.code);
+    }
+    else
+    {
+      responseP->subscribeError.errorCode.fill(oe.code, oe.details);
+    }
+  }
+
+  return SccOk;
+
+#else
   bool  reqSemTaken;
 
   reqSemTake(__FUNCTION__, "ngsi10 update subscription request", SemWriteOp, &reqSemTaken);
@@ -377,4 +421,5 @@ HttpStatusCode mongoUpdateContextSubscription
   reqSemGive(__FUNCTION__, "ngsi10 update subscription request", reqSemTaken);
 
   return SccOk;
+#endif
 }
