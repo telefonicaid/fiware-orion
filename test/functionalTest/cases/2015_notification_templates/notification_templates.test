@@ -38,7 +38,7 @@ accumulatorStart --pretty-print
 # 05. Create subscription for E1 with URL and HEADERS in template part - HEADERS with substitutions
 # 06. Create subscription for E1 with URL, VERB, PAYLOAD, QS and HEADERS in template part - all with substitutions (except VERB, of course)
 # 07. Create subscription for E1 with PAYLOAD, QS and HEADERS with unknown attribute 'A4' for substitution
-# 08. Create E1 with attributes A1,A2 and A3
+# 08. Create E1 with attributes A1, A2 and A3
 # 09. Dump accumulator, see 7 notifications
 #
 
@@ -225,8 +225,8 @@ echo
 echo
 
 
-echo "08. Create E1 with attributes A1,A2 and A3"
-echo "=========================================="
+echo "08. Create E1 with attributes A1, A2 and A3"
+echo "==========================================="
 payload='{
   "id": "E1",
   "A1": "a1",
@@ -317,8 +317,8 @@ Date: REGEX(.*)
 
 
 
-08. Create E1 with attributes A1,A2 and A3
-==========================================
+08. Create E1 with attributes A1, A2 and A3
+===========================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=none
@@ -329,6 +329,7 @@ Date: REGEX(.*)
 
 09. Dump accumulator, see 7 notifications
 =========================================
+#SORT_START
 POST http://127.0.0.1:9997/notify?step=01
 Fiware-Servicepath: /
 Content-Length: 227
@@ -535,7 +536,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "A4": ""
 }
 =======================================
-
+#SORT_END
 
 --TEARDOWN--
 brokerStop CB
