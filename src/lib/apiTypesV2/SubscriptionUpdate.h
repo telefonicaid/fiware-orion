@@ -39,6 +39,7 @@ namespace ngsiv2
     bool  notificationProvided;
     bool  attrsFormatProvided;
     bool  throttlingProvided;
+    bool  blacklistProvided;
 
     SubscriptionUpdate():
       descriptionProvided  (false),
@@ -47,7 +48,8 @@ namespace ngsiv2
       statusProvided       (false),
       notificationProvided (false),
       attrsFormatProvided  (false),
-      throttlingProvided   (false)
+      throttlingProvided   (false),
+      blacklistProvided    (false)
       {}
   };
 }

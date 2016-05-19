@@ -400,7 +400,24 @@ static void setFormat(const SubscriptionUpdate& subUp, const BSONObj& subOrig, B
   }
 }
 
-
+/* ****************************************************************************
+*
+* setBlacklist -
+*
+*/
+static void setBlacklist(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
+{
+  if (subUp.blackListProvided)
+  {
+    setBlackList(subUp, isBL);
+  }
+  else
+  {
+    bool bl = getBoolFieldF(subOrig, CSUB_BLACKLIST);
+    b->append(CSUB_BLACKLIST, bl);
+    LM_T(LmtMongo, ("Subscription blacklist: %s", bl?"TRUE":"FALSE"));
+  }
+}
 
 /* ****************************************************************************
 *
@@ -470,7 +487,7 @@ std::string mongoUpdateSubscription
   std::string         servicePath  = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
   CachedSubscription* subCacheP    = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
   bool                notificationDone = false;
-  long long           lastNotification = 0;
+  long long           lastNotification = 0;Up
 
   setExpiration(subUp, subOrig, &b);
   setHttpInfo(subUp, subOrig, &b);
@@ -480,6 +497,7 @@ std::string mongoUpdateSubscription
   setStatus(subUp, subOrig, &b);
   setEntities(subUp, subOrig, &b);
   setAttrs(subUp, subOrig, &b);
+  setBlacklist(subUp, subOrig, &b);
   setCondsAndInitialNotify(subUp, subOrig, tenant, servicePathV, xauthToken, fiwareCorrelator,
                            &b, &notificationDone);
 

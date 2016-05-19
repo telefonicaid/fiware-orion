@@ -1851,7 +1851,8 @@ static bool processOnChangeConditionForSubscription
   const std::vector<std::string>&  servicePathV,
   const Restriction*               resP,
   const std::string&               fiwareCorrelator,
-  const std::vector<std::string>&  attrsOrder
+  const std::vector<std::string>&  attrsOrder,
+  bool                             blackList = false
 )
 {
   std::string                   err;
@@ -1899,7 +1900,7 @@ static bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
-        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
+        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, blackList);
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
@@ -1910,7 +1911,7 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
-      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
+      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, blackList);
       ncr.contextElementResponseVector.release();
 
       return true;
@@ -1980,7 +1981,8 @@ BSONArray processConditionVector
                                                    servicePathV,
                                                    resP,
                                                    fiwareCorrelator,
-                                                   attrsOrder)))
+                                                   attrsOrder,
+                                                   blacklist)))
       {
         *notificationDone = true;
       }
@@ -2020,7 +2022,8 @@ BSONArray processConditionVector
   const Restriction*               resP,
   const std::string&               status,
   const std::string&               fiwareCorrelator,
-  const std::vector<std::string>&  attrsOrder
+  const std::vector<std::string>&  attrsOrder,
+  bool                             blacklist
 )
 {
   NotifyConditionVector ncV;
@@ -2044,7 +2047,8 @@ BSONArray processConditionVector
                                          resP,
                                          status,
                                          fiwareCorrelator,
-                                         attrsOrder);
+                                         attrsOrder,
+                                         blacklist);
 
   enV.release();
   ncV.release();

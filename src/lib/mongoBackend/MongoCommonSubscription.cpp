@@ -359,3 +359,15 @@ void setFormat(const Subscription& sub, BSONObjBuilder* b)
   b->append(CSUB_FORMAT, format);
   LM_T(LmtMongo, ("Subscription format: %s", format.c_str()));
 }
+
+/* ****************************************************************************
+*
+* setBlacklist -
+*
+*/
+void setBlacklist(const Subscription& sub, BSONObjBuilder* b)
+{
+  bool bl = sub.notification.blackList;
+  b->append(CSUB_BLACKLIST, format);
+  LM_T(LmtMongo, ("Subscription blacklist: %s", bl?"TRUE":"FALSE"));
+}

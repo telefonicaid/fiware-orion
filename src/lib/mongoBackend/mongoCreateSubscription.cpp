@@ -83,6 +83,7 @@ std::string mongoCreateSubscription
   setStatus(sub, &b);
   setEntities(sub, &b);
   setAttrs(sub, &b);
+  setBlacklist(sub, &sub);
 
   std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
   setCondsAndInitialNotify(sub, subId, status, sub.notification.httpInfo.url, sub.attrsFormat,
