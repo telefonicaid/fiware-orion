@@ -6,5 +6,4 @@
 - Fix: NGSIv2 header name change: X-Ngsiv2-AttrsFormat -> Ngsiv2-AttrsFormat (#2124)
 - Fix: wrong text payload when subscription string filter error occurs (#2106)
 - Fix: total count return in GET /v2/types operation (#2115)
-- Fix: NGSIv1 update subscription operation was wrongly updating duration when that field wasn't specified
 - Deprecated: /ngsi10 and /ngsi9 as URL path prefixes

@@ -58,17 +58,10 @@ TEST(SubscribeContextRequest, ok_json)
 
 
   //
-  // With the data obtained, render, present and release methods are exercised
+  // With the data obtained present and release methods are exercised
   //
-  SubscribeContextRequest*  scrP    = &parseData.scr.res;
-  const char*               outfile = "ngsi10.subscribeContextRequest_ok.expected.valid.json";
-  
+  SubscribeContextRequest*  scrP    = &parseData.scr.res;  
   scrP->present(""); // No output
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  //std::string out = scrP->render(SubscribeContext, "");
-  //EXPECT_STREQ(expectedBuf, out.c_str());
-
   scrP->release();
 
   utExit();

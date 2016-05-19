@@ -25,7 +25,7 @@ Subscription sequence ONCHANGE with compound values JSON
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPv4 -noCache
+brokerStart CB
 accumulatorStart
 
 --SHELL--
@@ -275,4 +275,4 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
-#bDrop CB
+dbDrop CB

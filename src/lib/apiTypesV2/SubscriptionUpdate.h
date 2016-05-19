@@ -32,7 +32,6 @@ namespace ngsiv2
   class SubscriptionUpdate : public Subscription
   {
   public:
-    bool  descriptionProvided;  // FIXME: already in parent class, redundant?
     bool  subjectProvided;
     bool  expiresProvided;
     bool  statusProvided;
@@ -43,7 +42,6 @@ namespace ngsiv2
     bool  fromNgsiv1;          // to support an special case when the SubscriptionUpdate comes from NGSIv1
 
     SubscriptionUpdate():
-      descriptionProvided  (false),
       subjectProvided      (false),
       expiresProvided      (false),
       statusProvided       (false),
@@ -51,7 +49,9 @@ namespace ngsiv2
       attrsFormatProvided  (false),
       throttlingProvided   (false),
       fromNgsiv1           (false)
-      {}
+      {
+        descriptionProvided = false;
+      }
   };
 }
 

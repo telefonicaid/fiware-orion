@@ -37,46 +37,6 @@
 
 using namespace ngsiv2;
 
-#if 0
-/* ****************************************************************************
-*
-* SubscribeContextRequest::render - 
-*/
-std::string SubscribeContextRequest::render(RequestType requestType, const std::string& indent)
-{
-  std::string  out                             = "";
-  std::string  tag                             = "subscribeContextRequest";
-  std::string  indent2                         = indent + "  ";
-
-  bool         attributeListRendered           = attributeList.size() != 0;
-  bool         referenceRendered               = true;  // Mandatory
-  bool         durationRendered                = duration.get() != "";
-  bool         restrictionRendered             = restrictions != 0;
-  bool         notifyConditionVectorRendered   = notifyConditionVector.size() != 0;
-  bool         throttlingRendered              = throttling.get() != "";
-
-  bool         commaAfterThrottling            = false; // Last element;
-  bool         commaAfterNotifyConditionVector = throttlingRendered;
-  bool         commaAfterRestriction           = notifyConditionVectorRendered || throttlingRendered;
-  bool         commaAfterDuration              = restrictionRendered || notifyConditionVectorRendered || throttlingRendered;
-  bool         commaAfterReference             = durationRendered || restrictionRendered ||notifyConditionVectorRendered || throttlingRendered;
-  bool         commaAfterAttributeList         = referenceRendered || durationRendered || restrictionRendered ||notifyConditionVectorRendered || throttlingRendered;
-  bool         commaAfterEntityIdVector        = attributeListRendered || referenceRendered || durationRendered || restrictionRendered ||notifyConditionVectorRendered || throttlingRendered;
-
-  out += startTag1(indent, tag, false);
-  out += entityIdVector.render(indent2, commaAfterEntityIdVector);
-  out += attributeList.render(indent2, commaAfterAttributeList);
-  out += reference.render(indent2, commaAfterReference);
-  out += duration.render(indent2, commaAfterDuration);
-  out += restriction.render(indent2, restrictions, commaAfterRestriction);
-  out += notifyConditionVector.render(indent2, commaAfterNotifyConditionVector);
-  out += throttling.render(indent2, commaAfterThrottling);
-  out += endTag(indent);
-
-  return out;
-}
-#endif
-
 
 
 /* ****************************************************************************
@@ -132,9 +92,13 @@ void SubscribeContextRequest::present(const std::string& indent)
 */
 void SubscribeContextRequest::release(void)
 {
+  // Old versions of this method also include a 'restriction.release()' call. However, now each time
+  // a SubscribeContextRequest is created, the method toNgsiv2Subscription() is used on it and the
+  // 'ownership' of the Restriction is transferred to the corresponding NGSIv2 class. Thus, leaving
+  // that 'restriction.release()' would cause double-free problems
+
   entityIdVector.release();
-  attributeList.release();
-  //restriction.release();    // FIXME PR: not truly sure if this is "memory-leak safe" but if enabled causes segfault
+  attributeList.release();  
   notifyConditionVector.release();
 }
 
