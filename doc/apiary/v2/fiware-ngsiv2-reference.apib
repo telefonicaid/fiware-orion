@@ -713,10 +713,67 @@ If `attrsFormat` is `values` then values entity partial representation mode is u
 Notifications must include a `Ngsiv2-AttrsFormat` header with the value of `attrsFormat` of the associated subscription,
 so notification receiver can know the format used without needing processing notification payload.
 
-### Notification templates
+## Custom notifications
 
-Based on the "template" field defined as part of the subscription and in a macro replacement language
-that could be used in "payload", "url", "headers", "method" and "qs". Details TBD.
+NGSIv2 clients can customize HTTP notification messages using a simple template mechanism. The
+`notification.httpCustom` property of a subscription allows to specify the following fields subject
+to be templatized:
+
+* `url`
+* `headers` (both header names and values)
+* `qs` (both in parameter names and values)
+* `payload`
+
+In addition the HTTP method to be used for delivering the notification can be customized as well using the `method` field,
+but it cannot be a template.
+
+Macro substitution for templates is based on the syntax `${..}`. In particular:
+
+* `${id}` is replaced by entity id
+* `${type}` is replaced by entity type
+* Any other `${token}` is replaced by the value of attribute which name is `token` or with
+  an empty string if the attribute is not included in the notification. If the value is a number,
+  a bool or null then its string representation is used. If the value is a JSON array or object
+  then its JSON representation as string is used.
+
+Example:
+
+Let's consider the following `notification.httpCustom` object in a given subscription.
+
+```
+"httpCustom": {
+  "url": "http://foo.com/entity/${id}",
+  "headers": {
+    "Content-Type": "text/plain"
+  },
+  "method": "PUT",
+  "qs": {
+    "type": "${type}"
+  },
+  "payload": "The temperature is ${temperature} degrees"
+}
+```
+
+Now, let's consider that NGSIv2 implementation triggers a notification associated to this subscription.
+Notification data is for entity with id "DC_S1-D41" and type "Room", including an attribute named
+"temperature" with value 23.4. The resulting notification after applying the template would be:
+
+```
+PUT http://foo.com/entity/DC_S1-D41?type=Room
+Content-Type: text/plain
+Content-Length: 31
+
+The temperature is 23.4 degrees
+```
+
+Some considerations to take into account:
+
+* It is the NGSIv2 client's responsability to ensure that after substitution the notification is a correct
+  HTTP message (e.g. the Content-Type header is application/xml but the payload doesn't correspond to a
+  well-formed XML document). Specifically, if the resulting URL after appliyng the template is malformed,
+  then the notification is skipped.
+* In case the data to notify contains more than one entity, a separate notification (HTTP message) is sent
+  for each of the entities (contrary to default behaviour, which is to send all entities in the same HTTP message).
 
 ## Group API Entry Point
 
@@ -1422,7 +1479,8 @@ A `notification` object contains the following subfields:
   + `exceptAttrs`: List of attributes to be not included in the notification message, i.e. notification message includes
      all entity attributes except the ones listed in this field.
   + If neither `attrs` nor `exceptAttrs` is specified, all attributes are included in the notification.
-+ `http`: It is used to convey parameters for notifications delivered through the HTTP protocol.
++ `http` or `httpCustom` (one of them has to be used, but not both at the same time): It is used to convey parameters
+  for notifications delivered through the HTTP protocol.
 + `attrsFormat` (optional): specifies how the entities will be represented in notifications. Accepted values are
   `normalized` (the one used if the field is omitted), `keyValues` or `values`. If `attrsFormat` takes any value different
   than those an error will be raised. See detail in "Notification messages" section.
@@ -1433,11 +1491,18 @@ An `http` object contains the following subfields:
 
 + `url` : URL referencing the service which is invoked when a notification is generated. A NGSIv2
   compliant server must support `http` URL schema, other schemas could also be supported.
+
+An `httpCustom` object contains the following subfields.
+
++ `url`: same as in `http` above.
 + `headers` (optional): a key-map of HTTP headers that are included in the notification messages.
 + `qs` (optional): a key-map of URL query parameters that are included in the notification message.
-+ `method` (optional): the method to use for sending the notification (default is POST)
++ `method` (optional): the method to use for sending the notification (default is POST). Only valid HTTP methods are allowed.
+   On specifying an invalid HTTP method, a 400 Bad Request error is returned.
 + `payload` (optional): the payload to be used in the notification. If omitted, the default payload (see
   "Notification messages" sections) is used.
+
+If `httpCustom` is used, then the considerations described in "Custom notifications" section apply.
 
 Notification rules are as follow:
 
@@ -1487,7 +1552,7 @@ Response:
                     }
                 },
                 "notification": {
-                    "http": {
+                    "httpCustom": {
                       "url": "http://localhost:1234",
                       "headers": {
                         "X-MyHeader": "foo"

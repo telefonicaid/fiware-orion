@@ -59,3 +59,46 @@ NGSIv2 introduces syntax restrictions for ID fields (such as entity id/type, att
 or metadata name/type) which are described in the "Field syntax restrictions" section in the
 [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/). You can also
 enable them for NGSIv1, as described in [this section of the documentation](v1_v2_coexistence.md#checking-id-fields).
+
+### Custom payload special treatment
+
+NGSIv2 provides a templating mechanism for subscriptions which allows to generate custom notifications
+(see "Custom notifications" section in
+the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/)). Forbidden
+characters restrictions apply to the `httpCustom.payload` field in NGSIv2 API operations, such as
+POST /v2/subscription or GET /v2/subscriptions.
+
+However, at notification time, any URL encoded characters in `httpCustom.payload` are decoded.
+
+Example:
+
+Let's consider the following `notification.httpCustom` object in a given subscription.
+
+```
+"httpCustom": {
+  "url": "http://foo.com/entity/${id}",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "method": "PUT",
+  "qs": {
+    "type": "${type}"
+  },
+  "payload": "{ %22temperature%22: ${temperature}, %22asString%22: %22${temperature}%22 }"
+}
+```
+
+Note that the above payload value is the URL encoded version of this string:
+`{ "temperature": ${temperature}, "asString": "${temperature}" }`.
+
+Now, let's consider that NGSIv2 implementation triggers a notification associated to this subscription.
+Notification data is for entity with id `DC_S1-D41` and type `Room`, including an attribute named
+`temperature` with value 23.4. The resulting notification after applying the template would be:
+
+```
+PUT http://foo.com/entity/DC_S1-D41?type=Room
+Content-Type: text/plain
+Content-Length: 43
+
+{ "temperature": 23.4, "asString": "23.4" }
+```
