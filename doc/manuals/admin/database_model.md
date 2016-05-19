@@ -293,7 +293,7 @@ Fields:
 -   **description** (optional field): a free text string describing the subscription. Maximum length is 1024.
 -   **custom**: a boolean field to specify if this subscription uses customized notifications (a functionality in the NGSIv2 API).
     If this field exist and its value is "true" then customized notifications are used and the `headers`, `qs`, `method` and
-    `payload` field are taken into account.
+    `payload` fields are taken into account.
 -   **headers**: optional field to store the HTTP headers keymap for notification customization functionality in NGSIv2.
 -   **qs**: optional field to store the query parameters keymap for notification customization functionality in NGSIv2.
 -   **method**: optional field to store the HTTP method for notification customization functionality in NGSIv2.
