@@ -278,6 +278,9 @@ Fields:
 -   **entities**: an array of entities (mandatory). The JSON for each
     entity contains **id**, **type** and **isPattern**.
 -   **attrs**: an array of attribute names (strings) (optional).
+-   **blacklist**: a boolean field that expecifies if `attrs` has to be interpreted
+    as a whitelist (if `blacklist` is equal to "false" or doesn't exist) or a
+    blacklist (if `blacklist` is equal to "true").
 -   **conditions**: a list of conditions that trigger notifications.
 -   **expression**: an expression used to evaluate if notifications has
     to be sent or not when updates come. It may be composed of the following
@@ -288,6 +291,13 @@ Fields:
     (meaning JSON notifications in NGSIv1 format), **normalized**, **keyValues** and **values** (the last three used in NGSIv2 format).
 -   **status**: either `active` (for active subscriptions) or `inactive (for inactive subscriptions).
 -   **description** (optional field): a free text string describing the subscription. Maximum length is 1024.
+-   **custom**: a boolean field to specify if this subscription uses customized notifications (a functionality in the NGSIv2 API).
+    If this field exist and its value is "true" then customized notifications are used and the `headers`, `qs`, `method` and
+    `payload` field are taken into account.
+-   **headers**: optional field to store the HTTP headers keymap for notification customization functionality in NGSIv2.
+-   **qs**: optional field to store the query parameters keymap for notification customization functionality in NGSIv2.
+-   **method**: optional field to store the HTTP method for notification customization functionality in NGSIv2.
+-   **payload**: optional field to store the payload for notification customization functionality in NGSIv2.
 
 Example document:
 
