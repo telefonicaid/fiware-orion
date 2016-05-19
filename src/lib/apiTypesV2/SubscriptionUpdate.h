@@ -32,7 +32,6 @@ namespace ngsiv2
   class SubscriptionUpdate : public Subscription
   {
   public:
-    bool  descriptionProvided;
     bool  subjectProvided;
     bool  expiresProvided;
     bool  statusProvided;
@@ -41,16 +40,20 @@ namespace ngsiv2
     bool  throttlingProvided;
     bool  blacklistProvided;
 
+    bool  fromNgsiv1;          // to support an special case when the SubscriptionUpdate comes from NGSIv1
+
     SubscriptionUpdate():
-      descriptionProvided  (false),
       subjectProvided      (false),
       expiresProvided      (false),
       statusProvided       (false),
       notificationProvided (false),
       attrsFormatProvided  (false),
       throttlingProvided   (false),
-      blacklistProvided    (false)
-      {}
+      blacklistProvided    (false),
+      fromNgsiv1           (false)
+      {
+        descriptionProvided = false;
+      }
   };
 }
 

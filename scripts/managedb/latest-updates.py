@@ -32,6 +32,10 @@ def entityString(entity):
     s = entity['id']
     if (entity.has_key('type')):
         s += ' (' + entity['type'] + ')'
+    if (entity.has_key('servicePath')):
+        s += ' (sp: ' + entity['servicePath'] + ')'
+    else:
+        s += ' (sp: <null>)'
     return s
 
 def printAttrs(attrHash, max):
@@ -46,21 +50,25 @@ def printAttrs(attrHash, max):
             if n == max:
                 return
 
-if 4 <= len(argv) <= 5:
+if 4 <= len(argv) <= 6:
     type = argv[1]
     db = argv[2]
     max = int(argv[3])
 else:
     print 'Wrong number of arguments'
-    print '   Usage:   ./latest-updates.py <entities|attributes> <db> <limit> [entity_filter] '
+    print '   Usage:   ./latest-updates.py <entities|attributes> <db> <limit> [entity_filter] [sp]'
     print '   Example  ./latest-updates.py entities orion 10'
     print '   Example  ./latest-updates.py entities orion 10 TEST_SENSOR'
+    print '   Example  ./latest-updates.py entities orion 10 TEST_SENSOR /myServicePath'
     exit(1)
 
 # Optional argument: filter
 query = {}
 if len(argv) == 5:
     query['_id.id'] = {'$regex': argv[4]}
+
+if len(argv) == 6:
+    query['_id.servicePath'] = argv[5]
 
 client = MongoClient('localhost', 27017)
 col = client[db]['entities']

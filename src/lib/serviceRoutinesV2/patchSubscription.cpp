@@ -72,7 +72,6 @@ std::string patchSubscription
   //
   TIMED_MONGO(mongoUpdateSubscription(parseDataP->subsV2,
                                       &beError,
-                                      ciP->uriParam,
                                       ciP->tenant,
                                       ciP->servicePathV,
                                       ciP->httpHeaders.xauthToken,
