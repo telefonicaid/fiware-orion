@@ -1961,6 +1961,8 @@ BSONArray processConditionVector
 
   *notificationDone = false;
 
+  LM_W(("KZ: In processConditionVector. Here the entire httpInfo is lost ..."));
+
   for (unsigned int ix = 0; ix < ncvP->size(); ++ix)
   {
     NotifyCondition* nc = (*ncvP)[ix];
@@ -1979,6 +1981,7 @@ BSONArray processConditionVector
                         CSUB_CONDITIONS_VALUE << condValues.arr()
                         ));
 
+      LM_W(("Possibly calling processOnChangeConditionForSubscription, but without httpInfo ..."));
       if ((status == STATUS_ACTIVE) &&
           (processOnChangeConditionForSubscription(enV,
                                                    attrL,
@@ -1995,6 +1998,7 @@ BSONArray processConditionVector
       {
         *notificationDone = true;
       }
+      LM_W(("KZ: Possibly after processOnChangeConditionForSubscription"));
     }
     else
     {

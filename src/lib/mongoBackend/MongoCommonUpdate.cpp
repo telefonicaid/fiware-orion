@@ -1019,7 +1019,7 @@ static bool addTriggeredSubscriptions_withCache
   std::string                       servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::vector<CachedSubscription*>  subVec;
 
-  LM_W(("KZ: Adding a TriggeredSubscription?"));
+  LM_W(("KZ: Adding a TriggeredSubscription? (%d items in vector)", subVec.size()));
 
   cacheSemTake(__FUNCTION__, "match subs for notifications");
   subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);

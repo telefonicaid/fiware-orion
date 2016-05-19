@@ -417,8 +417,9 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
           return badInput(ciP, "Invalid URL parsing notification url");
         }
       }
-      subsP->notification.httpInfo.url =      urlOpt.value;
+      subsP->notification.httpInfo.url      = urlOpt.value;
       subsP->notification.httpInfo.extended = false;
+      LM_W(("KZ: httpInfo.extended set to FALSE"));
     }
   }
   else if (notification.HasMember("httpExtended"))
@@ -471,7 +472,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // payload
     {
-      Opt<std::string> payloadOpt = getStringMust(httpExt, "payload", "payload httpExtended notification");
+      Opt<std::string> payloadOpt = getStringOpt(httpExt, "payload", "payload httpExtended notification");
       if (!payloadOpt.ok())
       {
         return badInput(ciP, payloadOpt.error);
@@ -514,6 +515,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     subsP->notification.httpInfo.extended = true;
+    LM_W(("KZ: httpInfo.extended set to TRUE (httpInfo at %p)", &subsP->notification.httpInfo));
   }
   else  // missing callback field
   {

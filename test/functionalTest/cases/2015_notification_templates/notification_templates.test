@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Notification Templates
+Notification Templates, Normal Case
 
 --SHELL-INIT--
 dbInit CB
@@ -31,21 +31,146 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create subscription for E1 with empty template part - see error
-# 02. Create subscription for E1 with everything except URL in template part - see error
-# 03. Create subscription for E1 with URL and invalid VERB in template part - see error
-# 04. Create subscription for E1 with only URL in template part
-# 05. Create subscription for E1 with URL and VERB in template part
-# 06. Create subscription for E1 with URL and PAYLOAD in template part - PAYLAD with substitutions
-# 07. Create subscription for E1 with URL and QS in template part - QS with substitutions
-# 08. Create subscription for E1 with URL and HEADERS in template part - HEADERS with substitutions
-# 09. Create subscription for E1 with URL, VERB, PAYLOAD, QS and HEADERS in template part - all with substitutions (except VERB, of course)
-# 10. Create subscription for E1 with PAYLOAD, QS and HEADERS with unknown attribute 'A4' for substitution
-# 11. Create E1 with attributes A1,A2 and A3
-# 12. Dump accumulator, see 7 notifications
+# 01. Create subscription for E1 with only URL in template part
+# 02. Create subscription for E1 with URL and VERB in template part
+# 03. Create subscription for E1 with URL and PAYLOAD in template part - PAYLOAD with substitutions
+# 04. Create subscription for E1 with URL and QS in template part - QS with substitutions
+# 05. Create subscription for E1 with URL and HEADERS in template part - HEADERS with substitutions
+# 06. Create subscription for E1 with URL, VERB, PAYLOAD, QS and HEADERS in template part - all with substitutions (except VERB, of course)
+# 07. Create subscription for E1 with PAYLOAD, QS and HEADERS with unknown attribute 'A4' for substitution
+# 08. Create E1 with attributes A1,A2 and A3
+# 09. Dump accumulator, see 7 notifications
 #
 
-echo "09. Create subscription for E1 with URL, VERB, PAYLOAD, QS and HEADERS in template part - all with substitutions (except VERB, of course)"
+echo "01. Create subscription for E1 with only URL in template part"
+echo "============================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+      "url":     "http://127.0.0.1:'${LISTENER_PORT}'/${NOTIFY_URL}",
+      "qs":      { "step": "01" }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create subscription for E1 with URL and VERB in template part"
+echo "================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+      "url":     "http://127.0.0.1:'${LISTENER_PORT}'/${NOTIFY_URL}",
+      "method":  "PATCH",
+      "qs":      { "step": "02" }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create subscription for E1 with URL and PAYLOAD in template part - PAYLOAD with substitutions"
+echo "================================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+      "url":     "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "payload": "{ \"A1\": \"${A1}\", \"A2\": \"${A2}\", \"A3\": \"${A3}\", \"step\": \"03\" }",
+      "qs":       { "step": "03" }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Create subscription for E1 with URL and QS in template part - QS with substitutions"
+echo "======================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+      "url":      "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "qs":       { "step": "04", "id": "${id}", "type": "${type}", "a1": "${A1}", "a2": "${A2}", "a3": "${A3}" }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. Create subscription for E1 with URL and HEADERS in template part - HEADERS with substitutions"
+echo "================================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+      "url":     "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "headers": { "entity-id": "${id}", "entity-type": "${type}", "A1": "${A1}", "A2": "${A2}", "A3": "${A3}", "step": "05" },
+      "qs":      { "step": "05" }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "06. Create subscription for E1 with URL, VERB, PAYLOAD, QS and HEADERS in template part - all with substitutions (except VERB, of course)"
 echo "========================================================================================================================================="
 payload='{
   "subject": {
@@ -60,11 +185,11 @@ payload='{
   },
   "notification": {
     "httpExtended": {
-      "url": "http://127.0.0.1:'${LISTENER_PORT}'/${NOTIFY_URL}",
-      "method": "PUT",
-      "payload": "{ \"A1\": \"${A1}\", \"A2\": \"${A2}\", \"A3\": \"${A3}\" }",
-      "qs":       { "id": "${id}", "type": "${type}", "a1": "${A1}", "a2": "${A2}", "a3": "${A3}" },
-      "headers":  { "id": "${id}", "type": "${type}", "A1": "${A1}", "A2": "${A2}", "A3": "${A3}" }
+      "url":      "http://127.0.0.1:'${LISTENER_PORT}'/${NOTIFY_URL}",
+      "method":   "DELETE",
+      "payload":  "{ \"A1\": \"${A1}\", \"A2\": \"${A2}\", \"A3\": \"${A3}\" }",
+      "qs":       { "step": "06", "id": "${id}", "type": "${type}", "a1": "${A1}", "a2": "${A2}", "a3": "${A3}" },
+      "headers":  { "entity-id": "${id}", "entity-type": "${type}", "A1": "${A1}", "A2": "${A2}", "A3": "${A3}", "step": "06" }
     }
   }
 }'
@@ -73,7 +198,34 @@ echo
 echo
 
 
-echo "10. Create E1 with attributes A1,A2 and A3"
+echo "07. Create subscription for E1 with PAYLOAD, QS and HEADERS with unknown attribute 'A4' for substitution"
+echo "========================================================================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+      "url":      "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "payload":  "{ \"A1\": \"${A1}\", \"A2\": \"${A2}\", \"A4\": \"${A4}\" }",
+      "qs":       { "step": "07", "id": "${id}", "type": "${type}", "a1": "${A1}", "a2": "${A2}", "a4": "${A4}" },
+      "headers":  { "entity-id": "${id}", "entity-type": "${type}", "A1": "${A1}", "A2": "${A2}", "A4": "${A4}", "step": "07" }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "08. Create E1 with attributes A1,A2 and A3"
 echo "=========================================="
 payload='{
   "id": "E1",
@@ -87,37 +239,302 @@ echo
 echo
 
 
-echo "11. Dump accumulator, see 7 notifications"
+echo "09. Dump accumulator, see 7 notifications"
 echo "========================================="
 accumulatorDump
-echo
 echo
 echo
 
 
 --REGEXPECT--
-09. Create subscription for E1 with URL, VERB, PAYLOAD, QS and HEADERS in template part - all with substitutions (except VERB, of course)
-=========================================================================================================================================
+01. Create subscription for E1 with only URL in template part
+=============================================================
 HTTP/1.1 201 Created
-Content-Length: 0 
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24}
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-10. Create E1 with attributes A1,A2 and A3
+02. Create subscription for E1 with URL and VERB in template part
+=================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create subscription for E1 with URL and PAYLOAD in template part - PAYLOAD with substitutions
+=================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create subscription for E1 with URL and QS in template part - QS with substitutions
+=======================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create subscription for E1 with URL and HEADERS in template part - HEADERS with substitutions
+=================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Create subscription for E1 with URL, VERB, PAYLOAD, QS and HEADERS in template part - all with substitutions (except VERB, of course)
+=========================================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Create subscription for E1 with PAYLOAD, QS and HEADERS with unknown attribute 'A4' for substitution
+========================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Create E1 with attributes A1,A2 and A3
 ==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/REGEX([0-9a-f\-]{24}
+Location: /v2/entities/E1?type=none
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-11. Dump accumulator, see 7 notifications
+09. Dump accumulator, see 7 notifications
 =========================================
+POST http://127.0.0.1:9997/notify?step=01
+Fiware-Servicepath: /
+Content-Length: 227
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:9997
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "A1": {
+        "metadata": {}, 
+        "type": "none", 
+        "value": "a1"
+    }, 
+    "A2": {
+        "metadata": {}, 
+        "type": "none", 
+        "value": "a2"
+    }, 
+    "A3": {
+        "metadata": {}, 
+        "type": "none", 
+        "value": 13
+    }, 
+    "NOTIFY_URL": {
+        "metadata": {}, 
+        "type": "none", 
+        "value": "notify"
+    }, 
+    "id": "E1", 
+    "type": "none"
+}
+=======================================
+PATCH http://127.0.0.1:9997/notify?step=02
+Fiware-Servicepath: /
+Content-Length: 227
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:9997
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "A1": {
+        "metadata": {}, 
+        "type": "none", 
+        "value": "a1"
+    }, 
+    "A2": {
+        "metadata": {}, 
+        "type": "none", 
+        "value": "a2"
+    }, 
+    "A3": {
+        "metadata": {}, 
+        "type": "none", 
+        "value": 13
+    }, 
+    "NOTIFY_URL": {
+        "metadata": {}, 
+        "type": "none", 
+        "value": "notify"
+    }, 
+    "id": "E1", 
+    "type": "none"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?step=03
+Fiware-Servicepath: /
+Content-Length: 59
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:9997
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "A1": "a1", 
+    "A2": "a2", 
+    "A3": "13.000000", 
+    "step": "03"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?a1=a1&step=04&a2=a2&type=none&a3=13.000000&id=E1
+Fiware-Servicepath: /
+Content-Length: 227
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:9997
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "A1": {
+        "metadata": {}, 
+        "type": "none", 
+        "value": "a1"
+    }, 
+    "A2": {
+        "metadata": {}, 
+        "type": "none", 
+        "value": "a2"
+    }, 
+    "A3": {
+        "metadata": {}, 
+        "type": "none", 
+        "value": 13
+    }, 
+    "NOTIFY_URL": {
+        "metadata": {}, 
+        "type": "none", 
+        "value": "notify"
+    }, 
+    "id": "E1", 
+    "type": "none"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?step=05
+Fiware-Servicepath: /
+Ngsiv2-Attrsformat: normalized
+Entity-Id: E1
+Content-Length: 227
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Step: 05
+Accept: application/json
+Host: 127.0.0.1:9997
+A3: 13.000000
+A2: a2
+A1: a1
+Entity-Type: none
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "A1": {
+        "metadata": {}, 
+        "type": "none", 
+        "value": "a1"
+    }, 
+    "A2": {
+        "metadata": {}, 
+        "type": "none", 
+        "value": "a2"
+    }, 
+    "A3": {
+        "metadata": {}, 
+        "type": "none", 
+        "value": 13
+    }, 
+    "NOTIFY_URL": {
+        "metadata": {}, 
+        "type": "none", 
+        "value": "notify"
+    }, 
+    "id": "E1", 
+    "type": "none"
+}
+=======================================
+DELETE http://127.0.0.1:9997/notify?a1=a1&step=06&a2=a2&type=none&a3=13.000000&id=E1
+Fiware-Servicepath: /
+Ngsiv2-Attrsformat: custom
+Entity-Id: E1
+Content-Length: 45
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Step: 06
+Accept: application/json
+Host: 127.0.0.1:9997
+A3: 13.000000
+A2: a2
+A1: a1
+Entity-Type: none
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "A1": "a1", 
+    "A2": "a2", 
+    "A3": "13.000000"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?a1=a1&step=07&a2=a2&a4=&type=none&id=E1
+Fiware-Servicepath: /
+Entity-Id: E1
+Content-Length: 36
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Step: 07
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:9997
+Accept: application/json
+A2: a2
+A1: a1
+Entity-Type: none
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "A1": "a1", 
+    "A2": "a2", 
+    "A4": ""
+}
+=======================================
 
 
 --TEARDOWN--

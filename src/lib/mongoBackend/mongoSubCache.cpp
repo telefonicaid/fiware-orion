@@ -65,6 +65,7 @@ using namespace mongo;
 */
 int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 {
+  LM_W(("In mongoSubCacheItemInsert"));
   //
   // 01. Check validity of subP parameter 
   //
@@ -104,7 +105,6 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);
   cSubP->subscriptionId        = strdup(idField.OID().toString().c_str());
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getFieldF(sub, CSUB_SERVICE_PATH).String().c_str() : "/");
-  cSubP->httpInfo.url          = strdup(sub.hasField(CSUB_REFERENCE)?    getFieldF(sub, CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       : 0;
@@ -112,6 +112,71 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->status                = sub.hasField(CSUB_STATUS)?           getFieldF(sub, CSUB_STATUS).String().c_str()         : "active";
   cSubP->count                 = 0;
   cSubP->next                  = NULL;
+
+
+  //
+  // 04.2 httpInfo
+  //
+  // Note that the URL of the notification is stored outside the httpInfo object in mongo
+  //
+  cSubP->httpInfo.url = sub.hasField(CSUB_REFERENCE)?    getFieldF(sub, CSUB_REFERENCE).String().c_str() : "NO REF";  // Mandatory
+
+  LM_W(("KZ2: URL == '%s'", cSubP->httpInfo.url.c_str()));
+  bool extended = (sub.hasField("extended"))? getBoolFieldF(sub, "extended") : false;
+
+  if (extended)
+  {
+    LM_W(("KZ2: EXTENDED"));
+    // method/verb
+    if (sub.hasField("method"))
+    {
+      cSubP->httpInfo.verb = str2Verb(getFieldF(sub, "method").String());
+    }
+    else
+    {
+      cSubP->httpInfo.verb = POST;
+    }
+
+    if ((cSubP->httpInfo.verb == NOVERB) || (cSubP->httpInfo.verb == UNKNOWNVERB))
+    {
+      cSubP->httpInfo.verb = POST;
+    }
+
+    LM_W(("KZ2: METHOD: %s", verbName(cSubP->httpInfo.verb)));
+
+    // payload
+    cSubP->httpInfo.payload = (sub.hasField("payload"))? getFieldF(sub, "payload").String() : "";
+    LM_W(("KZ2: PAYLOAD: %s", cSubP->httpInfo.payload.c_str()));
+
+    // qs
+    if (sub.hasField("qs"))
+    {
+      mongo::BSONObj qs = getFieldF(sub, "qs").Obj();
+
+      for (BSONObj::iterator i = qs.begin(); i.more();)
+      {
+        BSONElement e = i.next();
+
+        cSubP->httpInfo.qs[e.fieldName()] = e.String();
+        LM_W(("KZ2: QS '%s' == '%s'", e.fieldName(), e.String().c_str()));
+      }
+    }
+
+    // headers
+    if (sub.hasField("headers"))
+    {
+      mongo::BSONObj headers = getFieldF(sub, "headers").Obj();
+
+      for (BSONObj::iterator i = headers.begin(); i.more();)
+      {
+        BSONElement e = i.next();
+
+        cSubP->httpInfo.headers[e.fieldName()] = e.String();
+        LM_W(("KZ2: HEADERS '%s' == '%s'", e.fieldName(), e.String().c_str()));
+      }
+    }
+  }
+
 
   LM_T(LmtSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
 
@@ -417,6 +482,7 @@ int mongoSubCacheItemInsert
 */
 void mongoSubCacheRefresh(const std::string& database)
 {
+  LM_W(("KZ: In mongoSubCacheRefresh"));
   LM_T(LmtSubCache, ("Refreshing subscription cache for DB '%s'", database.c_str()));
 
   BSONObj                   query       = BSON("conditions.type" << ON_CHANGE_CONDITION);
@@ -430,6 +496,7 @@ void mongoSubCacheRefresh(const std::string& database)
   DBClientBase* connection = getMongoConnection();
   if (collectionQuery(connection, collection, query, &cursor, &errorString) != true)
   {
+    LM_W(("KZ: In mongoSubCacheRefresh: collectionQuery gave false"));
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     return;
@@ -437,17 +504,20 @@ void mongoSubCacheRefresh(const std::string& database)
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   int subNo = 0;
+  LM_W(("KZ: In mongoSubCacheRefresh: loop over cursor"));
   while (moreSafe(cursor))
   {
     BSONObj      sub;
     std::string  err;
 
+    LM_W(("KZ: In mongoSubCacheRefresh: in loop"));
     if (!nextSafeOrErrorF(cursor, &sub, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
 
+    LM_W(("KZ: In mongoSubCacheRefresh: calling mongoSubCacheItemInsert"));
     int r = mongoSubCacheItemInsert(tenant.c_str(), sub);
 
     if (r == 0)
@@ -458,6 +528,7 @@ void mongoSubCacheRefresh(const std::string& database)
   releaseMongoConnection(connection);
 
   LM_T(LmtSubCache, ("Added %d subscriptions for database '%s'", subNo, database.c_str()));
+  LM_W(("KZ: In mongoSubCacheRefresh: FROM"));
 }
 
 
