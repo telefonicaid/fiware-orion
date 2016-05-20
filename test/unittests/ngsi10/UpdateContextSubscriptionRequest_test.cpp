@@ -53,8 +53,7 @@ TEST(UpdateContextSubscriptionRequest, badLength_json)
   ConnectionInfo  ci("", "POST", "1.1");
   std::string     out;
   const char*     infile   = "ngsi10.updateContextSubscriptionRequest.badLength.invalid.json";
-  const char*     outfile1 = "ngsi10.updateContextSubscriptionRequest.badLength.expected1.valid.json";
-  const char*     outfile2 = "ngsi10.updateContextSubscriptionRequest.badLength.expected2.valid.json";
+  const char*     outfile1 = "ngsi10.updateContextSubscriptionRequest.badLength.expected1.valid.json";  
   const char*     outfile3 = "ngsi10.updateContextSubscriptionRequest.badLength.expected3.valid.json";
   const char*     outfile4 = "ngsi10.updateContextSubscriptionRequest.badLength.expected4.valid.json";
   
@@ -77,10 +76,6 @@ TEST(UpdateContextSubscriptionRequest, badLength_json)
   UpdateContextSubscriptionRequest*  ucsrP = &parseData.ucsr.res;
   
   ucsrP->present(""); // No output
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  out = ucsrP->render(UpdateContextSubscription, "");
-  EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   out  = ucsrP->check(UpdateContextSubscription, "", "FORCED ERROR", 0);

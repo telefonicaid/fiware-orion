@@ -22,25 +22,18 @@
 *
 * Author: Fermin Galan Marquez
 */
-#include <string>
 
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
-#include "common/globals.h"
-#include "common/defaultValues.h"
-#include "common/sem.h"
-#include "apiTypesV2/HttpInfo.h"
-#include "alarmMgr/alarmMgr.h"
-#include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/dbConstants.h"
-#include "mongoBackend/mongoSubscribeContext.h"
-#include "mongoBackend/connectionOperations.h"
-#include "cache/subCache.h"
+#include <string>
+#include <vector>
+#include "rest/OrionError.h"
+#include "ngsi/Duration.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/SubscribeContextResponse.h"
-#include "ngsi/StatusCode.h"
-#include "rest/uriParamNames.h"
+#include "apiTypesV2/Subscription.h"
+#include "mongoBackend/mongoCreateSubscription.h"
+#include "mongoBackend/mongoSubscribeContext.h"
 
+using namespace ngsiv2;
 
 
 /* ****************************************************************************
@@ -52,209 +45,35 @@ HttpStatusCode mongoSubscribeContext
   SubscribeContextRequest*             requestP,
   SubscribeContextResponse*            responseP,
   const std::string&                   tenant,
-  std::map<std::string, std::string>&  uriParam,
   const std::string&                   xauthToken,
   const std::vector<std::string>&      servicePathV,
   const std::string&                   fiwareCorrelator
 )
 {
-    std::string servicePath = servicePathV[0] == ""? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
-    bool        reqSemTaken = false;
+    OrionError   oe;
+    Subscription sub;
 
-    reqSemTake(__FUNCTION__, "ngsi10 subscribe request", SemWriteOp, &reqSemTaken);
+    requestP->toNgsiv2Subscription(&sub);
+    std::string subId = mongoCreateSubscription(sub, &oe, tenant, servicePathV, xauthToken, fiwareCorrelator);
 
-    //
-    // Calculate expiration (using the current time and the duration field in the request).
-    // If expiration is not present, use a default value
-    //
-    long long expiration = -1;
-    if (requestP->expires > 0)
-    {
-      expiration = requestP->expires;
+    if (subId != "")
+    {      
+      if (requestP->duration.isEmpty())
+      {
+        responseP->subscribeResponse.duration.set(DEFAULT_DURATION);
+      }
+      else
+      {
+        responseP->subscribeResponse.duration = requestP->duration;
+      }
+      responseP->subscribeResponse.subscriptionId.set(subId);
+      responseP->subscribeResponse.throttling = requestP->throttling;
     }
     else
     {
-      if (requestP->duration.isEmpty())
-      {
-        requestP->duration.set(DEFAULT_DURATION);
-      }
-
-      expiration = getCurrentTime() + requestP->duration.parse();
+      // Check OrionError
+      responseP->subscribeError.errorCode.fill(oe.code, oe.details);
     }
-    LM_T(LmtMongo, ("Subscription expiration: %lu", expiration));
-
-    /* Create the mongoDB subscription document */
-    BSONObjBuilder  sub;
-    OID             oid;
-
-    oid.init();
-
-    sub.append("_id", oid);
-    sub.append(CSUB_EXPIRATION, expiration);
-    sub.append(CSUB_REFERENCE,  requestP->reference.get());
-
-
-    /* Throttling */
-    long long throttling = 0;
-    if (requestP->throttling.seconds != -1)
-    {
-      throttling = (long long) requestP->throttling.seconds;
-      sub.append(CSUB_THROTTLING, throttling);
-    }
-    else if (!requestP->throttling.isEmpty())
-    {
-      throttling = (long long) requestP->throttling.parse();
-      sub.append(CSUB_THROTTLING, throttling);
-    }
-
-    /* ServicePath (note that it cannot be empty, by construction) */
-    sub.append(CSUB_SERVICE_PATH, servicePath);
-
-    /* Description */
-    if (requestP->description != "")
-    {
-      sub.append(CSUB_DESCRIPTION, requestP->description);
-    }
-    
-    /* Build entities array */
-    BSONArrayBuilder entities;
-    for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix)
-    {
-        EntityId* en = requestP->entityIdVector[ix];
-
-        if (en->type == "")
-        {
-          entities.append(BSON(CSUB_ENTITY_ID << en->id <<
-                               CSUB_ENTITY_ISPATTERN << en->isPattern));
-        }
-        else
-        {
-          entities.append(BSON(CSUB_ENTITY_ID << en->id <<
-                               CSUB_ENTITY_TYPE << en->type <<
-                               CSUB_ENTITY_ISPATTERN << en->isPattern));
-        }
-    }
-    sub.append(CSUB_ENTITIES, entities.arr());
-
-    /* Build attributes array */
-    BSONArrayBuilder attrs;
-    for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix)
-    {
-      attrs.append(requestP->attributeList[ix]);
-    }
-    sub.append(CSUB_ATTRS, attrs.arr());
-
-
-    //
-    // StringFilter in Scope?
-    //
-    // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in requestP->restriction.scopeVector?
-    // If so, set it as string filter to the sub-cache item
-    //
-    StringFilter*  stringFilterP = NULL;
-
-    for (unsigned int ix = 0; ix < requestP->restriction.scopeVector.size(); ++ix)
-    {
-      if (requestP->restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
-      {
-        stringFilterP = requestP->restriction.scopeVector[ix]->stringFilterP;
-      }
-    }
-
-    /* Adding status */
-    std::string status = requestP->status == ""?  STATUS_ACTIVE : requestP->status;
-    sub.append(CSUB_STATUS, status);
-
-    /* Build conditions array (including side-effect notifications and threads creation) */
-    bool       notificationDone = false;
-    BSONArray  conds = processConditionVector(&requestP->notifyConditionVector,
-                                             requestP->entityIdVector,
-                                             requestP->attributeList,
-                                             oid.toString(),
-                                             requestP->reference.get(),
-                                             &notificationDone,
-                                             requestP->attrsFormat,
-                                             tenant,
-                                             xauthToken,
-                                             servicePathV,
-                                             &requestP->restriction,
-                                             status,
-                                             fiwareCorrelator,
-                                             requestP->attributeList.attributeV);
-
-    sub.append(CSUB_CONDITIONS, conds);
-
-    /* Build expression */
-    BSONObjBuilder expression;
-
-    expression << CSUB_EXPR_Q << requestP->expression.q
-               << CSUB_EXPR_GEOM << requestP->expression.geometry
-               << CSUB_EXPR_COORDS << requestP->expression.coords
-               << CSUB_EXPR_GEOREL << requestP->expression.georel;
-    sub.append(CSUB_EXPR, expression.obj());
-
-    /* Last notification */
-    long long lastNotificationTime = 0;
-    if (notificationDone)
-    {
-      lastNotificationTime = (long long) getCurrentTime();
-
-      sub.append(CSUB_LASTNOTIFICATION, lastNotificationTime);
-      sub.append(CSUB_COUNT, (long long) 1);
-    }
-
-    /* Adding format to use in notifications */
-    sub.append(CSUB_FORMAT, renderFormatToString(requestP->attrsFormat));
-
-    /* Insert document in database */
-    std::string err;
-    if (!collectionInsert(getSubscribeContextCollectionName(tenant), sub.obj(), &err))
-    {
-      reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo db exception)", reqSemTaken);
-      responseP->subscribeError.errorCode.fill(SccReceiverInternalError, err);
-      return SccOk;
-    }
-
-
-    //
-    // 3. Create Subscription for the cache
-    //
-    std::string oidString = oid.toString();
-
-    LM_T(LmtSubCache, ("inserting a new sub in cache (%s)", oidString.c_str()));
-
-    ngsiv2::HttpInfo httpInfo;
-
-    httpInfo.url = requestP->reference.get();
-
-    cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
-    subCacheItemInsert(tenant.c_str(),
-                       servicePath.c_str(),
-                       httpInfo,
-                       requestP->entityIdVector,
-                       requestP->attributeList,
-                       requestP->notifyConditionVector,
-                       oidString.c_str(),
-                       expiration,
-                       throttling,
-                       requestP->attrsFormat,
-                       notificationDone,
-                       lastNotificationTime,
-                       stringFilterP,
-                       status,
-                       requestP->expression.q,
-                       requestP->expression.geometry,
-                       requestP->expression.coords,
-                       requestP->expression.georel);
-
-    cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
-
-    reqSemGive(__FUNCTION__, "ngsi10 subscribe request", reqSemTaken);
-
-    /* Fill int the response element */
-    responseP->subscribeResponse.duration = requestP->duration;
-    responseP->subscribeResponse.subscriptionId.set(oid.toString());
-    responseP->subscribeResponse.throttling = requestP->throttling;
 
     return SccOk;
 }

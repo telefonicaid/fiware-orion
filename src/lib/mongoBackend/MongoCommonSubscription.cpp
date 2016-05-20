@@ -281,7 +281,7 @@ void setCondsAndInitialNotify
   // could correspond to an update and the fields be missing (in which case the one from
   // the original subscription has to be taken; the caller deal with that)
 
-  /* Conds vector (and maybe and initial notification) */
+  /* Conds vector (and maybe an initial notification) */
   *notificationDone = false;
   LM_W(("KZ: calling processConditionVector. extended == %s", sub.notification.httpInfo.extended? "true" : "false"));
   BSONArray  conds = processConditionVector(sub.subject.condition.attributes,

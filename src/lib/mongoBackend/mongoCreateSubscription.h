@@ -48,7 +48,6 @@ extern std::string mongoCreateSubscription
 (
   const ngsiv2::Subscription&          sub,
   OrionError*                          oe,
-  std::map<std::string, std::string>&  uriParams,
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
   const std::string&                   xauthToken,
