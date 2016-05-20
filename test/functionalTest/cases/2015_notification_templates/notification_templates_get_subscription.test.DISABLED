@@ -31,7 +31,8 @@ brokerStart CB
 
 #
 # 01. Create a subscription with templates, include all fields in httpCustom
-# 02. GET the subscription, amking sure all httpCustom fields are present and correct
+# 02. GET the subscription, using GET /v2/subscriptions, making sure all httpCustom fields are present and correct
+# 03. GET the subscription, using GET /v2/subscriptions/<sub-id>, making sure all httpCustom fields are present and correct
 #
 
 --REGEXPECT--
