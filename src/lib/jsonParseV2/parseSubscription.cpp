@@ -725,8 +725,14 @@ static std::string parseDictionary(ConnectionInfo* ciP, std::map<std::string, st
     }
 
     std::string value = iter->value.GetString();
+    std::string key   = iter->name.GetString();
 
     if (forbiddenChars(value.c_str()))
+    {
+      return badInput(ciP, std::string("forbidden characters in custom ") + name);
+    }
+
+    if (forbiddenChars(key.c_str()))
     {
       return badInput(ciP, std::string("forbidden characters in custom ") + name);
     }
