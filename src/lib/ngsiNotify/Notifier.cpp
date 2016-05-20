@@ -106,7 +106,15 @@ static bool templateNotify
   if (httpInfo.payload == "")
   {
     LM_W(("KZ: using default payload"));
-    payload = "{" + ce.toJson(renderFormat, attrsOrder) + "}";
+    NotifyContextRequest ncr;
+    ContextElementResponse cer;
+    cer.contextElement = ce;
+    ncr.subscriptionId = subscriptionId;
+    ncr.contextElementResponseVector.push_back(&cer);
+    ncr.toJson(renderFormat, attrsOrder);
+
+    //payload = "{" + ce.toJson(renderFormat, attrsOrder) + "}";
+    payload = ncr.toJson(renderFormat, attrsOrder);
   }
   else
   {
@@ -126,6 +134,11 @@ static bool templateNotify
     std::string value = it->second;
 
     macroSubstitute(&value, it->second, ce);
+    if (value == "")
+    {
+      // To avoid e.g '?a=&b=&c='
+      continue;
+    }
     qs[key] = value;
     LM_W(("KZ: Added URI Param '%s': '%s'", key.c_str(), value.c_str()));
   }
@@ -394,11 +407,11 @@ void Notifier::sendNotifyContextRequest
     std::string payloadString;
     if (renderFormat == NGSI_V1_LEGACY)
     {
-      payloadString = ncrP->render(&ci, NotifyContext, "");
+      payloadString = ncrP->render(NotifyContext, "");
     }
     else
     {
-      payloadString = ncrP->toJson(&ci, renderFormat, attrsOrder);
+      payloadString = ncrP->toJson(renderFormat, attrsOrder);
     }
 
     /* Parse URL */

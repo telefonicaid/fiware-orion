@@ -34,8 +34,10 @@ accumulatorStart --pretty-print
 # 01. Create E1/T1 
 # 02. Create E1/T2 
 # 03. Create E1/T3 
-# 04. Create extended subscription for E1
-# 05. Dump accumulator and see three separate notifications
+# 04. Create regular subscription for E1 -> 3 entities in one notification
+# 05. Create same subscription but with 'httpExtended' instead 'http' -> 3 notifications
+# 06. Create extended subscription for E1 -> 3 notifications
+# 07. Dump accumulator and see 7 notifications (one first one multi-entity)
 #
 
 echo "01. Create E1/T1"
@@ -74,8 +76,58 @@ echo
 echo
 
 
-echo "04. Create extended subscription for E1"
-echo "======================================="
+echo "04. Create regular subscription for E1 -> 3 entities in one notification"
+echo "========================================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  },
+  "throttling": 0
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. Create same subscription but with 'httpExtended' instead 'http' -> 3 notifications"
+echo "======================================================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  },
+  "throttling": 0
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "06. Create extended subscription for E1 -> 3 notifications"
+echo "=========================================================="
 payload='{
   "subject": {
     "entities": [
@@ -103,8 +155,8 @@ echo
 echo
 
 
-echo "05. Dump accumulator and see three separate notifications"
-echo "========================================================="
+echo "07. Dump accumulator and see 7 notifications (one first one multi-entity)"
+echo "========================================================================="
 accumulatorDump
 echo
 echo
@@ -141,8 +193,8 @@ Date: REGEX(.*)
 
 
 
-04. Create extended subscription for E1
-=======================================
+04. Create regular subscription for E1 -> 3 entities in one notification
+========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -151,8 +203,169 @@ Date: REGEX(.*)
 
 
 
-05. Dump accumulator and see three separate notifications
-=========================================================
+05. Create same subscription but with 'httpExtended' instead 'http' -> 3 notifications
+======================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+
+06. Create extended subscription for E1 -> 3 notifications
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Dump accumulator and see 7 notifications (one first one multi-entity)
+=========================================================================
+POST http://127.0.0.1:9997/notify
+Content-Length: 267
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {},
+                "type": "none",
+                "value": true
+            },
+            "id": "E1",
+            "type": "T1"
+        },
+        {
+            "A2": {
+                "metadata": {},
+                "type": "none",
+                "value": null
+            },
+            "id": "E1",
+            "type": "T2"
+        },
+        {
+            "A3": {
+                "metadata": {},
+                "type": "none",
+                "value": 3
+            },
+            "id": "E1",
+            "type": "T3"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:9997/notify
+Fiware-Servicepath: /
+Content-Length: 71
+User-Agent: orion/1.1.0-next libcurl/7.38.0
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:9997
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: 67a715e0-1e8b-11e6-bad5-000c29173617
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "none",
+        "value": true
+    },
+    "id": "E1",
+    "type": "T1"
+}
+=======================================
+POST http://127.0.0.1:9997/notify
+Fiware-Servicepath: /
+Content-Length: 71
+User-Agent: orion/1.1.0-next libcurl/7.38.0
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:9997
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: 67a715e0-1e8b-11e6-bad5-000c29173617
+
+{
+    "A2": {
+        "metadata": {},
+        "type": "none",
+        "value": null
+    },
+    "id": "E1",
+    "type": "T2"
+}
+=======================================
+POST http://127.0.0.1:9997/notify
+Fiware-Servicepath: /
+Content-Length: 68
+User-Agent: orion/1.1.0-next libcurl/7.38.0
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:9997
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: 67a715e0-1e8b-11e6-bad5-000c29173617
+
+{
+    "A3": {
+        "metadata": {},
+        "type": "none",
+        "value": 3
+    },
+    "id": "E1",
+    "type": "T3"
+}
+=======================================
+PUT http://127.0.0.1:9997/notify?a2=null&type=T2&id=E1
+Fiware-Servicepath: /
+Entity-Id: E1
+Content-Length: 36
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+A2: null
+Entity-Type: T2
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "A1": "",
+    "A2": "null",
+    "A3": ""
+}
+=======================================
+PUT http://127.0.0.1:9997/notify?a3=3.000000&type=T3&id=E1
+Fiware-Servicepath: /
+Ngsiv2-Attrsformat: custom
+Entity-Id: E1
+Content-Length: 40
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Accept: application/json
+Host: 127.0.0.1:REGEX(\d+)
+A3: 3.000000
+Entity-Type: T3
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "A1": "",
+    "A2": "",
+    "A3": "3.000000"
+}
+=======================================
 
 
 --TEARDOWN--

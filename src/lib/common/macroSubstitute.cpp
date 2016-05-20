@@ -125,9 +125,19 @@ void macroSubstitute(std::string* to, const std::string& from, const ContextElem
   char*        toP     = (char*) calloc(1, CHUNK_SIZE);
   int          toIx    = 0;
   int          toLen   = CHUNK_SIZE;
-  const char*  fromP   = (char*) from.c_str();
 
   if (toP == NULL)
+  {
+    LM_E(("Runtime Error (out of memory)"));
+    *to = "";
+    return;
+  }
+
+  // We need to do a copy, or the fromP processing logic will destroy
+  char*       fromToFreeP = strdup(from.c_str());
+  const char* fromP       = fromToFreeP;
+
+  if (fromP == NULL)
   {
     LM_E(("Runtime Error (out of memory)"));
     *to = "";
@@ -283,4 +293,5 @@ void macroSubstitute(std::string* to, const std::string& from, const ContextElem
   //
   *to = toP;
   free(toP);
+  free(fromToFreeP);
 }
