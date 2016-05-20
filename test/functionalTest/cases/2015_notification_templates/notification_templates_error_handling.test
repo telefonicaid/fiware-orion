@@ -399,22 +399,72 @@ Date: REGEX(.*)
 
 07. Create subscription for E1 with forbidden chars in http:url - see error
 ===========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 79
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "forbidden characters in http field /url/",
+    "error": "BadRequest"
+}
 
 
 08. Create subscription for E1 with forbidden chars in template:url - see error
 ===============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "forbidden characters in custom /url/",
+    "error": "BadRequest"
+}
 
 
 09. Create subscription for E1 with forbidden chars in template:payload - see error
 ===================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 79
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "forbidden characters in custom /payload/",
+    "error": "BadRequest"
+}
 
 
 10. Create subscription for E1 with forbidden chars in template:qs - see error
 ==============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 98
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "forbidden characters in custom notification httpExtended qs",
+    "error": "BadRequest"
+}
 
 
 11. Create subscription for E1 with forbidden chars in template:headers - see error
 ===================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 103
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "forbidden characters in custom notification httpExtended headers",
+    "error": "BadRequest"
+}
 
 
 --TEARDOWN--
