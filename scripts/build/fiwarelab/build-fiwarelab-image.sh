@@ -91,7 +91,11 @@ found in its Github page: https://github.com/telefonicaid/Rush
 
 However, neither Rush nor Redis are started by default so you need to use /etc/init.d/redis
 and /etc/init.d/rush to do so. In addition, Orion needs to be configured to use Rush
-(see https://fiware-orion.readthedocs.io/en/develop/admin/rush/index.html).
+(see https://fiware-orion.readthedocs.io/en/develop/admin/rush/index.html). In order to
+start Rush and Redis services at VM startup you can use:
+
+ chkconfig redis on
+ chkconfig rush on
 
 Note that the certificate used by Rush is self-signed (using 'fiware' password) and uses fake 
 data. If you want to use your own certificate you have to use your own server.crt, server.csr 
