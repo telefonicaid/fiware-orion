@@ -144,7 +144,7 @@ std::string mongoCreateSubscription
 
   std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
   LM_W(("KZ: calling setCondsAndInitialNotify. sub.notification.httpInfo.extended == %s", (sub.notification.httpInfo.extended)? "true" : "false"));
-  setCondsAndInitialNotify(sub, subId, status, sub.notification.httpInfo.url, sub.attrsFormat,
+  setCondsAndInitialNotify(sub, subId, status, sub.notification.httpInfo, sub.attrsFormat,
                            tenant, servicePathV, xauthToken, fiwareCorrelator,
                            &b, &notificationDone);
   if (notificationDone)

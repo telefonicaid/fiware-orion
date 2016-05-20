@@ -121,7 +121,7 @@ extern void setCondsAndInitialNotify
   const ngsiv2::Subscription&      sub,
   const std::string&               subId,
   const std::string&               status,
-  const std::string&               url,
+  const ngsiv2::HttpInfo           httpInfo,
   RenderFormat                     attrsFormat,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,
