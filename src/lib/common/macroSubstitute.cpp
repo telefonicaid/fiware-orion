@@ -133,7 +133,7 @@ void macroSubstitute(std::string* to, const std::string& from, const ContextElem
     return;
   }
 
-  // We need to do a copy, or the fromP processing logic will destroy
+  // We need to do a copy, or the fromP processing logic will destroy incoming function argument
   char*       fromToFreeP = strdup(from.c_str());
   const char* fromP       = fromToFreeP;
 
