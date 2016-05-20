@@ -111,7 +111,7 @@ static bool templateNotify
     cer.contextElement = ce;
     ncr.subscriptionId = subscriptionId;
     ncr.contextElementResponseVector.push_back(&cer);
-    ncr.toJson(renderFormat, attrsOrder);
+    payload = ncr.toJson(renderFormat, attrsOrder);
 
     //payload = "{" + ce.toJson(renderFormat, attrsOrder) + "}";
     payload = ncr.toJson(renderFormat, attrsOrder);
@@ -407,7 +407,7 @@ void Notifier::sendNotifyContextRequest
     std::string payloadString;
     if (renderFormat == NGSI_V1_LEGACY)
     {
-      payloadString = ncrP->render(NotifyContext, "");
+      payloadString = ncrP->render(&ci, NotifyContext, "");
     }
     else
     {

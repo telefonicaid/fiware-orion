@@ -66,23 +66,14 @@ std::string NotifyContextRequest::render(ConnectionInfo* ciP, RequestType reques
 *
 * NotifyContextRequest::toJson -
 */
-std::string NotifyContextRequest::toJson(ConnectionInfo* ciP, RenderFormat renderFormat, const std::vector<std::string>& attrsFilter)
+std::string NotifyContextRequest::toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter)
 {
-  //
-  // First, v1 rendering of notification?
-  //
-  if (renderFormat == NGSI_V1_LEGACY)
-  {
-    return render(ciP, NotifyContext, "");
-  }
-
-
   if ((renderFormat != NGSI_V2_NORMALIZED) && (renderFormat != NGSI_V2_KEYVALUES) && (renderFormat != NGSI_V2_VALUES))
   {
     OrionError oe(SccBadRequest, "Invalid notification format");
     alarmMgr.badInput(clientIp, "Invalid notification format");
 
-    return oe.render(ciP, "");
+    return oe.render("", "v2");
   }
 
   std::string out;
