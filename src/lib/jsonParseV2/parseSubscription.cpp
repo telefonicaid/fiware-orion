@@ -55,6 +55,8 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscriptionU
 static std::string badInput(ConnectionInfo* ciP, const std::string& msg);
 static std::string parseDictionary(ConnectionInfo* ciP, std::map<std::string, std::string>& dict, const Value& object, const std::string& name);
 
+
+
 /* ****************************************************************************
 *
 * parseSubscription -
@@ -365,6 +367,8 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
   return "";
 }
 
+
+
 /* ****************************************************************************
 *
 * parseNotification -
@@ -372,7 +376,6 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
 */
 static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& notification)
 {
-
   subsP->notificationProvided = true;
 
   if (!notification.IsObject())
@@ -388,6 +391,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   else if (notification.HasMember("http"))
   {
     const Value& http = notification["http"];
+
     if (!http.IsObject())
     {
       return badInput(ciP, "http notification is not an object");
@@ -413,8 +417,9 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
           return badInput(ciP, "Invalid URL parsing notification url");
         }
       }
-      subsP->notification.httpInfo.url =      urlOpt.value;
+      subsP->notification.httpInfo.url      = urlOpt.value;
       subsP->notification.httpInfo.extended = false;
+      LM_W(("KZ: httpInfo.extended set to FALSE"));
     }
   }
   else if (notification.HasMember("httpExtended"))
@@ -467,7 +472,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // payload
     {
-      Opt<std::string> payloadOpt = getStringMust(httpExt, "payload", "payload httpExtended notification");
+      Opt<std::string> payloadOpt = getStringOpt(httpExt, "payload", "payload httpExtended notification");
       if (!payloadOpt.ok())
       {
         return badInput(ciP, payloadOpt.error);
@@ -478,7 +483,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     // qs
     if (httpExt.HasMember("qs"))
     {
-      const Value& qs = notification["qs"];
+      const Value& qs = httpExt["qs"];
       if (!qs.IsObject())
       {
         return badInput(ciP, "notification httpExtended qs is not an object");
@@ -495,7 +500,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     // headers
     if (httpExt.HasMember("headers"))
     {
-      const Value& headers = notification["headers"];
+      const Value& headers = httpExt["headers"];
       if (!headers.IsObject())
       {
         return badInput(ciP, "notification httpExtended headers is not an object");
@@ -510,7 +515,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     subsP->notification.httpInfo.extended = true;
-
+    LM_W(("KZ: httpInfo.extended set to TRUE (httpInfo at %p)", &subsP->notification.httpInfo));
   }
   else  // missing callback field
   {
@@ -547,6 +552,8 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
    return "";
 }
+
+
 
 /* ****************************************************************************
 *
@@ -648,8 +655,11 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
       }
     }
   }
+
   return "";
 }
+
+
 
 /* ****************************************************************************
 *
@@ -676,10 +686,11 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
   return "";
 }
 
+
+
 /* ****************************************************************************
 *
 * parseDictionary -
-*
 */
 static std::string parseDictionary(ConnectionInfo* ciP, std::map<std::string, std::string>& dict, const Value& object, const std::string& name)
 {
@@ -701,10 +712,11 @@ static std::string parseDictionary(ConnectionInfo* ciP, std::map<std::string, st
   return "";
 }
 
+
+
 /* ****************************************************************************
 *
-* error -
-*
+* badInput -
 */
 static std::string badInput(ConnectionInfo* ciP, const std::string& msg)
 {

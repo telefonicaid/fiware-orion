@@ -103,7 +103,6 @@ struct CachedSubscription
   std::string                 status;
   int64_t                     count;
   RenderFormat                renderFormat;
-  char*                       reference;
   SubscriptionExpression      expression;
   ngsiv2::HttpInfo            httpInfo;
 

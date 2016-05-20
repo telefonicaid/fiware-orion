@@ -642,9 +642,9 @@ must be sent.
 Notifications include two fields:
 
 * `subscriptionId` which represents the concerned subscription that originates the notification
-* `data` an array with the notification data itself which includes the entity and attributes concerned. Each
-  element in the array corresponds to a different entity. By default each entity will be represented in
-  normalized mode. However by using the `attrsFormat` modifier it can be requested a simplified representation.
+* `data` an array with the notification data itself which includes the entity and all attributes concerned. Each
+  element in the array corresponds to a different entity. By default, each entity is represented in
+  normalized mode. However by using the `attrsFormat` modifier, a simplified representation can be requested.
 
 If `attrsFormat` is `normalized` (or if `attrsFormat` is omitted) then default entity representation is used:
 
@@ -711,12 +711,15 @@ If `attrsFormat` is `values` then values entity partial representation mode is u
 ```
 
 Notifications must include a `Ngsiv2-AttrsFormat` header with the value of `attrsFormat` of the associated subscription,
-so notification receiver can know the format used without needing processing notification payload.
+so that notification receivers will know the format used without having to process the notification payload.
 
 ### Notification templates
 
 Based on the "template" field defined as part of the subscription and in a macro replacement language
 that could be used in "payload", "url", "headers", "method" and "qs". Details TBD.
+
+Note that if a custom payload is used for the notification (the field `payload` is given in the corresponding subscription),
+then a value of `custom` is used for the `Ngsiv2-AttrsFormat` header.
 
 ## Group API Entry Point
 

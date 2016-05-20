@@ -40,6 +40,7 @@
 #include "common/errorMessages.h"
 #include "common/defaultValues.h"
 #include "common/RenderFormat.h"
+#include "apiTypesV2/HttpInfo.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -1018,6 +1019,8 @@ static bool addTriggeredSubscriptions_withCache
   std::string                       servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::vector<CachedSubscription*>  subVec;
 
+  LM_W(("KZ: Adding a TriggeredSubscription? (%d items in vector)", subVec.size()));
+
   cacheSemTake(__FUNCTION__, "match subs for notifications");
   subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
@@ -1031,6 +1034,7 @@ static bool addTriggeredSubscriptions_withCache
     if (cSubP->expirationTime < now)
     {
       LM_T(LmtSubCache, ("%s is EXPIRED (EXP:%lu, NOW:%lu, DIFF: %d)", cSubP->subscriptionId, cSubP->expirationTime, now, now - cSubP->expirationTime));
+      LM_W(("KZ: Nope - expired"));
       continue;
     }
 
@@ -1038,6 +1042,7 @@ static bool addTriggeredSubscriptions_withCache
     if (cSubP->status == STATUS_INACTIVE)
     {
       LM_T(LmtSubCache, ("%s is INACTIVE", cSubP->subscriptionId));
+      LM_W(("KZ: Nope - inactive"));
       continue;
     }
 
@@ -1068,6 +1073,7 @@ static bool addTriggeredSubscriptions_withCache
                            now,
                            now - cSubP->lastNotificationTime,
                            cSubP->throttling));
+        LM_W(("KZ: Nope - throttling"));
         continue;
       }
       else
@@ -1092,10 +1098,11 @@ static bool addTriggeredSubscriptions_withCache
                          cSubP->throttling));
     }
 
+    LM_W(("KZ: creating the TriggeredSubscription for '%s'", cSubP->httpInfo.url.c_str()));
     TriggeredSubscription* subP = new TriggeredSubscription((long long) cSubP->throttling,
                                                            (long long) cSubP->lastNotificationTime,
                                                            cSubP->renderFormat,
-                                                           cSubP->reference,
+                                                           cSubP->httpInfo,
                                                            aList,
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant);
@@ -1272,13 +1279,17 @@ static bool addTriggeredSubscriptions_noCache
       long long           lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
       std::string         renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "";
       RenderFormat        renderFormat       = stringToRenderFormat(renderFormatString);
+      ngsiv2::HttpInfo    httpInfo;
+
+      // FIXME: All http-info to be extracted from DB here, for the 'no cache' case to work
+      httpInfo.url = sub.hasField(CSUB_REFERENCE)? getStringFieldF(sub, CSUB_REFERENCE) : "";
 
       TriggeredSubscription* trigs = new TriggeredSubscription
         (
           throttling,
           lastNotification,
           renderFormat,
-          getStringFieldF(sub, CSUB_REFERENCE),
+          httpInfo,
           subToAttributeList(sub), "", "");
 
       if (sub.hasField(CSUB_EXPR))
@@ -1374,7 +1385,6 @@ static bool processOnChangeConditionForUpdateContext
   ContextElementResponse*          notifyCerP,
   const AttributeList&             attrL,
   std::string                      subId,
-  std::string                      notifyUrl,  // FIXME PR: Remove - this param is no longer used
   RenderFormat                     renderFormat,
   std::string                      tenant,
   const std::string&               xauthToken,
@@ -1503,7 +1513,6 @@ static bool processSubscriptions
     notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
                                                                 tSubP->attrL,
                                                                 mapSubId,
-                                                                tSubP->reference,
                                                                 tSubP->renderFormat,
                                                                 tenant,
                                                                 xauthToken,

@@ -63,7 +63,7 @@ extern const char* verbName(Verb verb);
 
 /* ****************************************************************************
 *
-* str2Verb - 
+* str2Verb -
 */
 extern Verb str2Verb(const std::string& str);
 

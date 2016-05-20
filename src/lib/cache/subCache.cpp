@@ -488,12 +488,6 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
     cSubP->subscriptionId = NULL;
   }
 
-  if (cSubP->reference != NULL)
-  {
-    free(cSubP->reference);
-    cSubP->reference = NULL;
-  }
-
   for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
   {
     cSubP->entityIdInfos[ix]->release();
@@ -688,6 +682,7 @@ void subCacheItemInsert
   const std::string&            georel
 )
 {
+  LM_W(("KZ: inserting sub in cache. extended == %s", httpInfo.extended? "true" : "false"));
   //
   // Add the subscription to the subscription cache.
   // But only if any of the entities in entityIdVector is pattern based -
@@ -727,7 +722,6 @@ void subCacheItemInsert
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->servicePath           = strdup(servicePath);
   cSubP->subscriptionId        = strdup(subscriptionId);
-  cSubP->reference             = strdup(httpInfo.url.c_str());  // FIXME: CachedSubscription soon will have HttpInfo as well
   cSubP->expirationTime        = expirationTime;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
@@ -739,8 +733,8 @@ void subCacheItemInsert
   cSubP->expression.geometry   = geometry;
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
-  cSubP->httpInfo.url          = httpInfo.url;
-  cSubP->httpInfo.verb         = httpInfo.verb;
+  cSubP->httpInfo              = httpInfo;
+  LM_W(("KZ: inserted subscription in cache. httpInfo.extended: %s", cSubP->httpInfo.extended? "true" : "false"));
 
   if (stringFilterP != NULL)
   {
@@ -838,6 +832,7 @@ void subCacheItemInsert
   entIdStdVector2EntityIdVector(entities, &enV);
   attrL.fill(notifAttributes);
 
+  LM_W(("KZ: calling subCacheItemInsert. httpInfo.extended: %s", httpInfo.extended? "true" : "false"));
   subCacheItemInsert(tenant,
                      servicePath,
                      httpInfo,
@@ -1068,7 +1063,7 @@ void subCacheRefresh(void)
                             cSubP->throttling,
                             cSubP->expirationTime,
                             cSubP->lastNotificationTime,
-                            cSubP->reference,
+                            cSubP->httpInfo.url,
                             cSubP->entityIdInfos.size(),
                             cSubP->attributes.size(),
                             cSubP->notifyConditionVector.size()));

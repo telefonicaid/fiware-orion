@@ -63,6 +63,7 @@ bool collectionQuery
   }
 
   LM_T(LmtMongo, ("query() in '%s' collection: '%s'", col.c_str(), q.toString().c_str()));
+  LM_W(("KZ: query() in '%s' collection: '%s'", col.c_str(), q.toString().c_str()));
 
   try
   {
