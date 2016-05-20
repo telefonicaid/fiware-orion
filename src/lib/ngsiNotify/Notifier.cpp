@@ -133,8 +133,9 @@ static bool templateNotify
     std::string key   = it->first;
     std::string value = it->second;
 
+    macroSubstitute(&key,   it->first, ce);
     macroSubstitute(&value, it->second, ce);
-    if (value == "")
+    if ((value == "") && (key == ""))
     {
       // To avoid e.g '?a=&b=&c='
       continue;
@@ -153,7 +154,15 @@ static bool templateNotify
     std::string key   = it->first;
     std::string value = it->second;
 
+    macroSubstitute(&key,   it->first, ce);
     macroSubstitute(&value, it->second, ce);
+
+    if (key == "")
+    {
+      // To avoid empty header name
+      continue;
+    }
+
     headers[key] = value;
     LM_W(("KZ: Added HTTP Header '%s': '%s'", key.c_str(), value.c_str()));
   }
