@@ -36,6 +36,11 @@ brokerStart CB
 # 04. Create subscription for E1 without URL in http-part - see error
 # 05. Create subscription for E1 without http-part nor template part - see error
 # 06. Create subscription for E1 with both http-part and template part - see error
+# 07. Create subscription for E1 with forbidden chars in http:url - see error
+# 08. Create subscription for E1 with forbidden chars in template:url - see error
+# 09. Create subscription for E1 with forbidden chars in template:payload - see error
+# 10. Create subscription for E1 with forbidden chars in template:qs - see error
+# 11. Create subscription for E1 with forbidden chars in template:headers - see error
 #
 
 echo "01. Create subscription for E1 with empty template part - see error"
@@ -184,6 +189,129 @@ echo
 echo
 
 
+echo "07. Create subscription for E1 with forbidden chars in http:url - see error"
+echo "==========================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://127.0.0.1:1234/()"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "08. Create subscription for E1 with forbidden chars in template:url - see error"
+echo "==============================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+      "url": "http://127.0.0.1:1234/()"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "09. Create subscription for E1 with forbidden chars in template:payload - see error"
+echo "==================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+      "url":     "http://127.0.0.1:1234/notify",
+      "payload": "{ \"a1\": \"()\" }"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "10. Create subscription for E1 with forbidden chars in template:qs - see error"
+echo "=============================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+      "url":      "http://127.0.0.1:1234/notify",
+      "qs":       { "id": "()", "type": "${type}", "a1": "${A1}", "a2": "${A2}", "a3": "${A3}" }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "11. Create subscription for E1 with forbidden chars in template:headers - see error"
+echo "==================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+      "url": "http://127.0.0.1:1234/notify",
+      "headers":  { "entity-id": "()", "entity-type": "${type}", "A1": "${A1}", "A2": "${A2}", "A3": "${A3}" }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
 --REGEXPECT--
 01. Create subscription for E1 with empty template part - see error
 ===================================================================
@@ -267,6 +395,26 @@ Date: REGEX(.*)
     "description": "notification has http and httpExtended",
     "error": "BadRequest"
 }
+
+
+07. Create subscription for E1 with forbidden chars in http:url - see error
+===========================================================================
+
+
+08. Create subscription for E1 with forbidden chars in template:url - see error
+===============================================================================
+
+
+09. Create subscription for E1 with forbidden chars in template:payload - see error
+===================================================================================
+
+
+10. Create subscription for E1 with forbidden chars in template:qs - see error
+==============================================================================
+
+
+11. Create subscription for E1 with forbidden chars in template:headers - see error
+===================================================================================
 
 
 --TEARDOWN--

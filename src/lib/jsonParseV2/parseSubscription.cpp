@@ -33,12 +33,12 @@
 #include "common/string.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
+#include "rest/Verb.h"
 #include "ngsi/Request.h"
+#include "parse/forbiddenChars.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 #include "jsonParseV2/utilsParse.h"
-#include "rest/Verb.h"
-
 #include "jsonParseV2/parseSubscription.h"
 
 using namespace rapidjson;
@@ -406,6 +406,11 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
         return badInput(ciP, urlOpt.error);
       }
 
+      if (forbiddenChars(urlOpt.value.c_str()))
+      {
+        return badInput(ciP, "forbidden characters in http field /url/");
+      }
+
       {
         std::string  host;
         int          port;
@@ -425,6 +430,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   else if (notification.HasMember("httpExtended"))
   {
     const Value& httpExt = notification["httpExtended"];
+
     if (!httpExt.IsObject())
     {
       return badInput(ciP, "httpExtended notification is not an object");
@@ -437,6 +443,11 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       if (!urlOpt.ok())
       {
         return badInput(ciP, urlOpt.error);
+      }
+
+      if (forbiddenChars(urlOpt.value.c_str()))
+      {
+        return badInput(ciP, "forbidden characters in custom /url/");
       }
 
       subsP->notification.httpInfo.url = urlOpt.value;
@@ -477,7 +488,14 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       {
         return badInput(ciP, payloadOpt.error);
       }
+
+      if (forbiddenChars(payloadOpt.value.c_str()))
+      {
+        return badInput(ciP, "forbidden characters in custom /payload/");
+      }
+
       subsP->notification.httpInfo.payload = payloadOpt.value;
+
     }
 
     // qs
@@ -706,7 +724,14 @@ static std::string parseDictionary(ConnectionInfo* ciP, std::map<std::string, st
       return badInput(ciP, name + " element is not an string");
     }
 
-    dict[iter->name.GetString()] = iter->value.GetString();
+    std::string value = iter->value.GetString();
+
+    if (forbiddenChars(value.c_str()))
+    {
+      return badInput(ciP, std::string("forbidden characters in custom ") + name);
+    }
+
+    dict[iter->name.GetString()] = value;
   }
 
   return "";
