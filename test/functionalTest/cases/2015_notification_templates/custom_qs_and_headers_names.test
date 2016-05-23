@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Notification Templates, Normal Case
+Custom qs and headers names
 
 --SHELL-INIT--
 dbInit CB

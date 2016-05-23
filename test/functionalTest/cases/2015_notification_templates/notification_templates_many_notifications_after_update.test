@@ -33,9 +33,9 @@ accumulatorStart --pretty-print
 #
 # 01. Create E1/T
 # 02. Create E2/T
-# 03. Create E2/T
+# 03. Create E3/T
 # 04. Create extended subscription covering E1/T and E2/T -> 2 notifications
-# 05. Create extended subscription covering E2/T and E3/T -> 2 notifications
+# 05. Update subscription covering E2/T and E3/T -> 2 notifications
 # 06. Dump accumulator and see 4 notifications
 #
 
@@ -100,9 +100,11 @@ orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
+subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
-echo "05. Create extended subscription covering E2/T and E3/T -> 2 notifications"
-echo "=========================================================================="
+
+echo "05. Update subscription covering E2/T and E3/T -> 2 notifications"
+echo "================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -114,15 +116,9 @@ payload='{
     "condition": {
       "attrs": []
     }
-  },
-  "notification": {
-    "httpExtended": {
-      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
-    }
-  },
-  "throttling": 0
+  }
 }'
-orionCurl --url /v2/subscriptions --payload "$payload"
+orionCurl --url /v2/subscriptions/$subId -X PATCH --payload "$payload"
 echo
 echo
 
@@ -175,11 +171,10 @@ Date: REGEX(.*)
 
 
 
-05. Create extended subscription covering E2/T and E3/T -> 2 notifications
-==========================================================================
-HTTP/1.1 201 Created
+05. Update subscription covering E2/T and E3/T -> 2 notifications
+=================================================================
+HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
