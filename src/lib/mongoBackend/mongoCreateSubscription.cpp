@@ -44,6 +44,65 @@ using namespace mongo;
 using namespace ngsiv2;
 
 
+
+/* ****************************************************************************
+*
+* insertInCache -
+*
+*/
+static void insertInCache
+(
+  const Subscription&  sub,
+  const std::string&   subId,
+  const std::string&   tenant,
+  const std::string&   servicePath,
+  bool                 notificationDone,
+  long long            lastNotification
+)
+{
+  // Insert in csub cache
+
+  //
+  // StringFilter in Scope?
+  //
+  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY sub.restriction.scopeVector?
+  // If so, set it as string filter to the sub-cache item
+  //
+  StringFilter*  stringFilterP = NULL;
+
+  for (unsigned int ix = 0; ix < sub.restriction.scopeVector.size(); ++ix)
+  {
+    if (sub.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
+    {
+      stringFilterP = sub.restriction.scopeVector[ix]->stringFilterP;
+    }
+  }
+
+  cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
+  subCacheItemInsert(tenant.c_str(),
+                     servicePath.c_str(),
+                     sub.notification.httpInfo,
+                     sub.subject.entities,
+                     sub.notification.attributes,
+                     sub.subject.condition.attributes,
+                     subId.c_str(),
+                     sub.expires,
+                     sub.throttling,
+                     sub.attrsFormat,
+                     notificationDone,
+                     lastNotification,
+                     stringFilterP,
+                     sub.status,
+                     sub.subject.condition.expression.q,
+                     sub.subject.condition.expression.geometry,
+                     sub.subject.condition.expression.coords,
+                     sub.subject.condition.expression.georel,
+                     sub.notification.blacklist);
+
+  cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
+}
+
+
 /* ****************************************************************************
 *
 * mongoCreateSubscription -
@@ -57,7 +116,6 @@ std::string mongoCreateSubscription
 (
   const Subscription&                  sub,
   OrionError*                          oe,
-  std::map<std::string, std::string>&  uriParams,
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
   const std::string&                   xauthToken,
@@ -110,46 +168,10 @@ std::string mongoCreateSubscription
     return "";
   }
 
-  // Insert in csub cache
-
-  //
-  // StringFilter in Scope?
-  //
-  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY sub.restriction.scopeVector?
-  // If so, set it as string filter to the sub-cache item
-  //
-  StringFilter*  stringFilterP = NULL;
-
-  for (unsigned int ix = 0; ix < sub.restriction.scopeVector.size(); ++ix)
+  if (!noCache)
   {
-    if (sub.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
-    {
-      stringFilterP = sub.restriction.scopeVector[ix]->stringFilterP;
-    }
+    insertInCache(sub, subId, tenant, servicePath, notificationDone, lastNotification);
   }
-
-  cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
-  subCacheItemInsert(tenant.c_str(),
-                     servicePath.c_str(),
-                     sub.notification.httpInfo,
-                     sub.subject.entities,
-                     sub.notification.attributes,
-                     sub.subject.condition.attributes,
-                     subId.c_str(),
-                     sub.expires,
-                     sub.throttling,
-                     sub.attrsFormat,
-                     notificationDone,
-                     lastNotification,
-                     stringFilterP,
-                     sub.status,
-                     sub.subject.condition.expression.q,
-                     sub.subject.condition.expression.geometry,
-                     sub.subject.condition.expression.coords,
-                     sub.subject.condition.expression.georel,
-                     sub.notification.blacklist);
-
-  cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
 
   reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);
 

@@ -41,8 +41,7 @@ extern HttpStatusCode mongoSubscribeContext
 (
   SubscribeContextRequest*                   requestP,
   SubscribeContextResponse*                  responseP,
-  const std::string&                         tenant,
-  std::map<std::string, std::string>&        uriParam,
+  const std::string&                         tenant,  
   const std::string&                         xauthToken,
   const std::vector<std::string>&            servicePathV,
   const std::string&                         fiwareCorrelator = "no correlator"
