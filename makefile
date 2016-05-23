@@ -18,7 +18,7 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-# Default prefix for installation 
+# Default prefix for installation
 # Used by RPM generation
 ifndef DESTDIR
 	DESTDIR=/
