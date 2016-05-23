@@ -89,6 +89,14 @@ outgoing HTTP calls from the Context Broker. The rush instance is installed in /
 An instance of Redis compatible with Rush is also installed. More information about Rush can be
 found in its Github page: https://github.com/telefonicaid/Rush
 
+However, neither Rush nor Redis are started by default so you need to use /etc/init.d/redis
+and /etc/init.d/rush to do so. In addition, Orion needs to be configured to use Rush
+(see https://fiware-orion.readthedocs.io/en/develop/admin/rush/index.html). In order to
+start Rush and Redis services at VM startup you can use:
+
+ chkconfig redis on
+ chkconfig rush on
+
 Note that the certificate used by Rush is self-signed (using 'fiware' password) and uses fake 
 data. If you want to use your own certificate you have to use your own server.crt, server.csr 
 and server.key files in /opt/Rush/util. The /opt/Rush/utils/create_http_certificates.sh may help 
@@ -104,26 +112,19 @@ MONGO_REPO=$(mktemp)
 cat > $MONGO_REPO <<EOF
 [mongodb]
 name=MongoDB Repository
-baseurl=http://downloads-distro.mongodb.org/repo/redhat/os/x86_64/
-gpgcheck=0
+baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/3.2/x86_64/
+gpgcheck=1
 enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-3.2.asc
 EOF
 sudo mv $MONGO_REPO /etc/yum.repos.d/mongodb.repo
 
-MONGO_VERSION=2.6.9
+MONGO_VERSION=3.2.6
 sudo yum install -y mongodb-org-$MONGO_VERSION \
                     mongodb-org-server-$MONGO_VERSION \
                     mongodb-org-shell-$MONGO_VERSION \
                     mongodb-org-mongos-$MONGO_VERSION \
                     mongodb-org-tools-$MONGO_VERSION
-
-# Default MongoDB configures set doesn't enables smallfiles by default. Enabling it ensures that MongoDB will 
-# work even in VM with small disk size
-cp /etc/mongod.conf /tmp/
-echo ' '                                           >> /tmp/mongod.conf
-echo '# Added by FIWARE Lab Orion building script' >> /tmp/mongod.conf
-echo 'smallfiles = true'                           >> /tmp/mongod.conf
-sudo mv /tmp/mongod.conf /etc/mongod.conf
 
 sudo chkconfig mongod on
 sudo /etc/init.d/mongod start
