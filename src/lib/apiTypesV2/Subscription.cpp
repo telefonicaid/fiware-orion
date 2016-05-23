@@ -72,7 +72,7 @@ namespace ngsiv2
     }
     jh.addString("status", this->status);
     jh.addRaw("subject", this->subject.toJson());
-    jh.addRaw("notification", this->notification.toJson());
+    jh.addRaw("notification", this->notification.toJson(renderFormatToString(this->attrsFormat)));
 
     if (this->throttling > 0)
     {
@@ -87,8 +87,12 @@ namespace ngsiv2
   /* ****************************************************************************
   *
   * Notification::toJson -
+  *
+  * FIXME P2: we should move 'attrsFormat' from Subject class to Notification
+  * class, to avoid passing attrsFormat as argument
+  *
   */
-  std::string Notification::toJson()
+  std::string Notification::toJson(const std::string& attrsFormat)
   {
     JsonHelper jh;
 
@@ -101,6 +105,8 @@ namespace ngsiv2
       jh.addDate("lastNotification", this->lastNotification);
     }
     jh.addRaw("attrs", vectorToJson(this->attributes));
+
+    jh.addString("attrsFormat", attrsFormat);
 
     jh.addRaw("http", this->httpInfo.toJson());
 
