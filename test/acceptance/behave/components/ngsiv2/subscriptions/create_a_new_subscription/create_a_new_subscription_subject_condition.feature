@@ -490,7 +490,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | error       | BadRequest               |
       | description | invalid query expression |
 
-  @condition_expression_q_parse_error @BUG_1989 @BUG_2106 @skip
+  @condition_expression_q_parse_error @BUG_1989 @BUG_2106
   Scenario Outline:  try to a new subscription using NGSI v2 with "q" condition expression but with parse errors
     Given  a definition of headers
       | parameter          | value                           |
@@ -510,26 +510,26 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | BadRequest               |
-      | description | invalid query expression |
+      | parameter   | value         |
+      | error       | BadRequest    |
+      | description | <description> |
     Examples:
-      | q       |
-      | speed== |
-      | speed!= |
-      | speed>= |
-      | speed<= |
-      | speed>  |
-      | speed<  |
-      | ==speed |
-      | !=speed |
-      | >=speed |
-      | <=speed |
-      | >speed  |
-      | <speed  |
+      | q       | description                     |
+      | speed== | empty right-hand-side in q-item |
+      | speed!= | empty right-hand-side in q-item |
+      | speed>= | empty right-hand-side in q-item |
+      | speed<= | empty right-hand-side in q-item |
+      | speed>  | empty right-hand-side in q-item |
+      | speed<  | empty right-hand-side in q-item |
+      | ==speed | empty left-hand-side in q-item  |
+      | !=speed | empty left-hand-side in q-item  |
+      | >=speed | empty left-hand-side in q-item  |
+      | <=speed | empty left-hand-side in q-item  |
+      | >speed  | empty left-hand-side in q-item  |
+      | <speed  | empty left-hand-side in q-item  |
 
   @condition_expression_q_range_error.row<row.id>
-  @condition_expression_q_range_error @1991 @BUG_2106 @skip
+  @condition_expression_q_range_error @1991 @BUG_2106
   Scenario Outline:  try to a new subscription using NGSI v2 with "q" condition expression but with invalid operator in ranges
     Given  a definition of headers
       | parameter          | value                           |
@@ -549,25 +549,49 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | BadRequest               |
-      | description | invalid query expression |
-    Examples: # now all return 200 and a payload in plain text
-      | q                |
-      | speed>=69..90    |
-      | speed>69..90     |
-      | speed<=69..79    |
-      | speed<99..190    |
-      | speed==99....190 |
-      | speed==99,,,190  |
+      | parameter   | value         |
+      | error       | BadRequest    |
+      | description | <description> |
+    Examples:
+      | q                | description                         |
+      | speed>=69..90    | ranges only valid for == and != ops |
+      | speed>69..90     | ranges only valid for == and != ops |
+      | speed<=69..79    | ranges only valid for == and != ops |
+      | speed<99..190    | ranges only valid for == and != ops |
+      | speed==99....190 | invalid range: types mixed          |
+      | speed==99,,,190  | empty item in list                  |
+
+  @condition_expression_q_range_error_invested.row<row.id>
+  @condition_expression_q_range_error_invested @BUG_2106 @2117 @skip
+  Scenario Outline:  try to a new subscription using NGSI v2 with "q" condition expression but with invalid operator in ranges (invested range)
+    Given  a definition of headers
+      | parameter          | value                           |
+      | Fiware-Service     | test_condition_expression_error |
+      | Fiware-ServicePath | /test                           |
+      | Content-Type       | application/json                |
+  # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter             | value                   |
+      | subject_type          | room                    |
+      | subject_idPattern     | .*                      |
+      | condition_attrs       | temperature             |
+      | condition_expression  | q>>><q>                 |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
+    When create a new subscription
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value         |
+      | error       | BadRequest    |
+      | description | <description> |
     Examples: # now all return 201 and the subsc is created
-      | q               |
-      | speed==100..1   |
-      | speed==100..-1  |
-      | speed==-100..-1 |
+      | q              | description    |
+      | speed==100..1  | invested range |
+      | speed==100..-1 | invested range |
 
   @condition_expression_q_invalid_chars.row<row.id>
-  @condition_expression_q_invalid_chars @BUG_1994 @BUG_2106 @skip
+  @condition_expression_q_invalid_chars @BUG_2106 @BUG_1994 @skip
   Scenario Outline:  try to a new subscription using NGSI v2 with "q" condition expression but with invalid chars
     Given  a definition of headers
       | parameter          | value                           |
@@ -588,10 +612,10 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                      |
-      | error       | BadRequest                                 |
-      | description | Invalid characters in condition expression |
-    Examples:
+      | parameter   | value                                    |
+      | error       | BadRequest                               |
+      | description | invalid character found in URI param /q/ |
+    Examples: # now all return 201 and the subsc is created
       | q           |
       | house<flat> |
       | house=flat  |
@@ -605,7 +629,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | my house    |
 
   @condition_expression_q_invalid_date.row<row.id>
-  @condition_expression_q_invalid_date @BUG_1996 @BUG_2106 @skip
+  @condition_expression_q_invalid_date @BUG_2106 @BUG_1996 @skip
   # FIXME: below Examples only represent at the "Complete date plus hours, minutes, seconds and a decimal fraction of a second" level in https://www.w3.org/TR/NOTE-datetime
   Scenario Outline:  try to a new subscription using NGSI v2 with "q" condition expression but with invalid date values (ISO8601)
     Given  a definition of headers
@@ -626,39 +650,39 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | BadRequest               |
-      | description | invalid query expression |
+      | parameter   | value         |
+      | error       | BadRequest    |
+      | description | <description> |
     Examples:
-      | q                                                          |
-      | my_time<>2016-04-05T14:00:00.00Z                           |
-      | my_time>=2r16-04-05T14:00:00.00Z                           |
-      | my_time>=-04-05T14:00:00.00Z                               |
-      | my_time>=2016_04-05T14:00:00.00Z                           |
-      | my_time>=2016-64-05T14:00:00.00Z                           |
-      | my_time>=2016--05T14:00:00.00Z                             |
-      | my_time>=2016-r4-05T14:00:00.00Z                           |
-      | my_time>=2016-04-55T14:00:00.00Z                           |
-      | my_time>=2016-04-r5T14:00:00.00Z                           |
-      | my_time>=2016-04-T14:00:00.00Z                             |
-      | my_time>=2016-04-05K14:00:00.00Z                           |
-      | my_time>=2016-04-05T54:00:00.00Z                           |
-      | my_time>=2016-04-05Tr4:00:00.00Z                           |
-      | my_time>=2016-04-05T:00:00.00Z                             |
-      | my_time>=2016-04-05T14;00:00.00Z                           |
-      | my_time>=2016-04-05T14:r0:00.00Z                           |
-      | my_time>=2016-04-05T14:44:00.00Z                           |
-      | my_time>=2016-04-05T14::00.00Z                             |
-      | my_time>=2016-04-05T14:10-00.00Z                           |
-      | my_time>=2016-04-05T14:10:x0.00Z                           |
-      | my_time>=2016-04-05T14:10:0x.00Z                           |
-      | my_time>=2016-04-05T14:10:.00Z                             |
-      | my_time>=2016-04-05T14:10:00,00Z                           |
-      | my_time>=2016-04-05T14:10:00.h00Z                          |
-      | my_time>=2016-04-05T14:10:00.0h0Z                          |
-      | my_time>=2016-04-05T14:10:00.,00L                          |
-      | my_time==2016-04-05T14:00:00.00Z,,2017-04-05T14:00:00.00Z  |
-      | my_time==2016-04-05T14:00:00.00Z...2017-04-05T14:00:00.00Z |
+      | q                                                          | description                        |
+      | my_time<>2016-04-05T14:00:00.00Z                           | TBD                                |
+      | my_time>=2r16-04-05T14:00:00.00Z                           | TBD                                |
+      | my_time>=-04-05T14:00:00.00Z                               | TBD                                |
+      | my_time>=2016_04-05T14:00:00.00Z                           | TBD                                |
+      | my_time>=2016-64-05T14:00:00.00Z                           | TBD                                |
+      | my_time>=2016--05T14:00:00.00Z                             | TBD                                |
+      | my_time>=2016-r4-05T14:00:00.00Z                           | TBD                                |
+      | my_time>=2016-04-55T14:00:00.00Z                           | TBD                                |
+      | my_time>=2016-04-r5T14:00:00.00Z                           | TBD                                |
+      | my_time>=2016-04-T14:00:00.00Z                             | TBD                                |
+      | my_time>=2016-04-05K14:00:00.00Z                           | TBD                                |
+      | my_time>=2016-04-05T54:00:00.00Z                           | TBD                                |
+      | my_time>=2016-04-05Tr4:00:00.00Z                           | TBD                                |
+      | my_time>=2016-04-05T:00:00.00Z                             | TBD                                |
+      | my_time>=2016-04-05T14;00:00.00Z                           | TBD                                |
+      | my_time>=2016-04-05T14:r0:00.00Z                           | TBD                                |
+      | my_time>=2016-04-05T14:44:00.00Z                           | TBD                                |
+      | my_time>=2016-04-05T14::00.00Z                             | TBD                                |
+      | my_time>=2016-04-05T14:10-00.00Z                           | TBD                                |
+      | my_time>=2016-04-05T14:10:x0.00Z                           | TBD                                |
+      | my_time>=2016-04-05T14:10:0x.00Z                           | TBD                                |
+      | my_time>=2016-04-05T14:10:.00Z                             | TBD                                |
+      | my_time>=2016-04-05T14:10:00,00Z                           | lists only valid for == and != ops |
+      | my_time>=2016-04-05T14:10:00.h00Z                          | TBD                                |
+      | my_time>=2016-04-05T14:10:00.0h0Z                          | TBD                                |
+      | my_time>=2016-04-05T14:10:00.,00L                          | lists only valid for == and != ops |
+      | my_time==2016-04-05T14:00:00.00Z,,2017-04-05T14:00:00.00Z  | empty item in list                 |
+      | my_time==2016-04-05T14:00:00.00Z...2017-04-05T14:00:00.00Z | invalid range: types mixed         |
 
   # ------------ subject - condition - expression - georel ---------------------
   @condition_expression_georel.row<row.id>
