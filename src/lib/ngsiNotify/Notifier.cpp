@@ -106,14 +106,12 @@ static bool templateNotify
   if (httpInfo.payload == "")
   {
     LM_W(("KZ: using default payload"));
-    NotifyContextRequest ncr;
+    NotifyContextRequest   ncr;
     ContextElementResponse cer;
+    
     cer.contextElement = ce;
     ncr.subscriptionId = subscriptionId;
     ncr.contextElementResponseVector.push_back(&cer);
-    payload = ncr.toJson(renderFormat, attrsOrder);
-
-    //payload = "{" + ce.toJson(renderFormat, attrsOrder) + "}";
     payload = ncr.toJson(renderFormat, attrsOrder);
   }
   else
