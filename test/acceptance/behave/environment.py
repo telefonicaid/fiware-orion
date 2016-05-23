@@ -176,20 +176,23 @@ def before_feature(context, feature):
     in case of backgroundFeature, re-throw steps defined in the feature descriptions
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
-    global steps_after_feature, steps_before_scenario, steps_after_scenario
     __logger__.info("\n\n\n\n")
     __logger__.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     __logger__.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     __logger__.info("FEATURE name: %s" % feature)
     __logger__.info("FEATURE description: %s" % feature.description)
-    # ---- ConditionsBeforeFeature ----
+    # ---- actions before the feature ----
     steps_before_feature = get_steps_from_feature_description(ACTIONS_BEFORE_FEATURE, feature)
+    print colored('')
+    if len(steps_before_feature) > 0:
+        print colored('')
+        print colored('  Actions executed before the feature:')
     for item in steps_before_feature:
-        execute_one_step(context, item)
+        execute_one_step(context, item, show=True)
 
-    steps_after_feature = get_steps_from_feature_description(ACTIONS_AFTER_FEATURE, feature)
-    steps_before_scenario = get_steps_from_feature_description(ACTIONS_BEFORE_SCENARIO, feature)
-    steps_after_scenario = get_steps_from_feature_description(ACTIONS_AFTER_SCENARIO, feature)
+    context.steps_after_feature = get_steps_from_feature_description(ACTIONS_AFTER_FEATURE, feature)
+    context.steps_before_scenario = get_steps_from_feature_description(ACTIONS_BEFORE_SCENARIO, feature)
+    context.steps_after_scenario = get_steps_from_feature_description(ACTIONS_AFTER_SCENARIO, feature)
 
 
 def after_feature(context, feature):
@@ -198,11 +201,13 @@ def after_feature(context, feature):
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param feature: feature properties
     """
-    global steps_after_feature
-    # ---- ConditionsAfterFeature ----
-    for item in steps_after_feature:
+    # ---- actions after the feature ----
+    print colored('')
+    if len(context.steps_after_feature) > 0:
+        print colored('  Actions executed after the feature:')
+    for item in context.steps_after_feature:
         execute_one_step(context, item, show=True)
-    # ---- Summary ----
+    # ---- Summary by feature ----
     features_data["file_name"] = feature.filename
     features_data["scenario_status"] = scenarios_status
     features_data["duration"] = feature.duration
@@ -226,11 +231,14 @@ def before_scenario(context, scenario):
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param scenario: scenario properties
     """
-    global steps_before_scenario
     __logger__.info("==>>")
     __logger__.info("BEFORE SCENARIO: %s " % scenario)
-    # ---- Action Before each Scenario ----
-    for item in steps_before_scenario:
+    # ---- actions before each scenario ----
+    print colored('')
+    print colored('------------------------------------------------------------------------------')
+    if len(context.steps_before_scenario) > 0:
+        print colored('  Actions executed before each scenario(Background):')
+    for item in context.steps_before_scenario:
         execute_one_step(context, item, show=True)
 
 
@@ -241,9 +249,8 @@ def after_scenario(context, scenario):
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param scenario: scenario properties
     """
-    global steps_after_scenario
-    # ---- Action After each Scenario ----
-    for item in steps_after_scenario:
+    # ---- actions after each scenario ----
+    for item in context.steps_after_scenario:
         execute_one_step(context, item, show=True)
     __logger__.info("AFTER SCENARIO")
     __logger__.info("<<==")
