@@ -1845,7 +1845,7 @@ static bool processOnChangeConditionForSubscription
   const AttributeList&             attrL,
   ConditionValueList*              condValues,
   const std::string&               subId,
-  const std::string&               notifyUrl,
+  const HttpInfo&                  notifyHttpInfo,
   RenderFormat                     renderFormat,
   const std::string&               tenant,
   const std::string&               xauthToken,
@@ -1899,13 +1899,8 @@ static bool processOnChangeConditionForSubscription
 
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
-        //
-        // FIXME PR: HttpInfo should come from payload
-        //
-        ngsiv2::HttpInfo httpInfo(notifyUrl);
-
         /* Send notification */
-        getNotifier()->sendNotifyContextRequest(&ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
+        getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
@@ -1916,12 +1911,7 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
-      //
-      // FIXME PR: HttpInfo should come from payload
-      //
-      ngsiv2::HttpInfo httpInfo(notifyUrl);
-
-      getNotifier()->sendNotifyContextRequest(&ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
+      getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
       ncr.contextElementResponseVector.release();
 
       return true;
@@ -1945,7 +1935,7 @@ BSONArray processConditionVector
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
   const std::string&               subId,
-  const std::string&               url,
+  const HttpInfo&                  httpInfo,
   bool*                            notificationDone,
   RenderFormat                     renderFormat,
   const std::string&               tenant,
@@ -1987,7 +1977,7 @@ BSONArray processConditionVector
                                                    attrL,
                                                    &(nc->condValueList),
                                                    subId,
-                                                   url,
+                                                   httpInfo,
                                                    renderFormat,
                                                    tenant,
                                                    xauthToken,
@@ -2026,7 +2016,7 @@ BSONArray processConditionVector
   const std::vector<EntID>&        entitiesV,
   const std::vector<std::string>&  notifAttributesV,
   const std::string&               subId,
-  const std::string&               url,
+  const HttpInfo&                  httpInfo,
   bool*                            notificationDone,
   RenderFormat                     renderFormat,
   const std::string&               tenant,
@@ -2050,7 +2040,7 @@ BSONArray processConditionVector
                                          enV,
                                          attrL,
                                          subId,
-                                         url,
+                                         httpInfo,
                                          notificationDone,
                                          renderFormat,
                                          tenant,

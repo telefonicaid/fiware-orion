@@ -48,7 +48,7 @@ def line_count(file_name):
 def escape(s):
     # Maybe some other "regex sensible" chars need to be escaped... this function will be
     # adjusted in that case
-    return s.replace('[', '\[').replace(']', '\]').replace('{','\{').replace('}', '\}')
+    return s.replace('[', '\[').replace(']', '\]').replace('{','\{').replace('}', '\}').replace('?', '\?')
 
 
 def diff_files(input_file, ref_file):

@@ -355,14 +355,46 @@ static void setCondsAndInitialNotify
       status = subOrig.hasField(CSUB_STATUS)? getStringFieldF(subOrig, CSUB_STATUS) : STATUS_ACTIVE;
     }
 
-    std::string url;
+    HttpInfo httpInfo;
     if (subUp.notificationProvided)
     {
-      url = subUp.notification.httpInfo.url;
+      httpInfo = subUp.notification.httpInfo;
     }
     else
     {
-      url = getStringFieldF(subOrig, CSUB_REFERENCE);
+      httpInfo.url      = getStringFieldF(subOrig, CSUB_REFERENCE);
+      httpInfo.extended = getBoolFieldF(subOrig, CSUB_EXTENDED);
+      if (httpInfo.extended)
+      {
+        // FIXME P5: qs and header population code also in mongoSubCache.cpp. Maybe it makes sense to define common functions
+        // in the HttpInfo for populating fields from BSONObj
+
+        httpInfo.verb    = subOrig.hasField(CSUB_METHOD) ? str2Verb(getStringFieldF(subOrig, CSUB_METHOD)) : POST;
+        httpInfo.payload = subOrig.hasField(CSUB_PAYLOAD) ? getStringFieldF(subOrig, CSUB_PAYLOAD) : "";
+
+        // qs
+        if (subOrig.hasField(CSUB_QS))
+        {
+          BSONObj qs = getFieldF(subOrig, CSUB_QS).Obj();
+
+          for (BSONObj::iterator i = qs.begin(); i.more();)
+          {
+            BSONElement e = i.next();
+            httpInfo.qs[e.fieldName()] = e.String();
+          }
+        }
+
+        // headers
+        if (subOrig.hasField(CSUB_HEADERS))
+        {
+          BSONObj headers = getFieldF(subOrig, (CSUB_HEADERS)).Obj();
+          for (BSONObj::iterator i = headers.begin(); i.more();)
+          {
+            BSONElement e = i.next();
+            httpInfo.headers[e.fieldName()] = e.String();
+          }
+        }
+      }
     }
 
     RenderFormat attrsFormat;
@@ -383,13 +415,13 @@ static void setCondsAndInitialNotify
       // (entities and notification attributes) are pased in subOrig
       //
       // See: https://fiware-orion.readthedocs.io/en/develop/user/updating_regs_and_subs/index.html
-      setCondsAndInitialNotifyNgsiv1(subUp, subOrig, subUp.id, status, url, attrsFormat,
+      setCondsAndInitialNotifyNgsiv1(subUp, subOrig, subUp.id, status, httpInfo.url, attrsFormat,
                                      tenant, servicePathV, xauthToken, fiwareCorrelator,
                                      b, notificationDone);
     }
     else
     {
-      setCondsAndInitialNotify(subUp, subUp.id, status, url, attrsFormat,
+      setCondsAndInitialNotify(subUp, subUp.id, status, httpInfo, attrsFormat,
                                tenant, servicePathV, xauthToken, fiwareCorrelator,
                                b, notificationDone);
     }

@@ -108,7 +108,13 @@ static bool templateNotify
   if (httpInfo.payload == "")
   {
     LM_W(("KZ: using default payload"));
-    payload = "{" + ce.toJson(renderFormat, attrsOrder) + "}";
+    NotifyContextRequest   ncr;
+    ContextElementResponse cer;
+    
+    cer.contextElement = ce;
+    ncr.subscriptionId = subscriptionId;
+    ncr.contextElementResponseVector.push_back(&cer);
+    payload = ncr.toJson(renderFormat, attrsOrder);
   }
   else
   {
@@ -128,7 +134,13 @@ static bool templateNotify
     std::string key   = it->first;
     std::string value = it->second;
 
+    macroSubstitute(&key,   it->first, ce);
     macroSubstitute(&value, it->second, ce);
+    if ((value == "") && (key == ""))
+    {
+      // To avoid e.g '?a=&b=&c='
+      continue;
+    }
     qs[key] = value;
     LM_W(("KZ: Added URI Param '%s': '%s'", key.c_str(), value.c_str()));
   }
@@ -143,7 +155,15 @@ static bool templateNotify
     std::string key   = it->first;
     std::string value = it->second;
 
+    macroSubstitute(&key,   it->first, ce);
     macroSubstitute(&value, it->second, ce);
+
+    if (key == "")
+    {
+      // To avoid empty header name
+      continue;
+    }
+
     headers[key] = value;
     LM_W(("KZ: Added HTTP Header '%s': '%s'", key.c_str(), value.c_str()));
   }
@@ -401,7 +421,7 @@ void Notifier::sendNotifyContextRequest
     }
     else
     {
-      payloadString = ncrP->toJson(&ci, renderFormat, attrsOrder);
+      payloadString = ncrP->toJson(renderFormat, attrsOrder);
     }
 
     /* Parse URL */

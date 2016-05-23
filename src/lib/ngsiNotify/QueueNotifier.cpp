@@ -111,7 +111,16 @@ void QueueNotifier::sendNotifyContextRequest
   }
 
   ci.outMimeType = JSON;
-  std::string payload = ncr->toJson(&ci, renderFormat, attrsOrder);
+  std::string payload;
+
+  if (renderFormat == NGSI_V1_LEGACY)
+  {
+    payload = ncr->render(&ci, NotifyContext, "");
+  }
+  else
+  {
+    payload = ncr->toJson(renderFormat, attrsOrder);
+  }
 
   /* Parse URL */
   std::string  host;
