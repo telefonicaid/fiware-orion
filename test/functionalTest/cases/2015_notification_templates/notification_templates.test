@@ -487,7 +487,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A1": {
-            "metadata": {},
+                "metadata": {},
                 "type": "none",
                 "value": "a1"
             },
@@ -557,6 +557,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 #SORT_END
+
 
 --TEARDOWN--
 brokerStop CB
