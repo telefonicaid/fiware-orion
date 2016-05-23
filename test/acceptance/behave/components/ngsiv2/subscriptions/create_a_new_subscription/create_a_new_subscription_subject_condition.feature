@@ -530,7 +530,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
 
   @condition_expression_q_range_error.row<row.id>
   @condition_expression_q_range_error @1991 @BUG_2106
-  Scenario Outline:  try to a new subscription using NGSI v2 with "q" condition expression but with invalid operator in ranges
+  Scenario Outline:  try to create a new subscription using NGSI v2 with "q" condition expression but with invalid operator in ranges
     Given  a definition of headers
       | parameter          | value                           |
       | Fiware-Service     | test_condition_expression_error |
