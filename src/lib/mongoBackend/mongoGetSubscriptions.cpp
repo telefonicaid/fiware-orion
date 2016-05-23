@@ -146,6 +146,9 @@ static void setNotification(Subscription* s, const BSONObj& r, const std::string
   s->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(r, CSUB_LASTNOTIFICATION) : -1;
   s->notification.timesSent        = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : -1;
 
+  // Attributes format
+  s->attrsFormat = r.hasField(CSUB_FORMAT) ? stringToRenderFormat(getStringFieldF(r, CSUB_FORMAT)) : NGSI_V1_LEGACY;
+
   //
   // Check values from subscription cache, update object from cache-values if necessary
   //

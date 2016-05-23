@@ -73,7 +73,7 @@ struct Notification
   long long                timesSent;
   long long                lastNotification;
   HttpInfo                 httpInfo;
-  std::string              toJson();
+  std::string              toJson(const std::string& attrsFormat);
   Notification():
     attributes(),
     blackList(false),
