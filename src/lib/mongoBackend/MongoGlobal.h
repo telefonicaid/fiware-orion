@@ -45,6 +45,7 @@
 #include "ngsiNotify/Notifier.h"
 #include "rest/uriParamNames.h"
 #include "apiTypesV2/Subscription.h"
+#include "apiTypesV2/HttpInfo.h"
 
 #include "mongoBackend/TriggeredSubscription.h"
 
@@ -355,7 +356,7 @@ extern BSONArray processConditionVector
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
   const std::string&               subId,
-  const std::string&               url,
+  const ngsiv2::HttpInfo&          httpInfo,
   bool*                            notificationDone,
   RenderFormat                     renderFormat,
   const std::string&               tenant,
@@ -382,7 +383,7 @@ extern BSONArray processConditionVector
   const std::vector<ngsiv2::EntID>&  entitiesV,
   const std::vector<std::string>&    notifAttributesV,
   const std::string&                 subId,
-  const std::string&                 url,
+  const ngsiv2::HttpInfo&            httpInfo,
   bool*                              notificationDone,
   RenderFormat                       renderFormat,
   const std::string&                 tenant,

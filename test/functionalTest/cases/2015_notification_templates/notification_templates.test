@@ -330,82 +330,92 @@ Date: REGEX(.*)
 09. Dump accumulator, see 7 notifications
 =========================================
 #SORT_START
-POST http://127.0.0.1:9997/notify?step=01
+POST http://127.0.0.1:REGEX(\d+)/notify?step=01
 Fiware-Servicepath: /
-Content-Length: 227
+Content-Length: 282
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
-Host: 127.0.0.1:9997
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-    "A1": {
-        "metadata": {}, 
-        "type": "none", 
-        "value": "a1"
-    }, 
-    "A2": {
-        "metadata": {}, 
-        "type": "none", 
-        "value": "a2"
-    }, 
-    "A3": {
-        "metadata": {}, 
-        "type": "none", 
-        "value": 13
-    }, 
-    "NOTIFY_URL": {
-        "metadata": {}, 
-        "type": "none", 
-        "value": "notify"
-    }, 
-    "id": "E1", 
-    "type": "none"
+    "data": [
+        {
+            "A1": {
+                "metadata": {},
+                "type": "none",
+                "value": "a1"
+            },
+            "A2": {
+                "metadata": {},
+                "type": "none",
+                "value": "a2"
+            },
+            "A3": {
+                "metadata": {},
+                "type": "none",
+                "value": 13
+            },
+            "NOTIFY_URL": {
+                "metadata": {},
+                "type": "none",
+                "value": "notify"
+            },
+            "id": "E1",
+            "type": "none"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-PATCH http://127.0.0.1:9997/notify?step=02
+PATCH http://127.0.0.1:REGEX(\d+)/notify?step=02
 Fiware-Servicepath: /
-Content-Length: 227
+Content-Length: 282
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
-Host: 127.0.0.1:9997
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-    "A1": {
-        "metadata": {}, 
-        "type": "none", 
-        "value": "a1"
-    }, 
-    "A2": {
-        "metadata": {}, 
-        "type": "none", 
-        "value": "a2"
-    }, 
-    "A3": {
-        "metadata": {}, 
-        "type": "none", 
-        "value": 13
-    }, 
-    "NOTIFY_URL": {
-        "metadata": {}, 
-        "type": "none", 
-        "value": "notify"
-    }, 
-    "id": "E1", 
-    "type": "none"
+    "data": [
+        {
+            "A1": {
+                "metadata": {},
+                "type": "none",
+                "value": "a1"
+            },
+            "A2": {
+                "metadata": {},
+                "type": "none",
+                "value": "a2"
+            },
+            "A3": {
+                "metadata": {},
+                "type": "none",
+                "value": 13
+            },
+            "NOTIFY_URL": {
+                "metadata": {},
+                "type": "none",
+                "value": "notify"
+            },
+            "id": "E1",
+            "type": "none"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?step=03
+POST http://127.0.0.1:REGEX(\d+)/notify?step=03
 Fiware-Servicepath: /
 Content-Length: 59
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
-Host: 127.0.0.1:9997
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -417,50 +427,55 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "step": "03"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?a1=a1&step=04&a2=a2&type=none&a3=13.000000&id=E1
+POST http://127.0.0.1:REGEX(\d+)/notify?a1=a1&step=04&a2=a2&type=none&a3=13.000000&id=E1
 Fiware-Servicepath: /
-Content-Length: 227
+Content-Length: 282
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
-Host: 127.0.0.1:9997
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-    "A1": {
-        "metadata": {}, 
-        "type": "none", 
-        "value": "a1"
-    }, 
-    "A2": {
-        "metadata": {}, 
-        "type": "none", 
-        "value": "a2"
-    }, 
-    "A3": {
-        "metadata": {}, 
-        "type": "none", 
-        "value": 13
-    }, 
-    "NOTIFY_URL": {
-        "metadata": {}, 
-        "type": "none", 
-        "value": "notify"
-    }, 
-    "id": "E1", 
-    "type": "none"
+    "data": [
+        {
+            "A1": {
+                "metadata": {},
+                "type": "none",
+                "value": "a1"
+            },
+            "A2": {
+                "metadata": {},
+                "type": "none",
+                "value": "a2"
+            },
+            "A3": {
+                "metadata": {},
+                "type": "none",
+                "value": 13
+            },
+            "NOTIFY_URL": {
+                "metadata": {},
+                "type": "none",
+                "value": "notify"
+            },
+            "id": "E1",
+            "type": "none"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?step=05
+POST http://127.0.0.1:REGEX(\d+)/notify?step=05
 Fiware-Servicepath: /
 Ngsiv2-Attrsformat: normalized
 Entity-Id: E1
-Content-Length: 227
+Content-Length: 282
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Step: 05
 Accept: application/json
-Host: 127.0.0.1:9997
+Host: 127.0.0.1:REGEX(\d+)
 A3: 13.000000
 A2: a2
 A1: a1
@@ -469,31 +484,36 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-    "A1": {
-        "metadata": {}, 
-        "type": "none", 
-        "value": "a1"
-    }, 
-    "A2": {
-        "metadata": {}, 
-        "type": "none", 
-        "value": "a2"
-    }, 
-    "A3": {
-        "metadata": {}, 
-        "type": "none", 
-        "value": 13
-    }, 
-    "NOTIFY_URL": {
-        "metadata": {}, 
-        "type": "none", 
-        "value": "notify"
-    }, 
-    "id": "E1", 
-    "type": "none"
+    "data": [
+        {
+            "A1": {
+            "metadata": {},
+                "type": "none",
+                "value": "a1"
+            },
+            "A2": {
+                "metadata": {},
+                "type": "none",
+                "value": "a2"
+            },
+            "A3": {
+                "metadata": {},
+                "type": "none",
+                "value": 13
+            },
+            "NOTIFY_URL": {
+                "metadata": {},
+                "type": "none",
+                "value": "notify"
+            },
+            "id": "E1",
+            "type": "none"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-DELETE http://127.0.0.1:9997/notify?a1=a1&step=06&a2=a2&type=none&a3=13.000000&id=E1
+DELETE http://127.0.0.1:REGEX(\d+)/notify?a1=a1&step=06&a2=a2&type=none&a3=13.000000&id=E1
 Fiware-Servicepath: /
 Ngsiv2-Attrsformat: custom
 Entity-Id: E1
@@ -501,7 +521,7 @@ Content-Length: 45
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Step: 06
 Accept: application/json
-Host: 127.0.0.1:9997
+Host: 127.0.0.1:REGEX(\d+)
 A3: 13.000000
 A2: a2
 A1: a1
@@ -515,14 +535,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "A3": "13.000000"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?a1=a1&step=07&a2=a2&a4=&type=none&id=E1
+POST http://127.0.0.1:REGEX(\d+)/notify?a1=a1&step=07&a2=a2&a4=&type=none&id=E1
 Fiware-Servicepath: /
 Entity-Id: E1
 Content-Length: 36
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Step: 07
 Ngsiv2-Attrsformat: custom
-Host: 127.0.0.1:9997
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 A2: a2
 A1: a1
