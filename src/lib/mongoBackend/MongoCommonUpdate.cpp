@@ -1394,7 +1394,7 @@ static bool processOnChangeConditionForUpdateContext
   {
     ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
 
-    if (attrL.size() == 0 || blacklist)
+    if ((attrL.size() == 0) || (blacklist == true))
     {
       /* Empty attribute list in the subscription mean that all attributes are added */
       cer.contextElement.contextAttributeVector.push_back(caP);

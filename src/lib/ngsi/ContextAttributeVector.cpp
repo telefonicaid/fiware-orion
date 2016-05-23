@@ -197,7 +197,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat rend
   {
     for (unsigned ix = 0; ix < vec.size(); ++ix)
     {
-      if ( std::find(attrsFilter.begin(), attrsFilter.end(), vec[ix]->name) == attrsFilter.end() )
+      if (std::find(attrsFilter.begin(), attrsFilter.end(), vec[ix]->name) == attrsFilter.end())
       {
          ++validAttributes;
       }
@@ -255,7 +255,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat rend
   {
     for (unsigned ix = 0; ix < vec.size(); ++ix)
     {
-      if ( std::find(attrsFilter.begin(), attrsFilter.end(), vec[ix]->name) == attrsFilter.end() )
+      if (std::find(attrsFilter.begin(), attrsFilter.end(), vec[ix]->name) == attrsFilter.end())
       {
         ++renderedAttributes;
         out += vec[ix]->toJson(renderedAttributes == validAttributes, renderFormat);
