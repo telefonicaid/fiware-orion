@@ -495,7 +495,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       }
 
       subsP->notification.httpInfo.payload = payloadOpt.value;
-
     }
 
     // qs
