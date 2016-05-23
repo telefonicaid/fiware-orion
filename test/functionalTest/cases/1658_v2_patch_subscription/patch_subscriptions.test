@@ -248,7 +248,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 407
+Content-Length: 434
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -261,6 +261,7 @@ Date: REGEX(.*)
             "temperature",
             "humidity"
         ],
+        "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
         }
@@ -302,7 +303,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 435
+Content-Length: 462
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -315,6 +316,7 @@ Date: REGEX(.*)
             "temperature",
             "humidity"
         ],
+        "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
         }
@@ -358,7 +360,7 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 432
+Content-Length: 459
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -371,6 +373,7 @@ Date: REGEX(.*)
             "color",
             "weight"
         ],
+        "attrsFormat": "normalized",
         "http": {
             "url": "https://veryfaraway:4321"
         }
@@ -414,7 +417,7 @@ Date: REGEX(.*)
 08. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 433
+Content-Length: 460
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -427,6 +430,7 @@ Date: REGEX(.*)
             "color",
             "weight"
         ],
+        "attrsFormat": "normalized",
         "http": {
             "url": "https://veryfaraway:4321"
         }
@@ -470,7 +474,7 @@ Date: REGEX(.*)
 10. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 432
+Content-Length: 459
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -483,6 +487,7 @@ Date: REGEX(.*)
             "color",
             "weight"
         ],
+        "attrsFormat": "normalized",
         "http": {
             "url": "https://veryfaraway:4321"
         }
@@ -526,7 +531,7 @@ Date: REGEX(.*)
 12. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 407
+Content-Length: 434
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -539,6 +544,7 @@ Date: REGEX(.*)
             "temperature",
             "humidity"
         ],
+        "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
         }

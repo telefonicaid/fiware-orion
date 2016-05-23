@@ -72,7 +72,7 @@ namespace ngsiv2
     }
     jh.addString("status", this->status);
     jh.addRaw("subject", this->subject.toJson());
-    jh.addRaw("notification", this->notification.toJson(renderFormatToString(this->attrsFormat)));
+    jh.addRaw("notification", this->notification.toJson(renderFormatToString(this->attrsFormat, true, true)));
 
     if (this->throttling > 0)
     {

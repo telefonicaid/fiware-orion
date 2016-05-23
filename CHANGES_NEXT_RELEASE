@@ -1,5 +1,6 @@
 - Add: 'values' option for GET /v2/types operation (#1170)
 - Add: ':' as alias for '==' in the NGSIv2 Simple Query Language (#1903)
+- Fix: several fixes related with 'attrsFormat' subscription field in NGSIv2 API (#2133, #2163)
 - Fix: crash when updating entities which corresponding document at DB is somehow large (#2112)
 - Fix: bug disabling throttling when creating a v2 subscription (Issue #2114)
 - Fix: NGSIv2 header name change: X-Total-Count -> Fiware-Total-Count (#2124)

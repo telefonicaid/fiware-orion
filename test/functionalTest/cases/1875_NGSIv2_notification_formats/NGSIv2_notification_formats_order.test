@@ -95,9 +95,9 @@ payload='
     "http": {
       "url": "http://localhost:'$LISTENER_PORT'/notify"
     },
-    "attrs": [ "A3", "A1", "A2" ]
-  },
-  "attrsFormat": "keyValues"
+    "attrs": [ "A3", "A1", "A2" ],
+    "attrsFormat": "keyValues"
+  }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
 echo

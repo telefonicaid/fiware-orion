@@ -145,7 +145,7 @@ Date: REGEX(.*)
 02. Get subscriptions by /sp1 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 273
+Content-Length: 300
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -158,6 +158,7 @@ Date: REGEX(.*)
             "attrs": [
                 "temperature"
             ],
+            "attrsFormat": "normalized",
             "http": {
                 "url": "http://localhost:1234"
             }
@@ -193,7 +194,7 @@ Date: REGEX(.*)
 04. Get subscriptions by /sp1 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 270
+Content-Length: 297
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -206,6 +207,7 @@ Date: REGEX(.*)
             "attrs": [
                 "pressure"
             ],
+            "attrsFormat": "normalized",
             "http": {
                 "url": "http://localhost:5678"
             }
@@ -252,7 +254,7 @@ Date: REGEX(.*)
 07. Get subscriptions by /sp2 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 270
+Content-Length: 297
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -265,6 +267,7 @@ Date: REGEX(.*)
             "attrs": [
                 "humidity"
             ],
+            "attrsFormat": "normalized",
             "http": {
                 "url": "http://localhost:9999"
             }

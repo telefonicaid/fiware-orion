@@ -166,7 +166,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions?options=count
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 721
+Content-Length: 767
 Content-Type: application/json
 Fiware-Total-Count: 2
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -182,6 +182,7 @@ Date: REGEX(.*)
                 "occupancy",
                 "lightstatus"
             ],
+            "attrsFormat": "legacy",
             "http": {
                 "url": "http://127.0.0.1:REGEX(\d+)/notify"
             }
@@ -217,6 +218,7 @@ Date: REGEX(.*)
                 "speed",
                 "location"
             ],
+            "attrsFormat": "legacy",
             "http": {
                 "url": "http://127.0.0.1:REGEX(\d+)/notify"
             }
@@ -258,7 +260,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions (now seeing the timesSent and lastNotification in one sub)
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 780
+Content-Length: 826
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -273,6 +275,7 @@ Date: REGEX(.*)
                 "occupancy",
                 "lightstatus"
             ],
+            "attrsFormat": "legacy",
             "http": {
                 "url": "http://127.0.0.1:REGEX(\d+)/notify"
             }
@@ -308,6 +311,7 @@ Date: REGEX(.*)
                 "speed",
                 "location"
             ],
+            "attrsFormat": "legacy",
             "http": {
                 "url": "http://127.0.0.1:REGEX(\d+)/notify"
             },
