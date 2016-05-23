@@ -161,7 +161,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | random=256 |
 
   @condition_attrs_multiples
-  Scenario Outline:  create several subcriptions using NGSI v2 with multiples values of condition sttributes values
+  Scenario Outline:  create a subscription using NGSI v2 with multiple condition attributes
     Given  a definition of headers
       | parameter          | value                |
       | Fiware-Service     | test_condition_attrs |
