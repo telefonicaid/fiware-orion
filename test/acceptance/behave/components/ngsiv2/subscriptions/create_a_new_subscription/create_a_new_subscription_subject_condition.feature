@@ -161,7 +161,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | random=256 |
 
   @condition_attrs_multiples
-  Scenario Outline:  create entities using NGSI v2 with multiples values of condition sttributes values
+  Scenario Outline:  create several subcriptions using NGSI v2 with multiples values of condition sttributes values
     Given  a definition of headers
       | parameter          | value                |
       | Fiware-Service     | test_condition_attrs |
@@ -298,7 +298,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | my house    |
 
   @condition_attrs_invalid_raw
-  Scenario Outline:  try to create an subscription using NGSI v2 with several invalid condition attributes (integer, boolean, no-string, etc)
+  Scenario Outline:  try to create a new subscription using NGSI v2 with several invalid condition attributes (integer, boolean, no-string, etc)
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_condition_attrs_error |
@@ -324,7 +324,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | SDFSDFSDF  |
 
   @condition_attrs_not_allowed_raw
-  Scenario Outline:  try to create an subscription using NGSI v2 with several not allowed condition-attrs (integer, boolean, no-string, etc)
+  Scenario Outline:  try to create a new subscription using NGSI v2 with several not allowed condition-attrs (integer, boolean, no-string, etc)
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_condition_attrs_error |
@@ -467,7 +467,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | random=256                                                |
 
   @condition_expression_q_escaped @BUG_1988 @skip
-  Scenario:  try to a new subscription using NGSI v2 with "q" condition expression but with escaped string
+  Scenario:  try to create a new subscription using NGSI v2 with "q" condition expression but with escaped string
     Given  a definition of headers
       | parameter          | value                     |
       | Fiware-Service     | test_condition_expression |
@@ -491,7 +491,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | description | invalid query expression |
 
   @condition_expression_q_parse_error @BUG_1989 @BUG_2106
-  Scenario Outline:  try to a new subscription using NGSI v2 with "q" condition expression but with parse errors
+  Scenario Outline:  try to create a new subscription using NGSI v2 with "q" condition expression but with parse errors
     Given  a definition of headers
       | parameter          | value                           |
       | Fiware-Service     | test_condition_expression_error |
@@ -563,7 +563,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
 
   @condition_expression_q_range_error_invested.row<row.id>
   @condition_expression_q_range_error_invested @BUG_2106 @2117 @skip
-  Scenario Outline:  try to a new subscription using NGSI v2 with "q" condition expression but with invalid operator in ranges (invested range)
+  Scenario Outline:  try to create a new subscription using NGSI v2 with "q" condition expression but with invalid operator in ranges (invested range)
     Given  a definition of headers
       | parameter          | value                           |
       | Fiware-Service     | test_condition_expression_error |
@@ -592,7 +592,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
 
   @condition_expression_q_invalid_chars.row<row.id>
   @condition_expression_q_invalid_chars @BUG_2106 @BUG_1994 @skip
-  Scenario Outline:  try to a new subscription using NGSI v2 with "q" condition expression but with invalid chars
+  Scenario Outline:  try to create a new subscription using NGSI v2 with "q" condition expression but with invalid chars
     Given  a definition of headers
       | parameter          | value                           |
       | Fiware-Service     | test_condition_expression_error |
@@ -631,7 +631,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
   @condition_expression_q_invalid_date.row<row.id>
   @condition_expression_q_invalid_date @BUG_2106 @BUG_1996 @skip
   # FIXME: below Examples only represent at the "Complete date plus hours, minutes, seconds and a decimal fraction of a second" level in https://www.w3.org/TR/NOTE-datetime
-  Scenario Outline:  try to a new subscription using NGSI v2 with "q" condition expression but with invalid date values (ISO8601)
+  Scenario Outline:  try to create a new subscription using NGSI v2 with "q" condition expression but with invalid date values (ISO8601)
     Given  a definition of headers
       | parameter          | value                              |
       | Fiware-Service     | test_condition_expression_error_II |
@@ -1228,7 +1228,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Fiware-Service     | test_condition_expression_coords_error |
       | Fiware-ServicePath | /test                                  |
       | Content-Type       | application/json                       |
-# These properties below are used in subscriptions request
+    # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter             | value                                                   |
       | subject_type          | room                                                    |
@@ -1259,7 +1259,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Fiware-Service     | test_condition_expression_coords_error |
       | Fiware-ServicePath | /test                                  |
       | Content-Type       | application/json                       |
-# These properties below are used in subscriptions request
+    # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter             | value                                                |
       | subject_type          | room                                                 |
