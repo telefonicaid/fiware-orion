@@ -136,7 +136,7 @@ static bool templateNotify
 
     macroSubstitute(&key,   it->first, ce);
     macroSubstitute(&value, it->second, ce);
-    if ((value == "") && (key == ""))
+    if ((value == "") || (key == ""))
     {
       // To avoid e.g '?a=&b=&c='
       continue;
