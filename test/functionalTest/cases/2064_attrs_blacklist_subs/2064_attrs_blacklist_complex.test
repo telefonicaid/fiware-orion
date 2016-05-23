@@ -39,10 +39,10 @@ WAIT_TIME=1.5s
 # 01. Create subscription
 # 02. Create entity (triggers notification)
 # 03. Check subscription timesSent value (1)
-# 04. Subcription update not involving actual update
+# 04. Subscription update not involving actual update
 # 05. Update entity (triggers notification)
 # 06. Check subscription timesSent value (2)
-# 07. Subcription update not involving actual update
+# 07. Subscription update not involving actual update
 # 08. Update entity (triggers notification)
 # 09. Check subscription timesSent value (3)
 # 10. Accumulator dump
@@ -108,8 +108,8 @@ echo
 echo
 
 
-echo '04. Subcription update not involving actual update'
-echo "=================================================="
+echo '04. Subscription update not involving actual update'
+echo "==================================================="
 payload='
 {
     "expires": "2050-04-05T14:00:00.00Z"
@@ -140,8 +140,8 @@ echo
 echo
 
 
-echo '07. Subcription update not involving actual update'
-echo "=================================================="
+echo '07. Subscription update not involving actual update'
+echo "==================================================="
 payload='
 {
     "expires": "2050-04-05T14:00:00.00Z"
@@ -240,8 +240,8 @@ Date: REGEX(.*)
 }
 
 
-04. Subcription update not involving actual update
-==================================================
+04. Subscription update not involving actual update
+===================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -298,8 +298,8 @@ Date: REGEX(.*)
 }
 
 
-07. Subcription update not involving actual update
-==================================================
+07. Subscription update not involving actual update
+===================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
