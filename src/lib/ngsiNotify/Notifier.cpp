@@ -115,15 +115,15 @@ static bool templateNotify
     cer.contextElement = ce;
     ncr.subscriptionId = subscriptionId;
     ncr.contextElementResponseVector.push_back(&cer);
-    payload = ncr.toJson(renderFormat, attrsOrder);
+    payload  = ncr.toJson(renderFormat, attrsOrder);
     mimeType = "application/json";
   }
   else
   {
     macroSubstitute(&payload, httpInfo.payload, ce);
-    payload = curl_unescape(payload.c_str(), payload.length());
+    payload      = curl_unescape(payload.c_str(), payload.length());
     renderFormat = NGSI_V2_CUSTOM;
-    mimeType = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
+    mimeType     = "text/plain; charset:utf-8";  // May be overridden by 'Content-Type' in 'headers'
   }
 
 

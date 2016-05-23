@@ -241,6 +241,7 @@ echo
 
 echo "09. Dump accumulator, see 7 notifications"
 echo "========================================="
+sleep 0.5  # Without this sleep, sometimes the last notification is missing
 accumulatorDump
 echo
 echo
@@ -337,7 +338,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
-Content-Type: text/plain
+Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
@@ -417,7 +418,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
-Content-Type: application/json; charset=utf-8
+Content-Type: text/plain; charset:utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
@@ -526,7 +527,7 @@ A3: 13.000000
 A2: a2
 A1: a1
 Entity-Type: none
-Content-Type: text/plain
+Content-Type: text/plain; charset:utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
