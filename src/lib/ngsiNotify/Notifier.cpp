@@ -22,6 +22,8 @@
 *
 * Author: Fermin Galan
 */
+#include <curl/curl.h>
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -111,6 +113,7 @@ static bool templateNotify
   else
   {
     macroSubstitute(&payload, httpInfo.payload, ce);
+    payload = curl_unescape(payload.c_str(), payload.length());
     renderFormat = NGSI_V2_CUSTOM;
     LM_W(("KZ: substituted payload: '%s'", payload.c_str()));
   }

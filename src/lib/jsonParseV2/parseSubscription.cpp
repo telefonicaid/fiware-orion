@@ -695,7 +695,7 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
   {
     if (!iter->IsString())
     {
-      return badInput(ciP, "attrs element is not an string");
+      return badInput(ciP, "attrs element is not a string");
     }
 
     vec->push_back(iter->GetString());
@@ -721,7 +721,7 @@ static std::string parseDictionary(ConnectionInfo* ciP, std::map<std::string, st
   {
     if (!iter->value.IsString())
     {
-      return badInput(ciP, name + " element is not an string");
+      return badInput(ciP, name + " element is not a string");
     }
 
     std::string value = iter->value.GetString();

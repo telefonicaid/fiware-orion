@@ -128,9 +128,9 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   {
     LM_W(("KZ2: EXTENDED"));
     // method/verb
-    if (sub.hasField("method"))
+    if (sub.hasField(CSUB_METHOD))
     {
-      cSubP->httpInfo.verb = str2Verb(getFieldF(sub, "method").String());
+      cSubP->httpInfo.verb = str2Verb(getFieldF(sub, CSUB_METHOD).String());
     }
     else
     {
@@ -145,13 +145,13 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
     LM_W(("KZ2: METHOD: %s", verbName(cSubP->httpInfo.verb)));
 
     // payload
-    cSubP->httpInfo.payload = (sub.hasField("payload"))? getFieldF(sub, "payload").String() : "";
+    cSubP->httpInfo.payload = (sub.hasField(CSUB_PAYLOAD))? getFieldF(sub, CSUB_PAYLOAD).String() : "";
     LM_W(("KZ2: PAYLOAD: %s", cSubP->httpInfo.payload.c_str()));
 
     // qs
-    if (sub.hasField("qs"))
+    if (sub.hasField(CSUB_QS))
     {
-      mongo::BSONObj qs = getFieldF(sub, "qs").Obj();
+      mongo::BSONObj qs = getFieldF(sub, CSUB_QS).Obj();
 
       for (BSONObj::iterator i = qs.begin(); i.more();)
       {
@@ -163,9 +163,9 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
     }
 
     // headers
-    if (sub.hasField("headers"))
+    if (sub.hasField(CSUB_HEADERS))
     {
-      mongo::BSONObj headers = getFieldF(sub, "headers").Obj();
+      mongo::BSONObj headers = getFieldF(sub, CSUB_HEADERS).Obj();
 
       for (BSONObj::iterator i = headers.begin(); i.more();)
       {

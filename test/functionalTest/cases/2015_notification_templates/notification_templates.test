@@ -109,7 +109,7 @@ payload='{
   "notification": {
     "httpExtended": {
       "url":     "http://127.0.0.1:'${LISTENER_PORT}'/notify",
-      "payload": "{ \"A1\": \"${A1}\", \"A2\": \"${A2}\", \"A3\": \"${A3}\", \"step\": \"03\" }",
+      "payload": "{ %22A1%22: %22${A1}%22, %22A2%22: %22${A2}%22, %22A3%22: %22${A3}%22, %22step%22: %2203%22 }",
       "qs":       { "step": "03" }
     }
   }
@@ -187,7 +187,7 @@ payload='{
     "httpExtended": {
       "url":      "http://127.0.0.1:'${LISTENER_PORT}'/${NOTIFY_URL}",
       "method":   "DELETE",
-      "payload":  "{ \"A1\": \"${A1}\", \"A2\": \"${A2}\", \"A3\": \"${A3}\" }",
+      "payload":  "{ %22A1%22: %22${A1}%22, %22A2%22: %22${A2}%22, %22A3%22: %22${A3}%22 }",
       "qs":       { "step": "06", "id": "${id}", "type": "${type}", "a1": "${A1}", "a2": "${A2}", "a3": "${A3}" },
       "headers":  { "entity-id": "${id}", "entity-type": "${type}", "A1": "${A1}", "A2": "${A2}", "A3": "${A3}", "step": "06" }
     }
@@ -214,7 +214,7 @@ payload='{
   "notification": {
     "httpExtended": {
       "url":      "http://127.0.0.1:'${LISTENER_PORT}'/notify",
-      "payload":  "{ \"A1\": \"${A1}\", \"A2\": \"${A2}\", \"A4\": \"${A4}\" }",
+      "payload":  "{ %22A1%22: %22${A1}%22, %22A2%22: %22${A2}%22, %22A4%22: %22${A4}%22 }",
       "qs":       { "step": "07", "id": "${id}", "type": "${type}", "a1": "${A1}", "a2": "${A2}", "a4": "${A4}" },
       "headers":  { "entity-id": "${id}", "entity-type": "${type}", "A1": "${A1}", "A2": "${A2}", "A4": "${A4}", "step": "07" }
     }
