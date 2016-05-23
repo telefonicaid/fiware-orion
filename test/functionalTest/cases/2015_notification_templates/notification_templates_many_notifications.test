@@ -352,7 +352,7 @@ Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 A1: true
 Entity-Type: T1
-Content-Type: application/json; charset=utf-8
+Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
@@ -371,7 +371,7 @@ Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 A2: null
 Entity-Type: T2
-Content-Type: application/json; charset=utf-8
+Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
@@ -390,7 +390,7 @@ Accept: application/json
 Host: 127.0.0.1:REGEX(\d+)
 A3: 3.000000
 Entity-Type: T3
-Content-Type: application/json; charset=utf-8
+Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {

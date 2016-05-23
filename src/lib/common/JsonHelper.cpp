@@ -124,7 +124,6 @@ std::string vectorToJson(std::vector<std::string> &list)
 *
 * objectToJson -
 */
-template <>
 std::string objectToJson(std::map<std::string, std::string>& list)
 {
   std::ostringstream  os;
@@ -146,7 +145,7 @@ std::string objectToJson(std::map<std::string, std::string>& list)
       os << ',';
     }
 
-    os << toJsonString(key) << ":" << toJsonString(value);
+    os << toJsonString(key) << ':' << toJsonString(value);
   }
 
   os << '}';

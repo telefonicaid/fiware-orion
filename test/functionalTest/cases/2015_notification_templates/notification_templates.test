@@ -216,7 +216,7 @@ payload='{
       "url":      "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "payload":  "{ %22A1%22: %22${A1}%22, %22A2%22: %22${A2}%22, %22A4%22: %22${A4}%22 }",
       "qs":       { "step": "07", "id": "${id}", "type": "${type}", "a1": "${A1}", "a2": "${A2}", "a4": "${A4}" },
-      "headers":  { "entity-id": "${id}", "entity-type": "${type}", "A1": "${A1}", "A2": "${A2}", "A4": "${A4}", "step": "07" }
+      "headers":  { "entity-id": "${id}", "entity-type": "${type}", "A1": "${A1}", "A2": "${A2}", "A4": "${A4}", "step": "07", "Content-Type": "user-specified" }
     }
   }
 }'
@@ -337,7 +337,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
-Content-Type: application/json; charset=utf-8
+Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
@@ -526,7 +526,7 @@ A3: 13.000000
 A2: a2
 A1: a1
 Entity-Type: none
-Content-Type: application/json; charset=utf-8
+Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
@@ -547,7 +547,7 @@ Accept: application/json
 A2: a2
 A1: a1
 Entity-Type: none
-Content-Type: application/json; charset=utf-8
+Content-Type: user-specified
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {

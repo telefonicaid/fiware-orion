@@ -81,6 +81,7 @@ static bool templateNotify
   std::string                         method;
   std::string                         url;
   std::string                         payload;
+  std::string                         mimeType;
   std::map<std::string, std::string>  qs;
   std::map<std::string, std::string>  headers;
 
@@ -115,13 +116,14 @@ static bool templateNotify
     ncr.subscriptionId = subscriptionId;
     ncr.contextElementResponseVector.push_back(&cer);
     payload = ncr.toJson(renderFormat, attrsOrder);
+    mimeType = "application/json";
   }
   else
   {
     macroSubstitute(&payload, httpInfo.payload, ce);
     payload = curl_unescape(payload.c_str(), payload.length());
     renderFormat = NGSI_V2_CUSTOM;
-    LM_W(("KZ: substituted payload: '%s'", payload.c_str()));
+    mimeType = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
   }
 
 
@@ -229,7 +231,7 @@ static bool templateNotify
                       ce.entityId.servicePath,
                       xauthToken,
                       uri,
-                      "application/json",
+                      mimeType,
                       payload,
                       fiwareCorrelator,
                       renderFormatToString(renderFormat),

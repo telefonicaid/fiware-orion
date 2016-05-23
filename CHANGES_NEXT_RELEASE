@@ -8,3 +8,4 @@
 - Fix: total count return in GET /v2/types operation (#2115)
 - Fix: -noCache now avoids populating cache on create/update subscription operations (#2147)
 - Deprecated: /ngsi10 and /ngsi9 as URL path prefixes
+- Fix: potential bug in internal logic at NGSIv2 GET subscription operations, possibly provoking crashes
