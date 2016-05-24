@@ -190,8 +190,8 @@ class ContextElementResponse;
 class StringFilter
 {
 public:
-  std::vector<StringFilterItem>  filters;
-  std::vector<BSONObj>           mongoFilters;
+  std::vector<StringFilterItem*>  filters;
+  std::vector<BSONObj>            mongoFilters;
 
   StringFilter();
   ~StringFilter();
