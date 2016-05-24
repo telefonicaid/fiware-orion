@@ -119,66 +119,8 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // Note that the URL of the notification is stored outside the httpInfo object in mongo
   //
-  cSubP->httpInfo.url = sub.hasField(CSUB_REFERENCE)?    getFieldF(sub, CSUB_REFERENCE).String().c_str() : "NO REF";  // Mandatory
+  cSubP->httpInfo.fill(sub);
 
-  LM_W(("KZ2: URL == '%s'", cSubP->httpInfo.url.c_str()));
-  bool extended = (sub.hasField("extended"))? getBoolFieldF(sub, "extended") : false;
-
-  if (extended)
-  {
-    LM_W(("KZ2: EXTENDED"));
-    // method/verb
-    if (sub.hasField(CSUB_METHOD))
-    {
-      cSubP->httpInfo.verb = str2Verb(getFieldF(sub, CSUB_METHOD).String());
-    }
-    else
-    {
-      cSubP->httpInfo.verb = POST;
-    }
-
-    if ((cSubP->httpInfo.verb == NOVERB) || (cSubP->httpInfo.verb == UNKNOWNVERB))
-    {
-      cSubP->httpInfo.verb = POST;
-    }
-
-    LM_W(("KZ2: METHOD: %s", verbName(cSubP->httpInfo.verb)));
-
-    // payload
-    cSubP->httpInfo.payload = (sub.hasField(CSUB_PAYLOAD))? getFieldF(sub, CSUB_PAYLOAD).String() : "";
-    LM_W(("KZ2: PAYLOAD: %s", cSubP->httpInfo.payload.c_str()));
-
-    // qs
-    if (sub.hasField(CSUB_QS))
-    {
-      mongo::BSONObj qs = getFieldF(sub, CSUB_QS).Obj();
-
-      for (BSONObj::iterator i = qs.begin(); i.more();)
-      {
-        BSONElement e = i.next();
-
-        cSubP->httpInfo.qs[e.fieldName()] = e.String();
-        LM_W(("KZ2: QS '%s' == '%s'", e.fieldName(), e.String().c_str()));
-      }
-    }
-
-    // headers
-    if (sub.hasField(CSUB_HEADERS))
-    {
-      mongo::BSONObj headers = getFieldF(sub, CSUB_HEADERS).Obj();
-
-      for (BSONObj::iterator i = headers.begin(); i.more();)
-      {
-        BSONElement e = i.next();
-
-        cSubP->httpInfo.headers[e.fieldName()] = e.String();
-        LM_W(("KZ2: HEADERS '%s' == '%s'", e.fieldName(), e.String().c_str()));
-      }
-    }
-  }
-
-
-  LM_T(LmtSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
 
   //
   // 05. Push Entity-data names to EntityInfo Vector (cSubP->entityInfos)

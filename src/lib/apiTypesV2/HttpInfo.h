@@ -28,6 +28,7 @@
 #include <string>
 #include <map>
 
+#include "mongo/client/dbclient.h"
 #include "rest/Verb.h"
 
 
@@ -51,7 +52,8 @@ struct HttpInfo
   HttpInfo();
   HttpInfo(const std::string& _url);
 
-  std::string toJson();
+  std::string  toJson();
+  void         fill(const mongo::BSONObj& bo);
 };
 
 }

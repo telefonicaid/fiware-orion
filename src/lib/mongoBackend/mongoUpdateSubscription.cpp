@@ -362,39 +362,7 @@ static void setCondsAndInitialNotify
     }
     else
     {
-      httpInfo.url      = getStringFieldF(subOrig, CSUB_REFERENCE);
-      httpInfo.extended = getBoolFieldF(subOrig, CSUB_EXTENDED);
-      if (httpInfo.extended)
-      {
-        // FIXME P5: qs and header population code also in mongoSubCache.cpp. Maybe it makes sense to define common functions
-        // in the HttpInfo for populating fields from BSONObj
-
-        httpInfo.verb    = subOrig.hasField(CSUB_METHOD) ? str2Verb(getStringFieldF(subOrig, CSUB_METHOD)) : POST;
-        httpInfo.payload = subOrig.hasField(CSUB_PAYLOAD) ? getStringFieldF(subOrig, CSUB_PAYLOAD) : "";
-
-        // qs
-        if (subOrig.hasField(CSUB_QS))
-        {
-          BSONObj qs = getFieldF(subOrig, CSUB_QS).Obj();
-
-          for (BSONObj::iterator i = qs.begin(); i.more();)
-          {
-            BSONElement e = i.next();
-            httpInfo.qs[e.fieldName()] = e.String();
-          }
-        }
-
-        // headers
-        if (subOrig.hasField(CSUB_HEADERS))
-        {
-          BSONObj headers = getFieldF(subOrig, (CSUB_HEADERS)).Obj();
-          for (BSONObj::iterator i = headers.begin(); i.more();)
-          {
-            BSONElement e = i.next();
-            httpInfo.headers[e.fieldName()] = e.String();
-          }
-        }
-      }
+      httpInfo.fill(subOrig);
     }
 
     RenderFormat attrsFormat;

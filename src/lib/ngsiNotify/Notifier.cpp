@@ -331,7 +331,7 @@ void Notifier::sendNotifyContextRequest
     ConnectionInfo  ci;
     Verb            verb = httpInfo.verb;
 
-    if (verb == NOVERB)
+    if ((verb == NOVERB) || (verb == UNKNOWNVERB))
     {
       // Default verb/method is POST
       verb = POST;
