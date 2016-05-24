@@ -2,7 +2,7 @@ FORMAT: 1A
 HOST: http://orion.lab.fiware.org
 TITLE: FIWARE-NGSI v2 Specification
 DATE: 30 September 2015
-VERSION: 2.0-wip1
+VERSION: 2.0-latest
 PREVIOUS_VERSION: <placeholder>
 APIARY_PROJECT: fiware-ngsi-v2
 SPEC_URL: https://telefonicaid.github.io/fiware-orion/api/v2/
@@ -48,7 +48,16 @@ This specification is licensed under the
 
 ## Conformance
 
-All the interfaces described by this specification are mandatory and must be implemented in order to be compliant with. 
+This specification describes the "full" compliance level.
+
+However, next iterations of this specification could define optionality
+in some parts and the compliance level (or roles/profiles)
+corresponding to them.
+
+## Conventions
+
+NGSI version 2 use camel case (camelCase) syntax for naming properties and related artifacts used by the API. When 
+referring to URIs, as part of HATEOAS patterns, and to mark them appropriately the suffix `_url` is added.
 
 # Specification
 
@@ -66,18 +75,26 @@ The FIWARE NGSI (Next Generation Service Interface) API defines
 
 ### Context data modelling and exchange
 
+The main elements in the NGSI data model are context entities, attributes and metadata, as shown
+in the figure below.
+
+![NGSI data model](https://raw.githubusercontent.com/telefonicaid/fiware-orion/develop/doc/apiary/v2/Ngsi-data-model.png)
+
 #### Context Entities
 
 Context entities, or simply called entities, are the center of gravity
 in the FIWARE NGSI information model. An entity represents a
-real-world object like e.g. a sensor, a person, or a room. Each entity
-is uniquely identified by its **entity id**. 
+thing, i.e. any physical or logical object (e.g. a sensor, a person, a room, an
+issue in a ticketing system, etc.). Each entity has an **entity id**.
 
 Furthermore, the type system of FIWARE NGSI enables entities to have 
 an **entity type**. Entity types are semantic types; they are intended
-to describe the type of real-world object represented by the entity.
+to describe the type of things represented by the entity.
 For example, a context entity with id *sensor-365* could have the
 type *temperatureSensor*.
+
+Each entity is uniquely identified by the combination of its id
+and type.
 
 #### Context Elements
 
@@ -180,7 +197,7 @@ An entity is represented by a JSON object with the following syntax:
 * The entity type is specified by the object's `type` property, which value is a string containing the entity's type name.
 
 * Entity attributes are specified by additional properties, which name is the `name` of the attribute and which representation
-  is described in the JSON Attribute Representation section below. Obviously, `id` and `type` are not allowed as attribute names.
+  is described in the "JSON Attribute Representation" section below. Obviously, `id` and `type` are not allowed as attribute names.
 
 An example of this syntax in shown below:
 
@@ -196,7 +213,7 @@ An example of this syntax in shown below:
 ```
 
 The normalized representation of entities always include `id`, `type` and the properties which represent attributes. However, simplified
-or partial representations (see below at Partial Representations section), may leave out some of them. The specification of each operation
+or partial representations (see below at "Partial Representations" section), may leave out some of them. The specification of each operation
 includes details about what  representation is expected as input or what representation will be provided (rendered) as output.
 
 ## JSON Attribute Representation
@@ -257,20 +274,21 @@ Some operations imply that only a partial representation of an entity will be pr
 
 * `id` and `type` are not allowed in update operations, as they are inmutable properties.
 
-* In the requests in which entity `type` is allowed, it may be omitted. When omitted, the default string value `none`
-  is used for the type.
+* In the requests in which entity `type` is allowed, it may be omitted. When omitted in entity creation operations,
+  the default string value `none` is used for the type.
 
 * In some cases, not all the attributes of the entity are shown, e.g. a query which selects a subset of entity attributes.
 
 * Attribute/metadata `value` may be omitted in requests, meaning that the attribute/metadata has `null` value. It is always present in responses.
 
-* Attribute/metadata `type` may be ommitted in requests. When omitted, the default string value `none`.
+* Attribute/metadata `type` may be ommitted in requests. When omitted in attribute/metadata creation or update operations, the default
+  string value `none` is used for the type.
 
 * Attribute `metadata` may be ommitted in requests, meaning that there are not metadata elements associated to the attribute. In responses, this property is set to
   `{}` if the attribute doesn't have metadata.
 
 
-## Special attribute types
+## Special Attribute Types
 
 Generally speaking, user-defined attribute types are informative, they are processed by the NGSIv2 server in
 an opaque way. Nonetheless, the types described below are used to convey an special meaning
@@ -288,7 +306,7 @@ an opaque way. Nonetheless, the types described below are used to convey an spec
 }
 ```
 
-## Virtual attributes
+## Virtual Attributes
 
 There are entity properties that are not directly modificable by NGSIv2 clients, but that can be rendered
 by NGSIv2 servers to provide extra information. From a representation point of view, they are like
@@ -299,8 +317,8 @@ to the `options` URL parameter.
 
 The list of virtual attributes is the following:
 
-* `dateCreation` (type: `date`): entity creation date as ISO 8601 string.
-* `dateModification` (type: `date`): entity modification date as ISO 8601 string.
+* `dateCreated` (type: `date`): entity creation date as ISO 8601 string.
+* `dateModified` (type: `date`): entity modification date as ISO 8601 string.
 
 As regular attributes, they can be  used in `attrs`, `q` filters and `orderBy`. However, they cannot be used
 in resource URLs.
@@ -333,50 +351,52 @@ explaining the cause.
 
 The following strings must not be used as attribute names:
 
-* `id`, as it would conflict to the field used to represent entity id)
+* `id`, as it would conflict to the field used to represent entity id.
 
-* `type`, as it would conflict to the field used to represent entity type)
+* `type`, as it would conflict to the field used to represent entity type.
 
 * `geo:distance`, as it would conflict with the string used in `orderBy` for proximity to center point.
 
-* Virtual attribute names (see specific section about virtual attributes)
+* Virtual attribute names (see specific section on "Virtual Attributes")
 
-## Ordering results
+## Ordering Results
 
-Operations that retrieve lists of entities allow the `orderBy` URI parameter to specify the order; its 
-value can be:
+Operations that retrieve lists of entities allow the `orderBy` URI parameter to specify which attributes or properties will
+be used as criteria to order results. Its value can be:
 
-* The keyword geo:distance to order results by distance to a reference geometry when a "near" (`georel=near`) spatial 
+* The keyword `geo:distance` to order results by distance to a reference geometry when a "near" (`georel=near`) spatial
   relationship is used. 
 
 * A comma-separated list of attributes (including virtual attributes), e.g. `temperature,!humidity`. Results are ordered
   by the first attribute. On ties, the results are ordered by the second attribute and so on. A "!" before the attribute
   name means that the order is reversed.
 
-## Error responses
+## Error Responses
 
-In the case of being present, the error payload is JSON object including the following fields:
+In the case of being present, the error payload is a JSON object including the following fields:
 
 + `error` (required, string): a textual description of the error.
 + `description` (optional, string): additional information about the error.
 + `affectedItems` (optional, array[string]): a list of elements affected by the error. Depending on the operation, it may
   refer to entities, registrations or subscriptions.
 
+All NGSIv2 server implementations must use the following HTTP response codes and `error` texts. However, the particular text used for
+`description` field is an implementation specific aspect.
+
 Error list (HTTP response code in parenthesis):
 
 * ParseError            (`400`). The incoming JSON payload cannot be parsed.
 * BadRequest            (`400`). The incoming request is invalid in this context.
-* NotFound              (`404`). The Context Element referred in the request has not been found.
-* TooManyResults        (`409`). There are several results that match with the resource identification used
-  in the request. This typically the case of requesting an entity with not enough information and the
-  solution is to enhance entity identification adding more information, e.g. adding entity type
-  and/or service path.
-* LengthRequired        (`411`). Zero/No Content-Length in PUT/POST/PATCH request.
+* NotFound              (`404`). The resource (entity, subscription, etc.) referred in the request has not been found.
+* TooManyResults        (`409`). There are several results that match with the resource identification used by the request.
+* ContentLengthRequired (`411`). Zero/No Content-Length in PUT/POST/PATCH request.
 * RequestEntityTooLarge (`413`). Payload is too large.
 * UnsupportedMediaType  (`415`). Request content type is not supported.
 * InvalidModification   (`422`). Some piece of information is missing in payload.
 * NotSupportedQuery     (`422`). The implementation does not support the query issued.
 * NoResourcesAvailable  (`413`). There are no server resources to fulfill the client request. 
+
+New error codes could be defined in new iterations of this specification.
 
 ## Geospatial properties of entities
 
@@ -637,7 +657,7 @@ must be sent.
 *default location*, then the query will be declared as ambigous and an HTTP error response with code ``409``
 must be sent. 
 
-## Notification messages
+## Notification Messages
 
 Notifications include two fields:
 
@@ -713,7 +733,7 @@ If `attrsFormat` is `values` then values entity partial representation mode is u
 Notifications must include a `Ngsiv2-AttrsFormat` header with the value of `attrsFormat` of the associated subscription,
 so notification receiver can know the format used without needing processing notification payload.
 
-## Custom notifications
+## Custom Notifications
 
 NGSIv2 clients can customize HTTP notification messages using a simple template mechanism. The
 `notification.httpCustom` property of a subscription allows to specify the following fields subject
@@ -806,12 +826,12 @@ a query or geographical query). A given entity have to match all the criteria to
 See [Simple Query Language](#simple_query_language) and [Geographical Queries](#geographical_queries). 
 
 The response payload is an Array which contains one object per matching entity. Each entity follows
-the JSON entity representation format (described in a section above).
+the JSON entity representation format (described in "JSON Entity Representation" section).
 
 Response code:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + id: Boe_Idearium (optional, string) - A comma separated list of elements.
@@ -843,17 +863,17 @@ Response code:
     The attributes are retrieved in the order specified by this parameter. If this parameter is not included, all the attributes
     are retrieved in arbitrary order.
 
-    + orderBy: temperature,!speed (optional, string) - Criteria for ordering results. See "Ordering results" section for details.
+    + orderBy: temperature,!speed (optional, string) - Criteria for ordering results. See "Ordering Results" section for details.
     
     + options (optional, string) - Options dictionary
       + Members
           + count - when used, the total number of entities is returned in the response as a HTTP header named `Fiware-Total-Count`.
-          + keyValues - when used, the response payload uses `keyValues` simplified entity representation. See corresponding 
+          + keyValues - when used, the response payload uses `keyValues` simplified entity representation. See "Simplified Entity Representation"
           section for details.
-          + values - when used, the response payload uses `values` simplified entity representation. See corresponding 
+          + values - when used, the response payload uses `values` simplified entity representation. See "Simplified Entity Representation"
           section for details.
           + unique - when used, the response payload uses `values` simplified entity representation. And, recurring values are left out.
-          See corresponding section for details.
+          See "Simplified Entity Representation" section for details.
 
 + Response 200 (application/json)
 
@@ -899,13 +919,13 @@ Response code:
 ### Create entity [POST /v2/entities{?options}]
 
 The payload is an object representing the entity to be created. The object follows
-the JSON entity representation format (described in a section above).
+the JSON entity representation format (described in a "JSON Entity Representation" section).
 
 Response:
 
 * Successful operation uses 201 Created. Reponse includes a `Location` header with the URL of the
   created entity.
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Request (application/json)
 
@@ -932,7 +952,7 @@ Response:
 + Parameters
     + options (optional, string) - Options dictionary
       + Members
-          + keyValues - when used, the request payload uses `keyValues` simplified entity representation. See corresponding 
+          + keyValues - when used, the request payload uses `keyValues` simplified entity representation. See "Simplified Entity Representation"
           section for details.
 
 + Response 201
@@ -947,7 +967,7 @@ Response:
 ### Retrieve entity [GET /v2/entities/{entityId}{?type,attrs,options}]
 
 The response is an object representing the entity identified by the ID. The object follows
-the JSON entity representation format (described in a section above).
+the JSON entity representation format (described in "JSON Entity Representation" section).
 
 This operation must return only one entity element, but it may happen that there are more
 than one entity with the same ID (e.g. entities with same ID but different type). In those cases
@@ -957,7 +977,7 @@ the list of conflicting entities, i.e. all the entities with such an ID.
 Response:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + entityId (required, string) - Entity id to be retrieved
@@ -969,11 +989,11 @@ Response:
     + options (optional, string) - Options dictionary
       + Members
           + keyValues - when used, the response payload uses `keyValues` simplified entity representation. See 
-          corresponding section for details.
-          + values - when used, the response payload uses `values` simplified entity representation. See corresponding 
+          "Simplified Entity Representation" section for details.
+          + values - when used, the response payload uses `values` simplified entity representation. See "Simplified Entity Representation"
           section for details.
           + unique - when used, the response payload uses `values` simplified entity representation. And, recurring values are left out.
-          See corresponding section for details.
+          See "Simplified Entity Representation" section for details.
 
 + Response 200 (application/json)
 
@@ -1012,7 +1032,7 @@ the list of conflicting entities, i.e. all the entities with such an ID.
 Response:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + entityId (required, string) - Entity id to be retrieved
@@ -1024,11 +1044,11 @@ Response:
     + options (optional, string) - Options dictionary
       + Members
           + keyValues - when used, the response payload uses `keyValues` simplified entity representation. See
-          corresponding section for details.
-          + values - when used, the response payload uses `values` simplified entity representation. See corresponding
+          "Simplified Entity Representation" section for details.
+          + values - when used, the response payload uses `values` simplified entity representation. See "Simplified Entity Representation"
           section for details.
           + unique - when used, the response payload uses `values` simplified entity representation. And, recurring values are left out.
-          See corresponding section for details.
+          See "Simplified Entity Representation" section for details.
 
 + Response 200 (application/json)
 
@@ -1056,7 +1076,7 @@ Response:
 ### Update or append entity attributes [POST /v2/entities/{entityId}/attrs{?type,options}]
 
 The request payload is an object representing the attributes to append or update. The object follows
-the JSON entity representation format (described in a section above), except that `id` and `type`
+the JSON entity representation format (described in "JSON Entity Representation" section), except that `id` and `type`
 are not allowed.
 
 The entity attributes are updated with the ones in the payload. In particular, depending on
@@ -1071,7 +1091,7 @@ whether `append` operation option is used or not.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + entityId (required, string) - Entity id to be updated
@@ -1081,7 +1101,7 @@ Response:
         + Members
             + append - Force an append operation
             + keyValues - when used, the request payload uses `keyValues` simplified entity representation. See 
-            corresponding section for details.
+            "Simplified Entity Representation" section for details.
 
 + Request (application/json)
 
@@ -1098,7 +1118,7 @@ Response:
 ### Update existing entity attributes [PATCH /v2/entities/{entityId}/attrs{?type,options}]
 
 The request payload is an object representing the attributes to update. The object follows
-the JSON entity representation format (described in a section above), except that `id` and `type`
+the JSON entity representation format (described in "JSON Entity Representation" section), except that `id` and `type`
 are not allowed.
 
 The entity attributes are updated with the ones in the payload. In addition to that, if one or more
@@ -1107,7 +1127,7 @@ attributes in the payload doesn't exist in the entity, an error if returned.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters 
     + entityId (required, string) - Entity id to be updated
@@ -1116,7 +1136,7 @@ Response:
     + options (optional, string) - Operations options
         + Members
             + keyValues - when used, the request payload uses `keyValues` simplified entity representation. See 
-            corresponding section for details.
+            "Simplified Entity Representation" section for details.
 
 + Request (application/json)
 
@@ -1134,7 +1154,7 @@ Response:
 ### Replace all entity attributes [PUT /v2/entities/{entityId}/attrs{?type,options}]
 
 The request payload is an object representing the new entity attributes. The object follows
-the JSON entity representation format (described in a section above), except that `id` and `type`
+the JSON entity representation format (described in a "JSON Entity Representation" above), except that `id` and `type`
 are not allowed.
 
 The attributes previously existing in the entity are removed and replaced by the ones in the
@@ -1143,7 +1163,7 @@ request.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters 
     + entityId (required, string) - Entity id
@@ -1152,7 +1172,7 @@ Response:
     + options (optional, string) - Operations options
         + Members
             + keyValues - when used, the request payload uses `keyValues` simplified entity representation. See 
-            corresponding section for details.
+            "Simplified Entity Representation" section for details.
 
 + Request (application/json)
 
@@ -1174,7 +1194,7 @@ Delete the entity.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters 
     + entityId (required, string) - Entity id to be deleted
@@ -1191,12 +1211,12 @@ Response:
 ### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}{?type}]
 
 Returns a JSON object with the attribute data of the attribute. The object follows the JSON representation for attributes
-(described in a section above).
+(described in "JSON Entity Representation" section).
 
 Response:
 
 * Successful operation uses 20O OK.
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -1216,12 +1236,12 @@ Response:
 
 The request payload is an object representing the new attributes data. Previous attribute data
 is replaced by the one in the request. The object follows the JSON representation for attributes
-(described in a section above).
+(described in "JSON Entity Representation" section).
 
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -1250,7 +1270,7 @@ Removes an entity attribute.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -1283,7 +1303,7 @@ The payload MIME type in responses is based on client-server HTTP negotiation, b
 Response:
 
 * Successful operation uses 20O OK.
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -1319,7 +1339,7 @@ The payload MIME type in request is specified in the `Content-Type` HTTP header.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -1361,7 +1381,7 @@ Results are ordered by entity `type` in alphabetical order.
 Response code:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + limit: 10 (optional, number) - Limit the number of types to be retrieved
@@ -1421,7 +1441,7 @@ The operation returns a JSON object with information about the type:
 Response code:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + entityType: Room (required, string) - Entity Type
@@ -1474,7 +1494,7 @@ A `notification` object contains the following subfields:
 
 + `attrs` or `exceptAttrs` (both cannot be used at the same time):
   + `attrs`: List of attributes to be included in the notification message. It also defines the order in which attributes
-    appear in notifications when `attrsFormat` `value` is used (see "Notification messages" section). Empty list means that
+    appear in notifications when `attrsFormat` `value` is used (see "Notification Messages" section). Empty list means that
     all attributes are included in the notification.
   + `exceptAttrs`: List of attributes to be excluded from the notification message, i.e. notification message includes
      all entity attributes except the ones listed in this field.
@@ -1483,7 +1503,7 @@ A `notification` object contains the following subfields:
   for notifications delivered through the HTTP protocol.
 + `attrsFormat` (optional): specifies how the entities will be represented in notifications. Accepted values are
   `normalized` (the one used if the field is omitted), `keyValues` or `values`. If `attrsFormat` takes any value different
-  than those an error will be raised. See detail in "Notification messages" section.
+  than those an error will be raised. See detail in "Notification Messages" section.
 + `timesSent` (not editable, only in GET operations): Number of notifications sent due to this subscription.
 + `lastNotification`: Last notification date in ISO8601 format.
 
@@ -1500,9 +1520,9 @@ An `httpCustom` object contains the following subfields.
 + `method` (optional): the method to use for sending the notification (default is POST). Only valid HTTP methods are allowed.
    On specifying an invalid HTTP method, a 400 Bad Request error is returned.
 + `payload` (optional): the payload to be used in the notification. If omitted, the default payload (see
-  "Notification messages" sections) is used.
+  "Notification Messages" sections) is used.
 
-If `httpCustom` is used, then the considerations described in "Custom notifications" section apply.
+If `httpCustom` is used, then the considerations described in "Custom Notifications" section apply.
 
 Notification rules are as follow:
 
@@ -1522,7 +1542,7 @@ Returns a list of all the subscriptions present in the system
 Response:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + limit: 10 (optional, number) - Limit the number of types to be retrieved
@@ -1581,7 +1601,7 @@ The subscription is represented by a JSON object as described at the beginning o
 Response:
 
 * Successful operation uses 201 Created
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Request (application/json)
 
@@ -1627,7 +1647,7 @@ The response is the subscription represented by a JSON object as described at th
 Response:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + subscriptionId: abcdef (required, string) - subscription Id.
@@ -1672,7 +1692,7 @@ Only the fields included in the request are updated in the subscription.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + subscriptionId: abcdef (required, string) - subscription Id.
@@ -1692,7 +1712,7 @@ Cancels subscription.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + subscriptionId: abcdef (required, string) - subscription Id.
@@ -1730,7 +1750,7 @@ Lists all the registrations present in the system.
 Response:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Response 200
 
@@ -1772,7 +1792,7 @@ The registration is represented by a JSON object as described at the beginning o
 Response:
 
 * Successful operation uses 201 Created
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Request (application/json)
 
@@ -1812,7 +1832,7 @@ The response is the registration represented by a JSON object as described at th
 Response:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + registrationId: abcdef (required, string) - registration Id.
@@ -1843,7 +1863,7 @@ Only the fields included in the request are updated in the registration.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + registrationId: abcdef (required, string) - registration Id.
@@ -1863,14 +1883,14 @@ Cancels registration.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + registrationId: abcdef (required, string) - registration Id.
 
 + Response 204
 
-# Group POJ RPC Operations
+# Group Batch Operations
 
 ### Update [POST /v2/op/update]
 
@@ -1879,12 +1899,12 @@ The payload is an object with two properties:
 
 + `actionType`, to specify the kind of update action to do: either APPEND, APPEND_STRICT, UPDATE, DELETE.
 + `entities`, an array of entities, each one specified using the JSON entity representation format (described
-  in a section above).
+  in "JSON Entity Representation" section).
 
 Response:
 
 * Successful operation uses 204 No Content.
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Request (application/json)
 
@@ -1894,14 +1914,22 @@ Response:
                 {
                     "type": "Room",
                     "id": "Bcn-Welt",
-                    "temperature": 21.7,
-                    "humidity": 60
+                    "temperature": {
+                      "value": 21.7
+                     },
+                    "humidity": {
+                      "value": 60
+                    }
                 },
                 {
                     "type": "Room",
                     "id": "Mad_Aud",
-                    "temperature": 22.9,
-                    "humidity": 85
+                    "temperature": {
+                      "value": 22.9
+                    },
+                    "humidity": {
+                      "value": 85
+                    }
                 }
             ]
         }
@@ -1909,7 +1937,7 @@ Response:
 + Parameters
     + options (optional, string) - Options dictionary
       + Members
-          + keyValues - when used, the request payload uses `keyValues` simplified entity representation. See corresponding 
+          + keyValues - when used, the request payload uses `keyValues` simplified entity representation. See "Simplified Entity Representation"
           section for details.
 
 + Response 204
@@ -1918,7 +1946,7 @@ Response:
 ### Query [POST /v2/op/query{?limit,offset,options}]
 
 The response payload is an Array which contains one object per matching entity. Each entity follows
-the JSON entity representation format (described in a section above).
+the JSON entity representation format (described in "JSON Entity Representation" section).
 
 The payload may contain the following elements (all of them optional):
 
@@ -1934,22 +1962,22 @@ The payload may contain the following elements (all of them optional):
 Response code:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + limit: 10 (optional, number) - Limit the number of entities to be retrieved
     + offset: 20 (optional, number) - Skip a number of records
-    + orderBy: temperature,!speed (optional, string) - Criteria for ordering results. See "Ordering results" section for details.
+    + orderBy: temperature,!speed (optional, string) - Criteria for ordering results. See "Ordering Results" section for details.
     + options (optional, string) - Options dictionary
       + Members
           + count - the total number of entities is returned in the response as an
           HTTP header named `Fiware-Total-Count`.
-          + keyValues - when used, the response payload uses `keyValues` simplified entity representation. See corresponding
+          + keyValues - when used, the response payload uses `keyValues` simplified entity representation. See "Simplified Entity Representation"
           section for details.
-          + values - when used, the response payload uses `values` simplified entity representation. See corresponding
+          + values - when used, the response payload uses `values` simplified entity representation. See "Simplified Entity Representation"
           section for details.
           + unique - when used, the response payload uses `values` simplified entity representation. And, recurring values are left out.
-          See corresponding section for details.
+          See "Simplified Entity Representation" section for details.
 
 
 + Request (application/json)
@@ -2026,7 +2054,7 @@ Response:
 
 * Successful operation uses 200 OK. In addition, in the case of successful CREATE, a list of IDs is returned,
   each one corresponding to the ID of the element in the request payload and in the same order.
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Request (application/json)
 
@@ -2091,7 +2119,7 @@ The payload may contain the following elements (all of them optional):
 Response code:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 + Parameters
     + limit: 10 (optional, number) - Limit the number of registrations to be retrieved
