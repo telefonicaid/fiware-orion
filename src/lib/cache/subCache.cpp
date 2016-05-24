@@ -682,7 +682,6 @@ void subCacheItemInsert
   const std::string&            georel
 )
 {
-  LM_W(("KZ: inserting sub in cache. extended == %s", httpInfo.extended? "true" : "false"));
   //
   // Add the subscription to the subscription cache.
   // But only if any of the entities in entityIdVector is pattern based -
@@ -734,7 +733,6 @@ void subCacheItemInsert
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
   cSubP->httpInfo              = httpInfo;
-  LM_W(("KZ: inserted subscription in cache. httpInfo.extended: %s", cSubP->httpInfo.extended? "true" : "false"));
 
   if (stringFilterP != NULL)
   {
@@ -832,7 +830,6 @@ void subCacheItemInsert
   entIdStdVector2EntityIdVector(entities, &enV);
   attrL.fill(notifAttributes);
 
-  LM_W(("KZ: calling subCacheItemInsert. httpInfo.extended: %s", httpInfo.extended? "true" : "false"));
   subCacheItemInsert(tenant,
                      servicePath,
                      httpInfo,

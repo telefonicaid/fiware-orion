@@ -127,7 +127,7 @@ void setHttpInfo(const Subscription& sub, BSONObjBuilder* b)
 
   LM_T(LmtMongo, ("Subscription reference: %s", sub.notification.httpInfo.url.c_str()));
   LM_T(LmtMongo, ("Subscription extended: %s", sub.notification.httpInfo.extended? "true" : "false"));
-  LM_W(("KZ: extended: %s", sub.notification.httpInfo.extended? "true" : "false"));
+
   if (sub.notification.httpInfo.extended)
   {
     setExtendedHttpInfo(sub.notification.httpInfo, b);
@@ -283,7 +283,6 @@ void setCondsAndInitialNotify
 
   /* Conds vector (and maybe an initial notification) */
   *notificationDone = false;
-  LM_W(("KZ: calling processConditionVector. extended == %s", sub.notification.httpInfo.extended? "true" : "false"));
   BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             sub.subject.entities,
                                             sub.notification.attributes,
