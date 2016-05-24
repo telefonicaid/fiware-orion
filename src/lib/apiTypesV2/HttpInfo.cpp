@@ -35,6 +35,7 @@
 
 using namespace mongo;
 
+
 namespace ngsiv2
 {
 
