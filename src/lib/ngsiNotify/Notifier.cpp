@@ -126,6 +126,8 @@ static bool templateNotify
     mimeType     = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
   }
 
+  LM_W(("KZ: In templateNotify: payload: '%s'", payload.c_str()));
+
 
   //
   // 4. URI Params (Query Strings)
