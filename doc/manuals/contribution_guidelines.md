@@ -407,10 +407,6 @@ directly or indirectly are forced to have that construct as well.
 
 ### ‘SHOULD follow’ rules:
 
-*Rule*: The keywords that are followed by '(' MUST have a space between the keywords and the parenthesis:
-
-```
-
 #### S1 (Statements):
 
 *Rule*: Each statement SHOULD have its own line.
