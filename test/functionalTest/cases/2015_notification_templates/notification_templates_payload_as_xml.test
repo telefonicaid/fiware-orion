@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Notification Templates with payload as XML
+Notification Templates with payload as XML for notifications
 
 --SHELL-INIT--
 dbInit CB
