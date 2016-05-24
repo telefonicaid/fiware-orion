@@ -66,7 +66,7 @@ bool StringFilterItem::fill(StringFilterItem* sfiP, std::string* errorStringP)
   stringRangeFrom       = sfiP->stringRangeFrom;
   stringRangeTo         = sfiP->stringRangeTo;
   attributeName         = sfiP->attributeName;
-  compiledPattern = sfiP->compiledPattern;
+  compiledPattern       = sfiP->compiledPattern;
 
   if (compiledPattern)
   {
@@ -863,6 +863,12 @@ StringFilter::StringFilter()
 StringFilter::~StringFilter()
 {
   mongoFilters.clear();
+
+  for (unsigned int ix = 0; ix < filters.size(); ++ix)
+  {
+    delete filters[ix];
+  }
+
   filters.clear();
 }
 
@@ -920,28 +926,20 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
       return false;
     }
 
-    StringFilterItem item;
+    StringFilterItem* item = new StringFilterItem();
 
-    if (item.parse(s, errorStringP) == true)
+    if (item->parse(s, errorStringP) == true)
     {
       filters.push_back(item);
     }
     else
     {
+      free(item);
       free(toFree);
       return false;
     }
 
     str = NULL;  // So that strtok_r continues eating the initial string
-
-    //
-    // The next line is to avoid premature free in StringFilterItem destructor, when this scope ends,
-    // as 'item' is an object on the stack and its destructor will be called automatically at
-    // end of scope.
-    //
-    // (Note that the "copy" inside the filters vector may have "true" for this)
-    //
-    item.compiledPattern = false;
   }
 
   free(toFree);
@@ -958,7 +956,7 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
 {
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
   {
-    StringFilterItem*  itemP = &filters[ix];
+    StringFilterItem*  itemP = filters[ix];
     std::string        k;
     BSONArrayBuilder   ba;
     BSONObjBuilder     bob;
@@ -1203,7 +1201,7 @@ bool StringFilter::match(ContextElementResponse* cerP)
 {
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
   {
-    StringFilterItem* itemP = &filters[ix];
+    StringFilterItem* itemP = filters[ix];
 
     // Unary operator?
     if ((itemP->op == SfopExists) || (itemP->op == SfopNotExists))
@@ -1316,22 +1314,16 @@ StringFilter* StringFilter::clone(std::string* errorStringP)
 
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
   {
-    StringFilterItem  sfi;
+    StringFilterItem*  sfi = new StringFilterItem();
 
-    if (!sfi.fill(&filters[ix], errorStringP))
+    if (!sfi->fill(filters[ix], errorStringP))
     {
+      delete sfi;
       delete sfP;
       return NULL;
     }
 
     sfP->filters.push_back(sfi);
-
-    // Next line is to avoid premature free in StringFilterItem destructor, when this scope ends,
-    // as 'item' is an object on the stack and its destructor will be called automatically at
-    // end of scope.
-    //
-    // (Note that the "copy" inside the filters vector may have "true" for this)
-    sfi.compiledPattern = false;
   }
 
   // Object copy
@@ -1350,24 +1342,16 @@ bool StringFilter::fill(StringFilter* sfP, std::string* errorStringP)
 {
   for (unsigned int ix = 0; ix < sfP->filters.size(); ++ix)
   {
-    StringFilterItem  sfi;
+    StringFilterItem*  sfi = new StringFilterItem();
 
-    if (!sfi.fill(&sfP->filters[ix], errorStringP))
+    if (!sfi->fill(sfP->filters[ix], errorStringP))
     {
+      delete sfi;
       LM_E(("Runtime Error (error filling StringFilterItem: %s)", errorStringP->c_str()));
       return false;
     }
     
     filters.push_back(sfi);
-
-    //
-    // The next line is to avoid premature free in StringFilterItem destructor, when this scope ends,
-    // as 'sfi' is an object on the stack and its destructor will be called automatically at
-    // end of scope.
-    //
-    // (Note that the "copy" inside the filters vector may have "true" for this)
-    //
-    sfi.compiledPattern = false;
   }
 
   // Object copy

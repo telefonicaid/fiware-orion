@@ -1,3 +1,4 @@
+- Add: notification attributes blacklist for NGSIv2 notifications (#2064)
 - Add: 'values' option for GET /v2/types operation (#1170)
 - Add: ':' as alias for '==' in the NGSIv2 Simple Query Language (#1903)
 - Fix: several fixes related with 'attrsFormat' subscription field in NGSIv2 API (#2133, #2163)
@@ -9,4 +10,5 @@
 - Fix: total count return in GET /v2/types operation (#2115)
 - Fix: -noCache now avoids populating cache on create/update subscription operations (#2147)
 - Fix: accessing to csub cache in update subscription logic to update count and lastNotification without taking semaphore (#2146)
+- Fix: crash in multi-token query string when attribute value regex comes in first place (#2164)
 - Deprecated: /ngsi10 and /ngsi9 as URL path prefixes
