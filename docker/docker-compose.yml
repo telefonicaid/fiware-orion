@@ -3,7 +3,7 @@
 # low resource hosts
 mongo:
   image: mongo:3.2
-  command: --smallfiles --nojournal
+  command: --nojournal
 
 orion:
   image: fiware/orion
