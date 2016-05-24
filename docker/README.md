@@ -25,7 +25,7 @@ Follow these steps:
 	
 		mongo:
 		  image: mongo:3.2
-		  command: --smallfiles --nojournal
+		  command: --nojournal
 		orion:
 		  image: fiware/orion
 		  links:
@@ -36,7 +36,7 @@ Follow these steps:
 
 3. Using the command-line and within the directory you created type: `sudo docker-compose up`.
 
-> Regarding --smallfiles, you can ommit it if your hosting machine have enough disk space. Regarding --nojournal it is not recommened for production, but it speeds up mongo container start up and avoids some race conditions problems if Orion container is faster and doesn't find the DB up and ready.
+> Regarding --nojournal it is not recommened for production, but it speeds up mongo container start up and avoids some race conditions problems if Orion container is faster and doesn't find the DB up and ready.
 
 After a few seconds you should have your Context Broker running and listening on port `1026`.
 
