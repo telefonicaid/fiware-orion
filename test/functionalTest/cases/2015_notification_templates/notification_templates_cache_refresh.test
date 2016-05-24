@@ -35,6 +35,7 @@ accumulatorStart --pretty-print
 # 02. Sleep 2.1 seconds to assure the sub-cache is refreshed from mongo
 # 03. Create entity to trigger the subscription
 # 04. Dump accumulator to see the notification
+# 05. GET the subscription
 #
 
 echo "01. Create subscription with template"
