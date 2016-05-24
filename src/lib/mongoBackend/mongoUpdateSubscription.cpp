@@ -688,12 +688,14 @@ std::string mongoUpdateSubscription
     long long countInc         = 1;
 
     // Update sub-cache
-    // FIXME #2146: this is safe without sem?
-    //
     if (subCacheP != NULL)
     {
+      cacheSemTake(__FUNCTION__, "Updating count and last notification in cache subscription");
+
       subCacheP->count                 += 1; // 'count' to be reset later if DB operation OK
       subCacheP->lastNotificationTime  = lastNotification;
+
+      cacheSemGive(__FUNCTION__, "Updating count and last notification in cache subscription");
 
       countInc = subCacheP->count;     // already inc with +1
     }
