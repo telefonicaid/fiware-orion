@@ -147,3 +147,6 @@ The list of available options is the following:
     for more detail.
 -   **-strictNgsiv1Ids**. To apply to the NGSIv1 API the same restrictions that apply to NGSIv2 for id fields regarding
     forbidden characters and length limit. See also [this section of the documentation](../user/v1_v2_coexistence.md#checking-id-fields).
+-   **-disableCustomNotifications**. Disabled NGSIv2 custom notifications. In particular:
+    * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
+    * No `${...}` macro substitution is performed.
