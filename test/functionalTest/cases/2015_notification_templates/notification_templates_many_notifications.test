@@ -35,7 +35,7 @@ accumulatorStart --pretty-print
 # 02. Create E1/T2 
 # 03. Create E1/T3 
 # 04. Create regular subscription for E1 -> 3 entities in one notification
-# 05. Create same subscription but with 'httpExtended' instead 'http' -> 3 notifications
+# 05. Create same subscription but with 'httpExtended' instead of 'http' -> 3 notifications
 # 06. Create extended subscription for E1 -> 3 notifications
 # 07. Dump accumulator and see 7 notifications (one first one multi-entity)
 #
@@ -101,8 +101,8 @@ echo
 echo
 
 
-echo "05. Create same subscription but with 'httpExtended' instead 'http' -> 3 notifications"
-echo "======================================================================================"
+echo "05. Create same subscription but with 'httpExtended' instead of 'http' -> 3 notifications"
+echo "========================================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -143,7 +143,7 @@ payload='{
     "httpExtended": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "method": "PUT",
-      "payload": "{ \"A1\": \"${A1}\", \"A2\": \"${A2}\", \"A3\": \"${A3}\" }",
+      "payload": "{ %22A1%22: %22${A1}%22, %22A2%22: %22${A2}%22, %22A3%22: %22${A3}%22 }",
       "qs":       { "id": "${id}", "type": "${type}", "a1": "${A1}", "a2": "${A2}", "a3": "${A3}" },
       "headers":  { "entity-id": "${id}", "entity-type": "${type}", "A1": "${A1}", "A2": "${A2}", "A3": "${A3}" }
     }
@@ -157,6 +157,7 @@ echo
 
 echo "07. Dump accumulator and see 7 notifications (one first one multi-entity)"
 echo "========================================================================="
+sleep 0.5  # Without this sleep, sometimes the last notification is missing
 accumulatorDump
 echo
 echo
@@ -203,8 +204,8 @@ Date: REGEX(.*)
 
 
 
-05. Create same subscription but with 'httpExtended' instead 'http' -> 3 notifications
-======================================================================================
+05. Create same subscription but with 'httpExtended' instead of 'http' -> 3 notifications
+=========================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -352,7 +353,7 @@ Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 A1: true
 Entity-Type: T1
-Content-Type: application/json; charset=utf-8
+Content-Type: text/plain; charset:utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
@@ -371,7 +372,7 @@ Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 A2: null
 Entity-Type: T2
-Content-Type: application/json; charset=utf-8
+Content-Type: text/plain; charset:utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
@@ -390,7 +391,7 @@ Accept: application/json
 Host: 127.0.0.1:REGEX(\d+)
 A3: 3.000000
 Entity-Type: T3
-Content-Type: application/json; charset=utf-8
+Content-Type: text/plain; charset:utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {

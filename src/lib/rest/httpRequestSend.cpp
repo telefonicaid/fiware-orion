@@ -241,7 +241,7 @@ int httpRequestSendWithCurl
   ++callNo;
 
   // For content-type application/json we add charset=utf-8
-  if (orig_content_type == "application/json")
+  if ((orig_content_type == "application/json") || (orig_content_type == "text/plain"))
   {
     content_type += "; charset=utf-8";
   }

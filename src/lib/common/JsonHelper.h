@@ -29,6 +29,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <map>
 
 class JsonHelper
 {
@@ -85,5 +86,13 @@ std::string vectorToJson(std::vector<T> &list)
 
 template <>
 std::string vectorToJson(std::vector<std::string> &list);
+
+
+
+/* ****************************************************************************
+*
+* objectToJson -
+*/
+extern std::string objectToJson(std::map<std::string, std::string>& list);
 
 #endif // SRC_LIB_COMMON_JSONHELPER_H

@@ -122,6 +122,41 @@ std::string vectorToJson(std::vector<std::string> &list)
 
 /* ****************************************************************************
 *
+* objectToJson -
+*/
+std::string objectToJson(std::map<std::string, std::string>& list)
+{
+  std::ostringstream  os;
+  bool                firstTime = true;
+
+  os << '{';
+
+  for (std::map<std::string, std::string>::const_iterator it = list.begin(); it != list.end(); ++it)
+  {
+    std::string key   = it->first;
+    std::string value = it->second;
+
+    if (firstTime)
+    {
+      firstTime = false;
+    }
+    else
+    {
+      os << ',';
+    }
+
+    os << toJsonString(key) << ':' << toJsonString(value);
+  }
+
+  os << '}';
+
+  return os.str();
+}
+
+
+
+/* ****************************************************************************
+*
 * JsonHelper -
 */
 JsonHelper::JsonHelper(): empty(true)

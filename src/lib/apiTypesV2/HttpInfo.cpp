@@ -65,6 +65,29 @@ std::string HttpInfo::toJson()
 
   jh.addString("url", this->url);
 
+  if (extended)
+  {
+    if (this->payload != "")
+    {
+      jh.addString("payload", this->payload);
+    }
+
+    if (this->verb != NOVERB)
+    {
+      jh.addString("method", verbName(this->verb));
+    }
+
+    if (qs.size() != 0)
+    {
+      jh.addRaw("qs", objectToJson(qs));
+    }
+
+    if (headers.size() != 0)
+    {
+      jh.addRaw("headers", objectToJson(headers));
+    }
+  }
+
   return jh.str();
 }
 
