@@ -331,9 +331,9 @@ void Notifier::sendNotifyContextRequest
     ConnectionInfo  ci;
     Verb            verb = httpInfo.verb;
 
-    if ((verb == NOVERB) || (verb == UNKNOWNVERB))
+    if ((verb == NOVERB) || (verb == UNKNOWNVERB) || disableCusNotif)
     {
-      // Default verb/method is POST
+      // Default verb/method (or the one in case of disabled custom notifications) is POST
       verb = POST;
     }
 
@@ -352,8 +352,10 @@ void Notifier::sendNotifyContextRequest
     // Redirect to the method sendNotifyContextRequestAsPerTemplate() when 'httpInfo.extended' is TRUE.
     // 'httpInfo.extended' is FALSE by default and set to TRUE by the json parser.
     //
+    // Note that disableCusNotif (taken from CLI) could disable the whole thing and force to use regular (not-custom) notifications
+    //
     LM_W(("KZ: httpInfo.extended == '%s'", httpInfo.extended? "true" : "false"));
-    if (httpInfo.extended)
+    if (httpInfo.extended && !disableCusNotif)
     {
       NotificationAsTemplateParams* paramP = new NotificationAsTemplateParams();
 
