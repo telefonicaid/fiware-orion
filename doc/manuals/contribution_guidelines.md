@@ -395,6 +395,16 @@ xyzInit(user,   pwd  host);
 
 *How to check*: checked using the internal script ```scripts/style_check.sh```
 
+#### M12 (`using namespace` in header files)
+
+*Rule*: the construct ```using namespace XXX``` must not be used in header files.
+
+*Rationale*: a header file should not decide for the source files that include the header file.
+If a header file contains this construct then all source files that include the header file,
+directly or indirectly are forced to have that construct as well.
+
+*How to check*: using an intelligent ```grep```.
+
 ### ‘SHOULD follow’ rules:
 
 #### S1 (Statements):
