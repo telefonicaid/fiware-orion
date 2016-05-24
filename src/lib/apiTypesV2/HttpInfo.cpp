@@ -25,9 +25,12 @@
 #include <string>
 #include <map>
 
+#include "mongo/client/dbclient.h"
 #include "logMsg/logMsg.h"
 
 #include "common/JsonHelper.h"
+#include "mongoBackend/dbConstants.h"
+#include "mongoBackend/safeMongo.h"
 #include "apiTypesV2/HttpInfo.h"
 
 
@@ -89,6 +92,54 @@ std::string HttpInfo::toJson()
   }
 
   return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* HttpInfo::fill -
+*/
+void HttpInfo::fill(const mongo::BSONObj& bo)
+{
+  this->url      = bo.hasField(CSUB_REFERENCE)? getStringFieldF(bo, CSUB_REFERENCE) : "";
+  this->extended = bo.hasField(CSUB_EXTENDED)? getBoolFieldF(bo, CSUB_EXTENDED)  : false;
+
+  if (this->extended)
+  {
+    this->payload  = bo.hasField(CSUB_PAYLOAD)? getStringFieldF(bo, CSUB_PAYLOAD) : "";
+
+    if (bo.hasField(CSUB_METHOD))
+    {
+      this->verb = str2Verb(getFieldF(bo, CSUB_METHOD).String());
+    }
+
+    // qs
+    if (bo.hasField(CSUB_QS))
+    {
+      mongo::BSONObj qs = getFieldF(bo, CSUB_QS).Obj();
+
+      for (mongo::BSONObj::iterator i = qs.begin(); i.more();)
+      {
+        mongo::BSONElement e = i.next();
+
+        this->qs[e.fieldName()] = e.String();
+      }
+    }
+
+    // headers
+    if (bo.hasField(CSUB_HEADERS))
+    {
+      mongo::BSONObj headers = getFieldF(bo, CSUB_HEADERS).Obj();
+
+      for (mongo::BSONObj::iterator i = headers.begin(); i.more();)
+      {
+        mongo::BSONElement e = i.next();
+
+        this->headers[e.fieldName()] = e.String();
+      }
+    }
+  }
 }
 
 }

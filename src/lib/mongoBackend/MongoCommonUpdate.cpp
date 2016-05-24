@@ -1281,8 +1281,7 @@ static bool addTriggeredSubscriptions_noCache
       RenderFormat        renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo    httpInfo;
 
-      // FIXME: All http-info to be extracted from DB here, for the 'no cache' case to work
-      httpInfo.url = sub.hasField(CSUB_REFERENCE)? getStringFieldF(sub, CSUB_REFERENCE) : "";
+      httpInfo.fill(sub);
 
       TriggeredSubscription* trigs = new TriggeredSubscription
         (

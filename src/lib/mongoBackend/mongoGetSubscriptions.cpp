@@ -141,49 +141,7 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
     subP->notification.attributes.push_back(attr);
   }
 
-  //
-  // Http Info
-  //
-  // FIXME P5: qs and header population code also in mongoSubCache.cpp AND mongoUpdateSubscription.cpp.
-  //           Maybe it makes sense to define common functions
-  //           in the HttpInfo for populating fields from BSONObj
-  //
-  subP->notification.httpInfo.url      = getStringFieldF(r, CSUB_REFERENCE);
-  subP->notification.httpInfo.extended = r.hasField(CSUB_EXTENDED)? getBoolFieldF(r, CSUB_EXTENDED)  : false;
-
-  if (subP->notification.httpInfo.extended)
-  {
-    subP->notification.httpInfo.payload  = r.hasField(CSUB_PAYLOAD)? getStringFieldF(r, CSUB_PAYLOAD) : "";
-
-    if (r.hasField(CSUB_METHOD))
-    {
-      subP->notification.httpInfo.verb = str2Verb(getFieldF(r, CSUB_METHOD).String());
-    }
-
-    // qs
-    if (r.hasField(CSUB_QS))
-    {
-      BSONObj qs = getFieldF(r, CSUB_QS).Obj();
-
-      for (BSONObj::iterator i = qs.begin(); i.more();)
-      {
-        BSONElement e = i.next();
-        subP->notification.httpInfo.qs[e.fieldName()] = e.String();
-      }
-    }
-
-    // headers
-    if (r.hasField(CSUB_HEADERS))
-    {
-      BSONObj headers = getFieldF(r, CSUB_HEADERS).Obj();
-
-      for (BSONObj::iterator i = headers.begin(); i.more();)
-      {
-        BSONElement e = i.next();
-        subP->notification.httpInfo.headers[e.fieldName()] = e.String();
-      }
-    }
-  }
+  subP->notification.httpInfo.fill(r);
 
   subP->throttling                    = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(r, CSUB_THROTTLING)       : -1;
   subP->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(r, CSUB_LASTNOTIFICATION) : -1;
