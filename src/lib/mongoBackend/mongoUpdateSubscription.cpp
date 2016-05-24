@@ -513,9 +513,9 @@ static void setBlacklist(const SubscriptionUpdate& subUp, const BSONObj& subOrig
   }
   else
   {
-    bool bl = getBoolFieldF(subOrig, CSUB_BLACKLIST);
+    bool bl = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(subOrig, CSUB_BLACKLIST) : false;
     b->append(CSUB_BLACKLIST, bl);
-    LM_T(LmtMongo, ("Subscription blacklist: %s", bl? "TRUE" : "FALSE"));
+    LM_T(LmtMongo, ("Subscription blacklist: %s", bl? "true" : "false"));
   }
 }
 

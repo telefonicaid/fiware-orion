@@ -370,5 +370,5 @@ void setBlacklist(const Subscription& sub, BSONObjBuilder* b)
 {
   bool bl = sub.notification.blacklist;
   b->append(CSUB_BLACKLIST, bl);
-  LM_T(LmtMongo, ("Subscription blacklist: %s", bl?"TRUE":"FALSE"));
+  LM_T(LmtMongo, ("Subscription blacklist: %s", bl ? "true" : "false"));
 }
