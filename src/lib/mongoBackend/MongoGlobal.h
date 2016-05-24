@@ -364,7 +364,8 @@ extern BSONArray processConditionVector
   const Restriction*               resP,
   const std::string&               status,
   const std::string&               fiwareCorrelator,
-  const std::vector<std::string>&  attrsFilter
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist = false
 );
 
 
@@ -391,7 +392,8 @@ extern BSONArray processConditionVector
   const Restriction*                 resP,
   const std::string&                 status,
   const std::string&                 fiwareCorrelator,
-  const std::vector<std::string>&    attrsOrder
+  const std::vector<std::string>&    attrsOrder,
+  bool                               blacklist = false
 );
 
 

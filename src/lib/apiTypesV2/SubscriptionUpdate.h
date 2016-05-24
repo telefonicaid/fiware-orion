@@ -38,6 +38,7 @@ namespace ngsiv2
     bool  notificationProvided;
     bool  attrsFormatProvided;
     bool  throttlingProvided;
+    bool  blacklistProvided;
 
     bool  fromNgsiv1;          // to support a special case when the SubscriptionUpdate comes from NGSIv1
 
@@ -48,6 +49,7 @@ namespace ngsiv2
       notificationProvided (false),
       attrsFormatProvided  (false),
       throttlingProvided   (false),
+      blacklistProvided    (false),
       fromNgsiv1           (false)
       {
         descriptionProvided = false;

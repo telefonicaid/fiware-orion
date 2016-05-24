@@ -685,7 +685,8 @@ void subCacheItemInsert
   const std::string&            q,
   const std::string&            geometry,
   const std::string&            coords,
-  const std::string&            georel
+  const std::string&            georel,
+  bool                          blacklist
 )
 {
   //
@@ -739,6 +740,7 @@ void subCacheItemInsert
   cSubP->expression.geometry   = geometry;
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
+  cSubP->blacklist             = blacklist;
 
   if (stringFilterP != NULL)
   {
@@ -824,7 +826,8 @@ void subCacheItemInsert
   const std::string&                 q,
   const std::string&                 geometry,
   const std::string&                 coords,
-  const std::string&                 georel
+  const std::string&                 georel,
+  bool                               blacklist
 )
 {
 
@@ -853,7 +856,8 @@ void subCacheItemInsert
                      q,
                      geometry,
                      coords,
-                     georel);
+                     georel,
+                     blacklist);
 
   enV.release();
   ncV.release();

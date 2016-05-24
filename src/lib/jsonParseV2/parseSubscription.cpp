@@ -508,7 +508,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       return r;
     }
 
-    subsP->notification.blackList = false;
+    subsP->notification.blacklist = false;
   }
   else if (notification.HasMember("exceptAttrs"))
   {
@@ -519,7 +519,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       return r;
     }
 
-    subsP->notification.blackList = true;
+    subsP->notification.blacklist = true;
   }
 
   // attrsFormat field

@@ -112,6 +112,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->status                = sub.hasField(CSUB_STATUS)?           getFieldF(sub, CSUB_STATUS).String().c_str()         : "active";
   cSubP->count                 = 0;
   cSubP->next                  = NULL;
+  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
 
   LM_T(LmtSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
 
@@ -326,6 +327,7 @@ int mongoSubCacheItemInsert
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
   cSubP->next                  = NULL;
+  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
 
   if (stringFilterP != NULL)
   {

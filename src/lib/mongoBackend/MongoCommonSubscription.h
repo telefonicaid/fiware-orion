@@ -168,4 +168,13 @@ extern void setExpression(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder
 extern void setFormat(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
 
 
+
+/* ****************************************************************************
+*
+* setBlacklist -
+*
+*/
+extern void setBlacklist(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
+
+
 #endif // SRC_LIB_MONGO_BACKEND_MONGOCOMMONSUBSCRIPTION_H

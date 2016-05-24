@@ -1098,6 +1098,7 @@ static bool addTriggeredSubscriptions_withCache
                                                            aList,
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant);
+    subP->blacklist = cSubP->blacklist;
 
     subP->fillExpression(cSubP->expression.geometry, cSubP->expression.coords, cSubP->expression.georel);
 
@@ -1280,6 +1281,8 @@ static bool addTriggeredSubscriptions_noCache
           getStringFieldF(sub, CSUB_REFERENCE),
           subToAttributeList(sub), "", "");
 
+      trigs->blacklist = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+
       if (sub.hasField(CSUB_EXPR))
       {
         BSONObj expr = getObjectFieldF(sub, CSUB_EXPR);
@@ -1378,7 +1381,8 @@ static bool processOnChangeConditionForUpdateContext
   std::string                      tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
-  const std::vector<std::string>&  attrsOrder
+  const std::vector<std::string>&  attrsOrder,
+  bool                             blacklist = false
 )
 {
   NotifyContextRequest   ncr;
@@ -1390,7 +1394,7 @@ static bool processOnChangeConditionForUpdateContext
   {
     ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
 
-    if (attrL.size() == 0)
+    if ((attrL.size() == 0) || (blacklist == true))
     {
       /* Empty attribute list in the subscription mean that all attributes are added */
       cer.contextElement.contextAttributeVector.push_back(caP);
@@ -1426,7 +1430,7 @@ static bool processOnChangeConditionForUpdateContext
   // FIXME: we use a proper origin name
   ncr.originator.set("localhost");
 
-  getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder);
+  getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, blacklist);
   return true;
 }
 
@@ -1500,7 +1504,9 @@ static bool processSubscriptions
                                                                 tenant,
                                                                 xauthToken,
                                                                 fiwareCorrelator,
-                                                                trigs->attrL.attributeV);
+                                                                trigs->attrL.attributeV,
+                                                                trigs->blacklist
+                                                                );
 
     if (notificationSent)
     {

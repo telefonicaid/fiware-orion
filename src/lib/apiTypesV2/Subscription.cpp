@@ -104,7 +104,15 @@ namespace ngsiv2
     {
       jh.addDate("lastNotification", this->lastNotification);
     }
-    jh.addRaw("attrs", vectorToJson(this->attributes));
+
+    if (!this->blacklist)
+    {
+      jh.addRaw("attrs", vectorToJson(this->attributes));
+    }
+    else
+    {
+      jh.addRaw("exceptAttrs", vectorToJson(this->attributes));
+    }
 
     jh.addString("attrsFormat", attrsFormat);
 

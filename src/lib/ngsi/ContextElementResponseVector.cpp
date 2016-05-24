@@ -76,14 +76,14 @@ std::string ContextElementResponseVector::render
 *
 * ContextElementResponseVector::toJson - 
 */
-std::string ContextElementResponseVector::toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter)
+std::string ContextElementResponseVector::toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist)
 {
   std::string out;
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     out += (renderFormat == NGSI_V2_VALUES)? "[": "{";
-    out += vec[ix]->toJson(renderFormat, attrsFilter);
+    out += vec[ix]->toJson(renderFormat, attrsFilter, blacklist);
     out += (renderFormat == NGSI_V2_VALUES)? "]": "}";
 
     if (ix != vec.size() - 1)

@@ -161,7 +161,7 @@ public:
          * actually created/sent */
     }
 
-    MOCK_METHOD7(sendNotifyContextRequest, void(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, RenderFormat renderFormat, const std::vector<std::string>&  attrsFilter));
+    MOCK_METHOD8(sendNotifyContextRequest, void(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, RenderFormat renderFormat, const std::vector<std::string>&  attrsFilter, bool blacklist));
     MOCK_METHOD5(sendNotifyContextAvailabilityRequest, void(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, const std::string& fiwareCorrelator, RenderFormat renderFormat));
 
     /* Wrappers for parent methods (used in ON_CALL() defaults set in the constructor) */

@@ -316,7 +316,8 @@ static void setCondsAndInitialNotifyNgsiv1
                                             &(sub.restriction),
                                             status,
                                             fiwareCorrelator,
-                                            sub.notification.attributes);
+                                            sub.notification.attributes,
+                                            sub.notification.blacklist);
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
@@ -499,7 +500,24 @@ static void setFormat(const SubscriptionUpdate& subUp, const BSONObj& subOrig, B
   }
 }
 
-
+/* ****************************************************************************
+*
+* setBlacklist -
+*
+*/
+static void setBlacklist(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
+{
+  if (subUp.blacklistProvided)
+  {
+    setBlacklist(subUp, b);
+  }
+  else
+  {
+    bool bl = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(subOrig, CSUB_BLACKLIST) : false;
+    b->append(CSUB_BLACKLIST, bl);
+    LM_T(LmtMongo, ("Subscription blacklist: %s", bl? "true" : "false"));
+  }
+}
 
 /* ****************************************************************************
 *
@@ -679,6 +697,7 @@ std::string mongoUpdateSubscription
   setStatus(subUp, subOrig, &b);
   setEntities(subUp, subOrig, &b);
   setAttrs(subUp, subOrig, &b);
+  setBlacklist(subUp, subOrig, &b);
   setCondsAndInitialNotify(subUp, subOrig, tenant, servicePathV, xauthToken, fiwareCorrelator,
                            &b, &notificationDone);
 

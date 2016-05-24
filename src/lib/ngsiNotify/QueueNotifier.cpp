@@ -61,14 +61,14 @@ int QueueNotifier::start()
 * QueueNotifier::sendNotifyContextRequest -
 */
 void QueueNotifier::sendNotifyContextRequest
-(
-  NotifyContextRequest*            ncr,
+(NotifyContextRequest*            ncr,
   const std::string&               url,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsOrder
+  const std::vector<std::string>&  attrsOrder,
+  bool blacklist
 )
 {
   ConnectionInfo ci;
@@ -111,7 +111,7 @@ void QueueNotifier::sendNotifyContextRequest
   }
 
   ci.outMimeType = JSON;
-  std::string payload = ncr->toJson(&ci, renderFormat, attrsOrder);
+  std::string payload = ncr->toJson(&ci, renderFormat, attrsOrder, blacklist);
 
   /* Parse URL */
   std::string  host;

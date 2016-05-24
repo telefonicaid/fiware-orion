@@ -413,7 +413,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -482,7 +482,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -545,7 +545,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -614,9 +614,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2),"http://notify4.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2),"http://notify4.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -693,9 +693,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2),"http://notify4.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2),"http://notify4.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -768,9 +768,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2),"http://notify4.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2),"http://notify4.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -841,7 +841,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -911,7 +911,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -977,7 +977,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1044,7 +1044,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify5.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify5.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1113,7 +1113,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify5.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify5.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1178,7 +1178,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify5.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify5.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1245,7 +1245,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchDisjoint)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1312,7 +1312,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatchDisjoint)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1379,7 +1379,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1431,7 +1431,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateNoMatch)
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1483,7 +1483,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendNoMatch)
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1534,7 +1534,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1584,7 +1584,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchWithoutChang
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1650,7 +1650,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1722,7 +1722,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMixMatchNoMatch)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1790,7 +1790,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1860,7 +1860,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notifica
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1933,7 +1933,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notifica
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2002,7 +2002,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notifica
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2070,7 +2070,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatch)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2141,7 +2141,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatch)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2207,7 +2207,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2275,7 +2275,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchDisjoint)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2343,7 +2343,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatchDisjoint)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2411,7 +2411,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2464,7 +2464,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateNoMatch)
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2515,7 +2515,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendNoMatch)
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2566,7 +2566,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2617,7 +2617,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchWithoutChang
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2683,7 +2683,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMixMatchNoMatch)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2755,7 +2755,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMixMatchNoMatch)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2823,7 +2823,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2893,7 +2893,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notifica
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2966,7 +2966,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notifica
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3035,7 +3035,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3100,7 +3100,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbQueryFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 

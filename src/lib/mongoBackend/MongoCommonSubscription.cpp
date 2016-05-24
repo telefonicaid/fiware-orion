@@ -296,7 +296,8 @@ void setCondsAndInitialNotify
                                             &(sub.restriction),
                                             status,
                                             fiwareCorrelator,
-                                            sub.notification.attributes);
+                                            sub.notification.attributes,
+                                            sub.notification.blacklist);
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
@@ -358,4 +359,16 @@ void setFormat(const Subscription& sub, BSONObjBuilder* b)
   std::string format = renderFormatToString(sub.attrsFormat);
   b->append(CSUB_FORMAT, format);
   LM_T(LmtMongo, ("Subscription format: %s", format.c_str()));
+}
+
+/* ****************************************************************************
+*
+* setBlacklist -
+*
+*/
+void setBlacklist(const Subscription& sub, BSONObjBuilder* b)
+{
+  bool bl = sub.notification.blacklist;
+  b->append(CSUB_BLACKLIST, bl);
+  LM_T(LmtMongo, ("Subscription blacklist: %s", bl ? "true" : "false"));
 }
