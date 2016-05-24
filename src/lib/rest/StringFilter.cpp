@@ -934,7 +934,7 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
     }
     else
     {
-      free(item);
+      delete item;
       free(toFree);
       return false;
     }
