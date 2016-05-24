@@ -85,7 +85,7 @@ static bool templateNotify
   std::map<std::string, std::string>  qs;
   std::map<std::string, std::string>  headers;
 
-  LM_W(("KZ: In templateNotify"));
+
   //
   // 1. Verb/Method
   //
@@ -95,20 +95,19 @@ static bool templateNotify
     verb = POST;
   }
   method = verbName(verb);
-  LM_W(("KZ: In templateNotify: method: '%s'", method.c_str()));
+
 
   //
   // 2. URL
   //
   macroSubstitute(&url, httpInfo.url, ce);
-  LM_W(("KZ: url: '%s'", url.c_str()));
+
 
   //
   // 3. Payload
   //
   if (httpInfo.payload == "")
   {
-    LM_W(("KZ: using default payload"));
     NotifyContextRequest   ncr;
     ContextElementResponse cer;
     
@@ -126,13 +125,10 @@ static bool templateNotify
     mimeType     = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
   }
 
-  LM_W(("KZ: In templateNotify: payload: '%s'", payload.c_str()));
-
 
   //
   // 4. URI Params (Query Strings)
   //
-  LM_W(("KZ: Adding URI Params"));
   for (std::map<std::string, std::string>::const_iterator it = httpInfo.qs.begin(); it != httpInfo.qs.end(); ++it)
   {
     std::string key   = it->first;
@@ -146,14 +142,12 @@ static bool templateNotify
       continue;
     }
     qs[key] = value;
-    LM_W(("KZ: Added URI Param '%s': '%s'", key.c_str(), value.c_str()));
   }
 
 
   //
   // 5. HTTP Headers
   //
-  LM_W(("KZ: Adding HTTP Headers"));
   for (std::map<std::string, std::string>::const_iterator it = httpInfo.headers.begin(); it != httpInfo.headers.end(); ++it)
   {
     std::string key   = it->first;
@@ -169,7 +163,6 @@ static bool templateNotify
     }
 
     headers[key] = value;
-    LM_W(("KZ: Added HTTP Header '%s': '%s'", key.c_str(), value.c_str()));
   }
 
 
@@ -193,11 +186,8 @@ static bool templateNotify
   //
   std::string  uri = uriPath;
 
-  LM_W(("KZ: Add URI params from template to uriPath?"));
   if (qs.size() != 0)
   {
-    LM_W(("KZ: Adding URI params from template to uriPath"));
-
     uri += "?";
 
     int ix = 0;
@@ -212,8 +202,6 @@ static bool templateNotify
       ++ix;
     }
   }
-  else
-    LM_W(("KZ: NOT adding URI params from template to uriPath"));
 
 
   //
@@ -224,7 +212,6 @@ static bool templateNotify
   std::string  out;
   int          r;
 
-  LM_W(("KZ: uri: '%s'", uri.c_str()));
   r = httpRequestSend(host,
                       port,
                       protocol,
@@ -292,8 +279,6 @@ void* sendNotifyContextRequestAsPerTemplate(void* p)
 {
   NotificationAsTemplateParams* paramP = (NotificationAsTemplateParams*) p;
 
-  LM_W(("KZ: In sendNotifyContextRequestAsPerTemplate"));
-
   for (unsigned int ix = 0; ix < paramP->ncrP->contextElementResponseVector.size(); ++ix)
   {
     templateNotify(paramP->ncrP->subscriptionId,
@@ -354,7 +339,6 @@ void Notifier::sendNotifyContextRequest
     // Redirect to the method sendNotifyContextRequestAsPerTemplate() when 'httpInfo.extended' is TRUE.
     // 'httpInfo.extended' is FALSE by default and set to TRUE by the json parser.
     //
-    LM_W(("KZ: httpInfo.extended == '%s'", httpInfo.extended? "true" : "false"));
     if (httpInfo.extended)
     {
       NotificationAsTemplateParams* paramP = new NotificationAsTemplateParams();
@@ -382,7 +366,6 @@ void Notifier::sendNotifyContextRequest
     }
 
 
-    LM_W(("KZ: Sending non-extended Notification"));
     //
     // Creating the value of the Fiware-ServicePath HTTP header.
     // This is a comma-separated list of the service-paths in the same order as the entities come in the payload

@@ -49,7 +49,6 @@ extern std::string postSubscriptions
   SubscribeContextResponse  scr;
   std::string               answer;
 
-  LM_W(("KZ: In postSubscriptions. extended == %s", (parseDataP->subsV2.notification.httpInfo.extended)? "true" : "false"));
   if (ciP->servicePathV.size() > 1)
   {
     const size_t  MSG_SIZE        = 96;  // strlen(msg) + enough room for digits

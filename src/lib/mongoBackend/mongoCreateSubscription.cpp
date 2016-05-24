@@ -123,7 +123,6 @@ std::string mongoCreateSubscription
 {
   bool reqSemTaken = false;
 
-  LM_W(("KZ: In mongoCreateSubscription. extended == %s", (sub.notification.httpInfo.extended)? "true" : "false"));
   reqSemTake(__FUNCTION__, "ngsiv2 create subscription request", SemWriteOp, &reqSemTaken);
 
   // Build the BSON object to insert
@@ -143,7 +142,6 @@ std::string mongoCreateSubscription
   setAttrs(sub, &b);
 
   std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
-  LM_W(("KZ: calling setCondsAndInitialNotify. sub.notification.httpInfo.extended == %s", (sub.notification.httpInfo.extended)? "true" : "false"));
   setCondsAndInitialNotify(sub, subId, status, sub.notification.httpInfo, sub.attrsFormat,
                            tenant, servicePathV, xauthToken, fiwareCorrelator,
                            &b, &notificationDone);
@@ -163,7 +161,6 @@ std::string mongoCreateSubscription
   std::string err;
   if (!collectionInsert(getSubscribeContextCollectionName(tenant), doc, &err))
   {
-    LM_W(("KZ: collectionInsert failed"));
     reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);
     oe->fill(SccReceiverInternalError, err);
     return "";
@@ -171,7 +168,6 @@ std::string mongoCreateSubscription
 
   if (!noCache)
   {
-    LM_W(("KZ: In mongoCreateSubscription. sending httpInfo to sub-cache (extended == %s)", (sub.notification.httpInfo.extended)? "true" : "false"));
     insertInCache(sub, subId, tenant, servicePath, notificationDone, lastNotification);
   }
 

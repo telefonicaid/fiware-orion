@@ -1019,8 +1019,6 @@ static bool addTriggeredSubscriptions_withCache
   std::string                       servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::vector<CachedSubscription*>  subVec;
 
-  LM_W(("KZ: Adding a TriggeredSubscription? (%d items in vector)", subVec.size()));
-
   cacheSemTake(__FUNCTION__, "match subs for notifications");
   subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
@@ -1034,7 +1032,6 @@ static bool addTriggeredSubscriptions_withCache
     if (cSubP->expirationTime < now)
     {
       LM_T(LmtSubCache, ("%s is EXPIRED (EXP:%lu, NOW:%lu, DIFF: %d)", cSubP->subscriptionId, cSubP->expirationTime, now, now - cSubP->expirationTime));
-      LM_W(("KZ: Nope - expired"));
       continue;
     }
 
@@ -1042,7 +1039,6 @@ static bool addTriggeredSubscriptions_withCache
     if (cSubP->status == STATUS_INACTIVE)
     {
       LM_T(LmtSubCache, ("%s is INACTIVE", cSubP->subscriptionId));
-      LM_W(("KZ: Nope - inactive"));
       continue;
     }
 
@@ -1073,7 +1069,6 @@ static bool addTriggeredSubscriptions_withCache
                            now,
                            now - cSubP->lastNotificationTime,
                            cSubP->throttling));
-        LM_W(("KZ: Nope - throttling"));
         continue;
       }
       else
@@ -1098,7 +1093,6 @@ static bool addTriggeredSubscriptions_withCache
                          cSubP->throttling));
     }
 
-    LM_W(("KZ: creating the TriggeredSubscription for '%s'", cSubP->httpInfo.url.c_str()));
     TriggeredSubscription* subP = new TriggeredSubscription((long long) cSubP->throttling,
                                                            (long long) cSubP->lastNotificationTime,
                                                            cSubP->renderFormat,

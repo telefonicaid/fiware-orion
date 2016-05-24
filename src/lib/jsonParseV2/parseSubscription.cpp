@@ -424,7 +424,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       }
       subsP->notification.httpInfo.url      = urlOpt.value;
       subsP->notification.httpInfo.extended = false;
-      LM_W(("KZ: httpInfo.extended set to FALSE"));
     }
   }
   else if (notification.HasMember("httpExtended"))
@@ -532,7 +531,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     subsP->notification.httpInfo.extended = true;
-    LM_W(("KZ: httpInfo.extended set to TRUE (httpInfo at %p)", &subsP->notification.httpInfo));
   }
   else  // missing callback field
   {

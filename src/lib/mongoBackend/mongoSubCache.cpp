@@ -65,7 +65,6 @@ using namespace mongo;
 */
 int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 {
-  LM_W(("In mongoSubCacheItemInsert"));
   //
   // 01. Check validity of subP parameter 
   //
@@ -424,7 +423,6 @@ int mongoSubCacheItemInsert
 */
 void mongoSubCacheRefresh(const std::string& database)
 {
-  LM_W(("KZ: In mongoSubCacheRefresh"));
   LM_T(LmtSubCache, ("Refreshing subscription cache for DB '%s'", database.c_str()));
 
   BSONObj                   query       = BSON("conditions.type" << ON_CHANGE_CONDITION);
@@ -438,7 +436,6 @@ void mongoSubCacheRefresh(const std::string& database)
   DBClientBase* connection = getMongoConnection();
   if (collectionQuery(connection, collection, query, &cursor, &errorString) != true)
   {
-    LM_W(("KZ: In mongoSubCacheRefresh: collectionQuery gave false"));
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     return;
@@ -446,20 +443,17 @@ void mongoSubCacheRefresh(const std::string& database)
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   int subNo = 0;
-  LM_W(("KZ: In mongoSubCacheRefresh: loop over cursor"));
   while (moreSafe(cursor))
   {
     BSONObj      sub;
     std::string  err;
 
-    LM_W(("KZ: In mongoSubCacheRefresh: in loop"));
     if (!nextSafeOrErrorF(cursor, &sub, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
 
-    LM_W(("KZ: In mongoSubCacheRefresh: calling mongoSubCacheItemInsert"));
     int r = mongoSubCacheItemInsert(tenant.c_str(), sub);
 
     if (r == 0)
@@ -470,7 +464,6 @@ void mongoSubCacheRefresh(const std::string& database)
   releaseMongoConnection(connection);
 
   LM_T(LmtSubCache, ("Added %d subscriptions for database '%s'", subNo, database.c_str()));
-  LM_W(("KZ: In mongoSubCacheRefresh: FROM"));
 }
 
 

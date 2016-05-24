@@ -132,7 +132,6 @@ std::string jsonRequestTreat
 
   case IndividualSubscriptionRequest:
     answer = parseSubscription(ciP, &parseDataP->subsV2, true);  // NOTE: partial == true
-    LM_W(("httpInfo.extended: %s", parseDataP->subsV2.notification.httpInfo.extended? "true" : "false"));
     if (answer != "OK")
     {
       return answer;
