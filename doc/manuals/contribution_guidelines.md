@@ -403,7 +403,7 @@ xyzInit(user,   pwd  host);
 If a header file contains this construct then all source files that include the header file,
 directly or indirectly are forced to have that construct as well.
 
-*How to check*: easily added to the internal script ```scripts/style_check.sh```, using an intelligent ```grep```.
+*How to check*: using an intelligent ```grep```.
 
 ### ‘SHOULD follow’ rules:
 
