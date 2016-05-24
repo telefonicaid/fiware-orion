@@ -554,7 +554,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     And verify that entity types returned in response are: "home"
     And verify that attributes types are returned in response based on the info in the recorder
 
-  @types_empty_list @BUG_2115 @skip
+  @types_empty_list @BUG_2115
   Scenario: get entities type using NGSI v2 without any entity types (empty list)
     Given  a definition of headers
       | parameter          | value               |

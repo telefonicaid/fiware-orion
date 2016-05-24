@@ -37,11 +37,11 @@
 *
 * renderFormatToString - 
 */
-const char* renderFormatToString(RenderFormat format, bool noDefault)
+const char* renderFormatToString(RenderFormat format, bool noDefault, bool useLegacyWord)
 {
   switch (format)
   {
-  case NGSI_V1_LEGACY:              return "JSON";
+  case NGSI_V1_LEGACY:              return useLegacyWord ? "legacy" : "JSON";
   case NGSI_V2_NORMALIZED:          return "normalized";
   case NGSI_V2_KEYVALUES:           return "keyValues";
   case NGSI_V2_VALUES:              return "values";
@@ -53,7 +53,7 @@ const char* renderFormatToString(RenderFormat format, bool noDefault)
     }
     else
     {
-      return "JSON";
+      return useLegacyWord ? "legacy" : "JSON";
     }
   }
 

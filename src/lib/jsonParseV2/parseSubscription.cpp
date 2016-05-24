@@ -212,29 +212,6 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     subsP->throttling = 0; // Default value if not provided at creation => no throttling
   }
 
-  // attrsFormat field
-  Opt<std::string>  attrsFormatOpt = getStringOpt(document, "attrsFormat");
-  if (!attrsFormatOpt.ok())
-  {
-    return badInput(ciP, attrsFormatOpt.error);
-  }
-  else if (attrsFormatOpt.given)
-  {
-    std::string   attrsFormatString = attrsFormatOpt.value;
-    RenderFormat  nFormat           = stringToRenderFormat(attrsFormatString, true);
-
-    if (nFormat == NO_FORMAT)
-    {
-      return badInput(ciP, "invalid attrsFormat (accepted values: legacy, normalized, keyValues, values)");
-    }
-    subsP->attrsFormatProvided = true;
-    subsP->attrsFormat = nFormat;
-  }
-  else if (!update) // Default value for creation
-  {
-    subsP->attrsFormat = DEFAULT_RENDER_FORMAT;  // Default format for NGSIv2: normalized
-  }
-
   return "OK";
 }
 
@@ -545,7 +522,31 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     subsP->notification.blacklist = true;
   }
 
-   return "";
+  // attrsFormat field
+  Opt<std::string>  attrsFormatOpt = getStringOpt(notification, "attrsFormat");
+  if (!attrsFormatOpt.ok())
+  {
+    return badInput(ciP, attrsFormatOpt.error);
+  }
+  else if (attrsFormatOpt.given)
+  {
+    std::string   attrsFormatString = attrsFormatOpt.value;
+    RenderFormat  nFormat           = stringToRenderFormat(attrsFormatString, true);
+
+    if (nFormat == NO_FORMAT)
+    {
+      return badInput(ciP, "invalid attrsFormat (accepted values: legacy, normalized, keyValues, values)");
+    }
+    subsP->attrsFormatProvided = true;
+    subsP->attrsFormat = nFormat;
+  }
+  else // Default value for creation
+  {
+    subsP->attrsFormatProvided = true;
+    subsP->attrsFormat = DEFAULT_RENDER_FORMAT;  // Default format for NGSIv2: normalized
+  }
+
+  return "";
 }
 
 /* ****************************************************************************

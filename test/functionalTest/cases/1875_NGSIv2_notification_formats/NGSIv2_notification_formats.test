@@ -137,9 +137,9 @@ payload='
     "http": {
       "url": "http://localhost:'$LISTENER_PORT'/notify"
     },
-    "attrs": [ "A1", "A4", "sub3_with_normalized" ]
-  },
-  "attrsFormat": "normalized",
+    "attrs": [ "A1", "A4", "sub3_with_normalized" ],
+    "attrsFormat": "normalized"
+  },  
   "expires": "2050-04-05T14:00:00.00Z"
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -166,9 +166,9 @@ payload='
     "http": {
       "url": "http://localhost:'$LISTENER_PORT'/notify"
     },
-    "attrs": [ "A1", "A5", "sub4_with_keyValues" ]
-  },
-  "attrsFormat": "keyValues",
+    "attrs": [ "A1", "A5", "sub4_with_keyValues" ],
+    "attrsFormat": "keyValues"
+  },  
   "expires": "2050-04-05T14:00:00.00Z"
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -195,9 +195,9 @@ payload='
     "http": {
       "url": "http://localhost:'$LISTENER_PORT'/notify"
     },
-    "attrs": [ "A1", "A6", "sub5_with_values" ]
-  },
-  "attrsFormat": "values",
+    "attrs": [ "A1", "A6", "sub5_with_values" ],
+    "attrsFormat": "values"
+  },  
   "expires": "2050-04-05T14:00:00.00Z"
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -223,9 +223,14 @@ echo
 
 echo "09. Update sub2, setting attrsFormat to keyValues"
 echo "================================================="
-payload='
-{
-  "attrsFormat": "keyValues"
+payload='{
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [ "A1", "A3", "sub2_without_attrsFormat" ],
+    "attrsFormat": "keyValues"
+  }
 }'
 orionCurl --url /v2/subscriptions/$sub2 -X PATCH --payload "$payload"
 echo
