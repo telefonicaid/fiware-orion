@@ -1,4 +1,13 @@
-# Deleting entities
+# Deleting entities (using NGSIv2)
+
+Entities can be deleted using `DELETE /v2/entities/{id}` (in the case the entity id
+identifies univocally the entity) or `DELETE /v2/entities/{id}?type={entityType}`
+(in the case the type is needed to identify the entity).
+
+You can also use the batch operation `POST /op/update` to remove entities, using
+`actionType` DELETE.
+
+# Deleting entities (using NGSIv1)
 
 Apart from [deleting individual attributes from a given entity](append_and_delete.md),
 you can also delete an entire entity, including all its attributes with

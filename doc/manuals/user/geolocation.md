@@ -1,4 +1,13 @@
-# Geolocation capabilities
+# Geolocation capabilities (using NGSIv2)
+
+NGSIv2 allows to filter by geographical location, e.g. all the entities located
+closer than 15 km to Madrid center. Of course, it needs properly located entities.
+
+Both topics (entity location and geographical queries) are dealt in detail in
+the "Geospacial properties of entities" and "Geographical Queries" sections of the
+[NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
+
+# Geolocation capabilities (using NGSIv1)
 
 Orion Context Broker has several capabilities related to geolocation
 that are described in this section.
@@ -450,11 +459,11 @@ be Alcobendas.
 EOF
 ```
 
-## Geo-located queries NGSIv2
+## Geo-located queries NGSIv2 using NGSIv1 syntax
 
-The [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/) defines a Geographical Query
-languague (based on `georel`, `geometry` and `coords` fields) that can be used also in NGSIv1 with the
-FIWARE::Location::NGSIv2 scope, e.g.:
+The [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable) defines a Geographical Query
+language (based on `georel`, `geometry` and `coords` fields) that can be used also in NGSIv1 with the
+`FIWARE::Location::NGSIv2` scope, e.g.:
 
 ```
 (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \

@@ -1,6 +1,10 @@
 # HTTP and NGSI response codes
 
-Two independent response codes are being considered in the API
+The HTTP and NGSI response codes distinction described in this section
+only applies to NGSIv1. NGSIv2 adopts a simpler approach which only
+uses the HTTP response code.
+
+Two independent response codes are being considered in the NGSIv1 API
 responses: one "internal" at NGSI level (i.e. encoded in the REST HTTP
 response payload) and other "external" at HTTP level (the HTTP response
 code itself). Note that this manual focuses on the NGSI aspects of the

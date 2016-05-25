@@ -11,7 +11,7 @@
 	  * [Entity Creation](#entity-creation)
 	  * [Query Context operation](#query-context-operation)
 	  * [Update Context elements](#update-context-elements)
-	  * [Context Subscriptions](#context-subscriptions)
+          * [Context Subscriptions](#context-subscriptions)
 	  * [Summary of NGSI10 standard operations URLs](#summary-of-ngsi10-standard-operations-urls)
     * [NGSI10 convenience operations](#ngsi10-convenience-operations)
 	  * [Convenience Entity Creation](#convenience-entity-creation)
@@ -35,6 +35,10 @@
 	  * [Summary of NGSI9 convenience operations URLs](#summary-of-ngsi9-convenience-operations-urls) 
 
 ## Introduction
+
+Note that there is also a [NGSIv2 version of this walkthrough](walkthrough_apiv2.md). In general, you should use NGSIv2
+(i.e. the other document), except if you need context management availability functionality (aka NGSI9), not
+yet developed in NGSIv2. In the case of doubt, you should use NGSIv2.
 
 This walkthrough adopts a practical approach that we hope will help our
 readers to get familiar with the Orion Context Broker and have some fun
@@ -74,7 +78,7 @@ information). Some remarks to take into account in order to use this stuff:
 It is recommended to get familiar with the theoretical concepts on which
 the NGSI model is based before starting. E.g. entities, attributes, etc.
 Have a look at the FIWARE documentation about this, e.g. [this public
-presentation](http://bit.l/fiware-orion).
+presentation](http://bit.ly/fiware-orion).
 
 [Top](#top)
 
@@ -943,9 +947,8 @@ Before starting to play with feature, [start the accumulator
 server](#starting-accumulator-server-for-the-tutorials) to
 capture notifications.
 
-ONCHANGE subscriptions are used when you want to be notified not when a
-given time interval has passed but when some attribute changes. Let's
-consider the following example:
+Subscriptions are used when you want to be notified when some
+attribute changes. Let's consider the following example:
 
 ```
 (curl localhost:1026/v1/subscribeContext -s -S --header 'Content-Type: application/json' \
