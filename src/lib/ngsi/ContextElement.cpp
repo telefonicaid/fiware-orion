@@ -113,14 +113,17 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
 *
 * ContextElement::toJson - 
 */
-std::string ContextElement::toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist)
+std::string ContextElement::toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist) const
 {
   std::string out;
 
   if (renderFormat != NGSI_V2_VALUES)
   {
     out += entityId.toJson();
-    out += ",";
+    if (contextAttributeVector.size() != 0)
+    {
+      out += ",";
+    }
   }
 
   if (contextAttributeVector.size() != 0)

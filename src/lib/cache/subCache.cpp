@@ -488,12 +488,6 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
     cSubP->subscriptionId = NULL;
   }
 
-  if (cSubP->reference != NULL)
-  {
-    free(cSubP->reference);
-    cSubP->reference = NULL;
-  }
-
   for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
   {
     cSubP->entityIdInfos[ix]->release();
@@ -728,7 +722,6 @@ void subCacheItemInsert
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->servicePath           = strdup(servicePath);
   cSubP->subscriptionId        = strdup(subscriptionId);
-  cSubP->reference             = strdup(httpInfo.url.c_str());  // FIXME: CachedSubscription soon will have HttpInfo as well
   cSubP->expirationTime        = expirationTime;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
@@ -741,6 +734,7 @@ void subCacheItemInsert
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
   cSubP->blacklist             = blacklist;
+  cSubP->httpInfo              = httpInfo;
 
   if (stringFilterP != NULL)
   {
@@ -1070,7 +1064,7 @@ void subCacheRefresh(void)
                             cSubP->throttling,
                             cSubP->expirationTime,
                             cSubP->lastNotificationTime,
-                            cSubP->reference,
+                            cSubP->httpInfo.url,
                             cSubP->entityIdInfos.size(),
                             cSubP->attributes.size(),
                             cSubP->notifyConditionVector.size()));

@@ -130,7 +130,7 @@ static void setSubject(Subscription* s, const BSONObj& r)
 *
 * setNotification -
 */
-static void setNotification(Subscription* s, const BSONObj& r, const std::string& tenant)
+static void setNotification(Subscription* subP, const BSONObj& r, const std::string& tenant)
 {
   // Attributes
   std::vector<BSONElement> attrs = getFieldF(r, CSUB_ATTRS).Array();
@@ -138,27 +138,32 @@ static void setNotification(Subscription* s, const BSONObj& r, const std::string
   {
     std::string attr = attrs[ix].String();
 
-    s->notification.attributes.push_back(attr);
+    subP->notification.attributes.push_back(attr);
   }
 
-  s->notification.httpInfo.url     = getStringFieldF(r, CSUB_REFERENCE);
-  s->throttling                    = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(r, CSUB_THROTTLING)       : -1;
-  s->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(r, CSUB_LASTNOTIFICATION) : -1;
-  s->notification.timesSent        = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : -1;
-  s->notification.blacklist        = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(r, CSUB_BLACKLIST)                   : false;
+  subP->notification.httpInfo.fill(r);
+
+  subP->throttling                    = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(r, CSUB_THROTTLING)       : -1;
+  subP->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(r, CSUB_LASTNOTIFICATION) : -1;
+  subP->notification.timesSent        = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : -1;
+  subP->notification.blacklist        = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(r, CSUB_BLACKLIST)                   : false;
 
   // Attributes format
-  s->attrsFormat = r.hasField(CSUB_FORMAT) ? stringToRenderFormat(getStringFieldF(r, CSUB_FORMAT)) : NGSI_V1_LEGACY;
+  subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(r, CSUB_FORMAT)) : NGSI_V1_LEGACY;
+
 
   //
   // Check values from subscription cache, update object from cache-values if necessary
   //
-  CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), s->id.c_str());
+  // NOTE: only 'lastNotificationTime' and 'count'
+  //
+  cacheSemTake(__FUNCTION__, "get lastNotification and count");
+  CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), subP->id.c_str());
   if (cSubP)
   {
-    if (cSubP->lastNotificationTime > s->notification.lastNotification)
+    if (cSubP->lastNotificationTime > subP->notification.lastNotification)
     {
-      s->notification.lastNotification = cSubP->lastNotificationTime;
+      subP->notification.lastNotification = cSubP->lastNotificationTime;
     }
 
     if (cSubP->count != 0)
@@ -166,14 +171,15 @@ static void setNotification(Subscription* s, const BSONObj& r, const std::string
       //
       // First, compensate for -1 in 'timesSent'
       //
-      if (s->notification.timesSent == -1)
+      if (subP->notification.timesSent == -1)
       {
-        s->notification.timesSent = 0;
+        subP->notification.timesSent = 0;
       }
 
-      s->notification.timesSent += cSubP->count;
+      subP->notification.timesSent += cSubP->count;
     }
   }
+  cacheSemGive(__FUNCTION__, "get lastNotification and count");
 }
 
 

@@ -27,6 +27,7 @@
 #include <sstream>
 
 #include "logMsg/logMsg.h"
+#include "apiTypesV2/HttpInfo.h"
 #include "common/RenderFormat.h"
 #include "mongoBackend/TriggeredSubscription.h"
 
@@ -38,18 +39,18 @@
 */
 TriggeredSubscription::TriggeredSubscription
 (
-  long long            _throttling,
-  long long            _lastNotification,
-  RenderFormat         _renderFormat,
-  const std::string&   _reference,
-  const AttributeList& _attrL,
-  const std::string&   _cacheSubId,
-  const char*          _tenant
+  long long                _throttling,
+  long long                _lastNotification,
+  RenderFormat             _renderFormat,
+  const ngsiv2::HttpInfo&  _httpInfo,
+  const AttributeList&     _attrL,
+  const std::string&       _cacheSubId,
+  const char*              _tenant
 ):
   throttling              (_throttling),
   lastNotification        (_lastNotification),
   renderFormat            (_renderFormat),
-  reference               (_reference),
+  httpInfo                (_httpInfo),
   attrL                   (_attrL),
   cacheSubId              (_cacheSubId),
   tenant                  ((_tenant == NULL)? "" : _tenant),
@@ -67,14 +68,14 @@ TriggeredSubscription::TriggeredSubscription
 */
 TriggeredSubscription::TriggeredSubscription
 (
-  RenderFormat         _renderFormat,
-  const std::string&   _reference,
-  const AttributeList& _attrL
+  RenderFormat             _renderFormat,
+  const ngsiv2::HttpInfo&  _httpInfo,
+  const AttributeList&     _attrL
 ):
   throttling              (-1),
   lastNotification        (-1),
   renderFormat            (_renderFormat),
-  reference               (_reference),
+  httpInfo                (_httpInfo),
   attrL                   (_attrL),
   cacheSubId              (""),
   tenant                  (""),
@@ -128,7 +129,7 @@ std::string TriggeredSubscription::toString(const std::string& delimiter)
 {
   std::stringstream ss;
 
-  ss << throttling << delimiter << lastNotification << delimiter << renderFormatToString(renderFormat) << delimiter << reference;  
+  ss << throttling << delimiter << lastNotification << delimiter << renderFormatToString(renderFormat) << delimiter << httpInfo.url;
   ss << expression.georel << delimiter << expression.coords << delimiter << expression.geometry << delimiter;
 
   return ss.str();

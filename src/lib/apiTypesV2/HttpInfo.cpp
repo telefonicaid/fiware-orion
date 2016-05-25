@@ -25,11 +25,15 @@
 #include <string>
 #include <map>
 
+#include "mongo/client/dbclient.h"
 #include "logMsg/logMsg.h"
 
 #include "common/JsonHelper.h"
+#include "mongoBackend/dbConstants.h"
+#include "mongoBackend/safeMongo.h"
 #include "apiTypesV2/HttpInfo.h"
 
+using namespace mongo;
 
 
 namespace ngsiv2
@@ -47,6 +51,16 @@ HttpInfo::HttpInfo() : verb(NOVERB), extended(false)
 
 /* ****************************************************************************
 *
+* HttpInfo::HttpInfo - 
+*/
+HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(NOVERB), extended(false)
+{
+}
+
+
+
+/* ****************************************************************************
+*
 * HttpInfo::toJson -
 */
 std::string HttpInfo::toJson()
@@ -55,7 +69,78 @@ std::string HttpInfo::toJson()
 
   jh.addString("url", this->url);
 
+  if (extended)
+  {
+    if (this->payload != "")
+    {
+      jh.addString("payload", this->payload);
+    }
+
+    if (this->verb != NOVERB)
+    {
+      jh.addString("method", verbName(this->verb));
+    }
+
+    if (qs.size() != 0)
+    {
+      jh.addRaw("qs", objectToJson(qs));
+    }
+
+    if (headers.size() != 0)
+    {
+      jh.addRaw("headers", objectToJson(headers));
+    }
+  }
+
   return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* HttpInfo::fill -
+*/
+void HttpInfo::fill(const BSONObj& bo)
+{
+  this->url      = bo.hasField(CSUB_REFERENCE)? getStringFieldF(bo, CSUB_REFERENCE) : "";
+  this->extended = bo.hasField(CSUB_EXTENDED)? getBoolFieldF(bo, CSUB_EXTENDED)  : false;
+
+  if (this->extended)
+  {
+    this->payload  = bo.hasField(CSUB_PAYLOAD)? getStringFieldF(bo, CSUB_PAYLOAD) : "";
+
+    if (bo.hasField(CSUB_METHOD))
+    {
+      this->verb = str2Verb(getFieldF(bo, CSUB_METHOD).String());
+    }
+
+    // qs
+    if (bo.hasField(CSUB_QS))
+    {
+      BSONObj qs = getFieldF(bo, CSUB_QS).Obj();
+
+      for (BSONObj::iterator i = qs.begin(); i.more();)
+      {
+        BSONElement e = i.next();
+
+        this->qs[e.fieldName()] = e.String();
+      }
+    }
+
+    // headers
+    if (bo.hasField(CSUB_HEADERS))
+    {
+      BSONObj headers = getFieldF(bo, CSUB_HEADERS).Obj();
+
+      for (BSONObj::iterator i = headers.begin(); i.more();)
+      {
+        BSONElement e = i.next();
+
+        this->headers[e.fieldName()] = e.String();
+      }
+    }
+  }
 }
 
 }

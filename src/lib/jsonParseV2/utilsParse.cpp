@@ -22,18 +22,19 @@
 *
 * Author: Orion dev team
 */
-
 #include "rapidjson/document.h"
 
 #include "utilsParse.h"
 
 using namespace rapidjson;
-
 using std::string;
 
-/*
- * getStringAux
- */
+
+
+/* ****************************************************************************
+*
+* getStringAux - 
+*/
 static Opt<string> getStringAux(const Value& parent, const char* field, const string& description, bool optional)
 {
   if (parent.HasMember(field))
@@ -50,14 +51,15 @@ static Opt<string> getStringAux(const Value& parent, const char* field, const st
   {
      return Opt<string>((!description.empty() ? description : field) + " is missing");
   }
+
   return Opt<string>("", false);
 }
 
 
-
-/*
- * getStringMust -  get a mandatory string from the rapidjson node
- */
+/* ****************************************************************************
+*
+* getStringMust - get a mandatory string from the rapidjson node
+*/
 extern Opt<string> getStringMust(const rapidjson::Value& parent, const char* field, const std::string& description)
 {
   return getStringAux(parent, field, description, false);
@@ -65,19 +67,21 @@ extern Opt<string> getStringMust(const rapidjson::Value& parent, const char* fie
 
 
 
-/*
- * getStringOpt - get a optional string from the rapidjson node
- */
+/* ****************************************************************************
+*
+* getStringOpt - get a optional string from the rapidjson node
+*/
 extern Opt<string> getStringOpt(const rapidjson::Value& parent, const char* field, const std::string& description)
 {
-  return  getStringAux(parent, field, description, true);
+  return getStringAux(parent, field, description, true);
 }
 
 
 
-/*
- * getInt64Aux
- */
+/* ****************************************************************************
+*
+* getInt64Aux - 
+*/
 static Opt<int64_t> getInt64Aux(const Value& parent, const char* field, const string& description, bool optional)
 {
   if (parent.HasMember(field))
@@ -92,16 +96,17 @@ static Opt<int64_t> getInt64Aux(const Value& parent, const char* field, const st
   }
   else if (!optional)
   {
-     return Opt<int64_t>((!description.empty() ? description : field) + " is missing");
+    return Opt<int64_t>((!description.empty() ? description : field) + " is missing");
   }
+
   return Opt<int64_t>(0, false);
 }
 
 
-
-/*
- * getInt64Must - get a mandatory int64_t from the rapidjson node
- */
+/* ****************************************************************************
+*
+* getInt64Must - get a mandatory int64_t from the rapidjson node
+*/
 extern Opt<int64_t> getInt64Must(const rapidjson::Value& parent, const char* field, const std::string& description)
 {
   return getInt64Aux(parent, field, description, false);
@@ -109,10 +114,11 @@ extern Opt<int64_t> getInt64Must(const rapidjson::Value& parent, const char* fie
 
 
 
-/*
- * getInt64Opt - get a optional int64_t from the rapidjson node
- */
-extern Opt<int64_t> getInt64Opt(const rapidjson::Value& parent, const char* field, const std::string& description) {
-  return  getInt64Aux(parent, field, description, true);
+/* ****************************************************************************
+*
+* getInt64Opt - get a optional int64_t from the rapidjson node
+*/
+extern Opt<int64_t> getInt64Opt(const rapidjson::Value& parent, const char* field, const std::string& description)
+{
+  return getInt64Aux(parent, field, description, true);
 }
-

@@ -118,6 +118,7 @@ static void* workerFunc(void* pSyncQ)
       std::string  out;
       int          r;
 
+      std::map<std::string, std::string> noHeaders;
       r =  httpRequestSendWithCurl(curl,
                                    params->ip,
                                    params->port,
@@ -133,7 +134,8 @@ static void* workerFunc(void* pSyncQ)
                                    params->renderFormat,
                                    true,
                                    NOTIFICATION_WAIT_MODE,
-                                   &out);
+                                   &out,
+                                   noHeaders);
 
       //
       // FIXME: ok and error counter should be incremented in the other notification modes (generalizing the concept, i.e.

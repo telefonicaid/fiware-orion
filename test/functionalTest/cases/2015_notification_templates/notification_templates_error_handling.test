@@ -1,0 +1,472 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Error Handling for Notification Templates
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create subscription for E1 with empty template part - see error
+# 02. Create subscription for E1 with everything except URL in template part - see error
+# 03. Create subscription for E1 with URL and invalid VERB in template part - see error
+# 04. Create subscription for E1 without URL in http-part - see error
+# 05. Create subscription for E1 without http-part nor template part - see error
+# 06. Create subscription for E1 with both http-part and template part - see error
+# 07. Create subscription for E1 with forbidden chars in http:url - see error
+# 08. Create subscription for E1 with forbidden chars in template:url - see error
+# 09. Create subscription for E1 with forbidden chars in template:payload - see error
+# 10. Create subscription for E1 with forbidden chars in template:qs - see error
+# 11. Create subscription for E1 with forbidden chars in template:headers - see error
+#
+
+echo "01. Create subscription for E1 with empty template part - see error"
+echo "==================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create subscription for E1 with everything except URL in template part - see error"
+echo "======================================================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+      "method": "PUT",
+      "payload": "{ \"A1\": \"${A1}\", \"A2\": \"${A2}\", \"A3\": \"${A3}\" }",
+      "qs":       { "id": "${id}", "type": "${type}", "a1": "${A1}", "a2": "${A2}", "a3": "${A3}" },
+      "headers":  { "entity-id": "${id}", "entity-type": "${type}", "A1": "${A1}", "A2": "${A2}", "A3": "${A3}" }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create subscription for E1 with URL and invalid VERB in template part - see error"
+echo "====================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/${NOTIFY_URL}",
+      "method": "PUTTY"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Create subscription for E1 without URL in http-part - see error"
+echo "==================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "http": {
+      "abc": "123"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. Create subscription for E1 without http-part nor template part - see error"
+echo "=============================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": { }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "06. Create subscription for E1 with both http-part and template part - see error"
+echo "================================================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/${NOTIFY_URL}"
+    },
+    "httpExtended": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/${NOTIFY_URL}"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "07. Create subscription for E1 with forbidden chars in http:url - see error"
+echo "==========================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://127.0.0.1:1234/()"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "08. Create subscription for E1 with forbidden chars in template:url - see error"
+echo "==============================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+      "url": "http://127.0.0.1:1234/()"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "09. Create subscription for E1 with forbidden chars in template:payload - see error"
+echo "==================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+      "url":     "http://127.0.0.1:1234/notify",
+      "payload": "{ \"a1\": \"()\" }"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "10. Create subscription for E1 with forbidden chars in template:qs - see error"
+echo "=============================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+      "url":      "http://127.0.0.1:1234/notify",
+      "qs":       { "id": "()", "type": "${type}", "a1": "${A1}", "a2": "${A2}", "a3": "${A3}" }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "11. Create subscription for E1 with forbidden chars in template:headers - see error"
+echo "==================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+      "url": "http://127.0.0.1:1234/notify",
+      "headers":  { "entity-id": "()", "entity-type": "${type}", "A1": "${A1}", "A2": "${A2}", "A3": "${A3}" }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription for E1 with empty template part - see error
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 79
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "url httpExtended notification is missing",
+    "error": "BadRequest"
+}
+
+
+02. Create subscription for E1 with everything except URL in template part - see error
+======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 79
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "url httpExtended notification is missing",
+    "error": "BadRequest"
+}
+
+
+03. Create subscription for E1 with URL and invalid VERB in template part - see error
+=====================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 79
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "unknown method httpExtended notification",
+    "error": "BadRequest"
+}
+
+
+04. Create subscription for E1 without URL in http-part - see error
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 71
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "url http notification is missing",
+    "error": "BadRequest"
+}
+
+
+05. Create subscription for E1 without http-part nor template part - see error
+==============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 67
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "http notification is missing",
+    "error": "BadRequest"
+}
+
+
+06. Create subscription for E1 with both http-part and template part - see error
+================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 77
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "notification has http and httpExtended",
+    "error": "BadRequest"
+}
+
+
+07. Create subscription for E1 with forbidden chars in http:url - see error
+===========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 79
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "forbidden characters in http field /url/",
+    "error": "BadRequest"
+}
+
+
+08. Create subscription for E1 with forbidden chars in template:url - see error
+===============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "forbidden characters in custom /url/",
+    "error": "BadRequest"
+}
+
+
+09. Create subscription for E1 with forbidden chars in template:payload - see error
+===================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 79
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "forbidden characters in custom /payload/",
+    "error": "BadRequest"
+}
+
+
+10. Create subscription for E1 with forbidden chars in template:qs - see error
+==============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 98
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "forbidden characters in custom notification httpExtended qs",
+    "error": "BadRequest"
+}
+
+
+11. Create subscription for E1 with forbidden chars in template:headers - see error
+===================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 103
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "forbidden characters in custom notification httpExtended headers",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

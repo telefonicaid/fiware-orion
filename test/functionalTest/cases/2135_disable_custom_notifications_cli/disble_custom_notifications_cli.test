@@ -1,0 +1,363 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Disable custom notifications CLI
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 -disableCustomNotifications
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# This is a a variant of case 2015 notification_templates_many_notifications.test using
+# the disableCustomNotifications CLI
+#
+# 01. Create E1/T1
+# 02. Create E1/T2
+# 03. Create E1/T3
+# 04. Create regular subscription for E1 -> 3 entities in one notification
+# 05. Create same subscription but with 'httpExtended' instead of 'http' -> 3 entities in one notification
+# 06. Create extended subscription for E1 -> 3 entities in one notification
+# 07. Dump accumulator and see 3 notifications (all multi-entity)
+#
+
+echo "01. Create E1/T1"
+echo "================"
+payload='{
+  "id": "E1",
+  "type": "T1",
+  "A1": true
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E1/T2"
+echo "================"
+payload='{
+  "id": "E1",
+  "type": "T2",
+  "A2": null
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "03. Create E1/T3"
+echo "================"
+payload='{
+  "id": "E1",
+  "type": "T3",
+  "A3": 3
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "04. Create regular subscription for E1 -> 3 entities in one notification"
+echo "========================================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  },
+  "throttling": 0
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. Create same subscription but with 'httpExtended' instead of 'http' -> 3 entities in one notification"
+echo "========================================================================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  },
+  "throttling": 0
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "06. Create extended subscription for E1 -> 3 entities in one notification"
+echo "========================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpExtended": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "method": "PUT",
+      "payload": "{ %22A1%22: %22${A1}%22, %22A2%22: %22${A2}%22, %22A3%22: %22${A3}%22 }",
+      "qs":       { "id": "${id}", "type": "${type}", "a1": "${A1}", "a2": "${A2}", "a3": "${A3}" },
+      "headers":  { "entity-id": "${id}", "entity-type": "${type}", "A1": "${A1}", "A2": "${A2}", "A3": "${A3}" }
+    }
+  },
+  "throttling": 0
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "07. Dump accumulator and see 3 notifications (all multi-entity)"
+echo "==============================================================="
+sleep 0.5  # Without this sleep, sometimes the last notification is missing
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1/T1
+================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create E1/T2
+================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T2
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create E1/T3
+================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T3
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create regular subscription for E1 -> 3 entities in one notification
+========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create same subscription but with 'httpExtended' instead of 'http' -> 3 entities in one notification
+========================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Create extended subscription for E1 -> 3 entities in one notification
+=========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Dump accumulator and see 3 notifications (all multi-entity)
+===============================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 267
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {},
+                "type": "none",
+                "value": true
+            },
+            "id": "E1",
+            "type": "T1"
+        },
+        {
+            "A2": {
+                "metadata": {},
+                "type": "none",
+                "value": null
+            },
+            "id": "E1",
+            "type": "T2"
+        },
+        {
+            "A3": {
+                "metadata": {},
+                "type": "none",
+                "value": 3
+            },
+            "id": "E1",
+            "type": "T3"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 267
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {},
+                "type": "none",
+                "value": true
+            },
+            "id": "E1",
+            "type": "T1"
+        },
+        {
+            "A2": {
+                "metadata": {},
+                "type": "none",
+                "value": null
+            },
+            "id": "E1",
+            "type": "T2"
+        },
+        {
+            "A3": {
+                "metadata": {},
+                "type": "none",
+                "value": 3
+            },
+            "id": "E1",
+            "type": "T3"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 267
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {},
+                "type": "none",
+                "value": true
+            },
+            "id": "E1",
+            "type": "T1"
+        },
+        {
+            "A2": {
+                "metadata": {},
+                "type": "none",
+                "value": null
+            },
+            "id": "E1",
+            "type": "T2"
+        },
+        {
+            "A3": {
+                "metadata": {},
+                "type": "none",
+                "value": 3
+            },
+            "id": "E1",
+            "type": "T3"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop
