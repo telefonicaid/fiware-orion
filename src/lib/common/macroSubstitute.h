@@ -1,9 +1,9 @@
-#ifndef ORION_ERROR_H
-#define ORION_ERROR_H
+#ifndef SRC_LIB_COMMON_MACROSUBSTITUTE_H_
+#define SRC_LIB_COMMON_MACROSUBSTITUTE_H_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -27,28 +27,14 @@
 */
 #include <string>
 
-#include "ngsi/StatusCode.h"
-#include "rest/HttpStatusCode.h"
+#include "ngsi/ContextElement.h"
 
 
 
 /* ****************************************************************************
 *
-* OrionError - 
+* macroSubstitute - 
 */
-typedef struct OrionError
-{
-  HttpStatusCode  code;
-  std::string     reasonPhrase;
-  std::string     details;
+extern void macroSubstitute(std::string* sP, const std::string& in, const ContextElement& ce);
 
-  OrionError();
-  OrionError(StatusCode& statusCode);
-  OrionError(HttpStatusCode _code, const std::string& _details = "", const std::string& _reasonPhrase = "");
-
-  std::string  render(ConnectionInfo* ciP, const std::string& indent);
-  std::string  render(const std::string& _indent, const std::string apiVersion);
-  void         fill(HttpStatusCode _code, const std::string& _details,  const std::string& _reasonPhrase = "");
-} OrionError;
-
-#endif
+#endif  // SRC_LIB_COMMON_MACROSUBSTITUTE_H_

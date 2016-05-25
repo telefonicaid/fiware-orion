@@ -40,7 +40,7 @@ void* startSenderThread(void* p)
     SenderThreadParams* params = (SenderThreadParams*) p;
     char                portV[STRING_SIZE_FOR_INT];
     std::string         url;
-
+    
     snprintf(portV, sizeof(portV), "%d", params->port);
     url = params->ip + ":" + portV + params->resource;
 
@@ -61,6 +61,8 @@ void* startSenderThread(void* p)
       std::string  out;
       int          r;
 
+      std::map<std::string, std::string> headers;
+
       r = httpRequestSend(params->ip,
                           params->port,
                           params->protocol,
@@ -75,7 +77,8 @@ void* startSenderThread(void* p)
                           params->renderFormat,
                           true,
                           NOTIFICATION_WAIT_MODE,
-                          &out);
+                          &out,
+                          headers);
 
       if (r == 0)
       {

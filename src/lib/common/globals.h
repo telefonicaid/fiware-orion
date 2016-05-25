@@ -186,6 +186,7 @@ extern bool               countersStatistics;
 extern bool               notifQueueStatistics;
 
 extern bool               checkIdv1;
+extern bool               disableCusNotif;
 
 
 

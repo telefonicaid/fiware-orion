@@ -123,23 +123,18 @@ std::string jsonRequestTreat
     break;
 
   case SubscriptionsRequest:
+    answer = parseSubscription(ciP, &parseDataP->subsV2);
+    if (answer != "OK")
     {
-
-      answer = parseSubscription(ciP, &parseDataP->subsV2);
-      if (answer != "OK")
-      {
-        return answer;
-      }
+      return answer;
     }
     break;
 
   case IndividualSubscriptionRequest:
+    answer = parseSubscription(ciP, &parseDataP->subsV2, true);  // NOTE: partial == true
+    if (answer != "OK")
     {
-      answer = parseSubscription(ciP, &parseDataP->subsV2, true);  // NOTE: partial == true
-      if (answer != "OK")
-      {
-        return answer;
-      }
+      return answer;
     }
     break;
 

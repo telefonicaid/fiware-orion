@@ -82,7 +82,7 @@ static bool processSubscriptions
     if (!processAvailabilitySubscription(triggerEntitiesV,
                                          trigs->attrL,
                                          mapSubId,
-                                         trigs->reference,
+                                         trigs->httpInfo.url,
                                          trigs->renderFormat,
                                          tenant,
                                          fiwareCorrelator))
@@ -271,6 +271,10 @@ static bool addTriggeredSubscriptions
 
     if (subs.count(subIdStr) == 0)
     {
+      ngsiv2::HttpInfo httpInfo;
+
+      httpInfo.url = getStringFieldF(sub, CASUB_REFERENCE);
+
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
       //
@@ -279,7 +283,7 @@ static bool addTriggeredSubscriptions
       //
       TriggeredSubscription* trigs = new TriggeredSubscription(
         sub.hasField(CASUB_FORMAT)? stringToRenderFormat(getStringFieldF(sub, CASUB_FORMAT)) : NGSI_V1_LEGACY,
-        getStringFieldF(sub, CASUB_REFERENCE),
+        httpInfo,
         subToAttributeList(sub));
 
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
