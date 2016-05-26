@@ -59,6 +59,7 @@ char          fwdHost[64];
 char          notificationMode[64];
 bool          simulatedNotification;
 int           lsPeriod             = 0;
+bool          disableCusNotif      = false;
 
 char          dbHost[64];
 char          rplSet[64];

@@ -72,7 +72,7 @@ class EntityId
                      const std::string&   predetectedError,
                      int                  counter);
 
-  std::string  toJson(void);
+  std::string  toJson(void) const;
 };
 
 #endif  // SRC_LIB_NGSI_ENTITYID_H_

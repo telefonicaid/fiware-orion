@@ -30,8 +30,10 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "apiTypesV2/HttpInfo.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoNotifyContext.h"
+#include "ngsi10/NotifyContextRequest.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -897,4 +899,3 @@ TEST(mongoNotifyContextRequest, createEntity)
 
     utExit();
 }
-

@@ -61,14 +61,15 @@ int QueueNotifier::start()
 * QueueNotifier::sendNotifyContextRequest -
 */
 void QueueNotifier::sendNotifyContextRequest
-(NotifyContextRequest*            ncr,
+(
+  NotifyContextRequest*            ncr,
   const std::string&               url,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsOrder,
-  bool blacklist
+  bool                             blacklist
 )
 {
   ConnectionInfo ci;
@@ -111,7 +112,16 @@ void QueueNotifier::sendNotifyContextRequest
   }
 
   ci.outMimeType = JSON;
-  std::string payload = ncr->toJson(&ci, renderFormat, attrsOrder, blacklist);
+  std::string payload;
+
+  if (renderFormat == NGSI_V1_LEGACY)
+  {
+    payload = ncr->render(&ci, NotifyContext, "");
+  }
+  else
+  {
+    payload = ncr->toJson(renderFormat, attrsOrder, blacklist);
+  }
 
   /* Parse URL */
   std::string  host;

@@ -53,6 +53,8 @@ namespace ngsiv2
       }
     }
   }
+
+
   /* ****************************************************************************
   *
   * Subscription::toJson -
@@ -116,7 +118,14 @@ namespace ngsiv2
 
     jh.addString("attrsFormat", attrsFormat);
 
-    jh.addRaw("http", this->httpInfo.toJson());
+    if (this->httpInfo.extended)
+    {
+      jh.addRaw("httpExtended", this->httpInfo.toJson());
+    }
+    else
+    {
+      jh.addRaw("http", this->httpInfo.toJson());
+    }
 
     return jh.str();
   }

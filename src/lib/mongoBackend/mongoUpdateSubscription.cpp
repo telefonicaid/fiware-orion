@@ -356,14 +356,14 @@ static void setCondsAndInitialNotify
       status = subOrig.hasField(CSUB_STATUS)? getStringFieldF(subOrig, CSUB_STATUS) : STATUS_ACTIVE;
     }
 
-    std::string url;
+    HttpInfo httpInfo;
     if (subUp.notificationProvided)
     {
-      url = subUp.notification.httpInfo.url;
+      httpInfo = subUp.notification.httpInfo;
     }
     else
     {
-      url = getStringFieldF(subOrig, CSUB_REFERENCE);
+      httpInfo.fill(subOrig);
     }
 
     RenderFormat attrsFormat;
@@ -384,13 +384,13 @@ static void setCondsAndInitialNotify
       // (entities and notification attributes) are pased in subOrig
       //
       // See: https://fiware-orion.readthedocs.io/en/develop/user/updating_regs_and_subs/index.html
-      setCondsAndInitialNotifyNgsiv1(subUp, subOrig, subUp.id, status, url, attrsFormat,
+      setCondsAndInitialNotifyNgsiv1(subUp, subOrig, subUp.id, status, httpInfo.url, attrsFormat,
                                      tenant, servicePathV, xauthToken, fiwareCorrelator,
                                      b, notificationDone);
     }
     else
     {
-      setCondsAndInitialNotify(subUp, subUp.id, status, url, attrsFormat,
+      setCondsAndInitialNotify(subUp, subUp.id, status, httpInfo, attrsFormat,
                                tenant, servicePathV, xauthToken, fiwareCorrelator,
                                b, notificationDone);
     }
