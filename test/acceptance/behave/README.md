@@ -352,6 +352,20 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
        ```
        create an entity in raw and "normalized" modes
        ```
+  - to create N attributes in raw mode use `&` as separator. If use `&&` is assumed that this attribute has not a property. Ex:
+        ```
+          | parameter           | value                               |
+          | entities_type       | "house"                             |
+          | entities_id         | "room_2"                            |
+          | attributes_name     | "temperature"&"pressure"&"humidity" |
+          | attributes_value    | 34&"high"&"random=3"                |
+          | attributes_type     | "celsius"&&"porcent"                |
+          | attributes_metadata | true&false                          |
+          | metadatas_name      | "very_hot"                          |
+          | metadatas_type      | "alarm"                             |
+          | metadatas_value     | "default"                           |
+        ```             
+       
   Logs:     
   - If don´t want verify the value of something trace in log, use `ignored` as value.
      ```

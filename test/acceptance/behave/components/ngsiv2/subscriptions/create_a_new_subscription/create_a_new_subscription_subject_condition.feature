@@ -860,14 +860,14 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json                       |
     # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter             | value                                                                         |
-      | subject_type          | room                                                                          |
-      | subject_idPattern     | .*                                                                            |
-      | condition_attrs       | temperature                                                                   |
-      | condition_expression  | georel>>>near;minDistance:5000&&geometry>>><geometry>&coords>>>25.774,-80.190 |
-      | notification_http_url | http://localhost:1234                                                         |
-      | notification_attrs    | temperature                                                                   |
-      | expires               | 2016-04-05T14:00:00.00Z                                                       |
+      | parameter             | value                                                                        |
+      | subject_type          | room                                                                         |
+      | subject_idPattern     | .*                                                                           |
+      | condition_attrs       | temperature                                                                  |
+      | condition_expression  | georel>>>near;minDistance:5000&geometry>>><geometry>&coords>>>25.774,-80.190 |
+      | notification_http_url | http://localhost:1234                                                        |
+      | notification_attrs    | temperature                                                                  |
+      | expires               | 2016-04-05T14:00:00.00Z                                                      |
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -893,7 +893,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | subject_type          | room                                                        |
       | subject_idPattern     | .*                                                          |
       | condition_attrs       | temperature                                                 |
-      | condition_expression  | georel>>>coveredBy&&geometry>>><geometry>&coords>>><coords> |
+      | condition_expression  | georel>>>coveredBy&geometry>>><geometry>&coords>>><coords> |
       | notification_http_url | http://localhost:1234                                       |
       | notification_attrs    | temperature                                                 |
       | expires               | 2016-04-05T14:00:00.00Z                                     |
@@ -921,7 +921,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | subject_type          | room                                                                               |
       | subject_idPattern     | .*                                                                                 |
       | condition_attrs       | temperature                                                                        |
-      | condition_expression  | georel>>>near;minDistance<separator>5000&&geometry>>>point&coords>>>25.774,-80.190 |
+      | condition_expression  | georel>>>near;minDistance<separator>5000&geometry>>>point&coords>>>25.774,-80.190 |
       | notification_http_url | http://localhost:1234                                                              |
       | notification_attrs    | temperature                                                                        |
       | expires               | 2016-04-05T14:00:00.00Z                                                            |
@@ -976,7 +976,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | subject_type          | room                                                        |
       | subject_idPattern     | .*                                                          |
       | condition_attrs       | temperature                                                 |
-      | condition_expression  | georel>>><georel>&&geometry>>>point&coords>>>25.774,-80.190 |
+      | condition_expression  | georel>>><georel>&geometry>>>point&coords>>>25.774,-80.190 |
       | notification_http_url | http://localhost:1234                                       |
       | notification_attrs    | temperature                                                 |
       | expires               | 2016-04-05T14:00:00.00Z                                     |

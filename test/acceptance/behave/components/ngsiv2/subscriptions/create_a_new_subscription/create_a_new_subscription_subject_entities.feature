@@ -483,9 +483,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                                         |
-      | error       | BadRequest                                    |
-      | description | subject entities element has not id/idPattern |
+      | parameter   | value                                                 |
+      | error       | BadRequest                                            |
+      | description | subject entities element has no id/idPattern nor type |
 
   @id_idPattern
   Scenario:  try to create a new subscription using NGSI v2 with id and idPattern fields
