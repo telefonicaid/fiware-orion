@@ -458,7 +458,7 @@ really needed*
 
 ### Simple Location Format
 
-Simple Location Format supports basic geometries (*point* , *line* , *box* , *polygon*) and covers
+Simple Location Format supports basic geometries (*point*, *line*, *box*, *polygon*) and covers
 the typical use cases when encoding geographical locations. It has been inspired by
 [GeoRSS Simple](http://www.georss.org/simple.html).
 
@@ -617,7 +617,7 @@ The list of operators (and the format of the values they use) is as follows:
     This operation is only valid for attributes of type date, numbers or strings (used with
     attributes of other types may lead to unpredictable results).
 + **Match pattern**: `~=`. The value matches a given pattern, expressed as a regular expression, e.g.
-    `color=ow`.
+    `color~=ow`.
     For an entity to match, it must contain an attribute with that exact name (color), and
     whose value matches the string in the right-hand side, 'ow' in this example (`brown` and `yellow`
     would match, `black` and `white` would not).
