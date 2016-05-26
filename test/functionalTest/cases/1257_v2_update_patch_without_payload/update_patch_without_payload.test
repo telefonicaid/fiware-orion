@@ -64,14 +64,14 @@ Date: REGEX(.*)
 02. PATCH /v2/entities/E1 (without payload)
 ===========================================
 HTTP/1.1 411 Length Required
-Content-Length: 91
+Content-Length: 98
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
-    "error": "LengthRequired"
+    "error": "ContentLengthRequired"
 }
 
 

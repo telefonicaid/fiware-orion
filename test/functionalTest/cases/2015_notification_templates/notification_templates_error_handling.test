@@ -57,7 +57,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
     }
   }
 }'
@@ -80,7 +80,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "method": "PUT",
       "payload": "{ \"A1\": \"${A1}\", \"A2\": \"${A2}\", \"A3\": \"${A3}\" }",
       "qs":       { "id": "${id}", "type": "${type}", "a1": "${A1}", "a2": "${A2}", "a3": "${A3}" },
@@ -107,7 +107,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/${NOTIFY_URL}",
       "method": "PUTTY"
     }
@@ -179,7 +179,7 @@ payload='{
     "http": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/${NOTIFY_URL}"
     },
-    "httpExtended": {
+    "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/${NOTIFY_URL}"
     }
   }
@@ -227,7 +227,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "url": "http://127.0.0.1:1234/()"
     }
   }
@@ -251,7 +251,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "url":     "http://127.0.0.1:1234/notify",
       "payload": "{ \"a1\": \"()\" }"
     }
@@ -276,7 +276,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "url":      "http://127.0.0.1:1234/notify",
       "qs":       { "id": "()", "type": "${type}", "a1": "${A1}", "a2": "${A2}", "a3": "${A3}" }
     }
@@ -301,7 +301,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "url": "http://127.0.0.1:1234/notify",
       "headers":  { "entity-id": "()", "entity-type": "${type}", "A1": "${A1}", "A2": "${A2}", "A3": "${A3}" }
     }
@@ -316,13 +316,13 @@ echo
 01. Create subscription for E1 with empty template part - see error
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 79
+Content-Length: 77
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "url httpExtended notification is missing",
+    "description": "url httpCustom notification is missing",
     "error": "BadRequest"
 }
 
@@ -330,13 +330,13 @@ Date: REGEX(.*)
 02. Create subscription for E1 with everything except URL in template part - see error
 ======================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 79
+Content-Length: 77
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "url httpExtended notification is missing",
+    "description": "url httpCustom notification is missing",
     "error": "BadRequest"
 }
 
@@ -344,13 +344,13 @@ Date: REGEX(.*)
 03. Create subscription for E1 with URL and invalid VERB in template part - see error
 =====================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 79
+Content-Length: 77
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "unknown method httpExtended notification",
+    "description": "unknown method httpCustom notification",
     "error": "BadRequest"
 }
 
@@ -386,13 +386,13 @@ Date: REGEX(.*)
 06. Create subscription for E1 with both http-part and template part - see error
 ================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 77
+Content-Length: 75
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "notification has http and httpExtended",
+    "description": "notification has http and httpCustom",
     "error": "BadRequest"
 }
 
@@ -442,13 +442,13 @@ Date: REGEX(.*)
 10. Create subscription for E1 with forbidden chars in template:qs - see error
 ==============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 98
+Content-Length: 96
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "forbidden characters in custom notification httpExtended qs",
+    "description": "forbidden characters in custom notification httpCustom qs",
     "error": "BadRequest"
 }
 
@@ -456,13 +456,13 @@ Date: REGEX(.*)
 11. Create subscription for E1 with forbidden chars in template:headers - see error
 ===================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 103
+Content-Length: 101
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "forbidden characters in custom notification httpExtended headers",
+    "description": "forbidden characters in custom notification httpCustom headers",
     "error": "BadRequest"
 }
 

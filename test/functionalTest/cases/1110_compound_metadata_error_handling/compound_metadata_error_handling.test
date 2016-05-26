@@ -44,7 +44,7 @@ payload='{
   "id": "room_0",
   "attr":
   {
-    "type": "date",
+    "type": "DateTime",
     "value": 19,
     "metadata": {
       "meta1":

@@ -50,7 +50,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "url":     "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "payload": "%3Cattributes%3E%3Ca1%3E${A1}%3C/a1%3E%3Ca2%3E${A2}%3C/a2%3E%3Ca3%3E${A3}%3C/a3%3E%3C/attributes%3E",
       "headers": { "Content-Type": "application/xml" }

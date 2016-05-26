@@ -34,7 +34,7 @@ accumulatorStart --pretty-print
 # 01. Create E1/T
 # 02. Create E2/T
 # 03. Create E3/T
-# 04. Create extended subscription covering E1/T and E2/T -> 2 notifications
+# 04. Create custom subscription covering E1/T and E2/T -> 2 notifications
 # 05. Update subscription covering E2/T and E3/T -> 2 notifications
 # 06. Dump accumulator and see 4 notifications
 #
@@ -75,8 +75,8 @@ echo
 echo
 
 
-echo "04. Create extended subscription covering E1/T and E2/T -> 2 notifications"
-echo "=========================================================================="
+echo "04. Create custom subscription covering E1/T and E2/T -> 2 notifications"
+echo "========================================================================"
 payload='{
   "subject": {
     "entities": [
@@ -90,7 +90,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
     }
   },
@@ -161,8 +161,8 @@ Date: REGEX(.*)
 
 
 
-04. Create extended subscription covering E1/T and E2/T -> 2 notifications
-==========================================================================
+04. Create custom subscription covering E1/T and E2/T -> 2 notifications
+========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})

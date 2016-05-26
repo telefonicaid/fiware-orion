@@ -39,9 +39,9 @@ std::string errorStringForV2(const std::string& _reasonPhrase)
   {
     return "BadRequest";
   }
-  else if (_reasonPhrase == "Length Required")
+  else if (_reasonPhrase == "Content Length Required")
   {
-    return "LengthRequired";
+    return "ContentLengthRequired";
   }
   else if (_reasonPhrase == "Request Entity Too Large")
   {

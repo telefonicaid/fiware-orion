@@ -38,8 +38,8 @@ accumulatorStart --pretty-print
 # 02. Create E1/T2
 # 03. Create E1/T3
 # 04. Create regular subscription for E1 -> 3 entities in one notification
-# 05. Create same subscription but with 'httpExtended' instead of 'http' -> 3 entities in one notification
-# 06. Create extended subscription for E1 -> 3 entities in one notification
+# 05. Create same subscription but with 'httpCustom' instead of 'http' -> 3 entities in one notification
+# 06. Create custom subscription for E1 -> 3 entities in one notification
 # 07. Dump accumulator and see 3 notifications (all multi-entity)
 #
 
@@ -104,8 +104,8 @@ echo
 echo
 
 
-echo "05. Create same subscription but with 'httpExtended' instead of 'http' -> 3 entities in one notification"
-echo "========================================================================================================"
+echo "05. Create same subscription but with 'httpCustom' instead of 'http' -> 3 entities in one notification"
+echo "======================================================================================================"
 payload='{
   "subject": {
     "entities": [
@@ -118,7 +118,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
     }
   },
@@ -129,8 +129,8 @@ echo
 echo
 
 
-echo "06. Create extended subscription for E1 -> 3 entities in one notification"
-echo "========================================================================="
+echo "06. Create custom subscription for E1 -> 3 entities in one notification"
+echo "======================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -143,7 +143,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "method": "PUT",
       "payload": "{ %22A1%22: %22${A1}%22, %22A2%22: %22${A2}%22, %22A3%22: %22${A3}%22 }",
@@ -207,8 +207,8 @@ Date: REGEX(.*)
 
 
 
-05. Create same subscription but with 'httpExtended' instead of 'http' -> 3 entities in one notification
-========================================================================================================
+05. Create same subscription but with 'httpCustom' instead of 'http' -> 3 entities in one notification
+======================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -217,8 +217,8 @@ Date: REGEX(.*)
 
 
 
-06. Create extended subscription for E1 -> 3 entities in one notification
-=========================================================================
+06. Create custom subscription for E1 -> 3 entities in one notification
+=======================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})

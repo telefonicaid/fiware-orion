@@ -56,7 +56,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "url":     "http://127.0.0.1:'${LISTENER_PORT}'/${NOTIFY_URL}",
       "qs":      { "step": "01" }
     }
@@ -81,7 +81,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "url":     "http://127.0.0.1:'${LISTENER_PORT}'/${NOTIFY_URL}",
       "method":  "PATCH",
       "qs":      { "step": "02" }
@@ -107,7 +107,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "url":     "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "payload": "{ %22A1%22: %22${A1}%22, %22A2%22: %22${A2}%22, %22A3%22: %22${A3}%22, %22step%22: %2203%22 }",
       "qs":       { "step": "03" }
@@ -133,7 +133,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "url":      "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "qs":       { "step": "04", "id": "${id}", "type": "${type}", "a1": "${A1}", "a2": "${A2}", "a3": "${A3}" }
     }
@@ -158,7 +158,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "url":     "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "headers": { "entity-id": "${id}", "entity-type": "${type}", "A1": "${A1}", "A2": "${A2}", "A3": "${A3}", "step": "05" },
       "qs":      { "step": "05" }
@@ -184,7 +184,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "url":      "http://127.0.0.1:'${LISTENER_PORT}'/${NOTIFY_URL}",
       "method":   "DELETE",
       "payload":  "{ %22A1%22: %22${A1}%22, %22A2%22: %22${A2}%22, %22A3%22: %22${A3}%22 }",
@@ -212,7 +212,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "url":      "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "payload":  "{ %22A1%22: %22${A1}%22, %22A2%22: %22${A2}%22, %22A4%22: %22${A4}%22 }",
       "qs":       { "step": "07", "id": "${id}", "type": "${type}", "a1": "${A1}", "a2": "${A2}", "a4": "${A4}" },

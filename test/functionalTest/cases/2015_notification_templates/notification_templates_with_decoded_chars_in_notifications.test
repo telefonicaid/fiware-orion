@@ -51,7 +51,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "url":     "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "payload": "A string with double-quotes: %22${A1}%22",
       "method":  "POST",
@@ -132,7 +132,7 @@ A string with double-quotes: "a1"=======================================
 04. GET the subscription to see the encoded chars in custom payload
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 442
+Content-Length: 440
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -142,7 +142,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
-        "httpExtended": {
+        "httpCustom": {
             "headers": {
                 "hs1": "1",
                 "hs2": "${A1}"
