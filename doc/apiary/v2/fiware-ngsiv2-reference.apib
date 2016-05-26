@@ -10,29 +10,32 @@ GITHUB_SOURCE: http://github.com/telefonicaid/fiware-orion.git
 
 # FIWARE-NGSI v2 Specification
 
-This specification defines the FIWARE-NGSI version 2 API. FIWARE-NGSI v2 is intended to manage all the whole lifecycle of
-context information including updates, queries, registrations and subscriptions.
+This specification defines the FIWARE-NGSI version 2 API. FIWARE-NGSI v2 is intended to manage
+the entire lifecycle of context information, including updates, queries, registrations,
+and subscriptions.
 
 # Preface
 
 ## Editors
 
-José Manuel Cantera Fonseca (Telefónica I+D), Fermín Galán Márquez (Telefónica I+D), Tobias Jacobs (NEC).
+José Manuel Cantera Fonseca (Telefónica I+D), Fermín Galán Márquez (Telefónica I+D),
+Tobias Jacobs (NEC).
   
 ## Acknowledgements
 
-The editors would like to express their gratitude to the following people who actively contributed to this specification:
-Juan José Hierro (Telefónica I+D), Marcos Reyes (Telefónica I+D), Ken Zangelin (Telefónica I+D), Iván Arias López (Telefónica I+D),
-Carlos Romero Brox (Telefónica I+D), Antonio José López Navarro (Telefónica I+D),  Marc Capdevielle (Orange), Gilles Privat (Orange), 
+The editors would like to express their gratitude to the following people who actively
+contributed to this specification:
+Juan José Hierro (Telefónica I+D), Marcos Reyes (Telefónica I+D), Ken Zangelin (Telefónica I+D),
+Iván Arias López (Telefónica I+D), Carlos Romero Brox (Telefónica I+D),
+Antonio José López Navarro (Telefónica I+D),  Marc Capdevielle (Orange), Gilles Privat (Orange), 
 Sergio García Gómez (Telefónica I+D), Martin Bauer (NEC).
   
 ## Status
 
 This is a work in progress and is changing on a daily basis.
-Please send your comments to fiware-ngsi@lists.fiware.org. You can
-trace the discussions checking the archives of the mailing list:
-https://lists.fiware.org/private/fiware-ngsi/ (list subscription
-required).
+Please send your comments to fiware-ngsi@lists.fiware.org.
+You can trace the discussions checking the archives of the mailing list:
+https://lists.fiware.org/private/fiware-ngsi/ (list subscription required).
 
 In addition, note that a list of currently open discussions is available at
 
@@ -50,14 +53,14 @@ This specification is licensed under the
 
 This specification describes the "full" compliance level.
 
-However, next iterations of this specification could define optionality
-in some parts and the compliance level (or roles/profiles)
-corresponding to them.
+However, future iterations of this specification might define optionality in some parts and the
+compliance level (or roles/profiles) corresponding to them.
 
 ## Conventions
 
-NGSI version 2 use camel case (camelCase) syntax for naming properties and related artifacts used by the API. When 
-referring to URIs, as part of HATEOAS patterns, and to mark them appropriately the suffix `_url` is added.
+NGSI version 2 uses camel case (camelCase) syntax for naming properties and related artifacts used
+by the API. When  referring to URIs, as part of HATEOAS patterns, and to mark them appropriately,
+the suffix `_url` is added.
 
 # Specification
 
@@ -65,36 +68,36 @@ referring to URIs, as part of HATEOAS patterns, and to mark them appropriately t
 
 The FIWARE NGSI (Next Generation Service Interface) API defines 
 
-* a **data model** for context information, based on a simple information model using the notion of *context entities*
-* a **context data interface** for exchanging information by means of query, subscription, and update operations
-* a **context availability interface** for exchanging information on how to obtain context information
-(whether to separate the two interfaces is currently under discussion).
+* a **data model** for context information, based on a simple information model using the notion of
+  *context entities*
+* a **context data interface** for exchanging information by means of query, subscription, and
+  update operations
+* a **context availability interface** for exchanging information on how to obtain context
+  information (whether to separate the two interfaces is currently under discussion).
 * a set of typical **roles** played by NGSI-compliant components
 
 ## Terminology
 
 ### Context data modelling and exchange
 
-The main elements in the NGSI data model are context entities, attributes and metadata, as shown
-in the figure below.
+The main elements in the NGSI data model are context entities, attributes and metadata,
+as shown in the figure below.
 
 ![NGSI data model](https://raw.githubusercontent.com/telefonicaid/fiware-orion/develop/doc/apiary/v2/Ngsi-data-model.png)
 
 #### Context Entities
 
-Context entities, or simply called entities, are the center of gravity
-in the FIWARE NGSI information model. An entity represents a
-thing, i.e. any physical or logical object (e.g. a sensor, a person, a room, an
-issue in a ticketing system, etc.). Each entity has an **entity id**.
+Context entities, or simply entities, are the center of gravity in the FIWARE NGSI information 
+model. An entity represents a thing, i.e., any physical or logical object (e.g., a sensor, a person,
+a room, an issue in a ticketing system, etc.). Each entity has an **entity id**.
 
 Furthermore, the type system of FIWARE NGSI enables entities to have 
 an **entity type**. Entity types are semantic types; they are intended
-to describe the type of things represented by the entity.
+to describe the type of thing represented by the entity.
 For example, a context entity with id *sensor-365* could have the
 type *temperatureSensor*.
 
-Each entity is uniquely identified by the combination of its id
-and type.
+Each entity is uniquely identified by the combination of its id and type.
 
 #### Context Elements
 
@@ -103,7 +106,7 @@ is still under discussion; therefore the notion of context elements
 currently only appears in this section.)*
 
 A context element is a data object (e.g. JSON object; see the section
-on JSON representation below) which contains information about a
+on JSON representation below) that contains information about a
 specific context entity. Consequently, a context element has a
 mandatory property `id` in order to identify the context entity it
 refers to. It furthermore can contain an optional property `type`
@@ -111,10 +114,12 @@ to describe the type of the entity. Further properties can be used
 to represent more information about the entity (see the **context
 attributes** section below).
 
-It is important to understand that the relationship of entity and context element is one-to-many. This means that 
+It is important to understand that the relationship between entities and context elements is
+one-to-many.
+This means that:
 * each context element refers to exactly one entity
-* there can be several context elements  referring to the same entity. The context elements can for example contain
-different pieces of information about the entity
+* there can be several context elements referring to the same entity. 
+The context elements can for example contain different pieces of information about the entity.
 
 #### Context Attributes 
 
@@ -124,27 +129,29 @@ attribute *current_speed* of entity *car-104*.
 
 In the NGSI data model, attributes have an *attribute name*,
 an *attribute type*, an *attribute value* and *metadata*. 
- * The attribute name describes which kind of property of the entity the attribute value represents, for example *current_speed*.
- * The attribute type represents the NGSI value type of the attribute value.
- Note that FIWARE NGSI has its own type system for attribute values, so NGSI value types are not the same as JSON types.
- * The attribute value finally contains
+* The attribute name describes what kind of property the attribute value represents of the entity,
+for example *current_speed*.
+* The attribute type represents the NGSI value type of the attribute value.
+Note that FIWARE NGSI has its own type system for attribute values, so NGSI value types are not
+the same as JSON types.
+* The attribute value finally contains
   * the actual data
-  * optional **metadata** describing properties of the attribute value like e.g. accuracy, provider, or a timestamp
+  * optional **metadata** describing properties of the attribute value like e.g. accuracy, provider,
+    or a timestamp
   
 #### Context Metadata
 
-Context metadata is used in FIWARE NGSI at several places, one of
+Context metadata is used in FIWARE NGSI in several places, one of
 them being an optional part of the attribute value as described
-above. Similarly to attributes, each piece of metadata has 
- * **a metadata name**, describing the role of the metadata at the
+above. Similar to attributes, each piece of metadata has:
+ * **a metadata name**, describing the role of the metadata in the
  place where it occurs; for example, the metadata name *accuracy* 
  indicates that the metadata value describes how accurate a given 
  attribute value is
  * a **metadata type**, describing the NGSI value type of the metadata value
  * a **metadata value** containing the actual metadata
 
-Note that in NGSI it is not foreseen that metadata values can
-themselves have metadata.
+Note that in NGSI it is not foreseen that metadata may contain nested metadata.
 
 #### Restrictions and Operation Scopes
 
@@ -192,12 +199,15 @@ context broker, context registry, context consumer)
 
 An entity is represented by a JSON object with the following syntax:
 
-* The entity id is specified by the object's `id` property, which value is a string containing the entity id.
+* The entity id is specified by the object's `id` property, whose value is a string containing the
+  entity id.
 
-* The entity type is specified by the object's `type` property, which value is a string containing the entity's type name.
+* The entity type is specified by the object's `type` property, whose value is a string containing
+  the entity's type name.
 
-* Entity attributes are specified by additional properties, which name is the `name` of the attribute and which representation
-  is described in the "JSON Attribute Representation" section below. Obviously, `id` and `type` are not allowed as attribute names.
+* Entity attributes are specified by additional properties, whose names are the `name` of the 
+  attribute and whose representation is described in the "JSON Attribute Representation" section
+  below. Obviously, `id` and `type` are not allowed to be used as attribute names.
 
 An example of this syntax in shown below:
 
@@ -212,25 +222,29 @@ An example of this syntax in shown below:
 }
 ```
 
-The normalized representation of entities always include `id`, `type` and the properties which represent attributes. However, simplified
-or partial representations (see below at "Partial Representations" section), may leave out some of them. The specification of each operation
-includes details about what  representation is expected as input or what representation will be provided (rendered) as output.
+The normalized representation of entities always include `id`, `type` and the properties that
+represent attributes. However, simplified or partial representations
+(see the "Partial Representations" section below) may leave some of them out.
+The specification of each operation includes details about what representation is expected as input
+or what representation will be provided (rendered) as output.
 
 ## JSON Attribute Representation
 
 An attribute is represented by a JSON object with the following syntax:
 
-* The attribute value is specified by the `value` property, which value may be any JSON datatype.
+* The attribute value is specified by the `value` property, whose value may be any JSON datatype.
 
-* The attribute NGSI type is specified by the `type` property, which value is a string containing the NGSI type.
+* The attribute NGSI type is specified by the `type` property, whose value is a string containing
+  the NGSI type.
 
-* The attribute metadata is specified by the `metadata` property. Its value is another JSON object which will contain a
-  property per metadata element defined (the name of the property is the `name` of the metadata element). Each metadata element,
-  in turn, is represented by a JSON object containing the following properties:
+* The attribute metadata is specified by the `metadata` property. Its value is another JSON object
+  which contains a property per metadata element defined (the name of the property is the `name` of
+  the metadata element). Each metadata element, in turn, is represented by a JSON object containing
+  the following properties:
 
-  * `value`: Its value will contain the metadata value, which may correspond to any JSON datatype.
+  * `value`: Its value contains the metadata value, which may correspond to any JSON datatype.
 
-  * `type`: Its value will contain a string representation of the metadata NGSI type.
+  * `type`: Its value contains a string representation of the metadata NGSI type.
 
 An example of this syntax in shown below:
 
@@ -244,10 +258,11 @@ An example of this syntax in shown below:
 
 ## Simplified Entity Representation
 
-There are two representation modes, which must be supported by implementations, and which allow to generate simplified representations of entities.
+There are two representation modes that must be supported by implementations. These representation
+modes allow to generate simplified representations of entities.
 
-* *keyValues* mode. This mode represents each entity attribute only by its value, leaving out the information about type and metadata.
-  Thus, when this mode is on, only the attribute value is represented and will correspond to the value of the property which represents the attribute.
+* *keyValues* mode. This mode represents the entity attributes by their values only, leaving out the
+  information about type and metadata.
   See example below.
 
 ```
@@ -258,44 +273,49 @@ There are two representation modes, which must be supported by implementations, 
 }
 ```
 
-* *values mode*. This mode represents the entity only by a collection of attribute values conveyed by an Array. Id and type information are left out.
-  See example below. The order of the attributes in the Array is specified by the `attrs` URI param (e.g. `attrs=branch,colour,engine`) or arbitrary
-  order in the case `attrs` is not used.
+* *values mode*. This mode represents the entity as an array of attribute values.
+  Information about id and type is left out.
+  See example below.
+  The order of the attributes in the array is specified by the `attrs` URI param
+  (e.g. `attrs=branch,colour,engine`). If `attrs` is not used, the order is arbitrary.
 
 ```
 [ 'Ford', 'black', 78.3 ]
 ```
 
-* *unique mode*. This mode is just like *values mode*, with the only difference that values are not repeated.
+* *unique mode*. This mode is just like *values mode*, except that values are not repeated.
 
 ## Partial Representations
 
-Some operations imply that only a partial representation of an entity will be provided, which are summarized below:
+Some operations use partial representation of entities:
 
-* `id` and `type` are not allowed in update operations, as they are inmutable properties.
+* `id` and `type` are not allowed in update operations, as they are immutable properties.
 
-* In the requests in which entity `type` is allowed, it may be omitted. When omitted in entity creation operations,
-  the default string value `none` is used for the type.
+* In requests where entity `type` is allowed, it may be omitted. When omitted in entity
+  creation operations, the default string value `none` is used for the type.
 
-* In some cases, not all the attributes of the entity are shown, e.g. a query which selects a subset of entity attributes.
+* In some cases, not all the attributes of the entity are shown, e.g. a query selecting a subset
+  of the entity attributes.
 
-* Attribute/metadata `value` may be omitted in requests, meaning that the attribute/metadata has `null` value. It is always present in responses.
+* Attribute/metadata `value` may be omitted in requests, meaning that the attribute/metadata has
+  `null` value. In responses, the value is always present.
 
-* Attribute/metadata `type` may be ommitted in requests. When omitted in attribute/metadata creation or update operations, the default
-  string value `none` is used for the type.
+* Attribute/metadata `type` may be omitted in requests. When omitted in attribute/metadata creation
+  or in update operations, the default string value `none` is used for the type.
 
-* Attribute `metadata` may be ommitted in requests, meaning that there are not metadata elements associated to the attribute. In responses, this property is set to
-  `{}` if the attribute doesn't have metadata.
+* Attribute `metadata` may be omitted in requests, meaning that there are no metadata elements
+  associated to the attribute. In responses, this property is set to
+  `{}` if the attribute doesn't have any metadata.
 
 
 ## Special Attribute Types
 
-Generally speaking, user-defined attribute types are informative, they are processed by the NGSIv2 server in
-an opaque way. Nonetheless, the types described below are used to convey an special meaning
+Generally speaking, user-defined attribute types are informative; they are processed by the NGSIv2
+server in an opaque way. Nonetheless, the types described below are used to convey a special meaning:
 
-* `date`:  identifies dates, in ISO8601 format. These attributes can be used with the
-  greater than, less than, greater or equal, lesser or equal and range query operators. For instance
-  (only the referred entity attribute is shown) :
+* `date`:  identifies dates, in ISO8601 format. These attributes can be used with the query operators
+  greater-than, less-than, greater-or-equal, less-or-equal and range. For instance
+  (only the referred entity attribute is shown):
 
 ```
 {
@@ -308,25 +328,25 @@ an opaque way. Nonetheless, the types described below are used to convey an spec
 
 ## Virtual Attributes
 
-There are entity properties that are not directly modificable by NGSIv2 clients, but that can be rendered
-by NGSIv2 servers to provide extra information. From a representation point of view, they are like
-regular attributes, with name, value and type.
+There are entity properties that are not directly modifiable by NGSIv2 clients, but that can be
+rendered by NGSIv2 servers to provide extra information. From a representation point of view, they
+are just like regular attributes, with name, value and type.
 
-Virtual attributes are not rendered by default. In oder to render an specific attribute, add its name
+Virtual attributes are not rendered by default. In order to render a specific attribute, add its name
 to the `options` URL parameter.
 
-The list of virtual attributes is the following:
+The list of virtual attributes is as follows:
 
-* `dateCreated` (type: `date`): entity creation date as ISO 8601 string.
-* `dateModified` (type: `date`): entity modification date as ISO 8601 string.
+* `dateCreated` (type: `date`): entity creation date as an ISO 8601 string.
+* `dateModified` (type: `date`): entity modification date as an ISO 8601 string.
 
-As regular attributes, they can be  used in `attrs`, `q` filters and `orderBy`. However, they cannot be used
-in resource URLs.
-
+Like regular attributes, they can be  used in `attrs`, `q` filters and `orderBy`.
+However, they cannot be used in resource URLs.
 
 ## Field syntax restrictions
 
-Fields used as identifiers in the NGSIv2 API follow special rules regarding allowed syntax. These rules applies to:
+Fields used as identifiers in the NGSIv2 API follow special rules regarding allowed syntax.
+These rules apply to:
 
 * Entity id
 * Entity type
@@ -337,58 +357,63 @@ Fields used as identifiers in the NGSIv2 API follow special rules regarding allo
 
 The rules are:
 
-* Allowed characters are the ones in the plain ASCII set except the following ones: control characters, whitespace, `&`, `?`, `/` and `#`.
+* Allowed characters are the ones in the plain ASCII set, except the following ones:
+  control characters, whitespace, `&`, `?`, `/` and `#`.
 * Maximum field length is 256 characters.
 * Minimum field length is 1 character.
 
-In addition to the above rules, given NGSIv2 server implementations could add additional syntactical restrictions in those
-or other fields, e.g. to avoid some cross script injection attacks.
+In addition to the above rules, given NGSIv2 server implementations could add additional syntactical
+restrictions in those or other fields, e.g., to avoid cross script injection attacks.
 
-In the case a client attemps to use a field not valid from a syntax point of view, it shall get a "Bad Request" error
-explaining the cause.
+In case a client attempts to use a field that is invalid from a syntax point of view, the client gets
+a "Bad Request" error response, explaining the cause.
 
-## Atrribute names restrictions
+## Attribute names restrictions
 
 The following strings must not be used as attribute names:
 
-* `id`, as it would conflict to the field used to represent entity id.
+* `id`, as it would conflict with the field used to represent entity id.
 
-* `type`, as it would conflict to the field used to represent entity type.
+* `type`, as it would conflict with the field used to represent entity type.
 
-* `geo:distance`, as it would conflict with the string used in `orderBy` for proximity to center point.
+* `geo:distance`, as it would conflict with the string used in `orderBy` for proximity to
+  center point.
 
 * Virtual attribute names (see specific section on "Virtual Attributes")
 
 ## Ordering Results
 
-Operations that retrieve lists of entities allow the `orderBy` URI parameter to specify which attributes or properties will
-be used as criteria to order results. Its value can be:
+Operations that retrieve lists of entities permit the `orderBy` URI parameter to specify the
+attributes or properties to be be used as criteria when ordering results.
+The value of `orderBy` can be:
 
-* The keyword `geo:distance` to order results by distance to a reference geometry when a "near" (`georel=near`) spatial
-  relationship is used. 
+* The keyword `geo:distance` to order results by distance to a reference geometry when a "near"
+  (`georel=near`) spatial relationship is used. 
 
-* A comma-separated list of attributes (including virtual attributes), e.g. `temperature,!humidity`. Results are ordered
-  by the first attribute. On ties, the results are ordered by the second attribute and so on. A "!" before the attribute
-  name means that the order is reversed.
+* A comma-separated list of attributes (including virtual attributes), e.g. `temperature,!humidity`.
+  Results are ordered by the first attribute. On ties, the results are ordered by the second
+  attribute and so on. A "!" before the attribute name means that the order is reversed.
 
 ## Error Responses
 
-In the case of being present, the error payload is a JSON object including the following fields:
+If present, the error payload is a JSON object including the following fields:
 
 + `error` (required, string): a textual description of the error.
 + `description` (optional, string): additional information about the error.
-+ `affectedItems` (optional, array[string]): a list of elements affected by the error. Depending on the operation, it may
-  refer to entities, registrations or subscriptions.
++ `affectedItems` (optional, array[string]): a list of elements affected by the error.
+  Depending on the operation, it may refer to entities, registrations or subscriptions.
 
-All NGSIv2 server implementations must use the following HTTP response codes and `error` texts. However, the particular text used for
-`description` field is an implementation specific aspect.
+All NGSIv2 server implementations must use the following HTTP response codes and `error` texts.
+However, the particular text used for `description` field is an implementation specific aspect.
 
 Error list (HTTP response code in parenthesis):
 
 * ParseError            (`400`). The incoming JSON payload cannot be parsed.
 * BadRequest            (`400`). The incoming request is invalid in this context.
-* NotFound              (`404`). The resource (entity, subscription, etc.) referred in the request has not been found.
-* TooManyResults        (`409`). There are several results that match with the resource identification used by the request.
+* NotFound              (`404`). The resource (entity, subscription, etc.) referred in the request
+  has not been found.
+* TooManyResults        (`409`). There are several results that match with the resource identification
+  used in the request.
 * ContentLengthRequired (`411`). Zero/No Content-Length in PUT/POST/PATCH request.
 * RequestEntityTooLarge (`413`). Payload is too large.
 * UnsupportedMediaType  (`415`). Request content type is not supported.
@@ -396,69 +421,79 @@ Error list (HTTP response code in parenthesis):
 * NotSupportedQuery     (`422`). The implementation does not support the query issued.
 * NoResourcesAvailable  (`413`). There are no server resources to fulfill the client request. 
 
-New error codes could be defined in new iterations of this specification.
+New error codes may be defined in new iterations of this specification.
 
 ## Geospatial properties of entities
 
-The geospatial properties of a context entity can be represented by means of regular context attributes.
+The geospatial properties of a context entity can be represented by means of regular
+context attributes.
 The provision of geospatial properties enables the resolution of geographical queries.
 
 Two different syntaxes must be supported by compliant implementations: 
 
-* *Simple Location Format*. It is meant as a very lightweight format that developers and users can quickly
-and easily add to their existing entities with little effort.
+* *Simple Location Format*. It is meant as a very lightweight format for developers and users to
+  quickly and easily add to their existing entities.
 
-* *GeoJSON*.  [GeoJSON](https://tools.ietf.org/html/draft-butler-geojson-06)
-is a geospatial data interchange format based on the JavaScript Object Notation (JSON). GeoJSON provides greater flexibility
-allowing the representation of point altitudes or even more complex geospatial shapes, for instance
-[multi geometries](http://www.macwright.org/2015/03/23/geojson-second-bite.html#multi-geometries).
+* *GeoJSON*.  [GeoJSON](https://tools.ietf.org/html/draft-butler-geojson-06) is a geospatial data
+  interchange format based on the JavaScript Object Notation (JSON).
+  GeoJSON provides greater flexibility allowing the representation of point altitudes or even more
+  complex geospatial shapes, for instance
+  [multi geometries](http://www.macwright.org/2015/03/23/geojson-second-bite.html#multi-geometries).
 
-Client applications are responsible for defining which entity attributes convey geospatial properties (by providing
-an appropriate NGSI attribute type). Typically it will be an entity attribute named `location`,
-but nothing prevents use cases where an entity contains more than one geospatial attribute. For instance,
-locations specified at different granularity levels or provided by different location methods with different accuracy. 
-Nonetheless, it is noteworthy the fact that spatial properties
+Client applications are responsible for defining which entity attributes convey geospatial properties
+(by providing an appropriate NGSI attribute type). Typically this is an entity attribute named
+`location`, but nothing prevents use cases where an entity contains more than one geospatial
+attribute. For instance, locations specified at different granularity levels or provided by different
+location methods with different accuracy. 
+Nonetheless, it is noteworthy that spatial properties
 need special indexes which can be under resource constraints imposed by backend databases.
 Thus, implementations may raise errors when spatial index limits are exceeded.
-The recommended HTTP status code for those situations is ``413``, *Request entity too large*, and the reported error
-on the response payload must be ``NoResourcesAvailable``.
+The recommended HTTP status code for those situations is ``413``, *Request entity too large*, and the
+reported error on the response payload must be ``NoResourcesAvailable``.
 
-*Note: At the time of writing it is still under discussion if supporting both syntaxes is really needed* 
+*Note: At the time of writing it is still under discussion whether supporting both syntaxes is
+really needed* 
 
 ### Simple Location Format
 
-Simple Location Format supports basic geometries ( *point* , *line* , *box* , *polygon* ) and covers the typical
-use cases when encoding geographical locations. It has been inspired by [GeoRSS Simple](http://www.georss.org/simple.html).
+Simple Location Format supports basic geometries (*point* , *line* , *box* , *polygon*) and covers
+the typical use cases when encoding geographical locations. It has been inspired by
+[GeoRSS Simple](http://www.georss.org/simple.html).
 
-It is noteworthy that the Simple Location Format is not intended to represent complex positions on Earth surface.
-For instance, those applications which require to capture altitude coordinates will have to use GeoJSON as
+It is noteworthy that the Simple Location Format is not intended to represent complex positions on
+Earth surface.
+For instance, applications that require to capture altitude coordinates will have to use GeoJSON as
 representation format for the geospatial properties of their entities. 
 
-A context attribute  which represents a location encoded using the Simple Location Format
+A context attribute representing a location encoded with the Simple Location Format
 must conform to the following syntax:
 
-* The attribute type must be one of the following values: (`geo:point`, `geo:line`, `geo:box` or `geo:polygon`).
-* The attribute value must be a list of coordinates. By default coordinates will be defined
-using the [WGS84 Lat Long](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84),
-[EPSG::4326](http://www.opengis.net/def/crs/EPSG/0/4326) coordinate reference system (CRS),
-with latitude and longitude units of decimal degrees. Such coordinate list will allow to encode the geometry
-specified by the `type` attribute and will be encoded according with the specific rules defined below:
+* The attribute type must be one of the following values: (`geo:point`, `geo:line`, `geo:box` or 
+  `geo:polygon`).
+* The attribute value must be a list of coordinates. By default, coordinates are defined
+  using the [WGS84 Lat Long](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84),
+  [EPSG::4326](http://www.opengis.net/def/crs/EPSG/0/4326) coordinate reference system (CRS),
+  with latitude and longitude units of decimal degrees. Such coordinate list allow to encode
+  the geometry specified by the `type` attribute and are encoded according to the specific
+  rules defined below:
 
   * Type `geo:point`:   the attribute value must contain a string containing a
-  valid latitude-longitude pair, separated by a comma. 
+    valid latitude-longitude pair, separated by comma.
   * Type `geo:line`:    the attribute value must contain a string array of
-  valid latitude-longitude pairs. There must be at least two pairs.
+    valid latitude-longitude pairs. There must be at least two pairs.
   * Type `geo:polygon`: the attribute value must contain a string array
-  of valid latitude-longitude pairs.
-There must be at least four pairs, with the last being identical to the first
-(so a polygon has a minimum of three actual points).
-Coordinate pairs should be properly ordered so that the line segments
-that compose the polygon remain on the ​outer ​edge of the area defined.
-For instance, the following path, ```[0,0], [0,2], [2,0], [2, 2]```, is an example of an invalid polygon definition. 
-Implementations should raise an error when none of the former conditions are met by input data. 
-  * Type `geo:box`:     A bounding box is a rectangular region, often used to define the extents of a map or
-a rough area of interest. A box is represented by a two-length string array of latitude-longitude pairs.
-The first pair is the lower corner, the second is the upper corner.
+    of valid latitude-longitude pairs.
+    There must be at least four pairs, with the last being identical to the first
+    (so a polygon has a minimum of three actual points).
+    Coordinate pairs should be properly ordered so that the line segments
+    that compose the polygon remain on the outer edge of the defined area.
+    For instance, the following path, ```[0,0], [0,2], [2,0], [2, 2]```, is an example of an invalid
+    polygon definition. 
+    Implementations should raise an error when none of the former conditions are met by input data. 
+  * Type `geo:box`:     A bounding box is a rectangular region, often used to define the extents of a
+    map or a rough area of interest. A box is represented by a two-length string array of
+    latitude-longitude pairs.
+    The first pair is the lower corner, the second is the upper corner.
 
 Note: Circle geometries are not supported, as the [literature](https://github.com/geojson/geojson-spec/wiki/Proposal---Circles-and-Ellipses-Geoms#discussion-notes)
 describes different shortcomings for implementations. 
@@ -488,15 +523,17 @@ The examples below illustrate the referred syntax:
 
 ### GeoJSON
 
-A context attribute which represents a location encoded using GeoJSON must conform to the following syntax:
+A context attribute representing a location encoded using GeoJSON must conform to the following syntax:
 
 * The NGSI type of the attribute must be `geo:json`.
-* The attribute value must be a valid GeoJSON object. It is noteworthy that longitude comes first in GeoJSON coordinates.
+* The attribute value must be a valid GeoJSON object. It is noteworthy that longitude comes before
+  latitude in GeoJSON coordinates.
 
 The example below illustrates the usage of GeoJSON.
-More GeoJSON examples can be found at [GeoJSON IETF Spec](https://tools.ietf.org/html/draft-butler-geojson-06#page-14).
-Additionally, the following [GeoJSON Tutorial](http://www.macwright.org/2015/03/23/geojson-second-bite.html)
-can be useful in urderstanding the format. 
+More GeoJSON examples can be found in [GeoJSON IETF Spec](https://tools.ietf.org/html/draft-butler-geojson-06#page-14).
+Additionally, the following
+[GeoJSON Tutorial](http://www.macwright.org/2015/03/23/geojson-second-bite.html)
+might be useful in understanding the format. 
 
 ```
 {
@@ -512,14 +549,16 @@ can be useful in urderstanding the format.
 
 ## Simple Query Language
 
-The Simple Query Language provides a simplified syntax to retrieve entities which match a set of conditions.
-A query is composed by a list of statements separated by the ';' character. Each statement express a matching condition.
-The query will return all the entities which match all the matching conditions (AND logical operator). 
+The Simple Query Language provides a simplified syntax to retrieve entities which match a set of
+conditions.
+A query is composed by a list of statements separated by the ';' character.
+Each statement express a matching condition.
+The query returns all the entities that match all the matching conditions (AND logical operator). 
 
-There are two kind of statements: *unary statements* and *binary statements*.
+There are two kinds of statements: *unary statements* and *binary statements*.
 
-Binary statements are composed by an attribute name (e.g. "temperature"), operator and value (which format
-depends on the operator), e.g.:
+Binary statements are composed by an attribute name (e.g. "temperature"), an operator and a value
+(whose format depends on the operator), e.g.:
 
 ```
 temperature==50
@@ -528,77 +567,97 @@ temperature<=20
 
 The list of operators (and the format of the values they use) is as follows:
 
-+ **Equal**: `==`. It accepts the following values:
-    + Single element, e.g. `temperature==40`. It matches entities whose attribute value
-      that exact value.
-    + A list of comma-separated values, e.g. `color==black,red`. It matches entities whose
-      attribute value is one of the values (OR clause). Eg. entities which `color` is set to
-      `black` will match, while entities which `color` is set to `white` will not match.
-    + A range, specified as a minimum and maximum separated by `..`. It matches if
-      the value is in the interval between the minimum and the maximum (both included). It can only be used
-      with attributes which contain dates (ISO8601 format), numbers or strings. E.g. `temperature==10..20` matchs if the
-      temperature is greater or equal than 10 and lower or equal than 20.
-+ **Unequal**: `!=`. It accepts the following values:
-      + The value is a single element, e.g. `temperature!=40`. It matches entities whose attribute
-      value is not that exact value.
-      + A list of comma-separated values, e.g. `color!=black,red`. It matches entities whose
-      attribute value is not any of the values (AND clause). Eg. entities whose `color` is set
-      to `black` will not match, while entities whose `color` is set to `white`will match.
-      + A range, specified as a minimum and maximum separated by `..`. It matches
-      if the value is not in the interval between the minimum and the maximum (both included). It can only
-      be used with attributes which contain dates (ISO8601 format), numbers or strings. E.g. `temperature!=10..20` matches if
-      the temperature is lower than 10 or greater than 20 (it will not match if the tempeature is 10 or the
-      temperature is 20).
-+ **Greater than**: `>`. The value is a single element, e.g. `temperature>40`. It
-  matches entities which attribute value is strictly greater than that value. It only makes sense when
-  used with attributes which contain dates, numbers or strings (using with attributes of other type might lead to
-  unexpected results).
-+ **Less than**: `<`. The value is a single element, e.g. `temperature<40`. It
-  matches entities which attribute value is strictly less than that value. It only makes sense when
-  used with attributes which contain dates, numbers or strings (using with attributes of other type might lead to
-  unexpected results).
-+ **Greater or equal than**: `>=`. The value is a single element, e.g. `temperature>=40`.
-  It matches entities which attribute value is greater than or equal to that value. It only makes sense when
-  used with attributes which contain dates, numbers or strings (using with attributes of other type might lead to
-  unexpected results).
-+ **Less or equal than**: `<=`. The value is a single element, e.g. `temperature<=40`. It
-  matches entities which attribute value is less than or equal to that value. It only makes sense when
-  used with attributes which contain dates, numbers or strings (using with attributes of other type might lead to
-  unexpected results).
++ **Equal**: `==`. This operator accepts the following types of right-hand side:
+    + Single element, e.g. `temperature==40`. For an entity to match, it must contain an attribute
+      with that exact name (temperature) and value (40).
+    + A list of comma-separated values, e.g. `color==black,red`. For an entity to match, it must
+      contain an attribute with that name and the value of the attribute must be **any** of the
+      values in the list (OR clause).
+      E.g. entities with an attribute named `color`, whose value is `black` are a match, while
+      entities with an attribute named `color` but whose value is `white` do not match.
+    + A range, specified as a minimum and a maximum, separated by `..`, e.g. `temperature==10..20`.
+      For an entity to match, it must contain an attribute with that name (temperature), and its value
+      must be in the interval between the minimum and the maximum of the range (both included).
+      Ranges can only be used with attributes that represent dates (in ISO8601 format), numbers or
+      strings.
++ **Unequal**: `!=`. This operator accepts the following types of right-hand side:
+    + Single element, e.g. `temperature!=41`. For an entity to match, it must contain an attribute
+      with that exact name (temperature) and whose value is **not** that exact value (41).
+    + A list of comma-separated values, e.g. `color!=black,red`. For an entity to match, it must
+      contain an attribute with that name, and whose value is **not** any of the values in the list
+      (AND clause).
+      Eg. entities whose attribute `color` is set to `black` will not match, while entities whose
+      attribute `color` is set to `white` will match.
+    + A range, specified as a minimum and maximum separated by `..`, e.g. `temperature!=10..20`.
+      For an entity to match, it must contain an attribute with that exact name (temperature) and
+      whose value is **not** in the interval between the minimum and the maximum (both included).
+      Ranges can only be used with attributes that represent dates (in ISO8601 format), numbers or
+      strings.
++ **Greater than**: `>`. The right-hand side must be a single element, e.g. `temperature>42`.
+    For an entity to match, it must contain an attribute with that exact name (temperature) and
+    whose value is strictly greater than that value (42).
+    This operation is only valid for attributes of type date, numbers or strings (used with
+    attributes of other types may lead to unpredictable results).
++ **Less than**: `<`. The right-hand side must be a single element, e.g. `temperature<43`.
+    For an entity to match, it must contain an attribute with that exact name (temperature) and
+    whose value is strictly less than that value (43).
+    This operation is only valid for attributes of type date, numbers or strings (used with
+    attributes of other types may lead to unpredictable results).
++ **Greater or equal than**: `>=`. The right-hand side must be a single element, e.g. `temperature>=44`.
+    For an entity to match, it must contain an attribute with that exact name (temperature) and
+    whose value is greater than or equal to that value (44).
+    This operation is only valid for attributes of type date, numbers or strings (used with
+    attributes of other types may lead to unpredictable results).
++ **Less or equal than**: `<=`. The right-hand side must be a single element, e.g. `temperature<=45`.
+    For an entity to match, it must contain an attribute with that exact name (temperature) and
+    whose value is less than or equal to that value (45).
+    This operation is only valid for attributes of type date, numbers or strings (used with
+    attributes of other types may lead to unpredictable results).
 + **Match pattern**: `~=`. The value matches a given pattern, expressed as a regular expression, e.g.
-  `color=ow` matches `brown` or `yellow`. It only makes sense when used with attributes which contain strings.
+    `color=ow`.
+    For an entity to match, it must contain an attribute with that exact name (color), and
+    whose value matches the string in the right-hand side, 'ow' in this example (`brown` and `yellow`
+    would match, `black` and `white` would not).
+    This operation is only valid for attributes of type string.
 
-The symbol `:` can be used as synonym of `==`.
+The symbol `:` can be used instead of `==`.
 
-In the case of equal or unequal, if the value to match include a `,`, you can use simple quote
-(`'`), e.g: `color=='light,green','deep,blue'`.
+In the case of equal or unequal, if s string to match includes a `,`, you can use simple quote
+(`'`) to disable the special meaning of the comma,  e.g: `color=='light,green','deep,blue'`.
+The first example would match a color with the exact value 'light,green' OR 'deep,blue'.
 
-Unary negatory statements use the unary operator `!`, while affirmative unary statements use no operator at all.
-The unary statements are used to check for attribute existence. E.g. `temperature` matches entities that have
-an attribute called 'temperature' (no matter its value), while `!temperature` matches entities that do not have
-a temperature attribute.
-  
+Unary negatory statements use the unary operator `!`, while affirmative unary statements use no
+operator at all.
+The unary statements are used to check for the existence of attribute.
+E.g. `temperature` matches entities that have an attribute called 'temperature' (no matter its value),
+while `!temperature` matches entities that do not have a temperature called 'attribute'.
  
 ## Geographical Queries
 
-Geographical queries are specified by means of the following parameters:
+Geographical queries are specified using the following parameters:
 
 ``georel`` is intended to specify a spatial relationship (a predicate)
 between matching entities and a reference shape (`geometry`).
 It is composed of a token list separated by ';'.
-The first token is the relationship name, the rest of tokens (if any) are modifiers which
-provide more information about such a relationship. The following values are allowed:
+The first token is the relationship name, the rest of the tokens (if any) are modifiers which
+provide more information about the relationship. The following values are recognized:
 
-+ `georel=near`. The ``near`` relationship means that matching entities must be located at certain threshold
-distance to the reference geometry. It supports the following modifiers:
-  + `maxDistance`.  Express, in meters, the maximum distance at which matching entities must be located.
-  + `minDistance`.  Express, in meters, the minimum distance at which matching entities must be located.
-+ `georel=coveredBy`. Denotes that matching entities are those which exist entirely within the reference geometry.
-When resolving this query the border of a shape must be considered to be part of the shape. 
-+ `georel=intersects`. Denotes that matching entities will be those intersecting with the reference geometry.
-+ `georel=equals`. The geometry associated to the position of matching entities
-and the reference geometry must be exactly the same.
-+ `georel=disjoint`. Denotes that matching entities will be those NOT intersecting with the reference geometry. 
++ `georel=near`. The ``near`` relationship means that matching entities must be located at a certain
+  threshold distance to the reference geometry. It supports the following modifiers:
+  + `maxDistance`.  Expresses, in meters, the maximum distance at which matching entities must be
+    located.
+  + `minDistance`.  Expresses, in meters, the minimum distance at which matching entities must be
+    located.
++ `georel=coveredBy`. Denotes that matching entities are those that exist entirely within the
+  reference geometry.
+  When resolving a query of this type, the border of the shape must be considered to be part of the
+  shape. 
++ `georel=intersects`. Denotes that matching entities are those intersecting with the reference
+  geometry.
++ `georel=equals`. The geometry associated to the position of matching entities and the reference
+  geometry must be exactly the same.
++ `georel=disjoint`. Denotes that matching entities are those **not** intersecting with the
+  reference geometry. 
 
 `geometry` allows to define the reference shape to be used when resolving the query.
  The following geometries (see Simple Location Format) must be supported:
@@ -608,29 +667,29 @@ and the reference geometry must be exactly the same.
 + `geometry=polygon`, defines a polygon.
 + `geometry=box`, defines a bounding box.
 
-**coords** must be a string containing a semicolon separated list of pairs of geographical coordinates
+**coords** must be a string containing a semicolon-separated list of pairs of geographical coordinates
 in accordance with the geometry specified and the rules mandated by the Simple Location Format:
 
-* `geometry=point`.   `coords` will contain a pair of WGS-84 geo-coordinates.
-* `geometry=line`.    `coords` will contain a list of pairs of WGS-84 geo-coordinates.
-* `geometry=polygon`. `coords` will be composed by at least four pairs of WGS-84 geo-coordinates.
-* `geometry=box`.     `coords` will be composed by two pairs of WGS-84 geo-coordinates.
+* `geometry=point`.   `coords` contains a pair of WGS-84 geo-coordinates.
+* `geometry=line`.    `coords` contains a list of pairs of WGS-84 geo-coordinates.
+* `geometry=polygon`. `coords` is composed by at least four pairs of WGS-84 geo-coordinates.
+* `geometry=box`.     `coords` is composed by two pairs of WGS-84 geo-coordinates.
 
 Examples:
 
 `georel=near;maxDistance:1000&geometry=point&coords=-40.4,-3.5`.
-Matching entities will be located, at a maximum, 1000 meters far away from the reference point.
+Matching entities must be located (at most) 1000 meters from the reference point.
 
 `georel=near;minDistance:5000&geometry=point&coords=-40.4,-3.5`.
-Matching entities will be at least 5000 meters far away from the reference point. 
+Matching entities must be (at least) 5000 meters from the reference point. 
 
 `georel=coveredBy&geometry=polygon&coords=25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190`
-Matching entities will be those located within the referred polygon.
+Matching entities are those located within the referred polygon.
 
 ### Query Resolution
 
 If an implementation is not able to resolve a geographical query, the HTTP Status code of the response
-must be ```422```, *Unprocessable Entity*. The error name present in the error payload must be
+must be ```422```, *Unprocessable Entity*. The error name, present in the error payload, must be
 ``NotSupportedQuery``. 
 
 When resolving geographical queries, through the Simple Query Language,
@@ -638,35 +697,35 @@ the API implementation is responsible for determining which entity attribute
 contains the geographical location to be used for matching purposes.
 To this aim, the following rules must be followed:
 
-* If an entity has no attribute which corresponds to a location (encoded as GeoJSON or the
-Simple Location Format), then such an entity has not declared any geospatial property and will not match any
-geographical query.
+* If an entity has no attribute corresponding to a location (encoded as GeoJSON or the
+Simple Location Format), then such an entity has not declared any geospatial property and will not
+match any geographical query.
 
-* If an entity only exposes one attribute corresponding to a location, then such an attribute will be used when
-resolving geographical queries.
+* If an entity only exposes one attribute corresponding to a location, then such an attribute will be
+used when resolving geographical queries.
 
-* If an entity exposes more than one location, then the attribute which contains a metadata property
-named ``defaultLocation``, with boolean value ``true``
-will be taken as the reference location used for resolving geographical queries.
+* If an entity exposes more than one location, then the attribute containing a metadata property
+named ``defaultLocation``, with boolean value ``true`` will be taken as the reference location used for resolving geographical queries. 
 
-* If there is more than one attribute exposing location but none of them has been labeled as being the
-default location, then the query will be declared as ambigous and an HTTP error response with code ``409``
+* If there is more than one attribute exposing location but none of them is labeled as default
+location, then the query will be declared ambiguous and an HTTP error response with a ``409`` code
 must be sent.
 
-* If there is more than one attribute exposing location which has been labeled as being the
-*default location*, then the query will be declared as ambigous and an HTTP error response with code ``409``
-must be sent. 
+* If there is more than one attribute exposing location labeled as *default location*, then the query
+is declared ambiguous and an HTTP error response with a ``409`` code must be sent. 
 
 ## Notification Messages
 
 Notifications include two fields:
 
-* `subscriptionId` which represents the concerned subscription that originates the notification
-* `data` an array with the notification data itself which includes the entity and attributes concerned. Each
-  element in the array corresponds to a different entity. By default each entity will be represented in
-  normalized mode. However by using the `attrsFormat` modifier it can be requested a simplified representation.
+* `subscriptionId` represents the concerned subscription that originates the notification
+* `data` is an array with the notification data itself which includes the entity and the concerned
+  attributes. Each element in the array corresponds to a different entity. By default, the entities
+  are represented in `normalized` mode. However, using the `attrsFormat` modifier, a simplified
+  representation format can be requested.
 
-If `attrsFormat` is `normalized` (or if `attrsFormat` is omitted) then default entity representation is used:
+If `attrsFormat` is `normalized` (or if `attrsFormat` is omitted) then default entity representation
+is used:
 
 ```
 {
@@ -698,7 +757,7 @@ If `attrsFormat` is `normalized` (or if `attrsFormat` is omitted) then default e
 }
 ```
 
-If `attrsFormat` is `keyValues` then keyValues entity partial representation mode is used:
+If `attrsFormat` is `keyValues` then keyValues partial entity representation mode is used:
 
 ```
 {
@@ -709,19 +768,18 @@ If `attrsFormat` is `keyValues` then keyValues entity partial representation mod
        "type": "Room",
        "temperature": 23,
        "humidity": 70
-       }
      },
      {
-     "id": "Room2",
-     "type": "Room",
-     "temperature": 24
+       "id": "Room2",
+       "type": "Room",
+       "temperature": 24
      }
    ]
 }
 ```
 
 
-If `attrsFormat` is `values` then values entity partial representation mode is used:
+If `attrsFormat` is `values` then values partial entity representation mode is used:
 
 ```
 {
@@ -730,22 +788,25 @@ If `attrsFormat` is `values` then values entity partial representation mode is u
 }
 ```
 
-Notifications must include a `Ngsiv2-AttrsFormat` header with the value of `attrsFormat` of the associated subscription,
-so notification receiver can know the format used without needing processing notification payload.
+Notifications must include a `Ngsiv2-AttrsFormat` HTTP header with the value of the format of the
+associated subscription, so that the notification receiver is aware of the format without
+needing to process the notification payload.
 
 ## Custom Notifications
 
 NGSIv2 clients can customize HTTP notification messages using a simple template mechanism. The
-`notification.httpCustom` property of a subscription allows to specify the following fields subject
+`notification.httpCustom` property of a subscription allows to specify the following fields
 to be templatized:
 
 * `url`
-* `headers` (both header names and values)
-* `qs` (both in parameter names and values)
+* `headers` (both header name and value can be templatized)
+* `qs` (both parameter name and value can be templatized)
 * `payload`
 
-In addition the HTTP method to be used for delivering the notification can be customized as well using the `method` field,
-but it cannot be a template.
+The fifth field `method`, lets the NGSIv2 clients select the HTTP method to be used for delivering
+the notification, but note that only valid HTTP verbs can be used: GET, PUT, POST, DELETE, PATCH,
+HEAD, OPTIONS, TRACE, and CONNECT.
+
 
 Macro substitution for templates is based on the syntax `${..}`. In particular:
 
