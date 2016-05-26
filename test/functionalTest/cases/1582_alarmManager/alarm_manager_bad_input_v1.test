@@ -152,7 +152,7 @@ Date: REGEX(.*)
 04. POST /v1/updateContext without payload
 ==========================================
 HTTP/1.1 411 Length Required
-Content-Length: 153
+Content-Length: 161
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -161,7 +161,7 @@ Date: REGEX(.*)
     "errorCode": {
         "code": "411",
         "details": "Zero/No Content-Length in PUT/POST/PATCH request",
-        "reasonPhrase": "Length Required"
+        "reasonPhrase": "Content Length Required"
     }
 }
 

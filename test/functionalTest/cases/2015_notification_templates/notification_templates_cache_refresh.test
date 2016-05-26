@@ -52,7 +52,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "url":      "http://127.0.0.1:'${LISTENER_PORT}'/${NOTIFY_URL}",
       "method":   "PATCH",
       "payload":  "{ %22A1%22: %22${A1}%22, %22A2%22: %22${A2}%22, %22A3%22: %22${A3}%22 }",
@@ -154,7 +154,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 05. GET the subscription
 ========================
 HTTP/1.1 200 OK
-Content-Length: 587
+Content-Length: 585
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -165,7 +165,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
-            "httpExtended": {
+            "httpCustom": {
                 "headers": {
                     "A1": "${A1}",
                     "A2": "${A2}",

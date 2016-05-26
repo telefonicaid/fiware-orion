@@ -47,7 +47,7 @@ payload='{
   "type": "T1",
   "birthdate": {
     "value": "foo",
-    "type": "date"
+    "type": "DateTime"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -69,7 +69,7 @@ payload='{
   "type": "T1",
   "birthdate": {
     "value": "2050-04-05T14:00:00.00Z",
-    "type": "date"
+    "type": "DateTime"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -89,7 +89,7 @@ echo "==================================="
 payload='{
   "birthdate": {
     "value": "bar",
-    "type": "date"
+    "type": "DateTime"
   }
 }'
 orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
@@ -109,7 +109,7 @@ echo "================================="
 payload='{
   "birthdate": {
     "value": "2018-12-03T13:21:42.00Z",
-    "type": "date"
+    "type": "DateTime"
   }
 }'
 orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
@@ -166,7 +166,7 @@ Date: REGEX(.*)
 04. Get entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 99
+Content-Length: 103
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -174,7 +174,7 @@ Date: REGEX(.*)
 {
     "birthdate": {
         "metadata": {},
-        "type": "date",
+        "type": "DateTime",
         "value": "2050-04-05T14:00:00.00Z"
     },
     "id": "E1",
@@ -199,7 +199,7 @@ Date: REGEX(.*)
 06. Check entity hasn't been modified
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 99
+Content-Length: 103
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -207,7 +207,7 @@ Date: REGEX(.*)
 {
     "birthdate": {
         "metadata": {},
-        "type": "date",
+        "type": "DateTime",
         "value": "2050-04-05T14:00:00.00Z"
     },
     "id": "E1",
@@ -227,7 +227,7 @@ Date: REGEX(.*)
 08. Get entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 99
+Content-Length: 103
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -235,7 +235,7 @@ Date: REGEX(.*)
 {
     "birthdate": {
         "metadata": {},
-        "type": "date",
+        "type": "DateTime",
         "value": "2018-12-03T13:21:42.00Z"
     },
     "id": "E1",

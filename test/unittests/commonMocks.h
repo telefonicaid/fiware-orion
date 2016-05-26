@@ -264,7 +264,7 @@ MATCHER_P(MatchHttpInfo, expected, "")
     return false;
   }
 
-  if (expectedP->extended != argP->extended)
+  if (expectedP->custom != argP->custom)
   {
     return false;
   }

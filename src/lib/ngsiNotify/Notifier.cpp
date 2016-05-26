@@ -337,13 +337,13 @@ void Notifier::sendNotifyContextRequest
     //   - if 'payload' is given, use that string as template instead of the default payload string, substituting all fields that are to be substituted
     //   - if 'method' is given, then a custom HTTP method is used (instead of POST, which is default)
     //
-    // Redirect to the method sendNotifyContextRequestAsPerTemplate() when 'httpInfo.extended' is TRUE.
-    // 'httpInfo.extended' is FALSE by default and set to TRUE by the json parser.
+    // Redirect to the method sendNotifyContextRequestAsPerTemplate() when 'httpInfo.custom' is TRUE.
+    // 'httpInfo.custom' is FALSE by default and set to TRUE by the json parser.
     //
     //
     // Note that disableCusNotif (taken from CLI) could disable custom notifications and force to use regular ones
     //
-    if (httpInfo.extended && !disableCusNotif)
+    if (httpInfo.custom && !disableCusNotif)
     {
       NotificationAsTemplateParams* paramP = new NotificationAsTemplateParams();
 

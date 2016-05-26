@@ -75,7 +75,7 @@ payload='{
   "type": "T",
   "birthday": {
     "value": "2016-02-23T10:00:00.00Z",
-    "type": "date"
+    "type": "DateTime"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -88,7 +88,7 @@ echo "==================================================================="
 payload='{
  "birthday": {
    "value": "2016-02-24T10:00:00.00Z",
-   "type": "date"
+   "type": "DateTime"
   }
 }'
 orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
@@ -101,7 +101,7 @@ echo "==================================================================="
 payload='{
  "birthday": {
    "value": "2016-02-25T10:00:00.00Z",
-   "type": "date"
+   "type": "DateTime"
   }
 }'
 orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
@@ -158,7 +158,7 @@ Date: REGEX(.*)
 05. Get accumulator dump (1 notifications)
 ==========================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 152
+Content-Length: 156
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -171,7 +171,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "birthday": {
                 "metadata": {},
-                "type": "date",
+                "type": "DateTime",
                 "value": "2016-02-23T10:00:00.00Z"
             }, 
             "id": "E1",

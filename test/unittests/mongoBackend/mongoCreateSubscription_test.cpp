@@ -41,9 +41,9 @@ using namespace ngsiv2;
 
 /* ****************************************************************************
 *
-* createSubscriptionNotExtendedOK -
+* createSubscriptionNotCustomOK -
 */
-TEST(mongoCreateSubscriptions, createSubscriptionNotExtendedOK)
+TEST(mongoCreateSubscriptions, createSubscriptionNotCustomOK)
 {
   OrionError  oe;
 
@@ -72,7 +72,7 @@ TEST(mongoCreateSubscriptions, createSubscriptionNotExtendedOK)
   sub.notification.attributes.push_back("C");
   sub.notification.attributes.push_back("D");
   sub.notification.httpInfo.url      = "http://foo.bar";
-  sub.notification.httpInfo.extended = false;
+  sub.notification.httpInfo.custom   = false;
 
   /* Invoke the function in mongoBackend library */
   std::string result = mongoCreateSubscription(sub, &oe, "", servicePathVector, "", "");
@@ -96,7 +96,7 @@ TEST(mongoCreateSubscriptions, createSubscriptionNotExtendedOK)
 
   EXPECT_STREQ("this is the sub", C_STR_FIELD(doc, "description"));
   EXPECT_STREQ("active", C_STR_FIELD(doc, "status"));
-  EXPECT_FALSE(doc.getBoolField("extended"));
+  EXPECT_FALSE(doc.getBoolField("custom"));
 
   BSONObj expression = doc.getField("expression").embeddedObject();
   EXPECT_STREQ("temperature<=20", C_STR_FIELD(expression, "q"));
@@ -136,9 +136,9 @@ TEST(mongoCreateSubscriptions, createSubscriptionNotExtendedOK)
 
 /* ****************************************************************************
 *
-* createSubscriptionExtendedOK -
+* createSubscriptionCustomOK -
 */
-TEST(mongoCreateSubscriptions, createSubscriptionExtendedOK)
+TEST(mongoCreateSubscriptions, createSubscriptionCustomOK)
 {
   OrionError  oe;
 
@@ -167,7 +167,7 @@ TEST(mongoCreateSubscriptions, createSubscriptionExtendedOK)
   sub.notification.attributes.push_back("C");
   sub.notification.attributes.push_back("D");
   sub.notification.httpInfo.url      = "http://foo.bar";
-  sub.notification.httpInfo.extended = true;
+  sub.notification.httpInfo.custom   = true;
   sub.notification.httpInfo.verb     = PUT;
   sub.notification.httpInfo.headers.insert(std::pair<std::string, std::string>("X-My-Header", "foo"));
   sub.notification.httpInfo.headers.insert(std::pair<std::string, std::string>("Content-Type", "text/plain"));
@@ -197,7 +197,7 @@ TEST(mongoCreateSubscriptions, createSubscriptionExtendedOK)
 
   EXPECT_STREQ("this is the sub", C_STR_FIELD(doc, "description"));
   EXPECT_STREQ("active", C_STR_FIELD(doc, "status"));
-  EXPECT_TRUE(doc.getBoolField("extended"));
+  EXPECT_TRUE(doc.getBoolField("custom"));
 
   EXPECT_STREQ("PUT", C_STR_FIELD(doc, "method"));
   EXPECT_STREQ("Hey!", C_STR_FIELD(doc, "payload"));

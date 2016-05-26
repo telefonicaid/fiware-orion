@@ -56,7 +56,7 @@ payload='{
   "id": "E24",
   "birthdate": {
     "value": "2016-02-24T10:00:00.00Z",
-    "type": "date"
+    "type": "DateTime"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -70,7 +70,7 @@ payload='{
   "id": "E23",
   "birthdate": {
     "value": "2016-02-23T10:00:00.00Z",
-    "type": "date"
+    "type": "DateTime"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -84,7 +84,7 @@ payload='{
   "id": "E22",
   "birthdate": {
     "value": "2016-02-22T10:00:00.00Z",
-    "type": "date"
+    "type": "DateTime"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -249,7 +249,7 @@ Date: REGEX(.*)
 04b. GET entities with birthdate=2016-02-24T10:00:00.00Z, see E24 (without keyValues)
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 104
+Content-Length: 108
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -258,7 +258,7 @@ Date: REGEX(.*)
     {
         "birthdate": {
             "metadata": {},
-            "type": "date",
+            "type": "DateTime",
             "value": "2016-02-24T10:00:00.00Z"
         },
         "id": "E24",
@@ -319,7 +319,7 @@ Date: REGEX(.*)
 06b. GET entities with birthdate<2016-02-25T10:00:00.00Z, see all three (without keyValues)
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 310
+Content-Length: 322
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -328,7 +328,7 @@ Date: REGEX(.*)
     {
         "birthdate": {
             "metadata": {},
-            "type": "date",
+            "type": "DateTime",
             "value": "2016-02-24T10:00:00.00Z"
         },
         "id": "E24",
@@ -337,7 +337,7 @@ Date: REGEX(.*)
     {
         "birthdate": {
             "metadata": {},
-            "type": "date",
+            "type": "DateTime",
             "value": "2016-02-23T10:00:00.00Z"
         },
         "id": "E23",
@@ -346,7 +346,7 @@ Date: REGEX(.*)
     {
         "birthdate": {
             "metadata": {},
-            "type": "date",
+            "type": "DateTime",
             "value": "2016-02-22T10:00:00.00Z"
         },
         "id": "E22",
@@ -380,7 +380,7 @@ Date: REGEX(.*)
 07b. GET entities with birthdate>=2016-02-23T10:00:00.00Z, see E23 and E24 (without keyValues)
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 207
+Content-Length: 215
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -389,7 +389,7 @@ Date: REGEX(.*)
     {
         "birthdate": {
             "metadata": {},
-            "type": "date",
+            "type": "DateTime",
             "value": "2016-02-24T10:00:00.00Z"
         },
         "id": "E24",
@@ -398,7 +398,7 @@ Date: REGEX(.*)
     {
         "birthdate": {
             "metadata": {},
-            "type": "date",
+            "type": "DateTime",
             "value": "2016-02-23T10:00:00.00Z"
         },
         "id": "E23",
@@ -432,7 +432,7 @@ Date: REGEX(.*)
 08b. GET entities with birthdate<=2016-02-23T10:00:00.00Z, see E22 and E23 (without keyValues)
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 207
+Content-Length: 215
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -441,7 +441,7 @@ Date: REGEX(.*)
     {
         "birthdate": {
             "metadata": {},
-            "type": "date",
+            "type": "DateTime",
             "value": "2016-02-23T10:00:00.00Z"
         },
         "id": "E23",
@@ -450,7 +450,7 @@ Date: REGEX(.*)
     {
         "birthdate": {
             "metadata": {},
-            "type": "date",
+            "type": "DateTime",
             "value": "2016-02-22T10:00:00.00Z"
         },
         "id": "E22",

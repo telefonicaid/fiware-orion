@@ -50,7 +50,7 @@ payload='{
     }
   },
   "notification": {
-    "httpExtended": {
+    "httpCustom": {
       "url":     "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "qs":      { "param${A1}": "${A2}" },
       "headers": { "X-${A3}": "${A4}" }
