@@ -192,5 +192,5 @@ void  SubscribeContextRequest::toNgsiv2Subscription(Subscription* sub)
   sub->descriptionProvided            = false;
   sub->attrsFormat                    = NGSI_V1_LEGACY;
   sub->notification.blacklist         = false;
-  sub->notification.httpInfo.extended = false;  
+  sub->notification.httpInfo.custom   = false;  
 }

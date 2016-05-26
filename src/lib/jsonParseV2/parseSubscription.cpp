@@ -399,8 +399,8 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
           return badInput(ciP, "Invalid URL parsing notification url");
         }
       }
-      subsP->notification.httpInfo.url      = urlOpt.value;
-      subsP->notification.httpInfo.extended = false;
+      subsP->notification.httpInfo.url    = urlOpt.value;
+      subsP->notification.httpInfo.custom = false;
     }
   }
   else if (notification.HasMember("httpCustom"))
@@ -507,7 +507,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       }
     }
 
-    subsP->notification.httpInfo.extended = true;
+    subsP->notification.httpInfo.custom = true;
   }
   else  // missing callback field
   {

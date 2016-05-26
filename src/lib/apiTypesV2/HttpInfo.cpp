@@ -43,7 +43,7 @@ namespace ngsiv2
 *
 * HttpInfo::HttpInfo - 
 */
-HttpInfo::HttpInfo() : verb(NOVERB), extended(false)
+HttpInfo::HttpInfo() : verb(NOVERB), custom(false)
 {
 }
 
@@ -53,7 +53,7 @@ HttpInfo::HttpInfo() : verb(NOVERB), extended(false)
 *
 * HttpInfo::HttpInfo - 
 */
-HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(NOVERB), extended(false)
+HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(NOVERB), custom(false)
 {
 }
 
@@ -69,7 +69,7 @@ std::string HttpInfo::toJson()
 
   jh.addString("url", this->url);
 
-  if (extended)
+  if (custom)
   {
     if (this->payload != "")
     {
@@ -103,10 +103,10 @@ std::string HttpInfo::toJson()
 */
 void HttpInfo::fill(const BSONObj& bo)
 {
-  this->url      = bo.hasField(CSUB_REFERENCE)? getStringFieldF(bo, CSUB_REFERENCE) : "";
-  this->extended = bo.hasField(CSUB_EXTENDED)? getBoolFieldF(bo, CSUB_EXTENDED)  : false;
+  this->url    = bo.hasField(CSUB_REFERENCE)? getStringFieldF(bo, CSUB_REFERENCE) : "";
+  this->custom = bo.hasField(CSUB_CUSTOM)?    getBoolFieldF(bo,   CSUB_CUSTOM)    : false;
 
-  if (this->extended)
+  if (this->custom)
   {
     this->payload  = bo.hasField(CSUB_PAYLOAD)? getStringFieldF(bo, CSUB_PAYLOAD) : "";
 
