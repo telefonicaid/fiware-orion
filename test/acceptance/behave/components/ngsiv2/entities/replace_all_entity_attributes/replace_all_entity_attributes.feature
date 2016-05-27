@@ -138,10 +138,10 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
       | parameter          |
       | without_properties |
     When replace attributes by ID "room_1" if it exists and with "normalized" mode
-    Then verify that receive an "Length Required" http code
+    Then verify that receive an "Content Length Required" http code
     And verify an error response
       | parameter   | value                                            |
-      | error       | LengthRequired                                   |
+      | error       | ContentLengthRequired                            |
       | description | Zero/No Content-Length in PUT/POST/PATCH request |
 
   @maximum_size

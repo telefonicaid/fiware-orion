@@ -82,8 +82,8 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
 
   @date_type @BUG_1885 @ISSUE_1604
   # this scenario is only to automate the check for a bug.
-  # later, it is necessary more scenarios and examples to testing of the date type, See ISO8601 format.
-  Scenario:  get an attribute value by entity ID and attribute name if it exists using NGSI v2 with date in attribute type
+  # later, it is necessary more scenarios and examples to testing of the DateTime type, See ISO8601 format.
+  Scenario:  get an attribute value by entity ID and attribute name if it exists using NGSI v2 with DateTime in attribute type
     Given  a definition of headers
       | parameter          | value                  |
       | Fiware-Service     | test_update_happy_path |
@@ -97,7 +97,7 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | attributes_number | 3                       |
       | attributes_name   | timestamp               |
       | attributes_value  | 2035-06-15T07:21:24.00Z |
-      | attributes_type   | date                    |
+      | attributes_type   | DateTime                |
       | metadatas_number  | 2                       |
       | metadatas_name    | very_hot                |
       | metadatas_type    | alarm                   |
