@@ -2,17 +2,17 @@
 
 Apart from metadata elements to which Orion pays special attention (e.g.
 ID, etc.), users can attach their own metadata to entity attributes. These
-metadata elements are processed by Orion in a transparent way: it simply
-stores them in the database at update time and retrieve it at query and
+metadata elements are processed by Orion in a transparent way: Orion simply
+stores them in the database at update time and retrieves them at query and
 notification time.
 
-You can use any name for your custom metadata except for the ones used
-for some metadata names that are interpreted by Orion:
+You can use any name for your custom metadata except for a few reserved names, used
+for special metadata that are interpreted by Orion:
 
 -   [ID](#metadata-id-for-attributes)
 -   [location] (currently [deprecated](../deprecated.md), but still supported)
 
-Its management is a slight different in NGSIv1 and NGSIv2, so it is
+Its management is slightly different in NGSIv1 and NGSIv2, so it is
 described in different sections.
 
 ## Custom attribute metadata (using NGSIv2)
@@ -40,7 +40,7 @@ curl localhost:1026/v2/entities -s -S --header 'Content-Type: application/json' 
 EOF
 ```
 
-Different from NGSIv1, at the present moment NGSIv2 doesn't define an operation
+Unlike NGSIv1, at the moment NGSIv2 doesn't define an operation
 to update metadata regardless of the attribute value being updated
 or not. In addition, it doesn't define an operation to add metadata after
 attribute creation. In other words, the whole metadata array is updated
