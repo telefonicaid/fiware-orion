@@ -174,7 +174,7 @@ class NGSI:
                         "attrs": {
                             "timestamp_0": {
                                 "value": "017-06-17T07:21:24.238Z",
-                                "type": "date",
+                                "type": "DateTime",
                                 "md": [{
                                             "name": "very_hot_1",
                                             "type": "alarm",
@@ -737,7 +737,7 @@ class NGSI:
         ex:
             {
                 timestamp: {
-                    type: "date"
+                    type: "DateTime"
                     value: "017-06-17T07:21:24.238Z"
                     "metadata": {
                           very_hot: {

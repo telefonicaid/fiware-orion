@@ -241,10 +241,10 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | Fiware-ServicePath | /test                |
       | Content-Type       | application/json     |
     When create entity group with "1" entities in "normalized" mode
-    Then verify that receive several "Length Required" http code
+    Then verify that receive several "Content Length Required" http code
     And verify several error responses
       | parameter   | value                                            |
-      | error       | LengthRequired                                   |
+      | error       | ContentLengthRequired                            |
       | description | Zero/No Content-Length in PUT/POST/PATCH request |
 
   # ---------- Services --------------------------------

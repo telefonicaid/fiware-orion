@@ -161,10 +161,10 @@ Feature: update attributes by entity ID if it exists using NGSI v2. "PATCH" - /v
       | parameter          |
       | without_properties |
     When update attributes by ID "room" if it exists and with "normalized" mode
-    Then verify that receive an "Length Required" http code
+    Then verify that receive an "Content Length Required" http code
     And verify an error response
       | parameter   | value                                            |
-      | error       | LengthRequired                                   |
+      | error       | ContentLengthRequired                            |
       | description | Zero/No Content-Length in PUT/POST/PATCH request |
 
   @maximum_size

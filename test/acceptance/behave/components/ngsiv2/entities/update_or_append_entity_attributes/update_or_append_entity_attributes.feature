@@ -156,10 +156,10 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | parameter          |
       | without_properties |
     When update or append attributes by ID "room" and with "normalized" mode
-    Then verify that receive an "Length Required" http code
+    Then verify that receive an "Content Length Required" http code
     And verify an error response
       | parameter   | value                                            |
-      | error       | LengthRequired                                   |
+      | error       | ContentLengthRequired                            |
       | description | Zero/No Content-Length in PUT/POST/PATCH request |
 
   @maximum_size @BUG_1199

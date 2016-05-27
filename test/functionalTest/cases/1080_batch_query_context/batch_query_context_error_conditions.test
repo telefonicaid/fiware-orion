@@ -39,9 +39,8 @@ brokerStart CB
 # 07. POST /v2/op/query, with a scope being a vector, not an object - see error
 # 08. POST /v2/op/query, with a scope without 'type' - see error
 # 09. POST /v2/op/query, with a scope without 'value' - see error
-# 10. POST /v2/op/query, with a scope with an unknown field (not 'value' nor 'type') - see error
-# 11. POST /v2/op/query, with a scope whose 'type' is not a String - see error
-# 12. POST /v2/op/query, with a scope whose 'value' is not a String - see error
+# 10. POST /v2/op/query, with a scope whose 'type' is not a String - see error
+# 11. POST /v2/op/query, with a scope whose 'value' is not a String - see error
 #
 
 echo "01. POST /v2/op/query, with empty payload, see error"
@@ -154,23 +153,7 @@ echo
 echo
 
 
-echo "10. POST /v2/op/query, with a scope with an unknown field (not 'value' nor 'type') - see error"
-echo "=============================================================================================="
-payload='{
-  "scopes": [
-    {
-      "type": "scope-type",
-      "value": "scope-value",
-      "unknown": "error"
-    }
-  ]
-}'
-orionCurl --url /v2/op/query --payload "$payload"
-echo
-echo
-
-
-echo "11. POST /v2/op/query, with a scope whose 'type' is not a String - see error"
+echo "10. POST /v2/op/query, with a scope whose 'type' is not a String - see error"
 echo "============================================================================"
 payload='{
   "scopes": [
@@ -185,7 +168,7 @@ echo
 echo
 
 
-echo "12. POST /v2/op/query, with a scope whose 'value' is not a String - see error"
+echo "11. POST /v2/op/query, with a scope whose 'value' is not a String - see error"
 echo "============================================================================="
 payload='{
   "scopes": [
@@ -327,21 +310,7 @@ Date: REGEX(.*)
 }
 
 
-10. POST /v2/op/query, with a scope with an unknown field (not 'value' nor 'type') - see error
-==============================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "unrecognized item in scope object: /unknown/",
-    "error": "BadRequest"
-}
-
-
-11. POST /v2/op/query, with a scope whose 'type' is not a String - see error
+10. POST /v2/op/query, with a scope whose 'type' is not a String - see error
 ============================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 71
@@ -355,16 +324,16 @@ Date: REGEX(.*)
 }
 
 
-12. POST /v2/op/query, with a scope whose 'value' is not a String - see error
+11. POST /v2/op/query, with a scope whose 'value' is not a String - see error
 =============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 72
+Content-Length: 89
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for scope value",
+    "description": "invalid JSON type for scope value (must be string)",
     "error": "BadRequest"
 }
 

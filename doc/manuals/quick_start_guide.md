@@ -12,16 +12,16 @@ First of all, you need an account in FIWARE Lab, so register for one in [the fol
 
 Let's assume that the authentication token you got is in the AUTH_TOKEN shell variable. Now, let's start querying some real-time information from the city sensors of Santander (in particular, a sound level meter):
 ``` 
-curl orion.lab.fiware.org:1026/v1/contextEntities/urn:smartsantander:testbed:357 \
-   -X GET -s -S --header 'Content-Type: application/json'  --header 'Accept: application/json' \ 
+curl orion.lab.fiware.org:1026/v2/entities/urn:smartsantander:testbed:357 \
+   -X GET -s -S --header 'Accept: application/json' \
    --header  "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool
 ``` 
 You will get a JSON document including the time of the last measure (TimeInstant), sound level (sound), sensor battery charge (batteryCharge) and sensor location (Latitud and Longitud... sorry for the Spanish in these last ones ;) for the sensor identified by "urn:smartsantander:testbed:357".
 
 Let's query another sensor, this time one related to road traffic:
 ``` 
-curl orion.lab.fiware.org:1026/v1/contextEntities/urn:smartsantander:testbed:3332 \
-   -X GET -s -S  --header 'Content-Type: application/json' --header 'Accept: application/json' \
+curl orion.lab.fiware.org:1026/v2/entities/urn:smartsantander:testbed:3332 \
+   -X GET -s -S  --header 'Accept: application/json' \
    --header "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool
 ``` 
 The data you find in the returned JSON about the "urn:smartsantander:testbed:3332" sensor is:
@@ -34,27 +34,26 @@ The data you find in the returned JSON about the "urn:smartsantander:testbed:333
 The Orion Context Broker global instance can also be used to create new entities. First, chose a unique entity ID (uniqueness is important, given that the Orion Context Broker instance is shared and you could be modifying the entity of some other user):
 
     # RANDOM_NUMBER=$(cat /dev/urandom | tr -dc '0-9' | fold -w 10 | head -n 1)
-    # ID=MyEntity-$RANDOM_NUMBER# echo $ID
+    # ID=MyEntity-$RANDOM_NUMBER
+    # echo $ID
 
 The following command creates an entity with the attributes "city_location" and "temperature" in the Orion Context Broker:
 
 ``` 
-(curl orion.lab.fiware.org:1026/v1/contextEntities/$ID -X POST -s -S \
-   --header 'Content-Type: application/json' --header 'Accept: application/json' \
-   --header "X-Auth-Token: $AUTH_TOKEN" -d @- | python -mjson.tool) <<EOF
+curl orion.lab.fiware.org:1026/v2/entities -X POST -s -S \
+   --header 'Content-Type: application/json' \
+   --header "X-Auth-Token: $AUTH_TOKEN" -d @- <<EOF
 {
-    "attributes": [
-        {
-            "name": "city_location",
-            "type": "city",
-            "value": "Madrid"
-        },
-        {
-            "name": "temperature",
-            "type": "float",
-            "value": "23.8"
-        }
-    ]
+  "id": "$ID",
+  "type": "User",
+  "city_location": {
+    "value": "Madrid",
+    "type": "City"
+  },
+  "temperature": {
+    "value": 23.8,
+    "type": "Number"
+  }
 }
 EOF
 ``` 
@@ -62,20 +61,29 @@ EOF
 In order to check that the entity is there, you can query it the same way you queried the public sensors:
 
 ``` 
-(curl orion.lab.fiware.org:1026/v1/contextEntities/$ID -X GET -s -S \
-    --header 'Content-Type: application/json' --header 'Accept: application/json'\
-    --header "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool)
+curl orion.lab.fiware.org:1026/v2/entities/$ID -X GET -s -S \
+    --header 'Accept: application/json'\
+    --header "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool
 ``` 
 And you can, of course, modify the values for the attributes, e.g. to modify the temperature:
 
 ```
-(curl orion.lab.fiware.org:1026/v1/contextEntities/$ID/attributes/temperature \
-   -X PUT -s -S --header  'Content-Type: application/json' --header 'Accept: application/json' \
-   --header "X-Auth-Token: $AUTH_TOKEN" -d @- | python -mjson.tool) <<EOF
+curl orion.lab.fiware.org:1026/v2/entities/$ID/attrs/temperature \
+   -X PUT -s -S --header  'Content-Type: application/json' \
+   --header "X-Auth-Token: $AUTH_TOKEN" -d @- <<EOF
 {
-    "value": "18.4"
+  "value": 18.4,
+  "type": "Number"
 }
 EOF
+```
+
+or (more compact):
+
+```
+curl orion.lab.fiware.org:1026/v2/entities/$ID/attrs/temperature/value \
+   -X PUT -s -S --header  'Content-Type: text/plain' \
+   --header "X-Auth-Token: $AUTH_TOKEN" -d 18.4
 ```
 
 If you re-run the query command above, you will see that the temperature has changed to 18.4 ºC.

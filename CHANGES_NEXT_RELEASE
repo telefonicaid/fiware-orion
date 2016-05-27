@@ -17,4 +17,4 @@
 - Add: NGSIv2 custom notifications (Issue #2015)
 - Fix: New keyword "DateTime" to replace "date" for attributes that express date/time (Issue #2198)
 - Fix: Improved error text "ContentLengthRequired" to replace "LengthRequired" (Issue #2198)
-
+- Fix: POST /v2/op/query was not supporting FIWARE::Location::NGSIv2 filters
