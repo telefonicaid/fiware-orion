@@ -631,7 +631,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
   @condition_expression_q_invalid_date.row<row.id>
   @condition_expression_q_invalid_date @BUG_2106 @BUG_1996 @skip
   # FIXME: below Examples only represent at the "Complete date plus hours, minutes, seconds and a decimal fraction of a second" level in https://www.w3.org/TR/NOTE-datetime
-  Scenario Outline:  try to create a new subscription using NGSI v2 with "q" condition expression but with invalid date values (ISO8601)
+  Scenario Outline:  try to create a new subscription using NGSI v2 with "q" condition expression but with invalid DateTime values (ISO8601)
     Given  a definition of headers
       | parameter          | value                              |
       | Fiware-Service     | test_condition_expression_error_II |
@@ -889,14 +889,14 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json                       |
     # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter             | value                                                       |
-      | subject_type          | room                                                        |
-      | subject_idPattern     | .*                                                          |
-      | condition_attrs       | temperature                                                 |
+      | parameter             | value                                                      |
+      | subject_type          | room                                                       |
+      | subject_idPattern     | .*                                                         |
+      | condition_attrs       | temperature                                                |
       | condition_expression  | georel>>>coveredBy&geometry>>><geometry>&coords>>><coords> |
-      | notification_http_url | http://localhost:1234                                       |
-      | notification_attrs    | temperature                                                 |
-      | expires               | 2016-04-05T14:00:00.00Z                                     |
+      | notification_http_url | http://localhost:1234                                      |
+      | notification_attrs    | temperature                                                |
+      | expires               | 2016-04-05T14:00:00.00Z                                    |
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -917,14 +917,14 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json                       |
     # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter             | value                                                                              |
-      | subject_type          | room                                                                               |
-      | subject_idPattern     | .*                                                                                 |
-      | condition_attrs       | temperature                                                                        |
+      | parameter             | value                                                                             |
+      | subject_type          | room                                                                              |
+      | subject_idPattern     | .*                                                                                |
+      | condition_attrs       | temperature                                                                       |
       | condition_expression  | georel>>>near;minDistance<separator>5000&geometry>>>point&coords>>>25.774,-80.190 |
-      | notification_http_url | http://localhost:1234                                                              |
-      | notification_attrs    | temperature                                                                        |
-      | expires               | 2016-04-05T14:00:00.00Z                                                            |
+      | notification_http_url | http://localhost:1234                                                             |
+      | notification_attrs    | temperature                                                                       |
+      | expires               | 2016-04-05T14:00:00.00Z                                                           |
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -972,14 +972,14 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json                       |
     # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter             | value                                                       |
-      | subject_type          | room                                                        |
-      | subject_idPattern     | .*                                                          |
-      | condition_attrs       | temperature                                                 |
+      | parameter             | value                                                      |
+      | subject_type          | room                                                       |
+      | subject_idPattern     | .*                                                         |
+      | condition_attrs       | temperature                                                |
       | condition_expression  | georel>>><georel>&geometry>>>point&coords>>>25.774,-80.190 |
-      | notification_http_url | http://localhost:1234                                       |
-      | notification_attrs    | temperature                                                 |
-      | expires               | 2016-04-05T14:00:00.00Z                                     |
+      | notification_http_url | http://localhost:1234                                      |
+      | notification_attrs    | temperature                                                |
+      | expires               | 2016-04-05T14:00:00.00Z                                    |
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response

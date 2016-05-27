@@ -119,10 +119,10 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | parameter   | value           |
       | description | without payload |
     When create a new subscription
-    Then verify that receive a "Length Required" http code
+    Then verify that receive a "Content Length Required" http code
     And verify an error response
       | parameter   | value                                            |
-      | error       | LengthRequired                                   |
+      | error       | ContentLengthRequired                            |
       | description | Zero/No Content-Length in PUT/POST/PATCH request |
 
   # ---------- content-type header --------------------------------
