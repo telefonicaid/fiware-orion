@@ -1,6 +1,6 @@
 # HTTP and NGSI response codes
 
-The HTTP and NGSI response codes distinction described in this section
+The HTTP and NGSI response code distinction described in this section
 only applies to NGSIv1. NGSIv2 adopts a simpler approach which only
 uses the HTTP response code.
 
