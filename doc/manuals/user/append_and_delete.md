@@ -1,25 +1,25 @@
 # Adding and removing attributes and entities (using NGSIv2)
 
 Entities are added using the `POST /v2/entities` operation. They
-are deleted using `DELETE /v2/entities/{id}` (in the case the entity id
-identifies univocally the entity) or `DELETE /v2/entities/{id}?type={entityType}`
-(in the case the type is needed to identify the entity).
+are deleted using `DELETE /v2/entities/{id}` (in case the entity id
+univocally identifies the entity) or `DELETE /v2/entities/{id}?type={entityType}`
+(in case the type is also needed to fully identify the entity).
 
 Regarding entity attributes, you can update the value of entity attributes
-using the `PATCH /v2/entities/{id}/attrs` or the `POST /v2/entities/{id}/attrs`
-operations (again, you need to use `?type={entityType}` in the case `{id}`
-doesn't identify univocally the entity). The basic rule to take into account
+using the `PATCH /v2/entities/{id}/attrs` or `POST /v2/entities/{id}/attrs`
+operations (again, you need to use `?type={entityType}` in case `{id}`
+doesn't univocally identify the entity). The basic rule to take into account
 is that PATCH assumes that the attributes already exist in the entity, while
-POST can be used to update existing attributes or add new ones. If you want
+POST is used to update existing attributes or to add new ones. If you want
 to use POST to strictly append attributes (i.e. raising an error if some of
-the attributes already exists) then `option=append` needs to be added, i.e.
+the attributes already exist) then `option=append` needs to be added, i.e.
 `POST /v2/entities/{id}/attrs?options=append`.
 
 In order to remove attributes, use `DELETE /v2/entities/{id}/attrs/{attrName}`
 or `DELETE /v2/entities/{id}/attrs/{attrName}?type={entityType}`
 
 Finally, you can use the batch operation `POST /op/update` to add or remove entities and/or
-attributes using the different `actionType`s which that operation allows: APPEND,
+attributes using the different `actionType`s which that the operation allows: APPEND,
 APPEND_STRICT or DELETE.
 
 All the operations mentioned above are described in detail in the
