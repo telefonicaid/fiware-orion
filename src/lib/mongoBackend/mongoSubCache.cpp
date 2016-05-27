@@ -322,7 +322,7 @@ int mongoSubCacheItemInsert
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->servicePath           = strdup(servicePath);
   cSubP->renderFormat          = renderFormat;
-  cSubP->httpInfo.url          = strdup(sub.hasField(CSUB_REFERENCE)? getFieldF(sub, CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
+  cSubP->httpInfo.url          = sub.hasField(CSUB_REFERENCE)? getFieldF(sub, CSUB_REFERENCE).String().c_str() : "NO REF";  // Mandatory
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
