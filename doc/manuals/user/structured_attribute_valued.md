@@ -4,7 +4,7 @@ Apart from simple values such as 22.5 or "yellow", you can use
 complex structures as attribute values. In particular, an attribute can
 be set to a vector or to a key-value map (usually referred to as an
 "object") at creation/update time. These values are
-retrieved with at query and notification time.
+retrieved at query and notification time.
 
 Vector or key-map values correspond directly to JSON vectors and JSON
 objects, respectively. Thus, the following create entity request sets
@@ -116,8 +116,8 @@ although you can use for instance a JSON number as a field value in updates
 (such as `{"x": 3.2 }`), you will retrieve a string in queries and notifications 
 (i.e. `{ "x": "3.2"}`).
 
-NGSIv2, the final "leaf" elements of the structured attribute values after traversing
+In NGSIv2, the final "leaf" elements of the structured attribute values after traversing
 all vectors and key-maps uses the right native JSON type (number, boolean, etc.).
-Thus, take if you use for instance a JSON number as a field value in updates
-(such as `{"x": 3.2 }`), you will retrieve also a number in queries
+Thus, if you use for instance a JSON number as a field value in updates
+(such as `{"x": 3.2 }`), you will get also a number in queries
 and notifications (i.e. `{ "x": 3.2}`).
