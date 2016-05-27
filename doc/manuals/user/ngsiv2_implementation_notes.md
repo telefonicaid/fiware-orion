@@ -1,4 +1,4 @@
-#<a name="top"></a> NGSIv2 Implementation Notes
+#<a name="top"></a>NGSIv2 Implementation Notes
 
 This document describes some considerations to take into account
 regarding the specific implementation done by Orion Context Broker
@@ -26,3 +26,5 @@ Related with: https://github.com/telefonicaid/fiware-orion/issues/2073
 ## Default type for entities
 
 ## Default type for attributes
+
+## Scope functionality in POST /v2/op/update has not been yet consolidated
