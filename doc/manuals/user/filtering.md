@@ -14,9 +14,9 @@
     
 ## Introduction
 
-NGSIv2 and NGSIv1 have different filtering mechanisms. For example, in NGSIv1
-filtering is heavily based in the use of the `scope` payload element. Both
-approaches (NGSIv2 and NGSIv1) are described in separate sections.
+NGSIv2 and NGSIv1 have different filtering mechanisms. For example, in NGSIv1,
+filtering is heavily based on the use of the `scope` payload element. Both
+approaches (NGSIv2 and NGSIv1) are described below, each in a separate section.
 
 [Top](#top)
 
@@ -28,19 +28,19 @@ subscription notifications (in the `subject.condition.expression` field).
 
 ### Simple Query Language
 
-It allows to define conditions that entity attributes must match, e.g.
+The Simple Query Language allows to define conditions that entity attributes must match, e.g.
 attribute "temperature" has to be greater than 40.
 
-You can find some examples in [this section of the API walthrough](walkthrough_apiv2#query-entity).
-The full syntax definition can be found in the "Simple Query Language"
+Examples are found in [this section of the API walthrough](walkthrough_apiv2#query-entity).
+The full syntax definition is found in the "Simple Query Language"
 section of the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
 
 [Top](#top)
 
 ### Geographical Queries
 
-It allows to filter by geographical location, e.g. all the entities located
-closer than 15 km to Madrid center. Of course, it needs properly located entities.
+Geographical Queries allow to filter by geographical location, e.g. all the entities located
+closer than 15 km from the center of Madrid. Of course, properly located entities are mandatory.
 
 Both topics (entity location and geographical queries) are dealt in detail in
 the "Geospacial properties of entities" and "Geographical Queries" sections of the
