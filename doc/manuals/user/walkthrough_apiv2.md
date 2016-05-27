@@ -18,7 +18,7 @@
 
 ## Introduction
 
-Note that there is also a [NGSIv1 version of this walkthrough](walkthrough_apiv1.md). In general,
+Note that there is also an [NGSIv1 version of this walkthrough](walkthrough_apiv1.md). In general,
 you should use NGSIv2 (i.e. this document), except if you need context management availability
 functionality (aka NGSI9), not yet developed in NGSIv2. In the case of doubt, you should use NGSIv2.
 
@@ -26,9 +26,9 @@ This walkthrough adopts a practical approach that we hope will help our
 readers to get familiar with the Orion Context Broker and have some fun
 in the process :).
 
-The walkthrough is based in the NGSIv2 Specification, that can be found
-found in Apiary format [here](http://telefonicaid.github.io/fiware-orion/api/v2/stable).
-You should also have a look to the [NGSIv2 implementation notes](ngsiv2_implementation_notes.md).
+The walkthrough is based on the NGSIv2 Specification, that can be found
+in Apiary format [here](http://telefonicaid.github.io/fiware-orion/api/v2/stable).
+You should also have a look at the [NGSIv2 implementation notes](ngsiv2_implementation_notes.md).
 
 The main section is [context management](#context-management). It describes the
 basic context broker functionality for context management (information about entities,
@@ -36,7 +36,7 @@ such as the temperature of a car). Some remarks to take into account in order to
 
 Context availability management (information not about the entities themselves, but about the providers of
 that information) has not been yet developed in the current candidate version for NGSIv2 (although a
-section about that exist at the end of this document, as a placeholder to include this information in the
+section about that exists at the end of this document, as a placeholder to include this information in the
 future). You need to use NGSIv1 is you want to use this functionality. See
 [NGSIv1 walkthrough](walkthrough_apiv1.md) for more details.
 
@@ -117,10 +117,10 @@ To restart the broker (as root or using the sudo command):
 
 Some parts of the tutorial (the ones related with subscriptions and
 notifications) require some process to play the role of the consumer
-application able to receive notifications. To that end, download the
-accumulator script, available [at
+application able to receive notifications. To that end, please download the
+accumulator script, available [in
 GitHub](https://github.com/telefonicaid/fiware-orion/blob/master/scripts/accumulator-server.py).
-It is a very simple "dummy" application that just listens to a given URL
+It is a very simple "dummy" application that simply listens to a given URL
 (let's use localhost:1028/accumulate) and prints whatever it gets in the
 terminal window where it is executed. Run it using the following
 command:
@@ -134,8 +134,8 @@ command:
 The accumulator-server.py is also part of the contextBroker-test package (see
 [optional packages section in how to install](../admin/install.md#optional-packages)).
 The script is located at `/usr/share/contextBroker/tests/accumulator-server.py` after
-installation. However, if you only need the accumulator-server.py it uses to be simpler
-just downloading it from GitHub, as suggested above.
+installation. However, if you only need the accumulator-server.py it's easier to
+just download it from GitHub, as suggested above.
 
 [Top](#top)
 
@@ -246,14 +246,14 @@ Broker with context management operations.
 
 ### Entity creation
 
-Orion Context Broker will start in an empty state, so first of all we
-need to make it aware of the existence of certain entities. In
+Orion Context Broker starts in an empty state, so first of all we
+need to make it is aware of the existence of certain entities. In
 particular, we are going to "create" Room1 and Room2 entities, each one
 with two attributes (temperature and pressure). We do this using the
 `POST /v2/entities` operation.
 
 First, we are going to create Room1. Let's assume that at entity
-creation time temperature and pressure of Room1 are 23 ºC and 720 mmHg
+creation time, temperature and pressure of Room1 are 23 ºC and 720 mmHg
 respectively.
 
 ```
@@ -273,17 +273,17 @@ curl localhost:1026/v2/entities -s -S --header 'Content-Type: application/json' 
 EOF
 ```
 
-Appart from `id` and `type` fields (that define the ID and type of the entity),
-the payload containts a set of attributes. Each attribrute contains a value
+Apart from `id` and `type` fields (that define the ID and type of the entity),
+the payload contains a set of attributes. Each attribrute contains a value
 and a type.
 
-Orion Context Broker doesn't perform any checking on types (e.g. it doesn't
+Orion Context Broker doesn't perform any check on types (e.g. it doesn't
 check that when a context producer application updates the value of the
 temperature, this value is formatted as a float like `25.5` or `-40.23`
 and not something like `hot`).
 
 Upon receipt of this request, the broker will create the entity in its
-internal database, set the values for its attributes and will response
+internal database, it will set the values for its attributes and it will respond
 with a 201 Created HTTP code.
 
 Next, let's create Room2 in a similar way (in this case, setting
@@ -307,7 +307,7 @@ EOF
 ```
 
 Apart from simple values corresponding to JSON datatypes (i.e. numbers, strings, booleans, etc.)
-for attribute values, you can also use complex structures or custom metadata. These are advance
+for attribute values, you can also use complex structures or custom metadata. These are advanced
 topics, described in [this section](structured_attribute_valued.md#structured-attribute-values ) and
 [this other](metadata.md#custom-attribute-metadata), respectively.
 
@@ -420,7 +420,7 @@ curl localhost:1026/v2/entities/Room1/attrs/temperature -s -S  \
     --header 'Accept: application/json' | python -mjson.tool
 ```
 
-which response is as follows:
+whose response is as follows:
 
 ```
 {
@@ -439,7 +439,7 @@ curl localhost:1026/v2/entities/Room1/attrs/temperature/value -s -S  \
     --header 'Accept: text/plain' | python -mjson.tool
 ```
 
-which response is just:
+whose response is simply:
 
 ```
 23.0
@@ -492,7 +492,7 @@ You can get all the entities using the `GET /v2/entities` operation
 curl localhost:1026/v2/entities -s -S --header 'Accept: application/json' | python -mjson.tool
 ```
 
-In our case, it will return both Room1 and Room2:
+In our case, both Room1 and Room2 will be returned:
 
 ```
 [
@@ -527,9 +527,9 @@ In our case, it will return both Room1 and Room2:
 ]
 ```
 
-As with `GET /v2/entities/{id}` the `keyValues` and `values` options can be also used.
+As with `GET /v2/entities/{id}` the `keyValues` and `values` options can be used also.
 
-Appart from providing the whole set of entities, this operation implements filtering
+Apart from providing the whole set of entities, this operation implements filtering
 capabilities in order to adjust the list of retrieved entities to what you need. In
 particular:
 
@@ -543,9 +543,9 @@ curl localhost:1026/v2/entities?type=Room -s -S  \
 ```
 
 * You can filter using entity id patterns, using the `idPattern` URL parameter
-  (which value is a regular expression). For example, to get all entities which
-  id starts with `Room` and it is followed by a number in the 2 to 5 range
-  (in this case retrieving Room2) you can use (not the `-g` in curl command line
+  (whose value is a regular expression). For example, to get all entities whose
+  id starts with `Room` and is followed by a number in the 2 to 5 range
+  (in this case retrieving Room2) you can use (note the `-g` in curl command line
   to avoid problems with brackets):
 ```
 curl localhost:1026/v2/entities?idPattern=Room[2-5] -g -s -S  \
@@ -553,20 +553,20 @@ curl localhost:1026/v2/entities?idPattern=Room[2-5] -g -s -S  \
 ```
 
 * You can filter using attribute filters, using the `q` URL parameter. For
-  a whole description have a look to the "Simple Query Language" section in
+  a whole description have a look at the "Simple Query Language" section in
   the [NGSv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable).
-  For example, to get all entities which temperature greater to 22 (in this case
+  For example, to get all entities whose temperature is greater than 22 (in this case
   retriving Room1) you can use:
 ```
 curl 'localhost:1026/v2/entities?q=temperature>22' -s -S  \
     --header 'Accept: application/json' | python -mjson.tool
 ```
 
-* You can filter by geographical location. This is an advance topic, described in
+* You can filter by geographical location. This is an advanced topic, described in
   [this section](geolocation.md#geolocation-capabilities).
 
-As final comment, note that although our example is very simple (only 2 entities) Orion
-can manage millions of entities in a real deployment. Thus, by default only 20 entities
+As a final comment, note that although our example is very simple (only 2 entities) Orion
+can manage millions of entities in a real deployment. Thus, by default, only 20 entities
 are returned (which is fine for this tutorial, but probably not for a real utilization
 scenario). In order to learn about how to retrieve large sets of entities page by page
 see [the section on pagination](pagination.md#pagination) in this manual.
@@ -575,8 +575,8 @@ see [the section on pagination](pagination.md#pagination) in this manual.
 
 ### Update entity
 
-You can update the value of entities attributes using the `PATCH /v2/entities/{id}/attrs`
-operation. It The assumes that the attribute already exist in the entity.
+You can update the value of entity attributes using the `PATCH /v2/entities/{id}/attrs`
+operation. This assumes that the attribute already exists in the entity.
 
 Now we will play the role of a context producer application, i.e. a
 source of context information. Let's assume that this application in a
@@ -603,16 +603,16 @@ As you can see, the structure of the request is very similar to the one used by 
 [entity creation operation](#entity-creation), except that entity id and type are
 not included in the payload.
 
-Upon receipt of this request, the broker will update the values for the
-entity attributes in its internal database and will response with 204 No Content.
+Upon receipt of this request, the broker updates the values for the
+entity attributes in its internal database and responds with 204 No Content.
 
-Now, you can the [query entity operation](#query-context-operation) to check that Room1
-has been actually updated.
+Now, you can use the [query entity operation](#query-context-operation) to check that Room1
+has been actually been updated.
 
 You can also use the `PUT /v2/entities/{id}/attrs/{attrName}/value` operation to update
-the value of an attribute in a more compact way and leaving attribute type untouched.
-Note that in this case. For example, to update Room1 temperature to 28.4 (note that
-Content-Type is `text/plain` as corresponds to `28.4` value):
+the value of an attribute in a really compact way and leaving the attribute type untouched.
+For example, to update Room1 temperature to 28.4 (note that the Content-Type here is `text/plain`
+which corresponds to the value `28.4` - no JSON involved here ...):
 
 ```
 curl localhost:1026/v2/entities/Room1/attrs/temperature/value -s -S \
@@ -620,37 +620,38 @@ curl localhost:1026/v2/entities/Room1/attrs/temperature/value -s -S \
     -X PUT -d 28.5
 ```
 
-Finally, `PUT /v2/entities/{id}/attrs` operation can be use to replace all the attributes
+Finally, the `PUT /v2/entities/{id}/attrs` operation can be use to replace all the attributes
 of a given entity, i.e. removing previously existing ones.
 
 As in the case of entity creation, apart from simple values corresponding to
 JSON datatypes (i.e. numbers, strings, booleans, etc.) for attribute values, you can also
-use complex structures or custom metadata. These are advance topics, described in
+use complex structures or custom metadata. These are advanced topics, described in
 [this section](structured_attribute_valued.md#structured-attribute-values ) and
 [this other](metadata.md#custom-attribute-metadata ), respectively.
 
-More detail in adding or removing attributes can be found in [this section](append_and_delete.md).
+More details on adding/removing attributes can be found in [this section](append_and_delete.md)
 of the manual.
 
 [Top](#top)
 
 ### Subscriptions
 
-The operations you know up to now to create, query and update entities are the
-basic building blocks for synchronous context producer and context consumer applications.
+The operations you have been familiarized with uptil now, to create, query and 
+update entities are the basic building blocks for synchronous context producer and
+context consumer applications.
 However, Orion Context Broker has another powerful feature that you can take advantage of: the
 ability to subscribe to context information so when "something" happens
-(we will explain the different cases for that "something") your
-application will get an asynchronous notification. In that way, you
+(we will explain the different cases for that "something"), your
+application will get an asynchronous notification. This way, you
 don't need to continuously repeat query requests (i.e. polling),
 the Orion Context Broker will let you know the information when it
 comes.
 
-Before starting to play with feature, [start the accumulator
+Before starting to play with this feature, please [start the accumulator
 server](#starting-accumulator-server-for-the-tutorials) to
 capture notifications.
 
-In order to create a subscriptions, the following `POST /v2/subscriptions` operation
+In order to create a subscription, the following `POST /v2/subscriptions` operation
 is used. Let's consider the following example (note we are using `-v` to get the Location
 header in the response, as explained later on):
 
@@ -688,16 +689,16 @@ EOF
 
 Let's examine in detail the different elements included in the payload:
 
--   The `entities` and `attrs` subfields within `notifications` the contents of the
-    notification message. In this example, we are specifying that the notification
+-   The `entities` and `attrs` subfields within `notifications` define the contents of the
+    notification messages. In this example, we are specifying that the notification
     has to include the temperature attribute for entity Room1.
--   The callback URL to send notifications is defined with the
-    `url` sub-field. We are using the URL of the accumulator-server.py
-    program started before. Only one URL can be included per
+-   The URL where to send notifications is defined with the
+    `url` sub-field. Here we are using the URL of the accumulator-server.py
+    program, previously started. Only one URL can be included per
     subscription. However, you can have several
     subscriptions on the same context elements (i.e. same entity
     and attribute) without any problem.
--   Subscriptions could have an expiration date (`expires` field), specified
+-   Subscriptions may have an expiration date (`expires` field), specified
     using the [ISO 8601](http://www.wikipedia.org/wiki/ISO_8601) standard format. Once
     subscription overpass that date, the subscription is simply ignored
     (however, it is still stored in the broker database and needs to be
@@ -705,17 +706,17 @@ Let's examine in detail the different elements included in the payload:
     manual](../admin/database_admin.md#deleting-expired-documents)).
     You can extend the duration of a subscription by updating it, as
     described [in this document](duration.md#extending-duration).
-    We are using a date far enough (year 2040 :) to be sure that the subscription
-    will not expire while you run this tutorial.
+    We are using a date far enough away in time (year 2040) hoping the subscription
+    will not expire while you run this tutorial :).
 -   The `conditions` element defines the "trigger" for the subscription. The
-    `attrs` field contains a list of attribute names. They define the
+    `attrs` field contains a list of attribute names. These names define the
     "triggering attributes", i.e. attributes that upon creation/change
     due to [entity creation](#entity-creation) or [update](#update-entity) trigger
     the notification.
 -   The rule is that if at least one of the attributes in the `conditions.attrs`
     list changes (e.g. some kind of "OR" condition), then a notification is sent.
     For example, in this case, when Room1 pressure changes, the Room1 temperature
-    value is notified, but not pressure itself. If you want also pressure to be notified,
+    value is notified, but not pressure itself. If you want pressure to be notified as well,
     the request would need to include "pressure" within the `notifications.attrs` list
     (or to use an empty attribute vector, which means "all
     the attributes in the entity"). Now, this example here, to be
@@ -725,7 +726,7 @@ Let's examine in detail the different elements included in the payload:
 -   You can leave `conditions.attrs` empty to make a notification
     trigger on any entity attribute change (regardless of the name of the attribute).
 -   You can include filtering expressions in `conditions`. For example, to get notified
-    not only if pressure changes, but if changes without the range from 700 to 800. This
+    not only if pressure changes, but if it changes within the range 700-800. This
     is an advanced topic, see the "Subscriptions" section in the
     [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
 -   The throttling element is used to specify a minimum
@@ -736,12 +737,12 @@ Let's examine in detail the different elements included in the payload:
     notification receptor a means to protect itself against context producers
     that update attribute values too frequently. In multi-CB configurations, take
     into account that the last-notification measure is local to each CB node. Although
-    each node periodically synchronizes with DB in order to get potencially newer
+    each node periodically synchronizes with the DB in order to get potencially newer
     values (more on this [here](perf_tuning.md#subscription-cache) it may happen that
     a particular node has an old value, so throttling is not 100% accurate.
 
-The response corresponding to that request uses 201 Created as HTTO response code.
-In addition, it contains a `Location header` wich hold the subscription ID: a
+The response corresponding to that request uses 201 Created as HTTP response code.
+In addition, it contains a `Location header` which holds the subscription ID: a
 24 hexadecimal number used for updating and cancelling the subscription.
 Write it down because you will need it later in this tutorial.
 
@@ -788,7 +789,7 @@ Orion Context Broker notifies context subscriptions using the POST
 HTTP method (on the URL for the subscription). The payload includes
 a reference to the subscription ID and a `data` vector, with the
 actual data for the entities. Note that the the entity representation
-format is the same than the one used by the responses to the
+format is the same as the one used by the responses to the
 `GET /v2/entities` operation.
 
 You may wonder why accumulator-server.py is getting this message if you
@@ -804,8 +805,8 @@ application can get the initial status using synchronous queries. Thus, this
 behavior could be changed in a later version. What's your opinion? :)
 
 Now, do the following exercise, based on what you know from [update
-entity](#update-entity): Do the following 4 updates in sequence, letting
-pass more than 5 seconds between one and the next (to avoid losing
+entity](#update-entity): oerform the following four updates in sequence, letting
+pass more than 5 seconds between updates (to avoid losing
 notifications due to throttling):
 
 -   update Room1 temperature to 27: nothing happens, as temperature is
@@ -820,18 +821,18 @@ notifications due to throttling):
     is for Room1, not Room2.
 
 Next, try to check how throttling is enforced. Update Room1 pressure
-fast, without letting pass 5 seconds and you will see that the second
-notification doesn't arrive to accumulator-server.py.
+fast, without letting pass 5 seconds and you will see that no second
+notification arrives to accumulator-server.py.
 
 Subscriptions can be retrieved using `GET /v2/subscriptions` (which
 provides the whole list and need [pagination](pagination.md) if the
 list is too large) or `GET /v2/subscriptions/{subId}` (to get a single
-subscription). In addition, they can be updated using `PATCH /v2/subscription/{subId}`
-operation. Finally, they can be deleted using `DELETE /v2/subscriptions/{subId}` operation.
+subscription). In addition, subscriptions can be updated using the `PATCH /v2/subscription/{subId}`
+operation. Finally, they can be deleted using the `DELETE /v2/subscriptions/{subId}` operation.
 
 Some aditional considerations:
 
-* Subscription can be paused. In order to do that, just set the `status` attribute
+* Subscriptions can be paused. In order to do that, just set the `status` attribute
   to "inactive" (if you want to resume subscription, set it back to "active"):
 ```
 curl localhost:1026/v2/subscriptions/57458eb60962ef754e7c0998 -s -S \
@@ -842,11 +843,11 @@ curl localhost:1026/v2/subscriptions/57458eb60962ef754e7c0998 -s -S \
 EOF
 ```
 
-* Notifications can be customize in several ways. First, you can tune the entities
+* Notifications can be customized in several ways. First, you can tune the entities
   representation format in notifications, using the `attrsFormat` field within
-  `notification`. Secondly, you can use custom notification HTTP verb (e.g. PUT),
-  HTTP headers, URL query parameters and payloads (not necessarily in JSON, e.g. XML).
-  Have a look "Notification Messages" and "Custom Notifications" in the
+  `notification`. Secondly, you can use a custom notification HTTP verb (e.g. PUT),
+  custom HTTP headers, custom URL query parameters and custom payloads (not necessarily in JSON).
+  Have a look at "Notification Messages" and "Custom Notifications" in the
   [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
 
 [Top](#top)
@@ -854,7 +855,7 @@ EOF
 ### Browsing all types and detailed information on a type
 
 The following operation can be used to get a list of all entity types
-existing at Orion Context Broker in a given moment. For example, let's assume
+that exist in Orion Context Broker in a given moment. For example, let's assume
 we have 3 entities of type Room and 2 entities of type Car:
 
 ```
@@ -905,14 +906,14 @@ important remarks:
 
 -   Given that NGSI doesn't force all the entities of a given type to
     have the same set of attributes (i.e. entities of the same type
-    could have a different attributes set) the attributes set per type
+    may have a different attributes set) the attributes set per type
     returned by this operation is the union set of the attribut sets of
     each entity belonging to that type.
--   Moreover, attributes with the same in different entities could have
+-   Moreover, attributes with the same in different entities may have
     different types. Thus, the `types` field associated to each attribute
     is a list.
 
-If you only need the list of entity types (without extra attribute detail)
+If you only need the list of entity types (without extra attribute details),
 you can use:
 
 ```
@@ -928,7 +929,7 @@ and get:
 ]
 
 ```
-Note that [pagination mechanism](pagination.md#pagination) also works in
+Note that the [pagination mechanism](pagination.md#pagination) also works in
 the `GET /v2/types` operation described above.
 
 In addition, you can use the following operation to get detailed
@@ -963,7 +964,7 @@ The response will be:
 ### Batch operations
 
 Apart from the RESTful operations to manage entities described so far NGSIv2 also
-includs "batch" operations that can be useful in some cases. In particular,
+includs "batch" operations that may be useful in some cases. In particular,
 there is a batch update operation (`POST /v2/op/update`) and a batch query
 operation (`POST /v2/op/query`).
 
@@ -1038,7 +1039,7 @@ curl -v localhost:1026/v2/op/update -s -S --header 'Content-Type: application/js
 EOF
 ```
 
-Apart from APPEND and UPDATE, there are other action types: DELETE, APPEND_STRICT, etc. Check
+Apart from APPEND and UPDATE, there are other action types: DELETE, APPEND_STRICT, etc. Check out the 
 [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable)
 for details.
 
@@ -1049,7 +1050,7 @@ However `POST /v2/op/query` can express queries that `GET /v2/entities` cannot (
 a list of entities of different type).
 
 For example, to get the attributes temperature and pressure of all the entities of type Room or Car
-which temperature is greater than 40 and that are located 20 km near to the coordinates 40.31, -3.75 the
+whose temperature is greater than 40 and that are located withon 20 km from the coordinates 40.31, -3.75, the
 following operation could be used:
 
 ```
@@ -1089,17 +1090,17 @@ EOF
 ```
 
 The syntax for the `scope` field above has not been fully consolidated in the NGSIv2 specification
-yet. By the moment, that syntax is in beta status. Thus, *use it with care as it may change in the
+yet. For the moment, that syntax is in beta status. Thus, *use it with care as it may change in the
 future*.
 
 [Top](#top)
 
 ## Context availability management
 
-Current NGSIv2 specification doesn't cover this functionality. It will be
-defined in a next NGSIv2 candidate release.
+The current NGSIv2 specification doesn't cover this functionality. It will be
+defined in a future NGSIv2 release candidate.
 
-On the meanwhile, you can use context availability management, described
+In the meanwhile, you can use context availability management, described
 [as part of the walkthrough for NGSIv1](walkthrough_apiv1.md#context-availability-management-using-ngsi9).
 
 [Top](#top)
