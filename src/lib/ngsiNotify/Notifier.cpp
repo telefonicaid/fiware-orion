@@ -120,9 +120,11 @@ static bool templateNotify
   else
   {
     macroSubstitute(&payload, httpInfo.payload, ce);
-    payload      = curl_unescape(payload.c_str(), payload.length());
+    char* pload  = curl_unescape(payload.c_str(), payload.length());
+    payload      = pload;
     renderFormat = NGSI_V2_CUSTOM;
     mimeType     = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
+    free(pload);
   }
 
 
