@@ -36,7 +36,7 @@
 
 ## Introduction
 
-Note that there is also a [NGSIv2 version of this walkthrough](walkthrough_apiv2.md). In general, you should use NGSIv2
+Note that there is also an [NGSIv2 version of this walkthrough](walkthrough_apiv2.md). In general, you should use NGSIv2
 (i.e. the other document), except if you need context management availability functionality (aka NGSI9), not
 yet developed in NGSIv2. In the case of doubt, you should use NGSIv2.
 
