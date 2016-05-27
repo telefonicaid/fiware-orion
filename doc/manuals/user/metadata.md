@@ -72,12 +72,12 @@ which response is
 }
 ```
 
-At the present moment, NGSIv2 doesn't allow to delete individually metadata elements once introduced.
+At the moment, NGSIv2 doesn't allow to delete individual metadata elements once introduced.
 However, you can delete all metadata updating the attribute with `metadata` set to `{}`.
 
 Note that, from the point of view of [subscriptions](walkthrough_apiv2.md#subscriptions),
 changing the metadata of a given attribute is considered a change even
-if attribute value itself hasn't changed.
+though the attribute value itself hasn't changed.
 
 ## Custom attribute metadata (using NGSIv1)
 
