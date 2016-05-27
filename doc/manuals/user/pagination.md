@@ -23,14 +23,14 @@ time. In the case of entities query, this can be changed with the
 
 Let's illustrate with an example: a given client cannot process more
 than 100 results in a single response and the query includes a
-total of 322 results. The client could do the following (only URL is
+total of 322 results. The client could do the following (only the URL is
 included, for the sake of completeness).
 
     GET <orion_host>:1026/v2/entities?limit=100&options=count
     ...
     (The first 100 elements are returned, along with the `Fiware-Total-Count: 322`
-    header, which allows the client to know how many entities are in sum and,
-    therefore, the number of subsequence queries to do)
+    header, which makes the client aware of how many entities there are in total and,
+    therefore, the number of subsequent queries to be done)
 
     GET <orion_host>:1026/v2/entities?offset=100&limit=100
     ...
@@ -44,8 +44,8 @@ included, for the sake of completeness).
     ...
     (Entities from 301 to 222)
 
-Note that if the request uses an "out of bound" offset you will get an
-empty list, as shown below:
+Note that if the request uses an offset beyond the total number of results, an
+empty list is returned, as shown below:
 
 ```
 GET <orion_host>:1026/v2/entities?offset=1000&limit=100
