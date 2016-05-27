@@ -1,0 +1,407 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Using attrs and q at the same time in conditions
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 -subCacheIval 2
+#brokerStart CB 0 IPv4 -noCache
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create sub1: attrs = temp, temp==10
+# 02. Create sub2: attrs = temp, temp>10
+# 03. Create sub3: attrs = temp, temp<10
+# 04. Create entity temp==10
+# 05. Update entity temp==15
+# 06. Update entity temp==5
+# 07. Update entity temp==10
+# 08. Dump accumulator: see four
+# 09. Check that the order is the following: sub1, sub2, sub3, sub1
+#
+
+echo "01. Create sub1: attrs = temp, temperature==10"
+echo "=============================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "id": "Room"
+            }
+        ],
+        "condition": {
+            "attrs": [ "temp" ],
+            "expression": {
+               "q": "temp==10"
+            }
+         }
+    },
+    "notification": {
+        "http": {
+          "url": "http://localhost:'$LISTENER_PORT'/notify"
+        },
+        "attrs": [ ]
+    }
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload"
+subId1=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "02. Create sub2: attrs = temp, temperature>10"
+echo "============================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "id": "Room"
+            }
+        ],
+        "condition": {
+            "attrs": [ "temp" ],
+            "expression": {
+               "q": "temp>10"
+            }
+         }
+    },
+    "notification": {
+        "http": {
+          "url": "http://localhost:'$LISTENER_PORT'/notify"
+        },
+        "attrs": [ ]
+    }
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload"
+subId2=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "03. Create sub3: attrs = temp, temperature<10"
+echo "============================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "id": "Room"
+            }
+        ],
+        "condition": {
+            "attrs": [ "temp" ],
+            "expression": {
+               "q": "temp<10"
+            }
+         }
+    },
+    "notification": {
+        "http": {
+          "url": "http://localhost:'$LISTENER_PORT'/notify"
+        },
+        "attrs": [ ]
+    }
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload"
+subId3=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+# Sleep for a time larger than subCacheIval
+sleep 5s
+
+echo "04. Create entity temp==10"
+echo "=========================="
+payload='{
+  "id": "Room",
+  "temp": 10
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "05. Update entity temp==15"
+echo "=========================="
+payload='{
+  "value": 15
+}'
+orionCurl --url '/v2/entities/Room/attrs/temp' -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "06. Update entity temp==5"
+echo "========================="
+payload='{
+  "value": 5
+}'
+orionCurl --url '/v2/entities/Room/attrs/temp' -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "07. Update entity temp==10"
+echo "=========================="
+payload='{
+  "value": 10
+}'
+orionCurl --url '/v2/entities/Room/attrs/temp' -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "08. Dump accumulator: see four"
+echo "=============================="
+accumulatorDump
+echo
+echo
+
+echo "09. Check that the order is the following: sub1, sub2, sub3, sub1"
+echo "================================================================="
+notif1=$(accumulatorDump | grep subscriptionId | awk -F\" '{print $4}'| head -n 1)
+notif2=$(accumulatorDump | grep subscriptionId | awk -F\" '{print $4}'| head -n 2 | tail -n 1)
+notif3=$(accumulatorDump | grep subscriptionId | awk -F\" '{print $4}'| head -n 3 | tail -n 1)
+notif4=$(accumulatorDump | grep subscriptionId | awk -F\" '{print $4}'| head -n 4 | tail -n 1)
+
+if [ "$notif1" == "$subId1" ]
+then
+  echo "Notification 1: OK"
+else
+  echo "Notification 1: FAIL ($notif1 != $subId1)"
+fi
+
+if [ "$notif2" == "$subId2" ]
+then
+  echo "Notification 2: OK"
+else
+  echo "Notification 2: FAIL ($notif2 != $subId2)"
+fi
+
+if [ "$notif3" == "$subId3" ]
+then
+  echo "Notification 3: OK"
+else
+  echo "Notification 3: FAIL ($notif3 != $subId3)"
+fi
+
+if [ "$notif4" == "$subId1" ]
+then
+  echo "Notification 4: OK"
+else
+  echo "Notification 4: FAIL ($notif4 != $subId1)"
+fi
+
+
+echo
+echo
+
+
+--REGEXPECT--
+01. Create sub1: attrs = temp, temperature==10
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create sub2: attrs = temp, temperature>10
+=============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create sub3: attrs = temp, temperature<10
+=============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create entity temp==10
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Room?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Update entity temp==15
+==========================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Update entity temp==5
+=========================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Update entity temp==10
+==========================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Dump accumulator: see four
+==============================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 130
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "id": "Room",
+            "temp": {
+                "metadata": {},
+                "type": "none",
+                "value": 10
+            },
+            "type": "none"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 130
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "id": "Room",
+            "temp": {
+                "metadata": {},
+                "type": "none",
+                "value": 15
+            },
+            "type": "none"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 129
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "id": "Room",
+            "temp": {
+                "metadata": {},
+                "type": "none",
+                "value": 5
+            },
+            "type": "none"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 130
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "id": "Room",
+            "temp": {
+                "metadata": {},
+                "type": "none",
+                "value": 10
+            },
+            "type": "none"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+09. Check that the order is the following: sub1, sub2, sub3, sub1
+=================================================================
+Notification 1: OK
+Notification 2: OK
+Notification 3: OK
+Notification 4: OK
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
