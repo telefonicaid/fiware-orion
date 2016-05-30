@@ -19,4 +19,3 @@
 - Fix: Improved error text "ContentLengthRequired" to replace "LengthRequired" (Issue #2198)
 - Fix: POST /v2/op/query was not supporting FIWARE::Location::NGSIv2 filters
 - Fix: Expression lost after refeshing subscription cache (Issue #2202)
-- Fix: Filling http info in sub cache item when updating subscriptions (Issue #2203)
