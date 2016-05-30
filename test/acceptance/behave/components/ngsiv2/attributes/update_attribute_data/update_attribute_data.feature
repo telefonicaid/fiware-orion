@@ -114,10 +114,10 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
       | parameter          |
       | without_properties |
     When update an attribute by ID "room_1" and attribute name "temperature_0" if it exists
-    Then verify that receive an "Length Required" http code
+    Then verify that receive an "Content Length Required" http code
     And verify an error response
       | parameter   | value                                            |
-      | error       | LengthRequired                                   |
+      | error       | ContentLengthRequired                            |
       | description | Zero/No Content-Length in PUT/POST/PATCH request |
 
   @maximum_size @BUG_1385
@@ -1000,8 +1000,8 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
     And verify that receive several "Created" http code
     # These properties below are used in update request
     And properties to entities
-      | parameter        | value     |
-      | attributes_value | 25        |
+      | parameter        | value |
+      | attributes_value | 25    |
     When update an attribute by ID "room" and attribute name "" if it exists
     Then verify that receive an "Bad Request" http code
     And verify an error response

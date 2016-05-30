@@ -57,14 +57,14 @@ There are some exception cases in which the above restrictions do not apply. In 
 
 NGSIv2 introduces syntax restrictions for ID fields (such as entity id/type, attribute name/type
 or metadata name/type) which are described in the "Field syntax restrictions" section in the
-[NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/). You can also
+[NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable). You can also
 enable them for NGSIv1, as described in [this section of the documentation](v1_v2_coexistence.md#checking-id-fields).
 
 ### Custom payload special treatment
 
 NGSIv2 provides a templating mechanism for subscriptions which allows to generate custom notifications
 (see "Custom notifications" section in
-the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/)). Forbidden
+the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable)). Forbidden
 characters restrictions apply to the `httpCustom.payload` field in NGSIv2 API operations, such as
 POST /v2/subscription or GET /v2/subscriptions.
 

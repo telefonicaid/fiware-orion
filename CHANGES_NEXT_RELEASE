@@ -15,3 +15,7 @@
 - Deprecated: /ngsi10 and /ngsi9 as URL path prefixes
 - Fix: potential bug in internal logic at NGSIv2 GET subscription operations, possibly provoking crashes
 - Add: NGSIv2 custom notifications (Issue #2015)
+- Fix: New keyword "DateTime" to replace "date" for attributes that express date/time (Issue #2198)
+- Fix: Improved error text "ContentLengthRequired" to replace "LengthRequired" (Issue #2198)
+- Fix: POST /v2/op/query was not supporting FIWARE::Location::NGSIv2 filters
+- Fix: Expression lost after refeshing subscription cache (Issue #2202)

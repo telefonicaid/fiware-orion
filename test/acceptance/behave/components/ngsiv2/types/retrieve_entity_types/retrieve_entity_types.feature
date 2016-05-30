@@ -104,7 +104,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_number | 2                        |
       | attributes_name   | timestamp                |
       | attributes_value  | 2017-06-17T07:21:24.238Z |
-      | attributes_type   | date                     |
+      | attributes_type   | DateTime                 |
       | metadatas_number  | 2                        |
       | metadatas_name    | very_hot                 |
       | metadatas_type    | alarm                    |
@@ -188,7 +188,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_number | 2                        |
       | attributes_name   | timestamp                |
       | attributes_value  | 2017-06-17T07:21:24.238Z |
-      | attributes_type   | date                     |
+      | attributes_type   | DateTime                 |
       | metadatas_number  | 2                        |
       | metadatas_name    | very_hot                 |
       | metadatas_type    | alarm                    |
@@ -238,7 +238,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_number | 2                        |
       | attributes_name   | timestamp                |
       | attributes_value  | 2017-06-17T07:21:24.238Z |
-      | attributes_type   | date                     |
+      | attributes_type   | DateTime                 |
       | metadatas_number  | 2                        |
       | metadatas_name    | very_hot                 |
       | metadatas_type    | alarm                    |
@@ -320,7 +320,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_number | 2                        |
       | attributes_name   | timestamp                |
       | attributes_value  | 2017-06-17T07:21:24.238Z |
-      | attributes_type   | date                     |
+      | attributes_type   | DateTime                 |
       | metadatas_number  | 2                        |
       | metadatas_name    | very_hot                 |
       | metadatas_type    | alarm                    |
@@ -373,7 +373,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_number | 2                        |
       | attributes_name   | timestamp                |
       | attributes_value  | 2017-06-17T07:21:24.238Z |
-      | attributes_type   | date                     |
+      | attributes_type   | DateTime                 |
       | metadatas_number  | 2                        |
       | metadatas_name    | very_hot                 |
       | metadatas_type    | alarm                    |
@@ -603,7 +603,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_number | 2                        |
       | attributes_name   | timestamp                |
       | attributes_value  | 2017-06-17T07:21:24.238Z |
-      | attributes_type   | date                     |
+      | attributes_type   | DateTime                 |
       | metadatas_number  | 2                        |
       | metadatas_name    | very_hot                 |
       | metadatas_type    | alarm                    |
@@ -796,7 +796,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_number | 2                        |
       | attributes_name   | timestamp                |
       | attributes_value  | 2017-06-17T07:21:24.238Z |
-      | attributes_type   | date                     |
+      | attributes_type   | DateTime                 |
       | metadatas_number  | 2                        |
       | metadatas_name    | very_hot                 |
       | metadatas_type    | alarm                    |
@@ -930,7 +930,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_number | 2                        |
       | attributes_name   | timestamp                |
       | attributes_value  | 2017-06-17T07:21:24.238Z |
-      | attributes_type   | date                     |
+      | attributes_type   | DateTime                 |
       | metadatas_number  | 2                        |
       | metadatas_name    | very_hot                 |
       | metadatas_type    | alarm                    |
@@ -1088,7 +1088,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_number | 2                        |
       | attributes_name   | timestamp                |
       | attributes_value  | 2017-06-17T07:21:24.238Z |
-      | attributes_type   | date                     |
+      | attributes_type   | DateTime                 |
       | metadatas_number  | 2                        |
       | metadatas_name    | very_hot                 |
       | metadatas_type    | alarm                    |
@@ -1182,7 +1182,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_number | 2                        |
       | attributes_name   | timestamp                |
       | attributes_value  | 2017-06-17T07:21:24.238Z |
-      | attributes_type   | date                     |
+      | attributes_type   | DateTime                 |
       | metadatas_number  | 2                        |
       | metadatas_name    | very_hot                 |
       | metadatas_type    | alarm                    |

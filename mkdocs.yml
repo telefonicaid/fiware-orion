@@ -13,6 +13,7 @@ pages:
   - 'Getting Started': 'quick_start_guide.md'
   - 'User & Programmers Manual':
       - 'Introduction': 'user/index.md'
+      - 'API Walkthrough (v2)': 'user/walkthrough_apiv2.md'
       - 'API Walkthrough': 'user/walkthrough_apiv1.md'
       - 'Adding entities and attributes': 'user/append_and_delete.md'
       - 'Delete entity': 'user/delete_entity.md'
@@ -34,6 +35,7 @@ pages:
       - 'Known limitations': 'user/known_limitations.md'
       - 'Forbidden characters': 'user/forbidden_characters.md'
       - 'Docker': 'user/docker.md'
+      - 'NGSIv2 Implementation Notes': 'user/ngsiv2_implementation_notes.md'
       - 'Considerations on NGSIv1 and NGSIv2 coexistence': 'user/v1_v2_coexistence.md'
   - 'Installation & Administration Manual':
       - 'Introduction': 'admin/index.md'

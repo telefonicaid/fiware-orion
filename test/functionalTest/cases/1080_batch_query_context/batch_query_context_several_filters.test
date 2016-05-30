@@ -1,0 +1,293 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+V2 batch query with options values
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity R1 of type R, with attributes A=10, location P
+# 02. Create an entity R2 of type R, with attributes A=20, location ~13km to P
+# 03. Create an entity R3 of type R, with attributes A=30, location ~13km to P
+# 04. Create an entity C1 of type C, with attributes A=100, location ~15 km to P
+# 05. Create an entity C2 of type C, with attributes A=200, location ~13 km to P
+# 06. Create an entity C3 of type C, with attributes A=300, location ~15 km to P
+# 07. Query R and C entities ending with 2 or 3, A>25 and max distance 13.5 km to P: R3/R and C2/C
+#
+# Hint:
+#          P: 40.418889, -3.691944
+# ~13km to P: 40.316667, -3.75
+# ~15km to P: 40.533333, -3.633333
+#
+
+echo "01. Create an entity R1 of type R, with attributes A=10, location P"
+echo "==================================================================="
+payload='{
+  "id": "R1",
+  "type": "R",
+  "A": {
+    "value": 10
+  },
+  "location": {
+    "value": "40.418889, -3.691944",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an entity R2 of type R, with attributes A=20, location ~13km to P"
+echo "============================================================================"
+payload='{
+  "id": "R2",
+  "type": "R",
+  "A": {
+    "value": 20
+  },
+  "location": {
+    "value": "40.316667, -3.75",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create an entity R3 of type R, with attributes A=30, location ~13km to P"
+echo "============================================================================"
+payload='{
+  "id": "R3",
+  "type": "R",
+  "A": {
+    "value": 30
+  },
+  "location": {
+    "value": "40.316667, -3.75",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Create an entity C1 of type C, with attributes A=100, location ~15 km to P"
+echo "=============================================================================="
+payload='{
+  "id": "C1",
+  "type": "C",
+  "A": {
+    "value": 100
+  },
+  "location": {
+    "value": "40.533333, -3.633333",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Create an entity C2 of type C, with attributes A=200, location ~13 km to P"
+echo "=============================================================================="
+payload='{
+  "id": "C2",
+  "type": "C",
+  "A": {
+    "value": 200
+  },
+  "location": {
+    "value": "40.316667, -3.75",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Create an entity C3 of type C, with attributes A=300, location ~15 km to P"
+echo "=============================================================================="
+payload='{
+  "id": "C3",
+  "type": "C",
+  "A": {
+    "value": 300
+  },
+  "location": {
+    "value": "40.533333, -3.633333",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "07. Query R and C entities ending with 2 or 3, A>25 and max distance 13.5 km to P: R3/R and C2/C"
+echo "================================================================================================"
+payload='{
+  "entities": [
+    {
+      "idPattern": "[2-3]$",
+      "type": "R"
+    },
+    {
+      "idPattern": "[2-3]$",
+      "type": "C"
+    }
+  ],
+  "attributes": [ ],
+  "scopes": [
+    {
+      "type": "FIWARE::StringQuery",
+      "value": "A>25"
+    },
+    {
+      "type" : "FIWARE::Location::NGSIv2",
+      "value" : {
+        "georel": [ "near", "maxDistance:13500" ],
+        "geometry": "point",
+        "coords": [ [40.418889, -3.691944] ]
+      }
+    }
+  ]
+}
+'
+orionCurl --url '/v2/op/query' --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity R1 of type R, with attributes A=10, location P
+===================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/R1?type=R
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create an entity R2 of type R, with attributes A=20, location ~13km to P
+============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/R2?type=R
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create an entity R3 of type R, with attributes A=30, location ~13km to P
+============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/R3?type=R
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create an entity C1 of type C, with attributes A=100, location ~15 km to P
+==============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/C1?type=C
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create an entity C2 of type C, with attributes A=200, location ~13 km to P
+==============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/C2?type=C
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Create an entity C3 of type C, with attributes A=300, location ~15 km to P
+==============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/C3?type=C
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Query R and C entities ending with 2 or 3, A>25 and max distance 13.5 km to P: R3/R and C2/C
+================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 284
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A": {
+            "metadata": {},
+            "type": "none",
+            "value": 30
+        },
+        "id": "R3",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.316667, -3.75"
+        },
+        "type": "R"
+    },
+    {
+        "A": {
+            "metadata": {},
+            "type": "none",
+            "value": 200
+        },
+        "id": "C2",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.316667, -3.75"
+        },
+        "type": "C"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

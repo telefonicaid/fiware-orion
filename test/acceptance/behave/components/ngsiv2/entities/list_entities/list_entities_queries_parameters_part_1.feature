@@ -426,7 +426,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | "alarm"           |
       | metadatas_value  | "hot"             |
     And create an entity in raw and "normalized" modes
-    And verify that receive several "Created" http code
+    And verify that receive a "Created" http code
     And record entity group
     When get all entities
       | parameter | value                                  |

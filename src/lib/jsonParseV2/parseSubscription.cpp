@@ -361,9 +361,9 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   }
 
   // Callback
-  if (notification.HasMember("http") && notification.HasMember("httpExtended"))
+  if (notification.HasMember("http") && notification.HasMember("httpCustom"))
   {
-    return badInput(ciP, "notification has http and httpExtended");
+    return badInput(ciP, "notification has http and httpCustom");
   }
   else if (notification.HasMember("http"))
   {
@@ -399,22 +399,22 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
           return badInput(ciP, "Invalid URL parsing notification url");
         }
       }
-      subsP->notification.httpInfo.url      = urlOpt.value;
-      subsP->notification.httpInfo.extended = false;
+      subsP->notification.httpInfo.url    = urlOpt.value;
+      subsP->notification.httpInfo.custom = false;
     }
   }
-  else if (notification.HasMember("httpExtended"))
+  else if (notification.HasMember("httpCustom"))
   {
-    const Value& httpExt = notification["httpExtended"];
+    const Value& httpCustom = notification["httpCustom"];
 
-    if (!httpExt.IsObject())
+    if (!httpCustom.IsObject())
     {
-      return badInput(ciP, "httpExtended notification is not an object");
+      return badInput(ciP, "httpCustom notification is not an object");
     }
 
     // URL
     {
-      Opt<std::string> urlOpt = getStringMust(httpExt, "url", "url httpExtended notification");
+      Opt<std::string> urlOpt = getStringMust(httpCustom, "url", "url httpCustom notification");
 
       if (!urlOpt.ok())
       {
@@ -431,7 +431,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // method -> verb
     {
-      Opt<std::string> methodOpt = getStringOpt(httpExt, "method", "method httpExtended notification");
+      Opt<std::string> methodOpt = getStringOpt(httpCustom, "method", "method httpCustom notification");
 
       if (!methodOpt.ok())
       {
@@ -446,7 +446,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
         if (verb == UNKNOWNVERB)
         {
-          return badInput(ciP, "unknown method httpExtended notification");
+          return badInput(ciP, "unknown method httpCustom notification");
         }
       }
       else // not given by user, the default one will be used
@@ -459,7 +459,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // payload
     {
-      Opt<std::string> payloadOpt = getStringOpt(httpExt, "payload", "payload httpExtended notification");
+      Opt<std::string> payloadOpt = getStringOpt(httpCustom, "payload", "payload httpCustom notification");
       if (!payloadOpt.ok())
       {
         return badInput(ciP, payloadOpt.error);
@@ -474,15 +474,15 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     // qs
-    if (httpExt.HasMember("qs"))
+    if (httpCustom.HasMember("qs"))
     {
-      const Value& qs = httpExt["qs"];
+      const Value& qs = httpCustom["qs"];
       if (!qs.IsObject())
       {
-        return badInput(ciP, "notification httpExtended qs is not an object");
+        return badInput(ciP, "notification httpCustom qs is not an object");
       }
 
-      std::string r = parseDictionary(ciP, subsP->notification.httpInfo.qs, qs, "notification httpExtended qs");
+      std::string r = parseDictionary(ciP, subsP->notification.httpInfo.qs, qs, "notification httpCustom qs");
 
       if (r != "")
       {
@@ -491,15 +491,15 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     // headers
-    if (httpExt.HasMember("headers"))
+    if (httpCustom.HasMember("headers"))
     {
-      const Value& headers = httpExt["headers"];
+      const Value& headers = httpCustom["headers"];
       if (!headers.IsObject())
       {
-        return badInput(ciP, "notification httpExtended headers is not an object");
+        return badInput(ciP, "notification httpCustom headers is not an object");
       }
 
-      std::string r = parseDictionary(ciP, subsP->notification.httpInfo.headers, headers, "notification httpExtended headers");
+      std::string r = parseDictionary(ciP, subsP->notification.httpInfo.headers, headers, "notification httpCustom headers");
 
       if (r != "")
       {
@@ -507,7 +507,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       }
     }
 
-    subsP->notification.httpInfo.extended = true;
+    subsP->notification.httpInfo.custom = true;
   }
   else  // missing callback field
   {
@@ -582,6 +582,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
   {
    return badInput(ciP, "condition is not an object");
   }
+
   // Attributes
   if (!condition.HasMember("attrs"))
   {
@@ -609,14 +610,18 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
     if (expression.HasMember("q"))
     {
       const Value& q = expression["q"];
+      std::string  qString;
+
       if (!q.IsString())
       {
         return badInput(ciP, "q is not a string");
       }
-      subsP->subject.condition.expression.q = q.GetString();
+
+      qString = q.GetString();
+      subsP->subject.condition.expression.q = qString;
 
       std::string  errorString;
-      Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, expression["q"].GetString());
+      Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, qString);
 
       scopeP->stringFilterP = new StringFilter();
       if (scopeP->stringFilterP->parse(scopeP->value.c_str(), &errorString) == false)

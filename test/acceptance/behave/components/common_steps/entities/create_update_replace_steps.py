@@ -111,7 +111,7 @@ def create_an_entity_in_raw(context, mode):
              "value": [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]
              "value": {"x": {"x1": "a","x2": "b"}}
              "value": "41.3763726, 2.1864475,14"  -->  "type": "geo:point"
-             "value": "2017-06-17T07:21:24.238Z"  -->  "type: "date"
+             "value": "2017-06-17T07:21:24.238Z"  -->  "type: "DateTime"
         Some cases are not parsed correctly to dict in python
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param mode: mode in that will be created the entity (normalized | keyValues | values), It is not the query parameter.

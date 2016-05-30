@@ -45,8 +45,7 @@ brokerStart CB 0 IPv4 -logSummary 3 -relogAlarms
 echo "01. Provoke FOUR Bad Inputs"
 echo "==========================="
 orionCurl --url /v2/noService
-payload='abc'
-orionCurl --url /v2/entities --payload "$payload"
+orionCurl --url /v2/entities --payload "abc"
 orionCurl --url /v2/entities -X GETT
 orionCurl --url /v2/entities -X POST
 echo
@@ -104,14 +103,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 HTTP/1.1 411 Length Required
-Content-Length: 91
+Content-Length: 98
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
-    "error": "LengthRequired"
+    "error": "ContentLengthRequired"
 }
 
 
@@ -132,7 +131,7 @@ Date: REGEX(.*)
  Raising alarm BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): service '/v2/noService' not found
  Repeated BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): JSON parse error
  Repeated BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): bad verb for url '/v2/entities', method 'GETT'
- Repeated BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): {"error":"LengthRequired","description":"Zero/No Content-Length in PUT/POST/PATCH request"}
+ Repeated BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): {"error":"ContentLengthRequired","description":"Zero/No Content-Length in PUT/POST/PATCH request"}
  
 
 --TEARDOWN--

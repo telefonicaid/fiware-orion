@@ -58,7 +58,7 @@ server_url = '/accumulate'
 verbose    = 0
 pretty     = False
 
-# Arguments from command line
+# FIXME: this is a mess... need to use a more ordered way of passing arguments
 if len(argv) > 1:
     port       = int(argv[1])
 
@@ -67,7 +67,6 @@ if len(argv) > 2:
 
 if len(argv) > 3:
     if argv[3] == 'on':
-        print 'verbose mode is on'
         verbose = 1
     if argv[3] == '--pretty-print':
         pretty = True
@@ -78,8 +77,20 @@ if len(argv) > 4:
     if argv[4] == '--pretty-print':
         pretty = True
     if argv[4] == 'on':
-        print 'verbose mode is on'
         verbose = 1
+
+if len(argv) > 5:
+    if argv[5] == '--pretty-print':
+        pretty = True
+    if argv[5] == 'on':
+        verbose = 1
+
+if verbose:
+    print "verbose mode is on"
+    print "port: " + str(port)
+    print "host: " + str(host)
+    print "server_url: " + str(server_url)
+    print "pretty: " + str(pretty)
 
 pid     = str(os.getpid())
 pidfile = "/tmp/accumulator." + str(port) + ".pid"

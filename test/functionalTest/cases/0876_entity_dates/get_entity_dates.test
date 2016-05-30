@@ -166,7 +166,7 @@ Date: REGEX(.*)
 02a. Get entity with dates
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 226
+Content-Length: 234
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -179,12 +179,12 @@ Date: REGEX(.*)
     },
     "dateCreated": {
         "metadata": {},
-        "type": "date",
+        "type": "DateTime",
         "value": "REGEX(.*)"
     },
     "dateModified": {
         "metadata": {},
-        "type": "date",
+        "type": "DateTime",
         "value": "REGEX(.*)"
     },
     "id": "E",
@@ -242,7 +242,7 @@ Date: REGEX(.*)
 05a. Get entity with dates
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 226
+Content-Length: 234
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -255,12 +255,12 @@ Date: REGEX(.*)
     },
     "dateCreated": {
         "metadata": {},
-        "type": "date",
+        "type": "DateTime",
         "value": "REGEX(.*)"
     },
     "dateModified": {
         "metadata": {},
-        "type": "date",
+        "type": "DateTime",
         "value": "REGEX(.*)"
     },
     "id": "E",

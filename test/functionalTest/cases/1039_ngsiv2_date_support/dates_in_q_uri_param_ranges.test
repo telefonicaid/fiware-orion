@@ -45,7 +45,7 @@ payload='{
   "id": "E24",
   "birthdate": {
     "value": "2016-02-24T10:00:00.00Z",
-    "type": "date"
+    "type": "DateTime"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -59,7 +59,7 @@ payload='{
   "id": "E23",
   "birthdate": {
     "value": "2016-02-23T10:00:00.00Z",
-    "type": "date"
+    "type": "DateTime"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -73,7 +73,7 @@ payload='{
   "id": "E22",
   "birthdate": {
     "value": "2016-02-22T10:00:00.00Z",
-    "type": "date"
+    "type": "DateTime"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"

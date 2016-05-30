@@ -73,7 +73,7 @@
 *
 * other special types
 */
-#define DATE_TYPE     "date"
+#define DATE_TYPE     "DateTime"
 #define DEFAULT_TYPE  "none"
 
 

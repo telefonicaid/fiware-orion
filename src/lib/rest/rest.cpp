@@ -1140,8 +1140,9 @@ static int connectionTreat
       (ciP->httpHeaders.contentLength == 0) && 
       ((strncasecmp(ciP->url.c_str(), "/log/", 5) != 0) && (strncasecmp(ciP->url.c_str(), "/admin/log", 10) != 0)))
   {
-    std::string errorMsg = restErrorReplyGet(ciP, "", url, SccLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request");
-    ciP->httpStatusCode = SccLengthRequired;
+    std::string errorMsg = restErrorReplyGet(ciP, "", url, SccContentLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request");
+
+    ciP->httpStatusCode  = SccContentLengthRequired;
     restReply(ciP, errorMsg);
     alarmMgr.badInput(clientIp, errorMsg);
   }

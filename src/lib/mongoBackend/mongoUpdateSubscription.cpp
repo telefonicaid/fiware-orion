@@ -84,15 +84,15 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
   }
   else
   {
-    // reference is a mandatory field and extended has a clear mapping to false in the case of missing field
+    // 'reference' is a mandatory field and 'custom' has a clear mapping to false in the case of missing field
     std::string reference = getStringFieldF(subOrig, CSUB_REFERENCE);
-    bool extended         = subOrig.hasField(CSUB_EXTENDED) ? getBoolFieldF(subOrig, CSUB_EXTENDED) : false;
+    bool custom           = subOrig.hasField(CSUB_CUSTOM) ? getBoolFieldF(subOrig, CSUB_CUSTOM) : false;
 
     b->append(CSUB_REFERENCE, reference);
-    b->append(CSUB_EXTENDED,  extended);
+    b->append(CSUB_CUSTOM  ,  custom);
 
     LM_T(LmtMongo, ("Subscription reference: %s", reference.c_str()));
-    LM_T(LmtMongo, ("Subscription extended: %s", extended? "true" : "false"));
+    LM_T(LmtMongo, ("Subscription custom:    %s", custom? "true" : "false"));
 
     if (subOrig.hasField(CSUB_METHOD))
     {

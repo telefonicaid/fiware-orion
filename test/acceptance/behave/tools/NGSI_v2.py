@@ -174,7 +174,7 @@ class NGSI:
                         "attrs": {
                             "timestamp_0": {
                                 "value": "017-06-17T07:21:24.238Z",
-                                "type": "date",
+                                "type": "DateTime",
                                 "md": [{
                                             "name": "very_hot_1",
                                             "type": "alarm",
@@ -624,7 +624,7 @@ class NGSI:
         assert str(type(attribute["value"])) == "<type '%s'>" % field_type,  \
             'ERROR - in attribute value "%s" with type "%s" does not match' % (str(attribute["value"]), field_type)
 
-    def verify_an_entity_by_id(self, queries_parameters, entities_context, resp, entity_id_to_test):
+    def verify_an_entity_by_id(self, queries_parameters, entities_context, resp, entity_id_to_test, **kwargs):
         """
         verify an entity by id
          :param queries_parameters: queries parameters used
@@ -645,13 +645,14 @@ class NGSI:
                 }
             }
         """
+        attrs_request = kwargs.get("attrs", False)
         attrs_list = []
-        options_key_values = False
         resp_json = convert_str_to_dict(resp.content, JSON)
         __logger__.debug("query parameter: %s" % str(queries_parameters))
-        assert resp_json["id"] == entity_id_to_test,  'ERROR - in id "%s"' % resp_json["id"]
-        if entities_context["entities_type"] != "none":
-            assert resp_json["type"] == entities_context["entities_type"],  'ERROR - in type "%s" ' % resp_json["type"]
+        if not attrs_request:
+            assert resp_json["id"] == entity_id_to_test,  'ERROR - in id "%s"' % resp_json["id"]
+            if entities_context["entities_type"] != "none":
+                assert resp_json["type"] == entities_context["entities_type"],  'ERROR - in type "%s" ' % resp_json["type"]
 
         #  attr query parameter
         if "attrs" in queries_parameters:
@@ -662,44 +663,70 @@ class NGSI:
             else:
                 for e in range(int(entities_context["attributes_number"])):
                     attrs_list.append("%s_%s" % (entities_context["attributes_name"], str(e)))
-        if  "options" in queries_parameters:
-            if queries_parameters["options"] == "keyValues":
-                options_key_values = True
 
-         # verify attributes
-        for i in range(len(attrs_list)):
-            attr_name = attrs_list[i]
-            __logger__.info("attribute name: %s" % attr_name)
-            assert attr_name in resp_json, 'ERROR - in attribute name "%s" ' % attr_name
-            attribute = resp_json[attr_name]
-            if not options_key_values:
-                if entities_context["attributes_type"] != "none":
-                    assert entities_context["attributes_type"] == attribute["type"], \
-                        'ERROR - in attribute type "%s" without keyValues option' % entities_context["attributes_type"]
-                if entities_context["attributes_value"] is not None:
-                    assert entities_context["attributes_value"] == attribute["value"], \
-                        'ERROR - in attribute value "%s" without keyValues option' % entities_context["attributes_value"]
-               # verify attribute metadatas
-                if entities_context["metadatas_number"] > 0:
-                    for m in range(int(entities_context["metadatas_number"])):
-                        if int(entities_context["metadatas_number"]) == 1:
-                            meta_name = entities_context["metadatas_name"]
-                        else:
-                            meta_name = "%s_%s" % (entities_context["metadatas_name"], str(m))
-                        assert meta_name in attribute["metadata"],\
-                            'ERROR - attribute metadata name "%s" does not exist without keyValues option' \
-                            % meta_name
-                        metadata = attribute["metadata"][meta_name]
-                        if entities_context["metadatas_type"] != "none":
-                            assert entities_context["metadatas_type"] == metadata["type"], \
-                                'ERROR - in attribute metadata type "%s" without keyValues option' % entities_context["metadatas_type"]
-                        if entities_context["metadatas_value"] != "none":
-                            assert entities_context["metadatas_value"] == metadata["value"], \
-                                'ERROR - in attribute metadata value "%s" without keyValues option' % entities_context["metadatas_value"]
+        #  options query parameter
+        if  "options" in queries_parameters:
+            __logger__.debug("options query parameter: %s" % str(queries_parameters["options"]))
+            # options = keyValues
+            if queries_parameters["options"].find("keyValues") >= 0:
+                # verify attributes
+                for i in range(len(attrs_list)):
+                    attr_name = attrs_list[i]
+                    __logger__.info("attribute name: %s" % attr_name)
+                    assert attr_name in resp_json, 'ERROR - in attribute name "%s" ' % attr_name
+                    attribute = resp_json[attr_name]
+                    if entities_context["attributes_value"] != "none":
+                        assert entities_context["attributes_value"] == attribute, \
+                            'ERROR - in attribute value "%s" with keyValues option' % entities_context["attributes_value"]
+            # options = values
+            elif queries_parameters["options"].find("values") >= 0:
+                # verify attributes value
+                c = 0
+                for i in range(len(attrs_list)):
+                    if entities_context["attributes_value"] != "none":
+                        assert entities_context["attributes_value"] == resp_json[c], \
+                            'ERROR - in attribute value "%s" with values option' % entities_context["attributes_value"]
+                    c=+1
+            # options = unique
+            elif queries_parameters["options"].find("unique") >= 0:
+                # verify attributes value
+                for i in range(len(attrs_list)):
+                    if entities_context["attributes_value"] != "none":
+                        assert entities_context["attributes_value"] in resp_json, \
+                            'ERROR - in attribute value "%s" with unique option' % entities_context["attributes_value"]
+            # options = normalized
             else:
-                if entities_context["attributes_value"] != "none":
-                    assert entities_context["attributes_value"] == attribute, \
-                        'ERROR - in attribute value "%s" with keyValues option' % entities_context["attributes_value"]
+                # verify attributes
+                for i in range(len(attrs_list)):
+                    attr_name = attrs_list[i]
+                    __logger__.info("attribute name: %s" % attr_name)
+                    assert attr_name in resp_json, 'ERROR - in attribute name "%s" ' % attr_name
+                    attribute = resp_json[attr_name]
+                    # verify attribute type
+                    if entities_context["attributes_type"] != "none":
+                        assert entities_context["attributes_type"] == attribute["type"], \
+                            'ERROR - in attribute type "%s" with normalized option' % entities_context["attributes_type"]
+                    # verify attribute value
+                    if entities_context["attributes_value"] is not None:
+                        assert entities_context["attributes_value"] == attribute["value"], \
+                            'ERROR - in attribute value "%s" with normalized option' % entities_context["attributes_value"]
+                    # verify attribute metadatas
+                    if entities_context["metadatas_number"] > 0:
+                        for m in range(int(entities_context["metadatas_number"])):
+                            if int(entities_context["metadatas_number"]) == 1:
+                                meta_name = entities_context["metadatas_name"]
+                            else:
+                                meta_name = "%s_%s" % (entities_context["metadatas_name"], str(m))
+                            assert meta_name in attribute["metadata"],\
+                                'ERROR - attribute metadata name "%s" does not exist with normalized option' \
+                                % meta_name
+                            metadata = attribute["metadata"][meta_name]
+                            if entities_context["metadatas_type"] != "none":
+                                assert entities_context["metadatas_type"] == metadata["type"], \
+                                    'ERROR - in attribute metadata type "%s" with normalized option' % entities_context["metadatas_type"]
+                            if entities_context["metadatas_value"] != "none":
+                                assert entities_context["metadatas_value"] == metadata["value"], \
+                                    'ERROR - in attribute metadata value "%s" with normalized option' % entities_context["metadatas_value"]
 
     def verify_an_attribute_by_id(self, entities_context, resp, attribute_name_to_request):
         """
@@ -710,7 +737,7 @@ class NGSI:
         ex:
             {
                 timestamp: {
-                    type: "date"
+                    type: "DateTime"
                     value: "017-06-17T07:21:24.238Z"
                     "metadata": {
                           very_hot: {
@@ -1061,6 +1088,8 @@ class NGSI:
            assert EMPTY == curs["reference"], u' ERROR - the reference "%s" is not the expected' % curs["reference"]
         __logger__.info("callback(reference) in the \"notification\" field is verified successfully")
         # throttling field
+        if subscription_context["throttling"] is None:
+            subscription_context["throttling"] = 0
         assert curs["throttling"] == int(subscription_context["throttling"]), u' ERROR - the throttling "%s" is not the expected' % curs["throttling"]
         __logger__.info("throttling in the \"notification\" field is verified successfully")
         # expiration field

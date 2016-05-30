@@ -4215,7 +4215,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     std::string s2 = res.subscribeError.errorCode.details.substr(69+24, res.subscribeError.errorCode.details.size()-69-24);
     EXPECT_EQ("Database Error (collection: utest.csubs "
               "- insert(): { _id: ObjectId('", s1);
-    EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", extended: false, throttling: -1, servicePath: \"/#\", status: \"active\", entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], blacklist: false, conditions: [ { type: \"ONCHANGE\", value: [ \"A\" ] } ], expression: { q: \"\", geometry: \"\", coords: \"\", georel: \"\" }, format: \"JSON\" } "
+    EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", custom: false, throttling: -1, servicePath: \"/#\", status: \"active\", entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], blacklist: false, conditions: [ { type: \"ONCHANGE\", value: [ \"A\" ] } ], expression: { q: \"\", geometry: \"\", coords: \"\", georel: \"\" }, format: \"JSON\" } "
               "- exception: boom!!)", s2);
 
     /* Restore real DB connection */

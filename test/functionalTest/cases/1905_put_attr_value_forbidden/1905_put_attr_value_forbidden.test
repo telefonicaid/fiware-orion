@@ -41,7 +41,7 @@ payload='{
 "id": "room",
 "type": "Room",
 "temperature": {
-  "type": "date",
+  "type": "DateTime",
   "value": "2035-06-15T07:21:24.238Z"
   }
 }

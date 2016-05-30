@@ -1,7 +1,7 @@
 # Considerations on NGSIv1 and NGSIv2 coexistence
 
 NGSIv1 is the API offered by Orion Context Broker from its very first version. 
-[NGSIv2](http://telefonicaid.github.io/fiware-orion/api/v2/) development started 
+[NGSIv2](http://telefonicaid.github.io/fiware-orion/api/v2/stable) development started 
 in July 2015 in Orion 0.23.0. Although at the end NGSIv1 will be deprecated and 
 removed from the code in some future Orion version (so only NGSIv2 will remain) 
 this is a big work and both API versions will be coexisting during some time. 
@@ -37,7 +37,7 @@ In addition, note that NGSIv2 geo-query filters can be used also in NGSIv1. See
 
 NGSIv2 introduces syntax restrictions for ID fields (such as entity id/type, attribute name/type
 or metadata name/type) which are described in the "Field syntax restrictions" section in the
-[NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/). In order to
+[NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable). In order to
 keep backward compatibility, these restrictions are not used in the NGSIv1 API by default, but
 you can enable them using the `-strictNgsiv1Ids` [CLI parameter](../admin/cli.md).
 

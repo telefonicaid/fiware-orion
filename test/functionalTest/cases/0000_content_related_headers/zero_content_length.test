@@ -36,7 +36,7 @@ curl localhost:${CB_PORT}/v1/registry/registerContext --header "Content-Length: 
     "errorCode": {
         "code": "411",
         "details": "Zero/No Content-Length in PUT/POST/PATCH request",
-        "reasonPhrase": "Length Required"
+        "reasonPhrase": "Content Length Required"
     },
     "registrationId": "000000000000000000000000"
 }

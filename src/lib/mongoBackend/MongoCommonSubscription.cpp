@@ -68,10 +68,10 @@ void setExpiration(const Subscription& sub, BSONObjBuilder* b)
 
 /* ****************************************************************************
 *
-* setExtendedHttpInfo -
+* setCustomHttpInfo -
 *
 */
-static void setExtendedHttpInfo(const HttpInfo& httpInfo, BSONObjBuilder* b)
+static void setCustomHttpInfo(const HttpInfo& httpInfo, BSONObjBuilder* b)
 {
   if (httpInfo.verb != NOVERB)
   {
@@ -123,14 +123,14 @@ static void setExtendedHttpInfo(const HttpInfo& httpInfo, BSONObjBuilder* b)
 void setHttpInfo(const Subscription& sub, BSONObjBuilder* b)
 {
   b->append(CSUB_REFERENCE, sub.notification.httpInfo.url);
-  b->append(CSUB_EXTENDED,  sub.notification.httpInfo.extended);
+  b->append(CSUB_CUSTOM,    sub.notification.httpInfo.custom);
 
   LM_T(LmtMongo, ("Subscription reference: %s", sub.notification.httpInfo.url.c_str()));
-  LM_T(LmtMongo, ("Subscription extended: %s", sub.notification.httpInfo.extended? "true" : "false"));
+  LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.httpInfo.custom? "true" : "false"));
 
-  if (sub.notification.httpInfo.extended)
+  if (sub.notification.httpInfo.custom)
   {
-    setExtendedHttpInfo(sub.notification.httpInfo, b);
+    setCustomHttpInfo(sub.notification.httpInfo, b);
   }
 }
 
