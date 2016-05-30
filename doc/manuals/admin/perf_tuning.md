@@ -172,7 +172,7 @@ where
   available file descriptors.
 * **db pool size** is the size of the DB connection pool, configured with `-dbPoolSize` [CLI parameter](cli.md),
   which default value is 10.
-* *extra* an amount of file descriptors used by log files, listening sockets and file descriptors used by libraries.
+* **extra** an amount of file descriptors used by log files, listening sockets and file descriptors used by libraries.
   There isn't any general rule for this value, but one in the range of 100 to 200 must suffice most of the cases.
 
 If the above inequity deesn't hold, Orion Context Broker will not work properly. In particular, it
