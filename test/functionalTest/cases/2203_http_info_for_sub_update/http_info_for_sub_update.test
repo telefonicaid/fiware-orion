@@ -1,0 +1,319 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+HTTP info in cached subscription on subUpdate
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# This test was created to provoke the bug 2203, by commenting the call to 
+#   cSubP->httpInfo.fill(sub)
+# in the mongoSubCacheItemInsert with MANY parameters, in mongoSubCache.cpp
+# WITHOUT that line, nothing is sent to the accumulator.
+# WITH that line, this test works.
+#
+# 01. Create sub: attrs = temp, temp==10
+# 02. GET sub
+# 03. Update sub, temp==11
+# 04. GET sub - shows only that sub is OK in mongo
+# 05. Create Entity Room, to provoke notification (now sub-cache is used)
+# 06. Create Entity Room, but without notification (now sub-cache is used)
+# 07. Dump accumulator
+#
+
+echo "01. Create sub: attrs = temp, temp==10"
+echo "======================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [ "temp" ],
+      "expression": {
+        "q": "temp==10"
+      }
+    }
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify",
+      "method": "PUT",
+      "qs":      { "Q1": "${A1}" },
+      "headers": { "H1": "${A1}", "Content-Type": "application/json" },
+      "payload": "{ %22What%22: %22PAYLOAD1%22, %22temp%22: %22${temp}%22 }"
+    },
+    "attrs": [ ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "02. GET sub"
+echo "==========="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "03. Update sub, temp==11"
+echo "========================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [ "temp" ],
+      "expression": {
+        "q": "temp==11"
+      }
+    }
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify",
+      "method": "PATCH",
+      "qs":      { "Q2": "${A2}" },
+      "headers": { "H2": "${A2}", "Content-Type": "application/json" },
+      "payload": "{ %22What%22: %22PAYLOAD2%22, %22temp%22: %22${temp}%22 }"
+    },
+    "attrs": [ ]
+  }
+}'
+orionCurl --url /v2/subscriptions/$subId --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "04. GET sub - shows only that sub is OK in mongo"
+echo "================================================"
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "05. Create Entity Room, to provoke notification (now sub-cache is used)"
+echo "======================================================================="
+payload='{
+  "id": "Room",
+  "type": "R1",
+  "temp": 11
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "06. Create Entity Room, but without notification (now sub-cache is used)"
+echo "========================================================================"
+payload='{
+  "id": "Room",
+  "type": "R2",
+  "temp": 10
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "07. Dump accumulator"
+echo "===================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create sub: attrs = temp, temp==10
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. GET sub
+===========
+HTTP/1.1 200 OK
+Content-Length: 449
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "httpCustom": {
+                "headers": {
+                    "Content-Type": "application/json",
+                    "H1": "${A1}"
+                },
+                "method": "PUT",
+                "payload": "{ %22What%22: %22PAYLOAD1%22, %22temp%22: %22${temp}%22 }",
+                "qs": {
+                    "Q1": "${A1}"
+                },
+                "url": "http://localhost:REGEX(\d+)/notify"
+            }
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [
+                    "temp"
+                ],
+                "expression": {
+                    "q": "temp==10"
+                }
+            },
+            "entities": [
+                {
+                    "id": "Room",
+                    "idPattern": "",
+                    "type": ""
+                }
+            ]
+        }
+    }
+]
+
+
+03. Update sub, temp==11
+========================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. GET sub - shows only that sub is OK in mongo
+================================================
+HTTP/1.1 200 OK
+Content-Length: 451
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "httpCustom": {
+                "headers": {
+                    "Content-Type": "application/json",
+                    "H2": "${A2}"
+                },
+                "method": "PATCH",
+                "payload": "{ %22What%22: %22PAYLOAD2%22, %22temp%22: %22${temp}%22 }",
+                "qs": {
+                    "Q2": "${A2}"
+                },
+                "url": "http://localhost:REGEX(\d+)/notify"
+            }
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [
+                    "temp"
+                ],
+                "expression": {
+                    "q": "temp==11"
+                }
+            },
+            "entities": [
+                {
+                    "id": "Room",
+                    "idPattern": "",
+                    "type": ""
+                }
+            ]
+        }
+    }
+]
+
+
+05. Create Entity Room, to provoke notification (now sub-cache is used)
+=======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Room?type=R1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Create Entity Room, but without notification (now sub-cache is used)
+========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Room?type=R2
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Dump accumulator
+====================
+PATCH http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 43
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "What": "PAYLOAD2", 
+    "temp": "11.000000"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop
