@@ -458,7 +458,7 @@ really needed*
 
 ### Simple Location Format
 
-Simple Location Format supports basic geometries (*point*, *line*, *box*, *polygon*) and covers
+Simple Location Format supports basic geometries ( *point*, *line*, *box*, *polygon* ) and covers
 the typical use cases when encoding geographical locations. It has been inspired by
 [GeoRSS Simple](http://www.georss.org/simple.html).
 
@@ -931,9 +931,8 @@ Response code:
     + geometry: point (optional, string) - Geografical area to which the query is restricted.
       See [Geographical Queries](#geographical_queries).
     
-    + coords: 40.6391,-8.6533 (optional, string) - List of latitude-longitude pairs of coordinates
-      separated by ';'.
-      See [Geographical Queries](#geographical_queries).
+    + coords: 41.390205,2.154007;48.8566,2.3522 (optional, string) - List of latitude-longitude
+      pairs of coordinates separated by ';'. See [Geographical Queries](#geographical_queries).
     
     + limit: 20 (optional, number) - Limits the number of entities to be retrieved
     
@@ -1308,7 +1307,7 @@ Response:
 ### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}{?type}]
 
 Returns a JSON object with the attribute data of the attribute. The object follows the JSON
-representation for attributes (described in "JSON Entity Representation" section).
+representation for attributes (described in "JSON Attribute Representation" section).
 
 Response:
 
@@ -1334,7 +1333,7 @@ Response:
 
 The request payload is an object representing the new attribute data. Previous attribute data
 is replaced by the one in the request. The object follows the JSON representation for attributes
-(described in "JSON Entity Representation" section).
+(described in "JSON Attribute Representation" section).
 
 Response:
 
@@ -1623,7 +1622,7 @@ A `notification` object contains the following subfields:
   than those, an error is raised. See detail in "Notification Messages" section.
 + `timesSent` (not editable, only present in GET operations): Number of notifications sent due to
    this subscription.
-+ `lastNotification`: Last notification date in ISO8601 format.
++ `lastNotification` (not editable, only present in GET operations): Last notification date in ISO8601 format.
 
 An `http` object contains the following subfields:
 
