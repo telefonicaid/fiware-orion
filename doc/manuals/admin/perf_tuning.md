@@ -144,13 +144,40 @@ On the other hand, setting thread pools is a way of "capping" throughput. If the
 all the time, at the end the queue saturates and you will end up losing incoming request or ongoing
 notifications.
 
-Finally, you may have thread exhaustion problems if you don’t use thread pools. You can detect that
+Finally, you may have *thread exhaustion problems* if you don't use thread pools. You can detect that
 situation by two symptoms. First, an unexpectedly high number of threads associated to the process.
 Second, error messages like this appearing in the logs:
 
 ```
 Runtime Error (error creating thread: ...)
 ```
+
+On the other hand, you may have *file descriptors exahustion problems* if your pools are not correctly
+sized. In particular, the following inequity ensures the number of file descriptors used by Orion
+is below the operating system limit:
+
+```
+max fds > 5 * n + max cons + db pool size + extra
+```
+
+where
+
+* **max fds** is the per process file descriptors limit, i.e. the output of the `ulimit -n` command. It can
+  be changed with `ulimit -n <new limit>`.
+* **n**, number of threads in the notification threads pool size. The 5 factor is due to each thread can
+  hold up to 5 connections (libcurl pool).
+* **max cons** is the size of the thread pool for incoming connections, configured with `-reqPoolSize`
+  [CLI parameter](cli.md). Note that if you don't use this parameter, default is not using incoming
+  connection pool size. Thus, a burst of incoming connections large enough could exhaust in theory all 
+  available file descriptors.
+* **db pool size** is the size of the DB connections pool, configured with `-dbPoolSize` [CLI parameter](cli.md),
+  which default value is 10.
+* *extra* an amount of file descriptors used by log files, listening sockets and file descriptors used by libraries.
+  There isn't any general rule for this value, but one in the range of 100 to 200 must suffice most of the cases.
+
+If the above inequity is not hold, Orion Context Broker will not work properly. In particular, it
+could happen that Orion couldn't accept new incoming connections and/or send notifications due to lack
+of file descriptors.
 
 [Top](#top)
 

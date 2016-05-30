@@ -3,6 +3,7 @@
 * [Resource Availability](#resource-availability)
 * [Remote Service Access](#remote-service-access)
 * [Resource consumption](#resource-consumption)
+    * [Diagnose file descriptors exahustion problems](#diagnose-file-descriptors-exahustion-problems)
     * [Diagnose spontaneous binary corruption problems](#diagnose-spontaneous-binary-corruption-problems)
 * [I/O Flows](#io-flows)
     * [Diagnose database connection problems](#diagnose-database-connection-problems)
@@ -99,6 +100,30 @@ The solutions for this problem are the following:
 -   Reduce the log verbosity level, e.g. if you are using `-t 0-255` the
     log will grow very fast so, in case of problems, please avoid using
     unneeded trace levels.
+
+### Diagnose file descriptors exahustion problems
+
+The symptoms of this problem are:
+
+-   Orion Context Broker is having problems managing network connections,
+    e.g. incoming connections are not handled and/or notifications cannot
+    be sent.
+-   You are using threadpool notification mode (in theory it could happen
+    in other notification modes, but it is highly improbable).
+-   The number of file descriptors used by Orion is close to the operating
+    system limit (i.e. `ulimit -n`). In order to get the number of used
+    file descriptors by a given process the following command can be used:
+
+```
+lsof -p <pid> | wc -l
+```
+
+The solution to the problem is to ensure that Orion is properly configured in order
+to the inequity described at [threadpool considerations](perf_tuning.md#thread-pool-considerations)
+holds. Alternatively, the operating system limit could be raised with
+`ulimit -n <new limit>`.
+
+[Top](#top)
 
 ### Diagnose spontaneous binary corruption problems
 

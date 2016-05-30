@@ -129,7 +129,8 @@ The list of available options is the following:
       is sent to a given URL path (if the receiver supports permanent connections). Following notifications to the same
       URL path will reuse the connection, saving HTTP connection time.
     * In threadpool mode, notifications are enqueued into a queue of size `q` and `n` threads take the notifications
-      from the queue and perform the outgoing requests asynchronously.
+      from the queue and perform the outgoing requests asynchronously. Please have a look to the
+      [threadpool considerations](perf_tuning.md#thread-pool-considerations) section if you want to use this mode.
 -   **-simulatedNotification**. Notifications are not sent, but recorded internally and shown in the 
     [statistics](statistics.md) operation (`simulatedNotifications` counter). This is not aimed for production
     usage, but it is useful for debugging to calculate a maximum upper limit in notification rate from a CB
