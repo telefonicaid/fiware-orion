@@ -175,7 +175,7 @@ where
 * *extra* an amount of file descriptors used by log files, listening sockets and file descriptors used by libraries.
   There isn't any general rule for this value, but one in the range of 100 to 200 must suffice most of the cases.
 
-If the above inequity is not hold, Orion Context Broker will not work properly. In particular, it
+If the above inequity deesn't hold, Orion Context Broker will not work properly. In particular, it
 may happen that Orion is unable to accept new incoming connections and/or send notifications due to lack
 of file descriptors.
 
