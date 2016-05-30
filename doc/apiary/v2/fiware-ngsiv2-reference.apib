@@ -293,7 +293,7 @@ Some operations imply that only a partial representation of an entity will be pr
 Generally speaking, user-defined attribute types are informative, they are processed by the NGSIv2 server in
 an opaque way. Nonetheless, the types described below are used to convey an special meaning
 
-* `date`:  identifies dates, in ISO8601 format. These attributes can be used with the
+* `DateTime`:  identifies dates, in ISO8601 format. These attributes can be used with the
   greater than, less than, greater or equal, lesser or equal and range query operators. For instance
   (only the referred entity attribute is shown) :
 
@@ -301,7 +301,7 @@ an opaque way. Nonetheless, the types described below are used to convey an spec
 {
   "timestamp": {
     "value": "2017-06-17T07:21:24.238Z",
-    "type: "date"
+    "type: "DateTime"
   }
 }
 ```
@@ -317,8 +317,8 @@ to the `options` URL parameter.
 
 The list of virtual attributes is the following:
 
-* `dateCreated` (type: `date`): entity creation date as ISO 8601 string.
-* `dateModified` (type: `date`): entity modification date as ISO 8601 string.
+* `dateCreated` (type: `DateTime`): entity creation date as ISO 8601 string.
+* `dateModified` (type: `DateTime`): entity modification date as ISO 8601 string.
 
 As regular attributes, they can be  used in `attrs`, `q` filters and `orderBy`. However, they cannot be used
 in resource URLs.
@@ -912,7 +912,7 @@ Response code:
                     },
                     "timestamp": {
                         "value": "2015-06-04T07:20:27.378Z",
-                        "type": "date"
+                        "type": "DateTime"
                     }
                 }
             }
@@ -2036,7 +2036,7 @@ Response code:
                 "accuracy": 2,
                 "timestamp": {
                     "value": "2015-06-04T07:20:27.378Z",
-                    "type": "date"
+                    "type": "DateTime"
                 }
             }
          }
