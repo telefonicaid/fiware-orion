@@ -26,7 +26,6 @@ Using attrs and q at the same time in conditions
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0 IPv4 -subCacheIval 2
-#brokerStart CB 0 IPv4 -noCache
 accumulatorStart --pretty-print
 
 --SHELL--
