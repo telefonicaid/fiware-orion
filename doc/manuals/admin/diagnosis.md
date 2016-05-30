@@ -101,7 +101,7 @@ The solutions for this problem are the following:
     log will grow very fast so, in case of problems, please avoid using
     unneeded trace levels.
 
-### Diagnose file descriptors exahustion problems
+### Diagnose file descriptors exhaustion problems
 
 The symptoms of this problem are:
 
@@ -119,8 +119,8 @@ lsof -p <pid> | wc -l
 ```
 
 The solution to the problem is to ensure that Orion is properly configured in order
-to the inequity described at [threadpool considerations](perf_tuning.md#thread-pool-considerations)
-holds. Alternatively, the operating system limit could be raised with
+for the inequity described at [threadpool considerations](perf_tuning.md#thread-pool-considerations)
+to hold. Alternatively, the operating system limit could be raised with
 `ulimit -n <new limit>`.
 
 [Top](#top)
