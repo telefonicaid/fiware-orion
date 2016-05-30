@@ -379,8 +379,7 @@ int mongoSubCacheItemInsert
   //
   // Note that the URL of the notification is stored outside the httpInfo object in mongo
   //
-  // FIXME PR: Next line SHPULD NOT de commented
-  // cSubP->httpInfo.fill(sub);
+  cSubP->httpInfo.fill(sub);
 
 
   //
