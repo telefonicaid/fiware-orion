@@ -582,6 +582,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
   {
    return badInput(ciP, "condition is not an object");
   }
+
   // Attributes
   if (!condition.HasMember("attrs"))
   {
@@ -609,14 +610,18 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
     if (expression.HasMember("q"))
     {
       const Value& q = expression["q"];
+      std::string  qString;
+
       if (!q.IsString())
       {
         return badInput(ciP, "q is not a string");
       }
-      subsP->subject.condition.expression.q = q.GetString();
+
+      qString = q.GetString();
+      subsP->subject.condition.expression.q = qString;
 
       std::string  errorString;
-      Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, expression["q"].GetString());
+      Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, qString);
 
       scopeP->stringFilterP = new StringFilter();
       if (scopeP->stringFilterP->parse(scopeP->value.c_str(), &errorString) == false)

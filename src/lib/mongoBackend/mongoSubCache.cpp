@@ -58,7 +58,7 @@ using namespace mongo;
 *  -2:  Out of memory (either returns -2 or exit the entire broker)
 *  -3:  No patterned entity found
 *  -4:  The vector of notify-conditions is empty
-*
+*  -5:  Error parsing string filter
 *
 * Note that the 'count' of the inserted subscription is set to ZERO.
 *
@@ -120,6 +120,46 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   // Note that the URL of the notification is stored outside the httpInfo object in mongo
   //
   cSubP->httpInfo.fill(sub);
+
+
+  //
+  // 04.3 expression
+  //
+  if (sub.hasField(CSUB_EXPR))
+  {
+    mongo::BSONObj expression = getFieldF(sub, CSUB_EXPR).Obj();
+
+    if (expression.hasField(CSUB_EXPR_Q))
+    {
+      std::string errorString;
+      cSubP->expression.q = getFieldF(expression, CSUB_EXPR_Q).String();
+      if (cSubP->expression.q != "")
+      {
+        if (!cSubP->expression.stringFilter.parse(cSubP->expression.q.c_str(), &errorString))
+        {
+          LM_E(("Runtime Error (error parsing string filter: %s)", errorString.c_str()));
+          subCacheItemDestroy(cSubP);
+          delete cSubP;
+          return -5;
+        }
+      }
+    }
+
+    if (expression.hasField(CSUB_EXPR_GEOM))
+    {
+      cSubP->expression.geometry = getFieldF(expression, CSUB_EXPR_GEOM).String();
+    }
+
+    if (expression.hasField(CSUB_EXPR_COORDS))
+    {
+      cSubP->expression.coords = getFieldF(expression, CSUB_EXPR_COORDS).String();
+    }
+
+    if (expression.hasField(CSUB_EXPR_GEOREL))
+    {
+      cSubP->expression.georel = getFieldF(expression, CSUB_EXPR_GEOREL).String();
+    }
+  }
 
 
   //
@@ -218,7 +258,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 *  -2: Empty servicePath
 *  -3: Out of memory (either this or EXIT)
 *  -4: Subscription not valid for sub-cache (no patterns)
-*  -5: Subscription notvalid for sub-cache (empty notify-condition vector)
+*  -5: Subscription not valid for sub-cache (empty notify-condition vector)
 *
 *
 * Note that the 'count' of the inserted subscription is set to ZERO.
@@ -270,7 +310,7 @@ int mongoSubCacheItemInsert
 
 
   //
-  // 02. Push Entity-data names to EntityInfo Vector (cSubP->entityInfos)
+  // 03. Push Entity-data names to EntityInfo Vector (cSubP->entityInfos)
   //     NOTE that if there is no patterned entity in the entity-vector,
   //     then the subscription is not valid for the sub-cache and is rejected.
   //
@@ -303,7 +343,7 @@ int mongoSubCacheItemInsert
 
 
   //
-  // 03. Extract data from mongo sub
+  // 04. Extract data from mongo sub
   //
   std::vector<BSONElement>  attrVec       = getFieldF(sub, CSUB_ATTRS).Array();
   std::vector<BSONElement>  condVec       = getFieldF(sub, CSUB_CONDITIONS).Array();
@@ -322,7 +362,6 @@ int mongoSubCacheItemInsert
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->servicePath           = strdup(servicePath);
   cSubP->renderFormat          = renderFormat;
-  cSubP->httpInfo.url          = sub.hasField(CSUB_REFERENCE)? getFieldF(sub, CSUB_REFERENCE).String().c_str() : "NO REF";  // Mandatory
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
@@ -335,6 +374,17 @@ int mongoSubCacheItemInsert
   cSubP->next                  = NULL;
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
 
+  //
+  // httpInfo
+  //
+  // Note that the URL of the notification is stored outside the httpInfo object in mongo
+  //
+  cSubP->httpInfo.fill(sub);
+
+
+  //
+  // String Filter
+  //
   if (stringFilterP != NULL)
   {
     std::string errorString;
