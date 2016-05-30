@@ -119,7 +119,7 @@ lsof -p <pid> | wc -l
 ```
 
 The solution to the problem is to ensure that Orion is properly configured in order
-for the inequity described at [threadpool considerations](perf_tuning.md#thread-pool-considerations)
+for the inequity described in [threadpool considerations](perf_tuning.md#thread-pool-considerations)
 to hold. Alternatively, the operating system limit could be raised with
 `ulimit -n <new limit>`.
 
