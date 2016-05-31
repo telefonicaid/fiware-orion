@@ -135,7 +135,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
     }
     else
     {
-      std::string  description = std::string("Unrecognizedfield in JSON payload: /") + name + "/";
+      std::string  description = std::string("Unrecognized field in JSON payload: /") + name + "/";
       ErrorCode    ec("BadRequest", description);
 
       alarmMgr.badInput(clientIp, description);
