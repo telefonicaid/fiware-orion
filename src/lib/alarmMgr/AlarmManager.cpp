@@ -101,6 +101,29 @@ int AlarmManager::semInit(void)
 
 /* ****************************************************************************
 *
+* AlarmManager::semGet - 
+*/
+const char* AlarmManager::semGet(void)
+{
+  int value;
+
+  if (sem_getvalue(&sem, &value) == -1)
+  {
+    return "error - state not available";
+  }
+
+  if (value == 0)
+  {
+    return "taken";
+  }
+  
+  return "available";  
+}
+
+
+
+/* ****************************************************************************
+*
 * AlarmManager::semTake - 
 */
 void AlarmManager::semTake(void)

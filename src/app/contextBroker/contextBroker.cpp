@@ -1129,8 +1129,8 @@ static const char* validLogLevels[] =
   { "*",     LOGLEVEL,  LOGLEVEL_COMPS_V2, "", badVerbPutOnly                     }
 
 #define SEM_STATE_REQUESTS                                                           \
-  { "GET",   SEM_STATE, SEM_STATECOMPS, "", semStateTreat                         }, \
-  { "*",     SEM_STATE, SEM_STATECOMPS, "", badVerbGetOnly                        }
+  { "GET",   SEM_STATE, SEM_STATE_COMPS,   "", semStateTreat                      }, \
+  { "*",     SEM_STATE, SEM_STATE_COMPS,   "", badVerbGetOnly                     }
 
 
 

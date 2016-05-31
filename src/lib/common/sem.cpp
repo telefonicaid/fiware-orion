@@ -554,10 +554,35 @@ const char* timeStatSemGet(void)
 *  curl context
 */
 
+static bool contexts_mutex_taken   = false;
+static int  contexts_mutex_errors  = 0;
+static bool contexts_mutex2_taken  = false;
+static int  contexts_mutex2_errors = 0;
 
-static pthread_mutex_t contexts_mutex       = PTHREAD_MUTEX_INITIALIZER;
-static bool            contexts_mutex_taken = false;
+static pthread_mutex_t contexts_mutex         = PTHREAD_MUTEX_INITIALIZER;
 static std::map<std::string, struct curl_context> contexts;
+
+/* ****************************************************************************
+*
+* curl1SemGet - 
+*/
+const char* curl1SemGet(void)
+{
+  return (contexts_mutex_taken)? "taken" : "available";
+}
+
+
+
+/* ****************************************************************************
+*
+* curl2SemGet - 
+*/
+const char* curl2SemGet(void)
+{
+  return (contexts_mutex2_taken)? "taken" : "available";
+}
+
+
 
 // Statistics
 static struct timespec accCCMutexTime = { 0, 0 };
@@ -615,6 +640,7 @@ static int get_curl_context_reuse(const std::string& key, struct curl_context* p
       if (pm == NULL)
       {
         pthread_mutex_unlock(&contexts_mutex);
+        ++contexts_mutex_errors;
         contexts_mutex_taken = false;
         LM_E(("Runtime Error (malloc)"));
         return -1;
@@ -625,6 +651,7 @@ static int get_curl_context_reuse(const std::string& key, struct curl_context* p
       {
         pthread_mutex_unlock(&contexts_mutex);
         contexts_mutex_taken = false;
+        ++contexts_mutex_errors;
         LM_E(("Runtime Error (pthread_mutex_init)"));
         free(pm);
         return s;
@@ -668,6 +695,7 @@ static int get_curl_context_reuse(const std::string& key, struct curl_context* p
     s = pthread_mutex_lock(pcc->pmutex);
     if (s != 0)
     {
+      ++contexts_mutex2_errors;
       LM_E(("Runtime Error (pthread_mutex_lock)"));
       return s;
     }
@@ -681,6 +709,7 @@ static int get_curl_context_reuse(const std::string& key, struct curl_context* p
       int s = pthread_mutex_lock(&contexts_mutex);
       if (s != 0)
       {
+        ++contexts_mutex_errors;
         LM_E(("Runtime Error (pthread_mutex_lock)"));
         return s;
       }
@@ -690,6 +719,7 @@ static int get_curl_context_reuse(const std::string& key, struct curl_context* p
       s = pthread_mutex_unlock(&contexts_mutex);
       if (s != 0)
       {
+        ++contexts_mutex_errors;
         LM_E(("Runtime Error (pthread_mutex_unlock)"));
         return s;
       }
@@ -764,7 +794,7 @@ static int release_curl_context_reuse(struct curl_context *pcc, bool final)
     if (s != 0)
     {
       LM_E(("Runtime Error (pthread_mutex_unlock)"));
-      ++contexts_mutex_errors;
+      ++contexts_mutex2_errors;
       return s;
     }
     contexts_mutex2_taken = false;
@@ -823,4 +853,3 @@ float mutexTimeCCGet(void)
 {
   return accCCMutexTime.tv_sec + ((float) accCCMutexTime.tv_nsec) / 1E9;
 }
-
