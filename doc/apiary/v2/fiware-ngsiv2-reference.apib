@@ -1389,12 +1389,12 @@ Response:
 This operation returns the `value` property with the value of the attribute.
 
 * If attribute value is JSON Array or Object:
-  * If `Accept` header contains `application/json` or `text/plain` return the value as a JSON with a
+  * If `Accept` header can be expanded to `application/json` or `text/plain` return the value as a JSON with a
     response type of application/json or text/plain (whichever is the first in `Accept` header or
-    application/json in the case of `Accept: */*`).
+    `application/json` in the case of `Accept: */*`).
   * Else return a HTTP error "406 Not Acceptable: accepted MIME types: application/json, text/plain"
 * If attribute value is a string, number, null or boolean:
-  * If `Accept` header contains text/plain return the value as text. In case of a string, citation
+  * If `Accept` header can be expanded to text/plain return the value as text. In case of a string, citation
     marks are used at the begining and end.
   * Else return a HTTP error "406 Not Acceptable: accepted MIME types: text/plain"
 
