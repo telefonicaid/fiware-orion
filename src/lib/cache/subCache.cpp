@@ -1136,9 +1136,14 @@ void subCacheSync(void)
 
   while (cSubP != NULL)
   {
+    //
+    // FIXME P7: For some reason, sometimes the same subscription is found twice in the cache (Issue 2216)
+    //           Once the issue 2216 is fixed, this if-block must be removed.
+    //
     if (savedSubV[cSubP->subscriptionId] != NULL)
     {
-      continue;  // FIXME P7: For some reason, sometimes the same subscription is found twice: semaphore problem?
+      cSubP = cSubP->next;
+      continue;
     }
 
     CachedSubSaved* cssP       = new CachedSubSaved();
