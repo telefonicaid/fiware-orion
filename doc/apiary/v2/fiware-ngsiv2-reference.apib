@@ -195,6 +195,12 @@ is typically done in the REST interface)
 (placeholder to describe roles like context provider, context producer,
 context broker, context registry, context consumer)
 
+## MIME Types
+
+The API response payloads in this specification are based on `application/json` and  (for attribute value 
+type operation) `text/plain` MIME types. Clients issuing HTTP requests with accept types different 
+than those will get a `406 Not Acceptable` error.
+
 ## JSON Entity Representation
 
 An entity is represented by a JSON object with the following syntax:
@@ -1388,19 +1394,15 @@ Response:
 
 This operation returns the `value` property with the value of the attribute.
 
-* If the response payload MIME type is `application/json`:
-  * If the attribute value is a JSON object or array, the payload is that JSON object or array
-  * If the attribute value is a string, a number, null or a boolean, an HTTP error 
-    "406 Not Acceptable: accepted MIME types: text/plain" is returned.
-* If the response payload MIME type is `text/plain`,
-  * If the attribute value is a JSON object or array, the payload in a stringification of that JSON
-    object or array.
-  * If the attribute value is a string, number, null or boolean, the payload is a text
-    representation of that value. In case of a string, citation marks are used at the begining and
-    end.
-
-The payload MIME type in responses is based on client-server HTTP negotiation, based on the client
-`Accept` header.
+* If attribute value is JSON Array or Object:
+  * If `Accept` header can be expanded to `application/json` or `text/plain` return the value as a JSON with a
+    response type of application/json or text/plain (whichever is the first in `Accept` header or
+    `application/json` in the case of `Accept: */*`).
+  * Else return a HTTP error "406 Not Acceptable: accepted MIME types: application/json, text/plain"
+* If attribute value is a string, number, null or boolean:
+  * If `Accept` header can be expanded to text/plain return the value as text. In case of a string, citation
+    marks are used at the begining and end.
+  * Else return a HTTP error "406 Not Acceptable: accepted MIME types: text/plain"
 
 Response:
 
