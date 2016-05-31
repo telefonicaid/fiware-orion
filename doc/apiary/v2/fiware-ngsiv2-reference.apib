@@ -195,6 +195,12 @@ is typically done in the REST interface)
 (placeholder to describe roles like context provider, context producer,
 context broker, context registry, context consumer)
 
+## MIME Types
+
+The API response payloads in this specification are based in `application/json` and  (for attribute value 
+type operation) `text/plain` MIME types. Client issuing HTTP requests with accept types different 
+than those will get a 406 Not Acceptable error.
+
 ## JSON Entity Representation
 
 An entity is represented by a JSON object with the following syntax:
