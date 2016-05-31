@@ -5,6 +5,7 @@
  
 ## Table of Contents
 
+  * [API Walkthrough (v2)](walkthrough_apiv2.md)
   * [API Walkthrough](walkthrough_apiv1.md)
   * [Pagination](pagination.md)
   * [Geolocation ](geolocation.md)
@@ -26,3 +27,4 @@
   * [Security considerations](security.md)
   * [Known Limitations](known_limitations.md)
   * [Considerations on NGSIv1 and NGSIv2 coexistence](v1_v2_coexistence.md)
+  * [NGSIv2 Implementation Notes](ngsiv2_implementation_notes.md)
