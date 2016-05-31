@@ -1,10 +1,10 @@
 #<a name="top"></a>Filtering results
 
 * [Introduction](#introduction)
-* [NGSIv2 filtering]
+* [NGSIv2 filtering](#ngsiv2-filtering)
   * [Simple Query Language](#simple-query-language)
   * [Geographical Queries](#geographical-queries)
-* [NGSIv1 filtering]
+* [NGSIv1 filtering](#ngsiv1-filtering)
   * [Existence type filter](#existence-type-filter)
   * [No-Existence type filter](#no-existence-type-filter)
   * [Entity type filter](#entity-type-filter)

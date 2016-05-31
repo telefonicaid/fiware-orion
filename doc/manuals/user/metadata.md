@@ -10,7 +10,7 @@ You can use any name for your custom metadata except for a few reserved names, u
 for special metadata that are interpreted by Orion:
 
 -   [ID](#metadata-id-for-attributes)
--   [location] (currently [deprecated](../deprecated.md), but still supported)
+-   [location], whid his currently [deprecated](../deprecated.md), but still supported
 
 Its management is slightly different in NGSIv1 and NGSIv2, so it is
 described in different sections.
