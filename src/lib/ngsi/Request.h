@@ -84,6 +84,7 @@ typedef enum RequestType
 
   LogTraceRequest = 51,
   LogLevelRequest,
+  SemStateRequest,
   VersionRequest,
   ExitRequest,
   LeakRequest,
