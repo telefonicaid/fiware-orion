@@ -476,7 +476,7 @@ const char* reqSemGet(void)
     return "taken";
   }
   
-  return "available";  
+  return "free";  
 }
 
 
@@ -499,7 +499,7 @@ const char* transSemGet(void)
     return "taken";
   }
   
-  return "available";  
+  return "free";  
 }
 
 
@@ -522,7 +522,7 @@ const char* cacheSemGet(void)
     return "taken";
   }
   
-  return "available";  
+  return "free";  
 }
 
 
@@ -545,7 +545,7 @@ const char* timeStatSemGet(void)
     return "taken";
   }
   
-  return "available";  
+  return "free";  
 }
 
 
@@ -559,27 +559,27 @@ static int  contexts_mutex_errors  = 0;
 static bool contexts_mutex2_taken  = false;
 static int  contexts_mutex2_errors = 0;
 
-static pthread_mutex_t contexts_mutex         = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t contexts_mutex = PTHREAD_MUTEX_INITIALIZER;
 static std::map<std::string, struct curl_context> contexts;
 
 /* ****************************************************************************
 *
-* curl1SemGet - 
+* connectionContextSemGet - 
 */
-const char* curl1SemGet(void)
+const char* connectionContextSemGet(void)
 {
-  return (contexts_mutex_taken)? "taken" : "available";
+  return (contexts_mutex_taken)? "taken" : "free";
 }
 
 
 
 /* ****************************************************************************
 *
-* curl2SemGet - 
+* connectionSubContextSemGet - 
 */
-const char* curl2SemGet(void)
+const char* connectionSubContextSemGet(void)
 {
-  return (contexts_mutex2_taken)? "taken" : "available";
+  return (contexts_mutex2_taken)? "taken" : "free";
 }
 
 

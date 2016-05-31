@@ -439,7 +439,7 @@ const char* lmSemGet(void)
     return "taken";
   }
   
-  return "available";  
+  return "free";  
 }
 
 

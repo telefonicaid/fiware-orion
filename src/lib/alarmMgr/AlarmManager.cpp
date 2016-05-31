@@ -117,7 +117,7 @@ const char* AlarmManager::semGet(void)
     return "taken";
   }
   
-  return "available";  
+  return "free";
 }
 
 

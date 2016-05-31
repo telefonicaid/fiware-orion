@@ -478,7 +478,7 @@ const char* mongoConnectionPoolSemGet(void)
     return "taken";
   }
   
-  return "available";  
+  return "free";  
 }
 
 
@@ -501,5 +501,5 @@ const char* mongoConnectionSemGet(void)
     return "taken";
   }
   
-  return "available";  
+  return "free";  
 }

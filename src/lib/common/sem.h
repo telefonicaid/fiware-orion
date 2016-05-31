@@ -111,8 +111,8 @@ extern const char* timeStatSemGet(void);
 extern const char* cacheSemGet(void);
 extern const char* transSemGet(void);
 extern const char* reqSemGet(void);
-extern const char* curl1SemGet(void);
-extern const char* curl2SemGet(void);
+extern const char* connectionContextSemGet(void);
+extern const char* connectionSubContextSemGet(void);
 
 
 
