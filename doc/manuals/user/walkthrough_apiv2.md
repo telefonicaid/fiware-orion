@@ -1091,7 +1091,7 @@ EOF
 
 The syntax for the `scope` field above has not been fully consolidated in the NGSIv2 specification
 yet. For the moment, that syntax is in beta status. Thus, *use it with care as it may change in the
-future*.
+future* (see [NGSIv2 implementation notes](ngsiv2_implementation_notes.md#scope-functionality)).
 
 [Top](#top)
 
