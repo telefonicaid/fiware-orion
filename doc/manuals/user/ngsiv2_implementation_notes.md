@@ -60,16 +60,16 @@ Related with: https://github.com/telefonicaid/fiware-orion/issues/2073
 
 ## Metadata vector and object values not implemented yet
 
-NGSIv2 specification allows metadata value to be JSON Array or Object. However, such datatypes has not been
-yet implemented for metadata value in Orion.
+NGSIv2 specification allows metadata value to be JSON Array or Object. However, such datatypes are yet to be
+implemented for metadata values in Orion.
 
 ## Default type for entities, attributes and metadata
 
-Currently, Orion uses `none` string as default for entities/attributes/metadata at creation/update time.
-However, this could change in the future, as described at https://github.com/telefonicaid/fiware-orion/issues/2223.
+Currently, Orion uses the string `none` as default for entities/attributes/metadata at creation/update time.
+However, this may change in the future, as described in https://github.com/telefonicaid/fiware-orion/issues/2223.
 
 ## Scope functionality
 
-Orion implements `scope` field at `POST /v2/op/update` operation (you can see
-[an example at the NGSIv2 walkthrough](walkthrough_apiv2.md#batch-operations)). However, note that this syntax is
-somehow experimental and it hasn't been yet consolidaed in the NGSIv2 specification.
+Orion implements a `scope` field in the `POST /v2/op/update` operation (you can see
+[an example in the NGSIv2 walkthrough](walkthrough_apiv2.md#batch-operations)). However, note that this syntax is
+somewhat experimental and it hasn't been consolidated in the NGSIv2 specification.
