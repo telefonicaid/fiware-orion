@@ -46,14 +46,14 @@ In the case of Orion, that limit is one (1) attribute.
 
 ## Legacy attribute format in notifications
 
-Apart from the values described for `attrsFormat` at the NGSIv2 specification, Orion also support
-`legacy` value in order to send notifications in NGSIv1 format. This way, users can have the
-enhancements of NGSIv2 subscriptions (e.g. filtering) with NGSIv1 legacy notifications receivers.
+Apart from the values described for `attrsFormat` in the NGSIv2 specification, Orion also supports a
+`legacy` value, in order to send notifications in NGSIv1 format. This way, users can benefit from the
+enhancements of NGSIv2 subscriptions (e.g. filtering) with NGSIv1 legacy notification receivers.
 
 ## Disable attribute detail in GET types operation
 
 Not yet implemented, but is expected that Orion will implmement the `noAttrsType` option for the
-`GET /v2/types` operation in order not include attribute detail (which aggregation could be
+`GET /v2/types` operation in order to not include attribute details (whose aggregation could be
 costly in terms of performance).
 
 Related with: https://github.com/telefonicaid/fiware-orion/issues/2073
