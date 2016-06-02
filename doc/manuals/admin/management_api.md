@@ -31,7 +31,7 @@ a trace level, a GET /log/trace must be issued first and after that the
 complete trace string to be sent in the PUT request can be assembled.
 
 
-## Semahores
+## Semaphores
 Another useful (especially if the broker stops responding correctly) REST API is
 the semaphore listing offered:
 
