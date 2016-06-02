@@ -895,22 +895,12 @@ static char* dateGet(int index, char* line, int lineSize)
   {
     struct timeb timebuffer;
     struct tm    tm;
-    char         line_tmp[80];
+    char         line_buf[80];
 
     ftime(&timebuffer);
-    localtime_r(&secondsNow, &tm);
-
-    //
-    // NOTE
-    //   To see the time-zone:
-    //     printf("timezone: %s\n", tm.tm_zone);
-    //
-    //   It is UTC, as returned by time(NULL)
-    //
-
-    strftime(line_tmp, 80, fds[index].timeFormat, &tm);
-
-    snprintf(line, lineSize, "%s.%.3dUTC", line_tmp, timebuffer.millitm);
+    gmtime_r(&secondsNow, &tm);
+    strftime(line_buf, 80, fds[index].timeFormat, &tm);
+    snprintf(line, lineSize, "%s.%.3dZ", line_buf, timebuffer.millitm);
   }
 
   return line;
