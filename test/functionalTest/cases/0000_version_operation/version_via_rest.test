@@ -34,7 +34,7 @@ orionCurl --url "/version"
 
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++
-HTTP/1.1 200 OK
+HTTP/1.1.2.0-next OK
 Content-Length: REGEX(\d+)
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
