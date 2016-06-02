@@ -31,7 +31,7 @@ a trace level, a GET /log/trace must be issued first and after that the
 complete trace string to be sent in the PUT request can be assembled.
 
 
-## Sempahores
+## Semahores
 Another useful (especially if the broker stops responding correctly) REST API is
 the semaphore listing offered:
 
@@ -90,6 +90,6 @@ Short explanation of the semaphores:
 * transaction            Protects the Transaction ID (for the log-file)
 
 The information supplied for each of the semaphores is:
-* status:  free or taken
+* status:  `free` or `taken`
 
 [ For now only one item per semaphore but the idea is to add more information in the future ]
