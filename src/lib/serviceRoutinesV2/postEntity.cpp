@@ -63,8 +63,9 @@ std::string postEntity
   ParseData*                 parseDataP
 )
 {
-  Entity*      eP  = &parseDataP->ent.res;
-  std::string  op  = ciP->uriParam["op"];
+  Entity*        eP  = &parseDataP->ent.res;
+  std::string    op  = ciP->uriParam["op"];
+  Ngsiv2Flavour  flavor;
 
   eP->id   = compV[2];
   eP->type = ciP->uriParam["type"];
@@ -77,19 +78,21 @@ std::string postEntity
 
   if (ciP->uriParamOptions["append"] == true) // pure-append
   {
-    op = "APPEND_STRICT";
+    op     = "APPEND_STRICT";
+    flavor = NGSIV2_FLAVOUR_ONUPDATE;
   }
   else
   {
-    op = "APPEND";   // append or update
+    op     = "APPEND";   // append or update
+    flavor = NGSIV2_FLAVOUR_ONAPPEND;
   }
-
-
+  LM_W(("KZ: update action type: '%s' (flavor: %d)", op.c_str(), flavor));
+  
   // Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, op);
 
   // Call standard op postUpdateContext
-  postUpdateContext(ciP, components, compV, parseDataP, NGSIV2_FLAVOUR_ONAPPENDORUPDATE);
+  postUpdateContext(ciP, components, compV, parseDataP, flavor);
 
   // Any error in the response?
   UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
