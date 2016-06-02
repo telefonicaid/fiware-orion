@@ -918,15 +918,12 @@ static char* dateGet(int index, char* line, int lineSize)
   {
     struct timeb timebuffer;
     struct tm    tm;
-    char         line_tmp[80];
-    char         timeZone[20];
+    char         line_buf[80];
 
     ftime(&timebuffer);
-    localtime_r(&secondsNow, &tm);
-    strftime(line_tmp, 80, fds[index].timeFormat, &tm);
-    strftime(timeZone, sizeof(timeZone), "%Z", &tm);
-
-    snprintf(line, lineSize, "%s.%.3d%s", line_tmp, timebuffer.millitm, timeZone);
+    gmtime_r(&secondsNow, &tm);
+    strftime(line_buf, 80, fds[index].timeFormat, &tm);
+    snprintf(line, lineSize, "%s.%.3dZ", line_buf, timebuffer.millitm);
   }
 
   return line;

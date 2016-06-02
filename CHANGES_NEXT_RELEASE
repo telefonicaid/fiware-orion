@@ -1,1 +1,2 @@
+- Fix: UTC as time in log file (Issue #2232)
 - Add: new operation: GET /admin/sem, to see list of the brokers semaphores (Issue #2145)
