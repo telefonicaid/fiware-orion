@@ -78,16 +78,16 @@ The response is a listing of information of all the broker's semaphores:
 ```
 
 Short explanation of the semaphores:
-* alarmMgr               Protects the data of the Alarm Manager 
-* connectionContext      Protects the curl context for sending HTTP notifications/forwarded messages
-* connectionSubContext   Protects the curl context for sending HTTP notifications/forwarded messages
-* dbConnectionPool       Protects mongo connection pool
-* dbConnection           Protects the set of connections of the mongo connection pool
-* logMsg                 Makes sure that not two messages are written simultaneously to the log-file
-* request                Makes sure there are not two simultaneous requests to mongodb 
-* subCache               Protects the Subscription Cache
-* timeStat               Protects the data for timing statistics
-* transaction            Protects the Transaction ID (for the log-file)
+* **alarmMgr**, protects the data of the Alarm Manager 
+* **connectionContext**, protects the curl context for sending HTTP notifications/forwarded messages
+* **connectionSubContext**, protects the curl context for sending HTTP notifications/forwarded messages
+* **dbConnectionPool**, protects mongo connection pool
+* **dbConnection**, protects the set of connections of the mongo connection pool
+* **logMsg**, makes sure that not two messages are written simultaneously to the log-file
+* **request**, makes sure there are not two simultaneous requests to mongodb 
+* **subCache**, protects the Subscription Cache
+* **timeStat**, protects the data for timing statistics
+* **transaction**, protects the Transaction ID (for the log-file)
 
 The information supplied for each of the semaphores is:
 * status:  `free` or `taken`
