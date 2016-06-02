@@ -5,8 +5,8 @@ HOST: http://fiware-ngsi2.apiblueprint.org/
 
 FIWARE-NGSI Simple API (v2) Cookbook.
 
-This is a cookbook with recipes that show how to use FIWARE-NGSI v2 aka FIWARE-NGSI Simple API.
-Use this examples for learning and enjoy!
+This is a cookbook with recipes that show how to use FIWARE-NGSI v2 aka FIWARE-NGSI Simple API. The examples of this guide contain the `Fiware-Service: tourguide` header. This header is specific to Orion Context Broker and it is used to allow testing the cookbook examples against the FIWARE tour guide application.  
+Use these examples for learning and enjoy!
 
 This is a work in progress and is changing on a daily basis.
 Please send your comments to fiware-ngsi@lists.fiware.org. You can
@@ -410,8 +410,6 @@ This resource allows you to obtain a list of subresources published by the API:
     + Headers
 
             Fiware-Total-Count: 2068
-            Link: http://example.org/v2/entities?offset=2&limit=2; rel="next", http://example.org/v2/entities?offset=2066&limit=2; rel="last",
-            http://example.org/v2/entities?offset=0&limit=2; rel="first", http://example.org/v2/entities?offset=1&limit=2; rel="prev"
 
     + Body
 
@@ -1252,7 +1250,7 @@ This resource allows you to obtain a list of subresources published by the API:
 ### By pattern matching [GET /v2/entities{?idPattern,options}]
 
 + Parameters
-    + idPattern: 0115206c51f60b48b77e4* (optional, string) - Only retrieve entities having a matching id.
+    + idPattern: ^0115206c51f60b48b77e4.* (optional, string) - Only retrieve entities having a matching id.
     + options: keyValues (optional, string) - rendering options
 
 + Request 
@@ -1499,6 +1497,7 @@ This resource allows you to obtain a list of subresources published by the API:
     + limit: 20 - Limit the number of results (optional, number) - Maximum number of results to return
     + attrs: name (optional, string) - Attributes to be returned
     + options: keyValues (optional, string) - query options (`keyValues` mode)
+    + offset: 0
 
 
 + Request 
@@ -1774,7 +1773,7 @@ This resource allows you to obtain a list of subresources published by the API:
 ### By Id [DELETE /v2/entities/{entityId}]
 
 + Parameters
-    + entityId: review-Elizalde-35 (required, string) - Entity ID
+    + entityId: `review-Elizalde-35` (required, string) - Entity ID
 
 + Request (application/json) 
     
@@ -2108,7 +2107,7 @@ This resource allows you to obtain a list of subresources published by the API:
 
 + Parameters
     + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - Entity ID
-    + attrName: priceRange (required, string) - Attribute name.
+    + attrName: address (required, string) - Attribute name.
 
 + Request (application/json)
     
@@ -2119,13 +2118,17 @@ This resource allows you to obtain a list of subresources published by the API:
     + Body
 
             {
-                "value": 25
+              "streetAddress": "Cuesta de las Cabras Aldapa 2",
+              "addressRegion": "Araba",
+              "addressLocality": "Alegría-Dulantzi",
+              "postalCode": "01240"
             }
 
 + Response 204
 
 
 # Group Subscriptions
+## Subscription [/v2/subscriptions]
 
 ### List all subscriptions present in the system [GET /v2/subscriptions]
 
@@ -2215,6 +2218,68 @@ This resource allows you to obtain a list of subresources published by the API:
             "throttling": 5
           }
         ]
+### Pagination [GET /v2/subscriptions{?limit,offset,options}]
+
++ Parameters
+    + options: count
+    + limit: 1
+    + offset: 1
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
+
++ Response 200 (application/json)
+   
+   + Headers
+
+            Fiware-Total-Count: 2
+
+   + Body
+
+            [
+              {
+                "id": "57444e1525516d268e96c98d",
+                "description": "Update average rating 3",
+                "expires": "2020-04-05T14:00:00.00Z",
+                "status": "active",
+                "subject":
+                {
+                  "entities":
+                  [
+                    {
+                      "id": "",
+                      "idPattern": ".*",
+                      "type": "Review"
+                    }
+                  ],
+                  "condition":
+                  {
+                    "attrs":
+                    [
+                      "ratingValue"
+                    ]
+                  }
+                },
+                "notification":
+                {
+                  "attrs":
+                  [
+                    "ratingValue",
+                    "itemReviewed"
+                  ],
+                  "attrsFormat": "normalized",
+                  "http":
+                  {
+                    "url": "http://backend.niceeating.foo.com:1028/ratings3"
+                  }
+                },
+                "throttling": 5
+              }
+            ]
 
 ### Get the details of a subscription [GET /v2/subscriptions/{subscriptionId}]
 
@@ -2269,20 +2334,6 @@ This resource allows you to obtain a list of subresources published by the API:
         }
 
 
-### Remove a suscription [DELETE /v2/subscriptions/{subscriptionId}]
-
-+ Parameters
-    + subscriptionId: 57444cda25516d268e96c98c (required, string) - ID of the suscription
-
-+ Request
-    
-    + Headers
-
-            Fiware-Service: tourguide
-
-+ Response 204
-
-
 ### Create a new subscription [POST /v2/subscriptions]
 
 + Request (application/json)
@@ -2329,7 +2380,7 @@ This resource allows you to obtain a list of subresources published by the API:
 ### Partial - Update an existing subscription [PATCH /v2/subscriptions/{subscriptionId}]
 
 + Parameters
-    + subscriptionId: 57444cda25516d268e96c98c (required, string) - ID of the suscription
+    + subscriptionId: 57444cda25516d268e96c98c (required, string) - ID of the subscription
 
 + Request (application/json)
     
@@ -2340,7 +2391,20 @@ This resource allows you to obtain a list of subresources published by the API:
     + Body
         
             {
-                "duration": "1Y"
+                "expires": "2040-01-01T14:00:00.00Z"
             }
+
++ Response 204
+
+### Remove a subscription [DELETE /v2/subscriptions/{subscriptionId}]
+
++ Parameters
+    + subscriptionId: 57444cda25516d268e96c98c (required, string) - ID of the subscription
+
++ Request
+    
+    + Headers
+
+            Fiware-Service: tourguide
 
 + Response 204
