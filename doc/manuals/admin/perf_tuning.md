@@ -14,7 +14,7 @@
 
 ##  MongoDB configuration
 
-Since version 0.21.0, Orion supports both MongoDB 2.6, 3.0 and 3.2 without difference from a functional
+Since version 0.21.0, Orion supports MongoDB 2.6, 3.0 and 3.2 without difference from a functional
 point of view. However, MongoDB 2.6 implements a per-collection lock, while MongoDB 3.0/3.2 (when configured
 to use WireTiger storage engine) implements per-document lock. Thus, the lock system in MongoDB 3.0/3.2
 (with WireTiger) is less restrictive than the one used by MongoDB 2.6.
