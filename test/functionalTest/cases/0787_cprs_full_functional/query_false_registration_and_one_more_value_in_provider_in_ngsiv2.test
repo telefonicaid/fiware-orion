@@ -21,19 +21,23 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Update With a False Registration
+Query With a False Registration And With One More Value No Avoid The 404
 
 --SHELL-INIT--
 dbInit CB
 dbInit CP1
+dbInit CP2
 brokerStart CB
 brokerStart CP1
+brokerStart CP2
 
 --SHELL--
 
 #
 # 01. Register E1/T1/A1-CP1 in CB
-# 02. Update/UPDATE E1/T1/A1 in CB, using NGSIv2
+# 02. Register E1/T1/A2-CP2 in CB
+# 03. Update/APPEND E1/T1/A2 in CP2
+# 04. Query E1/T1/A1+A2 in CB
 #
 
 echo "01. Register E1/T1/A1-CP1 in CB"
@@ -65,16 +69,65 @@ echo
 echo
 
 
-echo "02. Update/UPDATE E1/T1/A1 in CB, using NGSIv2"
-echo "=============================================="
+echo "02. Register E1/T1/A2-CP2 in CB"
+echo "==============================="
 payload='{
-  "A1":
-  {
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+           "type": "T1",
+           "isPattern": "false",
+           "id": "E1"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "A2",
+          "type": "string",
+          "isDomain": "false"
+        }
+      ],
+      "providingApplication": "http://localhost:'${CP2_PORT}'/v1"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload"
+echo
+echo
+
+
+echo "03. Update/APPEND E1/T1/A2 in CP2"
+echo "================================="
+payload='{
+  "type": "T1",
+  "id":   "E1",
+  "A2": {
     "type": "string",
-    "value": "Via CB"
+    "value": "A2 in CP2"
   }
 }'
-orionCurl --url /v2/entities/E1/attrs?type=T1 --payload "$payload" -X PATCH
+orionCurl --url /v2/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "04. Query E1/T1/A1+A2 in CB"
+echo "==========================="
+payload='{
+  "entities": [
+    {
+      "id":   "E1",
+      "type": "T1"
+    }
+  ],
+  "attributes": [
+    "A1",
+    "A2"
+  ]
+}'
+orionCurl --url /v2/op/query --payload "$payload"
 echo
 echo
 
@@ -94,22 +147,55 @@ Date: REGEX(.*)
 }
 
 
-02. Update/UPDATE E1/T1/A1 in CB, using NGSIv2
-==============================================
-HTTP/1.1 404 Not Found
-Content-Length: 61
+02. Register E1/T1/A2-CP2 in CB
+===============================
+HTTP/1.1 200 OK
+Content-Length: 74
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "No context element found",
-    "error": "NotFound"
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
 }
+
+
+03. Update/APPEND E1/T1/A2 in CP2
+=================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Query E1/T1/A1+A2 in CB
+===========================
+HTTP/1.1 200 OK
+Content-Length: 82
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A2": {
+            "metadata": {},
+            "type": "string",
+            "value": "A2 in CP2"
+        },
+        "id": "E1",
+        "type": "T1"
+    }
+]
 
 
 --TEARDOWN--
 brokerStop CB
 brokerStop CP1
+brokerStop CP2
 dbDrop CB
 dbDrop CP1
+dbDrop CP2

@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Update With a False Registration
+Query With a False Registration And With One More Value No Avoid The 404
 
 --SHELL-INIT--
 dbInit CB
@@ -33,7 +33,8 @@ brokerStart CP1
 
 #
 # 01. Register E1/T1/A1-CP1 in CB
-# 02. Update/UPDATE E1/T1/A1 in CB, using NGSIv2
+# 02. Update/APPEND E1/T1/A2 in CB
+# 03. Query E1/T1/A1+A2 in CB
 #
 
 echo "01. Register E1/T1/A1-CP1 in CB"
@@ -65,16 +66,36 @@ echo
 echo
 
 
-echo "02. Update/UPDATE E1/T1/A1 in CB, using NGSIv2"
-echo "=============================================="
+echo "02. Update/APPEND E1/T1/A2 in CB"
+echo "================================"
 payload='{
-  "A1":
-  {
+  "type": "T1",
+  "id":   "E1",
+  "A2": {
     "type": "string",
-    "value": "Via CB"
+    "value": "A2 in CB"
   }
 }'
-orionCurl --url /v2/entities/E1/attrs?type=T1 --payload "$payload" -X PATCH
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Query E1/T1/A1+A2 in CB"
+echo "==========================="
+payload='{
+  "entities": [
+    {
+      "id":   "E1",
+      "type": "T1"
+    }
+  ],
+  "attributes": [
+    "A1",
+    "A2"
+  ]
+}'
+orionCurl --url /v2/op/query --payload "$payload"
 echo
 echo
 
@@ -89,23 +110,40 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "P1M", 
+    "duration": "P1M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
 
-02. Update/UPDATE E1/T1/A1 in CB, using NGSIv2
-==============================================
-HTTP/1.1 404 Not Found
-Content-Length: 61
+02. Update/APPEND E1/T1/A2 in CB
+================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Query E1/T1/A1+A2 in CB
+===========================
+HTTP/1.1 200 OK
+Content-Length: 81
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "description": "No context element found",
-    "error": "NotFound"
-}
+[
+    {
+        "A2": {
+            "metadata": {},
+            "type": "string",
+            "value": "A2 in CB"
+        },
+        "id": "E1",
+        "type": "T1"
+    }
+]
 
 
 --TEARDOWN--

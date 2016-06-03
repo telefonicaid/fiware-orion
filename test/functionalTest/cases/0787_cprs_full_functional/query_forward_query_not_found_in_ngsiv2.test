@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Update With a False Registration
+Forward local query that fails
 
 --SHELL-INIT--
 dbInit CB
@@ -32,30 +32,30 @@ brokerStart CP1
 --SHELL--
 
 #
-# 01. Register E1/T1/A1-CP1 in CB
-# 02. Update/UPDATE E1/T1/A1 in CB, using NGSIv2
+# 01. Register E1/T1/A1 in CB, provApp: CP1
+# 02. Query E1/T1/A1
 #
 
-echo "01. Register E1/T1/A1-CP1 in CB"
-echo "==============================="
+echo "01. Register E1/T1/A1 in CB, provApp: CP1"
+echo "========================================="
 payload='{
   "contextRegistrations": [
-    {
-      "entities": [
-        {
-           "type": "T1",
-           "isPattern": "false",
-           "id": "E1"
-        }
-      ],
-      "attributes": [
-        {
-          "name": "A1",
-          "type": "string",
-          "isDomain": "false"
-        }
-      ],
-      "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
+  {
+    "entities": [
+      {
+         "type": "T1",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A1",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
     }
  ],
  "duration": "P1M"
@@ -65,23 +65,16 @@ echo
 echo
 
 
-echo "02. Update/UPDATE E1/T1/A1 in CB, using NGSIv2"
-echo "=============================================="
-payload='{
-  "A1":
-  {
-    "type": "string",
-    "value": "Via CB"
-  }
-}'
-orionCurl --url /v2/entities/E1/attrs?type=T1 --payload "$payload" -X PATCH
+echo "02. Query E1/T1/A1"
+echo "=================="
+orionCurl --url /v2/entities/E1/attrs/A1?type=T1
 echo
 echo
 
 
 --REGEXPECT--
-01. Register E1/T1/A1-CP1 in CB
-===============================
+01. Register E1/T1/A1 in CB, provApp: CP1
+=========================================
 HTTP/1.1 200 OK
 Content-Length: 74
 Content-Type: application/json
@@ -94,16 +87,16 @@ Date: REGEX(.*)
 }
 
 
-02. Update/UPDATE E1/T1/A1 in CB, using NGSIv2
-==============================================
+02. Query E1/T1/A1
+==================
 HTTP/1.1 404 Not Found
-Content-Length: 61
+Content-Length: 95
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "No context element found",
+    "description": "The requested entity has not been found. Check type and id",
     "error": "NotFound"
 }
 
