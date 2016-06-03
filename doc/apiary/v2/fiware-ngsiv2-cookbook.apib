@@ -5,7 +5,9 @@ HOST: http://fiware-ngsi2.apiblueprint.org/
 
 FIWARE-NGSI Simple API (v2) Cookbook.
 
-This is a cookbook with recipes that show how to use FIWARE-NGSI v2 aka FIWARE-NGSI Simple API. The examples of this guide contain the `Fiware-Service: tourguide` header. This header is specific to Orion Context Broker and it is used to allow testing the cookbook examples against the FIWARE tour guide application.  
+This is a cookbook with recipes that show how to use FIWARE-NGSI v2 aka FIWARE-NGSI Simple API. 
+The examples of this guide contain the `Fiware-Service: tourguide` header. 
+This header is specific to Orion Context Broker and it is used to allow testing the cookbook examples against the FIWARE tour guide application.  
 Use these examples for learning and enjoy!
 
 This is a work in progress and is changing on a daily basis.
@@ -34,8 +36,7 @@ This resource allows you to obtain a list of subresources published by the API:
         {
             "entities_url":      "/v2/entities",
             "types_url":         "/v2/types",
-            "subscriptions_url": "/v2/subscriptions",
-            "registrations_url": "/v2/registrations"
+            "subscriptions_url": "/v2/subscriptions"
         }
 
 # Group Entity Collection
@@ -1428,7 +1429,7 @@ This resource allows you to obtain a list of subresources published by the API:
         }
 
 
-
+<!--
 ### One entity attribute. Not present [GET /v2/entities/{entityId}{?attrs}]
 
 + Parameters
@@ -1447,7 +1448,7 @@ This resource allows you to obtain a list of subresources published by the API:
           "error": "NotFound",
           "description": "The requested entity has not been found. Check type and id"
         }
-
+-->
 ### Several entity attributes [GET /v2/entities/{entityId}{?attrs}]
 
 + Parameters
