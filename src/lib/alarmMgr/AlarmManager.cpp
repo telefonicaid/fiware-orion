@@ -109,7 +109,7 @@ const char* AlarmManager::semGet(void)
 
   if (sem_getvalue(&sem, &value) == -1)
   {
-    return "error - state not available";
+    return "error";
   }
 
   if (value == 0)

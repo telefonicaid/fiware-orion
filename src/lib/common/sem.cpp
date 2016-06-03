@@ -468,7 +468,7 @@ const char* reqSemGet(void)
 
   if (sem_getvalue(&reqSem, &value) == -1)
   {
-    return "error - state not available";
+    return "error";
   }
 
   if (value == 0)
@@ -491,7 +491,7 @@ const char* transSemGet(void)
 
   if (sem_getvalue(&transSem, &value) == -1)
   {
-    return "error - state not available";
+    return "error";
   }
 
   if (value == 0)
@@ -514,7 +514,7 @@ const char* cacheSemGet(void)
 
   if (sem_getvalue(&cacheSem, &value) == -1)
   {
-    return "error - state not available";
+    return "error";
   }
 
   if (value == 0)
@@ -537,7 +537,7 @@ const char* timeStatSemGet(void)
 
   if (sem_getvalue(&timeStatSem, &value) == -1)
   {
-    return "error - state not available";
+    return "error";
   }
 
   if (value == 0)

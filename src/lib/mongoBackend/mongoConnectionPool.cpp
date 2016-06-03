@@ -470,7 +470,7 @@ const char* mongoConnectionPoolSemGet(void)
 
   if (sem_getvalue(&connectionPoolSem, &value) == -1)
   {
-    return "error - state not available";
+    return "error";
   }
 
   if (value == 0)
@@ -493,7 +493,7 @@ const char* mongoConnectionSemGet(void)
 
   if (sem_getvalue(&connectionSem, &value) == -1)
   {
-    return "error - state not available";
+    return "error";
   }
 
   if (value == 0)
