@@ -45,6 +45,10 @@
 /* ****************************************************************************
 *
 * semRender - 
+*
+* NOTE: in the current implementation, 'toplevel' is always false.
+*       When the operation "GET /admin/sem/<sem-name>" is implemented, 'toplevel' will
+*       be set to true for the rendering of the response to that request.
 */
 static const std::string semRender(const char* name, bool toplevel, const char* state)
 {
@@ -59,7 +63,7 @@ static const std::string semRender(const char* name, bool toplevel, const char* 
   out += JSON_STR("status") + ":" + JSON_STR(state);
 
   //
-  // FIXME P4 Fill in more fields here in the future:
+  // FIXME P4 Fill in more fields here in the future (as part of issue #2145):
   //
   // "owner":     in case 'taken': who took it
   // "purpose":   in case 'taken': for what purpose
