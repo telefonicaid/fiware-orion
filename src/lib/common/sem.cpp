@@ -554,13 +554,19 @@ const char* timeStatSemGet(void)
 *  curl context
 */
 
-static bool contexts_mutex_taken   = false;
-static int  contexts_mutex_errors  = 0;
-static bool contexts_mutex2_taken  = false;
-static int  contexts_mutex2_errors = 0;
 
-static pthread_mutex_t contexts_mutex = PTHREAD_MUTEX_INITIALIZER;
-static std::map<std::string, struct curl_context> contexts;
+//
+// Variables for mutexes and their state
+//
+// FIXME: contexts_mutex_errors and contexts_mutex2_errors are not yet used, see issue #2145
+//
+static std::map<std::string, struct curl_context>  contexts;
+static pthread_mutex_t                             contexts_mutex         = PTHREAD_MUTEX_INITIALIZER;
+static bool                                        contexts_mutex_taken   = false;
+static int                                         contexts_mutex_errors  = 0;
+static bool                                        contexts_mutex2_taken  = false;
+static int                                         contexts_mutex2_errors = 0;
+
 
 /* ****************************************************************************
 *
