@@ -20,3 +20,4 @@
 - Fix: POST /v2/op/query was not supporting FIWARE::Location::NGSIv2 filters
 - Fix: Expression lost after refeshing subscription cache (Issue #2202)
 - Fix: Avoided a possible infinite loop in sub-cache synchronization function (subscriptions stopped working due to this bug)
+- Fix: Removed capping in NGSIv2 update forwarding (Issue #2193)
