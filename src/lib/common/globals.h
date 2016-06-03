@@ -129,7 +129,8 @@ typedef enum Ngsiv2Flavour
 {
   NGSIV2_NO_FLAVOUR               = 0,
   NGSIV2_FLAVOUR_ONCREATE         = 1,
-  NGSIV2_FLAVOUR_ONAPPENDORUPDATE = 2,
+  NGSIV2_FLAVOUR_ONAPPEND         = 2,
+  NGSIV2_FLAVOUR_ONUPDATE         = 3
 } Ngsiv2Flavour;
 
 

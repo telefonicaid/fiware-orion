@@ -101,11 +101,13 @@ std::string UpdateContextResponse::render(ConnectionInfo* ciP, RequestType reque
       out += errorCode.render(indent + "  ");
     }
     else
+    {
       out += contextElementResponseVector.render(ciP, RtUpdateContextResponse, indent + "  ", false);
+    }
   }
-  
-  out += endTag(indent);
 
+  out += endTag(indent);
+  
   return out;
 }
 

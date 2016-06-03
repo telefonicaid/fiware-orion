@@ -1,4 +1,4 @@
-# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Update With Shadowed Attribute
+One Forward Update To Context Provider
 
 --SHELL-INIT--
 dbInit CB
@@ -33,11 +33,10 @@ brokerStart CP1
 
 #
 # 01. Update/APPEND E1/T1/A1 in CP1
-# 02. Update/APPEND E1/T1/A1 in CB
-# 03. Register E1/T1/A1 in CB, provApp: CP1
-# 04. Update/UPDATE E1/T1/A1 in CB
-# 05. Query E1/T1/A1 in CP1 (untouched by 04)
-# 06. Query E1/T1/A1 in CB (modified by 04)
+# 02. Register E1/T1/A1 in CB, provApp: CP1
+# 03. Update/UPDATE E1/T1/A1
+# 04. Query E1/T1/A1 in CB
+# 05. Query E1/T1/A1 in CP1
 #
 
 echo "01. Update/APPEND E1/T1/A1 in CP1"
@@ -63,30 +62,7 @@ echo
 echo
 
 
-echo "02. Update/APPEND E1/T1/A1 in CB"
-echo "================================"
-payload='{
-  "contextElements": [
-    {
-      "type": "T1",
-      "id":   "E1",
-      "attributes": [
-        {
-          "name": "A1",
-          "type": "string",
-          "value": "A1 in CB"
-        }
-      ]
-    }
-  ],
-  "updateAction": "APPEND"
-}'
-orionCurl --url /v1/updateContext --payload "$payload"
-echo
-echo
-
-
-echo "03. Register E1/T1/A1 in CB, provApp: CP1"
+echo "02. Register E1/T1/A1 in CB, provApp: CP1"
 echo "========================================="
 payload='{
   "contextRegistrations": [
@@ -115,49 +91,21 @@ echo
 echo
 
 
-echo "04. Update/UPDATE E1/T1/A1 in CB"
-echo "================================"
+echo "03. Update/UPDATE E1/T1/A1"
+echo "=========================="
 payload='{
-  "contextElements": [
-    {
-      "type": "T1",
-      "id":   "E1",
-      "attributes": [
-        {
-          "name": "A1",
-          "type": "string",
-          "value": "A1 modified by 04"
-        }
-      ]
-    }
-  ],
-  "updateAction": "UPDATE"
+  "A1": {
+      "type": "string",
+      "value": "A1 via CB"
+  }
 }'
-orionCurl --url /v1/updateContext --payload "$payload"
+orionCurl --url /v2/entities/E1/attrs?type=T1 --payload "$payload" -X PATCH
 echo
 echo
 
 
-echo "05. Query E1/T1/A1 in CP1 (untouched by 04)"
-echo "==========================================="
-payload='{
-  "entities": [
-    {
-      "id":   "E1",
-      "type": "T1"
-    }
-  ],
-  "attributes": [
-    "A1"
-  ]
-}'
-orionCurl --url /v1/queryContext --payload "$payload" --port $CP1_PORT
-echo
-echo
-
-
-echo "06. Query E1/T1/A1 in CB (modified by 04)"
-echo "========================================="
+echo "04. Query E1/T1/A1 in CB"
+echo "========================"
 payload='{
   "entities": [
     {
@@ -170,6 +118,24 @@ payload='{
   ]
 }'
 orionCurl --url /v1/queryContext --payload "$payload"
+echo
+echo
+
+
+echo "05. Query E1/T1/A1 in CP1"
+echo "========================="
+payload='{
+  "entities": [
+    {
+      "id":   "E1",
+      "type": "T1"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ]
+}'
+orionCurl --url /v1/queryContext --port $CP1_PORT --payload "$payload"
 echo
 echo
 
@@ -207,39 +173,7 @@ Date: REGEX(.*)
 }
 
 
-02. Update/APPEND E1/T1/A1 in CB
-================================
-HTTP/1.1 200 OK
-Content-Length: 383
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A1", 
-                        "type": "string", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-
-
-03. Register E1/T1/A1 in CB, provApp: CP1
+02. Register E1/T1/A1 in CB, provApp: CP1
 =========================================
 HTTP/1.1 200 OK
 Content-Length: 74
@@ -248,45 +182,22 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "P1M", 
+    "duration": "P1M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
 
-04. Update/UPDATE E1/T1/A1 in CB
-================================
-HTTP/1.1 200 OK
-Content-Length: 383
-Content-Type: application/json
+03. Update/UPDATE E1/T1/A1
+==========================
+HTTP/1.1 204 No Content
+Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A1", 
-                        "type": "string", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
 
 
-05. Query E1/T1/A1 in CP1 (untouched by 04)
-===========================================
+04. Query E1/T1/A1 in CB
+========================
 HTTP/1.1 200 OK
 Content-Length: 392
 Content-Type: application/json
@@ -301,7 +212,7 @@ Date: REGEX(.*)
                     {
                         "name": "A1", 
                         "type": "string", 
-                        "value": "A1 in CP1"
+                        "value": "A1 via CB"
                     }
                 ], 
                 "id": "E1", 
@@ -317,10 +228,10 @@ Date: REGEX(.*)
 }
 
 
-06. Query E1/T1/A1 in CB (modified by 04)
-=========================================
+05. Query E1/T1/A1 in CP1
+=========================
 HTTP/1.1 200 OK
-Content-Length: 400
+Content-Length: 392
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -333,7 +244,7 @@ Date: REGEX(.*)
                     {
                         "name": "A1", 
                         "type": "string", 
-                        "value": "A1 modified by 04"
+                        "value": "A1 via CB"
                     }
                 ], 
                 "id": "E1", 
