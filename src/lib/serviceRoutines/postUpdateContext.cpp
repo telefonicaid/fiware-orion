@@ -440,6 +440,7 @@ std::string postUpdateContext
   UpdateContextRequest*   upcrP  = &parseDataP->upcr.res;
   std::string             answer;
 
+
   //
   // 01. Check service-path consistency
   //
@@ -504,6 +505,7 @@ std::string postUpdateContext
     upcrP->release();
     return answer;
   }
+
 
 
   //
