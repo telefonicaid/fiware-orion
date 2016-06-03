@@ -79,7 +79,7 @@ You only need to pay attention to this if your upgrade path crosses 0.11.0 or 0.
 
 * Orion versions previous to 0.11.0 recommend MongoDB 2.2
 * Orion version from 0.11.0 to 0.20.0 recommend MongoDB 2.4. Check [the 2.4 upgrade procedure in the oficial MongoDB documentation.](http://docs.mongodb.org/master/release-notes/2.4-upgrade/)
-* Orion version from 0.21.0 on recommend MongoDB 2.6/3.0/3,2. check [the 2.6 upgrade procedure](http://docs.mongodb.org/master/release-notes/2.6-upgrade/),
+* Orion version from 0.21.0 on recommend MongoDB 2.6/3.0/3.2. check [the 2.6 upgrade procedure](http://docs.mongodb.org/master/release-notes/2.6-upgrade/),
   [the 3.0 upgrade procedure](http://docs.mongodb.org/master/release-notes/3.0-upgrade/) or [the 3.2 upgrade procedure](http://docs.mongodb.org/master/release-notes/3.2-upgrade/) in the oficial
   MongoDB documentation.
 
