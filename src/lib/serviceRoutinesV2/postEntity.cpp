@@ -86,7 +86,6 @@ std::string postEntity
     op     = "APPEND";   // append or update
     flavor = NGSIV2_FLAVOUR_ONAPPEND;
   }
-  LM_W(("KZ: update action type: '%s' (flavor: %d)", op.c_str(), flavor));
   
   // Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, op);

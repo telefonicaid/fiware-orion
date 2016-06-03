@@ -440,7 +440,6 @@ std::string postUpdateContext
   UpdateContextRequest*   upcrP  = &parseDataP->upcr.res;
   std::string             answer;
 
-  LM_W(("KZ: In postUpdateContext"));
   //
   // 01. Check service-path consistency
   //
@@ -456,7 +455,6 @@ std::string postUpdateContext
 
     TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
 
-    LM_W(("KZ: invalid service path"));
     return answer;
   }
   else if (ciP->servicePathV[0] == "")
@@ -471,7 +469,6 @@ std::string postUpdateContext
 
     TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
 
-    LM_W(("KZ: invalid service path"));
     return answer;
   }
 
@@ -505,10 +502,8 @@ std::string postUpdateContext
     TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
 
     upcrP->release();
-    LM_W(("KZ: done - no forwarding"));
     return answer;
   }
-  LM_W(("KZ: Possibly sending forward updates to context providres"));
 
 
   //
@@ -645,7 +640,6 @@ std::string postUpdateContext
 
     UpdateContextResponse upcrs;
 
-    LM_W(("KZ: calling updateForward"));
     updateForward(ciP, requestV[ix], &upcrs);
 
     //

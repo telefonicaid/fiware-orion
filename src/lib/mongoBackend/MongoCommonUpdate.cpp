@@ -2902,7 +2902,6 @@ void processContextElement
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError, err);
-    LM_W(("KZ: collectionQuery error"));
     return;
   }
   TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -2923,7 +2922,6 @@ void processContextElement
     if (!nextSafeOrErrorF(cursor, &r, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
-      LM_W(("KZ: Runtime Error"));
       continue;
     }
     docs++;
@@ -2941,18 +2939,15 @@ void processContextElement
     {
       std::string details = std::string("error retrieving _id field in doc: '") + r.toString() + "'";
       alarmMgr.dbError(details);
-      LM_W(("KZ: DB Error"));
       continue;
     }
     // we need to use getOwned() here, otherwise we have empirically found that bad things may happen with long BSONObjs
     // (see http://stackoverflow.com/questions/36917731/context-broker-crashing-with-certain-update-queries)
-    LM_W(("KZ: keeping one"));
     results.push_back(r.getOwned());
   }
   releaseMongoConnection(connection);
 
   LM_T(LmtServicePath, ("Docs found: %d", results.size()));
-  LM_W(("KZ: Docs found: %d", results.size()));
 
   // Used to accumulate error response information, checked at the end
   bool         attributeAlreadyExistsError = false;
@@ -2981,7 +2976,6 @@ void processContextElement
    */
   if (results.size() == 0)
   {
-    LM_W(("KZ: 0 results"));
     /* Here we set the ServicePath if set in the request (if APPEND, of course).
      * Actually, the 'slash-escaped' ServicePath (variable: 'path') is sent to the function createEntity
      * which sets the ServicePath for the entity.
@@ -3006,11 +3000,9 @@ void processContextElement
       cerP->contextElement.contextAttributeVector.push_back(ca);
     }
 
-    LM_W(("KZ: action: %s", action.c_str()));
     if ((strcasecmp(action.c_str(), "update") == 0) || (strcasecmp(action.c_str(), "replace") == 0))
     {
       /* In the case of UPDATE or REPLACE we look for context providers */
-      LM_W(("KZ: looking for context providers"));
       searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
       cerP->statusCode.fill(SccOk);
       responseP->contextElementResponseVector.push_back(cerP);
@@ -3020,7 +3012,6 @@ void processContextElement
       //
       if (forwardsPending(responseP) == false)
       {
-        LM_W(("KZ: no context providers found"));
         cerP->statusCode.fill(SccContextElementNotFound);
       }
     }
