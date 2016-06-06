@@ -1745,9 +1745,9 @@ static void updateAttrInNotifyCer
   /* Reached this point, it means that it is a new attribute (APPEND case) */
   ContextAttribute* caP = new ContextAttribute(targetAttr, useDefaultType);
 
-  // KZ: this is the fix for issue 2237 (2 lines)
   if (caP->compoundValueP)
   {
+    // The ContextAttribute constructor steals the compound, but in this case, it must be cloed
     targetAttr->compoundValueP = caP->compoundValueP->clone();
   }
 
@@ -2026,7 +2026,6 @@ static bool processContextAttributeVector
     /* No matter if success or fail, we have to include the attribute in the response */
     ContextAttribute*  ca         = new ContextAttribute(targetAttr->name, targetAttr->type, "");
 
-    // ca->compoundValueP = targetAttr->compoundValueP;
     setResponseMetadata(targetAttr, ca);
     cerP->contextElement.contextAttributeVector.push_back(ca);
 
