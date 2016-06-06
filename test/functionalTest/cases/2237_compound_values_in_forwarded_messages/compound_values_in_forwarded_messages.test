@@ -1,4 +1,4 @@
-# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -34,10 +34,8 @@ brokerStart CP1
 #
 # 01. Register E1/T1/A1 in CB, provApp: CP1
 # 02. Create E1/T1/A1 in CP1
-# 03. Update/UPDATE E1/T1/A1 in CB, A1 with a compound value (using ngsiv1)
+# 03. Update/UPDATE E1/T1/A1 in CB, A1 with a compound value
 # 04. Query E1/A1 in CP1, to see the compound value of A1
-# 05. Update/UPDATE E1/T1/A1 in CB, A1 with a compound value (using ngsiv2)
-# 06. Query E1/A1 in CP1, to see the new compound value of A1
 #
 
 echo "01. Register E1/T1/A1 in CB, provApp: CP1"
@@ -92,8 +90,8 @@ echo
 echo
 
 
-echo "03. Update/UPDATE E1/T1/A1 in CB, A1 with a compound value (using ngsiv1)"
-echo "========================================================================="
+echo "03. Update/UPDATE E1/T1/A1 in CB, A1 with a compound value"
+echo "=========================================================="
 payload='{
   "contextElements": [
     {
@@ -120,10 +118,6 @@ echo "======================================================="
 orionCurl --url /v2/entities/E1/attrs/A1 --port $CP1_PORT
 echo
 echo
-
-
-# 05. Update/UPDATE E1/T1/A1 in CB, A1 with a compound value (using ngsiv2)
-# 06. Query E1/A1 in CP1, to see the new compound value of A1
 
 
 --REGEXPECT--
@@ -173,8 +167,8 @@ Date: REGEX(.*)
 }
 
 
-03. Update/UPDATE E1/T1/A1 in CB, A1 with a compound value (using ngsiv1)
-=========================================================================
+03. Update/UPDATE E1/T1/A1 in CB, A1 with a compound value
+==========================================================
 HTTP/1.1 200 OK
 Content-Length: 383
 Content-Type: application/json

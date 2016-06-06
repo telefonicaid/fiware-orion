@@ -1747,7 +1747,7 @@ static void updateAttrInNotifyCer
 
   if (caP->compoundValueP)
   {
-    // The ContextAttribute constructor steals the compound, but in this case, it must be cloed
+    // The ContextAttribute constructor steals the compound, but in this case, it must be cloned
     targetAttr->compoundValueP = caP->compoundValueP->clone();
   }
 
