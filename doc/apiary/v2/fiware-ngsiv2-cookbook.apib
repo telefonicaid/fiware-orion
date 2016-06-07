@@ -5,8 +5,10 @@ HOST: http://fiware-ngsi2.apiblueprint.org/
 
 FIWARE-NGSI Simple API (v2) Cookbook.
 
-This is a cookbook with recipes that show how to use FIWARE-NGSI v2 aka FIWARE-NGSI Simple API.
-Use this examples for learning and enjoy!
+This is a cookbook with recipes that show how to use FIWARE-NGSI v2 aka FIWARE-NGSI Simple API. 
+The examples of this guide contain the `Fiware-Service: tourguide` header. 
+This header is specific to Orion Context Broker and it is used to allow testing the cookbook examples against the FIWARE tour guide application.  
+Use these examples for learning and enjoy!
 
 This is a work in progress and is changing on a daily basis.
 Please send your comments to fiware-ngsi@lists.fiware.org. You can
@@ -34,8 +36,7 @@ This resource allows you to obtain a list of subresources published by the API:
         {
             "entities_url":      "/v2/entities",
             "types_url":         "/v2/types",
-            "subscriptions_url": "/v2/subscriptions",
-            "registrations_url": "/v2/registrations"
+            "subscriptions_url": "/v2/subscriptions"
         }
 
 # Group Entity Collection
@@ -44,94 +45,592 @@ This resource allows you to obtain a list of subresources published by the API:
 
 ### Normalized mode [GET /v2/entities]
 
-+ Response 200 (application/json)
+     
++ Request 
+    
+    + Headers
 
-      [
-         {
-            "type": "Room",
-            "id": "DC_S1_D41",
-            "temperature": {
-               "value": 35.6,
-               "type":  "urn:ogc:def:phenomenon:temperature",
-               "metadata": {
-                   "accuracy": {
-                       "type": "none",
-                       "value": 0.1
-                   }
-               }
-            }
-         },
-         {
-            "type": "Car",
-            "id":   "abc345fg",
-            "speed": {
-                "value":    14.7,
-                "type":     "none",
-                "metadata": { }
-            }
-         }
-      ]
-
-
-### Key values mode [GET /v2/entities?options=keyValues]
+            Fiware-Service: tourguide
 
 + Response 200 (application/json)
-
+        
         [
-         {
-            "type": "Room",
-            "id": "DC_S1_D41",
-            "temperature": 35.6
-         },
-         {
-            "type": "Car",
-            "id": "abc345fg",
-            "speed": 14.7
-         }
+          {
+            "id": "fa6691deb80329d4a9daf9ea08cc6db87b060441",
+            "type": "Review",
+            "author":
+            {
+              "type": "Person",
+              "value": "user8",
+              "metadata":
+              {
+              }
+            },
+            "dateCreated":
+            {
+              "type": "date",
+              "value": "2016-05-04T14:16:56.00Z",
+              "metadata":
+              {
+              }
+            },
+            "itemReviewed":
+            {
+              "type": "Restaurant",
+              "value": "Elizalde",
+              "metadata":
+              {
+              }
+            },
+            "publisher":
+            {
+              "type": "Organization",
+              "value": "Bitergia",
+              "metadata":
+              {
+              }
+            },
+            "reviewBody":
+            {
+              "type": "none",
+              "value": "Body review",
+              "metadata":
+              {
+              }
+            },
+            "reviewRating":
+            {
+              "type": "Rating",
+              "value": 3,
+              "metadata":
+              {
+              }
+            }
+          },
+          {
+            "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+            "type": "Restaurant",
+            "address":
+            {
+              "type": "PostalAddress",
+              "value":
+              {
+                "streetAddress": "Cuesta de las Cabras Aldapa 2",
+                "addressRegion": "Araba",
+                "addressLocality": "Alegría-Dulantzi",
+                "postalCode": "01240"
+              },
+              "metadata":
+              {
+              }
+            },
+            "aggregateRating":
+            {
+              "type": "AggregateRating",
+              "value":
+              {
+                "reviewCount": 1,
+                "ratingValue": 3
+              },
+              "metadata":
+              {
+              }
+            },
+            "capacity":
+            {
+              "type": "PropertyValue",
+              "value": 120,
+              "metadata":
+              {
+              }
+            },
+            "department":
+            {
+              "type": "none",
+              "value": "Franchise2",
+              "metadata":
+              {
+              }
+            },
+            "description":
+            {
+              "type": "none",
+              "value": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además ...",
+              "metadata":
+              {
+              }
+            },
+            "location":
+            {
+              "type": "geo:point",
+              "value": "42.8404625, -2.5123277",
+              "metadata":
+              {
+              }
+            },
+            "name":
+            {
+              "type": "none",
+              "value": "Elizalde",
+              "metadata":
+              {
+              }
+            },
+            "occupancyLevels":
+            {
+              "type": "PropertyValue",
+              "value": 0,
+              "metadata":
+              {
+                "timestamp":
+                {
+                  "type": "date",
+                  "value": "2016-05-04T14:10:30.135Z"
+                }
+              }
+            },
+            "priceRange":
+            {
+              "type": "none",
+              "value": 0,
+              "metadata":
+              {
+              }
+            },
+            "telephone":
+            {
+              "type": "none",
+              "value": "945 400 868",
+              "metadata":
+              {
+              }
+            }
+          },
+          {
+            "id": "34f036f9eef1f403c0ea66c55b8cdbace4b5f7a6",
+            "type": "Restaurant",
+            "address":
+            {
+              "type": "PostalAddress",
+              "value":
+              {
+                "streetAddress": "Avenida de Los Huetos 17",
+                "addressRegion": "Álava",
+                "addressLocality": "Vitoria-Gasteiz",
+                "postalCode": "01010"
+              },
+              "metadata":
+              {
+              }
+            },
+            "aggregateRating":
+            {
+              "type": "AggregateRating",
+              "value":
+              {
+                "reviewCount": 1,
+                "ratingValue": 2
+              },
+              "metadata":
+              {
+              }
+            },
+            "capacity":
+            {
+              "type": "PropertyValue",
+              "value": 160,
+              "metadata":
+              {
+              }
+            },
+            "department":
+            {
+              "type": "none",
+              "value": "Franchise4",
+              "metadata":
+              {
+              }
+            },
+            "description":
+            {
+              "type": "none",
+              "value": "El restaurante Araba cuenta con amplios salones para todo tipo de celebraciones, y además ...",
+              "metadata":
+              {
+              }
+            },
+            "location":
+            {
+              "type": "geo:point",
+              "value": "42.8538811, -2.7006836",
+              "metadata":
+              {
+              }
+            },
+            "name":
+            {
+              "type": "none",
+              "value": "Araba",
+              "metadata":
+              {
+              }
+            },
+            "occupancyLevels":
+            {
+              "type": "PropertyValue",
+              "value": 0,
+              "metadata":
+              {
+                "timestamp":
+                {
+                  "type": "date",
+                  "value": "2016-05-04T14:10:30.160Z"
+                }
+              }
+            },
+            "priceRange":
+            {
+              "type": "none",
+              "value": 42,
+              "metadata":
+              {
+              }
+            },
+            "telephone":
+            {
+              "type": "none",
+              "value": "945 222 669",
+              "metadata":
+              {
+              }
+            },
+            "url":
+            {
+              "type": "none",
+              "value": "http://www.restaurantearaba.com/",
+              "metadata":
+              {
+              }
+            }
+          }
         ]
+
+### Key values mode [GET /v2/entities{?options}]
+
++ Parameters
+    
+    + options: keyValues (optional, string) - keyValues: This mode represents each entity attribute only by its value, leaving out the information about type and metadata
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+
+          [
+            {
+              "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+              "type": "Restaurant",
+              "address":
+              {
+                "streetAddress": "Cuesta de las Cabras Aldapa 2",
+                "addressRegion": "Araba",
+                "addressLocality": "Alegría-Dulantzi",
+                "postalCode": "01240"
+              },
+              "aggregateRating":
+              {
+                "reviewCount": 1,
+                "ratingValue": 3
+              },
+              "capacity": 120,
+              "department": "Franchise2",
+              "description": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además ...",
+              "location": "42.8404625, -2.5123277",
+              "name": "Elizalde",
+              "occupancyLevels": 0,
+              "priceRange": 0,
+              "telephone": "945 400 868"
+            },
+            {
+              "id": "34f036f9eef1f403c0ea66c55b8cdbace4b5f7a6",
+              "type": "Restaurant",
+              "address":
+              {
+                "streetAddress": "Avenida de Los Huetos 17",
+                "addressRegion": "Álava",
+                "addressLocality": "Vitoria-Gasteiz",
+                "postalCode": "01010"
+              },
+              "aggregateRating":
+              {
+                "reviewCount": 1,
+                "ratingValue": 2
+              },
+              "capacity": 160,
+              "department": "Franchise4",
+              "description": "El restaurante Araba cuenta con amplios salones para todo tipo de celebraciones, y además ...",
+              "location": "42.8538811, -2.7006836",
+              "name": "Araba",
+              "occupancyLevels": 0,
+              "priceRange": 42,
+              "telephone": "945 222 669",
+              "url": "http://www.restaurantearaba.com/"
+            },
+            {
+                "id": "fa6691deb80329d4a9daf9ea08cc6db87b060441",
+                "type": "Review",
+                "author": "user8",
+                "dateCreated": "2016-05-04T14:16:56.00Z",
+                "itemReviewed": "Elizalde",
+                "publisher": "Bitergia",
+                "reviewBody": "Body review",
+                "reviewRating": 3
+            }
+          ]
+
+
 
 ### Pagination [GET /v2/entities{?limit,offset,options}]
 
 + Parameters
     + options: count
     + limit: 2
-    + offset: 2
+    + offset: 1
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
 
 + Response 200 (application/json)
 
     + Headers
 
-            Fiware-Total-Count: 30
-            Link: http://example.org/v2/entities?offset=4&limit=2; rel="next", http://example.org/v2/entities?offset=28&limit=2; rel="last",
-            http://example.org/v2/entities?offset=0&limit=2; rel="first", http://example.org/v2/entities?offset=2&limit=2; rel="prev"
+            Fiware-Total-Count: 2068
 
     + Body
 
-      [
-         {
-            "type": "Room",
-            "id": "DC_S1_D41",
-            "temperature": {
-               "value": 35.6,
-               "type": "urn:ogc:def:phenomenon:temperature",
-               "metadata": {
-                   "accuracy": {
-                       "type":  "none",
-                       "value": 0.1
-                   }
-               }
-            }
-         },
-         {
-            "type": "Car",
-            "id": "abc345fg",
-            "speed": {
-                "value"   : 14.7,
-                "type"    : "none",
-                "metadata": { }
-            }
-         }
-      ]
+            [
+              {
+                "id": "34f036f9eef1f403c0ea66c55b8cdbace4b5f7a6",
+                "type": "Restaurant",
+                "address":
+                {
+                  "type": "PostalAddress",
+                  "value":
+                  {
+                    "streetAddress": "Avenida de Los Huetos 17",
+                    "addressRegion": "Álava",
+                    "addressLocality": "Vitoria-Gasteiz",
+                    "postalCode": "01010"
+                  },
+                  "metadata":
+                  {
+                  }
+                },
+                "aggregateRating":
+                {
+                  "type": "AggregateRating",
+                  "value":
+                  {
+                    "reviewCount": 1,
+                    "ratingValue": 2
+                  },
+                  "metadata":
+                  {
+                  }
+                },
+                "capacity":
+                {
+                  "type": "PropertyValue",
+                  "value": 160,
+                  "metadata":
+                  {
+                  }
+                },
+                "department":
+                {
+                  "type": "none",
+                  "value": "Franchise4",
+                  "metadata":
+                  {
+                  }
+                },
+                "description":
+                {
+                  "type": "none",
+                  "value": "El restaurante Araba cuenta con amplios salones para todo tipo de celebraciones, y además ....",
+                  "metadata":
+                  {
+                  }
+                },
+                "location":
+                {
+                  "type": "geo:point",
+                  "value": "42.8538811, -2.7006836",
+                  "metadata":
+                  {
+                  }
+                },
+                "name":
+                {
+                  "type": "none",
+                  "value": "Araba",
+                  "metadata":
+                  {
+                  }
+                },
+                "occupancyLevels":
+                {
+                  "type": "PropertyValue",
+                  "value": 0,
+                  "metadata":
+                  {
+                    "timestamp":
+                    {
+                      "type": "date",
+                      "value": "2016-05-04T14:10:30.160Z"
+                    }
+                  }
+                },
+                "priceRange":
+                {
+                  "type": "none",
+                  "value": 42,
+                  "metadata":
+                  {
+                  }
+                },
+                "telephone":
+                {
+                  "type": "none",
+                  "value": "945 222 669",
+                  "metadata":
+                  {
+                  }
+                },
+                "url":
+                {
+                  "type": "none",
+                  "value": "http://www.restaurantearaba.com/",
+                  "metadata":
+                  {
+                  }
+                }
+              },
+              {
+                "id": "92e960de796a8cc48ed7c784119f7d5628e31a6f",
+                "type": "Restaurant",
+                "address":
+                {
+                  "type": "PostalAddress",
+                  "value":
+                  {
+                    "streetAddress": "Maskuribai Kalea",
+                    "addressRegion": "Araba",
+                    "addressLocality": "Amurrio",
+                    "postalCode": "01470"
+                  },
+                  "metadata":
+                  {
+                  }
+                },
+                "aggregateRating":
+                {
+                  "type": "AggregateRating",
+                  "value":
+                  {
+                    "reviewCount": 1,
+                    "ratingValue": 2
+                  },
+                  "metadata":
+                  {
+                  }
+                },
+                "capacity":
+                {
+                  "type": "PropertyValue",
+                  "value": 120,
+                  "metadata":
+                  {
+                  }
+                },
+                "department":
+                {
+                  "type": "none",
+                  "value": "Franchise3",
+                  "metadata":
+                  {
+                  }
+                },
+                "description":
+                {
+                  "type": "none",
+                  "value": "Bodega adscrita a la Denominación de Origen Arabako Txakolina y que elabora el 95% de la producción total de esta denominación...",
+                  "metadata":
+                  {
+                  }
+                },
+                "location":
+                {
+                  "type": "geo:point",
+                  "value": "43.047415, -3.0007716",
+                  "metadata":
+                  {
+                  }
+                },
+                "name":
+                {
+                  "type": "none",
+                  "value": "Arabako Txakolina, S.L.",
+                  "metadata":
+                  {
+                  }
+                },
+                "occupancyLevels":
+                {
+                  "type": "PropertyValue",
+                  "value": 0,
+                  "metadata":
+                  {
+                    "timestamp":
+                    {
+                      "type": "date",
+                      "value": "2016-05-04T14:10:30.161Z"
+                    }
+                  }
+                },
+                "priceRange":
+                {
+                  "type": "none",
+                  "value": 0,
+                  "metadata":
+                  {
+                  }
+                },
+                "telephone":
+                {
+                  "type": "none",
+                  "value": "645 713 355",
+                  "metadata":
+                  {
+                  }
+                },
+                "url":
+                {
+                  "type": "none",
+                  "value": "http://www.xarmant.net/",
+                  "metadata":
+                  {
+                  }
+                }
+              }
+            ]
+
 
 
 ## Filter entities [/v2/entities{?id}]
@@ -139,157 +638,658 @@ This resource allows you to obtain a list of subresources published by the API:
 ### By id [GET /v2/entities{?id,options}]
 
 + Parameters
-    + id: DC_S1_D41 (optional, string) - Only retrieve entities with this id
+    + id: 0115206c51f60b48b77e4c937835795c33bb953f (optional, string) - Only retrieve entities with this id
     + options: keyValues (optional, string) - rendering options
+
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
 
 + Response 200 (application/json)
 
-        [
-         {
-            "type": "Room",
-            "id": "DC_S1_D41",
-            "temperature": 35.6
-         }
-        ]
+          [
+            {
+              "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+              "type": "Restaurant",
+              "address":
+              {
+                "streetAddress": "Cuesta de las Cabras Aldapa 2",
+                "addressRegion": "Araba",
+                "addressLocality": "Alegría-Dulantzi",
+                "postalCode": "01240"
+              },
+              "aggregateRating":
+              {
+                "reviewCount": 1,
+                "ratingValue": 3
+              },
+              "capacity": 120,
+              "department": "Franchise2",
+              "description": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además ...",
+              "location": "42.8404625, -2.5123277",
+              "name": "Elizalde",
+              "occupancyLevels": 0,
+              "priceRange": 0,
+              "telephone": "945 400 868"
+            }
+          ]
+
+
 
 ### By type [GET /v2/entities{?type}]
 
 + Parameters
-    + type: Room (optional, string) - Only retrieve entities of this type
+    + type: Restaurant (optional, string) - Only retrieve entities of this type
+
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
 
 + Response 200 (application/json)
 
         [
-         {
-            "type": "Room",
-            "id": "DC_S1_D41",
-            "temperature": {
-               "value": 35.6,
-               "type": "urn:ogc:def:phenomenon:temperature",
-               "metadata": {
-                   "accuracy": {
-                       "type":  "none",
-                       "value": 0.1
-                   }
-               }
+          {
+            "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+            "type": "Restaurant",
+            "address":
+            {
+              "type": "PostalAddress",
+              "value":
+              {
+                "streetAddress": "Cuesta de las Cabras Aldapa 2",
+                "addressRegion": "Araba",
+                "addressLocality": "Alegría-Dulantzi",
+                "postalCode": "01240"
+              },
+              "metadata":
+              {
+              }
+            },
+            "aggregateRating":
+            {
+              "type": "AggregateRating",
+              "value":
+              {
+                "reviewCount": 1,
+                "ratingValue": 3
+              },
+              "metadata":
+              {
+              }
+            },
+            "capacity":
+            {
+              "type": "PropertyValue",
+              "value": 120,
+              "metadata":
+              {
+              }
+            },
+            "department":
+            {
+              "type": "none",
+              "value": "Franchise2",
+              "metadata":
+              {
+              }
+            },
+            "description":
+            {
+              "type": "none",
+              "value": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además ...",
+              "metadata":
+              {
+              }
+            },
+            "location":
+            {
+              "type": "geo:point",
+              "value": "42.8404625, -2.5123277",
+              "metadata":
+              {
+              }
+            },
+            "name":
+            {
+              "type": "none",
+              "value": "Elizalde",
+              "metadata":
+              {
+              }
+            },
+            "occupancyLevels":
+            {
+              "type": "PropertyValue",
+              "value": 0,
+              "metadata":
+              {
+                "timestamp":
+                {
+                  "type": "date",
+                  "value": "2016-05-04T14:10:30.135Z"
+                }
+              }
+            },
+            "priceRange":
+            {
+              "type": "none",
+              "value": 0,
+              "metadata":
+              {
+              }
+            },
+            "telephone":
+            {
+              "type": "none",
+              "value": "945 400 868",
+              "metadata":
+              {
+              }
             }
-         },
-         {
-            "type": "Room",
-            "id": "Boe_Idearium",
-            "temperature": {
-               "value": 22,
-               "type": "urn:ogc:def:phenomenon:temperature",
-               "metadata": { }
+          },
+          {
+            "id": "34f036f9eef1f403c0ea66c55b8cdbace4b5f7a6",
+            "type": "Restaurant",
+            "address":
+            {
+              "type": "PostalAddress",
+              "value":
+              {
+                "streetAddress": "Avenida de Los Huetos 17",
+                "addressRegion": "Álava",
+                "addressLocality": "Vitoria-Gasteiz",
+                "postalCode": "01010"
+              },
+              "metadata":
+              {
+              }
+            },
+            "aggregateRating":
+            {
+              "type": "AggregateRating",
+              "value":
+              {
+                "reviewCount": 1,
+                "ratingValue": 2
+              },
+              "metadata":
+              {
+              }
+            },
+            "capacity":
+            {
+              "type": "PropertyValue",
+              "value": 160,
+              "metadata":
+              {
+              }
+            },
+            "department":
+            {
+              "type": "none",
+              "value": "Franchise4",
+              "metadata":
+              {
+              }
+            },
+            "description":
+            {
+              "type": "none",
+              "value": "El restaurante Araba cuenta con amplios salones para todo tipo de celebraciones, y además ...",
+              "metadata":
+              {
+              }
+            },
+            "location":
+            {
+              "type": "geo:point",
+              "value": "42.8538811, -2.7006836",
+              "metadata":
+              {
+              }
+            },
+            "name":
+            {
+              "type": "none",
+              "value": "Araba",
+              "metadata":
+              {
+              }
+            },
+            "occupancyLevels":
+            {
+              "type": "PropertyValue",
+              "value": 0,
+              "metadata":
+              {
+                "timestamp":
+                {
+                  "type": "date",
+                  "value": "2016-05-04T14:10:30.160Z"
+                }
+              }
+            },
+            "priceRange":
+            {
+              "type": "none",
+              "value": 42,
+              "metadata":
+              {
+              }
+            },
+            "telephone":
+            {
+              "type": "none",
+              "value": "945 222 669",
+              "metadata":
+              {
+              }
+            },
+            "url":
+            {
+              "type": "none",
+              "value": "http://www.restaurantearaba.com/",
+              "metadata":
+              {
+              }
             }
-         }
+          }
         ]
 
 ### By id list [GET /v2/entities{?id,options}]
 
 + Parameters
-    + id: DC_S1_D41, Boe_Idearium (optional, string) - Id list with the entities to be retrieved
+    + id: 0115206c51f60b48b77e4c937835795c33bb953f,34f036f9eef1f403c0ea66c55b8cdbace4b5f7a6 (optional, string) - Id list with the entities to be retrieved
     + options: keyValues (optional, string) - rendering options
+
+
++ Request 
     
+    + Headers
+
+            Fiware-Service: tourguide
+
 + Response 200 (application/json)
 
+
+
         [
-         {
-            "type": "Room",
-            "id": "DC_S1_D41",
-            "temperature": 35.6
-         },
-         {
-            "type": "Room",
-            "id": "Boe_Idearium",
-            "temperature": 22.5
-         }
+          {
+            "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+            "type": "Restaurant",
+            "address":
+            {
+              "streetAddress": "Cuesta de las Cabras Aldapa 2",
+              "addressRegion": "Araba",
+              "addressLocality": "Alegría-Dulantzi",
+              "postalCode": "01240"
+            },
+            "aggregateRating":
+            {
+              "reviewCount": 1,
+              "ratingValue": 3
+            },
+            "capacity": 120,
+            "department": "Franchise2",
+            "description": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además ...",
+            "location": "42.8404625, -2.5123277",
+            "name": "Elizalde",
+            "occupancyLevels": 0,
+            "priceRange": 0,
+            "telephone": "945 400 868"
+          },
+          {
+            "id": "34f036f9eef1f403c0ea66c55b8cdbace4b5f7a6",
+            "type": "Restaurant",
+            "address":
+            {
+              "streetAddress": "Avenida de Los Huetos 17",
+              "addressRegion": "Álava",
+              "addressLocality": "Vitoria-Gasteiz",
+              "postalCode": "01010"
+            },
+            "aggregateRating":
+            {
+              "reviewCount": 1,
+              "ratingValue": 2
+            },
+            "capacity": 160,
+            "department": "Franchise4",
+            "description": "El restaurante Araba cuenta con amplios salones para todo tipo de celebraciones, y además ...",
+            "location": "42.8538811, -2.7006836",
+            "name": "Araba",
+            "occupancyLevels": 0,
+            "priceRange": 42,
+            "telephone": "945 222 669",
+            "url": "http://www.restaurantearaba.com/"
+          }
         ]
+
 
 
 ### By type list [GET /v2/entities{?type}]
 
 + Parameters
-    + type: ParkingLot, StreetParking (optional, string) - Type list
+    + type: Review,Restaurant (optional, string) - Type list
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
 
 + Response 200 (application/json)
 
         [
-         {
-            "type": "ParkingLot",
-            "id": "P12345-A",
-            "name": {
-               "value":    "Marques de Pombal",
-               "type":     "string",
-               "metadata": { }
+          {
+            "id": "fa6691deb80329d4a9daf9ea08cc6db87b060441",
+            "type": "Review",
+            "author":
+            {
+              "type": "Person",
+              "value": "user8",
+              "metadata":
+              {
+              }
             },
-            "availableSpotNumber": {
-              "value":    111,
-              "type":     "number",
-              "metadata": { }
+            "dateCreated":
+            {
+              "type": "date",
+              "value": "2016-05-04T14:16:56.00Z",
+              "metadata":
+              {
+              }
             },
-            "totalSpotNumber": {
-              "value":    250,
-              "type":     "number",
-              "metadata": { }
+            "itemReviewed":
+            {
+              "type": "Restaurant",
+              "value": "Elizalde",
+              "metadata":
+              {
+              }
             },
-            "lastEntrance": {
-               "value":    "2015-11-26T11:45:12.398Z",
-               "type":     "date",
-               "metadata": { }
+            "publisher":
+            {
+              "type": "Organization",
+              "value": "Bitergia",
+              "metadata":
+              {
+              }
             },
-            "location": {
-              "type":  "geo:point",
-              "value": "40.6378754,-8.6370621",
-              "metadata": {
-                "crs": {
-                  "type":  "urn:ogc:def:crs",
-                  "value": "EPSG::4326"
+            "reviewBody":
+            {
+              "type": "none",
+              "value": "Body review",
+              "metadata":
+              {
+              }
+            },
+            "reviewRating":
+            {
+              "type": "Rating",
+              "value": 3,
+              "metadata":
+              {
+              }
+            }
+          },
+          {
+            "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+            "type": "Restaurant",
+            "address":
+            {
+              "type": "PostalAddress",
+              "value":
+              {
+                "streetAddress": "Cuesta de las Cabras Aldapa 2",
+                "addressRegion": "Araba",
+                "addressLocality": "Alegría-Dulantzi",
+                "postalCode": "01240"
+              },
+              "metadata":
+              {
+              }
+            },
+            "aggregateRating":
+            {
+              "type": "AggregateRating",
+              "value":
+              {
+                "reviewCount": 1,
+                "ratingValue": 3
+              },
+              "metadata":
+              {
+              }
+            },
+            "capacity":
+            {
+              "type": "PropertyValue",
+              "value": 120,
+              "metadata":
+              {
+              }
+            },
+            "department":
+            {
+              "type": "none",
+              "value": "Franchise2",
+              "metadata":
+              {
+              }
+            },
+            "description":
+            {
+              "type": "none",
+              "value": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además ...",
+              "metadata":
+              {
+              }
+            },
+            "location":
+            {
+              "type": "geo:point",
+              "value": "42.8404625, -2.5123277",
+              "metadata":
+              {
+              }
+            },
+            "name":
+            {
+              "type": "none",
+              "value": "Elizalde",
+              "metadata":
+              {
+              }
+            },
+            "occupancyLevels":
+            {
+              "type": "PropertyValue",
+              "value": 0,
+              "metadata":
+              {
+                "timestamp":
+                {
+                  "type": "date",
+                  "value": "2016-05-04T14:10:30.135Z"
                 }
-              } 
-            }
-         },
-         {
-            "type": "StreetParking",
-            "id": "A45678",
-            "availableSpotNumber": {
-              "value":     11,
-              "type":      "number",
-              "metadata": { }
+              }
             },
-            "totalSpotNumber": {
-              "value":    20,
-              "type":     "number",
-              "metadata": { }
+            "priceRange":
+            {
+              "type": "none",
+              "value": 0,
+              "metadata":
+              {
+              }
             },
-            "location": {
-              "type": "geo:polygon",
-              "value": [
-                "40.64125502310924,-8.653267621994019",
-                "40.64123059990093,-8.652441501617432",
-                "40.64147483158176,-8.650263547897339",
-                "40.64125502310924,-8.653267621994019"
-              ],
-              "metadata": { } 
+            "telephone":
+            {
+              "type": "none",
+              "value": "945 400 868",
+              "metadata":
+              {
+              }
             }
-         }
+          },
+          {
+            "id": "34f036f9eef1f403c0ea66c55b8cdbace4b5f7a6",
+            "type": "Restaurant",
+            "address":
+            {
+              "type": "PostalAddress",
+              "value":
+              {
+                "streetAddress": "Avenida de Los Huetos 17",
+                "addressRegion": "Álava",
+                "addressLocality": "Vitoria-Gasteiz",
+                "postalCode": "01010"
+              },
+              "metadata":
+              {
+              }
+            },
+            "aggregateRating":
+            {
+              "type": "AggregateRating",
+              "value":
+              {
+                "reviewCount": 1,
+                "ratingValue": 2
+              },
+              "metadata":
+              {
+              }
+            },
+            "capacity":
+            {
+              "type": "PropertyValue",
+              "value": 160,
+              "metadata":
+              {
+              }
+            },
+            "department":
+            {
+              "type": "none",
+              "value": "Franchise4",
+              "metadata":
+              {
+              }
+            },
+            "description":
+            {
+              "type": "none",
+              "value": "El restaurante Araba cuenta con amplios salones para todo tipo de celebraciones, y además ...",
+              "metadata":
+              {
+              }
+            },
+            "location":
+            {
+              "type": "geo:point",
+              "value": "42.8538811, -2.7006836",
+              "metadata":
+              {
+              }
+            },
+            "name":
+            {
+              "type": "none",
+              "value": "Araba",
+              "metadata":
+              {
+              }
+            },
+            "occupancyLevels":
+            {
+              "type": "PropertyValue",
+              "value": 0,
+              "metadata":
+              {
+                "timestamp":
+                {
+                  "type": "date",
+                  "value": "2016-05-04T14:10:30.160Z"
+                }
+              }
+            },
+            "priceRange":
+            {
+              "type": "none",
+              "value": 42,
+              "metadata":
+              {
+              }
+            },
+            "telephone":
+            {
+              "type": "none",
+              "value": "945 222 669",
+              "metadata":
+              {
+              }
+            },
+            "url":
+            {
+              "type": "none",
+              "value": "http://www.restaurantearaba.com/",
+              "metadata":
+              {
+              }
+            }
+          }
         ]
+  
 
 ### By pattern matching [GET /v2/entities{?idPattern,options}]
 
 + Parameters
-    + idPattern: DC_.* (optional, string) - Only retrieve entities having a matching id.
+    + idPattern: ^0115206c51f60b48b77e4.* (optional, string) - Only retrieve entities having a matching id.
     + options: keyValues (optional, string) - rendering options
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
 
 + Response 200 (application/json)
 
         [
-         {
-            "type": "Room",
-            "id": "DC_S1_D41",
-            "temperature": 35.6
-         }
+          {
+            "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+            "type": "Restaurant",
+            "address":
+            {
+              "streetAddress": "Cuesta de las Cabras Aldapa 2",
+              "addressRegion": "Araba",
+              "addressLocality": "Alegría-Dulantzi",
+              "postalCode": "01240"
+            },
+            "aggregateRating":
+            {
+              "reviewCount": 1,
+              "ratingValue": 3
+            },
+            "capacity": 120,
+            "department": "Franchise2",
+            "description": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además ...",
+            "location": "42.8404625, -2.5123277",
+            "name": "Elizalde",
+            "occupancyLevels": 0,
+            "priceRange": 0,
+            "telephone": "945 400 868"
+          }
         ]
+
+
 
 # Group Context Entity
 
@@ -298,100 +1298,193 @@ This resource allows you to obtain a list of subresources published by the API:
 ### By Id [GET /v2/entities/{entityId}{?options}]
 
 + Parameters
-    + entityId: Bcn_Welt (required, string) - Entity Id.
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - Entity Id.
     + options: keyValues (optional, string) - rendering options
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
 
 + Response 200 (application/json)
 
         {
-            "type": "Room",
-            "id": "Bcn_Welt",
-            "temperature": 21.7,
-            "humidity": 60
+          "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+          "type": "Restaurant",
+          "address":
+          {
+            "streetAddress": "Cuesta de las Cabras Aldapa 2",
+            "addressRegion": "Araba",
+            "addressLocality": "Alegría-Dulantzi",
+            "postalCode": "01240"
+          },
+          "aggregateRating":
+          {
+            "reviewCount": 1,
+            "ratingValue": 3
+          },
+          "capacity": 120,
+          "department": "Franchise2",
+          "description": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además...",
+          "location": "42.8404625, -2.5123277",
+          "name": "Elizalde",
+          "occupancyLevels": 0,
+          "priceRange": 0,
+          "telephone": "945 400 868"
         }
+
+
 
 ### By Id. Not exists [GET /v2/entities/{entityId}]
 
 + Parameters
-    + entityId: Bcn_Welt (required, string) - Entity Id.
+    + entityId: mistakenID (required, string) - Entity Id.
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
 
 + Response 404 (application/json)
 
         {
-            "error": "NotFound",
-            "description": "There is no entity with such an id"
+          "error": "NotFound",
+          "description": "The requested entity has not been found. Check type and id"
         }
+
+
 
 ### By id and type [GET /v2/entities/{entityId}{?type,options}]
 
 + Parameters
-    + entityId: Boe_Idearium (required, string) - Entity ID
-    + type: Room (required, string) - Entity Type
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - Entity ID
+    + type: Restaurant (required, string) - Entity Type
     + options: keyValues (optional, string) - rendering options
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
 
 + Response 200 (application/json)
 
+
         {
-            "type": "Room",
-            "id": "Boe_Idearium",
-            "temperature": 22.5
+          "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+          "type": "Restaurant",
+          "address":
+          {
+            "streetAddress": "Cuesta de las Cabras Aldapa 2",
+            "addressRegion": "Araba",
+            "addressLocality": "Alegría-Dulantzi",
+            "postalCode": "01240"
+          },
+          "aggregateRating":
+          {
+            "reviewCount": 1,
+            "ratingValue": 3
+          },
+          "capacity": 120,
+          "department": "Franchise2",
+          "description": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además...",
+          "location": "42.8404625, -2.5123277",
+          "name": "Elizalde",
+          "occupancyLevels": 0,
+          "priceRange": 0,
+          "telephone": "945 400 868"
         }
+
+
 
 ## Partial entity retrieval [/v2/entities/{entityId}{?attrs}]
 
 ### One entity attribute [GET /v2/entities/{entityId}{?attrs}]
 
 + Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrs: temperature (optional, string) - Attribute to be retrieved
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - Entity ID
+    + attrs: name (optional, string) - Attribute to be retrieved
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
 
 + Response 200 (application/json)
 
         {
-            "type": "Room",
-            "id": "Boe_Idearium",
-            "temperature": {
-              "value":    22.7,
-              "type":     "urn:ogc:def:phenomenon:temperature",
-              "metadata": { }
+          "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+          "type": "Restaurant",
+          "name":
+          {
+            "type": "none",
+            "value": "Elizalde",
+            "metadata":
+            {
             }
+          }
         }
 
+
+<!--
 ### One entity attribute. Not present [GET /v2/entities/{entityId}{?attrs}]
 
 + Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - Entity ID
     + attrs: mistake (optional, string) - Attribute to be retrieved
 
-+ Response 200 (application/json)
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 404 (application/json)
 
         {
-           "type": "Room",
-           "id": "Boe_Idearium"
+          "error": "NotFound",
+          "description": "The requested entity has not been found. Check type and id"
         }
-
+-->
 ### Several entity attributes [GET /v2/entities/{entityId}{?attrs}]
 
 + Parameters
-    + entityId: 'Bcn_Welt' (required, string) - Entity ID
-    + attrs: temperature, humidity (optional, string) - Attributes to be retrieved. Coma separated list.
+    + entityId: '0115206c51f60b48b77e4c937835795c33bb953f' (required, string) - Entity ID
+    + attrs: name,telephone (optional, string) - Attributes to be retrieved. Coma separated list.
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
 
 + Response 200 (application/json)
 
         {
-            "type": "Room",
-            "id": "Boe_Idearium",
-            "temperature": {
-              "value": 22.7,
-              "type": "urn:ogc:def:phenomenon:temperature",
-              "metadata": { }
-            },
-            "humidity": {
-              "value": 60,
-              "type": "urn:x-ogc:def:phenomenon:OGC:Humidity",
-              "metadata": { }
+          "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+          "type": "Restaurant",
+          "name":
+          {
+            "type": "none",
+            "value": "Elizalde",
+            "metadata":
+            {
             }
+          },
+          "telephone":
+          {
+            "type": "none",
+            "value": "945 400 868",
+            "metadata":
+            {
+            }
+          }
         }
+
+
             
 # Group Query Context
 
@@ -400,48 +1493,89 @@ This resource allows you to obtain a list of subresources published by the API:
 ### Query by attribute content [GET /v2/entities{?q,limit,offset,attrs,options}]
 
 + Parameters
-    + q: temperature==22.5;humidity==60 (optional, string) - General query parameter that allows
+    + q: capacity>50;priceRange==42 (optional, string) - General query parameter that allows
     to filter by attribute content. 
     + limit: 20 - Limit the number of results (optional, number) - Maximum number of results to return
-    + attrs: seatsNumber (optional, string) - Attributes to be returned
+    + attrs: name (optional, string) - Attributes to be returned
     + options: keyValues (optional, string) - query options (`keyValues` mode)
+    + offset: 0
+
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
 
 + Response 200 (application/json)
 
         [
-         {
-            "type": "Room",
-            "id": "Bcn-Welt",
-            "seatsNumber": 15
-         }
+          {
+            "id": "34f036f9eef1f403c0ea66c55b8cdbace4b5f7a6",
+            "type": "Restaurant",
+            "name": "Araba"
+          }
         ]
+
 
 ### Query by distance to a certain point [GET /v2/entities{?type,coords,georel,geometry,options}]
 
 + Parameters
-    + type: WeatherStation (optional, string) - Entity type requested.
-    + coords: 41.3763726, 2.1864475 (optional, string) - Coordinates of the reference point.
+    + type: Restaurant (optional, string) - Entity type requested.
+    + coords: 42.8538811,-2.7006836 (optional, string) - Coordinates of the reference point.
     + geometry: point (optional, string) - Geometry (point, line, polygon) represented by the `coords` parameter. 
-    + georel: near;maxDistance:1000 (optional, string) - Geospatial relationship.
-    This example refers to those entities located at a maximum distance of 1000 meters from the reference point.
+    + georel: near;maxDistance:100 (optional, string) - Geospatial relationship.
+    This example refers to those entities located at a maximum distance of 100 meters from the reference point.
     + options: keyValues (optional, string) - query options (`keyValues` mode)
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
 
 + Response 200 (application/json)
 
         [
-         {
-            "type": "WeatherStation",
-            "id": "AEMET-789",
-            "location": "43.5,-8.2"
-         }
+          {
+            "id": "34f036f9eef1f403c0ea66c55b8cdbace4b5f7a6",
+            "type": "Restaurant",
+            "address":
+            {
+              "streetAddress": "Avenida de Los Huetos 17",
+              "addressRegion": "Álava",
+              "addressLocality": "Vitoria-Gasteiz",
+              "postalCode": "01010"
+            },
+            "aggregateRating":
+            {
+              "reviewCount": 1,
+              "ratingValue": 2
+            },
+            "capacity": 160,
+            "department": "Franchise4",
+            "description": "El restaurante Araba cuenta con amplios salones para todo tipo de celebraciones, y además ...",
+            "location": "42.8538811, -2.7006836",
+            "name": "Araba",
+            "occupancyLevels": 0,
+            "priceRange": 42,
+            "telephone": "945 222 669",
+            "url": "http://www.restaurantearaba.com/"
+          }
         ]
 
 
 ### No results [GET /v2/entities{?q}]
 
 + Parameters
-    + q: temperature>45 (optional, string) - General query parameter that allows
+    + q: capacity>500 (optional, string) - General query parameter that allows
     to filter by attribute content
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
 
 + Response 200 (application/json)
 
@@ -454,36 +1588,38 @@ This resource allows you to obtain a list of subresources published by the API:
 ### Normalized mode [POST /v2/entities]
 
 + Request (application/json)
+    
+    + Headers
 
-        {
-            "type": "Room",
-            "id": "Bcn-Welt",
-            "temperature": {
-              "value": 21.7,
-              "metadata": {
-                 "unitCode": {
-                    "value": "CEL"
-                 }
-              }
-            },
-            "humidity": {
-              "value": 60    
-            },
-            "address": {
-              "value": {
-                "addressCountry":  "ES",
-                "addressLocality": "Barcelona",
-                "streetAddress":   "Diagonal 00"             
-              },
-              "type": "PostalAddress"
+            Fiware-Service: tourguide
+
+    + Body
+
+            {
+                "type": "Review",
+                "id": "review-Elizalde-34",
+                "author": {
+                  "type":"Person",
+                  "value": "Client1234"
+                },
+                "itemReviewed": {
+                  "type": "Restaurant",
+                  "value": ""    
+                },
+                "reviewBody": {
+                  "value": "Cheap and nice place to eat."
+                },
+                "reviewRating":{
+                  "type": "Rating",
+                  "value": 4
+                }
             }
-        }
       
 + Response 201 (application/json)
 
     + Headers
 
-            Location: /v2/entities/Bcn-Welt?type=Room
+            Location: /v2/entities/review-Elizalde-34?type=Review
 
 
 ### keyValues mode [POST /v2/entities{?options}]
@@ -491,94 +1627,139 @@ This resource allows you to obtain a list of subresources published by the API:
 + Parameters
     + options: keyValues (optional, string) - operation options (`keyValues` mode)
 
-+ Request (application/json)    
++ Request (application/json) 
+    
+    + Headers
 
-        {
-            "type": "Room",
-            "id": "Bcn-Welt",
-            "temperature": 21.7,
-            "humidity": 60,
-            "address": {
-              "addressCountry":  "ES",
-              "addressLocality": "Barcelona",
-              "streetAddress":   "Diagonal 00"
-            }  
-        }
+            Fiware-Service: tourguide
+            
+    + Body
+
+            {
+                "type": "Review",
+                "id": "review-Elizalde-35",
+                "author": "client1234",
+                "itemReviewed": "0115206c51f60b48b77e4c937835795c33bb953f",
+                "reviewBody": "Cheap and nice place to eat",
+                "ratingValue": 4
+            }
 
 + Response 201 (application/json)
 
     + Headers
 
-            Location: /v2/entities/Bcn-Welt?type=Room
+            Location: /v2/entities/review-Elizalde-35?type=Review
+
 
 ### Georeferencing using simple location format [POST /v2/entities]
 
-+ Request (application/json)
++ Request (application/json) 
+    
+    + Headers
 
-        {
-           "id":   "AEMET-1351",
-           "type": "WeatherStation",
-           "address": {
-              "value": {
-                "addressCountry":  "ES",
-                "addressLocality": "Mañón",
-                "addressRegion":   "La Coruña"
-              }
-           },
-           "name": "Estaca de Bares",
-           "location": {              
-              "type":  "geo:point",
-              "value": "43.7861, -7.6847"
+            Fiware-Service: tourguide
+            
+    + Body
+
+            {
+               "id":   "SampleRestaurant",
+               "type": "Restaurant",
+               "address": {
+                  "type": "PostalAddress",
+                  "value": {
+                    "streetAddress": "Cuesta de las Cabras Aldapa 2",
+                    "addressLocality": "Alegría-Dulantzi",
+                    "addressRegion":   "Araba",
+                    "postalCode": "01240"
+                  }
+               },
+               "name": {
+                  "value": "Sample restaurant"
+                },
+               "location": {              
+                  "type":  "geo:point",
+                  "value": "42.8404625, -2.5123277"
+               },
+               "priceRange": {
+                   "value": 10
+               },
+               "telephone": {
+                   "value": "555 55 55 55"
+               },
+               "capacity": {
+                   "type": "propertyValue",
+                   "value": 120
+               },
+               "description": {
+                  "value": "Sample restaurant"
+               }
             }
-        }
 
 + Response 201 (application/json)
 
     + Headers
 
-            Location: /v2/entities/AEMET-1351?type=WeatherStation
+            Location: /v2/entities/SampleRestaurant?type=Restaurant
+
 
 ### Georeferencing using GeoJSON [POST /v2/entities]
 
-+ Request (application/json)
++ Request (application/json) 
+    
+    + Headers
 
-        {
-           "id":   "porto-AmbientArea-Boavista",
-           "type": "AmbientArea",
-           "name": "Boavista",
-           "location": {              
-              "type": "geo:json",
-              "value": {
-                 "type": "Polygon",
-                 "coordinates": [ [
-                    [ -8.633629796628234, 41.163854282188204 ],
-                    [ -8.630357419242978, 41.165230294132279 ],
-                    [ -8.627010741427831, 41.164981131496575 ],
-                    [ -8.637337472778501, 41.155229636824181 ],
-                    [ -8.637313461931976, 41.158014959877839 ],
-                    [ -8.636775456788547, 41.161148008811146 ],
-                    [ -8.633629796628234, 41.163854282188204 ]
-                 ] ]
-              }
+            Fiware-Service: tourguide
+            
+    + Body
+
+            {
+               "id":   "Vitoria-Gasteiz-1",
+               "type": "comercialArea",
+               "name": {
+                "value": "Vitoria-Gasteiz-Comercial-Zone"
+               },
+               "location": {              
+                  "type": "geo:json",
+                  "value": {
+                     "type": "Polygon",
+                     "coordinates": [ [
+                        [ 42.847476, -2.763969 ],
+                        [ 42.826006, -2.743151 ],
+                        [ 42.826485, -2.653740 ],
+                        [ 42.867061, -2.630934 ],
+                        [ 42.881801, -2.640617 ],
+                        [ 42.867767, -2.726723 ],
+                        [ 42.847476, -2.763969 ]
+                     ] ]
+                  }
+                }
             }
-        }
 
 + Response 201 (application/json)
 
     + Headers
 
-            Location: /v2/entities/porto-AmbientArea-Boavista?type=AmbientArea
+            Location: /v2/entities/Vitoria-Gasteiz-1?type=comercialArea
             
             
 ### Creation error. Already exists. [POST /v2/entities?options=keyValues]
 
-+ Request (application/json)
++ Request (application/json) 
+    
+    + Headers
 
-        {
-            "type": "Room",
-            "id": "Bcn-Welt",
-            "temperature": 21.7
-        }
+            Fiware-Service: tourguide
+            
+    + Body
+
+            {
+                "type": "Review",
+                "id": "review-Elizalde-35",
+                "author": "client1234",
+                "itemReviewed": "0115206c51f60b48b77e4c937835795c33bb953f",
+                "reviewBody": "Cheap and nice place to eat",
+                "ratingValue": 4
+            }
 
 + Response 422 (application/json)
 
@@ -593,139 +1774,190 @@ This resource allows you to obtain a list of subresources published by the API:
 ### By Id [DELETE /v2/entities/{entityId}]
 
 + Parameters
-    + entityId: Boe_Idearium (required, string) - Entity ID
+    + entityId: `review-Elizalde-35` (required, string) - Entity ID
+
++ Request (application/json) 
+    
+    + Headers
+
+            Fiware-Service: tourguide
 
 + Response 204
 
-
-## Manage entity attributes [/v2/entities/{entityId}{?options}]
-
-### Update. Normalized mode. [PATCH /v2/entities/{entityId}]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-
-+ Request (application/json)
-
-    + Body
-
-            {
-                "temperature": {
-                  "value": 21.7,
-                  "metadata": {
-                    "unitCode": "CEL"
-                  }
-                },
-                "ambientNoise": {
-                  "value": 31.5
-                }
-            }
-
-+ Response 204
-
-### Update. keyValues mode. [PATCH /v2/entities/{entityId}{?options}]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + options:  keyValues (optional, string) - operation options (`keyValues` mode)
-
-+ Request (application/json)
-
-    + Body
-
-            {
-                "temperature": 21.7,
-                "ambientNoise": 31.5
-            }
-
-+ Response 204
-
-
-### Update or append. keyValues mode. [POST /v2/entities/{entityId}{?options}]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + options:  keyValues (optional, string) - operation options (`keyValues` mode)
-
-+ Request (application/json)
-
-        {
-            "temperature": 25.5,
-            "seatsNumber": 6
-        }
-
-+ Response 204
-
-### Remove [DELETE /v2/entities/{entityId}{?attrs}]
-
-+ Parameters
-    + entityId: Boe_Idearium (required, string) - Entity ID
-    + attrs: humidity, seatsNumber - Attribute list
-
-+ Response 204
 
 # Group Context Attributes
 
 ## Attribute Collection [/v2/entities/{entityId}/attrs{?options}]
 
-### List all. Normalized Mode. [GET /v2/entities/{entityId}/attrs]
+### List all. Normalized mode. [GET /v2/entities/{entityId}/attrs]
 
 + Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - Entity ID
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
 
 + Response 200 (application/json)
-
+       
         {
-            "temperature": {
-               "type":     "number",
-               "value":    22.5,
-               "metadata": {
-                 "unitCode": {
-                    "type": "none",
-                    "value": "CEL"
-                 }
-               }
+          "address":
+          {
+            "type": "PostalAddress",
+            "value":
+            {
+              "streetAddress": "Cuesta de las Cabras Aldapa 2",
+              "addressRegion": "Araba",
+              "addressLocality": "Alegría-Dulantzi",
+              "postalCode": "01240"
             },
-            "humidity": {
-               "type": "number",
-               "value": 60,
-               "metadata": { }
-            },
-            "location": {
-              "type": "geo:point",
-              "value": "41.3763726, 2.1864475",
-              "metadata": { }
+            "metadata":
+            {
             }
+          },
+          "aggregateRating":
+          {
+            "type": "AggregateRating",
+            "value":
+            {
+              "reviewCount": 1,
+              "ratingValue": 3
+            },
+            "metadata":
+            {
+            }
+          },
+          "capacity":
+          {
+            "type": "PropertyValue",
+            "value": 120,
+            "metadata":
+            {
+            }
+          },
+          "department":
+          {
+            "type": "none",
+            "value": "Franchise2",
+            "metadata":
+            {
+            }
+          },
+          "description":
+          {
+            "type": "none",
+            "value": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además ...",
+            "metadata":
+            {
+            }
+          },
+          "location":
+          {
+            "type": "geo:point",
+            "value": "42.8404625, -2.5123277",
+            "metadata":
+            {
+            }
+          },
+          "name":
+          {
+            "type": "none",
+            "value": "Elizalde",
+            "metadata":
+            {
+            }
+          },
+          "occupancyLevels":
+          {
+            "type": "PropertyValue",
+            "value": 0,
+            "metadata":
+            {
+              "timestamp":
+              {
+                "type": "date",
+                "value": "2016-05-04T14:10:30.135Z"
+              }
+            }
+          },
+          "priceRange":
+          {
+            "type": "none",
+            "value": 0,
+            "metadata":
+            {
+            }
+          },
+          "telephone":
+          {
+            "type": "none",
+            "value": "945 400 868",
+            "metadata":
+            {
+            }
+          }
         }
 
 
-### List all. keyValues Mode. [GET /v2/entities/{entityId}/attrs{?options}]
+### List all. keyValues mode. [GET /v2/entities/{entityId}/attrs{?options}]
 
 + Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - Entity ID
     + options: keyValues (optional, string) - flags that payload is in `keyValues`mode.
 
++ Request  
+    
+    + Headers
+
+            Fiware-Service: tourguide
+            
 + Response 200 (application/json)
 
         {
-            "temperature": 21.7,
-            "humidity":    60,
-            "location":    "41.3763726, 2.1864475"
+          "address":
+          {
+            "streetAddress": "Cuesta de las Cabras Aldapa 2",
+            "addressRegion": "Araba",
+            "addressLocality": "Alegría-Dulantzi",
+            "postalCode": "01240"
+          },
+          "aggregateRating":
+          {
+            "reviewCount": 1,
+            "ratingValue": 3
+          },
+          "capacity": 120,
+          "department": "Franchise2",
+          "description": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además ...",
+          "location": "42.8404625, -2.5123277",
+          "name": "Elizalde",
+          "occupancyLevels": 0,
+          "priceRange": 0,
+          "telephone": "945 400 868"
         }
+
 
         
 ### Replace all. keyValues mode [PUT /v2/entities/{entityId}/attrs{?options}]
 
 + Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - Entity ID
     + options: keyValues (optional, string) - flags that payload is in `keyValues`mode.
 
-+ Request (application/json)
++ Request (application/json) 
+    
+    + Headers
 
-        {
-            "temperature": 21.7,
-            "seatsNumber": 12
-        }
+            Fiware-Service: tourguide
+            
+    + Body
+
+            {
+                "priceRange": 10,
+                "capacity": 100
+            }
 
 + Response 200
         
@@ -735,32 +1967,37 @@ This resource allows you to obtain a list of subresources published by the API:
 ### Get [GET /v2/entities/{entityId}/attrs/{attrName}]
 
 + Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: illuminance (required, string) - Attribute name.
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - Entity ID
+    + attrName: name (required, string) - Attribute name.
 
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+            
 + Response 200 (application/json)
 
         {
-            "value": 300,
-            "type": "number",
-            "metadata": {
-              "accuracy": {
-                "value": 1.0,
-                "type": "number"
-              },
-              "unitCode": {
-                "value": "LX",
-                "type":  "none"
-              }
-            }
+          "type": "none",
+          "value": "Elizalde",
+          "metadata":
+          {
+          }
         }
 
 
 ### Get. Not exists [GET /v2/entities/{entityId}/attrs/{attrName}]
 
 + Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - Entity ID
     + attrName: mistake (required, string) - Attribute name.
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
 
 + Response 404 (application/json)
 
@@ -773,17 +2010,20 @@ This resource allows you to obtain a list of subresources published by the API:
 ### Update [PUT /v2/entities/{entityId}/attrs/{attrName}]
 
 + Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute name.
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - Entity ID
+    + attrName: priceRange (required, string) - Attribute name.
 
-+ Request (application/json)
++ Request (application/json) 
+    
+    + Headers
 
-        {
-            "value": 25.0,
-            "metadata": {
-               "unitCode": "CEL"
+            Fiware-Service: tourguide
+            
+    + Body
+
+            {
+                "value": 10.0
             }
-        }
 
 + Response 200
 
@@ -791,9 +2031,15 @@ This resource allows you to obtain a list of subresources published by the API:
 ### Remove [DELETE /v2/entities/{entityId}/attrs/{attrName}]
 
 + Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute name.
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - Entity ID
+    + attrName: priceRange (required, string) - Attribute name.
 
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+            
 + Response 204
         
 
@@ -802,398 +2048,364 @@ This resource allows you to obtain a list of subresources published by the API:
 ### Get. As text [GET /v2/entities/{entityId}/attrs/{attrName}/value]
 
 + Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute name.
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - Entity ID
+    + attrName: name (required, string) - Attribute name.
     
 + Request
 
-  + Headers
+    + Headers
 
-      Accept: text/plain
+            Fiware-Service: tourguidee
+            Accept: text/plain
 
 + Response 200 (text/plain)
 
-        300
+        Elizalde
 
 
 ### Get. As JSON [GET /v2/entities/{entityId}/attrs/{attrName}/value]
 
 + Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute name.
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - Entity ID
+    + attrName: address (required, string) - Attribute name.
+
++ Request
+
+    + Headers
+
+            Fiware-Service: tourguide
 
 + Response 200 (application/json)
 
         {
-            "value": 300
+          "streetAddress": "Cuesta de las Cabras Aldapa 2",
+          "addressRegion": "Araba",
+          "addressLocality": "Alegría-Dulantzi",
+          "postalCode": "01240"
         }
 
 
-### Update. As Text [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
+### Update. As text [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
 
 + Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute name.
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - Entity ID
+    + attrName: priceRange (required, string) - Attribute name.
 
 + Request (text/plain)
+    
+    + Headers
 
-        25.0
+            Fiware-Service: tourguide
 
-+ Response 200
+    + Body
+
+            25.0
+
++ Response 204
 
 
 ### Update. As JSON [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
 
 + Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute name.
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - Entity ID
+    + attrName: address (required, string) - Attribute name.
 
 + Request (application/json)
+    
+    + Headers
 
-        {
-            "value": 25.0
-        }
+            Fiware-Service: tourguide
 
-+ Response 200
+    + Body
+
+            {
+              "streetAddress": "Cuesta de las Cabras Aldapa 2",
+              "addressRegion": "Araba",
+              "addressLocality": "Alegría-Dulantzi",
+              "postalCode": "01240"
+            }
+
++ Response 204
 
 
 # Group Subscriptions
+## Subscription [/v2/subscriptions]
 
 ### List all subscriptions present in the system [GET /v2/subscriptions]
 
-+ Response 200
++ Request
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
 
         [
+          {
+            "id": "57444cda25516d268e96c98c",
+            "description": "Update average rating",
+            "expires": "2020-04-05T14:00:00.00Z",
+            "status": "active",
+            "subject":
             {
-                "id": "abcdefg",
-                "entity": {
-                    "id": "Bcn_Welt",
-                    "type": "Room"
-                },
-                "attributes": [
-                    "temperature"
-                ],
-                "callback": "http://localhost:1234",
-                "options": {
-                    "duration": "1M",
-                    "condition": "ONCHANGE",
-                    "throttling": "PT5S"
+              "entities":
+              [
+                {
+                  "id": "",
+                  "idPattern": ".*",
+                  "type": "Review"
                 }
+              ],
+              "condition":
+              {
+                "attrs":
+                [
+                  "ratingValue"
+                ]
+              }
             },
-             {
-                "id": "wyztrew",
-                "entity": {
-                    "pattern": "DC_*",
-                    "type": "Room"
-                },
-                "attributes": [
-                    "temperature"
-                ],
-                "callback": "http://localhost:1234"
-            }
+            "notification":
+            {
+              "attrs":
+              [
+                "ratingValue",
+                "itemReviewed"
+              ],
+              "attrsFormat": "normalized",
+              "http":
+              {
+                "url": "http://backend.niceeating.foo.com:1028/ratings4"
+              }
+            },
+            "throttling": 5
+          },
+          {
+            "id": "57444e1525516d268e96c98d",
+            "description": "Update average rating 3",
+            "expires": "2020-04-05T14:00:00.00Z",
+            "status": "active",
+            "subject":
+            {
+              "entities":
+              [
+                {
+                  "id": "",
+                  "idPattern": ".*",
+                  "type": "Review"
+                }
+              ],
+              "condition":
+              {
+                "attrs":
+                [
+                  "ratingValue"
+                ]
+              }
+            },
+            "notification":
+            {
+              "attrs":
+              [
+                "ratingValue",
+                "itemReviewed"
+              ],
+              "attrsFormat": "normalized",
+              "http":
+              {
+                "url": "http://backend.niceeating.foo.com:1028/ratings3"
+              }
+            },
+            "throttling": 5
+          }
         ]
+### Pagination [GET /v2/subscriptions{?limit,offset,options}]
+
++ Parameters
+    + options: count
+    + limit: 1
+    + offset: 1
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
+
++ Response 200 (application/json)
+   
+   + Headers
+
+            Fiware-Total-Count: 2
+
+   + Body
+
+            [
+              {
+                "id": "57444e1525516d268e96c98d",
+                "description": "Update average rating 3",
+                "expires": "2020-04-05T14:00:00.00Z",
+                "status": "active",
+                "subject":
+                {
+                  "entities":
+                  [
+                    {
+                      "id": "",
+                      "idPattern": ".*",
+                      "type": "Review"
+                    }
+                  ],
+                  "condition":
+                  {
+                    "attrs":
+                    [
+                      "ratingValue"
+                    ]
+                  }
+                },
+                "notification":
+                {
+                  "attrs":
+                  [
+                    "ratingValue",
+                    "itemReviewed"
+                  ],
+                  "attrsFormat": "normalized",
+                  "http":
+                  {
+                    "url": "http://backend.niceeating.foo.com:1028/ratings3"
+                  }
+                },
+                "throttling": 5
+              }
+            ]
 
 ### Get the details of a subscription [GET /v2/subscriptions/{subscriptionId}]
 
 + Parameters
-    + subscriptionId: abcdefg (required, string) - ID of the suscription
+    + subscriptionId: 57444cda25516d268e96c98c (required, string) - ID of the suscription
 
-+ Response 200
++ Request
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
 
         {
-            "id": "abcdefg",
-            "entity": {
-                "id": "Bcn_Welt",
-                "type": "Room"
-            },
-            "attributes": [
-                "temperature"
+          "id": "57444cda25516d268e96c98c",
+          "description": "Update average rating",
+          "expires": "2020-04-05T14:00:00.00Z",
+          "status": "active",
+          "subject":
+          {
+            "entities":
+            [
+              {
+                "id": "",
+                "idPattern": ".*",
+                "type": "Review"
+              }
             ],
-            "callback": "http://localhost:1234",
-            "options": {
-                "duration": "1M",
-                "condition": "ONCHANGE",
-                "throttling": "PT5S"
+            "condition":
+            {
+              "attrs":
+              [
+                "ratingValue"
+              ]
             }
+          },
+          "notification":
+          {
+            "attrs":
+            [
+              "ratingValue",
+              "itemReviewed"
+            ],
+            "attrsFormat": "normalized",
+            "http":
+            {
+              "url": "http://backend.niceeating.foo.com:1028/ratings4"
+            }
+          },
+          "throttling": 5
         }
-
-### Remove a suscription [DELETE /v2/subscriptions/{subscriptionId}]
-
-+ Parameters
-    + subscriptionId: abcdefg (required, string) - ID of the suscription
-
-+ Response 204
 
 
 ### Create a new subscription [POST /v2/subscriptions]
 
 + Request (application/json)
+    
+    + Headers
 
-        {
-            "entity": {
-                "pattern": "Boe_*",
-                "type": "Room"
-            },
-            "attributes": [
-                "humidity"
-            ],
-            "callback": "http://subscriber.example.com/notify"
-        }
+            Fiware-Service: tourguide
+    + Body
+
+            {
+              "description": "Update average rating",
+              "subject": {
+                "entities": [
+                  {
+                    "idPattern": ".*",
+                    "type": "Review"
+                  }
+                ],
+                "condition": {
+                  "attrs": [
+                    "ratingValue"
+                  ]
+                }
+              },
+              "notification": {
+                "http": {
+                  "url": "http://backend.niceeating.foo.com:1028/ratings4"
+                },
+                "attrs": [
+                  "ratingValue",
+                  "itemReviewed"
+                ]
+              },
+              "expires": "2020-04-05T14:00:00.00Z",
+              "throttling": 5
+            }
 
 + Response 201
 
     + Headers
 
-            Location: /subscriptions/abcde98765
+            Location: /v2/subscriptions/57444cda25516d268e96c98c
 
 ### Partial - Update an existing subscription [PATCH /v2/subscriptions/{subscriptionId}]
 
 + Parameters
-    + subscriptionId: abcdefgh (required, string) - ID of the suscription
+    + subscriptionId: 57444cda25516d268e96c98c (required, string) - ID of the subscription
 
-+ Request
-
-        {
-            "duration": "1Y"
-        }
-
-+ Response 204
-
-### List all subscriptions associated to an entity [GET /v2/entities/{entityId}/subscriptions]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - ID of the entity
-
-+ Response 200 (application/json)
-
-        [
-            {
-                "id": "abcdefg",
-                "attributes": [
-                    "temperature"
-                ],
-                "callback": "http://localhost:1234",
-                "options": {
-                    "duration": "1M",
-                    "condition": "ONCHANGE",
-                    "throttling": "PT5S"
-                }
-            }
-        ]
-
-
-### Create a new subscription associated to an entity [POST /v2/entities/{entityId}/subscriptions]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - ID of the entity
-
-+ Request
-
-        {
-            "attributes": [
-                "humidity"
-            ],
-            "callback": "http://subscriber.example.com/notify"
-        }
-
-+ Response 201
-
++ Request (application/json)
+    
     + Headers
 
-            Location: /subscriptions/abcd9867hshshs
+            Fiware-Service: tourguide
 
-### Get the details of a subscription associated to an entity [GET /v2/entities/{entityId}/subscriptions/{subscriptionId}]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - ID of the entity
-    + subscriptionId: abcdefgh (required, string) - ID of the subscription
-
-+ Response 200 (application/json)
-
-        {
-            "id": "abcdefgh",
-            "attributes": [
-                "temperature"
-            ],
-            "callback": "http://localhost:1234",
-            "options": {
-                "duration": "1M",
-                "condition": "ONCHANGE",
-                "throttling": "PT5S"
-            }
-        }
-
-
-# Group Registrations
-
-### List all registrations present in the system [GET /v2/registrations]
-
-+ Response 200
-
-        [
+    + Body
+        
             {
-                "id": "abcdefg",
-                "entity": {
-                    "id": "Bcn_Welt",
-                    "type": "Room"
-                },
-                "attributes": [
-                    "temperature"
-                ],
-                "callback": "http://localhost:1234",
-                "options": {
-                    "duration": "1M"
-                }
-            },
-             {
-                "id": "wyztrew",
-                "entity": {
-                    "pattern": "DC_*",
-                    "type": "Room"
-                },
-                "attributes": [
-                    "temperature"
-                ],
-                "callback": "http://localhost:1234"
+                "expires": "2040-01-01T14:00:00.00Z"
             }
-        ]
 
-### Get the details of a registration [GET /v2/subscriptions/{registrationId}]
++ Response 204
+
+### Remove a subscription [DELETE /v2/subscriptions/{subscriptionId}]
 
 + Parameters
-    + registrationId: abcdefg (required, string) - ID of the registration
-
-+ Response 200
-
-        {
-            "id": "abcdefg",
-            "entity": {
-                "id": "Bcn_Welt",
-                "type": "Room"
-            },
-            "attributes": [
-                "temperature"
-            ],
-            "callback": "http://localhost:1234",
-        }
-
-### Create a new registration [POST /v2/registrations]
+    + subscriptionId: 57444cda25516d268e96c98c (required, string) - ID of the subscription
 
 + Request
-
-        {
-            "entity": {
-                "pattern": "Boe_*",
-                "type": "Room"
-            },
-            "attributes": [
-                "humidity"
-            ],
-            "callback": "http://provider.example.com/provide"
-        }
-
-+ Response 201 (application/json)
-
+    
     + Headers
 
-            Location: /registrations/abcde98765
-
-### Partial update an existing registration [PATCH /v2/registration/{registrationId}]
-
-+ Parameters
-    + registrationId: r1234avfd (required, string) - ID of the registration
-
-+ Request
-
-        {
-            "duration": "1Y"
-        }
+            Fiware-Service: tourguide
 
 + Response 204
-
-### Full update of an existing registration [PUT /v2/registration/{registrationId}]
-
-+ Parameters
-    + registrationId: r1234avfd (required, string) - ID of the registration
-
-+ Request
-
-        {
-            "entity": {
-                "pattern": "Boe_*",
-                "type": "Room"
-            },
-            "attributes": [
-                "temperature"
-            ],
-            "callback": "http://provider2.example.com/provide"
-        }
-
-+ Response 204
-
-### Remove a registration [DELETE /v2/registrations/{registrationId}]
-
-+ Parameters
-    + registrationId: abcdefg (required, string) - ID of the registration
-
-+ Response 204
-
-### List all registrations associated to an entity [GET /v2/entities/{entityId}/registrations]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - ID of the entity
-
-+ Response 200 (application/json)
-
-        [
-            {
-                "id": "abcdefg",
-                "attributes": [
-                    "temperature"
-                ],
-                "callback": "http://localhost:1234",
-                "options": {
-                    "duration": "1M"
-                }
-            }
-        ]
-
-
-### Create a new registration associated to an entity [POST /v2/entities/{entityId}/registrations]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - ID of the entity
-
-+ Request
-
-        {
-            "attributes": [
-                "humidity"
-            ],
-            "callback": "http://provider.example.com/provide"
-        }
-
-+ Response 201
-
-    + Headers
-
-            Location: /registration/abcd9867hshshs
-
-### Get the details of a registration associated to an entity [GET /v2/entities/{entityId}/registrations/{registrationId}]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - ID of the entity
-    + registrationId: abcdefgh (required, string) - ID of the registration
-
-+ Response 200 (application/json)
-
-        {
-            "id": "abcdefgh",
-            "attributes": [
-                "temperature"
-            ],
-            "callback": "http://localhost:1234",
-            "options": {
-                "duration": "1M"
-            }
-        }
