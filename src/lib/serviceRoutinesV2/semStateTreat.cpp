@@ -101,7 +101,9 @@ std::string semStateTreat
   const char* logMsgState                = lmSemGet();
   const char* alarmMgrState              = alarmMgr.semGet();
   const char* connectionContextState     = connectionContextSemGet();
-  const char* connectionSubContextState  = connectionSubContextSemGet();
+  char        connectionSubContextState[STRING_SIZE_FOR_INT];
+
+  connectionSubContextSemGet(connectionSubContextState, sizeof(connectionSubContextState));
 
   std::string out = "{";
 

@@ -80,7 +80,7 @@ The response is a listing of information of all the broker's semaphores:
 Short explanation of the semaphores:
 * **alarmMgr**, protects the data of the Alarm Manager 
 * **connectionContext**, protects the curl context for sending HTTP notifications/forwarded messages
-* **connectionSubContext**, protects the curl context for sending HTTP notifications/forwarded messages
+* **connectionSubContext**, protects the curl endpoint when sending HTTP notifications/forwarded messages
 * **dbConnectionPool**, protects mongo connection pool
 * **dbConnection**, protects the set of connections of the mongo connection pool
 * **logMsg**, makes sure that not two messages are written simultaneously to the log-file

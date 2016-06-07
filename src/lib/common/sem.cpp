@@ -39,10 +39,10 @@
 *
 * Globals -
 */
-static sem_t           reqSem;
-static sem_t           transSem;
-static sem_t           cacheSem;
-static sem_t           timeStatSem;
+static sem_t      reqSem;
+static sem_t      transSem;
+static sem_t      cacheSem;
+static sem_t      timeStatSem;
 static SemOpType  reqPolicy;
 
 
@@ -558,14 +558,14 @@ const char* timeStatSemGet(void)
 //
 // Variables for mutexes and their state
 //
-// FIXME: contexts_mutex_errors and contexts_mutex2_errors are not yet used, see issue #2145
+// FIXME: contexts_mutex_errors and endpoint_mutexes_errors are not yet used, see issue #2145
 //
 static std::map<std::string, struct curl_context>  contexts;
-static pthread_mutex_t                             contexts_mutex         = PTHREAD_MUTEX_INITIALIZER;
-static bool                                        contexts_mutex_taken   = false;
-static int                                         contexts_mutex_errors  = 0;
-static bool                                        contexts_mutex2_taken  = false;
-static int                                         contexts_mutex2_errors = 0;
+static pthread_mutex_t                             contexts_mutex          = PTHREAD_MUTEX_INITIALIZER;
+static bool                                        contexts_mutex_taken    = false;
+static int                                         contexts_mutex_errors   = 0;
+static int                                         endpoint_mutexes_taken  = 0;
+static int                                         endpoint_mutexes_errors = 0;
 
 
 /* ****************************************************************************
@@ -583,9 +583,18 @@ const char* connectionContextSemGet(void)
 *
 * connectionSubContextSemGet - 
 */
-const char* connectionSubContextSemGet(void)
+const char* connectionSubContextSemGet(char* buf, int bufLen)
 {
-  return (contexts_mutex2_taken)? "taken" : "free";
+  if (endpoint_mutexes_taken == 0)
+  {
+    snprintf(buf, bufLen, "free");
+  }
+  else
+  {
+    snprintf(buf, bufLen, "%d taken", endpoint_mutexes_taken);
+  }
+
+  return buf;
 }
 
 
@@ -610,6 +619,9 @@ void curl_context_cleanup(void)
 
   contexts.clear();
   curl_global_cleanup();
+
+  endpoint_mutexes_taken = 0;
+  contexts_mutex_taken   = false;
 }
 
 
@@ -701,11 +713,11 @@ static int get_curl_context_reuse(const std::string& key, struct curl_context* p
     s = pthread_mutex_lock(pcc->pmutex);
     if (s != 0)
     {
-      ++contexts_mutex2_errors;
+      ++endpoint_mutexes_errors;
       LM_E(("Runtime Error (pthread_mutex_lock)"));
       return s;
     }
-    contexts_mutex2_taken = true;
+    ++endpoint_mutexes_taken;
     
     if (semWaitStatistics)
     {
@@ -800,10 +812,10 @@ static int release_curl_context_reuse(struct curl_context *pcc, bool final)
     if (s != 0)
     {
       LM_E(("Runtime Error (pthread_mutex_unlock)"));
-      ++contexts_mutex2_errors;
+      ++endpoint_mutexes_errors;
       return s;
     }
-    contexts_mutex2_taken = false;
+    --endpoint_mutexes_taken;
 
     pcc->pmutex = NULL; // It will remain in global map
   }

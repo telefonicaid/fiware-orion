@@ -112,7 +112,7 @@ extern const char* cacheSemGet(void);
 extern const char* transSemGet(void);
 extern const char* reqSemGet(void);
 extern const char* connectionContextSemGet(void);
-extern const char* connectionSubContextSemGet(void);
+extern const char* connectionSubContextSemGet(char* buf, int bufLen);
 
 
 
