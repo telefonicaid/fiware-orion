@@ -92,7 +92,7 @@ std::string postBatchUpdate
   }
 
   // If postUpdateContext gives back a parseDataP->upcrs with !200 OK in 'errorCode', transform to HTTP Status error
-  if (parseDataP->upcrs.res.errorCode.code != SccOk)
+  if ((parseDataP->upcrs.res.errorCode.code != SccOk) && (parseDataP->upcrs.res.contextElementResponseVector.size() == 1))
   {
     OrionError   oe(parseDataP->upcrs.res.errorCode);
 
