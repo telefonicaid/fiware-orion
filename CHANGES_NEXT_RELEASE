@@ -1,2 +1,3 @@
 - Fix: UTC as time in log file (Issue #2232)
+- Fix: Removed capping in NGSIv2 update forwarding (Issue #2193)
 - Add: new operation: GET /admin/sem, to see list of the brokers semaphores (Issue #2145)
