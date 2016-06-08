@@ -53,7 +53,7 @@ echo
 echo "02. PUT /v2/entities/E2/attrs/A1/value with TEXT payload 'abc'"
 echo "=============================================================="
 payload='"abc"'
-orionCurl --url /v2/entities/E2/attrs/A1/value --payload "$payload" -X PUT --in text/plain --out application/json
+orionCurl --url /v2/entities/E2/attrs/A1/value --payload "$payload" -X PUT --in text/plain
 echo
 echo
 
