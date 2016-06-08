@@ -199,6 +199,7 @@
 #include "serviceRoutinesV2/postBatchQuery.h"
 #include "serviceRoutinesV2/postBatchUpdate.h"
 #include "serviceRoutinesV2/logLevelTreat.h"
+#include "serviceRoutinesV2/semStateTreat.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
@@ -721,6 +722,12 @@ static const char* validLogLevels[] =
 #define LOGLEVEL_COMPS_V2  2, { "admin", "log"                           }
 
 
+//
+// Semaphore state
+//
+#define SEM_STATE          SemStateRequest
+#define SEM_STATE_COMPS    2, { "admin", "sem"                         }
+
 
 //
 // Unversioned requests
@@ -1121,6 +1128,10 @@ static const char* validLogLevels[] =
   { "PUT",   LOGLEVEL,  LOGLEVEL_COMPS_V2, "", logLevelTreat                      }, \
   { "*",     LOGLEVEL,  LOGLEVEL_COMPS_V2, "", badVerbPutOnly                     }
 
+#define SEM_STATE_REQUESTS                                                           \
+  { "GET",   SEM_STATE, SEM_STATE_COMPS,   "", semStateTreat                      }, \
+  { "*",     SEM_STATE, SEM_STATE_COMPS,   "", badVerbGetOnly                     }
+
 
 
 /* ****************************************************************************
@@ -1158,6 +1169,7 @@ RestService restServiceV[] =
   STAT_CACHE_REQUESTS_V1,
   VERSION_REQUESTS,
   LOGLEVEL_REQUESTS_V2,
+  SEM_STATE_REQUESTS,
 
 #ifdef DEBUG
   EXIT_REQUESTS,

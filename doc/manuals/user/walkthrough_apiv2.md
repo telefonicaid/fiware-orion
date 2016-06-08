@@ -548,7 +548,7 @@ curl localhost:1026/v2/entities?type=Room -s -S  \
   (in this case retrieving Room2) you can use (note the `-g` in curl command line
   to avoid problems with brackets):
 ```
-curl localhost:1026/v2/entities?idPattern=Room[2-5] -g -s -S  \
+curl localhost:1026/v2/entities?idPattern=^Room[2-5] -g -s -S  \
     --header 'Accept: application/json' | python -mjson.tool
 ```
 
