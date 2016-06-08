@@ -114,7 +114,7 @@ Please have a look at the [Quick Start guide](doc/manuals/quick_start_guide.md) 
 
 * [FIWARE NGSI v1](doc/manuals/user/walkthrough_apiv1.md) (Markdown)
 * [FIWARE NGSI v2](doc/manuals/user/walkthrough_apiv2.md) (Markdown) - *release candidate*
-* [FIWARE NGSI v2](http://telefonicaid.github.io/fiware-orion/api/v2/cookbook) (Apiary) - *release candidate*
+* [FIWARE NGSI v2](http://telefonicaid.github.io/fiware-orion/api/v2/stable/cookbook) (Apiary) - *release candidate*
   * See also [NGSIv2 implementation notes](doc/manuals/user/ngsiv2_implementation_notes.md)
 
 [Top](#top)
