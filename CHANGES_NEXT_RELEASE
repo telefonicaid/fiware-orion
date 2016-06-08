@@ -1,4 +1,5 @@
 - Fix: UTC as time in log file (Issue #2232)
 - Fix: Removed capping in NGSIv2 update forwarding (Issue #2193)
 - Fix: In some cases, compound attribute values were forwarded as empty strings (Issue #2237)
+- Fix: attribute overwritten when JSON value used in PUT /v2/entities/<eId>/attr/<attrName>/values (Issue #2246)
 - Add: new operation: GET /admin/sem, to see list of the brokers semaphores (Issue #2145)
