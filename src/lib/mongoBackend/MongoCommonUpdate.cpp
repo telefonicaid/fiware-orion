@@ -2876,7 +2876,7 @@ void processContextElement
     }
 
     // This is the case of POST /v2/entities/<id>, in order to check that entity previously exist
-    if ((entitiesNumber == 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONAPPENDORUPDATE))
+    if ((entitiesNumber == 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONAPPEND))
     {
       buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, "Entity does not exist");
       return;
@@ -3002,7 +3002,7 @@ void processContextElement
 
     if ((strcasecmp(action.c_str(), "update") == 0) || (strcasecmp(action.c_str(), "replace") == 0))
     {
-      /* In the case of UPDATE or DELETE we look for context providers */
+      /* In the case of UPDATE or REPLACE we look for context providers */
       searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
       cerP->statusCode.fill(SccOk);
       responseP->contextElementResponseVector.push_back(cerP);
