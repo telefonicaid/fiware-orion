@@ -1800,7 +1800,6 @@ static bool updateContextAttributeItem
   const std::string&        apiVersion
 )
 {
-
   std::string err;
 
   if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace, apiVersion))
@@ -1842,9 +1841,6 @@ static bool updateContextAttributeItem
     return false;
   }
 
-  // Note that updateAttrInNotifyCer() may "ruin" targetAttr, as compoundValueP is moved
-  // (not copied) to the structure in the notifyCerP and null-ified in targetAttr. Thus, it has
-  // to be called after the location processing logic (as this logic may need the compoundValueP
   updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2");
 
   return true;
