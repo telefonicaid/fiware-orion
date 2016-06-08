@@ -1,4 +1,4 @@
-# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,17 +21,21 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Update: Three Found On CPrs, Two Local, Four Not Found
+Five Different CPrs In One Update
 
 --SHELL-INIT--
 dbInit CB
 dbInit CP1
 dbInit CP2
 dbInit CP3
+dbInit CP4
+dbInit CP5
 brokerStart CB
 brokerStart CP1
 brokerStart CP2
 brokerStart CP3
+brokerStart CP4
+brokerStart CP5
 
 --SHELL--
 
@@ -39,21 +43,19 @@ brokerStart CP3
 # 01. Update/APPEND E1/T1/A1 in CP1
 # 02. Update/APPEND E1/T1/A2 in CP2
 # 03. Update/APPEND E1/T1/A3 in CP3
-# 04. Update/APPEND E2/T1/A1 in CP1
-# 05. Update/APPEND E2/T1/A2 in CP2
-# 06. Update/APPEND E2/T1/A3 in CP3
-# 07. Register E1/T1/A1 in CB, provApp: CP1
-# 08. Register E1/T1/A2 in CB, provApp: CP2
-# 09. Register E1/T1/A3 in CB, provApp: CP3
-# 10. Register E2/T1/A1 in CB, provApp: CP1
-# 11. Register E2/T1/A2 in CB, provApp: CP2
-# 12. Register E2/T1/A3 in CB, provApp: CP3
-# 13. Register E2/T1/A4 in CB, provApp: CP3 (E2-A4 does not exist in CP3)
-# 14. Update/APPEND E1/T1/A4 in CB
-# 15. Update/UPDATE All seven attributes plus a few not found
-# 16. Query E1-E2/{} in CP1
-# 17. Query E1-E2/{} in CP2
-# 18. Query E1-E2/{} in CP3
+# 04. Update/APPEND E1/T1/A4 in CP4
+# 05. Update/APPEND E1/T1/A5 in CP5
+# 06. Register E1/T1/A1 in CB, provApp: CP1
+# 07. Register E1/T1/A2 in CB, provApp: CP2
+# 08. Register E1/T1/A3 in CB, provApp: CP3
+# 09. Register E1/T1/A4 in CB, provApp: CP4
+# 10. Register E1/T1/A5 in CB, provApp: CP5
+# 11. Update/UPDATE E1/T1/A1+A2+A3+A4+A5 in CB
+# 12. Query E1/T1/{} in CP1
+# 13. Query E1/T1/{} in CP2
+# 14. Query E1/T1/{} in CP3
+# 15. Query E1/T1/{} in CP4
+# 16. Query E1/T1/{} in CP5
 #
 
 echo "01. Update/APPEND E1/T1/A1 in CP1"
@@ -77,6 +79,7 @@ payload='{
 orionCurl --url /v1/updateContext --payload "$payload" --port $CP1_PORT
 echo
 echo
+
 
 echo "02. Update/APPEND E1/T1/A2 in CP2"
 echo "================================="
@@ -124,77 +127,53 @@ echo
 echo
 
 
-echo "04. Update/APPEND E2/T1/A1 in CP1"
+echo "04. Update/APPEND E1/T1/A4 in CP4"
 echo "================================="
 payload='{
   "contextElements": [
     {
       "type": "T1",
-      "id":   "E2",
+      "id":   "E1",
       "attributes": [
         {
-          "name": "A1",
+          "name": "A4",
           "type": "string",
-          "value": "A1 in CP1"
+          "value": "A4 in CP4"
         }
       ]
     }
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --port $CP1_PORT
+orionCurl --url /v1/updateContext --payload "$payload" --port $CP4_PORT
 echo
 echo
 
 
-echo "05. Update/APPEND E2/T1/A2 in CP2"
+echo "05. Update/APPEND E1/T1/A5 in CP5"
 echo "================================="
 payload='{
   "contextElements": [
     {
       "type": "T1",
-      "id":   "E2",
+      "id":   "E1",
       "attributes": [
         {
-          "name": "A2",
+          "name": "A5",
           "type": "string",
-          "value": "A2 in CP2"
+          "value": "A5 in CP5"
         }
       ]
     }
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --port $CP2_PORT
+orionCurl --url /v1/updateContext --payload "$payload" --port $CP5_PORT
 echo
 echo
 
 
-echo "06. Update/APPEND E2/T1/A3 in CP3"
-echo "================================="
-payload='{
-  "contextElements": [
-    {
-      "type": "T1",
-      "id":   "E2",
-      "attributes": [
-        {
-          "name": "A3",
-          "type": "string",
-          "value": "A3 in CP3"
-        }
-      ]
-    }
-  ],
-  "updateAction": "APPEND"
-}'
-orionCurl --url /v1/updateContext --payload "$payload" --port $CP3_PORT
-echo
-echo
-
-
-
-echo "07. Register E1/T1/A1 in CB, provApp: CP1"
+echo "06. Register E1/T1/A1 in CB, provApp: CP1"
 echo "========================================="
 payload='{
   "contextRegistrations": [
@@ -223,7 +202,7 @@ echo
 echo
 
 
-echo "08. Register E1/T1/A2 in CB, provApp: CP2"
+echo "07. Register E1/T1/A2 in CB, provApp: CP2"
 echo "========================================="
 payload='{
   "contextRegistrations": [
@@ -252,7 +231,7 @@ echo
 echo
 
 
-echo "09. Register E1/T1/A3 in CB, provApp: CP3"
+echo "08. Register E1/T1/A3 in CB, provApp: CP3"
 echo "========================================="
 payload='{
   "contextRegistrations": [
@@ -281,7 +260,7 @@ echo
 echo
 
 
-echo "10. Register E2/T1/A1 in CB, provApp: CP1"
+echo "09. Register E1/T1/A4 in CB, provApp: CP4"
 echo "========================================="
 payload='{
   "contextRegistrations": [
@@ -290,94 +269,7 @@ payload='{
       {
          "type": "T1",
          "isPattern": "false",
-         "id": "E2"
-      }
-    ],
-    "attributes": [
-      {
-        "name": "A1",
-        "type": "string",
-        "isDomain": "false"
-      }
-    ],
-    "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
-    }
- ],
- "duration": "P1M"
-}'
-orionCurl --url /v1/registry/registerContext --payload "$payload"
-echo
-echo
-
-
-echo "11. Register E2/T1/A2 in CB, provApp: CP2"
-echo "========================================="
-payload='{
-  "contextRegistrations": [
-  {
-    "entities": [
-      {
-         "type": "T1",
-         "isPattern": "false",
-         "id": "E2"
-      }
-    ],
-    "attributes": [
-      {
-        "name": "A2",
-        "type": "string",
-        "isDomain": "false"
-      }
-    ],
-    "providingApplication": "http://localhost:'${CP2_PORT}'/v1"
-    }
- ],
- "duration": "P1M"
-}'
-orionCurl --url /v1/registry/registerContext --payload "$payload"
-echo
-echo
-
-
-echo "12. Register E2/T1/A3 in CB, provApp: CP3"
-echo "========================================="
-payload='{
-  "contextRegistrations": [
-  {
-    "entities": [
-      {
-         "type": "T1",
-         "isPattern": "false",
-         "id": "E2"
-      }
-    ],
-    "attributes": [
-      {
-        "name": "A3",
-        "type": "string",
-        "isDomain": "false"
-      }
-    ],
-    "providingApplication": "http://localhost:'${CP3_PORT}'/v1"
-    }
- ],
- "duration": "P1M"
-}'
-orionCurl --url /v1/registry/registerContext --payload "$payload"
-echo
-echo
-
-
-echo "13. Register E2/T1/A4 in CB, provApp: CP3 (E2-A4 does not exist in CP3)"
-echo "======================================================================="
-payload='{
-  "contextRegistrations": [
-  {
-    "entities": [
-      {
-         "type": "T1",
-         "isPattern": "false",
-         "id": "E2"
+         "id": "E1"
       }
     ],
     "attributes": [
@@ -387,7 +279,7 @@ payload='{
         "isDomain": "false"
       }
     ],
-    "providingApplication": "http://localhost:'${CP3_PORT}'/v1"
+    "providingApplication": "http://localhost:'${CP4_PORT}'/v1"
     }
  ],
  "duration": "P1M"
@@ -397,113 +289,78 @@ echo
 echo
 
 
-echo "14. Update/APPEND E1/T1/A4 in CB"
-echo "================================"
+echo "10. Register E1/T1/A5 in CB, provApp: CP5"
+echo "========================================="
 payload='{
-  "contextElements": [
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T1",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A5",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://localhost:'${CP5_PORT}'/v1"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload"
+echo
+echo
+
+
+echo "11. Update/UPDATE E1/T1/A1+A2+A3+A4+A5 in CB"
+echo "============================================"
+payload='{
+  "actionType": "UPDATE",
+  "entities":
+  [
     {
       "type": "T1",
       "id":   "E1",
-      "attributes": [
-        {
-          "name": "A4",
-          "type": "string",
-          "value": "A4 in CB"
-        }
-      ]
+      "A1": {
+        "type": "string",
+        "value": "A1 via CB"
+      },
+      "A2": {
+        "type": "string",
+        "value": "A2 via CB"
+      },
+      "A3": {
+        "type": "string",
+        "value": "A3 via CB"
+      },
+      "A4": {
+        "type": "string",
+        "value": "A4 via CB"
+      },
+      "A5": {
+        "type": "string",
+        "value": "A5 via CB"
+      }
     }
-  ],
-  "updateAction": "APPEND"
+  ]
 }'
-orionCurl --url /v1/updateContext --payload "$payload"
+orionCurl --url /v2/op/update --payload "$payload"
 echo
 echo
 
 
-echo "15. Update/UPDATE All seven attributes plus a few not found"
-echo "==========================================================="
-payload='{
-  "contextElements": [
-    {
-      "type": "T1",
-      "id":   "E1",
-      "attributes": [
-        {
-          "name": "A1",
-          "type": "string",
-          "value": "A1 via CB"
-        },
-        {
-          "name": "A2",
-          "type": "string",
-          "value": "A2 via CB"
-        },
-        {
-          "name": "A3",
-          "type": "string",
-          "value": "A3 via CB"
-        },
-        {
-          "name": "A4",
-          "type": "string",
-          "value": "A4 via CB"
-        },
-        {
-          "name": "A5",
-          "type": "string",
-          "value": "A5 via CB"
-        }
-      ]
-    },
-    {
-      "type": "T1",
-      "id":   "E2",
-      "attributes": [
-        {
-          "name": "A1",
-          "type": "string",
-          "value": "A1 via CB"
-        },
-        {
-          "name": "A2",
-          "type": "string",
-          "value": "A2 via CB"
-        },
-        {
-          "name": "A3",
-          "type": "string",
-          "value": "A3 via CB"
-        },
-        {
-          "name": "A4",
-          "type": "string",
-          "value": "A4 via CB"
-        },
-        {
-          "name": "A5",
-          "type": "string",
-          "value": "A5 via CB"
-        }
-      ]
-    }
-  ],
-  "updateAction": "UPDATE"
-}'
-orionCurl --url /v1/updateContext --payload "$payload"
-echo
-echo
-
-
-echo "16. Query E1-E2/{} in CP1"
+echo "12. Query E1/T1/{} in CP1"
 echo "========================="
 payload='{
   "entities": [
     {
       "id":   "E1",
-      "type": "T1"
-    },
-    {
-      "id":   "E2",
       "type": "T1"
     }
   ]
@@ -513,16 +370,12 @@ echo
 echo
 
 
-echo "17. Query E1-E2/{} in CP2"
+echo "13. Query E1/T1/{} in CP2"
 echo "========================="
 payload='{
   "entities": [
     {
       "id":   "E1",
-      "type": "T1"
-    },
-    {
-      "id":   "E2",
       "type": "T1"
     }
   ]
@@ -532,21 +385,47 @@ echo
 echo
 
 
-echo "18. Query E1-E2/{} in CP3"
+echo "14. Query E1/T1/{} in CP3"
 echo "========================="
 payload='{
   "entities": [
     {
       "id":   "E1",
       "type": "T1"
-    },
-    {
-      "id":   "E2",
-      "type": "T1"
     }
   ]
 }'
 orionCurl --url /v1/queryContext --payload "$payload" --port $CP3_PORT
+echo
+echo
+
+
+echo "15. Query E1/T1/{} in CP4"
+echo "========================="
+payload='{
+  "entities": [
+    {
+      "id":   "E1",
+      "type": "T1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --port $CP4_PORT
+echo
+echo
+
+
+echo "16. Query E1/T1/{} in CP5"
+echo "========================="
+payload='{
+  "entities": [
+    {
+      "id":   "E1",
+      "type": "T1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --port $CP5_PORT
 echo
 echo
 
@@ -648,202 +527,8 @@ Date: REGEX(.*)
 }
 
 
-04. Update/APPEND E2/T1/A1 in CP1
+04. Update/APPEND E1/T1/A4 in CP4
 =================================
-HTTP/1.1 200 OK
-Content-Length: 383
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A1", 
-                        "type": "string", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-
-
-05. Update/APPEND E2/T1/A2 in CP2
-=================================
-HTTP/1.1 200 OK
-Content-Length: 383
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A2", 
-                        "type": "string", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-
-
-06. Update/APPEND E2/T1/A3 in CP3
-=================================
-HTTP/1.1 200 OK
-Content-Length: 383
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A3", 
-                        "type": "string", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-
-
-07. Register E1/T1/A1 in CB, provApp: CP1
-=========================================
-HTTP/1.1 200 OK
-Content-Length: 74
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "duration": "P1M", 
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
-
-
-08. Register E1/T1/A2 in CB, provApp: CP2
-=========================================
-HTTP/1.1 200 OK
-Content-Length: 74
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "duration": "P1M", 
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
-
-
-09. Register E1/T1/A3 in CB, provApp: CP3
-=========================================
-HTTP/1.1 200 OK
-Content-Length: 74
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "duration": "P1M", 
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
-
-
-10. Register E2/T1/A1 in CB, provApp: CP1
-=========================================
-HTTP/1.1 200 OK
-Content-Length: 74
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "duration": "P1M", 
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
-
-
-11. Register E2/T1/A2 in CB, provApp: CP2
-=========================================
-HTTP/1.1 200 OK
-Content-Length: 74
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "duration": "P1M", 
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
-
-
-12. Register E2/T1/A3 in CB, provApp: CP3
-=========================================
-HTTP/1.1 200 OK
-Content-Length: 74
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "duration": "P1M", 
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
-
-
-13. Register E2/T1/A4 in CB, provApp: CP3 (E2-A4 does not exist in CP3)
-=======================================================================
-HTTP/1.1 200 OK
-Content-Length: 74
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "duration": "P1M", 
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
-
-
-14. Update/APPEND E1/T1/A4 in CB
-================================
 HTTP/1.1 200 OK
 Content-Length: 383
 Content-Type: application/json
@@ -874,49 +559,16 @@ Date: REGEX(.*)
 }
 
 
-15. Update/UPDATE All seven attributes plus a few not found
-===========================================================
+05. Update/APPEND E1/T1/A5 in CP5
+=================================
 HTTP/1.1 200 OK
-Content-Length: 2180
+Content-Length: 383
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A4", 
-                        "type": "string", 
-                        "value": ""
-                    }, 
-                    {
-                        "name": "A1", 
-                        "type": "string", 
-                        "value": ""
-                    }, 
-                    {
-                        "name": "A2", 
-                        "type": "string", 
-                        "value": ""
-                    }, 
-                    {
-                        "name": "A3", 
-                        "type": "string", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }, 
         {
             "contextElement": {
                 "attributes": [
@@ -931,59 +583,6 @@ Date: REGEX(.*)
                 "type": "T1"
             }, 
             "statusCode": {
-                "code": "404", 
-                "details": "E1", 
-                "reasonPhrase": "No context element found"
-            }
-        }, 
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A5", 
-                        "type": "string", 
-                        "value": ""
-                    }, 
-                    {
-                        "name": "A4", 
-                        "type": "string", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "404", 
-                "details": "E2", 
-                "reasonPhrase": "No context element found"
-            }
-        }, 
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A1", 
-                        "type": "string", 
-                        "value": ""
-                    }, 
-                    {
-                        "name": "A2", 
-                        "type": "string", 
-                        "value": ""
-                    }, 
-                    {
-                        "name": "A3", 
-                        "type": "string", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
                 "code": "200", 
                 "reasonPhrase": "OK"
             }
@@ -992,10 +591,89 @@ Date: REGEX(.*)
 }
 
 
-16. Query E1-E2/{} in CP1
+06. Register E1/T1/A1 in CB, provApp: CP1
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+07. Register E1/T1/A2 in CB, provApp: CP2
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+08. Register E1/T1/A3 in CB, provApp: CP3
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+09. Register E1/T1/A4 in CB, provApp: CP4
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+10. Register E1/T1/A5 in CB, provApp: CP5
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+11. Update/UPDATE E1/T1/A1+A2+A3+A4+A5 in CB
+============================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+12. Query E1/T1/{} in CP1
 =========================
 HTTP/1.1 200 OK
-Content-Length: 752
+Content-Length: 392
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1019,33 +697,15 @@ Date: REGEX(.*)
                 "code": "200", 
                 "reasonPhrase": "OK"
             }
-        }, 
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A1", 
-                        "type": "string", 
-                        "value": "A1 via CB"
-                    }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
         }
     ]
 }
 
 
-17. Query E1-E2/{} in CP2
+13. Query E1/T1/{} in CP2
 =========================
 HTTP/1.1 200 OK
-Content-Length: 752
+Content-Length: 392
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1069,33 +729,15 @@ Date: REGEX(.*)
                 "code": "200", 
                 "reasonPhrase": "OK"
             }
-        }, 
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A2", 
-                        "type": "string", 
-                        "value": "A2 via CB"
-                    }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
         }
     ]
 }
 
 
-18. Query E1-E2/{} in CP3
+14. Query E1/T1/{} in CP3
 =========================
 HTTP/1.1 200 OK
-Content-Length: 752
+Content-Length: 392
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1119,17 +761,63 @@ Date: REGEX(.*)
                 "code": "200", 
                 "reasonPhrase": "OK"
             }
-        }, 
+        }
+    ]
+}
+
+
+15. Query E1/T1/{} in CP4
+=========================
+HTTP/1.1 200 OK
+Content-Length: 392
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
         {
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A3", 
+                        "name": "A4", 
                         "type": "string", 
-                        "value": "A3 via CB"
+                        "value": "A4 via CB"
                     }
                 ], 
-                "id": "E2", 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+16. Query E1/T1/{} in CP5
+=========================
+HTTP/1.1 200 OK
+Content-Length: 392
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A5", 
+                        "type": "string", 
+                        "value": "A5 via CB"
+                    }
+                ], 
+                "id": "E1", 
                 "isPattern": "false", 
                 "type": "T1"
             }, 
@@ -1147,7 +835,11 @@ brokerStop CB
 brokerStop CP1
 brokerStop CP2
 brokerStop CP3
+brokerStop CP4
+brokerStop CP5
 dbDrop CB
 dbDrop CP1
 dbDrop CP2
 dbDrop CP3
+dbDrop CP4
+dbDrop CP5
