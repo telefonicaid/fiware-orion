@@ -120,7 +120,7 @@ echo "================================"
 payload='{
   "A1": "A1 modified by 04"
 }'
-orionCurl --url '/v2/entities/E1/attrs?type=T1&options=keyValues' --payload "$payload"
+orionCurl --url '/v2/entities/E1/attrs?type=T1&options=keyValues' --payload "$payload" -X PATCH
 echo
 echo
 
