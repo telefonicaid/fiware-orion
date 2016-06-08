@@ -583,18 +583,9 @@ const char* connectionContextSemGet(void)
 *
 * connectionSubContextSemGet - 
 */
-const char* connectionSubContextSemGet(char* buf, int bufLen)
+const char* connectionSubContextSemGet(void)
 {
-  if (endpoint_mutexes_taken == 0)
-  {
-    snprintf(buf, bufLen, "free");
-  }
-  else
-  {
-    snprintf(buf, bufLen, "%d taken", endpoint_mutexes_taken);
-  }
-
-  return buf;
+  return (endpoint_mutexes_taken == 0)? "free" : "taken";
 }
 
 
