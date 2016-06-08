@@ -91,4 +91,20 @@ extern float mongoPoolConnectionSemWaitingTimeGet(void);
 */
 extern void mongoPoolConnectionSemWaitingTimeReset(void);
 
+
+
+/* ****************************************************************************
+*
+* mongoConnectionPoolSemGet - 
+*/
+extern const char* mongoConnectionPoolSemGet(void);
+
+
+
+/* ****************************************************************************
+*
+* mongoConnectionSemGet - 
+*/
+extern const char* mongoConnectionSemGet(void);
+
 #endif  // SRC_LIB_MONGOBACKEND_MONGOCONNECTIONPOOL_H_
