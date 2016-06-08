@@ -116,7 +116,7 @@ std::string semStateTreat
   out += semRender("logMsg",               false, logMsgState)               + ",";
   out += semRender("alarmMgr",             false, alarmMgrState)             + ",";
   out += semRender("connectionContext",    false, connectionContextState)    + ",";
-  out += semRender("connectionSubContext", false, connectionSubContextState);
+  out += semRender("connectionEndpoints",  false, connectionSubContextState);
 
   out += "}";
 

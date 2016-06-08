@@ -80,7 +80,13 @@ The response is a listing of information of all the broker's semaphores:
 Short explanation of the semaphores:
 * **alarmMgr**, protects the data of the Alarm Manager 
 * **connectionContext**, protects the curl context for sending HTTP notifications/forwarded messages
-* **connectionSubContext**, protects the curl endpoint when sending HTTP notifications/forwarded messages
+* **connectionEndpoints**, protects the curl endpoints when sending HTTP notifications/forwarded messages.
+                           Note that the value for this field is actually the number of taken individual
+                           semaphores used for each connection.
+                           If no individual semaphores are taken, the string "free" is used as value of this field.
+                           If one or more individual semaphores are taken, then a string describing the number of
+                           taken semaphores is used as value.
+
 * **dbConnectionPool**, protects mongo connection pool
 * **dbConnection**, protects the set of connections of the mongo connection pool
 * **logMsg**, makes sure that not two messages are written simultaneously to the log-file
