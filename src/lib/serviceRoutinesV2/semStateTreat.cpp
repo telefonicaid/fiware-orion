@@ -70,6 +70,7 @@ static const std::string semRender(const char* name, bool toplevel, const char* 
   // "errors":    number of errors for this semaphore
   // "waitTime":  total waiting-time for this semaphore
   // "count":     number of times the semaphore has been taken
+  // "taken":     number of taken semaphores (for connectionEndpoints only)
   //
 
 
