@@ -101,7 +101,21 @@ payload='{
         {
           "name": "A1",
           "type": "string",
-          "value": { "vec": [ "this", "is", "a", "compound", "value" ], "obj": { "and": "this", "is": "also", "a": "compound", "value": "." } }
+          "value": {
+            "vec": [
+              "this",
+              "is",
+              "a",
+              "compound",
+              "value"
+            ],
+            "obj": {
+              "and": "this",
+              "is": "also",
+              "a": "compound",
+              "value": "."
+            }
+          }
         }
       ]
     }
