@@ -46,6 +46,7 @@ badVerbGetDeletePatchOnly.cpp
 postBatchUpdate.cpp
 logLevelTreat.cpp
 badVerbAllNotDelete.cpp
+semStateTreat.cpp
 )
 
 SET (HEADERS
@@ -74,6 +75,7 @@ badVerbGetDeletePatchOnly.h
 postBatchUpdate.h
 logLevelTreat.h
 badVerbAllNotDelete.h
+semStateTreat.h
 )
 
 

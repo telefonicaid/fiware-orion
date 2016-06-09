@@ -3,3 +3,4 @@
 - Fix: In some cases, compound attribute values were forwarded as empty strings (Issue #2237)
 - Fix: attribute overwritten when JSON value used in PUT /v2/entities/<eId>/attr/<attrName>/values (Issue #2246)
 - Fix: subscription equal filter evaluation on update context logic (#2222)
+- Add: new operation: GET /admin/sem, to see list of the brokers semaphores (Issue #2145)
