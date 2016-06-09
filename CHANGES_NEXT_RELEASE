@@ -1,5 +1,5 @@
 - Fix: UTC as time in log file (Issue #2232)
 - Fix: Removed capping in NGSIv2 update forwarding (Issue #2193)
 - Fix: In some cases, compound attribute values were forwarded as empty strings (Issue #2237)
-- Fix: attribute overwritten when JSON value used in PUT /v2/entities/<eId>/attr/<attrName>/values (Issue #2246)
+- Fix: attribute overwritten when JSON value used in PUT /v2/entities/<eId>/attr/<attrName>/values (Issues #2246 and #2248)
 - Fix: subscription equal filter evaluation on update context logic (#2222)
