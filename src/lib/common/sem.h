@@ -105,6 +105,19 @@ extern int timeStatSemGive(const char* who, const char* what = NULL);
 
 /* ****************************************************************************
 *
+* xxxSemGet - get the state of the semaphores
+*/
+extern const char* timeStatSemGet(void);
+extern const char* cacheSemGet(void);
+extern const char* transSemGet(void);
+extern const char* reqSemGet(void);
+extern const char* connectionContextSemGet(void);
+extern const char* connectionSubContextSemGet(void);
+
+
+
+/* ****************************************************************************
+*
 * semTimeXxxGet - get accumulated semaphore waiting time
 */
 extern float semTimeReqGet(void);

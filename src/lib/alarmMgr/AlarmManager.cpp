@@ -101,6 +101,29 @@ int AlarmManager::semInit(void)
 
 /* ****************************************************************************
 *
+* AlarmManager::semGet - 
+*/
+const char* AlarmManager::semGet(void)
+{
+  int value;
+
+  if (sem_getvalue(&sem, &value) == -1)
+  {
+    return "error";
+  }
+
+  if (value == 0)
+  {
+    return "taken";
+  }
+  
+  return "free";
+}
+
+
+
+/* ****************************************************************************
+*
 * AlarmManager::semTake - 
 */
 void AlarmManager::semTake(void)
