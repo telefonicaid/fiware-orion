@@ -86,12 +86,27 @@ void OrionError::fill(HttpStatusCode _code, const std::string& _details, const s
 
 /* ****************************************************************************
 *
+* OrionError::toJson -
+*/
+std::string OrionError::toJson(void)
+{
+  return "{" + JSON_STR("error") + ":" + JSON_STR(reasonPhrase) + "," + JSON_STR("description") + ":" + JSON_STR(details) + "}";
+}
+
+
+/* ****************************************************************************
+*
 * OrionError::render - 
 */
 std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
 {
   //
   // For API version 2 this is pretty easy ...
+  //
+  // FIXME PR: render() should not be used for v2, in favour of toJson(), so removing
+  // this piece of code. Note that modifying ciP->httpStatusCode in a function aimed at
+  // just rendering (i.e. printing string) is very dangerous and breaks separation of
+  // concerns
   //
   if (ciP->apiVersion == "v2")
   {
@@ -158,6 +173,9 @@ std::string OrionError::render(const std::string& _indent, const std::string api
 {
   //
   // For API version 2 this is pretty easy ...
+  //
+  // FIXME PR: render() should not be used for v2, in favour of toJson(), so removing
+  // this piece of code
   //
   if (apiVersion == "v2")
   {

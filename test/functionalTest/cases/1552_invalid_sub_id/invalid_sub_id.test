@@ -52,13 +52,13 @@ echo
 01. Ask to see a subscription with invalid ID
 =============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 69
+Content-Length: 94
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "bad length - 24 chars expected",
+    "description": "Invalid subscription ID: bad length - 24 chars expected",
     "error": "BadRequest"
 }
 

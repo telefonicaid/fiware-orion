@@ -85,7 +85,8 @@ std::string patchSubscription
       beError.details = "The requested subscription has not been found. Check id";
     }
 
-    TIMED_RENDER(answer = beError.render(ciP, ""));
+    TIMED_RENDER(answer = beError.toJson());
+    ciP->httpStatusCode = beError.code;
 
     return answer;
   }

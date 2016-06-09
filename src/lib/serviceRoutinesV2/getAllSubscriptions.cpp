@@ -69,7 +69,8 @@ std::string getAllSubscriptions
   {
     std::string out;
 
-    TIMED_RENDER(out = oe.render(ciP,""));
+    TIMED_RENDER(out = oe.toJson());
+    ciP->httpStatusCode = oe.code;
 
     return out;
   }

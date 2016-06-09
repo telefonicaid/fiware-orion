@@ -76,7 +76,8 @@ extern std::string postSubscriptions
 
   if (beError.code != SccNone )
   {
-    TIMED_RENDER(answer = beError.render(ciP, ""));
+    TIMED_RENDER(answer = beError.toJson());
+    ciP->httpStatusCode = beError.code;
     return answer;
   }
   std::string location = "/v2/subscriptions/" + subsID;

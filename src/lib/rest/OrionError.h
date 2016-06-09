@@ -46,6 +46,7 @@ typedef struct OrionError
   OrionError(StatusCode& statusCode);
   OrionError(HttpStatusCode _code, const std::string& _details = "", const std::string& _reasonPhrase = "");
 
+  std::string  toJson(void);
   std::string  render(ConnectionInfo* ciP, const std::string& indent);
   std::string  render(const std::string& _indent, const std::string apiVersion);
   void         fill(HttpStatusCode _code, const std::string& _details,  const std::string& _reasonPhrase = "");
