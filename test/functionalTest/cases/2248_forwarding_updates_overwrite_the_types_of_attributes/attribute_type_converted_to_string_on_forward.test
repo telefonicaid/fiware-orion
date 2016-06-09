@@ -32,7 +32,7 @@ accumulatorStart --pretty-print
 
 #
 # 01. Register E1/A1 in CB, provApp: accumulator
-# 02. Update (with forward to accumulator) E1/A1 in CB to a JSON containing a Number
+# 02. Update (with forward to accumulator) E1/A1 in CB to a JSON containing a Number, a Bool, a 'Float', a Null and a String
 # 03. Dump accumulator to see the forward message - is the Number a Number or a string? Must be a Number
 #
 
@@ -63,8 +63,8 @@ echo
 echo
 
 
-echo "02. Update (with forward to accumulator) E1/A1 in CB to a JSON containing a Number"
-echo "=================================================================================="
+echo "02. Update (with forward to accumulator) E1/A1 in CB to a JSON containing a Number, a Bool, a 'Float', a Null and a String"
+echo "=========================================================================================================================="
 payload='{ "x": 2, "y": true, "z": null, "x2": 1.5, "str": "This is a string" }'
 orionCurl --url /v2/entities/E1/attrs/A1/value?type=T1 --payload "$payload" -X PUT --in json
 echo
@@ -93,8 +93,8 @@ Date: REGEX(.*)
 }
 
 
-02. Update (with forward to accumulator) E1/A1 in CB to a JSON containing a Number
-==================================================================================
+02. Update (with forward to accumulator) E1/A1 in CB to a JSON containing a Number, a Bool, a 'Float', a Null and a String
+==========================================================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
