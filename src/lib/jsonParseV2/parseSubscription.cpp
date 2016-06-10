@@ -310,6 +310,10 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
       }
       else if (idOpt.given)
       {
+        if (idOpt.value.empty())
+        {
+          return   badInput(ciP, "subject entities element id is empty");
+        }
         if (forbiddenIdCharsV2(idOpt.value.c_str()))
         {
           return badInput(ciP, "forbidden characters in subject entities element id");
@@ -327,6 +331,11 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
       }
       else if (idPatOpt.given)
       {
+        if (idPatOpt.value.empty())
+        {
+          return   badInput(ciP, "subject entities element idPattern is empty");
+        }
+
         regex_t regex;
         bool    invalidRE = (regcomp(&regex, idPatOpt.value.c_str(), 0) != 0);
 
