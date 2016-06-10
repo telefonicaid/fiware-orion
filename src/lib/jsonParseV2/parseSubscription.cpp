@@ -339,13 +339,13 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
         regex_t regex;
         bool    invalidRE = (regcomp(&regex, idPatOpt.value.c_str(), 0) != 0);
 
-        regfree(&regex);
-
         if (invalidRE)
         {
           return badInput(ciP, "invalid regexp in subject entities element idPattern");
         }
         idPattern = idPatOpt.value;
+
+        regfree(&regex);
       }
     }
 
