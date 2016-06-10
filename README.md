@@ -4,7 +4,7 @@
      release.sh needs to be changed also -->
 
 [![License badge](https://img.shields.io/badge/license-AGPL-blue.svg)](https://opensource.org/licenses/AGPL-3.0)
-[![Documentation badge](https://readthedocs.org/projects/fiware-orion/badge/?version=1.2.0)](http://fiware-orion.readthedocs.org/en/1.2.0/?badge=1.2.0)
+[![Documentation badge](https://readthedocs.org/projects/fiware-orion/badge/?version=latest)](http://fiware-orion.readthedocs.org/en/latest/?badge=latest)
 [![Docker badge](https://img.shields.io/docker/pulls/fiware/orion.svg)](https://hub.docker.com/r/fiware/orion/)
 [![Support badge]( https://img.shields.io/badge/support-sof-yellowgreen.svg)](http://stackoverflow.com/questions/tagged/fiware-orion)
 
@@ -114,7 +114,7 @@ Please have a look at the [Quick Start guide](doc/manuals/quick_start_guide.md) 
 
 * [FIWARE NGSI v1](doc/manuals/user/walkthrough_apiv1.md) (Markdown)
 * [FIWARE NGSI v2](doc/manuals/user/walkthrough_apiv2.md) (Markdown) - *release candidate*
-* [FIWARE NGSI v2](http://telefonicaid.github.io/fiware-orion/api/v2/cookbook) (Apiary) - *release candidate*
+* [FIWARE NGSI v2](http://telefonicaid.github.io/fiware-orion/api/v2/stable/cookbook) (Apiary) - *release candidate*
   * See also [NGSIv2 implementation notes](doc/manuals/user/ngsiv2_implementation_notes.md)
 
 [Top](#top)
