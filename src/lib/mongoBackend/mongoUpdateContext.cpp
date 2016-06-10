@@ -63,8 +63,6 @@ HttpStatusCode mongoUpdateContext
 {
     bool reqSemTaken;
 
-    LM_W(("KZ: In mongoUpdateContext"));
-
     reqSemTake(__FUNCTION__, "ngsi10 update request", SemWriteOp, &reqSemTaken);
 
     /* Check that the service path vector has only one element, returning error otherwise */
@@ -101,6 +99,5 @@ HttpStatusCode mongoUpdateContext
     }    
     reqSemGive(__FUNCTION__, "ngsi10 update request", reqSemTaken);
     
-    LM_W(("KZ: From mongoUpdateContext"));
     return SccOk;
 }
