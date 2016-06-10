@@ -123,7 +123,6 @@ std::string postEntity
       return res;
     }
   }
-#endif
 
   // Default value for status code: SccNoContent. This is needed as mongoBackend typically
   // uses SccOk (as SccNoContent doesn't exist for NGSIv1)
@@ -131,9 +130,21 @@ std::string postEntity
   {
     ciP->httpStatusCode = SccNoContent;
   }
+#endif
+
+  std::string answer = "";
+  if (parseDataP->upcrs.res.oe.code != SccNone )
+  {
+    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+  }
+  else
+  {
+    ciP->httpStatusCode = SccNoContent;
+  }
 
   // Cleanup and return result
   eP->release();
 
-  return "";
+  return answer;
 }

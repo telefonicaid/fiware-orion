@@ -99,11 +99,12 @@ std::string postEntities
   
 
   // 02. Call standard op postUpdateContext
-  postUpdateContext(ciP, components, compV, parseDataP, NGSIV2_FLAVOUR_ONCREATE);
+  postUpdateContext(ciP, components, compV, parseDataP, NGSIV2_FLAVOUR_ONCREATE);  
+  std::string    answer;
 
+#if 0
   StatusCode     rstatuscode = parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode;
   HttpStatusCode rhttpcode  = rstatuscode.code;
-  std::string    answer;
 
   // 03. Prepare HTTP headers
   if (rhttpcode == SccOk || rhttpcode == SccNone)
@@ -122,7 +123,7 @@ std::string postEntities
     ciP->httpHeaderValue.push_back(location);
     ciP->httpStatusCode = SccCreated;
   }
-#if 0
+
   else if (rhttpcode == SccInvalidModification)
   {
     OrionError oe(rstatuscode);
@@ -140,6 +141,29 @@ std::string postEntities
     }
   }
 #endif
+  // 03. Check error
+  if (parseDataP->upcrs.res.oe.code != SccNone )
+  {
+    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+  }
+  else
+  {
+    // Prepare HTTP headers
+    std::string location = "/v2/entities/" + eP->id;
+    if (eP->type != "" )
+    {
+      location += "?type=" + eP->type;
+    }
+    else
+    {
+      location += "?type=none";
+    }
+
+    ciP->httpHeader.push_back("Location");
+    ciP->httpHeaderValue.push_back(location);
+    ciP->httpStatusCode = SccCreated;
+  }
 
   // 04. Cleanup and return result
   eP->release();

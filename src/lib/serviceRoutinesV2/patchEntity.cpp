@@ -112,12 +112,15 @@ std::string patchEntity
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
     ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
-    return answer;
+  }
+  else
+  {
+    ciP->httpStatusCode = SccNoContent;
   }
 
 #endif
 
-
+#if 0
   // 04. Prepare HTTP headers
   if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
   {
@@ -131,7 +134,7 @@ std::string patchEntity
 
     TIMED_RENDER(answer = orionError.render(ciP, ""));
   }
-
+#endif
 
   // 05. Cleanup and return result
   eP->release();

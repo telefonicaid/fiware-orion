@@ -135,13 +135,13 @@ Date: REGEX(.*)
 04. Delete E1 again, see it fail
 ================================
 HTTP/1.1 404 Not Found
-Content-Length: 39
+Content-Length: 95
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "E1",
+    "description": "The requested entity has not been found. Check type and id",
     "error": "NotFound"
 }
 

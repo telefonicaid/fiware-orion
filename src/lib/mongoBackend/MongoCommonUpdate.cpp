@@ -1976,7 +1976,7 @@ static bool deleteContextAttributeItem
                           " - offending attribute: " + targetAttr->getName() +
                           " - attribute not found";
     cerP->statusCode.fill(SccInvalidParameter, details);
-    oe->fill(SccInvalidModification, details, "UnprocessableEntity");
+    oe->fill(SccContextElementNotFound, "Attribute not found", "NotFound");
 
     alarmMgr.badInput(clientIp, "attribute to be deleted is not found");
     ca->found = false;
@@ -3055,7 +3055,7 @@ void processContextElement
     else if (strcasecmp(action.c_str(), "delete") == 0)
     {
       cerP->statusCode.fill(SccContextElementNotFound);
-      responseP->oe.fill(SccContextElementNotFound, "No context element found", "NotFound");
+      responseP->oe.fill(SccContextElementNotFound, "The requested entity has not been found. Check type and id", "NotFound");
 
       responseP->contextElementResponseVector.push_back(cerP);
     }

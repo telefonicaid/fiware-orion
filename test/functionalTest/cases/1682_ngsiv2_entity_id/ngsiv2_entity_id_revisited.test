@@ -145,15 +145,15 @@ Date: REGEX(.*)
 
 04. POST /v2/entities/E1?options=append A and B (and check 400 Bad Request)
 ===========================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 104
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 113
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "one or more of the attributes in the request already exist: [ A ]",
-    "error": "BadRequest"
+    "error": "UnprocessableEntity"
 }
 
 
