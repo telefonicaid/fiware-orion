@@ -1831,14 +1831,14 @@ static bool updateContextAttributeItem
   }
 
   /* Check aspects related with location */
-  if (!processLocationAtUpdateAttribute(currentLocAttrName, targetAttr, geoJson, &err, apiVersion))
+  if (!processLocationAtUpdateAttribute(currentLocAttrName, targetAttr, geoJson, &err, apiVersion, oe))
   {
     std::string details = std::string("action: UPDATE") +
                           " - entity: [" + eP->toString() + "]" +
                           " - offending attribute: " + targetAttr->getName() +
                           " - " + err;
     cerP->statusCode.fill(SccInvalidParameter, details);
-    oe->fill(SccInvalidModification, details, "UnprocessableEntity");
+    // oe->fill() not used, as this is donde internally in processLocationAtUpdateAttribute()
 
     alarmMgr.badInput(clientIp, err);
     return false;
@@ -1896,14 +1896,14 @@ static bool appendContextAttributeItem
 
   /* Check aspects related with location */
   if (!processLocationAtAppendAttribute(currentLocAttrName, targetAttr, actualAppend, geoJson,
-                                        &err, apiVersion))
+                                        &err, apiVersion, oe))
   {
     std::string details = std::string("action: APPEND") +
                           " - entity: [" + eP->toString() + "]" +
                           " - offending attribute: " + targetAttr->getName() +
                           " - " + err;
     cerP->statusCode.fill(SccInvalidParameter, details);
-    oe->fill(SccInvalidModification, details, "UnprocessableEntity");
+    // oe->fill() is not used here as it is managed by processLocationAtAppendAttribute()
 
     alarmMgr.badInput(clientIp, err);
     return false;
@@ -2187,7 +2187,8 @@ static bool createEntity
   std::string*                     errDetail,
   std::string                      tenant,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               apiVersion
+  const std::string&               apiVersion,
+  OrionError*                      oe
 )
 {
   LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName(tenant).c_str()));
@@ -2203,6 +2204,7 @@ static bool createEntity
       "Attributes with same name with ID and not ID at the same time "
       "in the same entity are forbidden: entity: [" + eP->toString() + "]";
 
+    oe->fill(SccInvalidModification, *errDetail, "UnprocessableEntity");
     return false;
   }
 
@@ -2210,8 +2212,9 @@ static bool createEntity
   std::string     locAttr;
   BSONObjBuilder  geoJson;
 
-  if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion))
+  if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion, oe))
   {
+    // oe->fill() already managed by processLocationAtEntityCreation()
     return false;
   }
 
@@ -2295,6 +2298,7 @@ static bool createEntity
 
   if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
   {
+    oe->fill(SccReceiverInternalError, *errDetail, "InternalError");
     return false;
   }
 
@@ -3065,10 +3069,10 @@ void processContextElement
       std::string  errDetail;
       int          now = getCurrentTime();
 
-      if (!createEntity(enP, ceP->contextAttributeVector, now, &errDetail, tenant, servicePathV, apiVersion))
+      if (!createEntity(enP, ceP->contextAttributeVector, now, &errDetail, tenant, servicePathV, apiVersion, &(responseP->oe)))
       {
         cerP->statusCode.fill(SccInvalidParameter, errDetail);
-        responseP->oe.fill(SccInvalidModification, errDetail, "UnprocessableEntity");
+        // In this case, responseP->oe is not filled, at createEntity() deals interally with that
       }
       else
       {

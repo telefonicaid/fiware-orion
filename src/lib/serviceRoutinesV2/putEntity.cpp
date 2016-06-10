@@ -114,6 +114,15 @@ std::string putEntity
     TIMED_RENDER(answer = orionError.render(ciP, ""));
   }
 #endif
+  if (parseDataP->upcrs.res.oe.code != SccNone )
+  {
+    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+  }
+  else
+  {
+    ciP->httpStatusCode = SccNoContent;
+  }
 
   // 05. Cleanup and return result
   eP->release();
