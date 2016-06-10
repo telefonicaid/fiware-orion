@@ -85,6 +85,7 @@ std::string patchEntity
   postUpdateContext(ciP, components, compV, parseDataP);
 
   // 03. Check output from mongoBackend - any errors?
+#if 0
   if (parseDataP->upcrs.res.contextElementResponseVector.size() == 1)
   {
     if (parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code != SccOk)
@@ -105,6 +106,16 @@ std::string patchEntity
       }
     }
   }
+#else
+
+  if (parseDataP->upcrs.res.oe.code != SccNone )
+  {
+    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+    return answer;
+  }
+
+#endif
 
 
   // 04. Prepare HTTP headers

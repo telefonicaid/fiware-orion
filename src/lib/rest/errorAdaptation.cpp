@@ -25,6 +25,7 @@
 
 #include "rest/errorAdaptation.h"
 
+// FIXME PR: the whole file is going to become unnecesary
 
 /* ****************************************************************************
 *

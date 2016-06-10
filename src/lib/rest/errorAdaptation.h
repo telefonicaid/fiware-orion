@@ -1,6 +1,8 @@
 #ifndef SRC_LIB_REST_ERROR_ADAPTATION_H
 #define SRC_LIB_REST_ERROR_ADAPTATION_H
 
+// FIXME PR: the whole file is going to become unnecesary
+
 /*
 *
 * Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U

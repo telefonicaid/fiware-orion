@@ -1797,7 +1797,8 @@ static bool updateContextAttributeItem
   std::string*              currentLocAttrName,
   BSONObjBuilder*           geoJson,
   bool                      isReplace,
-  const std::string&        apiVersion
+  const std::string&        apiVersion,
+  OrionError*               oe
 )
 {
   std::string err;
@@ -1818,10 +1819,11 @@ static bool updateContextAttributeItem
       // FIXME P10: not sure if this .fill() is useless... it seems it is "overriden" by
       // another .fill() in this function caller. We keep it by the moment, but it probably
       // will removed when we refactor this function
-      cerP->statusCode.fill(SccInvalidParameter,
-                            std::string("action: UPDATE") +
+      std::string details = std::string("action: UPDATE") +
                             " - entity: [" + eP->toString() + "]" +
-                            " - offending attribute: " + targetAttr->getName());
+                            " - offending attribute: " + targetAttr->getName();
+      cerP->statusCode.fill(SccInvalidParameter, details);
+      oe->fill(SccContextElementNotFound, "No context element found", "NotFound");
 
       /* Although ca has been already pushed into cerP, it can be used */
       ca->found = false;
@@ -1831,12 +1833,13 @@ static bool updateContextAttributeItem
   /* Check aspects related with location */
   if (!processLocationAtUpdateAttribute(currentLocAttrName, targetAttr, geoJson, &err, apiVersion))
   {
-    cerP->statusCode.fill(
-          SccInvalidParameter,
-          std::string("action: UPDATE") +
-          " - entity: [" + eP->toString() + "]" +
-          " - offending attribute: " + targetAttr->getName() +
-          " - " + err);
+    std::string details = std::string("action: UPDATE") +
+                          " - entity: [" + eP->toString() + "]" +
+                          " - offending attribute: " + targetAttr->getName() +
+                          " - " + err;
+    cerP->statusCode.fill(SccInvalidParameter, details);
+    oe->fill(SccInvalidModification, details, "UnprocessableEntity");
+
     alarmMgr.badInput(clientIp, err);
     return false;
   }
@@ -1866,7 +1869,8 @@ static bool appendContextAttributeItem
   bool&                     entityModified,
   std::string*              currentLocAttrName,
   BSONObjBuilder*           geoJson,
-  const std::string&        apiVersion
+  const std::string&        apiVersion,
+  OrionError*               oe
 )
 {
   std::string err;
@@ -1876,11 +1880,13 @@ static bool appendContextAttributeItem
     /* If legalIdUsage() returns false, then that particular attribute can not be appended. In this case,
      * we interrupt the processing and early return with
      * a error StatusCode */
-    cerP->statusCode.fill(SccInvalidParameter,
-                          std::string("action: APPEND") +
+    std::string details = std::string("action: APPEND") +
                           " - entity: [" + eP->toString() + "]" +
                           " - offending attribute: " + targetAttr->getName() +
-                          " - attribute cannot be appended");
+                          " - attribute cannot be appended";
+    cerP->statusCode.fill(SccInvalidParameter, details);
+    oe->fill(SccInvalidModification, details, "UnprocessableEntity");
+
     alarmMgr.badInput(clientIp, "attribute cannot be appended");
     return false;
   }
@@ -1892,12 +1898,13 @@ static bool appendContextAttributeItem
   if (!processLocationAtAppendAttribute(currentLocAttrName, targetAttr, actualAppend, geoJson,
                                         &err, apiVersion))
   {
-    cerP->statusCode.fill(
-          SccInvalidParameter,
-          std::string("action: APPEND") +
-          " - entity: [" + eP->toString() + "]" +
-          " - offending attribute: " + targetAttr->getName() +
-          " - " + err);
+    std::string details = std::string("action: APPEND") +
+                          " - entity: [" + eP->toString() + "]" +
+                          " - offending attribute: " + targetAttr->getName() +
+                          " - " + err;
+    cerP->statusCode.fill(SccInvalidParameter, details);
+    oe->fill(SccInvalidModification, details, "UnprocessableEntity");
+
     alarmMgr.badInput(clientIp, err);
     return false;
   }
@@ -1927,7 +1934,8 @@ static bool deleteContextAttributeItem
   bool&                                 entityModified,
   std::string*                          currentLocAttrName,
   std::map<std::string, unsigned int>*  deletedAttributesCounter,
-  const std::string&                    apiVersion
+  const std::string&                    apiVersion,
+  OrionError*                           oe
 )
 {
   if (deleteAttribute(attrs, toUnset, deletedAttributesCounter, targetAttr))
@@ -1938,11 +1946,12 @@ static bool deleteContextAttributeItem
     /* Check aspects related with location */
     if (targetAttr->getLocation(apiVersion).length() > 0)
     {
-      cerP->statusCode.fill(SccInvalidParameter,
-                            std::string("action: DELETE") +
+      std::string details = std::string("action: DELETE") +
                             " - entity: [" + eP->toString() + "]" +
                             " - offending attribute: " + targetAttr->getName() +
-                            " - location attribute has to be defined at creation time, with APPEND");
+                            " - location attribute has to be defined at creation time, with APPEND";
+      cerP->statusCode.fill(SccInvalidParameter, details);
+      oe->fill(SccInvalidModification, details, "UnprocessableEntity");
 
       alarmMgr.badInput(clientIp, "location attribute has to be defined at creation time");
       return false;
@@ -1962,11 +1971,13 @@ static bool deleteContextAttributeItem
     /* If deleteAttribute() returns false, then that particular attribute has not
      * been found. In this case, we interrupt the processing and early return with
      * a error StatusCode */
-    cerP->statusCode.fill(SccInvalidParameter,
-                          std::string("action: DELETE") +
+    std::string details = std::string("action: DELETE") +
                           " - entity: [" + eP->toString() + "]" +
                           " - offending attribute: " + targetAttr->getName() +
-                          " - attribute not found");
+                          " - attribute not found";
+    cerP->statusCode.fill(SccInvalidParameter, details);
+    oe->fill(SccInvalidModification, details, "UnprocessableEntity");
+
     alarmMgr.badInput(clientIp, "attribute to be deleted is not found");
     ca->found = false;
 
@@ -2000,7 +2011,8 @@ static bool processContextAttributeVector
   BSONObjBuilder*                            geoJson,
   std::string                                tenant,
   const std::vector<std::string>&            servicePathV,
-  const std::string&                         apiVersion
+  const std::string&                         apiVersion,
+  OrionError*                                oe
 )
 {
   EntityId*                            eP              = &cerP->contextElement.entityId;
@@ -2043,7 +2055,8 @@ static bool processContextAttributeVector
                                       currentLocAttrName,
                                       geoJson,
                                       strcasecmp(action.c_str(), "replace") == 0,
-                                      apiVersion))
+                                      apiVersion,
+                                      oe))
       {
         return false;
       }
@@ -2061,7 +2074,8 @@ static bool processContextAttributeVector
                                       entityModified,
                                       currentLocAttrName,
                                       geoJson,
-                                      apiVersion))
+                                      apiVersion,
+                                      oe))
       {
         return false;
       }
@@ -2078,14 +2092,17 @@ static bool processContextAttributeVector
                                       entityModified,
                                       currentLocAttrName,
                                       &deletedAttributesCounter,
-                                      apiVersion))
+                                      apiVersion,
+                                      oe))
       {
         return false;
       }
     }
     else
     {
-      cerP->statusCode.fill(SccInvalidParameter, std::string("unknown actionType: '") + action + "'");
+      std::string details = std::string("unknown actionType: '") + action + "'";
+      cerP->statusCode.fill(SccInvalidParameter, details);
+      oe->fill(SccBadRequest, details, "BadRequest");
 
       // This is a BUG in the parse layer checks
       LM_E(("Runtime Error (unknown actionType '%s')", action.c_str()));
@@ -2130,6 +2147,7 @@ static bool processContextAttributeVector
   if (!addTriggeredSubscriptions(entityId, entityType, modifiedAttrs, subsToNotify, err, tenant, servicePathV))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
+    oe->fill(SccReceiverInternalError, err, "InternalServerError");
     return false;
   }
 
@@ -2295,7 +2313,8 @@ static bool removeEntity
   const std::string&       entityType,
   ContextElementResponse*  cerP,
   const std::string&       tenant,
-  const std::string&       servicePath
+  const std::string&       servicePath,
+  OrionError*              oe
 )
 {
   const std::string    idString          = "_id." ENT_ENTITY_ID;
@@ -2326,6 +2345,7 @@ static bool removeEntity
   if (!collectionRemove(getEntitiesCollectionName(tenant), bob.obj(), &err))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
+    oe->fill(SccReceiverInternalError, err, "InternalServerError");
     return false;
   }
 
@@ -2473,7 +2493,7 @@ static void updateEntity
   if (strcasecmp(action.c_str(), "delete") == 0 && ceP->contextAttributeVector.size() == 0)
   {
     LM_T(LmtServicePath, ("Removing entity"));
-    removeEntity(entityId, entityType, cerP, tenant, entitySPath);
+    removeEntity(entityId, entityType, cerP, tenant, entitySPath, &(responseP->oe));
     responseP->contextElementResponseVector.push_back(cerP);
     return;
   }
@@ -2561,7 +2581,8 @@ static void updateEntity
                                      &geoJson,
                                      tenant,
                                      servicePathV,
-                                     apiVersion))
+                                     apiVersion,
+                                     &(responseP->oe)))
   {
     // The entity wasn't actually modified, so we don't need to update it and we can continue with the next one
 
@@ -2685,6 +2706,8 @@ static void updateEntity
   if (!collectionUpdate(getEntitiesCollectionName(tenant), query.obj(), updatedEntityObj, false, &err))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
+    responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
+
     responseP->contextElementResponseVector.push_back(cerP);
 
     releaseTriggeredSubscriptions(subsToNotify);
@@ -2752,6 +2775,7 @@ static bool contextElementPreconditionsCheck
         alarmMgr.badInput(clientIp, details);
         buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification,
                                   "duplicated attribute /" + name + "/");
+        responseP->oe.fill(SccBadRequest, "duplicated attribute /" + name + "/", "BadRequest");
         return false; // Error already in responseP
       }
     }
@@ -2761,6 +2785,7 @@ static bool contextElementPreconditionsCheck
   if (isTrue(enP->isPattern))
   {
     buildGeneralErrorResponse(ceP, NULL, responseP, SccNotImplemented);
+    // No need of filling responseP->oe, this cannot append in NGSIv2
     return false;  // Error already in responseP
   }
 
@@ -2781,11 +2806,14 @@ static bool contextElementPreconditionsCheck
       {
         ContextAttribute* ca = new ContextAttribute(aP);
 
-        buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification,
-                                  std::string("action: ") + action +
-                                  " - entity: [" + enP->toString(true) + "]" +
-                                  " - offending attribute: " + aP->name +
-                                  " - empty attribute not allowed in APPEND or UPDATE");
+        std::string details = std::string("action: ") + action +
+            " - entity: [" + enP->toString(true) + "]" +
+            " - offending attribute: " + aP->name +
+            " - empty attribute not allowed in APPEND or UPDATE";
+
+        buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification, details);
+        responseP->oe.fill(SccBadRequest, details, "BadRequest");
+
         alarmMgr.badInput(clientIp, "empty attribute not allowed in APPEND or UPDATE");
         return false; // Error already in responseP
       }
@@ -2868,6 +2896,7 @@ void processContextElement
     if (!collectionCount(getEntitiesCollectionName(tenant), query, &entitiesNumber, &err))
     {
       buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError, err);
+      responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
       return;
     }
 
@@ -2875,6 +2904,7 @@ void processContextElement
     if ((entitiesNumber > 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONCREATE))
     {
       buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Already Exists");
+      responseP->oe.fill(SccInvalidModification, "Already Exists", "UnprocessableEntity");
       return;
     }
 
@@ -2882,6 +2912,7 @@ void processContextElement
     if ((entitiesNumber == 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONAPPEND))
     {
       buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, "Entity does not exist");
+      responseP->oe.fill(SccContextElementNotFound, "Entity does not exist", "NotFound");
       return;
     }
 
@@ -2891,6 +2922,7 @@ void processContextElement
     if (entitiesNumber > 1)
     {
       buildGeneralErrorResponse(ceP, NULL, responseP, SccConflict, MORE_MATCHING_ENT);
+      responseP->oe.fill(SccConflict, MORE_MATCHING_ENT, "TooManyResults");
       return;
     }
 
@@ -2905,6 +2937,7 @@ void processContextElement
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError, err);
+    responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
     return;
   }
   TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -3016,11 +3049,14 @@ void processContextElement
       if (forwardsPending(responseP) == false)
       {
         cerP->statusCode.fill(SccContextElementNotFound);
+        responseP->oe.fill(SccContextElementNotFound, "No context element found", "NotFound");
       }
     }
     else if (strcasecmp(action.c_str(), "delete") == 0)
     {
       cerP->statusCode.fill(SccContextElementNotFound);
+      responseP->oe.fill(SccContextElementNotFound, "No context element found", "NotFound");
+
       responseP->contextElementResponseVector.push_back(cerP);
     }
     else   /* APPEND or APPEND_STRICT */
@@ -3032,6 +3068,7 @@ void processContextElement
       if (!createEntity(enP, ceP->contextAttributeVector, now, &errDetail, tenant, servicePathV, apiVersion))
       {
         cerP->statusCode.fill(SccInvalidParameter, errDetail);
+        responseP->oe.fill(SccInvalidModification, errDetail, "UnprocessableEntity");
       }
       else
       {
@@ -3056,6 +3093,8 @@ void processContextElement
         {
           releaseTriggeredSubscriptions(subsToNotify);
           cerP->statusCode.fill(SccReceiverInternalError, err);
+          responseP->oe.fill(SccReceiverInternalError, err, "InternalError");
+
           responseP->contextElementResponseVector.push_back(cerP);
           return;  // Error already in responseP
         }
@@ -3085,6 +3124,7 @@ void processContextElement
   {
     std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
     buildGeneralErrorResponse(ceP, NULL, responseP, SccBadRequest, details);
+    responseP->oe.fill(SccInvalidModification, details, "UnprocessableEntity");
   }
 
   // Response in responseP
