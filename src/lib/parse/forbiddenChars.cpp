@@ -100,6 +100,12 @@ bool forbiddenIdChars(const std::string& api, const char* s, const char* excepti
   return forbiddenIdCharsV2(s, exceptions);
 }
 
+
+
+/* ****************************************************************************
+*
+* forbiddenIdCharsV2 -
+*/
 bool forbiddenIdCharsV2(const char* s, const char* exceptions)
 {
   if (s == (void*) 0)
