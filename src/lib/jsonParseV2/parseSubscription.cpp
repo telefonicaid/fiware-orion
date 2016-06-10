@@ -328,6 +328,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
         {
           return badInput(ciP, "Invalid regex for entity id pattern");
         }
+        regfree(&re);  // As the regex is not yet propagated ...
       }
     }
 
