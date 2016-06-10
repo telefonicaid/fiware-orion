@@ -3,3 +3,4 @@
 - Fix: In some cases, compound attribute values were forwarded as empty strings (Issue #2237)
 - Fix: attribute overwritten when JSON value used in PUT /v2/entities/<eId>/attr/<attrName>/values (Issues #2246 and #2248)
 - Fix: subscription equal filter evaluation on update context logic (#2222)
+- Fix: capturing invalid id patterns at json parse time for v2 subscriptions - this bug made the broker crash when receiving invalid id-patterns (Issue #2257)
