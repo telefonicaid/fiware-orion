@@ -561,7 +561,7 @@ might be useful in understanding the format.
 The Simple Query Language provides a simplified syntax to retrieve entities which match a set of
 conditions.
 A query is composed by a list of statements separated by the ';' character.
-Each statement express a matching condition.
+Each statement expresses a matching condition.
 The query returns all the entities that match all the matching conditions (AND logical operator). 
 
 There are two kinds of statements: *unary statements* and *binary statements*.
@@ -1600,7 +1600,8 @@ A `subject` contains the following subfields:
     + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
       time, but at least one of them must be present.
     + `type`: Type of the affected entities (optional).
-+ `condition`: Condition to trigger notifications. It has two optional properties:
++ `condition`: Condition to trigger notifications. This field is optional and it may contain two
+  optional properties:
     + `attrs`: array of attribute names
     + `expression`: an expression composed of `q`, `georel`, `geometry` and `coords` (see "List
        entities" operation above about this field).
