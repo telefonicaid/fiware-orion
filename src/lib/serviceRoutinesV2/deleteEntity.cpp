@@ -98,6 +98,7 @@ std::string deleteEntity
 
   for (unsigned int ix = 0; ix < upcrsP->contextElementResponseVector.size(); ++ix)
   {
+#if 0
     StatusCode      sc  = upcrsP->contextElementResponseVector[ix]->statusCode;
     HttpStatusCode  scc = sc.code;
 
@@ -133,6 +134,14 @@ std::string deleteEntity
 
       return answer;
     }
+#else
+    if (parseDataP->upcrs.res.oe.code != SccNone )
+    {
+      TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+      ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+      return answer;
+    }
+#endif
   }
 
   // Prepare status code

@@ -70,6 +70,7 @@ std::string postBatchUpdate
   parseDataP->upcr.res.present("");
   answer = postUpdateContext(ciP, components, compV, parseDataP);
 
+#if 0
   for (unsigned int ix = 0; ix < parseDataP->upcrs.res.contextElementResponseVector.size(); ++ix)
   {
     ContextElementResponse* cerP = parseDataP->upcrs.res.contextElementResponseVector[ix];
@@ -115,6 +116,18 @@ std::string postBatchUpdate
     ciP->httpStatusCode = SccNoContent;
     answer = "";
   }
+#else
+  if (parseDataP->upcrs.res.oe.code != SccNone )
+  {
+    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+  }
+  else
+  {
+    answer = "";
+    ciP->httpStatusCode = SccNoContent;
+  }
+#endif
 
   // 04. Cleanup and return result
   entities.release();

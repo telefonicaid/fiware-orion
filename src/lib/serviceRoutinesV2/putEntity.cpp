@@ -100,6 +100,7 @@ std::string putEntity
   {
     ciP->httpStatusCode = SccNoContent;
   }
+#if 0
   else if (ciP->httpStatusCode == SccConflict)
   {
     OrionError orionError(SccConflict, MORE_MATCHING_ENT);
@@ -112,6 +113,7 @@ std::string putEntity
 
     TIMED_RENDER(answer = orionError.render(ciP, ""));
   }
+#endif
 
   // 05. Cleanup and return result
   eP->release();

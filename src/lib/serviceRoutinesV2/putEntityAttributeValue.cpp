@@ -94,6 +94,7 @@ std::string putEntityAttributeValue
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
+  // FIME: ErrorCode shoould be avoided
 
   // 03. Check output from mongoBackend - any errors?
   if (parseDataP->upcrs.res.contextElementResponseVector.size() == 1)

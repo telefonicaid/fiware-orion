@@ -110,6 +110,7 @@ std::string putEntityAttribute
   parseDataP->upcr.res.release();
   parseDataP->upcrs.res.release();
 
+#if 0
   if (ciP->httpStatusCode == SccInvalidModification)
   {
     std::string  details = "Request payload is missing some piece of information. Please, check Orion documentation."; 
@@ -117,6 +118,7 @@ std::string putEntityAttribute
 
     TIMED_RENDER(answer = orionError.render(ciP, ""));
   }
+#endif
 
   return answer;
 }

@@ -88,6 +88,9 @@ std::string getEntityAttributeValue
 
   attribute.fill(&parseDataP->qcrs.res, compV[4]);
 
+  // FIXME P4: include OrionError instead of ErrorCode in Attributes and clean the
+  // code below
+
   // Render entity attribute response
   if (attribute.errorCode.error == "TooManyResults")
   {

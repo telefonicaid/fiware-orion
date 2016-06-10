@@ -68,6 +68,7 @@ std::string deleteSubscription
 
   TIMED_MONGO(ciP->httpStatusCode = mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, ciP->tenant));
 
+#if 0
   // FIXME PR: use OrionError from mongoBackend
   if (uncr.statusCode.code != SccOk)
   {
@@ -85,6 +86,14 @@ std::string deleteSubscription
 
     return answer;
   }
+#else
+  if (uncr.oe.code != SccNone )
+  {
+    TIMED_RENDER(answer = uncr.oe.toJson());
+    ciP->httpStatusCode = uncr.oe.code;
+    return answer;
+  }
+#endif
 
   ciP->httpStatusCode = SccNoContent;
 

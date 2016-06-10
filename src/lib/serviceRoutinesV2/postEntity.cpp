@@ -93,6 +93,7 @@ std::string postEntity
   // Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP, flavor);
 
+#if 0
   // Any error in the response?
   UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
   for (unsigned int ix = 0; ix < upcrsP->contextElementResponseVector.size(); ++ix)
@@ -122,6 +123,7 @@ std::string postEntity
       return res;
     }
   }
+#endif
 
   // Default value for status code: SccNoContent. This is needed as mongoBackend typically
   // uses SccOk (as SccNoContent doesn't exist for NGSIv1)

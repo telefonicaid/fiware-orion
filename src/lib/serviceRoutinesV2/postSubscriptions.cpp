@@ -80,6 +80,7 @@ extern std::string postSubscriptions
     ciP->httpStatusCode = beError.code;
     return answer;
   }
+
   std::string location = "/v2/subscriptions/" + subsID;
   ciP->httpHeader.push_back("Location");
   ciP->httpHeaderValue.push_back(location);

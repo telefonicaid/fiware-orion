@@ -122,6 +122,7 @@ std::string postEntities
     ciP->httpHeaderValue.push_back(location);
     ciP->httpStatusCode = SccCreated;
   }
+#if 0
   else if (rhttpcode == SccInvalidModification)
   {
     OrionError oe(rstatuscode);
@@ -138,6 +139,7 @@ std::string postEntities
       TIMED_RENDER(answer = oe.render(ciP, ""));
     }
   }
+#endif
 
   // 04. Cleanup and return result
   eP->release();
