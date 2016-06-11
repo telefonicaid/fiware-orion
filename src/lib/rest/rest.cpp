@@ -98,24 +98,6 @@ static void correlatorGenerate(char* buffer)
 
 /* ****************************************************************************
 *
-* setStatusCodeAndSmartRender -
-*
-* FIXME PR: same function as in errorAdaptation.h. I need this here by the moment,
-* to avoid a linking problem
-*/
-std::string setStatusCodeAndSmartRender(ConnectionInfo* ciP, OrionError& oe)
-{
-  if (ciP->apiVersion == "v2")
-  {
-    ciP->httpStatusCode = oe.code;
-  }
-  return oe.smartRender(ciP->apiVersion);
-}
-
-
-
-/* ****************************************************************************
-*
 * uriArgumentGet - 
 */
 static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val)

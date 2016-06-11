@@ -59,7 +59,7 @@ std::string deleteSubscription
     ParseData*                 parseDataP
 )
 {
-  std::string                 answer;
+  std::string                 answer = "";
   std::string                 subscriptionId =  compV[2];
   UnsubscribeContextResponse  uncr;
 
@@ -90,13 +90,14 @@ std::string deleteSubscription
   if (uncr.oe.code != SccNone )
   {
     TIMED_RENDER(answer = uncr.oe.toJson());
-    ciP->httpStatusCode = uncr.oe.code;
-    return answer;
+    ciP->httpStatusCode = uncr.oe.code;    
   }
-#endif
+  else
+  {
+    ciP->httpStatusCode = SccNoContent;
+  }
+#endif  
 
-  ciP->httpStatusCode = SccNoContent;
-
-  return "";
+  return answer;
 }
 

@@ -65,7 +65,7 @@ std::string deleteEntity
   ParseData*                 parseDataP
 )
 {
-  string  answer;
+  string  answer = "";
   Entity* eP;
 
   if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
@@ -92,14 +92,16 @@ std::string deleteEntity
   // Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
+  ciP->outMimeType = JSON;
+
+#if 0
   // Any error in the response?
   UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
 
-  ciP->outMimeType = JSON;
+  //...
 
   for (unsigned int ix = 0; ix < upcrsP->contextElementResponseVector.size(); ++ix)
   {
-#if 0
     StatusCode      sc  = upcrsP->contextElementResponseVector[ix]->statusCode;
     HttpStatusCode  scc = sc.code;
 
@@ -135,14 +137,6 @@ std::string deleteEntity
 
       return answer;
     }
-#else
-    if (parseDataP->upcrs.res.oe.code != SccNone )
-    {
-      TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
-      ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
-      return answer;
-    }
-#endif
   }
 
   // Prepare status code
@@ -150,11 +144,22 @@ std::string deleteEntity
   {
     ciP->httpStatusCode = SccNoContent;
   }
-
+#else
+  // Check for potential error
+  if (parseDataP->upcrs.res.oe.code != SccNone )
+  {
+    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+  }
+  else
+  {
+    ciP->httpStatusCode = SccNoContent;
+  }
+#endif  
 
   // Cleanup and return result
   eP->release();
   delete eP;
 
-  return "";
+  return answer;
 }
