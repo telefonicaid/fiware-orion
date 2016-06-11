@@ -92,7 +92,7 @@ std::string OrionError::smartRender(const std::string& apiVersion)
 {
   if (apiVersion == "v1")
   {
-    return render("");
+    return render();
   }
   else // v2
   {
@@ -113,17 +113,17 @@ std::string OrionError::toJson(void)
 }
 
 
+#if 0
 /* ****************************************************************************
 *
 * OrionError::render - 
 */
 std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
 {
-#if 0
   //
   // For API version 2 this is pretty easy ...
   //
-  // FIXME PR: render() should not be used for v2, in favour of toJson(), so removing
+  // FIXME: render() should not be used for v2, in favour of toJson(), so removing
   // this piece of code. Note that modifying ciP->httpStatusCode in a function aimed at
   // just rendering (i.e. printing string) is very dangerous and breaks separation of
   // concerns
@@ -143,7 +143,6 @@ std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
     reasonPhrase = errorStringForV2(reasonPhrase);
     return "{" + JSON_STR("error") + ":" + JSON_STR(reasonPhrase) + "," + JSON_STR("description") + ":" + JSON_STR(details) + "}";
   }
-#endif
 
   //
   // A little more hairy for API version 1
@@ -177,25 +176,21 @@ std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
 
   return out;
 }
+#endif
 
 
 /* ****************************************************************************
 *
 * OrionError::render -
 *
-* FIXME P3: OrionError() render method should be unified (probably the class itself needs
-* a good refactoring, to live in the NGSIv1-NGSIv2 dual world...)
-*
-* Simplified version, without ciP
-*
 */
-std::string OrionError::render(const std::string& _indent)
+std::string OrionError::render(void)
 {
 #if 0
   //
   // For API version 2 this is pretty easy ...
   //
-  // FIXME PR: render() should not be used for v2, in favour of toJson(), so removing
+  // FIXME: render() should not be used for v2, in favour of toJson(), so removing
   // this piece of code
   //
   if (apiVersion == "v2")
@@ -217,8 +212,8 @@ std::string OrionError::render(const std::string& _indent)
 
   std::string  out           = "";
   std::string  tag           = "orionError";
-  std::string  initialIndent = _indent;
-  std::string  indent        = _indent;
+  std::string  initialIndent = "";
+  std::string  indent        = "";
 
   //
   // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here
@@ -229,7 +224,7 @@ std::string OrionError::render(const std::string& _indent)
   indent += "  ";
 
   out += startTag1(indent, tag);
-  out += valueTag(indent + "  ", "code",          code,         true);
+  out += valueTag(indent  + "  ", "code",          code,         true);
   out += valueTag1(indent + "  ", "reasonPhrase",  reasonPhrase, details != "");
 
   if (details != "")

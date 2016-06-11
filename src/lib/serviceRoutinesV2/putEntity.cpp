@@ -106,13 +106,13 @@ std::string putEntity
   {
     OrionError orionError(SccConflict, MORE_MATCHING_ENT);
 
-    TIMED_RENDER(answer = orionError.render(ciP, ""));
+    TIMED_RENDER(answer = orionError.render());
   }
   else if (ciP->httpStatusCode == SccContextElementNotFound)
   {
     OrionError orionError(SccContextElementNotFound, "No context element found");
 
-    TIMED_RENDER(answer = orionError.render(ciP, ""));
+    TIMED_RENDER(answer = orionError.render());
   }
 #endif
   if (parseDataP->upcrs.res.oe.code != SccNone )

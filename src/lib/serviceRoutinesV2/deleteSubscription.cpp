@@ -69,7 +69,7 @@ std::string deleteSubscription
   TIMED_MONGO(ciP->httpStatusCode = mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, ciP->tenant));
 
 #if 0
-  // FIXME PR: use OrionError from mongoBackend
+  // FIXME: use OrionError from mongoBackend
   if (uncr.statusCode.code != SccOk)
   {
     OrionError oe(uncr.statusCode);
@@ -82,7 +82,7 @@ std::string deleteSubscription
       oe.details = "The requested subscription has not been found. Check id";
     }
 
-    TIMED_RENDER(answer = oe.render(ciP, ""));
+    TIMED_RENDER(answer = oe.render());
 
     return answer;
   }

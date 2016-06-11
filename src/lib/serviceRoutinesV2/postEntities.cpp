@@ -129,7 +129,7 @@ std::string postEntities
     OrionError oe(rstatuscode);
     ciP->httpStatusCode = SccInvalidModification;
 
-    TIMED_RENDER(answer = oe.render(ciP, ""));
+    TIMED_RENDER(answer = oe.render());
   }
   else if (rhttpcode == SccInvalidParameter)
   {
@@ -137,7 +137,7 @@ std::string postEntities
     if (invalidParameterForNgsiv2(rstatuscode.details, &oe))
     {
       ciP->httpStatusCode = oe.code;
-      TIMED_RENDER(answer = oe.render(ciP, ""));
+      TIMED_RENDER(answer = oe.render());
     }
   }
 #endif

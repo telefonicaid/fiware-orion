@@ -109,7 +109,7 @@ std::string postEntity
         {
           ciP->httpStatusCode = oe.code;
           std::string res;
-          TIMED_RENDER(res = oe.render(ciP, ""));
+          TIMED_RENDER(res = oe.render());
           eP->release();
           return res;
         }
@@ -119,7 +119,7 @@ std::string postEntity
       std::string  res;
 
       ciP->httpStatusCode = error.code;
-      TIMED_RENDER(res = error.render(ciP, ""));
+      TIMED_RENDER(res = error.render());
       eP->release();
       return res;
     }

@@ -250,6 +250,7 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, co
 
       LM_T(LmtRest, ("Unknown tag: '%s', request == '%s'", tag.c_str(), request.c_str()));
       
+      ciP->httpStatusCode = orionError.code;
       reply = setStatusCodeAndSmartRender(ciP, orionError);
    }
 

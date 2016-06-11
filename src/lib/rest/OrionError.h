@@ -49,8 +49,8 @@ public:
 
   std::string  smartRender(const std::string& apiVersion);
   std::string  toJson(void);
-  std::string  render(ConnectionInfo* ciP, const std::string& indent);
-  std::string  render(const std::string& _indent);
+  //std::string  render(ConnectionInfo* ciP, const std::string& indent);
+  std::string  render(void);
   void         fill(HttpStatusCode _code, const std::string& _details,  const std::string& _reasonPhrase = "");
 
 private:

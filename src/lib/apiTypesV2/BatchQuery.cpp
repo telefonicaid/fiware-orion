@@ -75,7 +75,7 @@ std::string BatchQuery::check(ConnectionInfo* ciP, RequestType requestType)
     OrionError oe(SccBadRequest, res);
 
     alarmMgr.badInput(clientIp, error);
-    return oe.render(ciP, "");
+    return oe.render();
   }
 
   return "OK";

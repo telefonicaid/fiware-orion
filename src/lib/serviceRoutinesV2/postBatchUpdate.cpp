@@ -105,7 +105,7 @@ std::string postBatchUpdate
       oe.details = "Entity not found";
     }
 
-    answer = oe.render(ciP, "");
+    answer = oe.render();
   }
   else
   {

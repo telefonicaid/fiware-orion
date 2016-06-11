@@ -100,7 +100,7 @@ std::string logTraceTreat
   {
     OrionError error(SccBadRequest, std::string("bad URL/Verb: ") + ciP->method + " " + path);
 
-    TIMED_RENDER(out = error.render(ciP, ""));
+    TIMED_RENDER(out = error.render());
   }
 
   return out;

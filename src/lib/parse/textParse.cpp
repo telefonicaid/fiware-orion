@@ -58,7 +58,7 @@ static std::string textParseAttributeValue(ConnectionInfo* ciP, ContextAttribute
     {
       OrionError oe(SccBadRequest, "Missing citation-mark at end of string");
 
-      return oe.render(ciP, "");
+      return oe.render();
     }
   }
 
