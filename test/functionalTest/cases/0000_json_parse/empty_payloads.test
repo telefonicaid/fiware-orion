@@ -214,7 +214,7 @@ Date: REGEX(.*)
     "subscriptionId": "000000000000000000000000"
 }
 10: ++++++++++++++++++++
-HTTP/1.1 200 OK
+HTTP/1.1 400 Bad Request
 Content-Length: 119
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -228,7 +228,7 @@ Date: REGEX(.*)
     }
 }
 11: ++++++++++++++++++++
-HTTP/1.1 200 OK
+HTTP/1.1 400 Bad Request
 Content-Length: 119
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -242,7 +242,7 @@ Date: REGEX(.*)
     }
 }
 12: ++++++++++++++++++++
-HTTP/1.1 200 OK
+HTTP/1.1 400 Bad Request
 Content-Length: 119
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

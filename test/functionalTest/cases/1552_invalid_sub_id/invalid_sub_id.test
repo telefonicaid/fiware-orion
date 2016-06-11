@@ -65,15 +65,15 @@ Date: REGEX(.*)
 
 02. Ask to see a subscription that doesn't exist
 ================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 89
+HTTP/1.1 404 Not Found
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "",
-    "error": "subscriptionId does not correspond to an active subscription"
+    "description": "subscriptionId does not correspond to an active subscription",
+    "error": "NotFound"
 }
 
 

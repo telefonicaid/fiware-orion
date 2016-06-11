@@ -1,8 +1,6 @@
 #ifndef SRC_LIB_REST_ERROR_ADAPTATION_H
 #define SRC_LIB_REST_ERROR_ADAPTATION_H
 
-// FIXME PR: the whole file is going to become unnecesary
-
 /*
 *
 * Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
@@ -30,8 +28,16 @@
 
 #include <string>
 
-#include "OrionError.h"
+#include "rest/OrionError.h"
 
+/* ****************************************************************************
+*
+* setStatusCodeAndSmartRender -
+*/
+extern std::string setStatusCodeAndSmartRender(ConnectionInfo* ciP, OrionError& oe);
+
+
+#if 0
 /* ****************************************************************************
 *
 * errorStringForV2 -
@@ -44,6 +50,7 @@ extern std::string errorStringForV2(const std::string& reasonPhrase);
 *  invalidParameterForNgsiv2 -
 */
 extern bool invalidParameterForNgsiv2(const std::string& details, OrionError* oe);
+#endif
 
 #endif // SRC_LIB_REST_ERROR_ADAPTATION_H
 

@@ -24,9 +24,24 @@
 */
 
 #include "rest/errorAdaptation.h"
+#include "rest/ConnectionInfo.h"
 
-// FIXME PR: the whole file is going to become unnecesary
 
+/* ****************************************************************************
+*
+* setStatusCodeAndSmartRender -
+*/
+std::string setStatusCodeAndSmartRender(ConnectionInfo* ciP, OrionError& oe)
+{
+  if (ciP->apiVersion == "v2")
+  {
+    ciP->httpStatusCode = oe.code;
+  }
+  return oe.smartRender(ciP->apiVersion);
+}
+
+
+#if 0
 /* ****************************************************************************
 *
 * errorStringForV2 -
@@ -103,3 +118,4 @@ bool invalidParameterForNgsiv2(const std::string& details, OrionError* oe)
 
   return false;
 }
+#endif

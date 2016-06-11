@@ -75,7 +75,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
   {
     alarmMgr.badInput(clientIp, "JSON Parse Error");
     eP->errorCode.fill(ERROR_STRING_PARSERROR, "Error parsing incoming JSON buffer");
-    ciP->httpStatusCode = SccBadRequest;;
+    ciP->httpStatusCode = SccBadRequest;
     return eP->render(ciP, EntitiesRequest);
   }
 

@@ -29,6 +29,7 @@
 #include "common/statistics.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
+#include "rest/errorAdaptation.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
 #include "alarmMgr/alarmMgr.h"
@@ -40,7 +41,6 @@
 #include "jsonParseV2/parseBatchUpdate.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 #include "apiTypesV2/SubscriptionUpdate.h"
-
 
 
 /* ****************************************************************************
@@ -78,16 +78,7 @@ std::string jsonRequestTreat
     if ((answer = parseDataP->ent.res.check(ciP, EntitiesRequest)) != "OK")
     {
       OrionError error(SccBadRequest, answer);
-      if (ciP->apiVersion == "v1")
-      {
-        return error.render(ciP, "");
-      }
-      else
-      {
-        ciP->httpStatusCode = SccBadRequest;
-        error.reasonPhrase  = "BadRequest";   // To avoid "Bad Request"
-        return error.toJson();
-      }
+      return setStatusCodeAndSmartRender(ciP, error);
     }
     break;
 
@@ -101,9 +92,8 @@ std::string jsonRequestTreat
 
     if ((answer = parseDataP->ent.res.check(ciP, EntityRequest)) != "OK")
     {
-      OrionError error(SccBadRequest, answer);
-      ciP->httpStatusCode = error.code;
-      return error.smartRender(ciP->apiVersion);
+      OrionError error(SccBadRequest, answer);      
+      return setStatusCodeAndSmartRender(ciP, error);
     }
     break;
 
@@ -118,9 +108,8 @@ std::string jsonRequestTreat
 
     if ((answer = parseDataP->attr.attribute.check(ciP, EntityAttributeRequest, "", "", 0)) != "OK")
     {
-      OrionError error(SccBadRequest, answer);
-      ciP->httpStatusCode = error.code;
-      return error.smartRender(ciP->apiVersion);
+      OrionError error(SccBadRequest, answer);      
+      return setStatusCodeAndSmartRender(ciP, error);
     }
     break;
 

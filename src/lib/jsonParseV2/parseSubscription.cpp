@@ -72,6 +72,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   {
     OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
     alarmMgr.badInput(clientIp, "JSON parse error");
+    ciP->httpStatusCode = SccBadRequest;
     return oe.toJson();
   }
 
@@ -79,6 +80,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   {
     OrionError oe(SccBadRequest, "Error parsing incoming JSON buffer", ERROR_STRING_PARSERROR);
     alarmMgr.badInput(clientIp, "JSON parse error");
+    ciP->httpStatusCode = SccBadRequest;
     return oe.toJson();
   }
 

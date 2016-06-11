@@ -49,6 +49,8 @@
 #include "rest/mhd.h"
 #include "rest/OrionError.h"
 #include "rest/restReply.h"
+#include "rest/errorAdaptation.h"
+
 #include "logMsg/traceLevels.h"
 
 
@@ -248,8 +250,7 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, co
 
       LM_T(LmtRest, ("Unknown tag: '%s', request == '%s'", tag.c_str(), request.c_str()));
       
-      ciP->httpStatusCode = orionError.code;
-      reply = orionError.smartRender(ciP->apiVersion);
+      reply = setStatusCodeAndSmartRender(ciP, orionError);
    }
 
    return reply;

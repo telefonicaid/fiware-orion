@@ -50,6 +50,7 @@
 #include "rest/rest.h"
 #include "rest/restReply.h"
 #include "rest/OrionError.h"
+#include "rest/errorAdaptation.h"
 #include "rest/uriParamNames.h"
 #include "common/limits.h"  // SERVICE_NAME_MAX_LEN
 
@@ -97,6 +98,24 @@ static void correlatorGenerate(char* buffer)
 
 /* ****************************************************************************
 *
+* setStatusCodeAndSmartRender -
+*
+* FIXME PR: same function as in errorAdaptation.h. I need this here by the moment,
+* to avoid a linking problem
+*/
+std::string setStatusCodeAndSmartRender(ConnectionInfo* ciP, OrionError& oe)
+{
+  if (ciP->apiVersion == "v2")
+  {
+    ciP->httpStatusCode = oe.code;
+  }
+  return oe.smartRender(ciP->apiVersion);
+}
+
+
+
+/* ****************************************************************************
+*
 * uriArgumentGet - 
 */
 static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val)
@@ -108,16 +127,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   if (val == NULL || *val == 0)
   {
     OrionError error(SccBadRequest, std::string("Empty right-hand-side for URI param /") + ckey + "/");
-    ciP->httpStatusCode = SccBadRequest;
-    if (ciP->apiVersion == "v1")
-    {
-      ciP->answer = error.render(ciP, "");
-    }
-    else
-    {
-      error.reasonPhrase = "BadRequest";   // to avoid "Bad Request"
-      ciP->answer = error.toJson();
-    }
+    ciP->answer = setStatusCodeAndSmartRender(ciP, error);
     return MHD_YES;
   }
 
@@ -130,8 +140,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       if ((*cP < '0') || (*cP > '9'))
       {
         OrionError error(SccBadRequest, std::string("Bad pagination offset: /") + value + "/ [must be a decimal number]");
-        ciP->httpStatusCode = SccBadRequest;
-        ciP->answer         = error.render(ciP, "");
+        ciP->answer = setStatusCodeAndSmartRender(ciP, error);
         return MHD_YES;
       }
 
@@ -198,17 +207,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     if (uriParamOptionsParse(ciP, val) != 0)
     {
       OrionError error(SccBadRequest, "Invalid value for URI param /options/");
-
-      ciP->httpStatusCode = SccBadRequest;
-      if (ciP->apiVersion == "v1")
-      {
-        ciP->answer = error.render(ciP, "");
-      }
-      else
-      {
-        error.reasonPhrase = "BadRequest";   // to avoid "Bad Request"
-        ciP->answer = error.toJson();
-      }
+      ciP->answer = setStatusCodeAndSmartRender(ciP, error);
     }
   }
   else if (key == URI_PARAM_TYPE)
@@ -268,17 +267,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     OrionError error(SccBadRequest, "invalid character in URI parameter");
 
     alarmMgr.badInput(clientIp, details);
-
-    ciP->httpStatusCode = SccBadRequest;
-    if (ciP->apiVersion == "v1")
-    {
-      ciP->answer = error.render(ciP, "");
-    }
-    else
-    {
-      error.reasonPhrase = "BadRequest";  // to avoid "Bad Request"
-      ciP->answer = error.toJson();
-    }
+    ciP->answer = setStatusCodeAndSmartRender(ciP, error);
   }
 
   return MHD_YES;
@@ -608,8 +597,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   if (servicePath[0] != '/')
   {
     OrionError e(SccBadRequest, "Only /absolute/ Service Paths allowed [a service path must begin with /]");
-    ciP->answer         = e.smartRender(ciP->apiVersion);
-    ciP->httpStatusCode = e.code;
+    ciP->answer = setStatusCodeAndSmartRender(ciP, e);
     return 1;
   }
 
@@ -618,8 +606,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   if (components > SERVICE_PATH_MAX_LEVELS)
   {
     OrionError e(SccBadRequest, "too many components in ServicePath");
-    ciP->answer         = e.smartRender(ciP->apiVersion);
-    ciP->httpStatusCode = e.code;
+    ciP->answer = setStatusCodeAndSmartRender(ciP, e);
     return 2;
   }
 
@@ -628,8 +615,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
     if (strlen(compV[ix].c_str()) > SERVICE_PATH_MAX_COMPONENT_LEN)
     {
       OrionError e(SccBadRequest, "component-name too long in ServicePath");
-      ciP->answer         = e.smartRender(ciP->apiVersion);
-      ciP->httpStatusCode = e.code;
+      ciP->answer = setStatusCodeAndSmartRender(ciP, e);
       return 3;
     }
 
@@ -647,8 +633,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
       if (!isalnum(comp[cIx]) && (comp[cIx] != '_'))
       {
         OrionError e(SccBadRequest, "a component of ServicePath contains an illegal character");
-        ciP->answer         = e.smartRender(ciP->apiVersion);
-        ciP->httpStatusCode = e.code;
+        ciP->answer = setStatusCodeAndSmartRender(ciP, e);
         return 4;
       }
     }
@@ -822,17 +807,8 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
   if (forbiddenChars(url.c_str()) == true)
   {
     OrionError error(SccBadRequest, "invalid character in URI");
-    ciP->httpStatusCode = SccBadRequest;
-    if (ciP->apiVersion == "v1")
-    {
-      ciP->answer = error.render(ciP, "");
-    }
-    else
-    {
-      error.reasonPhrase = "BadRequest";    // To avoid "Bad Request"
-      ciP->answer = error.toJson();
-    }
-
+    ciP->httpStatusCode = error.code;
+    ciP->answer         = setStatusCodeAndSmartRender(ciP, error);
     return false;
   }
 

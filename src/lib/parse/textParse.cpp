@@ -28,6 +28,7 @@
 #include "alarmMgr/alarmMgr.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
+#include "rest/errorAdaptation.h"
 #include "ngsi/ContextAttribute.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
@@ -89,7 +90,7 @@ static std::string textParseAttributeValue(ConnectionInfo* ciP, ContextAttribute
   else  // 5. None of the above - it's an error
   {
     OrionError oe(SccBadRequest, "attribute value type not recognized");
-    return oe.render(ciP, "");
+    return setStatusCodeAndSmartRender(ciP, oe);
   }
 
   return "OK";
@@ -117,16 +118,15 @@ std::string textRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     if ((answer = parseDataP->av.attribute.check(ciP, EntityAttributeValueRequest, "", "", 0)) != "OK")
     {
       OrionError error(SccBadRequest, answer);
-      ciP->httpStatusCode = error.code;
-      return error.smartRender(ciP->apiVersion);
+      return setStatusCodeAndSmartRender(ciP, error);
     }
     break;
 
   default:
     OrionError error(SccUnsupportedMediaType, "not supported content type: text/plain");
 
-    answer = error.smartRender(ciP->apiVersion);
-    ciP->httpStatusCode = SccUnsupportedMediaType;
+    answer = setStatusCodeAndSmartRender(ciP, error);
+    //ciP->httpStatusCode = SccUnsupportedMediaType; FIXME PR: not sure if remove this...
 
     alarmMgr.badInput(clientIp, "not supported content type: text/plain");
     break;
