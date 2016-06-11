@@ -70,14 +70,16 @@ std::string getEntityAttributeValue
 
   if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
   {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
-    return oe.render(ciP, "");
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
+    ciP->httpStatusCode = oe.code;
+    return oe.toJson();
   }
 
   if (forbiddenIdChars(ciP->apiVersion, compV[4].c_str() , NULL))
   {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
-    return oe.render(ciP, "");
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
+    ciP->httpStatusCode = oe.code;
+    return oe.toJson();
   }
 
   // Fill in QueryContextRequest
@@ -88,7 +90,7 @@ std::string getEntityAttributeValue
 
   attribute.fill(&parseDataP->qcrs.res, compV[4]);
 
-  // FIXME P4: include OrionError instead of ErrorCode in Attributes and clean the
+  // FIXME PR: include OrionError instead of ErrorCode in Attributes and clean the
   // code below
 
   // Render entity attribute response

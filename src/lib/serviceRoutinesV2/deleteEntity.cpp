@@ -70,8 +70,9 @@ std::string deleteEntity
 
   if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
   {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
-    return oe.render(ciP, "");
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
+    ciP->httpStatusCode = oe.code;
+    return oe.toJson();
   }
 
   eP       = new Entity();

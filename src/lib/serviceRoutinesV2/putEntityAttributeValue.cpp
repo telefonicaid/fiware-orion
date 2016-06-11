@@ -67,14 +67,16 @@ std::string putEntityAttributeValue
 
   if (forbiddenIdChars(ciP->apiVersion, entityId.c_str() , NULL))
   {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
-    return oe.render(ciP, "");
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
+    ciP->httpStatusCode = oe.code;
+    return oe.toJson();
   }
 
   if (forbiddenIdChars(ciP->apiVersion, attributeName.c_str() , NULL))
   {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
-    return oe.render(ciP, "");
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
+    ciP->httpStatusCode = oe.code;
+    return oe.toJson();
   }
 
 
@@ -85,8 +87,9 @@ std::string putEntityAttributeValue
   std::string err = parseDataP->av.attribute.check(ciP,ciP->requestType,"","", 0);
   if (err != "OK")
   {
-    OrionError oe(SccBadRequest, err);
-    return oe.render(ciP, "");
+    OrionError oe(SccBadRequest, err, "BadRequest");
+    ciP->httpStatusCode = oe.code;
+    return oe.toJson();
   }
   parseDataP->upcr.res.fill(entityId, &parseDataP->av.attribute, "UPDATE", type);
 
@@ -94,7 +97,7 @@ std::string putEntityAttributeValue
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
-  // FIME: ErrorCode shoould be avoided
+  // FIXME PR: ErrorCode shoould be avoided
 
   // 03. Check output from mongoBackend - any errors?
   if (parseDataP->upcrs.res.contextElementResponseVector.size() == 1)

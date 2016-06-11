@@ -72,14 +72,14 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   {
     OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
     alarmMgr.badInput(clientIp, "JSON parse error");
-    return oe.render(ciP, "");
+    return oe.toJson();
   }
 
   if (!document.IsObject())
   {
     OrionError oe(SccBadRequest, "Error parsing incoming JSON buffer", ERROR_STRING_PARSERROR);
     alarmMgr.badInput(clientIp, "JSON parse error");
-    return oe.render(ciP, "");
+    return oe.toJson();
   }
 
   if (document.ObjectEmpty())
@@ -755,7 +755,9 @@ static std::string parseDictionary(ConnectionInfo* ciP, std::map<std::string, st
 static std::string badInput(ConnectionInfo* ciP, const std::string& msg)
 {
   alarmMgr.badInput(clientIp, msg);
-  OrionError oe(SccBadRequest, msg);
+  OrionError oe(SccBadRequest, msg, "BadRequest");
 
-  return oe.render(ciP, "");
+  ciP->httpStatusCode = oe.code;
+
+  return oe.toJson();
 }

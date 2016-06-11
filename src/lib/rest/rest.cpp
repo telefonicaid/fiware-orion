@@ -109,7 +109,15 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     OrionError error(SccBadRequest, std::string("Empty right-hand-side for URI param /") + ckey + "/");
     ciP->httpStatusCode = SccBadRequest;
-    ciP->answer         = error.render(ciP, "");
+    if (ciP->apiVersion == "v1")
+    {
+      ciP->answer = error.render(ciP, "");
+    }
+    else
+    {
+      error.reasonPhrase = "BadRequest";   // to avoid "Bad Request"
+      ciP->answer = error.toJson();
+    }
     return MHD_YES;
   }
 
@@ -192,7 +200,15 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       OrionError error(SccBadRequest, "Invalid value for URI param /options/");
 
       ciP->httpStatusCode = SccBadRequest;
-      ciP->answer         = error.render(ciP, "");
+      if (ciP->apiVersion == "v1")
+      {
+        ciP->answer = error.render(ciP, "");
+      }
+      else
+      {
+        error.reasonPhrase = "BadRequest";   // to avoid "Bad Request"
+        ciP->answer = error.toJson();
+      }
     }
   }
   else if (key == URI_PARAM_TYPE)
@@ -254,7 +270,15 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     alarmMgr.badInput(clientIp, details);
 
     ciP->httpStatusCode = SccBadRequest;
-    ciP->answer         = error.render(ciP, "");
+    if (ciP->apiVersion == "v1")
+    {
+      ciP->answer = error.render(ciP, "");
+    }
+    else
+    {
+      error.reasonPhrase = "BadRequest";  // to avoid "Bad Request"
+      ciP->answer = error.toJson();
+    }
   }
 
   return MHD_YES;
@@ -584,7 +608,8 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   if (servicePath[0] != '/')
   {
     OrionError e(SccBadRequest, "Only /absolute/ Service Paths allowed [a service path must begin with /]");
-    ciP->answer = e.render(ciP, "");
+    ciP->answer         = e.smartRender(ciP->apiVersion);
+    ciP->httpStatusCode = e.code;
     return 1;
   }
 
@@ -593,7 +618,8 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   if (components > SERVICE_PATH_MAX_LEVELS)
   {
     OrionError e(SccBadRequest, "too many components in ServicePath");
-    ciP->answer = e.render(ciP, "");
+    ciP->answer         = e.smartRender(ciP->apiVersion);
+    ciP->httpStatusCode = e.code;
     return 2;
   }
 
@@ -602,7 +628,8 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
     if (strlen(compV[ix].c_str()) > SERVICE_PATH_MAX_COMPONENT_LEN)
     {
       OrionError e(SccBadRequest, "component-name too long in ServicePath");
-      ciP->answer = e.render(ciP, "");
+      ciP->answer         = e.smartRender(ciP->apiVersion);
+      ciP->httpStatusCode = e.code;
       return 3;
     }
 
@@ -620,7 +647,8 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
       if (!isalnum(comp[cIx]) && (comp[cIx] != '_'))
       {
         OrionError e(SccBadRequest, "a component of ServicePath contains an illegal character");
-        ciP->answer = e.render(ciP, "");
+        ciP->answer         = e.smartRender(ciP->apiVersion);
+        ciP->httpStatusCode = e.code;
         return 4;
       }
     }
@@ -795,7 +823,15 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
   {
     OrionError error(SccBadRequest, "invalid character in URI");
     ciP->httpStatusCode = SccBadRequest;
-    ciP->answer         = error.render(ciP, "");
+    if (ciP->apiVersion == "v1")
+    {
+      ciP->answer = error.render(ciP, "");
+    }
+    else
+    {
+      error.reasonPhrase = "BadRequest";    // To avoid "Bad Request"
+      ciP->answer = error.toJson();
+    }
 
     return false;
   }

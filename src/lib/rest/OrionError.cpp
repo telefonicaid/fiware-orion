@@ -86,6 +86,25 @@ void OrionError::fill(HttpStatusCode _code, const std::string& _details, const s
 
 /* ****************************************************************************
 *
+* OrionError::smartRender -
+*/
+std::string OrionError::smartRender(std::string apiVersion)
+{
+  if (apiVersion == "v1")
+  {
+    return render("");
+  }
+  else // v2
+  {
+    shrinkReasonPhrase();
+    return toJson();
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * OrionError::toJson -
 */
 std::string OrionError::toJson(void)
@@ -100,6 +119,7 @@ std::string OrionError::toJson(void)
 */
 std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
 {
+#if 0
   //
   // For API version 2 this is pretty easy ...
   //
@@ -123,7 +143,7 @@ std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
     reasonPhrase = errorStringForV2(reasonPhrase);
     return "{" + JSON_STR("error") + ":" + JSON_STR(reasonPhrase) + "," + JSON_STR("description") + ":" + JSON_STR(details) + "}";
   }
-
+#endif
 
   //
   // A little more hairy for API version 1
@@ -169,8 +189,9 @@ std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
 * Simplified version, without ciP
 *
 */
-std::string OrionError::render(const std::string& _indent, const std::string apiVersion)
+std::string OrionError::render(const std::string& _indent)
 {
+#if 0
   //
   // For API version 2 this is pretty easy ...
   //
@@ -187,6 +208,7 @@ std::string OrionError::render(const std::string& _indent, const std::string api
     reasonPhrase = errorStringForV2(reasonPhrase);
     return "{" + JSON_STR("error") + ":" + JSON_STR(reasonPhrase) + "," + JSON_STR("description") + ":" + JSON_STR(details) + "}";
   }
+#endif
 
 
   //
@@ -220,4 +242,36 @@ std::string OrionError::render(const std::string& _indent, const std::string api
   out += initialIndent + "}\n";
 
   return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* OrionError::render -
+*
+* This method removes any whitespace in the reasonPhrase field, i.e.
+* transforms "Not Found" to "NotFound".
+*
+* It is used by smartRender method, in order to prepare to render in API v2 case
+*
+*/
+void OrionError::shrinkReasonPhrase(void)
+{
+  char buf[80];  // 80 should be enough to hold any reason phrase
+
+  strncpy(buf, reasonPhrase.c_str(), 80);
+
+  // See: http://stackoverflow.com/questions/1726302/removing-spaces-from-a-string-in-c
+  char* i = buf;
+  char* j = buf;
+  while(*j != 0)
+  {
+    *i = *j++;
+    if(*i != ' ')
+      i++;
+  }
+  *i = 0;
+
+  reasonPhrase = std::string(buf);
 }

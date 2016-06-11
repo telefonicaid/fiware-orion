@@ -38,6 +38,7 @@
 */
 typedef struct OrionError
 {
+public:
   HttpStatusCode  code;
   std::string     reasonPhrase;
   std::string     details;
@@ -46,10 +47,15 @@ typedef struct OrionError
   OrionError(StatusCode& statusCode);
   OrionError(HttpStatusCode _code, const std::string& _details = "", const std::string& _reasonPhrase = "");
 
+  std::string  smartRender(std::string apiVersion);
   std::string  toJson(void);
   std::string  render(ConnectionInfo* ciP, const std::string& indent);
-  std::string  render(const std::string& _indent, const std::string apiVersion);
+  std::string  render(const std::string& _indent);
   void         fill(HttpStatusCode _code, const std::string& _details,  const std::string& _reasonPhrase = "");
+
+private:
+  void         shrinkReasonPhrase(void);
+
 } OrionError;
 
 #endif

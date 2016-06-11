@@ -460,14 +460,11 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     {
       OrionError  error(SccBadRequest, result);
 
-      std::string  response = error.render(ciP, "");
+      std::string  response = error.smartRender(ciP->apiVersion);
 
       alarmMgr.badInput(clientIp, result);
 
-      if (ciP->apiVersion != "v1")
-      {
-        ciP->httpStatusCode = SccBadRequest;  // FIXME P9:  OK for all versions?
-      }
+      ciP->httpStatusCode = SccBadRequest;
 
       restReply(ciP, response);
 

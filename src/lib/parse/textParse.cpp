@@ -117,14 +117,15 @@ std::string textRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     if ((answer = parseDataP->av.attribute.check(ciP, EntityAttributeValueRequest, "", "", 0)) != "OK")
     {
       OrionError error(SccBadRequest, answer);
-      return error.render(ciP, "");
+      ciP->httpStatusCode = error.code;
+      return error.smartRender(ciP->apiVersion);
     }
     break;
 
   default:
     OrionError error(SccUnsupportedMediaType, "not supported content type: text/plain");
 
-    answer = error.render(ciP, "");
+    answer = error.smartRender(ciP->apiVersion);
     ciP->httpStatusCode = SccUnsupportedMediaType;
 
     alarmMgr.badInput(clientIp, "not supported content type: text/plain");

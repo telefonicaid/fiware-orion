@@ -84,12 +84,12 @@ std::string postEntities
 
   if (!legalEntityLength(eP, ciP->servicePath))
   {
-    OrionError oe(SccBadRequest, "Too long entity id/type/servicePath combination");
-    ciP->httpStatusCode = SccBadRequest;
+    OrionError oe(SccBadRequest, "Too long entity id/type/servicePath combination", "BadRequest");
     eP->release();
 
     std::string out;
-    TIMED_RENDER(out = oe.render(ciP, ""));
+    TIMED_RENDER(out = oe.toJson());
+    ciP->httpStatusCode = oe.code;
 
     return out;
   }

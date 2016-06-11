@@ -78,7 +78,16 @@ std::string jsonRequestTreat
     if ((answer = parseDataP->ent.res.check(ciP, EntitiesRequest)) != "OK")
     {
       OrionError error(SccBadRequest, answer);
-      return error.render(ciP, "");
+      if (ciP->apiVersion == "v1")
+      {
+        return error.render(ciP, "");
+      }
+      else
+      {
+        ciP->httpStatusCode = SccBadRequest;
+        error.reasonPhrase  = "BadRequest";   // To avoid "Bad Request"
+        return error.toJson();
+      }
     }
     break;
 
@@ -93,7 +102,8 @@ std::string jsonRequestTreat
     if ((answer = parseDataP->ent.res.check(ciP, EntityRequest)) != "OK")
     {
       OrionError error(SccBadRequest, answer);
-      return error.render(ciP, "");
+      ciP->httpStatusCode = error.code;
+      return error.smartRender(ciP->apiVersion);
     }
     break;
 
@@ -109,7 +119,8 @@ std::string jsonRequestTreat
     if ((answer = parseDataP->attr.attribute.check(ciP, EntityAttributeRequest, "", "", 0)) != "OK")
     {
       OrionError error(SccBadRequest, answer);
-      return error.render(ciP, "");
+      ciP->httpStatusCode = error.code;
+      return error.smartRender(ciP->apiVersion);
     }
     break;
 
