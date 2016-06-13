@@ -130,7 +130,7 @@ std::string getEntities
   //
   if ((coords != "") && (geometry == ""))
   {
-    OrionError oe(SccInvalidModification, "Query not supported: URI param /coords/ used without /geometry/", "InvalidModification");
+    OrionError oe(SccBadRequest, "Wrong query: URI param /coords/ used without /geometry/", "BadRequest");
 
     TIMED_RENDER(out = oe.toJson());
     ciP->httpStatusCode = oe.code;
@@ -138,7 +138,7 @@ std::string getEntities
   }
   else if ((geometry != "") && (coords == ""))
   {
-    OrionError oe(SccInvalidModification, "Query not supported: URI param /geometry/ used without /coords/", "InvalidModification");
+    OrionError oe(SccBadRequest, "Wrong query: URI param /geometry/ used without /coords/", "BadRequest");
 
     TIMED_RENDER(out = oe.toJson());
     ciP->httpStatusCode = oe.code;
@@ -147,7 +147,7 @@ std::string getEntities
 
   if ((georel != "") && (geometry == ""))
   {
-    OrionError oe(SccInvalidModification, "Query not supported: URI param /georel/ used without /geometry/", "InvalidModification");
+    OrionError oe(SccBadRequest, "Wrong query: URI param /georel/ used without /geometry/", "BadRequest");
 
     TIMED_RENDER(out = oe.toJson());
     ciP->httpStatusCode = oe.code;
@@ -169,7 +169,7 @@ std::string getEntities
 
     if (scopeP->fill(ciP->apiVersion, geometry, coords, georel, &errorString) != 0)
     {
-      OrionError oe(SccInvalidModification, std::string("Query not supported: ") + errorString, "InvalidModification");
+      OrionError oe(SccBadRequest, std::string("Wrong query: ") + errorString, "BadRequest");
 
       TIMED_RENDER(out = oe.toJson());
       ciP->httpStatusCode = oe.code;

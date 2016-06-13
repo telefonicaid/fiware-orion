@@ -96,14 +96,14 @@ Date: REGEX(.*)
 02. POST /v2/entities (Room1-Room)
 ==================================
 HTTP/1.1 422 Unprocessable Entity
-Content-Length: 62
+Content-Length: 56
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "Already Exists",
-    "error": "UnprocessableEntity"
+    "error": "Unprocessable"
 }
 
 

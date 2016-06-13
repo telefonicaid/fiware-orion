@@ -67,17 +67,9 @@ std::string postBatchUpdate
   upcrP->fill(&buP->entities, buP->updateActionType.get());
   buP->release();  // upcrP just 'took over' the data from buP, buP is no longer needed
   parseDataP->upcr.res.present("");
-  answer = postUpdateContext(ciP, components, compV, parseDataP);
+  //answer = postUpdateContext(ciP, components, compV, parseDataP);
+  postUpdateContext(ciP, components, compV, parseDataP);
 
-
-  /* FIXME PR: enabling the #else part make some update fwd Cpr cases to fail:
-   *
-   *   o  0787_cprs_full_functional/update_false_registration_and_one_more_value_in_ngsiv2.test
-   *   o  0787_cprs_full_functional/update_false_registration_in_ngsiv2.test
-   *   o  0787_cprs_full_functional/update_forward_depends_on_attr_field_in_ngsiv2.test
-   *   o  0787_cprs_full_functional/update_found_and_not_found_in_local_and_three_cprs_in_ngsiv2.test
-   *   o  0787_cprs_full_functional/update_three_found_on_cps_two_local_four_not_found_in_ngsiv2.test
-   */
 #if 0
   for (unsigned int ix = 0; ix < parseDataP->upcrs.res.contextElementResponseVector.size(); ++ix)
   {

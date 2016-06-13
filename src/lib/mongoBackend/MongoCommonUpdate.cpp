@@ -1885,7 +1885,7 @@ static bool appendContextAttributeItem
                           " - offending attribute: " + targetAttr->getName() +
                           " - attribute cannot be appended";
     cerP->statusCode.fill(SccInvalidParameter, details);
-    oe->fill(SccInvalidModification, details, "UnprocessableEntity");
+    oe->fill(SccInvalidModification, details, "Unprocessable");
 
     alarmMgr.badInput(clientIp, "attribute cannot be appended");
     return false;
@@ -1951,7 +1951,7 @@ static bool deleteContextAttributeItem
                             " - offending attribute: " + targetAttr->getName() +
                             " - location attribute has to be defined at creation time, with APPEND";
       cerP->statusCode.fill(SccInvalidParameter, details);
-      oe->fill(SccInvalidModification, details, "UnprocessableEntity");
+      oe->fill(SccInvalidModification, details, "Unprocessable");
 
       alarmMgr.badInput(clientIp, "location attribute has to be defined at creation time");
       return false;
@@ -2204,7 +2204,7 @@ static bool createEntity
       "Attributes with same name with ID and not ID at the same time "
       "in the same entity are forbidden: entity: [" + eP->toString() + "]";
 
-    oe->fill(SccInvalidModification, *errDetail, "UnprocessableEntity");
+    oe->fill(SccInvalidModification, *errDetail, "Unprocessable");
     return false;
   }
 
@@ -2908,7 +2908,7 @@ void processContextElement
     if ((entitiesNumber > 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONCREATE))
     {
       buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Already Exists");
-      responseP->oe.fill(SccInvalidModification, "Already Exists", "UnprocessableEntity");
+      responseP->oe.fill(SccInvalidModification, "Already Exists", "Unprocessable");
       return;
     }
 
@@ -3128,7 +3128,7 @@ void processContextElement
   {
     std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
     buildGeneralErrorResponse(ceP, NULL, responseP, SccBadRequest, details);
-    responseP->oe.fill(SccInvalidModification, details, "UnprocessableEntity");
+    responseP->oe.fill(SccInvalidModification, details, "Unprocessable");
   }
 
   // Response in responseP

@@ -325,29 +325,29 @@ Date: REGEX(.*)
 
 06. Query coveredBy point (5, 5) -> not supported
 =================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 120
+HTTP/1.1 400 Bad Request
+Content-Length: 103
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: point geometry cannot be used with coveredBy georel",
-    "error": "InvalidModification"
+    "description": "Wrong query: point geometry cannot be used with coveredBy georel",
+    "error": "BadRequest"
 }
 
 
 07. Query coveredBy line (5, 5) (9, 5) -> not supported
 =======================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 119
+HTTP/1.1 400 Bad Request
+Content-Length: 102
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: line geometry cannot be used with coveredBy georel",
-    "error": "InvalidModification"
+    "description": "Wrong query: line geometry cannot be used with coveredBy georel",
+    "error": "BadRequest"
 }
 
 

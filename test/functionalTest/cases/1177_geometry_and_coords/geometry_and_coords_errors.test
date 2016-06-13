@@ -119,85 +119,85 @@ Date: REGEX(.*)
 
 02. GET /v2/entities with erroneous areaType - ERROR
 ====================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 135
+HTTP/1.1 400 Bad Request
+Content-Length: 118
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: error parsing geometry: Invalid selector in geometry specification",
-    "error": "InvalidModification"
+    "description": "Wrong query: error parsing geometry: Invalid selector in geometry specification",
+    "error": "BadRequest"
 }
 
 
 03. GET /v2/entities with Geometry but no Coordinates - ERROR
 =============================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 111
+HTTP/1.1 400 Bad Request
+Content-Length: 94
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: URI param /geometry/ used without /coords/",
-    "error": "InvalidModification"
+    "description": "Wrong query: URI param /geometry/ used without /coords/",
+    "error": "BadRequest"
 }
 
 
 04. GET /v2/entities with Coordinates but no Geometry - ERROR
 =============================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 111
+HTTP/1.1 400 Bad Request
+Content-Length: 94
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: URI param /coords/ used without /geometry/",
-    "error": "InvalidModification"
+    "description": "Wrong query: URI param /coords/ used without /geometry/",
+    "error": "BadRequest"
 }
 
 
 05. GET /v2/entities with Polygon with only two vertices - ERROR
 ================================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 100
+HTTP/1.1 400 Bad Request
+Content-Length: 83
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: Too few coordinates for polygon",
-    "error": "InvalidModification"
+    "description": "Wrong query: Too few coordinates for polygon",
+    "error": "BadRequest"
 }
 
 
 06. GET /v2/entities with Near with two vertices - ERROR
 ========================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 110
+HTTP/1.1 400 Bad Request
+Content-Length: 93
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: invalid number of coordinates for /point/",
-    "error": "InvalidModification"
+    "description": "Wrong query: invalid number of coordinates for /point/",
+    "error": "BadRequest"
 }
 
 
 07. GET /v2/entities with Near but no distance - ERROR
 ======================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 125
+HTTP/1.1 400 Bad Request
+Content-Length: 108
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: georel /near/ without either minDistance nor maxDistance",
-    "error": "InvalidModification"
+    "description": "Wrong query: georel /near/ without either minDistance nor maxDistance",
+    "error": "BadRequest"
 }
 
 

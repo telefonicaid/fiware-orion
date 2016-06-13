@@ -228,11 +228,16 @@ Date: REGEX(.*)
 
 04. Update/UPDATE E1/T1/A1+A2 in CB (A2 OK, A1 NOT OK)
 ======================================================
-HTTP/1.1 204 No Content
-Content-Length: 0
+HTTP/1.1 404 Not Found
+Content-Length: 92
+Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+{
+    "description": "Attributes that were not updated: [ E1-T1 : [A1] ]",
+    "error": "PartialUpdate"
+}
 
 
 05. Query E1/T1/A2 in CP2

@@ -194,57 +194,57 @@ Date: REGEX(.*)
 
 07. Not a number for circle center latitude
 ===========================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 88
+HTTP/1.1 400 Bad Request
+Content-Length: 71
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: invalid coordinates",
-    "error": "InvalidModification"
+    "description": "Wrong query: invalid coordinates",
+    "error": "BadRequest"
 }
 
 
 08. Not a number for circle center longitude
 ============================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 88
+HTTP/1.1 400 Bad Request
+Content-Length: 71
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: invalid coordinates",
-    "error": "InvalidModification"
+    "description": "Wrong query: invalid coordinates",
+    "error": "BadRequest"
 }
 
 
 09. Not a number for polygon vertex latitude
 ============================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 88
+HTTP/1.1 400 Bad Request
+Content-Length: 71
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: invalid coordinates",
-    "error": "InvalidModification"
+    "description": "Wrong query: invalid coordinates",
+    "error": "BadRequest"
 }
 
 
 10. Not a number for polygon vertex longitude
 =============================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 88
+HTTP/1.1 400 Bad Request
+Content-Length: 71
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: invalid coordinates",
-    "error": "InvalidModification"
+    "description": "Wrong query: invalid coordinates",
+    "error": "BadRequest"
 }
 
 
