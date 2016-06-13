@@ -30,7 +30,7 @@ function usage()
   echo "$empty [--changelog <changelog file to flush into .spec, default is CHANGES_NEXT_RELEASE>"
   echo
   echo "Modes:"
-  echo "* 'files', only modify files (bu don't commit changes)"
+  echo "* 'files', only modify files (but don't commit changes)"
   echo "* 'commit', modify files and commit changes (but don't tag)"
   echo "* 'tag', modify files, commit and tag (but don't push)"
   echo "* 'push', modify files, commit, tag and push to origin"
