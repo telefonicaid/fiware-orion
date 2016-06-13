@@ -22,7 +22,7 @@
 *
 * Author: Orion dev team
 */
-
+#include <regex.h>
 #include <algorithm>
 
 #include "rapidjson/document.h"
@@ -260,6 +260,10 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
   {
     return badInput(ciP, "condition is not an object");
   }
+  if (condition.Empty())
+  {
+    return badInput(ciP, "condition is empty");
+  }
   r = parseNotifyConditionVector(ciP, subsP, condition);
 
   return r;
@@ -283,11 +287,12 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
   {
     if (!iter->IsObject())
     {
-     return badInput(ciP, "subject entities element is not an object");
+      return badInput(ciP, "subject entities element is not an object");
     }
-    if (!iter->HasMember("id") && !iter->HasMember("idPattern") && !iter->HasMember("type"))
+
+    if (!iter->HasMember("id") && !iter->HasMember("idPattern"))
     {
-      return badInput(ciP, "subject entities element has no id/idPattern nor type");
+      return badInput(ciP, "subject entities element does not have id nor idPattern");
     }
 
     if (iter->HasMember("id") && iter->HasMember("idPattern"))
@@ -305,11 +310,18 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
       {
         return badInput(ciP, idOpt.error);
       }
-      id = idOpt.value;
-
-      if (id.empty())
+      else if (idOpt.given)
       {
-        idPattern = ".*";
+        if (idOpt.value.empty())
+        {
+          return badInput(ciP, "subject entities element id is empty");
+        }
+        if (forbiddenIdCharsV2(idOpt.value.c_str()))
+        {
+          return badInput(ciP, "forbidden characters in subject entities element id");
+        }
+
+        id = idOpt.value;
       }
     }
 
@@ -321,7 +333,20 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
       }
       else if (idPatOpt.given)
       {
+        if (idPatOpt.value.empty())
+        {
+          return badInput(ciP, "subject entities element idPattern is empty");
+        }
+
         idPattern = idPatOpt.value;
+
+        // FIXME P5: Keep the regex and propagate to sub-cache
+        regex_t re;
+        if (regcomp(&re, idPattern.c_str(), 0) != 0)
+        {
+          return badInput(ciP, "Invalid regex for entity id pattern");
+        }
+        regfree(&re);  // As the regex is not yet propagated ...
       }
     }
 
@@ -332,6 +357,10 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
     }
     else if (typeOpt.given)
     {
+      if (forbiddenIdCharsV2(typeOpt.value.c_str()))
+      {
+        return badInput(ciP, "forbidden characters in subject entities element type");
+      }
       type = typeOpt.value;
     }
 
@@ -483,6 +512,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       {
         return badInput(ciP, "notification httpCustom qs is not an object");
       }
+      if (qs.Empty())
+      {
+        return badInput(ciP, "notification httpCustom qs is empty");
+      }
 
       std::string r = parseDictionary(ciP, subsP->notification.httpInfo.qs, qs, "notification httpCustom qs");
 
@@ -499,6 +532,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       if (!headers.IsObject())
       {
         return badInput(ciP, "notification httpCustom headers is not an object");
+      }
+      if (headers.Empty())
+      {
+        return badInput(ciP, "notification httpCustom headers is empty");
       }
 
       std::string r = parseDictionary(ciP, subsP->notification.httpInfo.headers, headers, "notification httpCustom headers");
@@ -539,6 +576,11 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     if (r != "")
     {
       return r;
+    }
+
+    if (subsP->notification.attributes.empty())
+    {
+      return badInput(ciP, "http notification has exceptAttrs is empty");
     }
 
     subsP->notification.blacklist = true;
@@ -606,6 +648,10 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
     {
       return badInput(ciP, "expression is not an object");
     }
+    if (expression.Empty())
+    {
+      return badInput(ciP, "expression is empty");
+    }
 
     subsP->subject.condition.expression.isSet = true;
 
@@ -620,6 +666,11 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
       }
 
       qString = q.GetString();
+      if (qString.empty())
+      {
+        return badInput(ciP, "q is empty");
+      }
+
       subsP->subject.condition.expression.q = qString;
 
       std::string  errorString;
@@ -647,6 +698,10 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
       }
       else if (geometryOpt.given)
       {
+        if (geometryOpt.value.empty())
+        {
+          return badInput(ciP, "geometry is empty");
+        }
         subsP->subject.condition.expression.geometry = geometryOpt.value;
       }
     }
@@ -661,6 +716,10 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
       }
       else if (coordsOpt.given)
       {
+        if (coordsOpt.value.empty())
+        {
+          return badInput(ciP, "coords is empty");
+        }
         subsP->subject.condition.expression.coords = coordsOpt.value;
       }
     }
@@ -674,6 +733,10 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
       }
       if (georelOpt.given)
       {
+        if (georelOpt.value.empty())
+        {
+          return badInput(ciP, "georel is empty");
+        }
         subsP->subject.condition.expression.georel = georelOpt.value;
       }
     }
