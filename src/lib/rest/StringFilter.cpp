@@ -730,6 +730,13 @@ bool StringFilterItem::matchEquals(ContextAttribute* caP)
       return false;
     }
   }
+  else if (valueType == SfvtBool)
+  {
+    if (caP->boolValue != boolValue)
+    {
+      return false;
+    }
+  }
   else if (valueType == SfvtString)
   {
     if (caP->stringValue != stringValue)

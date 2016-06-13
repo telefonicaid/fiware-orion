@@ -72,17 +72,25 @@ volatile SubCacheState subCacheState = ScsIdle;
 *
 * EntityInfo::EntityInfo - 
 */
-EntityInfo::EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern) : entityId(_entityId), entityType(_entityType) 
+EntityInfo::EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern):
+  entityId(_entityId), entityType(_entityType)
 {
-  
   isPattern    = (_isPattern == "true") || (_isPattern == "TRUE") || (_isPattern == "True");
 
   if (isPattern)
   {
     // FIXME P5: recomp error should be captured? have a look to other usages of regcomp()
     // in order to see how it works
-    regcomp(&entityIdPattern, _entityId.c_str(), 0);
-    entityIdPatternToBeFreed = true;
+    if (regcomp(&entityIdPattern, _entityId.c_str(), 0) != 0)
+    {
+      alarmMgr.badInput(clientIp, "invalid regular expression for idPattern");
+      isPattern = false;  // FIXME P6: this entity should not be let into the system. Must be stopped before.
+                          //           Right here, best thing to do is simply to say it is not a regex
+    }
+    else
+    {
+      entityIdPatternToBeFreed = true;
+    }
   }
   else
   {

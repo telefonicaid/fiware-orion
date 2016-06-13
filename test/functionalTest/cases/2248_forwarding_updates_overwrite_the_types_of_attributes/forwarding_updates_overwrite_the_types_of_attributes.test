@@ -1,0 +1,207 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Forwarding updates overwrite the types of attributes
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+brokerStart CB
+brokerStart CP1
+
+--SHELL--
+
+#
+# 01. Create E1/T1/A1 in CP1, A1 with type 'string'
+# 02. Register E1/T1/A1 in CB, as belonging to CP1
+# 03. Update E1/T1/A1 in CB, using PUT /v2/entities/E1/attrs/A1/value, without stating type of the attribute, value is a string
+# 04. Make sure that the value of E1/T1/A1 is updated in CP1, but that its attribute type stays intact (as 'string')
+# 05. Update E1/T1/A1 in CB, using PUT /v2/entities/E1/attrs/A1/value, without stating type of the attribute, and value as JSON
+# 06. Make sure that the value of E1/T1/A1 is updated in CP1, but that its attribute type stays intact (as 'string')
+#
+
+echo "01. Create E1/T1/A1 in CP1, A1 with type 'string'"
+echo "================================================="
+payload='{
+  "type": "T1",
+  "id":   "E1",
+  "A1": {
+    "type": "string",
+    "value": "A1 01"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "02. Register E1/T1/A1 in CB, as belonging to CP1"
+echo "================================================"
+payload='{
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+          "id": "E1",
+          "type": "T1"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "string",
+          "isDomain": "false"
+        }
+      ],
+      "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
+    }
+  ],
+  "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload"
+echo
+echo
+
+
+echo "03. Update E1/T1/A1 in CB, using PUT /v2/entities/E1/attrs/A1/value, without stating type of the attribute, value is a string"
+echo "============================================================================================================================="
+payload='"A1 03"'
+orionCurl --url /v2/entities/E1/attrs/A1/value?type=T1 --payload "$payload" -X PUT --in text/plain
+echo
+echo
+
+
+echo "04. Make sure that the value of E1/T1/A1 is updated in CP1, but that its attribute type stays intact (as 'string')"
+echo "=================================================================================================================="
+orionCurl --url /v2/entities --port $CP1_PORT
+echo
+echo
+
+
+echo "05. Update E1/T1/A1 in CB, using PUT /v2/entities/E1/attrs/A1/value, without stating type of the attribute, and value as JSON"
+echo "============================================================================================================================="
+payload='{ "x": "XXX" }'
+orionCurl --url /v2/entities/E1/attrs/A1/value?type=T1 --payload "$payload" -X PUT --in application/json
+echo
+echo
+
+
+echo "06. Make sure that the value of E1/T1/A1 is updated in CP1, but that its attribute type stays intact (as 'string')"
+echo "=================================================================================================================="
+orionCurl --url /v2/entities --port $CP1_PORT
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1/T1/A1 in CP1, A1 with type 'string'
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Register E1/T1/A1 in CB, as belonging to CP1
+================================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "P1M",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+03. Update E1/T1/A1 in CB, using PUT /v2/entities/E1/attrs/A1/value, without stating type of the attribute, value is a string
+=============================================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Make sure that the value of E1/T1/A1 is updated in CP1, but that its attribute type stays intact (as 'string')
+==================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 78
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "string",
+            "value": "A1 03"
+        },
+        "id": "E1",
+        "type": "T1"
+    }
+]
+
+
+05. Update E1/T1/A1 in CB, using PUT /v2/entities/E1/attrs/A1/value, without stating type of the attribute, and value as JSON
+=============================================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Make sure that the value of E1/T1/A1 is updated in CP1, but that its attribute type stays intact (as 'string')
+==================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 82
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "string",
+            "value": {
+                "x": "XXX"
+            }
+        },
+        "id": "E1",
+        "type": "T1"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1

@@ -22,7 +22,7 @@
 *
 * Author: Orion dev team
 */
-
+#include <regex.h>
 #include <algorithm>
 
 #include "rapidjson/document.h"
@@ -285,7 +285,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
   {
     if (!iter->IsObject())
     {
-     return badInput(ciP, "subject entities element is not an object");
+      return badInput(ciP, "subject entities element is not an object");
     }
 
     if (!iter->HasMember("id") && !iter->HasMember("idPattern"))
@@ -336,16 +336,15 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
           return badInput(ciP, "subject entities element idPattern is empty");
         }
 
-        regex_t regex;
-        bool    invalidRE = (regcomp(&regex, idPatOpt.value.c_str(), 0) != 0);
-
-        if (invalidRE)
+        // FIXME P5: Keep the regex and propagate to sub-cache
+        regex_t re;
+        if (regcomp(&re, idPattern.c_str(), 0) != 0)
         {
-          return badInput(ciP, "invalid regexp in subject entities element idPattern");
+          return badInput(ciP, "Invalid regex for entity id pattern");
         }
-        idPattern = idPatOpt.value;
+        regfree(&re);  // As the regex is not yet propagated ...
 
-        regfree(&regex);
+        idPattern = idPatOpt.value;
       }
     }
 
