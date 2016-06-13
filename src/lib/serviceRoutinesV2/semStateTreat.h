@@ -1,9 +1,9 @@
-#ifndef SRC_APP_CONTEXTBROKER_VERSION_H_
-#define SRC_APP_CONTEXTBROKER_VERSION_H_
+#ifndef SRC_LIB_SERVICEROUTINESV2_SEMSTATETREAT_H_
+#define SRC_LIB_SERVICEROUTINESV2_SEMSTATETREAT_H_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,9 +25,24 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+#include <vector>
+
+#include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
 
 
 
-#define ORION_VERSION "1.2.0-next"
+/* ****************************************************************************
+*
+* semStateTreat - 
+*/
+extern std::string semStateTreat
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif  // SRC_APP_CONTEXTBROKER_VERSION_H_
+#endif  // SRC_LIB_SERVICEROUTINESV2_SEMSTATETREAT_H_

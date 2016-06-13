@@ -39,10 +39,10 @@
 *
 * Globals -
 */
-static sem_t           reqSem;
-static sem_t           transSem;
-static sem_t           cacheSem;
-static sem_t           timeStatSem;
+static sem_t      reqSem;
+static sem_t      transSem;
+static sem_t      cacheSem;
+static sem_t      timeStatSem;
 static SemOpType  reqPolicy;
 
 
@@ -459,12 +459,136 @@ int timeStatSemGive(const char* who, const char* what)
 
 
 /* ****************************************************************************
+*
+* reqSemGet - 
+*/
+const char* reqSemGet(void)
+{
+  int value;
+
+  if (sem_getvalue(&reqSem, &value) == -1)
+  {
+    return "error";
+  }
+
+  if (value == 0)
+  {
+    return "taken";
+  }
+  
+  return "free";  
+}
+
+
+
+/* ****************************************************************************
+*
+* transSemGet - 
+*/
+const char* transSemGet(void)
+{
+  int value;
+
+  if (sem_getvalue(&transSem, &value) == -1)
+  {
+    return "error";
+  }
+
+  if (value == 0)
+  {
+    return "taken";
+  }
+  
+  return "free";  
+}
+
+
+
+/* ****************************************************************************
+*
+* cacheSemGet - 
+*/
+const char* cacheSemGet(void)
+{
+  int value;
+
+  if (sem_getvalue(&cacheSem, &value) == -1)
+  {
+    return "error";
+  }
+
+  if (value == 0)
+  {
+    return "taken";
+  }
+  
+  return "free";  
+}
+
+
+
+/* ****************************************************************************
+*
+* timeStatSemGet - 
+*/
+const char* timeStatSemGet(void)
+{
+  int value;
+
+  if (sem_getvalue(&timeStatSem, &value) == -1)
+  {
+    return "error";
+  }
+
+  if (value == 0)
+  {
+    return "taken";
+  }
+  
+  return "free";  
+}
+
+
+
+/* ****************************************************************************
 *  curl context
 */
 
 
-static pthread_mutex_t contexts_mutex = PTHREAD_MUTEX_INITIALIZER;
-static std::map<std::string, struct curl_context> contexts;
+//
+// Variables for mutexes and their state
+//
+// FIXME: contexts_mutex_errors and endpoint_mutexes_errors are not yet used, see issue #2145
+//
+static std::map<std::string, struct curl_context>  contexts;
+static pthread_mutex_t                             contexts_mutex          = PTHREAD_MUTEX_INITIALIZER;
+static bool                                        contexts_mutex_taken    = false;
+static int                                         contexts_mutex_errors   = 0;
+static int                                         endpoint_mutexes_taken  = 0;
+static int                                         endpoint_mutexes_errors = 0;
+
+
+/* ****************************************************************************
+*
+* connectionContextSemGet - 
+*/
+const char* connectionContextSemGet(void)
+{
+  return (contexts_mutex_taken)? "taken" : "free";
+}
+
+
+
+/* ****************************************************************************
+*
+* connectionSubContextSemGet - 
+*/
+const char* connectionSubContextSemGet(void)
+{
+  return (endpoint_mutexes_taken == 0)? "free" : "taken";
+}
+
+
 
 // Statistics
 static struct timespec accCCMutexTime = { 0, 0 };
@@ -486,6 +610,9 @@ void curl_context_cleanup(void)
 
   contexts.clear();
   curl_global_cleanup();
+
+  endpoint_mutexes_taken = 0;
+  contexts_mutex_taken   = false;
 }
 
 
@@ -504,8 +631,10 @@ static int get_curl_context_reuse(const std::string& key, struct curl_context* p
   if (s != 0)
   {
     LM_E(("Runtime Error (pthread_mutex_lock failure)"));
+    ++contexts_mutex_errors;
     return s;
   }
+  contexts_mutex_taken = true;
 
   std::map<std::string, struct curl_context>::iterator it;
   it = contexts.find(key);
@@ -520,6 +649,8 @@ static int get_curl_context_reuse(const std::string& key, struct curl_context* p
       if (pm == NULL)
       {
         pthread_mutex_unlock(&contexts_mutex);
+        ++contexts_mutex_errors;
+        contexts_mutex_taken = false;
         LM_E(("Runtime Error (malloc)"));
         return -1;
       }
@@ -528,6 +659,8 @@ static int get_curl_context_reuse(const std::string& key, struct curl_context* p
       if (s != 0)
       {
         pthread_mutex_unlock(&contexts_mutex);
+        contexts_mutex_taken = false;
+        ++contexts_mutex_errors;
         LM_E(("Runtime Error (pthread_mutex_init)"));
         free(pm);
         return s;
@@ -548,9 +681,12 @@ static int get_curl_context_reuse(const std::string& key, struct curl_context* p
   s = pthread_mutex_unlock(&contexts_mutex);
   if (s != 0)
   {
+    ++contexts_mutex_errors;
     LM_E(("Runtime Error (pthread_mutex_unlock)"));
     return s;
   }
+
+  contexts_mutex_taken = false;
 
   // lock the mutex, if everything was right
   // and cc is not {NULL, NULl}
@@ -568,10 +704,12 @@ static int get_curl_context_reuse(const std::string& key, struct curl_context* p
     s = pthread_mutex_lock(pcc->pmutex);
     if (s != 0)
     {
+      ++endpoint_mutexes_errors;
       LM_E(("Runtime Error (pthread_mutex_lock)"));
       return s;
     }
-
+    ++endpoint_mutexes_taken;
+    
     if (semWaitStatistics)
     {
       clock_gettime(CLOCK_REALTIME, &endTime);
@@ -580,17 +718,21 @@ static int get_curl_context_reuse(const std::string& key, struct curl_context* p
       int s = pthread_mutex_lock(&contexts_mutex);
       if (s != 0)
       {
+        ++contexts_mutex_errors;
         LM_E(("Runtime Error (pthread_mutex_lock)"));
         return s;
       }
+      contexts_mutex_taken = true;
 
       clock_addtime(&accCCMutexTime, &diffTime);
       s = pthread_mutex_unlock(&contexts_mutex);
       if (s != 0)
       {
+        ++contexts_mutex_errors;
         LM_E(("Runtime Error (pthread_mutex_unlock)"));
         return s;
       }
+      contexts_mutex_taken = false;
     }
   }
 
@@ -661,8 +803,10 @@ static int release_curl_context_reuse(struct curl_context *pcc, bool final)
     if (s != 0)
     {
       LM_E(("Runtime Error (pthread_mutex_unlock)"));
+      ++endpoint_mutexes_errors;
       return s;
     }
+    --endpoint_mutexes_taken;
 
     pcc->pmutex = NULL; // It will remain in global map
   }
@@ -718,4 +862,3 @@ float mutexTimeCCGet(void)
 {
   return accCCMutexTime.tv_sec + ((float) accCCMutexTime.tv_nsec) / 1E9;
 }
-
