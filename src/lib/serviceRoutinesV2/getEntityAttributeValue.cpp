@@ -90,9 +90,7 @@ std::string getEntityAttributeValue
 
   attribute.fill(&parseDataP->qcrs.res, compV[4]);
 
-  // FIXME PR: include OrionError instead of ErrorCode in Attributes and clean the
-  // code below
-
+#if 0
   // Render entity attribute response
   if (attribute.oe.reasonPhrase == "TooManyResults")
   {
@@ -110,6 +108,12 @@ std::string getEntityAttributeValue
     ciP->httpStatusCode = SccContextElementNotFound;
 
     TIMED_RENDER(answer = oe.toJson());
+  }
+#endif
+  if (attribute.oe.code != SccNone)
+  {
+    TIMED_RENDER(answer = attribute.oe.toJson());
+    ciP->httpStatusCode = attribute.oe.code;
   }
   else
   {

@@ -97,6 +97,7 @@ std::string putEntityAttributeValue
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
+#if 0
   // FIXME PR: ErrorCode shoould be avoided
 
   // 03. Check output from mongoBackend - any errors?
@@ -124,10 +125,22 @@ std::string putEntityAttributeValue
   {
     ciP->httpStatusCode = SccNoContent;
   }
+#endif
 
+  // 03. Check output from mongoBackend
+  std::string answer;
+  if (parseDataP->upcrs.res.oe.code != SccNone)
+  {
+    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+  }
+  else
+  {
+    ciP->httpStatusCode = SccNoContent;
+  }
 
   // 05. Cleanup and return result
   parseDataP->upcr.res.release();
 
-  return "";
+  return answer;
 }

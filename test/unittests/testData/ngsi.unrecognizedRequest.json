@@ -2,6 +2,6 @@
   "orionError" : {
     "code" : "400",
     "reasonPhrase" : "Bad Request",
-    "details" : "unrecognized request"
+    "details" : "service not found"
   }
 }
