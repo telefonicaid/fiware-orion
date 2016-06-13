@@ -58,6 +58,8 @@ function checkValidInteger()
 #
 function flushCNRToSpec()
 {
+  SPEC_FILE=$PROJECT_DIR/rpm/SPECS/contextBroker.spec
+
   #
   # Edit rpm/SPECS/contextBroker.spec, adding the new changes from CHANGELOG_FILE
   #
@@ -78,7 +80,7 @@ function flushCNRToSpec()
   #    The for is because these is more than one oceuurence of '%changelog'. We are only
   #    interested in the last one.
   #
-  for line in $(grep -n '%changelog' rpm/SPECS/contextBroker.spec | awk -F: '{ print $1 }')
+  for line in $(grep -n '%changelog' $SPEC_FILE | awk -F: '{ print $1 }')
   do
     LINE=$line
   done
@@ -86,7 +88,7 @@ function flushCNRToSpec()
   #
   # 2. Get the total number of lines in rpm/SPECS/contextBroker.spec
   #
-  LINES=$(wc -l rpm/SPECS/contextBroker.spec | awk '{ print $1 }')
+  LINES=$(wc -l $SPEC_FILE | awk '{ print $1 }')
 
   #
   # 3. Get the number of lines in rpm/SPECS/contextBroker.spec after the insertion
@@ -97,18 +99,18 @@ function flushCNRToSpec()
   #
   # 4. To a temporal file, add the four 'chunks'
   #
-  head -$LINE rpm/SPECS/contextBroker.spec        >  /tmp/contextBroker.spec
+  head -$LINE $SPEC_FILE        >  /tmp/contextBroker.spec
 
-  echo -n '* '                                    >> /tmp/contextBroker.spec
-  echo $dateLine                                  >> /tmp/contextBroker.spec
+  echo -n '* '                  >> /tmp/contextBroker.spec
+  echo $dateLine                >> /tmp/contextBroker.spec
 
   cat $changelog                                  >> /tmp/contextBroker.spec
   echo                                            >> /tmp/contextBroker.spec
 
-  tail -$LAST_LINES rpm/SPECS/contextBroker.spec  >> /tmp/contextBroker.spec
+  tail -$LAST_LINES $SPEC_FILE  >> /tmp/contextBroker.spec
     
   # 5. Replace using the temporal file
-  mv /tmp/contextBroker.spec rpm/SPECS/contextBroker.spec 
+  mv /tmp/contextBroker.spec $SPEC_FILE
 
   rm $changelog; touch $changelog
 }
@@ -193,14 +195,20 @@ if [ "$baseVersion" != "$versionFromBranch" ]; then
   exit 1
 fi
 
+# Check dockerfile has the right tag
+grep $PROJECT_DIR/docker/Dockerfile "ENV GIT_REV_ORION $currentTag"
+if [ "$?" != "0" ]; then
+  echo $0: GIT_REV_ORION does not use current tag in Dockerfile"
+fi
+
 # Calculate next tag
 Z=$((Z+1))
 nextTag=$X.$Y.$Z
 echo $0: next tag is: "'"${nextTag}"'"
 
 # Modify src/app/contextBroker/version.h
-sed "s/$currentTag/$nextTag/" src/app/contextBroker/version.h > /tmp/version.h
-mv /tmp/version.h src/app/contextBroker/version.h
+sed "s/$currentTag/$nextTag/" $PROJECT_DIR/src/app/contextBroker/version.h > /tmp/version.h
+mv /tmp/version.h $PROJECT_DIR/src/app/contextBroker/version.h
 
 # Flush CNR into .spec
 DATE=$(LANG=C date +"%a %b %d %Y")
@@ -208,12 +216,12 @@ export dateLine="$DATE Fermin Galan <fermin.galanmarquez@telefonica.com> ${nextT
 flushCNRToSpec
 
 # Modify ENV GIT_REV_ORION at docker/Dockerfile
-sed "s/ENV GIT_REV_ORION $currentTag/ENV GIT_REV_ORION $nextTag/" docker/Dockerfile > /tmp/Dockerfile
-mv /tmp/Dockerfile docker/Dockerfile
+sed "s/ENV GIT_REV_ORION $currentTag/ENV GIT_REV_ORION $nextTag/" $PROJECT_DIR/docker/Dockerfile > /tmp/Dockerfile
+mv /tmp/Dockerfile $PROJEC_DIR/docker/Dockerfile
 
 # Commit all files
 if [ "$commit" == "on" ]; then
-  git add src/app/contextBroker/version.h $changelog Docker/Dockerfile rpm/SPECS/contextBroker.spec
+  cd $PROJECT_DIR && git add src/app/contextBroker/version.h $changelog Docker/Dockerfile rpm/SPECS/contextBroker.spec
   git commit -m "Step: $currentTag -> $nextTag"
 fi
 
