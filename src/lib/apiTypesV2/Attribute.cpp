@@ -84,7 +84,7 @@ void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
 {
   if (qcrsP->errorCode.code == SccContextElementNotFound)
   {
-    oe.fill(SccContextElementNotFound, "The requested entity has not been found. Check type and id", "NotFound");
+    oe.fill(SccContextElementNotFound, "The entity does not have such an attribute", "NotFound");
   }
   else if (qcrsP->errorCode.code != SccOk)
   {
