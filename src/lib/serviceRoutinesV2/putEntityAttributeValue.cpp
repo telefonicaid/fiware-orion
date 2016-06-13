@@ -65,6 +65,7 @@ std::string putEntityAttributeValue
   std::string  attributeName  = compV[4];
   std::string  type           = ciP->uriParam["type"];
 
+  // FIXME PR: unify both
   if (forbiddenIdChars(ciP->apiVersion, entityId.c_str() , NULL))
   {
     OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
