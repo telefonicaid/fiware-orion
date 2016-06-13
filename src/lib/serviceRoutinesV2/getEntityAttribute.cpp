@@ -92,11 +92,11 @@ std::string getEntityAttribute
 
   TIMED_RENDER(answer = attribute.render(ciP, EntityAttributeResponse));
 
-  if (attribute.errorCode.error == "TooManyResults")
+  if (attribute.oe.reasonPhrase == "TooManyResults")
   {
     ciP->httpStatusCode = SccConflict;
   }
-  else if (attribute.errorCode.error == "NotFound")
+  else if (attribute.oe.reasonPhrase == "NotFound")
   {
     ciP->httpStatusCode = SccContextElementNotFound; // Attribute to be precise!
   }

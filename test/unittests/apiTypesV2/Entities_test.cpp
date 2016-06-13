@@ -44,7 +44,7 @@ TEST(Entities, present)
 
   Entities ens;
   ens.vec.push_back(enP);
-  ens.errorCode.fill("FooError", "Lorem ipsum");
+  ens.oe.fill(SccNone, "Lorem ipsum", "FooError");
 
   ens.present("");
 

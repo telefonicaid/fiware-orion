@@ -34,7 +34,6 @@
 #include "apiTypesV2/Entities.h"
 #include "rest/OrionError.h"
 #include "rest/EntityTypeInfo.h"
-#include "apiTypesV2/ErrorCode.h"
 #include "serviceRoutinesV2/deleteEntity.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "parse/forbiddenChars.h"

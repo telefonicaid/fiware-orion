@@ -110,10 +110,11 @@ std::string putEntityAttributeValue
 
   if (ciP->httpStatusCode == SccConflict)
   {
-    ErrorCode   ec("TooManyResults", MORE_MATCHING_ENT);
+    // FIXME PR: not sure if I like this logic
+    OrionError  oe(SccConflict, MORE_MATCHING_ENT, "TooManyResults");
     std::string answer;
 
-    TIMED_RENDER(answer = ec.toJson(true));
+    TIMED_RENDER(answer = oe.toJson());
 
     return answer;
   }

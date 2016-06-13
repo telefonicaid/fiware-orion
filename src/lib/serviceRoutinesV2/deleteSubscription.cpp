@@ -30,7 +30,6 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "rest/OrionError.h"
-#include "apiTypesV2/ErrorCode.h"
 #include "mongoBackend/mongoUnsubscribeContext.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
 

@@ -43,50 +43,43 @@ using namespace rapidjson;
 */
 std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 {
-  Document document;
+  Document    document;
+  OrionError  oe;
 
   document.Parse(ciP->payload);
 
   if (document.HasParseError())
   {
-    ErrorCode ec;
-
     alarmMgr.badInput(clientIp, "JSON Parse Error");
-    ec.fill(ERROR_STRING_PARSERROR, "Errors found in incoming JSON buffer");
+    oe.fill(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
     ciP->httpStatusCode = SccBadRequest;
 
-    return ec.toJson(true);
+    return oe.toJson();
   }
 
   if (!document.IsObject())
   {
-    ErrorCode ec;
-
     alarmMgr.badInput(clientIp, "JSON Parse Error");
-    ec.fill("BadRequest", "JSON Parse Error");
+    oe.fill(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
     ciP->httpStatusCode = SccBadRequest;
 
-    return ec.toJson(true);
+    return oe.toJson();
   }
   else if (document.ObjectEmpty())
   {
-    ErrorCode ec;
-
     alarmMgr.badInput(clientIp, "Empty JSON payload");
-    ec.fill("BadRequest", "empty payload");
+    oe.fill(SccBadRequest, "empty payload", "BadRequest");
     ciP->httpStatusCode = SccBadRequest;
 
-    return ec.toJson(true);
+    return oe.toJson();
   }
   else if (!document.HasMember("entities") && !document.HasMember("attributes") && !document.HasMember("scopes"))
   {
-    ErrorCode ec;
-
     alarmMgr.badInput(clientIp, "Invalid JSON payload, no relevant fields found");
-    ec.fill("BadRequest", "Invalid JSON payload, no relevant fields found");
+    oe.fill(SccBadRequest, "Invalid JSON payload, no relevant fields found", "BadRequest");
     ciP->httpStatusCode = SccBadRequest;
 
-    return ec.toJson(true);
+    return oe.toJson();
   }
 
   for (Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
@@ -99,12 +92,11 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       std::string r = parseEntityVector(ciP, iter, &bqrP->entities, false);  // param 4: attributes are NOT allowed in payload
 
       if (r != "OK")
-      {
-        ErrorCode ec("BadRequest", r);
-
+      {        
         alarmMgr.badInput(clientIp, r);
+        oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
-        return ec.toJson(true);
+        return oe.toJson();
       }
     }
     else if (name == "attributes")
@@ -112,12 +104,11 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       std::string r = parseAttributeList(ciP, iter, &bqrP->attributeV);
 
       if (r != "OK")
-      {
-        ErrorCode ec("BadRequest", r);
-
+      {        
         alarmMgr.badInput(clientIp, r);
+        oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
-        return ec.toJson(true);
+        return oe.toJson();
       }
     }
     else if (name == "scopes")
@@ -125,23 +116,21 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       std::string r = parseScopeVector(ciP, iter, &bqrP->scopeV);
 
       if (r != "OK")
-      {
-        ErrorCode ec("BadRequest", r);
-
+      {        
         alarmMgr.badInput(clientIp, r);
+        oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
-        return ec.toJson(true);
+        return oe.toJson();
       }
     }
     else
     {
-      std::string  description = std::string("Unrecognized field in JSON payload: /") + name + "/";
-      ErrorCode    ec("BadRequest", description);
-
+      std::string  description = std::string("Unrecognized field in JSON payload: /") + name + "/";      
       alarmMgr.badInput(clientIp, description);
+      oe.fill(SccBadRequest, description, "BadRequest");
       ciP->httpStatusCode = SccBadRequest;
 
-      return ec.toJson(true);
+      return oe.toJson();
     }
   }
 

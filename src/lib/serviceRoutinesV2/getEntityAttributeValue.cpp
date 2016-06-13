@@ -94,20 +94,22 @@ std::string getEntityAttributeValue
   // code below
 
   // Render entity attribute response
-  if (attribute.errorCode.error == "TooManyResults")
+  if (attribute.oe.reasonPhrase == "TooManyResults")
   {
-    ErrorCode ec("TooManyResults", MORE_MATCHING_ENT);
+    // FIXME PR: no need of new OrionErrir, use the one in attribute variable
+    OrionError oe(SccConflict, MORE_MATCHING_ENT, "TooManyResults");
 
     ciP->httpStatusCode = SccConflict;
 
-    TIMED_RENDER(answer = ec.toJson(true));
+    TIMED_RENDER(answer = oe.toJson());
   }
-  else if (attribute.errorCode.error == "NotFound")
+  else if (attribute.oe.reasonPhrase == "NotFound")
   {
-    ErrorCode ec("NotFound", "The requested entity has not been found. Check type and id");
+    // FIXME PR: no need of new OrionErrir, use the one in attribute variable
+    OrionError oe(SccContextElementNotFound, "The requested entity has not been found. Check type and id", "NotFound");
     ciP->httpStatusCode = SccContextElementNotFound;
 
-    TIMED_RENDER(answer = ec.toJson(true));
+    TIMED_RENDER(answer = oe.toJson());
   }
   else
   {
