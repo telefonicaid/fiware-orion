@@ -38,29 +38,30 @@ The log format is designed to be processed by tools like
 Each line in the log file is composed by several key-value fields,
 separed by the pipe character (`|`). Example:
 
-    time=2014-07-18T16:39:06.265CEST | lvl=INFO | corr=N/A | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=main | comp=Orion | msg=contextBroker.cpp[1217]: Orion Context Broker is running
-    time=2014-07-18T16:39:06.266CEST | lvl=INFO | corr=N/A | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=mongoConnect | comp=Orion | msg=MongoGlobal.cpp[122]: Successful connection to database
-    time=2014-07-18T16:39:06.266CEST | lvl=INFO | corr=N/A | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=mongoInit | comp=Orion | msg=contextBroker.cpp[1055]: Connected to mongo at localhost:orion
-    time=2014-07-18T16:39:06.452CEST | lvl=INFO | corr=N/A | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=main | comp=Orion | msg=contextBroker.cpp[1290]: Startup completed
+    time=2014-07-18T16:39:06.265Z | lvl=INFO | corr=N/A | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=main | comp=Orion | msg=contextBroker.cpp[1217]: Orion Context Broker is running
+    time=2014-07-18T16:39:06.266Z | lvl=INFO | corr=N/A | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=mongoConnect | comp=Orion | msg=MongoGlobal.cpp[122]: Successful connection to database
+    time=2014-07-18T16:39:06.266Z | lvl=INFO | corr=N/A | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=mongoInit | comp=Orion | msg=contextBroker.cpp[1055]: Connected to mongo at localhost:orion
+    time=2014-07-18T16:39:06.452Z | lvl=INFO | corr=N/A | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=main | comp=Orion | msg=contextBroker.cpp[1290]: Startup completed
     ...
-    time=2014-07-18T16:39:22.920CEST | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=pending | subsrv=pending | from=pending | function=connectionTreat | comp=Orion | msg=rest.cpp[615]: Starting transaction from 10.0.0.1:v1/v1/updateContext
-    time=2014-07-18T16:39:22.922CEST | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=processContextElement | comp=Orion | msg=MongoCommonUpdate.cpp[1499]: Database Operation Successful (...)
-    time=2014-07-18T16:39:22.922CEST | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=createEntity | comp=Orion | msg=MongoCommonUpdate.cpp[1318]: Database Operation Successful (...)
-    time=2014-07-18T16:39:22.923CEST | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=addTriggeredSubscriptions | comp=Orion | msg=MongoCommonUpdate.cpp[811]: Database Operation Successful (...)
-    time=2014-07-18T16:39:22.923CEST | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=addTriggeredSubscriptions | comp=Orion | msg=MongoCommonUpdate.cpp[811]: Database Operation Successful (...)
-    time=2014-07-18T16:39:22.923CEST | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=connectionTreat | comp=Orion | msg=rest.cpp[745]: Transaction ended
+    time=2014-07-18T16:39:22.920Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=pending | subsrv=pending | from=pending | function=connectionTreat | comp=Orion | msg=rest.cpp[615]: Starting transaction from 10.0.0.1:v1/v1/updateContext
+    time=2014-07-18T16:39:22.922Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=processContextElement | comp=Orion | msg=MongoCommonUpdate.cpp[1499]: Database Operation Successful (...)
+    time=2014-07-18T16:39:22.922Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=createEntity | comp=Orion | msg=MongoCommonUpdate.cpp[1318]: Database Operation Successful (...)
+    time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=addTriggeredSubscriptions | comp=Orion | msg=MongoCommonUpdate.cpp[811]: Database Operation Successful (...)
+    time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=addTriggeredSubscriptions | comp=Orion | msg=MongoCommonUpdate.cpp[811]: Database Operation Successful (...)
+    time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=connectionTreat | comp=Orion | msg=rest.cpp[745]: Transaction ended
     ...
-    time=2014-07-18T16:39:35.415CEST | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | srv=pending | subsrv=pending | from=pending | function=connectionTreat | comp=Orion | msg=rest.cpp[615]: Starting transaction from 10.0.0.2:48373/v1/queryContext
-    time=2014-07-18T16:39:35.416CEST | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | srv=s1 | subsrv=/A | from=10.0.0.2 | function=entitiesQuery | comp=Orion | msg=MongoGlobal.cpp[877]: Database Operation Successful (...)
-    time=2014-07-18T16:39:35.416CEST | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | srv=s1 | subsrv=/A | from=10.0.0.2 | function=connectionTreat | comp=Orion | msg=rest.cpp[745]: Transaction ended
+    time=2014-07-18T16:39:35.415Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | srv=pending | subsrv=pending | from=pending | function=connectionTreat | comp=Orion | msg=rest.cpp[615]: Starting transaction from 10.0.0.2:48373/v1/queryContext
+    time=2014-07-18T16:39:35.416Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | srv=s1 | subsrv=/A | from=10.0.0.2 | function=entitiesQuery | comp=Orion | msg=MongoGlobal.cpp[877]: Database Operation Successful (...)
+    time=2014-07-18T16:39:35.416Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | srv=s1 | subsrv=/A | from=10.0.0.2 | function=connectionTreat | comp=Orion | msg=rest.cpp[745]: Transaction ended
     ...
-    time=2014-07-18T16:44:53.541CEST | lvl=INFO | corr=N/A | trans=N/A | corr=N/A | srv=N/A | subsrv=N/A | from=N/A | function=sigHandler | comp=Orion | msg=contextBroker.cpp[968]: Signal Handler (caught signal 2)
-    time=2014-07-18T16:44:53.541CEST | lvl=INFO | corr=N/A | trans=N/A | corr=N/A | srv=N/A | subsrv=N/A | from=N/A | function=sigHandler | comp=Orion | msg=contextBroker.cpp[974]: Orion context broker exiting due to receiving a signal
+    time=2014-07-18T16:44:53.541Z | lvl=INFO | corr=N/A | trans=N/A | corr=N/A | srv=N/A | subsrv=N/A | from=N/A | function=sigHandler | comp=Orion | msg=contextBroker.cpp[968]: Signal Handler (caught signal 2)
+    time=2014-07-18T16:44:53.541Z | lvl=INFO | corr=N/A | trans=N/A | corr=N/A | srv=N/A | subsrv=N/A | from=N/A | function=sigHandler | comp=Orion | msg=contextBroker.cpp[974]: Orion context broker exiting due to receiving a signal
 
 The different fields in each line are as follows:
 
 -   **time**. A timestamp corresponding to the moment in which the log
     line was generated in [ISO8601](https://es.wikipedia.org/wiki/ISO_8601) format.
+    Orion prints timestamps in UTC format.
 -   **lvl (level)**. There are five levels:
     -   ERROR: This level designates error events. There is a severe
         problem that should be fixed. A subclass of ERROR is FATAL,
