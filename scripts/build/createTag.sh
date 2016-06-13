@@ -196,9 +196,10 @@ if [ "$baseVersion" != "$versionFromBranch" ]; then
 fi
 
 # Check dockerfile has the right tag
-grep $PROJECT_DIR/docker/Dockerfile "ENV GIT_REV_ORION $currentTag"
+grep "ENV GIT_REV_ORION $currentTag" $PROJECT_DIR/docker/Dockerfile
 if [ "$?" != "0" ]; then
-  echo $0: GIT_REV_ORION does not use current tag in Dockerfile"
+  echo $0: GIT_REV_ORION does not use current tag in Dockerfile
+  exit 1
 fi
 
 # Calculate next tag
@@ -217,7 +218,7 @@ flushCNRToSpec
 
 # Modify ENV GIT_REV_ORION at docker/Dockerfile
 sed "s/ENV GIT_REV_ORION $currentTag/ENV GIT_REV_ORION $nextTag/" $PROJECT_DIR/docker/Dockerfile > /tmp/Dockerfile
-mv /tmp/Dockerfile $PROJEC_DIR/docker/Dockerfile
+mv /tmp/Dockerfile $PROJECT_DIR/docker/Dockerfile
 
 # Commit all files
 if [ "$commit" == "on" ]; then
