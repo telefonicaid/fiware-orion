@@ -47,6 +47,7 @@ payload='
     "subject": {
         "entities": [
             {
+                "idPattern": ".*",
                 "type": "Room"
             }
         ],
