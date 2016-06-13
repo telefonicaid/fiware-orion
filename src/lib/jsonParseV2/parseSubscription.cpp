@@ -258,7 +258,7 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
   {
     return badInput(ciP, "condition is not an object");
   }
-  if (condition.Empty())
+  if (condition.ObjectEmpty())
   {
     return badInput(ciP, "condition is empty");
   }
