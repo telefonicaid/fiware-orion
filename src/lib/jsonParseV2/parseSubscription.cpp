@@ -336,6 +336,8 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
           return badInput(ciP, "subject entities element idPattern is empty");
         }
 
+        idPattern = idPatOpt.value;
+
         // FIXME P5: Keep the regex and propagate to sub-cache
         regex_t re;
         if (regcomp(&re, idPattern.c_str(), 0) != 0)
@@ -343,8 +345,6 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
           return badInput(ciP, "Invalid regex for entity id pattern");
         }
         regfree(&re);  // As the regex is not yet propagated ...
-
-        idPattern = idPatOpt.value;
       }
     }
 
