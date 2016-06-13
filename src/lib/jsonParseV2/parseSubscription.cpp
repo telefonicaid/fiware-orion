@@ -260,7 +260,7 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
   {
     return badInput(ciP, "condition is not an object");
   }
-  if (condition.Empty())
+  if (condition.ObjectEmpty())
   {
     return badInput(ciP, "condition is empty");
   }
@@ -512,7 +512,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       {
         return badInput(ciP, "notification httpCustom qs is not an object");
       }
-      if (qs.Empty())
+      if (qs.ObjectEmpty())
       {
         return badInput(ciP, "notification httpCustom qs is empty");
       }
@@ -533,7 +533,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       {
         return badInput(ciP, "notification httpCustom headers is not an object");
       }
-      if (headers.Empty())
+      if (headers.ObjectEmpty())
       {
         return badInput(ciP, "notification httpCustom headers is empty");
       }
@@ -648,7 +648,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
     {
       return badInput(ciP, "expression is not an object");
     }
-    if (expression.Empty())
+    if (expression.ObjectEmpty())
     {
       return badInput(ciP, "expression is empty");
     }
