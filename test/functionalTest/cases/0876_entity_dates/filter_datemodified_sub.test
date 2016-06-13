@@ -63,7 +63,7 @@ payload='
     "subject": {
         "entities": [
             {
-                "idPatern": "E.*",
+                "idPattern": "E.*",
                 "type": "T"
             }
         ],

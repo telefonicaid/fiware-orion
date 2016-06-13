@@ -105,6 +105,7 @@ int noOfEntityByIdAttributeByNameIdAndType               = -1;
 
 int noOfLogTraceRequests                                 = -1;
 int noOfLogLevelRequests                                 = -1;
+int noOfSemStateRequests                                 = -1;
 int noOfVersionRequests                                  = -1;
 int noOfExitRequests                                     = -1;
 int noOfLeakRequests                                     = -1;
@@ -338,6 +339,7 @@ void statisticsUpdate(RequestType request, MimeType inMimeType)
 
   case LogTraceRequest:                                  ++noOfLogTraceRequests; break;
   case LogLevelRequest:                                  ++noOfLogLevelRequests; break;
+  case SemStateRequest:                                  ++noOfSemStateRequests; break;
   case VersionRequest:                                   ++noOfVersionRequests; break;
   case ExitRequest:                                      ++noOfExitRequests; break;
   case LeakRequest:                                      ++noOfLeakRequests; break;

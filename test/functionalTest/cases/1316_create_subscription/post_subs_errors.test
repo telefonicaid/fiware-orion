@@ -163,7 +163,8 @@ payload='
     "subject": {
         "entities": [
             {
-                "type": "Room"
+               "idPattern": ".*",
+               "type": "Room"
             }
         ],
         "condition": {
@@ -188,6 +189,7 @@ payload='
     "subject": {
         "entities": [
             {
+                "idPattern": ".*",
                 "type": "Room"
             }
         ]
@@ -212,7 +214,8 @@ payload='
     "subject": {
         "entities": [
             {
-                "type": "Room"
+                 "idPattern": ".*",
+                 "type": "Room"
             }
         ],
         "condition": {
@@ -243,13 +246,13 @@ echo
 01. POST /v2/subscriptions (without id/idpattern)
 =================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 92
+Content-Length: 94
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "subject entities element has no id/idPattern nor type",
+    "description": "subject entities element does not have id nor idPattern",
     "error": "BadRequest"
 }
 
