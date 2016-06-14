@@ -141,7 +141,7 @@ do
       exit 0
       ;;
     *)
-      echo $0: bad parameter/option: "'"${1}"'"
+      echo $0: bad parameter/option: "'"${OPTARG}"'"
       echo
       usage
       exit 1
