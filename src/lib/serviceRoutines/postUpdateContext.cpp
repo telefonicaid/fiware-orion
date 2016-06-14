@@ -650,13 +650,13 @@ std::string postUpdateContext
     response.merge(&upcrs);
   }
 
-  // Note this is a slight break in the separation of concern among the different layers (i.e.
-  // servicerRoutine/ logic works in a "NGSIv1 isolated context"). However, it seems to be
-  // a smart way off dealing with partial update situations
+  // Note this is a slight break in the separation of concerns among the different layers (i.e.
+  // serviceRoutine/ logic should work in a "NGSIv1 isolated context"). However, it seems to be
+  // a smart way of dealing with partial update situations
   if (ciP->apiVersion == "v2")
   {
     // Adjust OrionError response in the case of partial updates. This may happen in CPr forwarding
-    // scenarios. Note that mongoBackend logic "split" sucessfull updates and failing updates in
+    // scenarios. Note that mongoBackend logic "splits" sucessfull updates and failing updates in
     // two different CER (maybe using the same entity)
 
     std::string failing = "";
@@ -686,7 +686,7 @@ std::string postUpdateContext
     }
 
     // Note that we modify parseDataP->upcrs.res.oe and not response.oe, as the former is the
-    // one used by the calling postBatchUpdate() function
+    // one used by the calling postBatchUpdate() function at serviceRoutineV2 library
     if (fails == response.contextElementResponseVector.size())
     {
       // If all CER result in error, then it isn't a partial update, but a regular NotFound
@@ -694,7 +694,7 @@ std::string postUpdateContext
     }
     else if (fails > 0)
     {
-      // Removing trailing ,
+      // Removing trailing ", "
       failing = failing.substr(0, failing.size() - 2);
 
       // If some CER (but not all) fails, then it is a partial update
