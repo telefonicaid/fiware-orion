@@ -64,7 +64,6 @@ std::string deleteEntity
   ParseData*                 parseDataP
 )
 {
-  string  answer = "";
   Entity* eP;
 
   if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
@@ -94,6 +93,7 @@ std::string deleteEntity
   ciP->outMimeType = JSON;
 
   // Check for potential error
+  string  answer = "";
   if (parseDataP->upcrs.res.oe.code != SccNone )
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());

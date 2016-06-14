@@ -65,14 +65,7 @@ std::string getEntityAttribute
   std::string  answer;
   Attribute    attribute;
 
-  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
-  {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
-    ciP->httpStatusCode = oe.code;
-    return oe.toJson();
-  }
-
-  if (forbiddenIdChars(ciP->apiVersion, compV[4].c_str() , NULL))
+  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL) || (forbiddenIdChars(ciP->apiVersion, compV[4].c_str() , NULL)))
   {
     OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
     ciP->httpStatusCode = oe.code;

@@ -73,3 +73,9 @@ However, this may change in the future, as described in https://github.com/telef
 Orion implements a `scope` field in the `POST /v2/op/update` operation (you can see
 [an example in the NGSIv2 walkthrough](walkthrough_apiv2.md#batch-operations)). However, note that this syntax is
 somewhat experimental and it hasn't been consolidated in the NGSIv2 specification.
+
+## Error responses
+
+The error response rules defined in https://github.com/telefonicaid/fiware-orion/issues/1286 takes precedence over
+the ones described in "Error Responses" section in the NGSIv2 specification. In particular, Orion Context
+Broker never responses with "InvalidModification (422)", using "Unprocessable (422)" instead.

@@ -90,7 +90,7 @@ std::string putEntityAttributeValue
   postUpdateContext(ciP, components, compV, parseDataP);
 
   // 03. Check output from mongoBackend
-  std::string answer;
+  std::string answer = "";
   if (parseDataP->upcrs.res.oe.code != SccNone)
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());

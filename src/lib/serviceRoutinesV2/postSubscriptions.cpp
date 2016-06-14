@@ -47,7 +47,7 @@ extern std::string postSubscriptions
 )
 {
   SubscribeContextResponse  scr;
-  std::string               answer;
+  std::string               answer = "";
 
   if (ciP->servicePathV.size() > 1)
   {
@@ -73,19 +73,20 @@ extern std::string postSubscriptions
                           ciP->httpHeaders.xauthToken,
                           ciP->httpHeaders.correlator));
 
-
+  // Check potential error
   if (beError.code != SccNone )
   {
     TIMED_RENDER(answer = beError.toJson());
     ciP->httpStatusCode = beError.code;
-    return answer;
+  }
+  else
+  {
+    std::string location = "/v2/subscriptions/" + subsID;
+    ciP->httpHeader.push_back("Location");
+    ciP->httpHeaderValue.push_back(location);
+
+    ciP->httpStatusCode = SccCreated;
   }
 
-  std::string location = "/v2/subscriptions/" + subsID;
-  ciP->httpHeader.push_back("Location");
-  ciP->httpHeaderValue.push_back(location);
-
-  ciP->httpStatusCode = SccCreated;
-
-  return "";
+  return answer;
 }

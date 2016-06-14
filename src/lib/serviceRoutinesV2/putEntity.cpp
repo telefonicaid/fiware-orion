@@ -65,7 +65,6 @@ std::string putEntity
   ParseData*                 parseDataP
 )
 {
-  std::string answer = "";
   Entity*     eP     = &parseDataP->ent.res;
 
   eP->id   = compV[2];
@@ -85,24 +84,8 @@ std::string putEntity
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
-
-  // 03. Check output from mongoBackend - any errors?
-  if (parseDataP->upcrs.res.contextElementResponseVector.size() == 1)
-  {
-    if (parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code != SccOk)
-    {
-      ciP->httpStatusCode = parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code;
-    }
-  }
-
-  // 04. Check error
-#if 0
-  if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
-  {
-    ciP->httpStatusCode = SccNoContent;
-  }
-#endif
-
+  // 03. Check error
+  std::string answer = "";
   if (parseDataP->upcrs.res.oe.code != SccNone )
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
@@ -113,7 +96,7 @@ std::string putEntity
     ciP->httpStatusCode = SccNoContent;
   }
 
-  // 05. Cleanup and return result
+  // 04. Cleanup and return result
   eP->release();
 
   return answer;

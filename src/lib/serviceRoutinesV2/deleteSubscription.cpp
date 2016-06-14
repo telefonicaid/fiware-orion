@@ -58,15 +58,16 @@ std::string deleteSubscription
     ParseData*                 parseDataP
 )
 {
-  std::string                 answer = "";
   std::string                 subscriptionId =  compV[2];
   UnsubscribeContextResponse  uncr;
 
   // 'Fill In' UnsubscribeContextRequest
   parseDataP->uncr.res.subscriptionId.set(subscriptionId);
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, ciP->tenant));
+  TIMED_MONGO(mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, ciP->tenant));
 
+  // Check for potential error
+  std::string  answer = "";
   if (uncr.oe.code != SccNone )
   {
     TIMED_RENDER(answer = uncr.oe.toJson());

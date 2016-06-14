@@ -99,10 +99,10 @@ std::string postEntities
   
 
   // 02. Call standard op postUpdateContext
-  postUpdateContext(ciP, components, compV, parseDataP, NGSIV2_FLAVOUR_ONCREATE);  
-  std::string    answer;
+  postUpdateContext(ciP, components, compV, parseDataP, NGSIV2_FLAVOUR_ONCREATE);
 
   // 03. Check error
+  std::string  answer = "";
   if (parseDataP->upcrs.res.oe.code != SccNone )
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());

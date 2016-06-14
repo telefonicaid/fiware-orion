@@ -63,19 +63,11 @@ std::string putEntityAttribute
   ParseData*                 parseDataP
 )
 {
-  std::string  answer;
   std::string  entityId       = compV[2];
   std::string  attributeName  = compV[4];
   std::string  type           = ciP->uriParam["type"];
 
-  if (forbiddenIdChars(ciP->apiVersion, entityId.c_str() , NULL))
-  {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
-    ciP->httpStatusCode = oe.code;
-    return oe.toJson();
-  }
-
-  if (forbiddenIdChars(ciP->apiVersion, attributeName.c_str() , NULL))
+  if (forbiddenIdChars(ciP->apiVersion, entityId.c_str() , NULL) || (forbiddenIdChars(ciP->apiVersion, attributeName.c_str() , NULL)))
   {
     OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
     ciP->httpStatusCode = oe.code;
@@ -90,23 +82,8 @@ std::string putEntityAttribute
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
-  // 03. Check output from mongoBackend - any errors?
-#if 0
-  if (parseDataP->upcrs.res.contextElementResponseVector.size() == 1)
-  {
-    if (parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code != SccOk)
-    {
-      ciP->httpStatusCode = parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code;
-    }
-  }
-
-
-  // 04. Prepare HTTP headers
-  if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
-  {
-    ciP->httpStatusCode = SccNoContent;
-  }
-#endif
+  // 03. Check error
+  std::string  answer = "";
   if (parseDataP->upcrs.res.oe.code != SccNone )
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
@@ -121,16 +98,6 @@ std::string putEntityAttribute
   // 05. Cleanup and return result
   parseDataP->upcr.res.release();
   parseDataP->upcrs.res.release();
-
-#if 0
-  if (ciP->httpStatusCode == SccInvalidModification)
-  {
-    std::string  details = "Request payload is missing some piece of information. Please, check Orion documentation."; 
-    OrionError   orionError(SccInvalidModification, details);     
-
-    TIMED_RENDER(answer = orionError.render());
-  }
-#endif
 
   return answer;
 }

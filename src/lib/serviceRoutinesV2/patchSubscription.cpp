@@ -56,8 +56,7 @@ std::string patchSubscription
   ParseData*                 parseDataP
 )
 {
-  std::string                        answer;
-  std::string                        subscriptionId =  compV[2];
+  std::string  subscriptionId = compV[2];
 
   // 'Fill In' SusbcriptionUpdate
   parseDataP->subsV2.id = subscriptionId;
@@ -76,23 +75,18 @@ std::string patchSubscription
                                       ciP->httpHeaders.xauthToken,
                                       ciP->httpHeaders.correlator));
 
-
+  std::string  answer = "";
   if (beError.code != SccNone)
   {
-    if (beError.code == SccContextElementNotFound)
-    {
-      beError.details = "The requested subscription has not been found. Check id";
-    }
-
     TIMED_RENDER(answer = beError.toJson());
     ciP->httpStatusCode = beError.code;
-
-    return answer;
+  }
+  else
+  {
+    ciP->httpStatusCode = SccNoContent;
   }
 
-  ciP->httpStatusCode = SccNoContent;
-
-  return "";
+  return answer;
 }
 
 

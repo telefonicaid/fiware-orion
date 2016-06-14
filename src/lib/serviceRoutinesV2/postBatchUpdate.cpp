@@ -62,7 +62,6 @@ std::string postBatchUpdate
   BatchUpdate*           buP    = &parseDataP->bu.res;
   UpdateContextRequest*  upcrP  = &parseDataP->upcr.res;
   Entities               entities;
-  std::string            answer;
 
   upcrP->fill(&buP->entities, buP->updateActionType.get());
   buP->release();  // upcrP just 'took over' the data from buP, buP is no longer needed
@@ -70,6 +69,8 @@ std::string postBatchUpdate
 
   postUpdateContext(ciP, components, compV, parseDataP);
 
+  // Check potential error
+  std::string  answer = "";
   if (parseDataP->upcrs.res.oe.code != SccNone )
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
@@ -77,11 +78,10 @@ std::string postBatchUpdate
   }
   else
   {
-    answer = "";
     ciP->httpStatusCode = SccNoContent;
   }
 
-  // 04. Cleanup and return result
+  // Cleanup and return result
   entities.release();
   parseDataP->upcr.res.release();
 
