@@ -37,7 +37,7 @@ brokerStart CB
 # 05. POST /v2/subscriptions (empty body)
 # 06. POST /v2/subscriptions (missing subject)
 # 07. POST /v2/subscriptions (missing notification)
-# 08. POST /v2/subscriptions (missing subject condition)
+# 08. POST /v2/subscriptions (empty subject condition)
 # 09. POST /v2/subscriptions (malformed URL)
 
 
@@ -182,8 +182,8 @@ echo
 echo
 
 
-echo "08. POST /v2/subscriptions (missing subject condition)"
-echo "======================================================"
+echo "08. POST /v2/subscriptions (empty subject condition)"
+echo "===================================================="
 payload='
 {
     "subject": {
@@ -192,7 +192,8 @@ payload='
                 "idPattern": ".*",
                 "type": "Room"
             }
-        ]
+        ],
+        "condition": {}
     },
     "notification": {
         "http":{"url": "http://localhost:1234"},
@@ -341,14 +342,18 @@ Date: REGEX(.*)
 }
 
 
-08. POST /v2/subscriptions (missing subject condition)
-======================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+08. POST /v2/subscriptions (empty subject condition)
+====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 57
+Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+{
+    "description": "condition is empty",
+    "error": "BadRequest"
+}
 
 
 09. POST /v2/subscriptions (malformed URL)
