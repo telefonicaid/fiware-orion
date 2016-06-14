@@ -90,8 +90,8 @@ std::string putEntityAttribute
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
-
   // 03. Check output from mongoBackend - any errors?
+#if 0
   if (parseDataP->upcrs.res.contextElementResponseVector.size() == 1)
   {
     if (parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code != SccOk)
@@ -106,7 +106,17 @@ std::string putEntityAttribute
   {
     ciP->httpStatusCode = SccNoContent;
   }
-
+#endif
+  if (parseDataP->upcrs.res.oe.code != SccNone )
+  {
+    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+  }
+  else
+  {
+    answer = "";
+    ciP->httpStatusCode = SccNoContent;
+  }
 
   // 05. Cleanup and return result
   parseDataP->upcr.res.release();

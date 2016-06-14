@@ -90,26 +90,6 @@ std::string getEntityAttributeValue
 
   attribute.fill(&parseDataP->qcrs.res, compV[4]);
 
-#if 0
-  // Render entity attribute response
-  if (attribute.oe.reasonPhrase == "TooManyResults")
-  {
-    // FIXME PR: no need of new OrionErrir, use the one in attribute variable
-    OrionError oe(SccConflict, MORE_MATCHING_ENT, "TooManyResults");
-
-    ciP->httpStatusCode = SccConflict;
-
-    TIMED_RENDER(answer = oe.toJson());
-  }
-  else if (attribute.oe.reasonPhrase == "NotFound")
-  {
-    // FIXME PR: no need of new OrionErrir, use the one in attribute variable
-    OrionError oe(SccContextElementNotFound, "The requested entity has not been found. Check type and id", "NotFound");
-    ciP->httpStatusCode = SccContextElementNotFound;
-
-    TIMED_RENDER(answer = oe.toJson());
-  }
-#endif
   if (attribute.oe.code != SccNone)
   {
     TIMED_RENDER(answer = attribute.oe.toJson());

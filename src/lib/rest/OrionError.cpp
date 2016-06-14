@@ -113,71 +113,6 @@ std::string OrionError::toJson(void)
 }
 
 
-#if 0
-/* ****************************************************************************
-*
-* OrionError::render - 
-*/
-std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
-{
-  //
-  // For API version 2 this is pretty easy ...
-  //
-  // FIXME: render() should not be used for v2, in favour of toJson(), so removing
-  // this piece of code. Note that modifying ciP->httpStatusCode in a function aimed at
-  // just rendering (i.e. printing string) is very dangerous and breaks separation of
-  // concerns
-  //
-  if (ciP->apiVersion == "v2")
-  {
-    if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
-    {
-      ciP->httpStatusCode = SccBadRequest;
-    }
-
-    if (details == "Already Exists")
-    {
-      details = "Entity already exists";
-    }
-
-    reasonPhrase = errorStringForV2(reasonPhrase);
-    return "{" + JSON_STR("error") + ":" + JSON_STR(reasonPhrase) + "," + JSON_STR("description") + ":" + JSON_STR(details) + "}";
-  }
-
-  //
-  // A little more hairy for API version 1
-  //
-
-  std::string  out           = "";
-  std::string  tag           = "orionError";
-  std::string  initialIndent = _indent;
-  std::string  indent        = _indent;
-
-  //
-  // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here
-  //
-
-
-  out     = initialIndent + "{\n";
-  indent += "  ";
-
-  out += startTag1(indent, tag);
-  out += valueTag(indent + "  ", "code",          code,         true);
-  out += valueTag1(indent + "  ", "reasonPhrase",  reasonPhrase, details != "");
-
-  if (details != "")
-  {
-    out += valueTag1(indent + "  ", "details",       details);
-  }
-
-  out += endTag(indent);
-
-  out += initialIndent + "}\n";
-
-  return out;
-}
-#endif
-
 
 /* ****************************************************************************
 *
@@ -186,30 +121,6 @@ std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
 */
 std::string OrionError::render(void)
 {
-#if 0
-  //
-  // For API version 2 this is pretty easy ...
-  //
-  // FIXME: render() should not be used for v2, in favour of toJson(), so removing
-  // this piece of code
-  //
-  if (apiVersion == "v2")
-  {
-    if (details == "Already Exists")
-    {
-      details = "Entity already exists";
-    }
-
-    reasonPhrase = errorStringForV2(reasonPhrase);
-    return "{" + JSON_STR("error") + ":" + JSON_STR(reasonPhrase) + "," + JSON_STR("description") + ":" + JSON_STR(details) + "}";
-  }
-#endif
-
-
-  //
-  // A little more hairy for API version 1
-  //
-
   std::string  out           = "";
   std::string  tag           = "orionError";
   std::string  initialIndent = "";

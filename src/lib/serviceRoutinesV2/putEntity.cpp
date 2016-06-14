@@ -95,26 +95,14 @@ std::string putEntity
     }
   }
 
-
-  // 04. Prepare HTTP headers
+  // 04. Check error
+#if 0
   if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
   {
     ciP->httpStatusCode = SccNoContent;
   }
-#if 0
-  else if (ciP->httpStatusCode == SccConflict)
-  {
-    OrionError orionError(SccConflict, MORE_MATCHING_ENT);
-
-    TIMED_RENDER(answer = orionError.render());
-  }
-  else if (ciP->httpStatusCode == SccContextElementNotFound)
-  {
-    OrionError orionError(SccContextElementNotFound, "No context element found");
-
-    TIMED_RENDER(answer = orionError.render());
-  }
 #endif
+
   if (parseDataP->upcrs.res.oe.code != SccNone )
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());

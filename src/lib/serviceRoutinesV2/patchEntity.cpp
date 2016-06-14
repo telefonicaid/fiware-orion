@@ -86,29 +86,6 @@ std::string patchEntity
   postUpdateContext(ciP, components, compV, parseDataP);
 
   // 03. Check output from mongoBackend - any errors?
-#if 0
-  if (parseDataP->upcrs.res.contextElementResponseVector.size() == 1)
-  {
-    if (parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code != SccOk)
-    {
-      ciP->httpStatusCode = parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code;
-
-      if (parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code == SccContextElementNotFound)
-      {
-        OrionError orionError(SccContextElementNotFound, "No context element found");
-
-        TIMED_RENDER(answer = orionError.render());
-      } 
-      else if (parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code == SccConflict)
-      {
-        OrionError orionError(SccConflict, MORE_MATCHING_ENT);
-
-        TIMED_RENDER(answer = orionError.render());
-      }
-    }
-  }
-#else
-
   if (parseDataP->upcrs.res.oe.code != SccNone )
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
@@ -118,24 +95,6 @@ std::string patchEntity
   {
     ciP->httpStatusCode = SccNoContent;
   }
-
-#endif
-
-#if 0
-  // 04. Prepare HTTP headers
-  if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
-  {
-    ciP->httpStatusCode = SccNoContent;
-  }
-  else if (ciP->httpStatusCode == SccInvalidParameter)
-  {
-    OrionError orionError(SccContextElementNotFound, "No context element found");
-
-    ciP->httpStatusCode = SccContextElementNotFound;
-
-    TIMED_RENDER(answer = orionError.render());
-  }
-#endif
 
   // 05. Cleanup and return result
   eP->release();

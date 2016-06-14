@@ -251,18 +251,6 @@ std::string getEntities
   // 02. Call standard op postQueryContext
   answer = postQueryContext(ciP, components, compV, parseDataP);
 
-#if 0
-  // FXME PR: not sure if the following block is needed at the end
-  if (ciP->httpStatusCode != SccOk)
-  {
-    // Something went wrong in the query, an invalid pattern for example
-
-    parseDataP->qcr.res.release();
-
-    return answer;
-  }
-#endif
-
   // 03. Render Entities response
   if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)
   {

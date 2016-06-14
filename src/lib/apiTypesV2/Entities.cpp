@@ -60,17 +60,6 @@ Entities::~Entities()
 */
 std::string Entities::render(ConnectionInfo* ciP, RequestType requestType)
 {
-#if 0
-    * If no error reported in errorCode, render the vector of entities.
-    * Otherwise, render the errorCode.
-
-  if ((oe.details == "") && ((oe.reasonPhrase == "OK") || (oe.reasonPhrase == "")))
-  {
-    return vec.render(ciP, requestType, false);
-  }
-
-  return oe.toJson();
-#endif
   return vec.render(ciP, requestType, false);
 } 
 

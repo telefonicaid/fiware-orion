@@ -36,22 +36,6 @@
 */
 extern std::string setStatusCodeAndSmartRender(ConnectionInfo* ciP, OrionError& oe);
 
-
-#if 0
-/* ****************************************************************************
-*
-* errorStringForV2 -
-*/
-extern std::string errorStringForV2(const std::string& reasonPhrase);
-
-
-/* ****************************************************************************
-*
-*  invalidParameterForNgsiv2 -
-*/
-extern bool invalidParameterForNgsiv2(const std::string& details, OrionError* oe);
-#endif
-
 #endif // SRC_LIB_REST_ERROR_ADAPTATION_H
 
 

@@ -126,7 +126,6 @@ std::string textRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     OrionError error(SccUnsupportedMediaType, "not supported content type: text/plain");
 
     answer = setStatusCodeAndSmartRender(ciP, error);
-    //ciP->httpStatusCode = SccUnsupportedMediaType; FIXME PR: not sure if remove this...
 
     alarmMgr.badInput(clientIp, "not supported content type: text/plain");
     break;

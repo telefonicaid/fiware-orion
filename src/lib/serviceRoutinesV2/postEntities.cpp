@@ -102,45 +102,6 @@ std::string postEntities
   postUpdateContext(ciP, components, compV, parseDataP, NGSIV2_FLAVOUR_ONCREATE);  
   std::string    answer;
 
-#if 0
-  StatusCode     rstatuscode = parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode;
-  HttpStatusCode rhttpcode  = rstatuscode.code;
-
-  // 03. Prepare HTTP headers
-  if (rhttpcode == SccOk || rhttpcode == SccNone)
-  {
-    std::string location = "/v2/entities/" + eP->id;
-    if (eP->type != "" )
-    {
-      location += "?type=" + eP->type;
-    }
-    else
-    {
-      location += "?type=none";
-    }
-
-    ciP->httpHeader.push_back("Location");
-    ciP->httpHeaderValue.push_back(location);
-    ciP->httpStatusCode = SccCreated;
-  }
-
-  else if (rhttpcode == SccInvalidModification)
-  {
-    OrionError oe(rstatuscode);
-    ciP->httpStatusCode = SccInvalidModification;
-
-    TIMED_RENDER(answer = oe.render());
-  }
-  else if (rhttpcode == SccInvalidParameter)
-  {
-    OrionError oe;
-    if (invalidParameterForNgsiv2(rstatuscode.details, &oe))
-    {
-      ciP->httpStatusCode = oe.code;
-      TIMED_RENDER(answer = oe.render());
-    }
-  }
-#endif
   // 03. Check error
   if (parseDataP->upcrs.res.oe.code != SccNone )
   {

@@ -680,14 +680,8 @@ std::string postUpdateContext
             failingPerCer +=", ";
           }
         }
-        failing += cerP->contextElement.entityId.id + "-" + cerP->contextElement.entityId.type + " : [" + failingPerCer + "], ";
 
-#if 0
-        if (ix != response.contextElementResponseVector.size() - 1)
-        {
-          failing += ", ";
-        }
-#endif
+        failing += cerP->contextElement.entityId.id + "-" + cerP->contextElement.entityId.type + " : [" + failingPerCer + "], ";
       }
     }
 

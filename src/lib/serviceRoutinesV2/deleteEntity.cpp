@@ -93,57 +93,6 @@ std::string deleteEntity
 
   ciP->outMimeType = JSON;
 
-#if 0
-  // Any error in the response?
-  UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
-
-  //...
-
-  for (unsigned int ix = 0; ix < upcrsP->contextElementResponseVector.size(); ++ix)
-  {
-    StatusCode      sc  = upcrsP->contextElementResponseVector[ix]->statusCode;
-    HttpStatusCode  scc = sc.code;
-
-    if ((scc != SccOk) && (scc != SccNone))
-    {
-      OrionError oe;
-
-      ciP->httpStatusCode = scc;
-
-      if (scc == SccContextElementNotFound)
-      {
-        oe.code          = scc;
-        oe.reasonPhrase  = "NotFound";
-        oe.details       = "The requested entity has not been found. Check type and id";
-      }
-      else if (scc == SccInvalidParameter)
-      {
-        oe.code              = SccContextElementNotFound;
-        oe.reasonPhrase      = "NotFound";
-        oe.details           = "Attribute not found";
-        ciP->httpStatusCode  = SccContextElementNotFound; // We don't want a 472
-      }
-      else
-      {
-        oe.code          = scc;
-        oe.reasonPhrase  = sc.reasonPhrase;
-      }
-
-      TIMED_RENDER(answer = oe.render());
-
-      eP->release();
-      delete eP;
-
-      return answer;
-    }
-  }
-
-  // Prepare status code
-  if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
-  {
-    ciP->httpStatusCode = SccNoContent;
-  }
-#else
   // Check for potential error
   if (parseDataP->upcrs.res.oe.code != SccNone )
   {
@@ -154,7 +103,6 @@ std::string deleteEntity
   {
     ciP->httpStatusCode = SccNoContent;
   }
-#endif  
 
   // Cleanup and return result
   eP->release();

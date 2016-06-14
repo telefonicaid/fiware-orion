@@ -65,21 +65,12 @@ std::string putEntityAttributeValue
   std::string  attributeName  = compV[4];
   std::string  type           = ciP->uriParam["type"];
 
-  // FIXME PR: unify both
-  if (forbiddenIdChars(ciP->apiVersion, entityId.c_str() , NULL))
+  if (forbiddenIdChars(ciP->apiVersion, entityId.c_str() , NULL) || forbiddenIdChars(ciP->apiVersion, attributeName.c_str() , NULL))
   {
     OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
     ciP->httpStatusCode = oe.code;
     return oe.toJson();
   }
-
-  if (forbiddenIdChars(ciP->apiVersion, attributeName.c_str() , NULL))
-  {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
-    ciP->httpStatusCode = oe.code;
-    return oe.toJson();
-  }
-
 
   // 01. Fill in UpdateContextRequest with data from URI and payload
   parseDataP->av.attribute.name = attributeName;
@@ -97,36 +88,6 @@ std::string putEntityAttributeValue
 
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
-
-#if 0
-  // FIXME PR: ErrorCode shoould be avoided
-
-  // 03. Check output from mongoBackend - any errors?
-  if (parseDataP->upcrs.res.contextElementResponseVector.size() == 1)
-  {
-    if (parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code != SccOk)
-    {
-      ciP->httpStatusCode = parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code;
-    }
-  }
-
-  if (ciP->httpStatusCode == SccConflict)
-  {
-    // FIXME PR: not sure if I like this logic
-    OrionError  oe(SccConflict, MORE_MATCHING_ENT, "TooManyResults");
-    std::string answer;
-
-    TIMED_RENDER(answer = oe.toJson());
-
-    return answer;
-  }
-
-  // 04. Prepare HTTP headers
-  if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
-  {
-    ciP->httpStatusCode = SccNoContent;
-  }
-#endif
 
   // 03. Check output from mongoBackend
   std::string answer;
