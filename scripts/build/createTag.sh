@@ -1,4 +1,4 @@
-# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -18,16 +18,13 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-# FIXME: this script assumes that it is run from the fiware-orion repository run
-PROJECT_DIR="."
-
 function usage()
 {
   sfile="Usage: "$(basename $0)
   empty=$(echo $sfile | tr 'a-zA-z/0-9.:' ' ')
   echo "$sfile [-u (usage)]"
-  echo "$empty [--mode <files|commit|tag|push>"
-  echo "$empty [--changelog <changelog file to flush into .spec, default is CHANGES_NEXT_RELEASE>"
+  echo "$empty [-m <files|commit|tag|push>"
+  echo "$empty [-c <changelog file to flush into .spec, default is CHANGES_NEXT_RELEASE>"
   echo
   echo "Modes:"
   echo "* 'files', only modify files (but don't commit changes)"
@@ -58,7 +55,7 @@ function checkValidInteger()
 #
 function flushCNRToSpec()
 {
-  SPEC_FILE=$PROJECT_DIR/rpm/SPECS/contextBroker.spec
+  SPEC_FILE=rpm/SPECS/contextBroker.spec
 
   #
   # Edit rpm/SPECS/contextBroker.spec, adding the new changes from CHANGELOG_FILE
@@ -99,13 +96,13 @@ function flushCNRToSpec()
   #
   # 4. To a temporal file, add the four 'chunks'
   #
-  head -$LINE $SPEC_FILE        >  /tmp/contextBroker.spec
+  head -$LINE $SPEC_FILE >  /tmp/contextBroker.spec
 
-  echo -n '* '                  >> /tmp/contextBroker.spec
-  echo $dateLine                >> /tmp/contextBroker.spec
+  echo -n '* '           >> /tmp/contextBroker.spec
+  echo $dateLine         >> /tmp/contextBroker.spec
 
-  cat $changelog                                  >> /tmp/contextBroker.spec
-  echo                                            >> /tmp/contextBroker.spec
+  cat $changelog         >> /tmp/contextBroker.spec
+  echo                   >> /tmp/contextBroker.spec
 
   tail -$LAST_LINES $SPEC_FILE  >> /tmp/contextBroker.spec
     
@@ -130,17 +127,26 @@ changelog=CHANGES_NEXT_RELEASE
 
 mode=""
 
-while [ "$#" != 0 ]
+while getopts ":m:c:u" opt
 do
-  if   [ "$1" == "-u" ];            then usage 0;
-  elif [ "$1" == "--mode" ];        then mode="$2"; shift;
-  elif [ "$1" == "--changelog" ];   then changelog="$2"; shift;
-  else
-    echo $0: bad parameter/option: "'"${1}"'";
-    echo
-    usage 1
-  fi
-  shift
+  case $opt in
+    m)
+      mode=${OPTARG}
+      ;;
+    c)
+      changelog=${OPTARG}
+      ;;
+    u)
+      usage
+      exit 0
+      ;;
+    *)
+      echo $0: bad parameter/option: "'"${1}"'"
+      echo
+      usage
+      exit 1
+      ;;
+  esac
 done
 
 if [ "$mode" == "" ]; then
@@ -166,6 +172,12 @@ else
   usage 1
 fi
 
+# Check is run from the repository home
+if ! [ -e ".git/config" ]; then
+  echo $0: the script has to run from the repository root
+  exit 1
+fi
+
 # Check we are in a release/X.Y.Z branch
 branch=$(git rev-parse --abbrev-ref HEAD)
 if [[ $branch != release/* ]]; then
@@ -175,7 +187,7 @@ fi
 
 
 # Get current tag
-currentTag=$(grep "define ORION_VERSION" $PROJECT_DIR/src/app/contextBroker/version.h  | awk -F\" '{ print $2 }')
+currentTag=$(grep "define ORION_VERSION" src/app/contextBroker/version.h  | awk -F\" '{ print $2 }')
 echo $0: current tag is: "'"${currentTag}"'"
 
 # Check tag structure
@@ -196,7 +208,7 @@ if [ "$baseVersion" != "$versionFromBranch" ]; then
 fi
 
 # Check dockerfile has the right tag
-grep "ENV GIT_REV_ORION $currentTag" $PROJECT_DIR/docker/Dockerfile
+grep "ENV GIT_REV_ORION $currentTag" docker/Dockerfile > /dev/null
 if [ "$?" != "0" ]; then
   echo $0: GIT_REV_ORION does not use current tag in Dockerfile
   exit 1
@@ -208,8 +220,8 @@ nextTag=$X.$Y.$Z
 echo $0: next tag is: "'"${nextTag}"'"
 
 # Modify src/app/contextBroker/version.h
-sed "s/$currentTag/$nextTag/" $PROJECT_DIR/src/app/contextBroker/version.h > /tmp/version.h
-mv /tmp/version.h $PROJECT_DIR/src/app/contextBroker/version.h
+sed "s/$currentTag/$nextTag/" src/app/contextBroker/version.h > /tmp/version.h
+mv /tmp/version.h src/app/contextBroker/version.h
 
 # Flush CNR into .spec
 DATE=$(LANG=C date +"%a %b %d %Y")
@@ -217,12 +229,12 @@ export dateLine="$DATE Fermin Galan <fermin.galanmarquez@telefonica.com> ${nextT
 flushCNRToSpec
 
 # Modify ENV GIT_REV_ORION at docker/Dockerfile
-sed "s/ENV GIT_REV_ORION $currentTag/ENV GIT_REV_ORION $nextTag/" $PROJECT_DIR/docker/Dockerfile > /tmp/Dockerfile
-mv /tmp/Dockerfile $PROJECT_DIR/docker/Dockerfile
+sed "s/ENV GIT_REV_ORION $currentTag/ENV GIT_REV_ORION $nextTag/" docker/Dockerfile > /tmp/Dockerfile
+mv /tmp/Dockerfile docker/Dockerfile
 
 # Commit all files
 if [ "$commit" == "on" ]; then
-  cd $PROJECT_DIR && git add src/app/contextBroker/version.h $changelog Docker/Dockerfile rpm/SPECS/contextBroker.spec
+  git add src/app/contextBroker/version.h $changelog Docker/Dockerfile rpm/SPECS/contextBroker.spec
   git commit -m "Step: $currentTag -> $nextTag"
 fi
 
