@@ -34,7 +34,7 @@
 *
 * setStatusCodeAndSmartRender -
 */
-extern std::string setStatusCodeAndSmartRender(ConnectionInfo* ciP, OrionError& oe);
+//extern std::string setStatusCodeAndSmartRender(ConnectionInfo* ciP, OrionError& oe);
 
 #endif // SRC_LIB_REST_ERROR_ADAPTATION_H
 

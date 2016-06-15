@@ -246,12 +246,12 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, co
    }
    else
    {
-      OrionError orionError(errorCode);
+      OrionError oe(errorCode);
 
       LM_T(LmtRest, ("Unknown tag: '%s', request == '%s'", tag.c_str(), request.c_str()));
       
-      ciP->httpStatusCode = orionError.code;
-      reply = setStatusCodeAndSmartRender(ciP, orionError);
+      ciP->httpStatusCode = oe.code;
+      reply = oe.setStatusCodeAndSmartRender(ciP);
    }
 
    return reply;

@@ -24,6 +24,8 @@
 */
 #include <stdio.h>
 #include <string>
+#include <algorithm>  // std::remove_if
+#include <locale>     // std::isspace
 
 #include "common/tag.h"
 #include "rest/ConnectionInfo.h"
@@ -105,6 +107,22 @@ std::string OrionError::smartRender(const std::string& apiVersion)
 
 /* ****************************************************************************
 *
+* OrionError::setStatusCodeAndSmartRender -
+*/
+std::string OrionError::setStatusCodeAndSmartRender(ConnectionInfo* ciP)
+{
+  if (ciP->apiVersion == "v2")
+  {
+    ciP->httpStatusCode = code;
+  }
+
+  return smartRender(ciP->apiVersion);
+}
+
+
+
+/* ****************************************************************************
+*
 * OrionError::toJson -
 */
 std::string OrionError::toJson(void)
@@ -121,19 +139,13 @@ std::string OrionError::toJson(void)
 */
 std::string OrionError::render(void)
 {
-  std::string  out           = "";
+  std::string  out           = "{\n";
+  std::string  indent        = "  ";
   std::string  tag           = "orionError";
-  std::string  initialIndent = "";
-  std::string  indent        = "";
 
   //
   // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here
   //
-
-
-  out     = initialIndent + "{\n";
-  indent += "  ";
-
   out += startTag1(indent, tag);
   out += valueTag(indent  + "  ", "code",          code,         true);
   out += valueTag1(indent + "  ", "reasonPhrase",  reasonPhrase, details != "");
@@ -145,7 +157,7 @@ std::string OrionError::render(void)
 
   out += endTag(indent);
 
-  out += initialIndent + "}\n";
+  out += "}\n";
 
   return out;
 }
@@ -164,6 +176,7 @@ std::string OrionError::render(void)
 */
 void OrionError::shrinkReasonPhrase(void)
 {
+#if 1
   char buf[80];  // 80 should be enough to hold any reason phrase
 
   strncpy(buf, reasonPhrase.c_str(), 80);
@@ -180,4 +193,8 @@ void OrionError::shrinkReasonPhrase(void)
   *i = 0;
 
   reasonPhrase = std::string(buf);
+#else
+
+  reasonPhrase.erase(std::remove_if(reasonPhrase.begin(), reasonPhrase.end(), std::isspace), reasonPhrase.end());
+#endif
 }

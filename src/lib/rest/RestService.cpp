@@ -459,9 +459,9 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     std::string result;
     if ((ciP->tenant != "") && ((result = tenantCheck(ciP->tenant)) != "OK"))
     {
-      OrionError  error(SccBadRequest, result);
+      OrionError  oe(SccBadRequest, result);
 
-      std::string  response = setStatusCodeAndSmartRender(ciP, error);
+      std::string  response = oe.setStatusCodeAndSmartRender(ciP);
 
       alarmMgr.badInput(clientIp, result);
 

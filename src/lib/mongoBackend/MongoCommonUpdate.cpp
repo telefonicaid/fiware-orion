@@ -1838,7 +1838,7 @@ static bool updateContextAttributeItem
                           " - offending attribute: " + targetAttr->getName() +
                           " - " + err;
     cerP->statusCode.fill(SccInvalidParameter, details);
-    // oe->fill() not used, as this is donde internally in processLocationAtUpdateAttribute()
+    // oe->fill() not used, as this is done internally in processLocationAtUpdateAttribute()
 
     alarmMgr.badInput(clientIp, err);
     return false;
@@ -2789,7 +2789,7 @@ static bool contextElementPreconditionsCheck
   if (isTrue(enP->isPattern))
   {
     buildGeneralErrorResponse(ceP, NULL, responseP, SccNotImplemented);
-    // No need of filling responseP->oe, this cannot append in NGSIv2
+    // No need of filling responseP->oe, this cannot happen in NGSIv2
     return false;  // Error already in responseP
   }
 

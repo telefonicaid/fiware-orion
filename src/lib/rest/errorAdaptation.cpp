@@ -26,6 +26,7 @@
 #include "rest/errorAdaptation.h"
 #include "rest/ConnectionInfo.h"
 
+#if 0
 
 /* ****************************************************************************
 *
@@ -40,3 +41,5 @@ std::string setStatusCodeAndSmartRender(ConnectionInfo* ciP, OrionError& oe)
 
   return oe.smartRender(ciP->apiVersion);
 }
+
+#endif

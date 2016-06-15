@@ -869,7 +869,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Attributes that were not updated: [ E1-T1 : [A5], E2-T1 : [A5, A4] ]",
+    "description": "Attributes that were not updated: { E1-T1 : [A5], E2-T1 : [A5, A4] }",
     "error": "PartialUpdate"
 }
 

@@ -90,7 +90,7 @@ static std::string textParseAttributeValue(ConnectionInfo* ciP, ContextAttribute
   else  // 5. None of the above - it's an error
   {
     OrionError oe(SccBadRequest, "attribute value type not recognized");
-    return setStatusCodeAndSmartRender(ciP, oe);
+    oe.setStatusCodeAndSmartRender(ciP);
   }
 
   return "OK";
@@ -117,15 +117,15 @@ std::string textRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
 
     if ((answer = parseDataP->av.attribute.check(ciP, EntityAttributeValueRequest, "", "", 0)) != "OK")
     {
-      OrionError error(SccBadRequest, answer);
-      return setStatusCodeAndSmartRender(ciP, error);
+      OrionError oe(SccBadRequest, answer);
+      oe.setStatusCodeAndSmartRender(ciP);
     }
     break;
 
   default:
-    OrionError error(SccUnsupportedMediaType, "not supported content type: text/plain");
+    OrionError oe(SccUnsupportedMediaType, "not supported content type: text/plain");
 
-    answer = setStatusCodeAndSmartRender(ciP, error);
+    answer = oe.setStatusCodeAndSmartRender(ciP);
 
     alarmMgr.badInput(clientIp, "not supported content type: text/plain");
     break;

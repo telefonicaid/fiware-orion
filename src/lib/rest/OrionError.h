@@ -48,6 +48,7 @@ public:
   OrionError(HttpStatusCode _code, const std::string& _details = "", const std::string& _reasonPhrase = "");
 
   std::string  smartRender(const std::string& apiVersion);
+  std::string  setStatusCodeAndSmartRender(ConnectionInfo* ciP);
   std::string  toJson(void);
   std::string  render(void);
   void         fill(HttpStatusCode _code, const std::string& _details,  const std::string& _reasonPhrase = "");

@@ -77,8 +77,8 @@ std::string jsonRequestTreat
 
     if ((answer = parseDataP->ent.res.check(ciP, EntitiesRequest)) != "OK")
     {
-      OrionError error(SccBadRequest, answer);
-      return setStatusCodeAndSmartRender(ciP, error);
+      OrionError oe(SccBadRequest, answer);
+      return oe.setStatusCodeAndSmartRender(ciP);
     }
     break;
 
@@ -92,8 +92,8 @@ std::string jsonRequestTreat
 
     if ((answer = parseDataP->ent.res.check(ciP, EntityRequest)) != "OK")
     {
-      OrionError error(SccBadRequest, answer);      
-      return setStatusCodeAndSmartRender(ciP, error);
+        OrionError oe(SccBadRequest, answer);
+        return oe.setStatusCodeAndSmartRender(ciP);
     }
     break;
 
@@ -108,8 +108,8 @@ std::string jsonRequestTreat
 
     if ((answer = parseDataP->attr.attribute.check(ciP, EntityAttributeRequest, "", "", 0)) != "OK")
     {
-      OrionError error(SccBadRequest, answer);      
-      return setStatusCodeAndSmartRender(ciP, error);
+        OrionError oe(SccBadRequest, answer);
+        return oe.setStatusCodeAndSmartRender(ciP);
     }
     break;
 

@@ -656,7 +656,7 @@ std::string postUpdateContext
   if (ciP->apiVersion == "v2")
   {
     // Adjust OrionError response in the case of partial updates. This may happen in CPr forwarding
-    // scenarios. Note that mongoBackend logic "splits" sucessfull updates and failing updates in
+    // scenarios. Note that mongoBackend logic "splits" successfull updates and failing updates in
     // two different CER (maybe using the same entity)
 
     std::string failing = "";
@@ -698,7 +698,7 @@ std::string postUpdateContext
       failing = failing.substr(0, failing.size() - 2);
 
       // If some CER (but not all) fails, then it is a partial update
-      parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "Attributes that were not updated: [ " + failing + " ]", "PartialUpdate");
+      parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "Attributes that were not updated: { " + failing + " }", "PartialUpdate");
     }
 
   }

@@ -78,4 +78,4 @@ somewhat experimental and it hasn't been consolidated in the NGSIv2 specificatio
 
 The error response rules defined in https://github.com/telefonicaid/fiware-orion/issues/1286 takes precedence over
 the ones described in "Error Responses" section in the NGSIv2 specification. In particular, Orion Context
-Broker never responses with "InvalidModification (422)", using "Unprocessable (422)" instead.
+Broker never responds with "InvalidModification (422)", using "Unprocessable (422)" instead.
