@@ -423,6 +423,29 @@ static void lmSemInit(void)
 
 /* ****************************************************************************
 *
+* lmSemGet - 
+*/
+const char* lmSemGet(void)
+{
+  int value;
+
+  if (sem_getvalue(&sem, &value) == -1)
+  {
+    return "error";
+  }
+
+  if (value == 0)
+  {
+    return "taken";
+  }
+  
+  return "free";  
+}
+
+
+
+/* ****************************************************************************
+*
 * semTake -
 */
 static void semTake(void)

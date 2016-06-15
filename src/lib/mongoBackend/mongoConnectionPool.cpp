@@ -459,3 +459,47 @@ void mongoPoolConnectionSemWaitingTimeReset(void)
 }
 
 
+
+/* ****************************************************************************
+*
+* mongoConnectionPoolSemGet - 
+*/
+const char* mongoConnectionPoolSemGet(void)
+{
+  int value;
+
+  if (sem_getvalue(&connectionPoolSem, &value) == -1)
+  {
+    return "error";
+  }
+
+  if (value == 0)
+  {
+    return "taken";
+  }
+  
+  return "free";  
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoConnectionSemGet - 
+*/
+const char* mongoConnectionSemGet(void)
+{
+  int value;
+
+  if (sem_getvalue(&connectionSem, &value) == -1)
+  {
+    return "error";
+  }
+
+  if (value == 0)
+  {
+    return "taken";
+  }
+  
+  return "free";  
+}
