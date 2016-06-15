@@ -73,3 +73,21 @@ However, this may change in the future, as described in https://github.com/telef
 Orion implements a `scope` field in the `POST /v2/op/update` operation (you can see
 [an example in the NGSIv2 walkthrough](walkthrough_apiv2.md#batch-operations)). However, note that this syntax is
 somewhat experimental and it hasn't been consolidated in the NGSIv2 specification.
+
+## NGSIv2 query update forwarding to Context Providers
+
+Context availability management functionality (i.e. operations to register Context Providers) has not been
+already implemented in NGSIv2. However, you can [register providers using NGSIv1 operations](context_providers.md) 
+and have your NGSIv2-based updates and queries being forwarded to them in the same fashion than NGSIv1 operations.
+
+However, the following considerations have to be taken into account:
+
+* Query filtering (e.g. `GET /v2/entities?q=temperature>40`) is not supported on query forwarding. First, Orion 
+  doesn't include the filter in the `POST /v1/queryContext` operation forwarded to CPr. Second, Orion doesn't filter 
+  the CPr results before responding them back to client. An issue has been created corresponding to this 
+  limitation: https://github.com/telefonicaid/fiware-orion/issues/2282
+* On forwarding, any type of entity in the NGSIv2 update/query match registrations without entity type. However, the 
+  opposite doesn't work, so if you have registrations with type, then you would need to use `?type` in NGSIv2 
+  update/query in order to match.
+* In the case of partial updates (e.g. `POST /v2/op/entities` resulting in some entities/attributes being updated and 
+  some other entities/attributes not being updated due to failing or missing CPrs) 404 No Content is returned to client.
