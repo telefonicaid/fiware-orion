@@ -37,7 +37,6 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
 #include "rest/OrionError.h"
-#include "rest/errorAdaptation.h"
 #include "serviceRoutinesV2/postEntity.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "parse/forbiddenChars.h"

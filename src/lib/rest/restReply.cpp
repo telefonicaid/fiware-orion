@@ -49,7 +49,6 @@
 #include "rest/mhd.h"
 #include "rest/OrionError.h"
 #include "rest/restReply.h"
-#include "rest/errorAdaptation.h"
 
 #include "logMsg/traceLevels.h"
 

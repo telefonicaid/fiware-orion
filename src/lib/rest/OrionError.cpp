@@ -24,13 +24,10 @@
 */
 #include <stdio.h>
 #include <string>
-#include <algorithm>  // std::remove_if
-#include <locale>     // std::isspace
 
 #include "common/tag.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
-#include "rest/errorAdaptation.h"
 
 
 
@@ -173,28 +170,65 @@ std::string OrionError::render(void)
 *
 * It is used by smartRender method, in order to prepare to render in API v2 case
 *
+* FIXME P4: The following alternative (more compact) way has been proposed:
+*
+*  #include <algorithm>  // std::remove_if
+*  #include <cctype>     // std::isspace
+*
+*  ...
+*
+*  reasonPhrase.erase(std::remove_if(reasonPhrase.begin(), reasonPhrase.end(), std::isspace), reasonPhrase.end());
+*
+* However, 'std::isspace' doesn't directly work. We have been able to make it work with
+* 'static_cast<int(*)(int)>(isspace)'. However, that is obscure so until we can find
+* a way of using just 'std::isspace', the current implementation stills.
+*
 */
 void OrionError::shrinkReasonPhrase(void)
 {
-#if 1
   char buf[80];  // 80 should be enough to hold any reason phrase
 
-  strncpy(buf, reasonPhrase.c_str(), 80);
+#if 0
+  strncpy(buf, reasonPhrase.c_str(), sizeof(buf));
 
   // See: http://stackoverflow.com/questions/1726302/removing-spaces-from-a-string-in-c
+  if (*j != ' ')
+  {
+    *i = *j;
+    ++i;
+  }
+  ++j;
+
   char* i = buf;
   char* j = buf;
-  while(*j != 0)
+  while (*j != 0)
   {
     *i = *j++;
-    if(*i != ' ')
+    if (*i != ' ')
+    {
       i++;
+    }
   }
   *i = 0;
+#endif
+
+  char*         fromP = (char*) reasonPhrase.c_str();
+  char*         toP   = buf;
+  unsigned int  toLen = 0;
+
+  while ((*fromP != 0) && (toLen < sizeof(buf)))
+  {
+    // If next char is not whitespace: copy to outgoing
+    if (*fromP != ' ')
+    {
+      *toP = *fromP;
+      ++toP;
+      ++toLen;
+    }
+
+    ++fromP;
+  }
+  *toP = 0;  // End-of string
 
   reasonPhrase = std::string(buf);
-#else
-
-  reasonPhrase.erase(std::remove_if(reasonPhrase.begin(), reasonPhrase.end(), std::isspace), reasonPhrase.end());
-#endif
 }

@@ -50,7 +50,6 @@
 #include "rest/rest.h"
 #include "rest/restReply.h"
 #include "rest/OrionError.h"
-#include "rest/errorAdaptation.h"
 #include "rest/uriParamNames.h"
 #include "common/limits.h"  // SERVICE_NAME_MAX_LEN
 

@@ -33,7 +33,6 @@
 #include "apiTypesV2/Entities.h"
 #include "rest/EntityTypeInfo.h"
 #include "rest/OrionError.h"
-#include "rest/errorAdaptation.h"
 #include "serviceRoutinesV2/postEntities.h"
 #include "serviceRoutines/postUpdateContext.h"
 

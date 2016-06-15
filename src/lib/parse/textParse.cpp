@@ -28,7 +28,6 @@
 #include "alarmMgr/alarmMgr.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
-#include "rest/errorAdaptation.h"
 #include "ngsi/ContextAttribute.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
@@ -90,7 +89,7 @@ static std::string textParseAttributeValue(ConnectionInfo* ciP, ContextAttribute
   else  // 5. None of the above - it's an error
   {
     OrionError oe(SccBadRequest, "attribute value type not recognized");
-    oe.setStatusCodeAndSmartRender(ciP);
+    return oe.setStatusCodeAndSmartRender(ciP);
   }
 
   return "OK";
@@ -118,7 +117,7 @@ std::string textRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     if ((answer = parseDataP->av.attribute.check(ciP, EntityAttributeValueRequest, "", "", 0)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
-      oe.setStatusCodeAndSmartRender(ciP);
+      return oe.setStatusCodeAndSmartRender(ciP);
     }
     break;
 

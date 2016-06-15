@@ -29,7 +29,6 @@
 #include "common/statistics.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
-#include "rest/errorAdaptation.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
 #include "alarmMgr/alarmMgr.h"
@@ -92,8 +91,8 @@ std::string jsonRequestTreat
 
     if ((answer = parseDataP->ent.res.check(ciP, EntityRequest)) != "OK")
     {
-        OrionError oe(SccBadRequest, answer);
-        return oe.setStatusCodeAndSmartRender(ciP);
+      OrionError oe(SccBadRequest, answer);
+      return oe.setStatusCodeAndSmartRender(ciP);
     }
     break;
 
@@ -108,8 +107,8 @@ std::string jsonRequestTreat
 
     if ((answer = parseDataP->attr.attribute.check(ciP, EntityAttributeRequest, "", "", 0)) != "OK")
     {
-        OrionError oe(SccBadRequest, answer);
-        return oe.setStatusCodeAndSmartRender(ciP);
+      OrionError oe(SccBadRequest, answer);
+      return oe.setStatusCodeAndSmartRender(ciP);
     }
     break;
 

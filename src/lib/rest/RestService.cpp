@@ -41,7 +41,6 @@
 #include "parse/textParse.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
-#include "rest/errorAdaptation.h"
 #include "rest/RestService.h"
 #include "rest/restReply.h"
 #include "rest/rest.h"
