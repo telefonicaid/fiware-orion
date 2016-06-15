@@ -248,21 +248,24 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
   }
 
   // Condition
-  if (!subject.HasMember("condition"))
+  if (subject.HasMember("condition"))
   {
-    return badInput(ciP, "no subject condition specified");
-  }
+    const Value& condition = subject["condition"];
+    if (!condition.IsObject())
+    {
+      return badInput(ciP, "condition is not an object");
+    }
+    if (condition.ObjectEmpty())
+    {
+      return badInput(ciP, "condition is empty");
+    }
 
-  const Value& condition = subject["condition"];
-  if (!condition.IsObject())
-  {
-    return badInput(ciP, "condition is not an object");
+    r = parseNotifyConditionVector(ciP, subsP, condition);
+    if (r != "")
+    {
+      return r;
+    }
   }
-  if (condition.ObjectEmpty())
-  {
-    return badInput(ciP, "condition is empty");
-  }
-  r = parseNotifyConditionVector(ciP, subsP, condition);
 
   return r;
 }
@@ -626,16 +629,14 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
   }
 
   // Attributes
-  if (!condition.HasMember("attrs"))
+  if (condition.HasMember("attrs"))
   {
-    return badInput(ciP, "no condition attrs specified");
-  }
+    std::string r = parseAttributeList(ciP, &subsP->subject.condition.attributes, condition["attrs"]);
 
-  std::string r = parseAttributeList(ciP, &subsP->subject.condition.attributes, condition["attrs"]);
-
-  if (r != "")
-  {
-    return r;
+    if (r != "")
+    {
+      return r;
+    }
   }
 
   if (condition.HasMember("expression"))
