@@ -765,7 +765,17 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
       return badInput(ciP, "attrs element is not a string");
     }
 
-    vec->push_back(iter->GetString());
+    std::string attrName = iter->GetString();
+    if (attrName.empty())
+    {
+      return badInput(ciP, "attrs element is empty");
+    }
+    if (forbiddenIdCharsV2(attrName.c_str()))
+    {
+      return badInput(ciP, "attrs element has forbidden char");
+    }
+
+    vec->push_back(attrName);
   }
 
   return "";
