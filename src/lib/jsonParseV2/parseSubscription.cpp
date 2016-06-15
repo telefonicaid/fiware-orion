@@ -248,17 +248,24 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
   }
 
   // Condition
-  if (!subject.HasMember("condition"))
+  if (subject.HasMember("condition"))
   {
-    return badInput(ciP, "no subject condition specified");
-  }
+    const Value& condition = subject["condition"];
+    if (!condition.IsObject())
+    {
+      return badInput(ciP, "condition is not an object");
+    }
+    if (condition.ObjectEmpty())
+    {
+      return badInput(ciP, "condition is empty");
+    }
 
-  const Value& condition = subject["condition"];
-  if (!condition.IsObject())
-  {
-    return badInput(ciP, "condition is not an object");
+    r = parseNotifyConditionVector(ciP, subsP, condition);
+    if (r != "")
+    {
+      return r;
+    }
   }
-  r = parseNotifyConditionVector(ciP, subsP, condition);
 
   return r;
 }
@@ -284,9 +291,9 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
       return badInput(ciP, "subject entities element is not an object");
     }
 
-    if (!iter->HasMember("id") && !iter->HasMember("idPattern") && !iter->HasMember("type"))
+    if (!iter->HasMember("id") && !iter->HasMember("idPattern"))
     {
-      return badInput(ciP, "subject entities element has no id/idPattern nor type");
+      return badInput(ciP, "subject entities element does not have id nor idPattern");
     }
 
     if (iter->HasMember("id") && iter->HasMember("idPattern"))
@@ -304,11 +311,18 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
       {
         return badInput(ciP, idOpt.error);
       }
-      id = idOpt.value;
-
-      if (id.empty())
+      else if (idOpt.given)
       {
-        idPattern = ".*";
+        if (idOpt.value.empty())
+        {
+          return badInput(ciP, "subject entities element id is empty");
+        }
+        if (forbiddenIdCharsV2(idOpt.value.c_str()))
+        {
+          return badInput(ciP, "forbidden characters in subject entities element id");
+        }
+
+        id = idOpt.value;
       }
     }
 
@@ -320,6 +334,11 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
       }
       else if (idPatOpt.given)
       {
+        if (idPatOpt.value.empty())
+        {
+          return badInput(ciP, "subject entities element idPattern is empty");
+        }
+
         idPattern = idPatOpt.value;
 
         // FIXME P5: Keep the regex and propagate to sub-cache
@@ -339,6 +358,10 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
     }
     else if (typeOpt.given)
     {
+      if (forbiddenIdCharsV2(typeOpt.value.c_str()))
+      {
+        return badInput(ciP, "forbidden characters in subject entities element type");
+      }
       type = typeOpt.value;
     }
 
@@ -490,6 +513,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       {
         return badInput(ciP, "notification httpCustom qs is not an object");
       }
+      if (qs.ObjectEmpty())
+      {
+        return badInput(ciP, "notification httpCustom qs is empty");
+      }
 
       std::string r = parseDictionary(ciP, subsP->notification.httpInfo.qs, qs, "notification httpCustom qs");
 
@@ -506,6 +533,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       if (!headers.IsObject())
       {
         return badInput(ciP, "notification httpCustom headers is not an object");
+      }
+      if (headers.ObjectEmpty())
+      {
+        return badInput(ciP, "notification httpCustom headers is empty");
       }
 
       std::string r = parseDictionary(ciP, subsP->notification.httpInfo.headers, headers, "notification httpCustom headers");
@@ -546,6 +577,11 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     if (r != "")
     {
       return r;
+    }
+
+    if (subsP->notification.attributes.empty())
+    {
+      return badInput(ciP, "http notification has exceptAttrs is empty");
     }
 
     subsP->notification.blacklist = true;
@@ -593,16 +629,14 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
   }
 
   // Attributes
-  if (!condition.HasMember("attrs"))
+  if (condition.HasMember("attrs"))
   {
-    return badInput(ciP, "no condition attrs specified");
-  }
+    std::string r = parseAttributeList(ciP, &subsP->subject.condition.attributes, condition["attrs"]);
 
-  std::string r = parseAttributeList(ciP, &subsP->subject.condition.attributes, condition["attrs"]);
-
-  if (r != "")
-  {
-    return r;
+    if (r != "")
+    {
+      return r;
+    }
   }
 
   if (condition.HasMember("expression"))
@@ -612,6 +646,10 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
     if (!expression.IsObject())
     {
       return badInput(ciP, "expression is not an object");
+    }
+    if (expression.ObjectEmpty())
+    {
+      return badInput(ciP, "expression is empty");
     }
 
     subsP->subject.condition.expression.isSet = true;
@@ -627,6 +665,11 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
       }
 
       qString = q.GetString();
+      if (qString.empty())
+      {
+        return badInput(ciP, "q is empty");
+      }
+
       subsP->subject.condition.expression.q = qString;
 
       std::string  errorString;
@@ -654,6 +697,10 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
       }
       else if (geometryOpt.given)
       {
+        if (geometryOpt.value.empty())
+        {
+          return badInput(ciP, "geometry is empty");
+        }
         subsP->subject.condition.expression.geometry = geometryOpt.value;
       }
     }
@@ -668,6 +715,10 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
       }
       else if (coordsOpt.given)
       {
+        if (coordsOpt.value.empty())
+        {
+          return badInput(ciP, "coords is empty");
+        }
         subsP->subject.condition.expression.coords = coordsOpt.value;
       }
     }
@@ -681,6 +732,10 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
       }
       if (georelOpt.given)
       {
+        if (georelOpt.value.empty())
+        {
+          return badInput(ciP, "georel is empty");
+        }
         subsP->subject.condition.expression.georel = georelOpt.value;
       }
     }
@@ -710,7 +765,17 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
       return badInput(ciP, "attrs element is not a string");
     }
 
-    vec->push_back(iter->GetString());
+    std::string attrName = iter->GetString();
+    if (attrName.empty())
+    {
+      return badInput(ciP, "attrs element is empty");
+    }
+    if (forbiddenIdCharsV2(attrName.c_str()))
+    {
+      return badInput(ciP, "attrs element has forbidden char");
+    }
+
+    vec->push_back(attrName);
   }
 
   return "";

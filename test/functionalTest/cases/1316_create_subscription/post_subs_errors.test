@@ -37,7 +37,7 @@ brokerStart CB
 # 05. POST /v2/subscriptions (empty body)
 # 06. POST /v2/subscriptions (missing subject)
 # 07. POST /v2/subscriptions (missing notification)
-# 08. POST /v2/subscriptions (missing subject condition)
+# 08. POST /v2/subscriptions (empty subject condition)
 # 09. POST /v2/subscriptions (malformed URL)
 
 
@@ -163,7 +163,8 @@ payload='
     "subject": {
         "entities": [
             {
-                "type": "Room"
+               "idPattern": ".*",
+               "type": "Room"
             }
         ],
         "condition": {
@@ -181,16 +182,18 @@ echo
 echo
 
 
-echo "08. POST /v2/subscriptions (missing subject condition)"
-echo "======================================================"
+echo "08. POST /v2/subscriptions (empty subject condition)"
+echo "===================================================="
 payload='
 {
     "subject": {
         "entities": [
             {
+                "idPattern": ".*",
                 "type": "Room"
             }
-        ]
+        ],
+        "condition": {}
     },
     "notification": {
         "http":{"url": "http://localhost:1234"},
@@ -212,7 +215,8 @@ payload='
     "subject": {
         "entities": [
             {
-                "type": "Room"
+                 "idPattern": ".*",
+                 "type": "Room"
             }
         ],
         "condition": {
@@ -243,13 +247,13 @@ echo
 01. POST /v2/subscriptions (without id/idpattern)
 =================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 92
+Content-Length: 94
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "subject entities element has no id/idPattern nor type",
+    "description": "subject entities element does not have id nor idPattern",
     "error": "BadRequest"
 }
 
@@ -338,16 +342,16 @@ Date: REGEX(.*)
 }
 
 
-08. POST /v2/subscriptions (missing subject condition)
-======================================================
+08. POST /v2/subscriptions (empty subject condition)
+====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 69
+Content-Length: 57
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "no subject condition specified",
+    "description": "condition is empty",
     "error": "BadRequest"
 }
 

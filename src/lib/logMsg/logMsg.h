@@ -1890,4 +1890,12 @@ inline void lmTransactionEnd()
   lmTransactionReset();
 }
 
+
+
+/* ****************************************************************************
+*
+* lmSemGet - 
+*/
+extern const char* lmSemGet(void);
+
 #endif  // SRC_LIB_LOGMSG_LOGMSG_H_

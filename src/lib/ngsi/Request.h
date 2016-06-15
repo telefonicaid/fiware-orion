@@ -84,18 +84,20 @@ typedef enum RequestType
 
   LogTraceRequest = 51,
   LogLevelRequest,
+  SemStateRequest,
   VersionRequest,
   ExitRequest,
+
   LeakRequest,
   StatisticsRequest,
-
   RegisterResponse,
   RtSubscribeResponse,
   RtSubscribeError,
+
   RtContextElementResponse,
   RtContextAttributeResponse,
 
-  EntityTypes = 62,
+  EntityTypes = 65,
   AttributesForEntityType,
   RtEntityTypesResponse,
   RtAttributesForEntityTypeResponse,
@@ -105,7 +107,7 @@ typedef enum RequestType
   EntityByIdAttributeByNameIdAndType,
 
   // /v2 API
-  EntitiesRequest = 70,
+  EntitiesRequest = 75,
   EntitiesResponse,
   EntryPointsRequest,
   EntryPointsResponse,
