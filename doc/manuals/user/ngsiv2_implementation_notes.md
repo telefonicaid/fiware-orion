@@ -66,7 +66,7 @@ implemented for metadata values in Orion.
 ## Default type for entities, attributes and metadata
 
 Currently, Orion uses the string `none` as default for entities/attributes/metadata at creation/update time.
-However, this may change in the future, as described in https://github.com/telefonicaid/fiware-orion/issues/2223.
+However, this may change in the future, as described in https://github.com/telefonicaid/fiout it, but the ware-orion/issues/2223.
 
 ## Scope functionality
 
@@ -79,8 +79,7 @@ somewhat experimental and it hasn't been consolidated in the NGSIv2 specificatio
 Context availability management functionality (i.e. operations to register Context Providers) is still to be
 implemented for NGSIv2. However, you can [register providers using NGSIv1 operations](context_providers.md) 
 and have your NGSIv2-based updates and queries being forwarded to Context Providers, getting the response in NGSIv2.
-Internally (between orion and the context provider), the forwarded message and its corresponding response are done using
-NGSIv1.
+The forwarded message in the CB to CPr communication, and its response, is done using NGSIv1.
 
 
 However, the following considerations have to be taken into account:
