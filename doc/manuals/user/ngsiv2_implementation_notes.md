@@ -79,17 +79,18 @@ somewhat experimental and it hasn't been consolidated in the NGSIv2 specificatio
 Context availability management functionality (i.e. operations to register Context Providers) is still to be
 implemented for NGSIv2. However, you can [register providers using NGSIv1 operations](context_providers.md) 
 and have your NGSIv2-based updates and queries being forwarded to Context Providers, getting the response in NGSIv2.
-Internally, the forwarded message and its corresponding response are done using NGSIv1
+Internally, the forwarded message and its corresponding response are done using NGSIv1.
 
 
 However, the following considerations have to be taken into account:
 
 * Query filtering (e.g. `GET /v2/entities?q=temperature>40`) is not supported on query forwarding. First, Orion 
   doesn't include the filter in the `POST /v1/queryContext` operation forwarded to CPr. Second, Orion doesn't filter 
-  the CPr results before responding them back to client. An issue has been created corresponding to this 
-  limitation: https://github.com/telefonicaid/fiware-orion/issues/2282
-* On forwarding, any type of entity in the NGSIv2 update/query match registrations without entity type. However, the 
-  opposite doesn't work, so if you have registrations with type, then you would need to use `?type` in NGSIv2 
-  update/query in order to match.
+  the CPr results before responding them back to client. An issue corresponding to this limitation has been created:
+  https://github.com/telefonicaid/fiware-orion/issues/2282
+* On forwarding, any type of entity in the NGSIv2 update/query matches registrations without entity type. However, the 
+  opposite doesn't work, so if you have registrations with types, then you must use `?type` in NGSIv2  update/query in
+  order to obtain a match.
 * In the case of partial updates (e.g. `POST /v2/op/entities` resulting in some entities/attributes being updated and 
-  some other entities/attributes not being updated due to failing or missing CPrs) 404 No Content is returned to client.
+  other entities/attributes not being updated due to failing or missing CPrs), 404 No Content is returned to the client and
+  information about all attributes not being updated is provided in the payload.
