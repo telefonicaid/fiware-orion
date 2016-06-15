@@ -582,4 +582,26 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | house;flat  |
       | house(flat) |
 
+  @notification_http_and_http_custom_url
+  Scenario:  try to create a new subscription using NGSI v2 with notification http and httpCustom url field together
+    Given  a definition of headers
+      | parameter          | value                            |
+      | Fiware-Service     | test_notif_http_custom_url_error |
+      | Fiware-ServicePath | /test                            |
+      | Content-Type       | application/json                 |
+  # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter                    | value                   |
+      | subject_idPattern            | .*                      |
+      | condition_attrs              | temperature             |
+      | notification_http_url        | http://localhost:1234   |
+      | notification_http_custom_url | http://localhost:4567   |
+      | notification_attrs           | temperature             |
+      | expires                      | 2016-04-05T14:00:00.00Z |
+    When create a new subscription
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                |
+      | error       | BadRequest                           |
+      | description | notification has http and httpCustom |
   #  headers, qs, method, payload fields  in notification http still are not  defined their tests
