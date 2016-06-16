@@ -164,6 +164,14 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Thu Jun 16 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.2.1-1
+- Fix: UTC as time in log file (#2232)
+- Fix: Removed capping in NGSIv2 update forwarding (#2193)
+- Fix: In some cases, compound attribute values were forwarded as empty strings (#2237)
+- Fix: attribute overwritten when JSON value used in PUT /v2/entities/<eId>/attr/<attrName>/values (#2246 and #2248)
+- Fix: subscription equal filter evaluation on update context logic (#2222)
+- Fix: capturing invalid id patterns at json parse time for v2 subscriptions - this bug made the broker crash when receiving invalid id-patterns (#2257)
+
 * Thu Jun 02 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.2.0-1
 - Add: notification attributes blacklist for NGSIv2 notifications (#2064)
 - Add: NGSIv2 custom notifications (#2015)

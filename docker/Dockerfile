@@ -3,7 +3,7 @@ FROM centos:centos6.6
 MAINTAINER FIWARE Orion Context Broker Team. Telefónica I+D
 
 ENV ORION_USER orion
-ENV GIT_REV_ORION 1.2.0
+ENV GIT_REV_ORION 1.2.1
 ENV CLEAN_DEV_TOOLS 1
 
 RUN adduser --comment "${ORION_USER}" ${ORION_USER}
