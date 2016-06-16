@@ -234,7 +234,7 @@ mv /tmp/Dockerfile docker/Dockerfile
 
 # Commit all files
 if [ "$commit" == "on" ]; then
-  git add src/app/contextBroker/version.h $changelog Docker/Dockerfile rpm/SPECS/contextBroker.spec
+  git add src/app/contextBroker/version.h $changelog docker/Dockerfile rpm/SPECS/contextBroker.spec
   git commit -m "Step: $currentTag -> $nextTag"
 fi
 
