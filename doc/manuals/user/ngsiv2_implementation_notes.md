@@ -79,3 +79,37 @@ somewhat experimental and it hasn't been consolidated in the NGSIv2 specificatio
 The error response rules defined in https://github.com/telefonicaid/fiware-orion/issues/1286 takes precedence over
 the ones described in "Error Responses" section in the NGSIv2 specification. In particular, Orion Context
 Broker never responds with "InvalidModification (422)", using "Unprocessable (422)" instead.
+
+# Subscription payload validations
+
+The particular validations that Orion implements on NGSIv2 subscription payloads are the following ones:
+
+* **description**: optional (max length 1024)
+* **subject**: mandatory
+  * **entities**: mandatory
+    * **id** or **idPattern**: one of them is mandatory (but both at the same time is not allowed). id
+      must follow NGSIv2 restrictions for IDs. idPattern must be not empty and a valid regex.
+    * **type**: optional (but if appears it must follow NGSIv2 restrictions for IDs)
+  * **condition**: optional (but if appears it must have a content, i.e. `{}` is not allowed)
+    * **attrs**: optional (but if appears it must be a list; empty list is allowed)
+    * **expression**: optional (but if appears it must have a content, i.e. `{}` is not allowed)
+      * **q**: optional (but if appears it must be not empty, i.e. `""` is not allowed)
+      * **georel**: optional (but if appears it must be not empty, i.e. `""` is not allowed)
+      * **geometry**: optional (but if appears it must be not empty, i.e. `""` is not allowed)
+      * **coords**: optional (but if appears it must be not empty, i.e. `""` is not allowed)
+* **notification**:
+  * **http**: must be present if `httpCustom` is omitted, forbidden otherwise
+    * **url**: mandatory (must be a valid URL)
+  * **httpCustom**: must be present if `http` is omitted, forbidden otherwise
+    * **url**: mandatory (must be not empty)
+    * **headers**: optional (but if appears it must have a content, i.e. `{}` is not allowed)
+    * **qs**: optional (but if appears it must have a content, i.e. `{}` is not allowed)
+    * **method**: optional (but if apperas it must be a valid HTTP method)
+    * **payload**: optional (empty string is allowed)
+  * **attrs**: optional (but if appears it must be a list; empty list is allowed)
+  * **exceptAttrs**: optional (but it cannot appear if `attrs` is also used; if appears it must be a non-empty list)
+  * **attrsFormat**: optional (but if appears it must be a valid attrs format keyword)
+* **throttling**: optional (must be an integer)
+* **expires**: optional (must be a date)
+* **status**: optional (must be a valid status keyword)
+

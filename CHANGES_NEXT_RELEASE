@@ -1,3 +1,4 @@
+- Fix: NGSIv2 subscriptions payload validation (#1964, #1967, #1973, #1975, #1979, #1981, #1983, #1984, #1988, #2007, #2018, #2093, #2095, #2099)
 - Fix: UTC as time in log file (Issue #2232)
 - Fix: Removed capping in NGSIv2 update forwarding (Issue #2193)
 - Fix: In some cases, compound attribute values were forwarded as empty strings (Issue #2237)
