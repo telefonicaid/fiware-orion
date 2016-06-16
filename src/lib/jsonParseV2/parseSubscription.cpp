@@ -323,7 +323,10 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
         {
           return badInput(ciP, "forbidden characters in subject entities element id");
         }
-
+        if (idOpt.value.length() > MAX_ID_LEN)
+        {
+          return badInput(ciP, "max id length exceeded");
+        }
         id = idOpt.value;
       }
     }
@@ -363,6 +366,10 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
       if (forbiddenIdCharsV2(typeOpt.value.c_str()))
       {
         return badInput(ciP, "forbidden characters in subject entities element type");
+      }
+      if (typeOpt.value.length() > MAX_ID_LEN)
+      {
+        return badInput(ciP, "max type length exceeded");
       }
       type = typeOpt.value;
     }
@@ -776,7 +783,10 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
     {
       return badInput(ciP, "attrs element has forbidden char");
     }
-
+    if (attrName.length() > MAX_ID_LEN)
+    {
+      return badInput(ciP, "max attribute length exceeded");
+    }
     vec->push_back(attrName);
   }
 
