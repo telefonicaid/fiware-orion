@@ -33,7 +33,7 @@ brokerStart CP1
 
 #
 # 01. Register E1/T1/A1 in CB, provApp: CP1
-# 02. Modify E1/A1 in CP1 via CB, using PUT /v2/entities/E1/attrs/A1?type=T
+# 02. Modify E1/A1 in CP1 via CB, using PUT /v2/entities/E1/attrs/A1?type=T1, see error
 #
 
 echo "01. Register E1/T1/A1 in CB, provApp: CP1"
