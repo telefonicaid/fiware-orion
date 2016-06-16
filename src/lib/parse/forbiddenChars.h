@@ -40,4 +40,10 @@ extern bool forbiddenChars(const char* s, const char* exceptions = NULL);
 */
 extern bool forbiddenIdChars(const std::string& api, const char* s, const char* exceptions = NULL);
 
+/* ****************************************************************************
+*
+* forbiddenIdCharsV2 -
+*/
+extern bool forbiddenIdCharsV2(const char* s, const char* exceptions = NULL);
+
 #endif  // SRC_LIB_PARSE_FORBIDDENCHARS_H_

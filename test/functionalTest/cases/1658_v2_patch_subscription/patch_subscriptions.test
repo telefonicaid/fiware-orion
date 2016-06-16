@@ -45,7 +45,8 @@ payload='
     "subject": {
         "entities": [
             {
-                "type": "Room"
+                "type": "Room",
+                "idPattern": ".*"
             }
         ],
         "condition": {
@@ -199,7 +200,8 @@ payload='
     "subject": {
         "entities": [
             {
-                "type": "Room"
+                "type": "Room",
+                "idPattern": ".*"
             }
         ],
         "condition": {

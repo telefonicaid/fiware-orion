@@ -46,8 +46,8 @@ brokerStart CB
 #   georel=coveredBy&geometry=polygon&coords=25.774,-80.190,18.466,-66.118,32.321,-64.757,25.774,-80.190
 #
 # On error in geo-query params:
-#   HTTP Header: 422 Unprocessable Entity
-#   Payload:     NotSupportedQuery
+#   HTTP Header: 400 Bad Request
+#   Payload:     BadRequest
 #
 
 echo "01. geometry without coords - see error"
@@ -186,267 +186,267 @@ echo
 --REGEXPECT--
 01. geometry without coords - see error
 =======================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 111
+HTTP/1.1 400 Bad Request
+Content-Length: 96
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: URI param /geometry/ used without /coords/",
-    "error": "InvalidModification"
+    "description": "Invalid query: URI param /geometry/ used without /coords/",
+    "error": "BadRequest"
 }
 
 
 02. coords without geometry - see error
 =======================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 111
+HTTP/1.1 400 Bad Request
+Content-Length: 96
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: URI param /coords/ used without /geometry/",
-    "error": "InvalidModification"
+    "description": "Invalid query: URI param /coords/ used without /geometry/",
+    "error": "BadRequest"
 }
 
 
 03. georel without geometry - see error
 =======================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 111
+HTTP/1.1 400 Bad Request
+Content-Length: 96
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: URI param /georel/ used without /geometry/",
-    "error": "InvalidModification"
+    "description": "Invalid query: URI param /georel/ used without /geometry/",
+    "error": "BadRequest"
 }
 
 
 04. Non-supported area-type in geometry - see error
 ===================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 135
+HTTP/1.1 400 Bad Request
+Content-Length: 120
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: error parsing geometry: Invalid selector in geometry specification",
-    "error": "InvalidModification"
+    "description": "Invalid query: error parsing geometry: Invalid selector in geometry specification",
+    "error": "BadRequest"
 }
 
 
 05a. georel 'near' in box geometry - see error
 ==============================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 122
+HTTP/1.1 400 Bad Request
+Content-Length: 107
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: georel /near/ used with geometry different than point",
-    "error": "InvalidModification"
+    "description": "Invalid query: georel /near/ used with geometry different than point",
+    "error": "BadRequest"
 }
 
 
 05b. georel 'near' in polygon geometry - see error
 ==================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 122
+HTTP/1.1 400 Bad Request
+Content-Length: 107
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: georel /near/ used with geometry different than point",
-    "error": "InvalidModification"
+    "description": "Invalid query: georel /near/ used with geometry different than point",
+    "error": "BadRequest"
 }
 
 
 05c. georel 'near' in line geometry - see error
 ===============================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 122
+HTTP/1.1 400 Bad Request
+Content-Length: 107
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: georel /near/ used with geometry different than point",
-    "error": "InvalidModification"
+    "description": "Invalid query: georel /near/ used with geometry different than point",
+    "error": "BadRequest"
 }
 
 
 06. georel 'near' without min/max-distance - see error
 ======================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 125
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "Query not supported: georel /near/ without either minDistance nor maxDistance",
-    "error": "InvalidModification"
-}
-
-
-07. 3 coords in a point - see error
-===================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 104
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "Query not supported: invalid point in URI param /coords/",
-    "error": "InvalidModification"
-}
-
-
-08. invalid point in coords - see error
-=======================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 104
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "Query not supported: invalid point in URI param /coords/",
-    "error": "InvalidModification"
-}
-
-
-09. Too many points for a Point - see error
-===========================================
-HTTP/1.1 422 Unprocessable Entity
+HTTP/1.1 400 Bad Request
 Content-Length: 110
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: invalid number of coordinates for /point/",
-    "error": "InvalidModification"
+    "description": "Invalid query: georel /near/ without either minDistance nor maxDistance",
+    "error": "BadRequest"
+}
+
+
+07. 3 coords in a point - see error
+===================================
+HTTP/1.1 400 Bad Request
+Content-Length: 89
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid query: invalid point in URI param /coords/",
+    "error": "BadRequest"
+}
+
+
+08. invalid point in coords - see error
+=======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 89
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid query: invalid point in URI param /coords/",
+    "error": "BadRequest"
+}
+
+
+09. Too many points for a Point - see error
+===========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 95
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid query: invalid number of coordinates for /point/",
+    "error": "BadRequest"
 }
 
 
 10. Too many points for a Line - see error
 ===========================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 104
+HTTP/1.1 400 Bad Request
+Content-Length: 89
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: invalid point in URI param /coords/",
-    "error": "InvalidModification"
+    "description": "Invalid query: invalid point in URI param /coords/",
+    "error": "BadRequest"
 }
 
 
 11. Too few points for a Line - see error
 =========================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 109
+HTTP/1.1 400 Bad Request
+Content-Length: 94
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: invalid number of coordinates for /line/",
-    "error": "InvalidModification"
+    "description": "Invalid query: invalid number of coordinates for /line/",
+    "error": "BadRequest"
 }
 
 
 12. Too many points for a Box - see error
 ==========================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 104
+HTTP/1.1 400 Bad Request
+Content-Length: 89
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: invalid point in URI param /coords/",
-    "error": "InvalidModification"
+    "description": "Invalid query: invalid point in URI param /coords/",
+    "error": "BadRequest"
 }
 
 
 13. Too few points for a Box - see error
 ========================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 108
+HTTP/1.1 400 Bad Request
+Content-Length: 93
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: invalid number of coordinates for /box/",
-    "error": "InvalidModification"
+    "description": "Invalid query: invalid number of coordinates for /box/",
+    "error": "BadRequest"
 }
 
 
 14. Too few points for a Polygon - see error
 ============================================
-HTTP/1.1 422 Unprocessable Entity
+HTTP/1.1 400 Bad Request
+Content-Length: 85
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid query: Too few coordinates for polygon",
+    "error": "BadRequest"
+}
+
+
+15a. Degenerated box - see error
+================================
+HTTP/1.1 400 Bad Request
 Content-Length: 100
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: Too few coordinates for polygon",
-    "error": "InvalidModification"
-}
-
-
-15a. Degenerated box - see error
-================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 115
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "Query not supported: box coordinates are not defining an actual box",
-    "error": "InvalidModification"
+    "description": "Invalid query: box coordinates are not defining an actual box",
+    "error": "BadRequest"
 }
 
 
 15b. Degenerated box - see error
 ================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 115
+HTTP/1.1 400 Bad Request
+Content-Length: 100
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: box coordinates are not defining an actual box",
-    "error": "InvalidModification"
+    "description": "Invalid query: box coordinates are not defining an actual box",
+    "error": "BadRequest"
 }
 
 
 15c. Degenerated box - see error
 ================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 115
+HTTP/1.1 400 Bad Request
+Content-Length: 100
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: box coordinates are not defining an actual box",
-    "error": "InvalidModification"
+    "description": "Invalid query: box coordinates are not defining an actual box",
+    "error": "BadRequest"
 }
 
 

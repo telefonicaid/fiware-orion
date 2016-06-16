@@ -31,7 +31,7 @@
 
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/ContextAttribute.h"
-#include "apiTypesV2/ErrorCode.h"
+#include "rest/OrionError.h"
 
 struct QueryContextResponse;
 
@@ -43,7 +43,7 @@ class Attribute
 {
 public:
   ContextAttribute*  pcontextAttribute;
-  ErrorCode          errorCode;                    // Optional - mandatory if not 200-OK
+  OrionError         oe;                    // Optional - mandatory if not 200-OK
 
   Attribute(): pcontextAttribute(0) {}
   std::string  render(ConnectionInfo* ciP, RequestType requestType, bool comma = false);

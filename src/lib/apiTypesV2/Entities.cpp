@@ -37,7 +37,7 @@
 */
 Entities::Entities()
 {
-  errorCode.fill("OK", "");
+  oe.fill(SccNone, "", "");
 }
 
 
@@ -57,17 +57,10 @@ Entities::~Entities()
 *
 * Entities::render - 
 *
-* If no error reported in errorCode, render the vector of entities.
-* Otherwise, render the errorCode.
 */
 std::string Entities::render(ConnectionInfo* ciP, RequestType requestType)
 {
-  if ((errorCode.description == "") && ((errorCode.error == "OK") || (errorCode.error == "")))
-  {
-    return vec.render(ciP, requestType, false);
-  }
-
-  return errorCode.toJson(true);
+  return vec.render(ciP, requestType, false);
 } 
 
 
@@ -131,7 +124,7 @@ void Entities::fill(QueryContextResponse* qcrsP)
     // and an empty vector of entities ( [] )
     //
 
-    errorCode.fill("OK", "");
+    oe.fill(SccOk, "", "OK");
     return;
   }
   else if (qcrsP->errorCode.code != SccOk)
@@ -140,7 +133,7 @@ void Entities::fill(QueryContextResponse* qcrsP)
     // If any other error - use the error for the response
     //
 
-    errorCode.fill(qcrsP->errorCode);
+    oe.fill(qcrsP->errorCode.code, qcrsP->errorCode.details, qcrsP->errorCode.reasonPhrase);
     return;
   }
 

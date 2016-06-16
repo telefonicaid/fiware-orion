@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_REST_ERROR_ADAPTATION_H
-#define SRC_LIB_REST_ERROR_ADAPTATION_H
+#ifndef SRC_LIB_SERVICEROUTINESV2_SEMSTATETREAT_H_
+#define SRC_LIB_SERVICEROUTINESV2_SEMSTATETREAT_H_
 
 /*
 *
@@ -23,26 +23,26 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Fermin Galan
+* Author: Ken Zangelin
 */
-
 #include <string>
+#include <vector>
 
-#include "OrionError.h"
+#include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
 
-/* ****************************************************************************
-*
-* errorStringForV2 -
-*/
-extern std::string errorStringForV2(const std::string& reasonPhrase);
 
 
 /* ****************************************************************************
 *
-*  invalidParameterForNgsiv2 -
+* semStateTreat - 
 */
-extern bool invalidParameterForNgsiv2(const std::string& details, OrionError* oe);
+extern std::string semStateTreat
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif // SRC_LIB_REST_ERROR_ADAPTATION_H
-
-
+#endif  // SRC_LIB_SERVICEROUTINESV2_SEMSTATETREAT_H_

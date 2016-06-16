@@ -68,16 +68,11 @@ std::string getEntityAttributeValue
   std::string  type       = ciP->uriParam["type"];
   bool         text       = (ciP->outMimeType == TEXT);
 
-  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
+  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL) || (forbiddenIdChars(ciP->apiVersion, compV[4].c_str() , NULL)))
   {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
-    return oe.render(ciP, "");
-  }
-
-  if (forbiddenIdChars(ciP->apiVersion, compV[4].c_str() , NULL))
-  {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
-    return oe.render(ciP, "");
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
+    ciP->httpStatusCode = oe.code;
+    return oe.toJson();
   }
 
   // Fill in QueryContextRequest
@@ -88,21 +83,10 @@ std::string getEntityAttributeValue
 
   attribute.fill(&parseDataP->qcrs.res, compV[4]);
 
-  // Render entity attribute response
-  if (attribute.errorCode.error == "TooManyResults")
+  if (attribute.oe.code != SccNone)
   {
-    ErrorCode ec("TooManyResults", MORE_MATCHING_ENT);
-
-    ciP->httpStatusCode = SccConflict;
-
-    TIMED_RENDER(answer = ec.toJson(true));
-  }
-  else if (attribute.errorCode.error == "NotFound")
-  {
-    ErrorCode ec("NotFound", "The requested entity has not been found. Check type and id");
-    ciP->httpStatusCode = SccContextElementNotFound;
-
-    TIMED_RENDER(answer = ec.toJson(true));
+    TIMED_RENDER(answer = attribute.oe.toJson());
+    ciP->httpStatusCode = attribute.oe.code;
   }
   else
   {

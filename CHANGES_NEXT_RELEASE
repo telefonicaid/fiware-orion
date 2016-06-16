@@ -1,6 +1,18 @@
 - Fix: UTC as time in log file (Issue #2232)
 - Fix: Removed capping in NGSIv2 update forwarding (Issue #2193)
 - Fix: In some cases, compound attribute values were forwarded as empty strings (Issue #2237)
-- Fix: attribute overwritten when JSON value used in PUT /v2/entities/<eId>/attr/<attrName>/values (Issues #2246 and #2248)
+- Fix: attribute overwritten when JSON value used in PUT /v2/entities/<eId>/attrs/<attrName>/values (Issues #2246 and #2248)
 - Fix: subscription equal filter evaluation on update context logic (#2222)
 - Fix: capturing invalid id patterns at json parse time for v2 subscriptions - this bug made the broker crash when receiving invalid id-patterns (Issue #2257)
+- Add: new operation: GET /admin/sem, to see list of the brokers semaphores (Issue #2145)
+- Fix: out-of-NGSI service not found error now using 400 Bad Request HTTP response code (instead of 200 OK). Error message has been unified to "service not found" in all cases.
+- Fix: using 404 Not Found - PartialUpdate error when  NGSIv2 forwarded update is partially done (previously 204 No Content was used, without providing actual informaton about the partial update)
+- Fix: CPrs responding with not NGSIv1-compliant messages was progressed to clients as 204 Not Content in NGSIv2 update forward scenarios (now responding with 404 Not Found)
+- Fix: NGSIv2 "attribute already exists" error case was wrongly using 400 Bad Request, now it uses 422 Unprocessable Entity (according to rules defined in #1286)
+- Fix: NGSIv2 "duplicated attribute (in request)" error case was wronly using 422 Unprocessable Entity, now it uses 400 Bad Request (according to rules defined in #1286)
+- Fix: NGSIv2 "entity does not have such attribute" error case was wrongly using "requested entity has not been found" descriptions
+- Fix: missing error payload for NotFound error in 'PUT /v2/entities/<eId>/attrs/<attrName>' and 'PUT /v2/entities/<eId>/attrs/<attrName>/value' operations
+- Fix: NGSIv2 "InvalidModification" errors changed to "Unprocessable" (according to rules defined in #1286)
+- Fix: NGSIv2 geoquery syntax errors using 400 Bad Request instead of 422 Unprocessable Entity (according to rules defined in #1286)
+- Fix: GET /v2/subscriptions/subId error for non existing subscriptions (now using 404 Not Found, previously using 400 Bad Request)
+- FIX: 472 Unknown returned as HTTP status code by POST /v2/op/update in some cases (now using 404 Not Found).

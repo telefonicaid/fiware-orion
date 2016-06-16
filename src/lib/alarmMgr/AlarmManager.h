@@ -57,8 +57,10 @@ public:
   AlarmManager();
 
   int  init(bool logAlreadyRaisedAlarms);
-  void semTake(void);
-  void semGive(void);
+
+  void         semTake(void);
+  void         semGive(void);
+  const char*  semGet(void);
 
   void notificationErrorLogAlwaysSet(bool _notificationErrorLogAlways);
   void badInputLogAlwaysSet(bool _badInputLogAlways);

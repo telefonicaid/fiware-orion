@@ -227,13 +227,13 @@ echo
 01. Create entity with two geo:point -> fail
 ============================================
 HTTP/1.1 413 Request Entity Too Large
-Content-Length: 96
+Content-Length: 148
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "No more than one geo-location attribute allowed",
+    "description": "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
     "error": "NoResourcesAvailable"
 }
 
@@ -312,13 +312,13 @@ Date: REGEX(.*)
 04. Append a new geo:point attribute (attr2) -> fail
 ====================================================
 HTTP/1.1 413 Request Entity Too Large
-Content-Length: 96
+Content-Length: 148
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "No more than one geo-location attribute allowed",
+    "description": "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
     "error": "NoResourcesAvailable"
 }
 
@@ -457,13 +457,13 @@ Date: REGEX(.*)
 09. Change attr2 type to geo:point again -> fail
 ================================================
 HTTP/1.1 413 Request Entity Too Large
-Content-Length: 96
+Content-Length: 148
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "No more than one geo-location attribute allowed",
+    "description": "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
     "error": "NoResourcesAvailable"
 }
 

@@ -101,12 +101,12 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1/attrs/NONE/value
 ========================================
 HTTP/1.1 404 Not Found
-Content-Length: 95
+Content-Length: 79
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{"error":"NotFound","description":"The requested entity has not been found. Check type and id"}
+{"error":"NotFound","description":"The entity does not have such an attribute"}
 
 
 --TEARDOWN--

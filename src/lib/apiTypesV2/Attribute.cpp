@@ -66,7 +66,7 @@ std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool
     return out;
   }
 
-  return errorCode.toJson(true);
+  return oe.toJson();
 }
 
 
@@ -84,21 +84,21 @@ void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
 {
   if (qcrsP->errorCode.code == SccContextElementNotFound)
   {
-    errorCode.fill("NotFound",  "The requested entity has not been found. Check type and id");
+    oe.fill(SccContextElementNotFound, "The requested entity has not been found. Check type and id", "NotFound");
   }
   else if (qcrsP->errorCode.code != SccOk)
   {
     //
     // any other error distinct from Not Found
     //
-    errorCode.fill(qcrsP->errorCode);
+    oe.fill(qcrsP->errorCode.code, qcrsP->errorCode.details, qcrsP->errorCode.reasonPhrase);
   }
   else if (qcrsP->contextElementResponseVector.size() > 1) // qcrsP->errorCode.code == SccOk
   {
     //
     // If there are more than one entity, we return an error
     //
-    errorCode.fill("TooManyResults", MORE_MATCHING_ENT);
+    oe.fill(SccConflict, MORE_MATCHING_ENT, "TooManyResults");
   }
   else
   {
@@ -115,7 +115,7 @@ void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
 
     if (pcontextAttribute == NULL)
     {
-      errorCode.fill("NotFound",  "The entity does not have such an attribute");
+      oe.fill(SccContextElementNotFound, "The entity does not have such an attribute", "NotFound");
     }
   }
 }

@@ -34,7 +34,6 @@
 #include "apiTypesV2/Entities.h"
 #include "rest/OrionError.h"
 #include "rest/EntityTypeInfo.h"
-#include "apiTypesV2/ErrorCode.h"
 #include "serviceRoutinesV2/deleteEntity.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "parse/forbiddenChars.h"
@@ -65,13 +64,13 @@ std::string deleteEntity
   ParseData*                 parseDataP
 )
 {
-  string  answer;
   Entity* eP;
 
   if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
   {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
-    return oe.render(ciP, "");
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
+    ciP->httpStatusCode = oe.code;
+    return oe.toJson();
   }
 
   eP       = new Entity();
@@ -91,60 +90,23 @@ std::string deleteEntity
   // Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
-  // Any error in the response?
-  UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
-
   ciP->outMimeType = JSON;
 
-  for (unsigned int ix = 0; ix < upcrsP->contextElementResponseVector.size(); ++ix)
+  // Check for potential error
+  string  answer = "";
+  if (parseDataP->upcrs.res.oe.code != SccNone )
   {
-    StatusCode      sc  = upcrsP->contextElementResponseVector[ix]->statusCode;
-    HttpStatusCode  scc = sc.code;
-
-    if ((scc != SccOk) && (scc != SccNone))
-    {
-      OrionError oe;
-
-      ciP->httpStatusCode = scc;
-
-      if (scc == SccContextElementNotFound)
-      {
-        oe.code          = scc;
-        oe.reasonPhrase  = "NotFound";
-        oe.details       = "The requested entity has not been found. Check type and id";
-      }
-      else if (scc == SccInvalidParameter)
-      {
-        oe.code              = SccContextElementNotFound;
-        oe.reasonPhrase      = "NotFound";
-        oe.details           = "Attribute not found";
-        ciP->httpStatusCode  = SccContextElementNotFound; // We don't want a 472
-      }
-      else
-      {
-        oe.code          = scc;
-        oe.reasonPhrase  = sc.reasonPhrase;
-      }
-
-      TIMED_RENDER(answer = oe.render(ciP, ""));
-
-      eP->release();
-      delete eP;
-
-      return answer;
-    }
+    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
   }
-
-  // Prepare status code
-  if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
+  else
   {
     ciP->httpStatusCode = SccNoContent;
   }
-
 
   // Cleanup and return result
   eP->release();
   delete eP;
 
-  return "";
+  return answer;
 }

@@ -187,15 +187,15 @@ Date: REGEX(.*)
 
 05. Try to UPDATE non-existing attribute A3, see error
 ======================================================
-HTTP/1.1 472 Unknown
-Content-Length: 128
+HTTP/1.1 404 Not Found
+Content-Length: 61
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "action: UPDATE - entity: [E1, T1] - offending attribute: A3",
-    "error": "request parameter is invalid/not allowed"
+    "description": "No context element found",
+    "error": "NotFound"
 }
 
 

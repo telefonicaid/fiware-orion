@@ -42,7 +42,6 @@
 #include "apiTypesV2/SubscriptionUpdate.h"
 
 
-
 /* ****************************************************************************
 *
 * jsonRequestTreat - 
@@ -77,8 +76,8 @@ std::string jsonRequestTreat
 
     if ((answer = parseDataP->ent.res.check(ciP, EntitiesRequest)) != "OK")
     {
-      OrionError error(SccBadRequest, answer);
-      return error.render(ciP, "");
+      OrionError oe(SccBadRequest, answer);
+      return oe.setStatusCodeAndSmartRender(ciP);
     }
     break;
 
@@ -92,8 +91,8 @@ std::string jsonRequestTreat
 
     if ((answer = parseDataP->ent.res.check(ciP, EntityRequest)) != "OK")
     {
-      OrionError error(SccBadRequest, answer);
-      return error.render(ciP, "");
+      OrionError oe(SccBadRequest, answer);
+      return oe.setStatusCodeAndSmartRender(ciP);
     }
     break;
 
@@ -108,8 +107,8 @@ std::string jsonRequestTreat
 
     if ((answer = parseDataP->attr.attribute.check(ciP, EntityAttributeRequest, "", "", 0)) != "OK")
     {
-      OrionError error(SccBadRequest, answer);
-      return error.render(ciP, "");
+      OrionError oe(SccBadRequest, answer);
+      return oe.setStatusCodeAndSmartRender(ciP);
     }
     break;
 
@@ -157,7 +156,7 @@ std::string jsonRequestTreat
 
   default:
     OrionError error(SccNotImplemented, "Request Treat function not implemented");
-    answer = error.render(ciP, "");
+    answer = error.render();
     ciP->httpStatusCode = SccNotImplemented;
     break;
   }

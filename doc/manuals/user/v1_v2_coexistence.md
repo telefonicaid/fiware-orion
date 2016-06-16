@@ -76,4 +76,7 @@ However, the following considerations have to be taken into account:
   opposite doesn't work, so if you have registrations with types, then you must use `?type` in NGSIv2  update/query in
   order to obtain a match.
 * In the case of partial updates (e.g. `POST /v2/op/entities` resulting in some entities/attributes being updated and
-  other entities/attributes not being updated due to failing or missing CPrs), 204 No Content is returned to the client.
+  other entities/attributes not being updated due to failing or missing CPrs), 404 Not Found is returned to the client.
+  The `error` field in this case is `PartialUpdate` and the `description` field contains information about which entity
+  attributes failed to update.
+

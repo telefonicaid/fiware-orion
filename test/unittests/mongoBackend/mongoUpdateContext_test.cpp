@@ -10836,7 +10836,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
   ASSERT_EQ(0, ucRes.contextElementResponseVector.size());
   EXPECT_EQ(SccBadRequest, ucRes.errorCode.code);
   EXPECT_EQ("Bad Request", ucRes.errorCode.reasonPhrase);
-  EXPECT_EQ("service path length greater than one in update", ucRes.errorCode.details);
+  EXPECT_EQ("service path length greater than the one in update", ucRes.errorCode.details);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string

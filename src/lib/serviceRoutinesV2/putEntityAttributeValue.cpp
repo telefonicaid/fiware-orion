@@ -65,18 +65,12 @@ std::string putEntityAttributeValue
   std::string  attributeName  = compV[4];
   std::string  type           = ciP->uriParam["type"];
 
-  if (forbiddenIdChars(ciP->apiVersion, entityId.c_str() , NULL))
+  if (forbiddenIdChars(ciP->apiVersion, entityId.c_str() , NULL) || forbiddenIdChars(ciP->apiVersion, attributeName.c_str() , NULL))
   {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
-    return oe.render(ciP, "");
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
+    ciP->httpStatusCode = oe.code;
+    return oe.toJson();
   }
-
-  if (forbiddenIdChars(ciP->apiVersion, attributeName.c_str() , NULL))
-  {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
-    return oe.render(ciP, "");
-  }
-
 
   // 01. Fill in UpdateContextRequest with data from URI and payload
   parseDataP->av.attribute.name = attributeName;
@@ -85,8 +79,9 @@ std::string putEntityAttributeValue
   std::string err = parseDataP->av.attribute.check(ciP,ciP->requestType,"","", 0);
   if (err != "OK")
   {
-    OrionError oe(SccBadRequest, err);
-    return oe.render(ciP, "");
+    OrionError oe(SccBadRequest, err, "BadRequest");
+    ciP->httpStatusCode = oe.code;
+    return oe.toJson();
   }
   parseDataP->upcr.res.fill(entityId, &parseDataP->av.attribute, "UPDATE", type);
 
@@ -94,35 +89,20 @@ std::string putEntityAttributeValue
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
-
-  // 03. Check output from mongoBackend - any errors?
-  if (parseDataP->upcrs.res.contextElementResponseVector.size() == 1)
+  // 03. Check output from mongoBackend
+  std::string answer = "";
+  if (parseDataP->upcrs.res.oe.code != SccNone)
   {
-    if (parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code != SccOk)
-    {
-      ciP->httpStatusCode = parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code;
-    }
+    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
   }
-
-  if (ciP->httpStatusCode == SccConflict)
-  {
-    ErrorCode   ec("TooManyResults", MORE_MATCHING_ENT);
-    std::string answer;
-
-    TIMED_RENDER(answer = ec.toJson(true));
-
-    return answer;
-  }
-
-  // 04. Prepare HTTP headers
-  if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
+  else
   {
     ciP->httpStatusCode = SccNoContent;
   }
 
-
   // 05. Cleanup and return result
   parseDataP->upcr.res.release();
 
-  return "";
+  return answer;
 }

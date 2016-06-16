@@ -30,7 +30,6 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "rest/OrionError.h"
-#include "apiTypesV2/ErrorCode.h"
 #include "apiTypesV2/Entities.h"
 #include "serviceRoutinesV2/postBatchUpdate.h"
 #include "ngsi10/UpdateContextRequest.h"
@@ -63,60 +62,26 @@ std::string postBatchUpdate
   BatchUpdate*           buP    = &parseDataP->bu.res;
   UpdateContextRequest*  upcrP  = &parseDataP->upcr.res;
   Entities               entities;
-  std::string            answer;
 
   upcrP->fill(&buP->entities, buP->updateActionType.get());
   buP->release();  // upcrP just 'took over' the data from buP, buP is no longer needed
   parseDataP->upcr.res.present("");
-  answer = postUpdateContext(ciP, components, compV, parseDataP);
 
-  for (unsigned int ix = 0; ix < parseDataP->upcrs.res.contextElementResponseVector.size(); ++ix)
+  postUpdateContext(ciP, components, compV, parseDataP);
+
+  // Check potential error
+  std::string  answer = "";
+  if (parseDataP->upcrs.res.oe.code != SccNone )
   {
-    ContextElementResponse* cerP = parseDataP->upcrs.res.contextElementResponseVector[ix];
-
-    if (cerP->statusCode.code != SccOk)
-    {
-      parseDataP->upcrs.res.errorCode.fill(cerP->statusCode);
-    }
-  }
-
-
-  //
-  // If an error is flagged by ciP->httpStatusCode, store it in parseDataP->upcrs.res.errorCode
-  // for later processing (not sure this ever happen ...)
-  //
-  if (ciP->httpStatusCode != SccOk)
-  {
-    parseDataP->upcrs.res.errorCode.code     = ciP->httpStatusCode;
-    parseDataP->upcrs.res.errorCode.details  = answer;
-  }
-
-  // If postUpdateContext gives back a parseDataP->upcrs with !200 OK in 'errorCode', transform to HTTP Status error
-  if ((parseDataP->upcrs.res.errorCode.code != SccOk) && (parseDataP->upcrs.res.contextElementResponseVector.size() == 1))
-  {
-    OrionError   oe(parseDataP->upcrs.res.errorCode);
-
-    ciP->httpStatusCode = parseDataP->upcrs.res.errorCode.code;
-
-    // If 404 and details empty, assuming 'Entity not found'
-    if ((parseDataP->upcrs.res.errorCode.code == SccContextElementNotFound) && (oe.details == ""))
-    {
-      oe.details = "Entity not found";
-    }
-
-    answer = oe.render(ciP, "");
+    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
   }
   else
   {
-    //
-    // NOTE
-    //   For simplicity, 204 is always returned, even if entities are created
-    //
     ciP->httpStatusCode = SccNoContent;
-    answer = "";
   }
 
-  // 04. Cleanup and return result
+  // Cleanup and return result
   entities.release();
   parseDataP->upcr.res.release();
 

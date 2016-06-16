@@ -32,7 +32,6 @@
 #include "ngsi/Request.h"
 #include "ngsi/ScopeVector.h"
 #include "apiTypesV2/Entities.h"
-#include "apiTypesV2/ErrorCode.h"
 #include "rest/ConnectionInfo.h"
 
 
