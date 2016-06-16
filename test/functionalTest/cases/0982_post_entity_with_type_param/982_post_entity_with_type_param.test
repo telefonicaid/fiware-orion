@@ -236,15 +236,15 @@ Date: REGEX(.*)
 
 07. POST/v2/entities/E1/attrs T2 (append attribute A3, error already exists)
 ============================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 105
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 108
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "one or more of the attributes in the request already exist: [ A3 ]",
-    "error": "BadRequest"
+    "error": "Unprocessable"
 }
 
 

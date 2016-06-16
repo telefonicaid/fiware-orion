@@ -29,7 +29,7 @@
 #include <vector>
 
 #include "ngsi/ContextAttributeVector.h"
-#include "apiTypesV2/ErrorCode.h"
+#include "rest/OrionError.h"
 
 struct QueryContextResponse;
 
@@ -44,7 +44,7 @@ public:
   std::string             type;             // Optional
   std::string             isPattern;        // Optional
   ContextAttributeVector  attributeVector;  // Optional
-  ErrorCode               errorCode;        // Optional - mandatory if not 200-OK
+  OrionError              oe;               // Optional - mandatory if not 200-OK
 
   std::string             servicePath;      // Not part of payload, just an internal field
   bool                    typeGiven;        // Was 'type' part of the incoming payload?

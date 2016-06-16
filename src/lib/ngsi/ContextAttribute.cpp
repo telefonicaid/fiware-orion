@@ -36,10 +36,10 @@
 #include "alarmMgr/alarmMgr.h"
 #include "orionTypes/OrionValueType.h"
 #include "parse/forbiddenChars.h"
-#include "apiTypesV2/ErrorCode.h"
 #include "ngsi/ContextAttribute.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
+#include "rest/OrionError.h"
 
 #include "mongo/client/dbclient.h"
 #include "mongoBackend/dbConstants.h"
@@ -911,10 +911,10 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
     }
     else
     {
-      ErrorCode ec("NotAcceptable", "accepted MIME types: text/plain");
+      OrionError oe(SccNotAcceptable, "accepted MIME types: text/plain", "NotAcceptable");
       ciP->httpStatusCode = SccNotAcceptable;
 
-      out = ec.toJson(true);
+      out = oe.toJson();
     }
   }
   else  // TEXT

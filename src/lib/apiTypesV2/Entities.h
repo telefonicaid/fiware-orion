@@ -29,7 +29,7 @@
 #include <vector>
 
 #include "apiTypesV2/EntityVector.h"
-#include "apiTypesV2/ErrorCode.h"
+#include "rest/OrionError.h"
 
 
 struct QueryContextResponse;
@@ -42,7 +42,7 @@ class Entities
 {
 public:
   EntityVector  vec;          // Optional - mandatory if 200-OK
-  ErrorCode     errorCode;    // Optional - mandatory if not 200-OK
+  OrionError    oe;           // Optional - mandatory if not 200-OK
 
   Entities();
   ~Entities();

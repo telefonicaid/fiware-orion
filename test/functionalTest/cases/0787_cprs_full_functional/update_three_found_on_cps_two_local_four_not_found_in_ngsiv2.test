@@ -862,11 +862,16 @@ Date: REGEX(.*)
 
 15. Update/UPDATE All seven attributes plus a few not found
 ===========================================================
-HTTP/1.1 204 No Content
-Content-Length: 0
+HTTP/1.1 404 Not Found
+Content-Length: 110
+Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+{
+    "description": "Attributes that were not updated: { E1-T1 : [A5], E2-T1 : [A5, A4] }",
+    "error": "PartialUpdate"
+}
 
 
 16. Query E1-E2/{} in CP1

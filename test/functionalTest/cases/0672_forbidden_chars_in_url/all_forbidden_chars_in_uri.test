@@ -244,7 +244,7 @@ Date: REGEX(.*)
 
 09. Test without forbidden characters
 =====================================
-HTTP/1.1 200 OK
+HTTP/1.1 400 Bad Request
 Content-Length: 119
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

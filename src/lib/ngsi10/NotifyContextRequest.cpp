@@ -73,7 +73,7 @@ std::string NotifyContextRequest::toJson(RenderFormat renderFormat, const std::v
     OrionError oe(SccBadRequest, "Invalid notification format");
     alarmMgr.badInput(clientIp, "Invalid notification format");
 
-    return oe.render("", "v2");
+    return oe.toJson();
   }
 
   std::string out;

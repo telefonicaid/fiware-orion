@@ -37,6 +37,8 @@
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
 
+#include "rest/OrionError.h"
+
 using namespace mongo;
 using namespace orion;
 
@@ -90,7 +92,7 @@ static bool stringArray2coords
 * Get the GeoJSON information (geoJson output argument) for the given
 * ContextAttribute provided as parameter.
 *
-* It returns true, except in the case of error (in which in addition errDatail gets
+* It returns true, except in the case of error (in which in addition errDetail gets
 * filled)
 */
 static bool getGeoJson
@@ -254,7 +256,8 @@ bool processLocationAtEntityCreation
   std::string*                   locAttr,
   BSONObjBuilder*                geoJson,
   std::string*                   errDetail,
-  const std::string&             apiVersion
+  const std::string&             apiVersion,
+  OrionError*                    oe
 )
 {
   *locAttr = "";
@@ -274,17 +277,20 @@ bool processLocationAtEntityCreation
     {
       *errDetail = "You cannot use more than one geo location attribute "
                    "when creating an entity [see Orion user manual]";
+      oe->fill(SccRequestEntityTooLarge, *errDetail, "NoResourcesAvailable");
       return false;
     }
 
     if ((location != LOCATION_WGS84) && (location != LOCATION_WGS84_LEGACY))
     {
       *errDetail = "only WGS84 are supported, found: " + location;
+      oe->fill(SccBadRequest, *errDetail, "BadRequest");
       return false;
     }
 
     if (!getGeoJson(caP, geoJson, errDetail, apiVersion))
     {
+      oe->fill(SccBadRequest, *errDetail, "BadRequest");
       return false;
     }
 
@@ -305,7 +311,8 @@ bool processLocationAtUpdateAttribute
   const ContextAttribute*        targetAttr,
   mongo::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
-  const std::string&             apiVersion
+  const std::string&             apiVersion,
+  OrionError*                    oe
 )
 {
   std::string subErr;
@@ -323,6 +330,7 @@ bool processLocationAtUpdateAttribute
   if ((locationString.length() > 0) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
   {
     *errDetail = "only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]";
+    oe->fill(SccBadRequest, *errDetail, "BadRequest");
     return false;
   }
 
@@ -335,6 +343,7 @@ bool processLocationAtUpdateAttribute
       if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
       {
         *errDetail = "error parsing location attribute: " + subErr;
+        oe->fill(SccBadRequest, *errDetail, "BadRequest");
         return false;
       }
 
@@ -347,6 +356,7 @@ bool processLocationAtUpdateAttribute
     {
       *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
                     " when another one has been previously defined [" + *currentLocAttrName + "]";
+      oe->fill(SccRequestEntityTooLarge, "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]", "NoResourcesAvailable");
       return false;
     }
 
@@ -357,6 +367,7 @@ bool processLocationAtUpdateAttribute
       if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
       {
         *errDetail = "error parsing location attribute: " + subErr;
+        oe->fill(SccBadRequest, *errDetail, "BadRequest");
         return false;
       }
       return true;
@@ -374,6 +385,7 @@ bool processLocationAtUpdateAttribute
       if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
       {
         *errDetail = "error parsing location attribute: " + subErr;
+        oe->fill(SccBadRequest, *errDetail, "BadRequest");
         return false;
       }
     }
@@ -399,7 +411,8 @@ bool processLocationAtAppendAttribute
   bool                           actualAppend,
   mongo::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
-  const std::string&             apiVersion
+  const std::string&             apiVersion,
+  OrionError*                    oe
 )
 {
   std::string subErr;
@@ -410,6 +423,7 @@ bool processLocationAtAppendAttribute
   if ((locationString.length() > 0) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
   {
     *errDetail = "only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]";
+    oe->fill(SccBadRequest, *errDetail, "BadRequest");
     return false;
   }
 
@@ -421,6 +435,7 @@ bool processLocationAtAppendAttribute
     {
       *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
                    " when another one has been previously defined [" + *currentLocAttrName + "]";
+      oe->fill(SccRequestEntityTooLarge, "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]", "NoResourcesAvailable");
       return false;
     }
     /* Case 1b: there isn't any previous location attribute -> new attribute becomes the location attribute */
@@ -429,6 +444,7 @@ bool processLocationAtAppendAttribute
       if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
       {
         *errDetail = "error parsing location attribute for new attribute: " + subErr;
+        oe->fill(SccBadRequest, *errDetail, "BadRequest");
         return false;
       }
       *currentLocAttrName = targetAttr->name;
@@ -442,6 +458,7 @@ bool processLocationAtAppendAttribute
     {
       *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
                    " when another one has been previously defined [" + *currentLocAttrName + "]";
+      oe->fill(SccRequestEntityTooLarge, "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]", "NoResourcesAvailable");
       return false;
     }
 
@@ -451,6 +468,7 @@ bool processLocationAtAppendAttribute
       if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
       {
         *errDetail = "error parsing location attribute for existing attribute: " + subErr;
+        oe->fill(SccBadRequest, *errDetail, "BadRequest");
         return false;
       }
       *currentLocAttrName = targetAttr->name;

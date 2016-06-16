@@ -84,6 +84,7 @@ echo
 
 
 echo "03. Update E1/T1/A1 in CB, using PUT /v2/entities/E1/attrs/A1/value, without stating type of the attribute, value is a string"
+echo "Note: we get 404 Not Found, but is ok. It is due to accumulator-server.py doesn't answers in NGSIv1"
 echo "============================================================================================================================="
 payload='"A1 03"'
 orionCurl --url /v2/entities/E1/attrs/A1/value?type=T1 --payload "$payload" -X PUT --in text/plain
@@ -99,6 +100,7 @@ echo
 
 
 echo "05. Update E1/T1/A1 in CB, using PUT /v2/entities/E1/attrs/A1/value, without stating type of the attribute, and value as JSON"
+echo "Note: we get 404 Not Found, but is ok. It is due to accumulator-server.py doesn't answers in NGSIv1"
 echo "============================================================================================================================="
 payload='{ "x": "XXX" }'
 orionCurl --url /v2/entities/E1/attrs/A1/value?type=T1 --payload "$payload" -X PUT --in application/json
@@ -139,12 +141,18 @@ Date: REGEX(.*)
 
 
 03. Update E1/T1/A1 in CB, using PUT /v2/entities/E1/attrs/A1/value, without stating type of the attribute, value is a string
+Note: we get 404 Not Found, but is ok. It is due to accumulator-server.py doesn't answers in NGSIv1
 =============================================================================================================================
-HTTP/1.1 204 No Content
-Content-Length: 0
+HTTP/1.1 404 Not Found
+Content-Length: 61
+Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+{
+    "description": "No context element found",
+    "error": "NotFound"
+}
 
 
 04. Make sure that the value of E1/T1/A1 is updated in CP1, but that its attribute type stays intact (as 'string')
@@ -169,12 +177,18 @@ Date: REGEX(.*)
 
 
 05. Update E1/T1/A1 in CB, using PUT /v2/entities/E1/attrs/A1/value, without stating type of the attribute, and value as JSON
+Note: we get 404 Not Found, but is ok. It is due to accumulator-server.py doesn't answers in NGSIv1
 =============================================================================================================================
-HTTP/1.1 204 No Content
-Content-Length: 0
+HTTP/1.1 404 Not Found
+Content-Length: 61
+Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+{
+    "description": "No context element found",
+    "error": "NotFound"
+}
 
 
 06. Make sure that the value of E1/T1/A1 is updated in CP1, but that its attribute type stays intact (as 'string')

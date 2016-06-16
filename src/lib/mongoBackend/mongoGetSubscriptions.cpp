@@ -377,7 +377,7 @@ void mongoGetSubscription
     releaseMongoConnection(connection);
     LM_T(LmtMongo, ("subscription not found: '%s'", idSub.c_str()));
     reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
-    *oe = OrionError(SccSubscriptionIdNotFound);
+    *oe = OrionError(SccContextElementNotFound, "subscriptionId does not correspond to an active subscription", "NotFound");
     return;
   }
   releaseMongoConnection(connection);

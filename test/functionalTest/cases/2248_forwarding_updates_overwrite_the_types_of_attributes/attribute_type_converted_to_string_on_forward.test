@@ -64,6 +64,7 @@ echo
 
 
 echo "02. Update (with forward to accumulator) E1/A1 in CB to a JSON containing a Number, a Bool, a 'Float', a Null and a String"
+echo "Note: we get 404 Not Found, but is ok. It is due to accumulator-server.py doesn't answers in NGSIv1"
 echo "=========================================================================================================================="
 payload='{ "x": 2, "y": true, "z": null, "x2": 1.5, "str": "This is a string" }'
 orionCurl --url /v2/entities/E1/attrs/A1/value?type=T1 --payload "$payload" -X PUT --in json
@@ -94,12 +95,18 @@ Date: REGEX(.*)
 
 
 02. Update (with forward to accumulator) E1/A1 in CB to a JSON containing a Number, a Bool, a 'Float', a Null and a String
+Note: we get 404 Not Found, but is ok. It is due to accumulator-server.py doesn't answers in NGSIv1
 ==========================================================================================================================
-HTTP/1.1 204 No Content
-Content-Length: 0
+HTTP/1.1 404 Not Found
+Content-Length: 61
+Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+{
+    "description": "No context element found",
+    "error": "NotFound"
+}
 
 
 03. Dump accumulator to see the forward message - is the Number a Number or a string? Must be a Number

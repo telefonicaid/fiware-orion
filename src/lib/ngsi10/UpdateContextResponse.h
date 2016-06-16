@@ -32,6 +32,8 @@
 #include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
 
+#include "rest/OrionError.h"
+
 
 
 /* ****************************************************************************
@@ -42,6 +44,8 @@ typedef struct UpdateContextResponse
 {
   ContextElementResponseVector  contextElementResponseVector;  // Optional
   StatusCode                    errorCode;                     // Optional
+
+  OrionError                    oe;                            // Used by NGSIv2
 
   UpdateContextResponse();
   UpdateContextResponse(StatusCode& _errorCode);

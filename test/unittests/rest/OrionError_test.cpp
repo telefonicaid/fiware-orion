@@ -67,15 +67,15 @@ TEST(OrionError, all)
 
   ci.outMimeType = JSON;
 
-  out = e1.render(&ci, "");
+  out = e1.render();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = e3.render(&ci, "");
+  out = e3.render();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = e4.render(&ci, "");
+  out = e4.render();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 }

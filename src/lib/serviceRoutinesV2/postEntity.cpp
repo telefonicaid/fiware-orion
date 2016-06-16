@@ -37,7 +37,6 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
 #include "rest/OrionError.h"
-#include "rest/errorAdaptation.h"
 #include "serviceRoutinesV2/postEntity.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "parse/forbiddenChars.h"
@@ -72,8 +71,9 @@ std::string postEntity
 
   if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
   {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
-    return oe.render(ciP, "");
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
+    ciP->httpStatusCode = oe.code;
+    return oe.toJson();
   }
 
   if (ciP->uriParamOptions["append"] == true) // pure-append
@@ -94,38 +94,13 @@ std::string postEntity
   postUpdateContext(ciP, components, compV, parseDataP, flavor);
 
   // Any error in the response?
-  UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
-  for (unsigned int ix = 0; ix < upcrsP->contextElementResponseVector.size(); ++ix)
+  std::string answer = "";
+  if (parseDataP->upcrs.res.oe.code != SccNone )
   {
-    if ((upcrsP->contextElementResponseVector[ix]->statusCode.code != SccOk) &&
-        (upcrsP->contextElementResponseVector[ix]->statusCode.code != SccNone))
-    {
-      if (upcrsP->contextElementResponseVector[ix]->statusCode.code == SccInvalidParameter)
-      {
-        OrionError oe;
-        if (invalidParameterForNgsiv2(upcrsP->contextElementResponseVector[ix]->statusCode.details, &oe))
-        {
-          ciP->httpStatusCode = oe.code;
-          std::string res;
-          TIMED_RENDER(res = oe.render(ciP, ""));
-          eP->release();
-          return res;
-        }
-      }
-
-      OrionError error(upcrsP->contextElementResponseVector[ix]->statusCode);
-      std::string  res;
-
-      ciP->httpStatusCode = error.code;
-      TIMED_RENDER(res = error.render(ciP, ""));
-      eP->release();
-      return res;
-    }
+    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
   }
-
-  // Default value for status code: SccNoContent. This is needed as mongoBackend typically
-  // uses SccOk (as SccNoContent doesn't exist for NGSIv1)
-  if (ciP->httpStatusCode == SccOk)
+  else
   {
     ciP->httpStatusCode = SccNoContent;
   }
@@ -133,5 +108,5 @@ std::string postEntity
   // Cleanup and return result
   eP->release();
 
-  return "";
+  return answer;
 }
