@@ -30,7 +30,6 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "rest/OrionError.h"
-#include "apiTypesV2/ErrorCode.h"
 #include "mongoBackend/mongoUnsubscribeContext.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
 
@@ -59,34 +58,26 @@ std::string deleteSubscription
     ParseData*                 parseDataP
 )
 {
-  std::string                 answer;
   std::string                 subscriptionId =  compV[2];
   UnsubscribeContextResponse  uncr;
 
   // 'Fill In' UnsubscribeContextRequest
   parseDataP->uncr.res.subscriptionId.set(subscriptionId);
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, ciP->tenant));
+  TIMED_MONGO(mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, ciP->tenant));
 
-  if (uncr.statusCode.code != SccOk)
+  // Check for potential error
+  std::string  answer = "";
+  if (uncr.oe.code != SccNone )
   {
-    OrionError oe(uncr.statusCode);
-
-    ciP->httpStatusCode = uncr.statusCode.code;
-    oe.reasonPhrase     = uncr.statusCode.reasonPhrase;
-
-    if (uncr.statusCode.code == SccContextElementNotFound)
-    {
-      oe.details = "The requested subscription has not been found. Check id";
-    }
-
-    TIMED_RENDER(answer = oe.render(ciP, ""));
-
-    return answer;
+    TIMED_RENDER(answer = uncr.oe.toJson());
+    ciP->httpStatusCode = uncr.oe.code;    
+  }
+  else
+  {
+    ciP->httpStatusCode = SccNoContent;
   }
 
-  ciP->httpStatusCode = SccNoContent;
-
-  return "";
+  return answer;
 }
 

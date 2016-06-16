@@ -33,14 +33,14 @@ brokerStart CB
 # 01. GET /v2/entities/NONE/attrs/ANY
 #
 
-echo "02. GET /v2/entities/NONE/attrs/ANY"
+echo "01. GET /v2/entities/NONE/attrs/ANY"
 echo "==================================="
 orionCurl --url /v2/entities/NONE/attrs/ANY
 echo
 echo
 
 --REGEXPECT--
-02. GET /v2/entities/NONE/attrs/ANY
+01. GET /v2/entities/NONE/attrs/ANY
 ===================================
 HTTP/1.1 404 Not Found
 Content-Length: 95

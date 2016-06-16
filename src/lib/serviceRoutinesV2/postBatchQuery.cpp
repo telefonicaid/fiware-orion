@@ -31,7 +31,6 @@
 #include "ngsi/ParseData.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
-#include "apiTypesV2/ErrorCode.h"
 #include "apiTypesV2/Entities.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "alarmMgr/alarmMgr.h"

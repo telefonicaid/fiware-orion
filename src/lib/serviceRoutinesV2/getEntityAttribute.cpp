@@ -65,16 +65,11 @@ std::string getEntityAttribute
   std::string  answer;
   Attribute    attribute;
 
-  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
+  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL) || (forbiddenIdChars(ciP->apiVersion, compV[4].c_str() , NULL)))
   {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
-    return oe.render(ciP, "");
-  }
-
-  if (forbiddenIdChars(ciP->apiVersion, compV[4].c_str() , NULL))
-  {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
-    return oe.render(ciP, "");
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
+    ciP->httpStatusCode = oe.code;
+    return oe.toJson();
   }
 
   // 01. Fill in QueryContextRequest
@@ -90,11 +85,11 @@ std::string getEntityAttribute
 
   TIMED_RENDER(answer = attribute.render(ciP, EntityAttributeResponse));
 
-  if (attribute.errorCode.error == "TooManyResults")
+  if (attribute.oe.reasonPhrase == "TooManyResults")
   {
     ciP->httpStatusCode = SccConflict;
   }
-  else if (attribute.errorCode.error == "NotFound")
+  else if (attribute.oe.reasonPhrase == "NotFound")
   {
     ciP->httpStatusCode = SccContextElementNotFound; // Attribute to be precise!
   }

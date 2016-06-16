@@ -61,6 +61,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     {
         reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
         responseP->statusCode.fill(SccContextElementNotFound);
+        responseP->oe.fill(SccContextElementNotFound, "The requested subscription has not been found. Check id", "NotFound");
         alarmMgr.badInput(clientIp, "no subscriptionId");
         return SccOk;
     }
@@ -76,10 +77,12 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
       {
         // FIXME: Doubt - invalid OID format?  Or, just a subscription that was not found?
         std::string details = std::string("invalid OID format: '") + requestP->subscriptionId.get() + "'";
+        responseP->oe.fill(SccContextElementNotFound, "The requested subscription has not been found. Check id", "NotFound");
         alarmMgr.badInput(clientIp, details);
       }
       else // SccReceiverInternalError
       {
+        responseP->oe.fill(SccReceiverInternalError, responseP->statusCode.details, "InternalError");
         LM_E(("Runtime Error (exception getting OID: %s)", responseP->statusCode.details.c_str()));
       }
       return SccOk;
@@ -89,6 +92,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     {
       reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
       responseP->statusCode.fill(SccReceiverInternalError, err);
+      responseP->oe.fill(SccReceiverInternalError, err, "InternalError");
       return SccOk;
     }
 
@@ -96,6 +100,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     {
        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
        responseP->statusCode.fill(SccContextElementNotFound, std::string("subscriptionId: /") + requestP->subscriptionId.get() + "/");
+       responseP->oe.fill(SccContextElementNotFound, "The requested subscription has not been found. Check id", "NotFound");
        return SccOk;
     }
 
@@ -106,6 +111,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     {
       reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
       responseP->statusCode.fill(SccReceiverInternalError, err);
+      responseP->oe.fill(SccReceiverInternalError, err, "InternalError");
       return SccOk;
     }
 

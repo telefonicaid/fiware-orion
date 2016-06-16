@@ -33,7 +33,6 @@
 #include "apiTypesV2/Entities.h"
 #include "rest/EntityTypeInfo.h"
 #include "rest/OrionError.h"
-#include "rest/errorAdaptation.h"
 #include "serviceRoutinesV2/postEntities.h"
 #include "serviceRoutines/postUpdateContext.h"
 
@@ -84,12 +83,12 @@ std::string postEntities
 
   if (!legalEntityLength(eP, ciP->servicePath))
   {
-    OrionError oe(SccBadRequest, "Too long entity id/type/servicePath combination");
-    ciP->httpStatusCode = SccBadRequest;
+    OrionError oe(SccBadRequest, "Too long entity id/type/servicePath combination", "BadRequest");
     eP->release();
 
     std::string out;
-    TIMED_RENDER(out = oe.render(ciP, ""));
+    TIMED_RENDER(out = oe.toJson());
+    ciP->httpStatusCode = oe.code;
 
     return out;
   }
@@ -101,13 +100,16 @@ std::string postEntities
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP, NGSIV2_FLAVOUR_ONCREATE);
 
-  StatusCode     rstatuscode = parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode;
-  HttpStatusCode rhttpcode  = rstatuscode.code;
-  std::string    answer;
-
-  // 03. Prepare HTTP headers
-  if (rhttpcode == SccOk || rhttpcode == SccNone)
+  // 03. Check error
+  std::string  answer = "";
+  if (parseDataP->upcrs.res.oe.code != SccNone )
   {
+    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+  }
+  else
+  {
+    // Prepare HTTP headers
     std::string location = "/v2/entities/" + eP->id;
     if (eP->type != "" )
     {
@@ -121,22 +123,6 @@ std::string postEntities
     ciP->httpHeader.push_back("Location");
     ciP->httpHeaderValue.push_back(location);
     ciP->httpStatusCode = SccCreated;
-  }
-  else if (rhttpcode == SccInvalidModification)
-  {
-    OrionError oe(rstatuscode);
-    ciP->httpStatusCode = SccInvalidModification;
-
-    TIMED_RENDER(answer = oe.render(ciP, ""));
-  }
-  else if (rhttpcode == SccInvalidParameter)
-  {
-    OrionError oe;
-    if (invalidParameterForNgsiv2(rstatuscode.details, &oe))
-    {
-      ciP->httpStatusCode = oe.code;
-      TIMED_RENDER(answer = oe.render(ciP, ""));
-    }
   }
 
   // 04. Cleanup and return result

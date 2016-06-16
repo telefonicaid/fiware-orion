@@ -65,15 +65,17 @@ std::string getSubscription
 
   if ((err = idCheck(idSub)) != "OK")
   {
-    OrionError oe(SccBadRequest, err);
-    return oe.render(ciP, "Invalid subscription ID");
+    oe.fill(SccBadRequest, "Invalid subscription ID: " + err, "BadRequest");
+    ciP->httpStatusCode = oe.code;
+    return oe.toJson();
   }
 
   TIMED_MONGO(mongoGetSubscription(&sub, &oe, idSub, ciP->uriParam, ciP->tenant));
 
   if (oe.code != SccOk)
   {
-    TIMED_RENDER(out = oe.render(ciP, "Invalid subscription ID"));
+    TIMED_RENDER(out = oe.toJson());
+    ciP->httpStatusCode = oe.code;
     return out;
   }
 

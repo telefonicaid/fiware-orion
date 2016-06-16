@@ -65,7 +65,6 @@ std::string putEntity
   ParseData*                 parseDataP
 )
 {
-  std::string answer = "";
   Entity*     eP     = &parseDataP->ent.res;
 
   eP->id   = compV[2];
@@ -73,8 +72,9 @@ std::string putEntity
 
   if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
   {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
-    return oe.render(ciP, "");
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
+    ciP->httpStatusCode = oe.code;
+    return oe.toJson();
   }
 
   // 01. Fill in UpdateContextRequest
@@ -84,36 +84,19 @@ std::string putEntity
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
-
-  // 03. Check output from mongoBackend - any errors?
-  if (parseDataP->upcrs.res.contextElementResponseVector.size() == 1)
+  // 03. Check error
+  std::string answer = "";
+  if (parseDataP->upcrs.res.oe.code != SccNone )
   {
-    if (parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code != SccOk)
-    {
-      ciP->httpStatusCode = parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code;
-    }
+    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
   }
-
-
-  // 04. Prepare HTTP headers
-  if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
+  else
   {
     ciP->httpStatusCode = SccNoContent;
   }
-  else if (ciP->httpStatusCode == SccConflict)
-  {
-    OrionError orionError(SccConflict, MORE_MATCHING_ENT);
 
-    TIMED_RENDER(answer = orionError.render(ciP, ""));
-  }
-  else if (ciP->httpStatusCode == SccContextElementNotFound)
-  {
-    OrionError orionError(SccContextElementNotFound, "No context element found");
-
-    TIMED_RENDER(answer = orionError.render(ciP, ""));
-  }
-
-  // 05. Cleanup and return result
+  // 04. Cleanup and return result
   eP->release();
 
   return answer;

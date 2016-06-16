@@ -28,7 +28,6 @@
 #include "common/tag.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
-#include "rest/errorAdaptation.h"
 
 
 
@@ -86,110 +85,66 @@ void OrionError::fill(HttpStatusCode _code, const std::string& _details, const s
 
 /* ****************************************************************************
 *
-* OrionError::render - 
+* OrionError::smartRender -
 */
-std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
+std::string OrionError::smartRender(const std::string& apiVersion)
 {
-  //
-  // For API version 2 this is pretty easy ...
-  //
+  if (apiVersion == "v1")
+  {
+    return render();
+  }
+  else // v2
+  {
+    shrinkReasonPhrase();
+    return toJson();
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* OrionError::setStatusCodeAndSmartRender -
+*/
+std::string OrionError::setStatusCodeAndSmartRender(ConnectionInfo* ciP)
+{
   if (ciP->apiVersion == "v2")
   {
-    if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
-    {
-      ciP->httpStatusCode = SccBadRequest;
-    }
-
-    if (details == "Already Exists")
-    {
-      details = "Entity already exists";
-    }
-
-    reasonPhrase = errorStringForV2(reasonPhrase);
-    return "{" + JSON_STR("error") + ":" + JSON_STR(reasonPhrase) + "," + JSON_STR("description") + ":" + JSON_STR(details) + "}";
+    ciP->httpStatusCode = code;
   }
 
-
-  //
-  // A little more hairy for API version 1
-  //
-
-  std::string  out           = "";
-  std::string  tag           = "orionError";
-  std::string  initialIndent = _indent;
-  std::string  indent        = _indent;
-
-  //
-  // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here
-  //
-
-
-  out     = initialIndent + "{\n";
-  indent += "  ";
-
-  out += startTag1(indent, tag);
-  out += valueTag(indent + "  ", "code",          code,         true);
-  out += valueTag1(indent + "  ", "reasonPhrase",  reasonPhrase, details != "");
-
-  if (details != "")
-  {
-    out += valueTag1(indent + "  ", "details",       details);
-  }
-
-  out += endTag(indent);
-
-  out += initialIndent + "}\n";
-
-  return out;
+  return smartRender(ciP->apiVersion);
 }
+
+
+
+/* ****************************************************************************
+*
+* OrionError::toJson -
+*/
+std::string OrionError::toJson(void)
+{
+  return "{" + JSON_STR("error") + ":" + JSON_STR(reasonPhrase) + "," + JSON_STR("description") + ":" + JSON_STR(details) + "}";
+}
+
 
 
 /* ****************************************************************************
 *
 * OrionError::render -
 *
-* FIXME P3: OrionError() render method should be unified (probably the class itself needs
-* a good refactoring, to live in the NGSIv1-NGSIv2 dual world...)
-*
-* Simplified version, without ciP
-*
 */
-std::string OrionError::render(const std::string& _indent, const std::string apiVersion)
+std::string OrionError::render(void)
 {
-  //
-  // For API version 2 this is pretty easy ...
-  //
-  if (apiVersion == "v2")
-  {
-    if (details == "Already Exists")
-    {
-      details = "Entity already exists";
-    }
-
-    reasonPhrase = errorStringForV2(reasonPhrase);
-    return "{" + JSON_STR("error") + ":" + JSON_STR(reasonPhrase) + "," + JSON_STR("description") + ":" + JSON_STR(details) + "}";
-  }
-
-
-  //
-  // A little more hairy for API version 1
-  //
-
-  std::string  out           = "";
+  std::string  out           = "{\n";
+  std::string  indent        = "  ";
   std::string  tag           = "orionError";
-  std::string  initialIndent = _indent;
-  std::string  indent        = _indent;
 
   //
   // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here
   //
-
-
-  out     = initialIndent + "{\n";
-  indent += "  ";
-
   out += startTag1(indent, tag);
-  out += valueTag(indent + "  ", "code",          code,         true);
+  out += valueTag(indent  + "  ", "code",          code,         true);
   out += valueTag1(indent + "  ", "reasonPhrase",  reasonPhrase, details != "");
 
   if (details != "")
@@ -199,7 +154,81 @@ std::string OrionError::render(const std::string& _indent, const std::string api
 
   out += endTag(indent);
 
-  out += initialIndent + "}\n";
+  out += "}\n";
 
   return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* OrionError::render -
+*
+* This method removes any whitespace in the reasonPhrase field, i.e.
+* transforms "Not Found" to "NotFound".
+*
+* It is used by smartRender method, in order to prepare to render in API v2 case
+*
+* FIXME P4: The following alternative (more compact) way has been proposed:
+*
+*  #include <algorithm>  // std::remove_if
+*  #include <cctype>     // std::isspace
+*
+*  ...
+*
+*  reasonPhrase.erase(std::remove_if(reasonPhrase.begin(), reasonPhrase.end(), std::isspace), reasonPhrase.end());
+*
+* However, 'std::isspace' doesn't directly work. We have been able to make it work with
+* 'static_cast<int(*)(int)>(isspace)'. However, that is obscure so until we can find
+* a way of using just 'std::isspace', the current implementation stills.
+*
+*/
+void OrionError::shrinkReasonPhrase(void)
+{
+  char buf[80];  // 80 should be enough to hold any reason phrase
+
+#if 0
+  strncpy(buf, reasonPhrase.c_str(), sizeof(buf));
+
+  // See: http://stackoverflow.com/questions/1726302/removing-spaces-from-a-string-in-c
+  if (*j != ' ')
+  {
+    *i = *j;
+    ++i;
+  }
+  ++j;
+
+  char* i = buf;
+  char* j = buf;
+  while (*j != 0)
+  {
+    *i = *j++;
+    if (*i != ' ')
+    {
+      i++;
+    }
+  }
+  *i = 0;
+#endif
+
+  char*         fromP = (char*) reasonPhrase.c_str();
+  char*         toP   = buf;
+  unsigned int  toLen = 0;
+
+  while ((*fromP != 0) && (toLen < sizeof(buf)))
+  {
+    // If next char is not whitespace: copy to outgoing
+    if (*fromP != ' ')
+    {
+      *toP = *fromP;
+      ++toP;
+      ++toLen;
+    }
+
+    ++fromP;
+  }
+  *toP = 0;  // End-of string
+
+  reasonPhrase = std::string(buf);
 }

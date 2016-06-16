@@ -328,13 +328,13 @@ Date: REGEX(.*)
 03. Create entity with two geo:line -> fail
 ============================================
 HTTP/1.1 413 Request Entity Too Large
-Content-Length: 96
+Content-Length: 148
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "No more than one geo-location attribute allowed",
+    "description": "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
     "error": "NoResourcesAvailable"
 }
 
@@ -419,13 +419,13 @@ Date: REGEX(.*)
 06. Append a new geo:line attribute (attr2) -> fail
 ===================================================
 HTTP/1.1 413 Request Entity Too Large
-Content-Length: 96
+Content-Length: 148
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "No more than one geo-location attribute allowed",
+    "description": "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
     "error": "NoResourcesAvailable"
 }
 
@@ -573,13 +573,13 @@ Date: REGEX(.*)
 11. Change attr2 type to geo:line again -> fail
 ===============================================
 HTTP/1.1 413 Request Entity Too Large
-Content-Length: 96
+Content-Length: 148
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "No more than one geo-location attribute allowed",
+    "description": "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
     "error": "NoResourcesAvailable"
 }
 

@@ -293,7 +293,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
     alarmMgr.badInput(clientIp, "JSON parse error");
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.render(ciP, "");
+    return oe.toJson();
   }
 
 
@@ -304,16 +304,18 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
     alarmMgr.badInput(clientIp, "JSON Parse Error");
     ciP->httpStatusCode = SccBadRequest;
 
-    return oe.render(ciP, "");
+    return oe.toJson();
   }
 
   std::string  r = parseContextAttributeObject(document, caP);
   if (r != "OK")
   {
-    OrionError oe(SccBadRequest, r);
+    OrionError oe(SccBadRequest, r, "BadRequest");
 
+    alarmMgr.badInput(clientIp, r);
     ciP->httpStatusCode = SccBadRequest;
-    return oe.render(ciP, "");
+
+    return oe.toJson();
   }
   if (!caP->typeGiven)
   {

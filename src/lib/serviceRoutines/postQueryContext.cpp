@@ -319,7 +319,7 @@ std::string postQueryContext
     // Bad Input detected by Mongo Backend - request ends here !
     OrionError oe(qcrsP->errorCode);
 
-    TIMED_RENDER(answer = oe.render(ciP, ""));
+    TIMED_RENDER(answer = oe.render());
     qcrP->release();
     return answer;
   }

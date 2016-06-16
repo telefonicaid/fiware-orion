@@ -56,15 +56,15 @@ echo
 --REGEXPECT--
 01. POST /v2/entities, creating first entity with id E1
 ==========================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 75
+HTTP/1.1 400 Bad Request
+Content-Length: 66
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "duplicated attribute /attr/",
-    "error": "InvalidModification"
+    "error": "BadRequest"
 }
 
 

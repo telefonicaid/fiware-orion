@@ -43,62 +43,55 @@ using namespace rapidjson;
 */
 std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
 {
-  Document document;
+  Document   document;
+  OrionError oe;
 
   document.Parse(ciP->payload);
 
   if (document.HasParseError())
   {
-    ErrorCode ec;
-
     alarmMgr.badInput(clientIp, "JSON Parse Error");
-    ec.fill(ERROR_STRING_PARSERROR, "Errors found in incoming JSON buffer");
+    oe.fill(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
     ciP->httpStatusCode = SccBadRequest;
 
-    return ec.toJson(true);
+    return oe.toJson();
   }
 
   if (!document.IsObject())
   {
-    ErrorCode ec;
-
     alarmMgr.badInput(clientIp, "JSON Parse Error");
-    ec.fill("BadRequest", "JSON Parse Error");
+    oe.fill(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
     ciP->httpStatusCode = SccBadRequest;
 
-    return ec.toJson(true);
+    return oe.toJson();
   }
   else if (document.ObjectEmpty())
   {
-    ErrorCode ec;
-
     alarmMgr.badInput(clientIp, "Empty JSON payload");
-    ec.fill("BadRequest", "empty payload");
+    oe.fill(SccBadRequest, "empty payload", "BadRequest");
     ciP->httpStatusCode = SccBadRequest;
 
-    return ec.toJson(true);
+    return oe.toJson();
   }
   else if (!document.HasMember("entities"))
   {
-    ErrorCode    ec;
     std::string  details = "Invalid JSON payload, mandatory field /entities/ not found";
 
     alarmMgr.badInput(clientIp, details);
-    ec.fill("BadRequest", details);
+    oe.fill(SccBadRequest, details, "BadRequest");
     ciP->httpStatusCode = SccBadRequest;
 
-    return ec.toJson(true);
+    return oe.toJson();
   }
   else if (!document.HasMember("actionType"))
   {
-    ErrorCode    ec;
     std::string  details = "Invalid JSON payload, mandatory field /actionType/ not found";
 
     alarmMgr.badInput(clientIp, details);
-    ec.fill("BadRequest", details);
+    oe.fill(SccBadRequest, details, "BadRequest");
     ciP->httpStatusCode = SccBadRequest;
 
-    return ec.toJson(true);
+    return oe.toJson();
   }
 
   for (Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
@@ -112,11 +105,10 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
 
       if (r != "OK")
       {
-        ErrorCode ec("BadRequest", r);
-
         alarmMgr.badInput(clientIp, r);
+        oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
-        return ec.toJson(true);
+        return oe.toJson();
       }
     }
     else if (name == "actionType")
@@ -126,12 +118,12 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
     else
     {
       std::string  description = std::string("Unrecognized field in JSON payload: /") + name + "/";
-      ErrorCode    ec("BadRequest", description);
 
       alarmMgr.badInput(clientIp, description);
+      oe.fill(SccBadRequest, description, "BadRequest");
       ciP->httpStatusCode = SccBadRequest;
 
-      return ec.toJson(true);
+      return oe.toJson();
     }
   }
 

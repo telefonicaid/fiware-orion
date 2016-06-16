@@ -30,6 +30,8 @@
 #include "ngsi/ContextAttributeVector.h"
 #include "mongo/client/dbclient.h"
 
+#include "rest/OrionError.h"
+
 /* ****************************************************************************
 *
 * processLocationAtEntityCreation -
@@ -41,7 +43,8 @@ extern bool processLocationAtEntityCreation
   std::string*                   locAttr,
   mongo::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
-  const std::string&             apiVersion
+  const std::string&             apiVersion,
+  OrionError*                    oe
 );
 
 /* ****************************************************************************
@@ -55,7 +58,8 @@ extern bool processLocationAtUpdateAttribute
   const ContextAttribute*        targetAttr,
   mongo::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
-  const std::string&             apiVersion
+  const std::string&             apiVersion,
+  OrionError*                    oe
 );
 
 /* ****************************************************************************
@@ -70,7 +74,8 @@ extern bool processLocationAtAppendAttribute
   bool                           actualAppend,
   mongo::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
-  const std::string&             apiVersion
+  const std::string&             apiVersion,
+  OrionError*                    oe
 );
 
 #endif // SRC_LIB_MONGOBACKEND_LOCATION_H_

@@ -650,7 +650,64 @@ std::string postUpdateContext
     response.merge(&upcrs);
   }
 
-  TIMED_RENDER(answer = response.render(ciP, UpdateContext, ""));
+  // Note this is a slight break in the separation of concerns among the different layers (i.e.
+  // serviceRoutine/ logic should work in a "NGSIv1 isolated context"). However, it seems to be
+  // a smart way of dealing with partial update situations
+  if (ciP->apiVersion == "v2")
+  {
+    // Adjust OrionError response in the case of partial updates. This may happen in CPr forwarding
+    // scenarios. Note that mongoBackend logic "splits" successfull updates and failing updates in
+    // two different CER (maybe using the same entity)
+
+    std::string failing = "";
+    unsigned int fails  = 0;
+
+    for (unsigned int ix = 0; ix < response.contextElementResponseVector.size(); ++ix)
+    {
+
+      ContextElementResponse* cerP = response.contextElementResponseVector[ix];
+
+      if (cerP->statusCode.code != SccOk)
+      {
+        fails++;
+
+        std::string failingPerCer = "";
+        for (unsigned int jx = 0; jx < cerP->contextElement.contextAttributeVector.size(); ++jx)
+        {
+          failingPerCer += cerP->contextElement.contextAttributeVector[jx]->name;
+          if (jx != cerP->contextElement.contextAttributeVector.size() - 1)
+          {
+            failingPerCer +=", ";
+          }
+        }
+
+        failing += cerP->contextElement.entityId.id + "-" + cerP->contextElement.entityId.type + " : [" + failingPerCer + "], ";
+      }
+    }
+
+    // Note that we modify parseDataP->upcrs.res.oe and not response.oe, as the former is the
+    // one used by the calling postBatchUpdate() function at serviceRoutineV2 library
+    if (fails == response.contextElementResponseVector.size())
+    {
+      // If all CER result in error, then it isn't a partial update, but a regular NotFound
+      parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "No context element found", "NotFound");
+    }
+    else if (fails > 0)
+    {
+      // Removing trailing ", "
+      failing = failing.substr(0, failing.size() - 2);
+
+      // If some CER (but not all) fails, then it is a partial update
+      parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "Attributes that were not updated: { " + failing + " }", "PartialUpdate");
+    }
+
+  }
+  else  // v1
+  {
+    // Note that v2 case doesn't use an actual response (so no need to waste time rendering it).
+    // We render in the v1 case only
+    TIMED_RENDER(answer = response.render(ciP, UpdateContext, ""));
+  }
 
   //
   // Cleanup

@@ -30,6 +30,8 @@
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/StatusCode.h"
 
+#include "rest/OrionError.h"
+
 
 
 /* ****************************************************************************
@@ -40,6 +42,8 @@ typedef struct UnsubscribeContextResponse
 {
   SubscriptionId  subscriptionId;    // Mandatory
   StatusCode      statusCode;        // Mandatory
+
+  OrionError      oe;                // Used by NGSIv2
 
   UnsubscribeContextResponse();
   UnsubscribeContextResponse(StatusCode& statusCode);

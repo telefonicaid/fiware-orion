@@ -62,9 +62,9 @@ std::string getEntityType
 
   if (response.entityType.count == 0)
   {
-    OrionError oe(SccContextElementNotFound, "Entity type not found");
-    TIMED_RENDER(answer = oe.render(ciP, ""));
-    ciP->httpStatusCode = SccContextElementNotFound;
+    OrionError oe(SccContextElementNotFound, "Entity type not found", "NotFound");
+    TIMED_RENDER(answer = oe.toJson());
+    ciP->httpStatusCode = oe.code;
   }
   else
   {

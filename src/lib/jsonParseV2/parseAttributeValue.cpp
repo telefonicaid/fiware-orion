@@ -49,20 +49,18 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
   if (document.HasParseError())
   {
     alarmMgr.badInput(clientIp, "JSON parse error");
-    oe.reasonPhrase = ERROR_STRING_PARSERROR;
-    oe.details      = "Errors found in incoming JSON buffer";
+    oe.fill(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
     ciP->httpStatusCode = SccBadRequest;;
-    return oe.render(ciP, "");
+    return oe.toJson();
   }
 
 
   if (!document.IsObject() && !document.IsArray())
   {
     alarmMgr.badInput(clientIp, "JSON parse error");
-    oe.fill(SccBadRequest, "Neither JSON Object nor JSON Array for attribute::value");
+    oe.fill(SccBadRequest, "Neither JSON Object nor JSON Array for attribute::value", "BadRequest");
     ciP->httpStatusCode = SccBadRequest;;
-
-    return oe.render(ciP, "");
+    return oe.toJson();
   }
 
   caP->valueType  = (document.IsObject())? orion::ValueTypeObject : orion::ValueTypeVector;

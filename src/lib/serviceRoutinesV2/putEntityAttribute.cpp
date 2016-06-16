@@ -63,21 +63,15 @@ std::string putEntityAttribute
   ParseData*                 parseDataP
 )
 {
-  std::string  answer;
   std::string  entityId       = compV[2];
   std::string  attributeName  = compV[4];
   std::string  type           = ciP->uriParam["type"];
 
-  if (forbiddenIdChars(ciP->apiVersion, entityId.c_str() , NULL))
+  if (forbiddenIdChars(ciP->apiVersion, entityId.c_str() , NULL) || (forbiddenIdChars(ciP->apiVersion, attributeName.c_str() , NULL)))
   {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
-    return oe.render(ciP, "");
-  }
-
-  if (forbiddenIdChars(ciP->apiVersion, attributeName.c_str() , NULL))
-  {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
-    return oe.render(ciP, "");
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
+    ciP->httpStatusCode = oe.code;
+    return oe.toJson();
   }
 
   // 01. Fill in UpdateContextRequest from URL and payload
@@ -88,35 +82,22 @@ std::string putEntityAttribute
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
-
-  // 03. Check output from mongoBackend - any errors?
-  if (parseDataP->upcrs.res.contextElementResponseVector.size() == 1)
+  // 03. Check error
+  std::string  answer = "";
+  if (parseDataP->upcrs.res.oe.code != SccNone )
   {
-    if (parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code != SccOk)
-    {
-      ciP->httpStatusCode = parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code;
-    }
+    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
   }
-
-
-  // 04. Prepare HTTP headers
-  if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
+  else
   {
+    answer = "";
     ciP->httpStatusCode = SccNoContent;
   }
-
 
   // 05. Cleanup and return result
   parseDataP->upcr.res.release();
   parseDataP->upcrs.res.release();
-
-  if (ciP->httpStatusCode == SccInvalidModification)
-  {
-    std::string  details = "Request payload is missing some piece of information. Please, check Orion documentation."; 
-    OrionError   orionError(SccInvalidModification, details);     
-
-    TIMED_RENDER(answer = orionError.render(ciP, ""));
-  }
 
   return answer;
 }

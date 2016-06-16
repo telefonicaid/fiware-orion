@@ -365,7 +365,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   if ((ciP->url.length() == 0) || ((ciP->url.length() == 1) && (ciP->url.c_str()[0] == '/')))
   {
     OrionError  error(SccBadRequest, "The Orion Context Broker is a REST service, not a 'web page'");
-    std::string response = error.render(ciP, "");
+    std::string response = error.render();
 
     alarmMgr.badInput(clientIp, "The Orion Context Broker is a REST service, not a 'web page'");
     restReply(ciP, response);
@@ -458,16 +458,11 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     std::string result;
     if ((ciP->tenant != "") && ((result = tenantCheck(ciP->tenant)) != "OK"))
     {
-      OrionError  error(SccBadRequest, result);
+      OrionError  oe(SccBadRequest, result);
 
-      std::string  response = error.render(ciP, "");
+      std::string  response = oe.setStatusCodeAndSmartRender(ciP);
 
       alarmMgr.badInput(clientIp, result);
-
-      if (ciP->apiVersion != "v1")
-      {
-        ciP->httpStatusCode = SccBadRequest;  // FIXME P9:  OK for all versions?
-      }
 
       restReply(ciP, response);
 
@@ -531,7 +526,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   alarmMgr.badInput(clientIp, details);
 
   ciP->httpStatusCode = SccBadRequest;
-  std::string answer = restErrorReplyGet(ciP, "", ciP->payloadWord, SccBadRequest, std::string("unrecognized request"));
+  std::string answer = restErrorReplyGet(ciP, "", ciP->payloadWord, SccBadRequest, std::string("service not found"));
   restReply(ciP, answer);
 
   compV.clear();
