@@ -529,7 +529,7 @@ int Georel::parse(const char* in, std::string* errorString)
     }
     else
     {
-      *errorString = "Invalid selector in georel specification";
+      *errorString = "Invalid modifier in georel parameter";
       return -1;
     }
   }
