@@ -966,9 +966,7 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | room_10   | house_#         |
       | room_11   | my house        |
 
-  @attribute_type_update_forbidden.row<row.id>
-  @attribute_type_update_forbidden @BUG_1212 @BUG_1260 @BUG_1785 @skip
-    # this case will be moved to scenario above when it is repaired in BUG_1785
+  @attribute_type_update_forbidden @BUG_1212 @BUG_1260 @BUG_1785
   Scenario Outline:  try to update an attribute by entity ID using NGSI v2 with forbidden attributes type in update request
     Given  a definition of headers
       | parameter          | value                            |
@@ -996,9 +994,9 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
     When update attributes by ID "<entity_id>" if it exists and with "normalized" mode
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                |
-      | error       | BadRequest                           |
-      | description | Invalid characters in attribute type |
+      | parameter   | value                                             |
+      | error       | BadRequest                                        |
+      | description | attribute type length: 0, min length supported: 1 |
     Examples:
       | entity_id | attributes_type |
       | room_12   |                 |

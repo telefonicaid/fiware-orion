@@ -242,7 +242,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | españa     |
       | barça      |
 
-  @notification_attrs_length_exceed @BUG_2100 @skip
+  @notification_attrs_length_exceed @BUG_2100
   Scenario:  try to create a new subscription using NGSI v2 with length max exceed (256) in notification attrs field
     Given  a definition of headers
       | parameter          | value                         |
@@ -260,9 +260,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                              |
-      | error       | BadRequest                                                         |
-      | description | notification attribute name length: 257, max length supported: 256 |
+      | parameter   | value                         |
+      | error       | BadRequest                    |
+      | description | max attribute length exceeded |
 
   @notification_attrs_two_equals @BUG_2101 @skip
   Scenario:  try to create a new subscription using NGSI v2 with attributes name equals in notification attrs field

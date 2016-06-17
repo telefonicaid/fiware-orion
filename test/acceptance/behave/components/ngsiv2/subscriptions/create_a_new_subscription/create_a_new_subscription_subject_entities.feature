@@ -304,7 +304,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | error       | BadRequest      |
       | description | not defined yet |
 
-  @type_length_exceed @BUG_1965 @skip
+  @type_length_exceed @BUG_1965
   Scenario:  try to create subscriptions using NGSI v2 with type length that exceeds the maximum allowed (256)
     Given  a definition of headers
       | parameter          | value                     |
@@ -323,9 +323,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                                              |
-      | error       | BadRequest                                         |
-      | description | entity type length: 257, max length supported: 256 |
+      | parameter   | value                    |
+      | error       | BadRequest               |
+      | description | max type length exceeded |
 
   @type_wrong @BUG_1967
   Scenario Outline:  try to create a subscription using NGSI v2 with several wrong type values
@@ -626,7 +626,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | error       | BadRequest                           |
       | description | subject entities element id is empty |
 
-  @id_length_exceed @BUG_1974 @skip
+  @id_length_exceed @BUG_1974
   Scenario:  try to create subscription using NGSI v2 with with entities id length that exceeds the maximum allowed (256)
     Given  a definition of headers
       | parameter          | value                         |
@@ -644,9 +644,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                                            |
-      | error       | BadRequest                                       |
-      | description | entity id length: 257, max length supported: 256 |
+      | parameter   | value                  |
+      | error       | BadRequest             |
+      | description | max id length exceeded |
 
   @id_wrong @BUG_1975
   Scenario Outline:  try to create subscription using NGSI v2 with wrong entities id values
