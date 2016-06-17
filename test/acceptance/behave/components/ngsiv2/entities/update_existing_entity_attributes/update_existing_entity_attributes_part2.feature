@@ -966,7 +966,7 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | room_10   | house_#         |
       | room_11   | my house        |
 
-  @attribute_type_update_forbidden @BUG_1212 @BUG_1260 @BUG_1785     
+  @attribute_type_update_forbidden @BUG_1212 @BUG_1260 @BUG_1785
   Scenario Outline:  try to update an attribute by entity ID using NGSI v2 with forbidden attributes type in update request
     Given  a definition of headers
       | parameter          | value                            |
