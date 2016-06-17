@@ -19,4 +19,5 @@
 - Fix: Correctly returning error on present but empty attribute types in PATCH v2/entites/{id} operation (Issue #1785)
 - Fix: Error returned on encountering non-existing attributes in PATCH /v2/entities/<id>/attrs (Issue #1784)
 - Fix: Error payload returned on encountering non-existing entity/attribute in PUT /v2/entities/<entity-id>/attrs/<attr-name> (Issue #1360)
+- Fix: wrong regex patterns detection (#968)
 
