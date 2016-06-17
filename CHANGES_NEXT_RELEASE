@@ -15,4 +15,8 @@
 - Fix: NGSIv2 "InvalidModification" errors changed to "Unprocessable" (according to rules defined in #1286)
 - Fix: NGSIv2 geoquery syntax errors using 400 Bad Request instead of 422 Unprocessable Entity (according to rules defined in #1286)
 - Fix: GET /v2/subscriptions/subId error for non existing subscriptions (now using 404 Not Found, previously using 400 Bad Request)
-- FIX: 472 Unknown returned as HTTP status code by POST /v2/op/update in some cases (now using 404 Not Found).
+- Fix: 472 Unknown returned as HTTP status code by POST /v2/op/update in some cases (now using 404 Not Found).
+- Fix: Correctly returning error on present but empty attribute types in PATCH v2/entites/{id} operation (Issue #1785)
+- Fix: Error returned on encountering non-existing attributes in PATCH /v2/entities/<id>/attrs (Issue #1784)
+- Fix: Error payload returned on encountering non-existing entity/attribute in PUT /v2/entities/<entity-id>/attrs/<attr-name> (Issue #1360)
+

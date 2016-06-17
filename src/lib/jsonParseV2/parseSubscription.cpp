@@ -348,7 +348,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
 
         // FIXME P5: Keep the regex and propagate to sub-cache
         regex_t re;
-        if (regcomp(&re, idPattern.c_str(), 0) != 0)
+        if (regcomp(&re, idPattern.c_str(), REG_EXTENDED) != 0)
         {
           return badInput(ciP, "Invalid regex for entity id pattern");
         }

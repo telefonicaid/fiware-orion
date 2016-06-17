@@ -79,6 +79,13 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
         return "invalid JSON type for entity idPattern";
       }
 
+      regex_t re;
+      if (regcomp(&re, iter->value.GetString(), REG_EXTENDED) != 0)
+      {
+        return "invalid regex for entity id pattern";
+      }
+      regfree(&re);
+
       eP->id        = iter->value.GetString();
       eP->isPattern = "true";
     }

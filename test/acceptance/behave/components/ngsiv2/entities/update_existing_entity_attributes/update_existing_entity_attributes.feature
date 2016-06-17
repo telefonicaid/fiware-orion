@@ -898,7 +898,7 @@ Feature: update attributes by entity ID if it exists using NGSI v2. "PATCH" - /v
       | error       | BadRequest                     |
       | description | no 'name' for ContextAttribute |
 
-  @append_attributes_without_attr_type @BUG_1784 @skip
+  @append_attributes_without_attr_type @BUG_1784
   Scenario:  try to append new attributes by entity ID using NGSI v2 without attribute type nor metadata in update request
     Given  a definition of headers
       | parameter          | value                 |
@@ -930,7 +930,7 @@ Feature: update attributes by entity ID if it exists using NGSI v2. "PATCH" - /v
       | error       | NotFound                 |
       | description | No context element found |
 
-  @append_attributes_with_attr_type @BUG_1784 @skip
+  @append_attributes_with_attr_type @BUG_1784
   Scenario:  try to append new attributes by entity ID using NGSI v2 with attribute type but without metadata in update request
     Given  a definition of headers
       | parameter          | value                 |
@@ -963,7 +963,7 @@ Feature: update attributes by entity ID if it exists using NGSI v2. "PATCH" - /v
       | error       | NotFound                 |
       | description | No context element found |
 
-  @append_attributes_with_metatadata @BUG_1784 @skip
+  @append_attributes_with_metatadata @BUG_1784
   Scenario:  try to append new attributes by entity ID using NGSI v2 with metadata in update request
     Given  a definition of headers
       | parameter          | value                 |

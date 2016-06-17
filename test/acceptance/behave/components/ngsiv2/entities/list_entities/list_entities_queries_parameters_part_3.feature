@@ -267,6 +267,37 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     Then verify that receive an "OK" http code
     And verify that "3" entities are returned
 
+  @qp_attrs_unknown @BUG_2245 @skip
+  Scenario:  list entities using NGSI v2 with unknown value in attrs query parameter
+    Given  a definition of headers
+      | parameter          | value                  |
+      | Fiware-Service     | test_list_only_options |
+      | Fiware-ServicePath | /test                  |
+      | Content-Type       | application/json       |
+    And initialize entity groups recorder
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | home        |
+      | entities_id       | room1       |
+      | attributes_number | 5           |
+      | attributes_name   | temperature |
+      | attributes_value  | high        |
+      | attributes_type   | celsius     |
+      | metadatas_number  | 2           |
+      | metadatas_name    | very_hot    |
+      | metadatas_type    | alarm       |
+      | metadatas_value   | random=10   |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    When get all entities
+      | parameter | value    |
+      | attrs     | fdgdfgdf |
+    Then verify that receive an "OK" http code
+    And verify that "3" entities are returned
+
   @qp_attrs_and_id
   Scenario:  list entities using NGSI v2 with attrs and id queries parameters
     Given  a definition of headers

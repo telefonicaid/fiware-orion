@@ -81,7 +81,7 @@ EntityInfo::EntityInfo(const std::string& _entityId, const std::string& _entityT
   {
     // FIXME P5: recomp error should be captured? have a look to other usages of regcomp()
     // in order to see how it works
-    if (regcomp(&entityIdPattern, _entityId.c_str(), 0) != 0)
+    if (regcomp(&entityIdPattern, _entityId.c_str(), REG_EXTENDED) != 0)
     {
       alarmMgr.badInput(clientIp, "invalid regular expression for idPattern");
       isPattern = false;  // FIXME P6: this entity should not be let into the system. Must be stopped before.

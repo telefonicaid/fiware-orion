@@ -46,7 +46,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
 
   # ------------ subject - condition ---------------------
 
-  @condition_without @ISSUE_1946 @skip
+  @condition_without @ISSUE_1946
   Scenario:  try to create a new subscription using NGSI v2 without condition field
     Given  a definition of headers
       | parameter          | value            |
@@ -72,7 +72,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
 
   # ------------ subject - condition - attributes ---------------------
 
-  @condition_attrs_without @ISSUE_1946 @skip
+  @condition_attrs_without @ISSUE_1946
   Scenario:  try to create a new subscription using NGSI v2 without condition attributes field
     Given  a definition of headers
       | parameter          | value                |
@@ -88,12 +88,11 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | notification_attrs    | temperature             |
       | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
-    Then verify that receive a "Created" http code
-    And verify headers in response
-      | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
-    And verify that the subscription is stored in mongo
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value              |
+      | error       | BadRequest         |
+      | description | condition is empty |
 
   @condition_attrs_empty @ISSUE_1946
   Scenario:  try to create a new subscription using NGSI v2 without condition attributes field with empty array
@@ -191,7 +190,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | 1000   |
       | 10000  |
 
-  @condition_attrs_not_plain_ascii @BUG_1979 @skip
+  @condition_attrs_not_plain_ascii @BUG_1979
   Scenario Outline:  try to create subscription using NGSI v2 with condition attributes values with not plain ascii chars
     Given  a definition of headers
       | parameter          | value                      |
@@ -209,16 +208,16 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                                      |
-      | error       | BadRequest                                 |
-      | description | Invalid characters in condition attributes |
+      | parameter   | value                            |
+      | error       | BadRequest                       |
+      | description | attrs element has forbidden char |
     Examples:
       | attributes |
       | habitación |
       | españa     |
       | barça      |
 
-  @condition_attrs_length_minimum @BUG_1983 @skip
+  @condition_attrs_length_minimum @BUG_1983
   Scenario:  try to create subscription using NGSI v2 with condition-attrs length minimum allowed (1)
     Given  a definition of headers
       | parameter          | value                             |
@@ -236,11 +235,11 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                       |
-      | error       | BadRequest                                                  |
-      | description | condition attributes length: 257, max length supported: 256 |
+      | parameter   | value                  |
+      | error       | BadRequest             |
+      | description | attrs element is empty |
 
-  @condition_attrs_length_exceed @BUG_1980 @skip
+  @condition_attrs_length_exceed @BUG_1980
   Scenario:  try to create subscription using NGSI v2 with condition-attrs length that exceeds the maximum allowed (256)
     Given  a definition of headers
       | parameter          | value                             |
@@ -258,11 +257,11 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                       |
-      | error       | BadRequest                                                  |
-      | description | condition attributes length: 257, max length supported: 256 |
+      | parameter   | value                         |
+      | error       | BadRequest                    |
+      | description | max attribute length exceeded |
 
-  @condition_attrs_wrong @BUG_1981 @skip
+  @condition_attrs_wrong @BUG_1981
   Scenario Outline:  try to create subscription using NGSI v2 with wrong condition attributes values
     Given  a definition of headers
       | parameter          | value                      |
@@ -280,9 +279,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                                      |
-      | error       | BadRequest                                 |
-      | description | Invalid characters in condition attributes |
+      | parameter   | value                            |
+      | error       | BadRequest                       |
+      | description | attrs element has forbidden char |
     Examples:
       | attributes  |
       | house<flat> |
@@ -383,7 +382,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | content-length | 0                    |
     And verify that the subscription is stored in mongo
 
-  @condition_expression_empty @ISSUE_1946 @skip
+  @condition_expression_empty @ISSUE_1946
   Scenario:  try to create a new subscription using NGSI v2 without condition expression field with empty object
     Given  a definition of headers
       | parameter          | value                     |
@@ -400,15 +399,13 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | notification_attrs    | temperature             |
       | expires               | 2016-04-05T14:00:00.00Z |
     When create a new subscription
-    Then verify that receive a "Created" http code
-    And verify headers in response
-      | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
-    And verify that the subscription is stored in mongo
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value               |
+      | error       | BadRequest          |
+      | description | expression is empty |
 
   # ------------ subject - condition - expression - q ---------------------
-  @condition_expression_q.row<row.id>
   @condition_expression_q
   Scenario Outline: create a new subscription using NGSI v2 with "q" condition expression and several values
     Given  a definition of headers
@@ -466,7 +463,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | random=100                                                |
       | random=256                                                |
 
-  @condition_expression_q_escaped @BUG_1988 @skip
+  @condition_expression_q_escaped @BUG_1988
   Scenario:  try to create a new subscription using NGSI v2 with "q" condition expression but with escaped string
     Given  a definition of headers
       | parameter          | value                     |
@@ -484,11 +481,11 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | notification_attrs    | "temperature"              |
       | expires               | "2016-04-05T14:00:00.00Z"  |
     When create a new subscription in raw mode
-    Then verify that receive an "Bad Request" http code
-    And verify an error response
-      | parameter   | value                    |
-      | error       | BadRequest               |
-      | description | invalid query expression |
+    Then verify that receive a "Created" http code
+    And verify headers in response
+      | parameter      | value                |
+      | location       | /v2/subscriptions/.* |
+      | content-length | 0                    |
 
   @condition_expression_q_parse_error @BUG_1989 @BUG_2106
   Scenario Outline:  try to create a new subscription using NGSI v2 with "q" condition expression but with parse errors
@@ -528,7 +525,6 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | >speed  | empty left-hand-side in q-item  |
       | <speed  | empty left-hand-side in q-item  |
 
-  @condition_expression_q_range_error.row<row.id>
   @condition_expression_q_range_error @1991 @BUG_2106
   Scenario Outline:  try to create a new subscription using NGSI v2 with "q" condition expression but with invalid operator in ranges
     Given  a definition of headers
@@ -561,7 +557,6 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | speed==99....190 | invalid range: types mixed          |
       | speed==99,,,190  | empty item in list                  |
 
-  @condition_expression_q_range_error_invested.row<row.id>
   @condition_expression_q_range_error_invested @BUG_2106 @2117 @skip
   Scenario Outline:  try to create a new subscription using NGSI v2 with "q" condition expression but with invalid operator in ranges (invested range)
     Given  a definition of headers
@@ -590,7 +585,6 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | speed==100..1  | invested range |
       | speed==100..-1 | invested range |
 
-  @condition_expression_q_invalid_chars.row<row.id>
   @condition_expression_q_invalid_chars @BUG_2106 @BUG_1994 @skip
   Scenario Outline:  try to create a new subscription using NGSI v2 with "q" condition expression but with invalid chars
     Given  a definition of headers
@@ -628,7 +622,6 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | house_#     |
       | my house    |
 
-  @condition_expression_q_invalid_date.row<row.id>
   @condition_expression_q_invalid_date @BUG_2106 @BUG_1996 @skip
   # FIXME: below Examples only represent at the "Complete date plus hours, minutes, seconds and a decimal fraction of a second" level in https://www.w3.org/TR/NOTE-datetime
   Scenario Outline:  try to create a new subscription using NGSI v2 with "q" condition expression but with invalid DateTime values (ISO8601)
@@ -685,7 +678,6 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | my_time==2016-04-05T14:00:00.00Z...2017-04-05T14:00:00.00Z | invalid range: types mixed         |
 
   # ------------ subject - condition - expression - georel ---------------------
-  @condition_expression_georel.row<row.id>
   @condition_expression_georel
   Scenario Outline: create a new subscription using NGSI v2 with "georel" condition expression and allowed values
     Given  a definition of headers
@@ -1039,7 +1031,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | equals                | polygon  | 25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190 |
       | disjoint              | polygon  | 25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190 |
 
-  @condition_expression_geometry_wo_coords @ISSUE_ @skip
+  @condition_expression_geometry_wo_coords @ISSUE_1678 @skip
   Scenario: try to create a new subscription using NGSI v2 with "geometry" condition expression and without "coords" field
     Given  a definition of headers
       | parameter          | value                                    |
@@ -1063,7 +1055,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | error       | BadRequest                                                             |
       | description | Expression not supported: /geometry/ field used without /coords/ field |
 
-  @condition_expression_geometry_empty @ISSUE_ @skip
+  @condition_expression_geometry_empty @ISSUE_1678 @skip
   Scenario: try to create a new subscription using NGSI v2 with "geometry" condition expression and with empty value
     Given  a definition of headers
       | parameter          | value                                    |
@@ -1162,7 +1154,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | house(flat) |
 
   # ------------ subject - condition - expression - coords ---------------------
-  @condition_expression_coords_invalid_point @ISSUE_ @skip
+  @condition_expression_coords_invalid_point @ISSUE_1678 @skip
   Scenario Outline: try to create a new subscription using NGSI v2 with "coords" condition expression and invalid point
     Given  a definition of headers
       | parameter          | value                            |
@@ -1192,7 +1184,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | box      |
       | polygon  |
 
-  @condition_expression_coords_invalid_point @ISSUE_ @skip
+  @condition_expression_coords_invalid_point @ISSUE_1678 @skip
   Scenario Outline: try to create a new subscription using NGSI v2 with "coords" condition expression and invalid point
     Given  a definition of headers
       | parameter          | value                                  |
@@ -1221,7 +1213,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | .      |
       | ;      |
 
-  @condition_expression_coords_invalid_coordenates @ISSUE_ @skip
+  @condition_expression_coords_invalid_coordenates @ISSUE_1678 @skip
   Scenario Outline: try to create a new subscription using NGSI v2 with "coords" condition expression and invalid number of coordinates
     Given  a definition of headers
       | parameter          | value                                  |
@@ -1252,7 +1244,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | box      | 25.774,-80.190                                              |
       | box      | 25.774,-80.190;18.466,-66.118;32.321,-64.757;               |
 
-  @condition_expression_coords_few_coords_polygon @ISSUE_ @skip
+  @condition_expression_coords_few_coords_polygon @ISSUE_1678 @skip
   Scenario Outline: try to create a new subscription using NGSI v2 with "coords" condition expression and too few coordinates for polygon
     Given  a definition of headers
       | parameter          | value                                  |
