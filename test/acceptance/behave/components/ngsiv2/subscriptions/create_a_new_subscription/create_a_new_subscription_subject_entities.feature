@@ -247,14 +247,13 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | expires               | "2016-04-05T14:00:00.00Z"                                                                           |
       | status                | "active"                                                                                            |
     When create a new subscription in raw mode
-    Then verify that receive a "Created" http code
-    And verify headers in response
-      | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
-    And verify that the subscription is stored in mongo
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                 |
+      | error       | BadRequest                                            |
+      | description | forbidden characters in subject entities element type |
 
-  @type_not_plain_ascii @BUG_1964 @skip
+  @type_not_plain_ascii @BUG_1964
   Scenario Outline:  try to create subscriptions using NGSI v2 with not plain ascii type values
     Given  a definition of headers
       | parameter          | value              |
@@ -273,9 +272,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                             |
-      | error       | BadRequest                        |
-      | description | Invalid characters in entity type |
+      | parameter   | value                                                 |
+      | error       | BadRequest                                            |
+      | description | forbidden characters in subject entities element type |
     Examples:
       | type       |
       | habitación |
@@ -328,7 +327,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | error       | BadRequest                                         |
       | description | entity type length: 257, max length supported: 256 |
 
-  @type_wrong @BUG_1967 @skip
+  @type_wrong @BUG_1967
   Scenario Outline:  try to create a subscription using NGSI v2 with several wrong type values
     Given  a definition of headers
       | parameter          | value                  |
@@ -347,9 +346,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                             |
-      | error       | BadRequest                        |
-      | description | Invalid characters in entity type |
+      | parameter   | value                                                 |
+      | error       | BadRequest                                            |
+      | description | forbidden characters in subject entities element type |
     Examples:
       | type        |
       | house<flat> |
@@ -466,8 +465,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
 
 # ------------ subject - entities - id ----------------------
 
-  @id_without
-  Scenario:  try to create a new subscription using NGSI v2 without id field nor idPattern field
+  @id_and_id_pattern_without
+  Scenario:  try to create a new subscription using NGSI v2 without id, type nor idPattern fields
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_entities_id |
@@ -483,9 +482,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                 |
-      | error       | BadRequest                                            |
-      | description | subject entities element has no id/idPattern nor type |
+      | parameter   | value                                                   |
+      | error       | BadRequest                                              |
+      | description | subject entities element does not have id nor idPattern |
 
   @id_idPattern
   Scenario:  try to create a new subscription using NGSI v2 with id and idPattern fields
@@ -510,7 +509,6 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | error       | BadRequest                                    |
       | description | subject entities element has id and idPattern |
 
-  @id.row<row.id>
   @id
   Scenario Outline:  create entities using NGSI v2 with several entities id values
     Given  a definition of headers
@@ -573,14 +571,13 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | expires               | "2016-04-05T14:00:00.00Z"                                                                           |
       | status                | "active"                                                                                            |
     When create a new subscription in raw mode
-    Then verify that receive a "Created" http code
-    And verify headers in response
-      | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
-    And verify that the subscription is stored in mongo
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                               |
+      | error       | BadRequest                                          |
+      | description | forbidden characters in subject entities element id |
 
-  @id_not_plain_ascii @BUG_1973 @skip
+  @id_not_plain_ascii @BUG_1973
   Scenario Outline:  try to create subscription using NGSI v2 with several entities id values with not plain ascii chars
     Given  a definition of headers
       | parameter          | value            |
@@ -598,16 +595,16 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                           |
-      | error       | BadRequest                      |
-      | description | Invalid characters in entity id |
+      | parameter   | value                                               |
+      | error       | BadRequest                                          |
+      | description | forbidden characters in subject entities element id |
     Examples:
       | id         |
       | habitación |
       | españa     |
       | barça      |
 
-  @id_length_minimum @BUG_1984 @skip
+  @id_length_minimum @BUG_1984
   Scenario:  try to create subscription using NGSI v2 with entities id length minimum allowed (1)
     Given  a definition of headers
       | parameter          | value                             |
@@ -625,9 +622,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value           |
-      | error       | BadRequest      |
-      | description | not defined yet |
+      | parameter   | value                                |
+      | error       | BadRequest                           |
+      | description | subject entities element id is empty |
 
   @id_length_exceed @BUG_1974 @skip
   Scenario:  try to create subscription using NGSI v2 with with entities id length that exceeds the maximum allowed (256)
@@ -651,7 +648,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | error       | BadRequest                                       |
       | description | entity id length: 257, max length supported: 256 |
 
-  @id_wrong @BUG_1975 @skip
+  @id_wrong @BUG_1975
   Scenario Outline:  try to create subscription using NGSI v2 with wrong entities id values
     Given  a definition of headers
       | parameter          | value                  |
@@ -669,9 +666,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                           |
-      | error       | BadRequest                      |
-      | description | Invalid characters in entity id |
+      | parameter   | value                                               |
+      | error       | BadRequest                                          |
+      | description | forbidden characters in subject entities element id |
     Examples:
       | id          |
       | house<flat> |
@@ -787,13 +784,13 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | Content-Type       | application/json         |
     # These properties below are used in subscriptions request
     And properties to subscriptions
-      | parameter             | value                   |
-      | subject_idPattern     | <id_pattern>            |
-      | condition_attrs       | temperature             |
-      | notification_http_url | http://localhost:1234   |
-      | notification_attrs    | temperature             |
-      | expires               | 2016-04-05T14:00:00.00Z |
-    When create a new subscription
+      | parameter             | value                     |
+      | subject_idPattern     | "<id_pattern>"            |
+      | condition_attrs       | "temperature"             |
+      | notification_http_url | "http://localhost:1234"   |
+      | notification_attrs    | "temperature"             |
+      | expires               | "2016-04-05T14:00:00.00Z" |
+    When create a new subscription in raw mode
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
@@ -825,13 +822,66 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | .*34         |
       | ^te+.*       |
       | [A-Za-z0-9]* |
-      | \a*          |
-      | \w*          |
-      | \d*          |
-      | \D*          |
       | house(flat)  |
       | house(f*)    |
       | .*           |
+
+  @idpattern_backslash @BUG_2142 @skip
+  Scenario Outline:  create entities using NGSI v2 with several entities idPattern values
+    Given  a definition of headers
+      | parameter          | value                    |
+      | Fiware-Service     | test_entities_id_pattern |
+      | Fiware-ServicePath | /test                    |
+      | Content-Type       | application/json         |
+    # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter             | value                     |
+      | subject_idPattern     | "<id_pattern>"            |
+      | condition_attrs       | "temperature"             |
+      | notification_http_url | "http://localhost:1234"   |
+      | notification_attrs    | "temperature"             |
+      | expires               | "2016-04-05T14:00:00.00Z" |
+    When create a new subscription in raw mode
+    Then verify that receive a "Created" http code
+    And verify headers in response
+      | parameter      | value                |
+      | location       | /v2/subscriptions/.* |
+      | content-length | 0                    |
+    And verify that the subscription is stored in mongo
+    Examples:
+      | id_pattern |
+      | \a         |
+      | \w+        |
+      | \w*        |
+      | [\w]+      |
+      | (\w)+      |
+      | \d*        |
+      | \D*        |
+
+  @idpattern_wrong_regex
+  Scenario Outline:  create entities using NGSI v2 with wrong regex in idPattern values
+    Given  a definition of headers
+      | parameter          | value                    |
+      | Fiware-Service     | test_entities_id_pattern |
+      | Fiware-ServicePath | /test                    |
+      | Content-Type       | application/json         |
+    # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter             | value                     |
+      | subject_idPattern     | "<id_pattern>"            |
+      | condition_attrs       | "temperature"             |
+      | notification_http_url | "http://localhost:1234"   |
+      | notification_attrs    | "temperature"             |
+      | expires               | "2016-04-05T14:00:00.00Z" |
+    When create a new subscription in raw mode
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                               |
+      | error       | BadRequest                          |
+      | description | Invalid regex for entity id pattern |
+    Examples:
+      | id_pattern   |
+      | [A-Za-z0-9)* |
 
   @id_pattern_raw_whitespaces
   Scenario:  create an subscription using NGSI v2 with whitespaces in entities idPattern using raw mode
@@ -883,10 +933,12 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | error       | BadRequest                      |
       | description | Invalid characters in entity id |
     Examples:
-      | idPattern  |
-      | habitación |
-      | españa     |
-      | barça      |
+      | idPattern    |
+      | habitación   |
+      | españa       |
+      | barça        |
+      | house(barça) |
+      | ^aña+.*      |
 
   @id_pattern_length_minimum @BUG_1986 @skip
   Scenario:  try to create subscription using NGSI v2 with entities idPattern length minimum allowed (1)
