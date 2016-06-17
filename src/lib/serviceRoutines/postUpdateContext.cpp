@@ -690,6 +690,7 @@ std::string postUpdateContext
     if (fails == response.contextElementResponseVector.size())
     {
       // If all CER result in error, then it isn't a partial update, but a regular NotFound
+      LM_W(("KZ: Setting error text to 'No context element found'"));
       parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "No context element found", "NotFound");
     }
     else if (fails > 0)

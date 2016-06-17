@@ -659,6 +659,7 @@ static bool updateAttribute
 {
   actualUpdate = false;
 
+  LM_W(("KZ: In updateAttribute for '%s'", caP->name.c_str()));
   /* Attributes with metadata ID are stored as <attrName>__<ID> in the attributes embedded document */
   std::string effectiveName = dbDotEncode(caP->name);
   if (caP->getId() != "")
@@ -1823,9 +1824,10 @@ static bool updateContextAttributeItem
                             " - entity: [" + eP->toString() + "]" +
                             " - offending attribute: " + targetAttr->getName();
       cerP->statusCode.fill(SccInvalidParameter, details);
-      oe->fill(SccContextElementNotFound, "No context element found", "NotFound");
+      LM_W(("KZ: Setting error text to 'The entity does not have such an attribute'"));
+      oe->fill(SccContextElementNotFound, "The entity does not have such an attribute", "NotFound");
 
-      /* Although ca has been already pushed into cerP, it can be used */
+      /* Although 'ca' has been already pushed into cerP, the pointer is still valid, of course */
       ca->found = false;
     }
   }
@@ -3053,6 +3055,7 @@ void processContextElement
       if (forwardsPending(responseP) == false)
       {
         cerP->statusCode.fill(SccContextElementNotFound);
+        LM_W(("KZ: Setting error text to 'No context element found'"));
         responseP->oe.fill(SccContextElementNotFound, "No context element found", "NotFound");
       }
     }
