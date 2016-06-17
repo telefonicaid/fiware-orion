@@ -68,7 +68,7 @@ payload='
 }
 '
 
-orionCurl --url /ngsi10/subscribeContext --payload "$payload"
+orionCurl --url /v1/subscribeContext --payload "$payload"
 echo
 echo
 
