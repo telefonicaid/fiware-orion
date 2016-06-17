@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <regex.h>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -183,6 +184,15 @@ std::string EntityId::check
     return "isPattern set to true for a registration";
   }
 
+  if (isTrue(isPattern))
+  {
+    regex_t re;
+    if (regcomp(&re, id.c_str(), REG_EXTENDED) != 0)
+    {
+      return "invalid regex for entity id pattern";
+    }
+    regfree(&re);
+  }
   return "OK";
 }
 

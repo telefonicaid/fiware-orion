@@ -1,0 +1,99 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+NGSI10 subscription with invalid regex "*"
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create subscription with invalid regex in idPattern
+#
+
+echo "01. Create subscription with invalid regex"
+echo "=========================================="
+payload='
+{
+    "entities": [
+        {
+            "type": "Patient",
+            "isPattern": "true",
+            "id": "*"
+        }
+    ],
+    "attributes": [
+        "Blood glucose",
+        "Body temperature",
+        "Systolic blood pressure",
+        "Diastolic blood pressure",
+        "Respiration rate",
+        "Heart rate",
+        "Blood oxygen",
+        "timestamp"
+    ],
+    "reference": "http://A.B.C.D:5999/orion2mysql",
+    "duration": "P1Y",
+    "notifyConditions": [
+        {
+            "type": "ONCHANGE",
+            "condValues": [
+                "timestamp"
+            ]
+        }
+    ],
+    "throttling": "PT1S"
+}
+'
+
+orionCurl --url /v1/subscribeContext --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription with invalid regex
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 190
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "subscribeError": {
+        "errorCode": {
+            "code": "400",
+            "details": "invalid payload: invalid regex for entity id pattern",
+            "reasonPhrase": "Bad Request"
+        }
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+
