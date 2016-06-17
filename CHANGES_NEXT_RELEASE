@@ -16,3 +16,4 @@
 - Fix: NGSIv2 geoquery syntax errors using 400 Bad Request instead of 422 Unprocessable Entity (according to rules defined in #1286)
 - Fix: GET /v2/subscriptions/subId error for non existing subscriptions (now using 404 Not Found, previously using 400 Bad Request)
 - FIX: 472 Unknown returned as HTTP status code by POST /v2/op/update in some cases (now using 404 Not Found).
+- FIX: Correctly returning error on present but empty attribute types in PATCH v2/entites/{id} operation (Issue #1785)
