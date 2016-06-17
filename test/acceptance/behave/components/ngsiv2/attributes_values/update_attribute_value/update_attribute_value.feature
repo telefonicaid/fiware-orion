@@ -613,7 +613,7 @@ Feature: update an attribute value by entity ID and attribute name if it exists 
       | españa     |
       | barça      |
 
-  @entity_not_exists @BUG_1360 @skip
+  @entity_not_exists @BUG_1360
   Scenario:  try to update an attribute value by entity ID and attribute name but the entitiy id does not exist using NGSI v2
     Given  a definition of headers
       | parameter          | value                  |
@@ -845,7 +845,7 @@ Feature: update an attribute value by entity ID and attribute name if it exists 
       | españa          |
       | barça           |
 
-  @attribute_name_not_exists @BUG_1360 @skip
+  @attribute_name_not_exists @BUG_1360
   Scenario:  try to update an attribute value by entity ID and attribute name using NGSI v2 but the attribute name does not exist
     Given  a definition of headers
       | parameter          | value                      |
@@ -876,7 +876,7 @@ Feature: update an attribute value by entity ID and attribute name if it exists 
     And verify an error response
       | parameter   | value                    |
       | error       | NotFound                 |
-      | description | invalid character in URI |
+      | description | No context element found |
 
   @attribute_name_invalid @BUG_1351
   Scenario Outline:  try to update an attribute value by entity id and attribute name using NGSI v2 API with invalid attribute names
