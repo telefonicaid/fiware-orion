@@ -239,7 +239,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | error       | BadRequest             |
       | description | attrs element is empty |
 
-  @condition_attrs_length_exceed @BUG_1980 @skip
+  @condition_attrs_length_exceed @BUG_1980
   Scenario:  try to create subscription using NGSI v2 with condition-attrs length that exceeds the maximum allowed (256)
     Given  a definition of headers
       | parameter          | value                             |
@@ -257,9 +257,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                       |
-      | error       | BadRequest                                                  |
-      | description | condition attributes length: 257, max length supported: 256 |
+      | parameter   | value                         |
+      | error       | BadRequest                    |
+      | description | max attribute length exceeded |
 
   @condition_attrs_wrong @BUG_1981
   Scenario Outline:  try to create subscription using NGSI v2 with wrong condition attributes values
