@@ -23,3 +23,5 @@
 - Fix: invalid regex patterns detection (#968)
 - Fix: Better error returned on invalid geoquery (Issue #2174)
 - Fix: Better error returned on attribute not found in GET /v2/entities/<entity-id>/attrs/<attr-name>/value (Issue #2220)
+- Fix: Do not allow forbidden charsin description for subscription (#2308)
+
