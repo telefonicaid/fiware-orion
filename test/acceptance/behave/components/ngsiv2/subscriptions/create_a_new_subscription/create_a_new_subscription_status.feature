@@ -100,7 +100,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | inactive |
 
   @status_wrong
-  Scenario Outline:  create a new subscription using NGSI v2 with wrong status value
+  Scenario Outline:  try to create a new subscription using NGSI v2 with wrong status value
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_csub_status |
@@ -131,7 +131,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | random=100000 |
 
   @status_not_string
-  Scenario Outline:  create a new subscription using NGSI v2 with not string type in status
+  Scenario Outline:  try to create a new subscription using NGSI v2 with not string type in status
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_csub_status |
@@ -159,7 +159,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | 234324324     |
 
   @status_forbidden_chars
-  Scenario Outline:  create a new subscription using NGSI v2 with forbidden chars in status value
+  Scenario Outline:  try to create a new subscription using NGSI v2 with forbidden chars in status value
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_csub_status |

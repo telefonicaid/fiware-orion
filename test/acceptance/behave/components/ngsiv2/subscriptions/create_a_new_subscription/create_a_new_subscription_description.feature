@@ -101,7 +101,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | random=1024           |
 
   @description_length_exceed
-  Scenario:  create a new subscription using NGSI v2 with length exceed in description value
+  Scenario:  try to create a new subscription using NGSI v2 with length exceed in description value
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_csub_desc   |
@@ -125,8 +125,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | error       | BadRequest                      |
       | description | max description length exceeded |
 
-  @description_forbiden_chars @BUG_2308 @skip
-  Scenario Outline:  create a new subscription using NGSI v2 with forbidden chars in description value
+  @description_forbidden_chars @BUG_2308 @skip
+  Scenario Outline:  try to create a new subscription using NGSI v2 with forbidden chars in description value
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_csub_desc   |
@@ -157,3 +157,31 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | house'flat' |
       | house;flat  |
       | house(flat) |
+
+  @description_not_string
+  Scenario Outline:  try to create a new subscription using NGSI v2 with not string type in description
+    Given  a definition of headers
+      | parameter          | value            |
+      | Fiware-Service     | test_csub_desc   |
+      | Fiware-ServicePath | /test            |
+      | Content-Type       | application/json |
+    # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter             | value                   |
+      | subject_idPattern     | ".*"                    |
+      | condition_attrs       | "temperature"           |
+      | notification_http_url | "http://localhost:1234" |
+      | notification_attrs    | "temperature"           |
+      | description           | <desc>                  |
+    When create a new subscription in raw mode
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                       |
+      | error       | BadRequest                  |
+      | description | description is not a string |
+    Examples:
+      | desc          |
+      | true          |
+      | ["er", 34]    |
+      | {"value": 34} |
+      | 234324324     |
