@@ -3056,7 +3056,7 @@ void processContextElement
 
         if (apiVersion == "v1")
         {
-          responseP->oe.fill(SccContextElementNotFound, "Entity not found. Check type and id", "NotFound");
+          responseP->oe.fill(SccContextElementNotFound, "No context element found", "NotFound");
         }
         else
         {
