@@ -88,13 +88,13 @@ echo
 01. Intent to patch a non-existing entity - error, of course
 ============================================================
 HTTP/1.1 404 Not Found
-Content-Length: 61
+Content-Length: 95
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "No context element found",
+    "description": "The requested entity has not been found. Check type and id",
     "error": "NotFound"
 }
 
@@ -169,13 +169,13 @@ Date: REGEX(.*)
 06. PATCH /v2/entities/E1 attr3=6, to see the error (attr3 doesn't exist)
 =========================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 61
+Content-Length: 79
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "No context element found",
+    "description": "The entity does not have such an attribute",
     "error": "NotFound"
 }
 
