@@ -659,7 +659,6 @@ static bool updateAttribute
 {
   actualUpdate = false;
 
-  LM_W(("KZ: In updateAttribute for '%s'", caP->name.c_str()));
   /* Attributes with metadata ID are stored as <attrName>__<ID> in the attributes embedded document */
   std::string effectiveName = dbDotEncode(caP->name);
   if (caP->getId() != "")
@@ -1824,7 +1823,6 @@ static bool updateContextAttributeItem
                             " - entity: [" + eP->toString() + "]" +
                             " - offending attribute: " + targetAttr->getName();
       cerP->statusCode.fill(SccInvalidParameter, details);
-      LM_W(("KZ: Setting error text to 'The entity does not have such an attribute'"));
       oe->fill(SccContextElementNotFound, "The entity does not have such an attribute", "NotFound");
 
       /* Although 'ca' has been already pushed into cerP, the pointer is still valid, of course */
@@ -2917,8 +2915,8 @@ void processContextElement
     // This is the case of POST /v2/entities/<id>, in order to check that entity previously exist
     if ((entitiesNumber == 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONAPPEND))
     {
-      buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, "Entity does not exist");
-      responseP->oe.fill(SccContextElementNotFound, "Entity does not exist", "NotFound");
+      buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, "The requested entity has not been found. Check type and id");
+      responseP->oe.fill(SccContextElementNotFound, "The requested entity has not been found. Check type and id", "NotFound");
       return;
     }
 
@@ -3055,15 +3053,22 @@ void processContextElement
       if (forwardsPending(responseP) == false)
       {
         cerP->statusCode.fill(SccContextElementNotFound);
-        LM_W(("KZ: Setting error text to 'No context element found'"));
-        responseP->oe.fill(SccContextElementNotFound, "No context element found", "NotFound");
+
+        if (apiVersion == "v1")
+        {
+          responseP->oe.fill(SccContextElementNotFound, "Entity not found. Check type and id", "NotFound");
+        }
+        else
+        {
+          responseP->oe.fill(SccContextElementNotFound, "The requested entity has not been found. Check type and id", "NotFound");
+        }
       }
     }
     else if (strcasecmp(action.c_str(), "delete") == 0)
     {
       cerP->statusCode.fill(SccContextElementNotFound);
-      responseP->oe.fill(SccContextElementNotFound, "The requested entity has not been found. Check type and id", "NotFound");
 
+      responseP->oe.fill(SccContextElementNotFound, "The requested entity has not been found. Check type and id", "NotFound");
       responseP->contextElementResponseVector.push_back(cerP);
     }
     else   /* APPEND or APPEND_STRICT */
@@ -3075,7 +3080,7 @@ void processContextElement
       if (!createEntity(enP, ceP->contextAttributeVector, now, &errDetail, tenant, servicePathV, apiVersion, &(responseP->oe)))
       {
         cerP->statusCode.fill(SccInvalidParameter, errDetail);
-        // In this case, responseP->oe is not filled, at createEntity() deals interally with that
+        // In this case, responseP->oe is not filled, as createEntity() deals internally with that
       }
       else
       {
