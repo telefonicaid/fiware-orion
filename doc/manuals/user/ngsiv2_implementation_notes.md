@@ -110,6 +110,6 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
   * **exceptAttrs**: optional (but it cannot be present if `attrs` is also used; if present it must be a non-empty list)
   * **attrsFormat**: optional (but if present it must be a valid attrs format keyword)
 * **throttling**: optional (must be an integer)
-* **expires**: optional (must be a date)
+* **expires**: optional (must be a date or empty string "")
 * **status**: optional (must be a valid status keyword)
 
