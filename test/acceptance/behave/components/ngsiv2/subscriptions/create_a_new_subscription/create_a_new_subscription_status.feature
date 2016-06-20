@@ -44,11 +44,11 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
   Actions After the Feature:
   Setup: stop ContextBroker
 
-  @description_without
-  Scenario:  create a new subscription using NGSI v2 without description value
+  @status_without
+  Scenario:  create a new subscription using NGSI v2 without status value
     Given  a definition of headers
       | parameter          | value            |
-      | Fiware-Service     | test_csub_desc   |
+      | Fiware-Service     | test_csub_status |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
      # These properties below are used in subscriptions request
@@ -69,17 +69,16 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | content-length | 0                    |
     And verify that the subscription is stored in mongo
 
-  @description
-  Scenario Outline:  create a new subscription using NGSI v2 with description value
+  @status
+  Scenario Outline:  create a new subscription using NGSI v2 with status value
     Given  a definition of headers
       | parameter          | value            |
-      | Fiware-Service     | test_csub_desc   |
+      | Fiware-Service     | test_csub_status |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    # These properties below are used in subscriptions request
+     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter              | value                   |
-      | description            | <desc>                  |
       | subject_type           | room                    |
       | subject_idPattern      | .*                      |
       | condition_attrs        | temperature             |
@@ -87,6 +86,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | notification_http_url  | http://localhost:1234   |
       | notification_attrs     | temperature             |
       | expires                | 2016-04-05T14:00:00.00Z |
+      | status                 | <status>                |
     When create a new subscription
     Then verify that receive a "Created" http code
     And verify headers in response
@@ -95,47 +95,20 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | content-length | 0                    |
     And verify that the subscription is stored in mongo
     Examples:
-      | desc                  |
-      |                       |
-      | my first subscription |
-      | random=1024           |
+      | status   |
+      | active   |
+      | inactive |
 
-  @description_length_exceed
-  Scenario:  try to create a new subscription using NGSI v2 with length exceed in description value
+  @status_wrong
+  Scenario Outline:  try to create a new subscription using NGSI v2 with wrong status value
     Given  a definition of headers
       | parameter          | value            |
-      | Fiware-Service     | test_csub_desc   |
-      | Fiware-ServicePath | /test            |
-      | Content-Type       | application/json |
-    # These properties below are used in subscriptions request
-    And properties to subscriptions
-      | parameter              | value                   |
-      | description            | random=1025             |
-      | subject_type           | room                    |
-      | subject_idPattern      | .*                      |
-      | condition_attrs        | temperature             |
-      | condition_attrs_number | 3                       |
-      | notification_http_url  | http://localhost:1234   |
-      | notification_attrs     | temperature             |
-      | expires                | 2016-04-05T14:00:00.00Z |
-    When create a new subscription
-    Then verify that receive a "Bad Request" http code
-    And verify an error response
-      | parameter   | value                           |
-      | error       | BadRequest                      |
-      | description | max description length exceeded |
-
-  @description_forbidden_chars @BUG_2308 @skip
-  Scenario Outline:  try to create a new subscription using NGSI v2 with forbidden chars in description value
-    Given  a definition of headers
-      | parameter          | value            |
-      | Fiware-Service     | test_csub_desc   |
+      | Fiware-Service     | test_csub_status |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
      # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter              | value                   |
-      | description            | <desc>                  |
       | subject_type           | room                    |
       | subject_idPattern      | .*                      |
       | condition_attrs        | temperature             |
@@ -143,26 +116,25 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | notification_http_url  | http://localhost:1234   |
       | notification_attrs     | temperature             |
       | expires                | 2016-04-05T14:00:00.00Z |
+      | status                 | <status>                |
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                                  |
-      | error       | BadRequest                             |
-      | description | description element has forbidden char |
+      | parameter   | value                                                        |
+      | error       | BadRequest                                                   |
+      | description | status is not valid (it has to be either active or inactive) |
     Examples:
-      | desc        |
-      | house<flat> |
-      | house=flat  |
-      | house"flat" |
-      | house'flat' |
-      | house;flat  |
-      | house(flat) |
+      | status        |
+      |               |
+      | fsdfsdf       |
+      | expired       |
+      | random=100000 |
 
-  @description_not_string
-  Scenario Outline:  try to create a new subscription using NGSI v2 with not string type in description
+  @status_not_string
+  Scenario Outline:  try to create a new subscription using NGSI v2 with not string type in status
     Given  a definition of headers
       | parameter          | value            |
-      | Fiware-Service     | test_csub_desc   |
+      | Fiware-Service     | test_csub_status |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
     # These properties below are used in subscriptions request
@@ -172,16 +144,49 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | condition_attrs       | "temperature"           |
       | notification_http_url | "http://localhost:1234" |
       | notification_attrs    | "temperature"           |
-      | description           | <desc>                  |
+      | status                | <status>                |
     When create a new subscription in raw mode
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                       |
-      | error       | BadRequest                  |
-      | description | description is not a string |
+      | parameter   | value                  |
+      | error       | BadRequest             |
+      | description | status is not a string |
     Examples:
-      | desc          |
+      | status        |
       | true          |
       | ["er", 34]    |
       | {"value": 34} |
       | 234324324     |
+
+  @status_forbidden_chars
+  Scenario Outline:  try to create a new subscription using NGSI v2 with forbidden chars in status value
+    Given  a definition of headers
+      | parameter          | value            |
+      | Fiware-Service     | test_csub_status |
+      | Fiware-ServicePath | /test            |
+      | Content-Type       | application/json |
+     # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter              | value                   |
+      | status                 | <status>                |
+      | subject_type           | room                    |
+      | subject_idPattern      | .*                      |
+      | condition_attrs        | temperature             |
+      | condition_attrs_number | 3                       |
+      | notification_http_url  | http://localhost:1234   |
+      | notification_attrs     | temperature             |
+      | expires                | 2016-04-05T14:00:00.00Z |
+    When create a new subscription
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                        |
+      | error       | BadRequest                                                   |
+      | description | status is not valid (it has to be either active or inactive) |
+    Examples:
+      | status      |
+      | house<flat> |
+      | house=flat  |
+      | house"flat" |
+      | house'flat' |
+      | house;flat  |
+      | house(flat) |
