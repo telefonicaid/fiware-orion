@@ -383,42 +383,41 @@ static bool compErrorDetect
 
   if ((compV[0] == "v2") && (compV[1] == "entities"))
   {
-    if (components == 4)
+    if ((components == 4) && (compV[3] == "attrs"))  // URL: /v2/entities/<entity-id>/attrs
     {
-      if (compV[3] == "attrs")
+      std::string entityId = compV[2];
+
+      if (entityId == "")
       {
-        if (compV[2] == "")
-        {
-          details = "entity id length: 0, min length supported: 1";
-        }
+        details = "entity id length: 0, min length supported: 1";
       }
     }
-    else if (components == 5)
+    else if ((components == 5) && (compV[3] == "attrs"))  // URL: /v2/entities/<entity-id>/attrs/<attr-name>
     {
-      if (compV[3] == "attrs")
+      std::string entityId = compV[2];
+      std::string attrName = compV[4];
+
+      if (entityId == "")
       {
-        if (compV[2] == "")
-        {
-          details = "entity id length: 0, min length supported: 1";
-        }
-        else if (compV[4] == "")
-        {
-          details = "attribute name length: 0, min length supported: 1";
-        }
+        details = "entity id length: 0, min length supported: 1";
+      }
+      else if (attrName == "")
+      {
+        details = "attribute name length: 0, min length supported: 1";
       }
     }
-    else if (components == 6)
+    else if ((components == 6) && (compV[3] == "attrs") && (compV[5] == "value")) // URL: /v2/entities/<entity-id>/attrs/<attr-name>/value
     {
-      if ((compV[3] == "attrs") && (compV[5] == "value"))
+      std::string entityId = compV[2];
+      std::string attrName = compV[4];
+
+      if (entityId == "")
       {
-        if (compV[2] == "")
-        {
-          details = "entity id length: 0, min length supported: 1";
-        }
-        else if (compV[4] == "")
-        {
-          details = "attribute name length: 0, min length supported: 1";
-        }
+        details = "entity id length: 0, min length supported: 1";
+      }
+      else if (attrName == "")
+      {
+        details = "attribute name length: 0, min length supported: 1";
       }
     }
   }
@@ -426,10 +425,10 @@ static bool compErrorDetect
   if (details != "")
   {
     oeP->fill(SccBadRequest, details);
-    return true;  // means: this was an error, stop here
+    return true;  // means: this was an error, make the broker stop this request
   }
   
-  return false;
+  return false;  // No special error detected, let the broker continue with the request to detect the error later on
 }
 
 
