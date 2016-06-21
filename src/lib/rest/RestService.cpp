@@ -354,13 +354,12 @@ static void filterRelease(ParseData* parseDataP, RequestType request)
 *
 * compCheck - 
 */
-static bool compCheck(int components, const std::vector<std::string>& compV, int* ixP)
+static bool compCheck(int components, const std::vector<std::string>& compV)
 {
   for (int ix = 0; ix < components; ++ix)
   {
     if (compV[ix] == "")
     {
-      *ixP = ix;
       return false;
     }
   }
@@ -373,7 +372,12 @@ static bool compCheck(int components, const std::vector<std::string>& compV, int
 *
 * compErrorDetect - 
 */
-bool compErrorDetect(int components, const std::vector<std::string>& compV, OrionError* oeP, int compErrorIx)
+static bool compErrorDetect
+(
+  int                              components,
+  const std::vector<std::string>&  compV,
+  OrionError*                      oeP
+)
 {
   std::string  details; 
 
@@ -456,12 +460,11 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   ciP->httpStatusCode = SccOk;
 
   components = stringSplit(ciP->url, '/', compV);
-  int compErrorIx;
-  if (!compCheck(components, compV, &compErrorIx))
+  if (!compCheck(components, compV))
   {
     OrionError oe;
 
-    if (compErrorDetect(components, compV, &oe, compErrorIx))
+    if (compErrorDetect(components, compV, &oe))
     {
       alarmMgr.badInput(clientIp, oe.details);
       ciP->httpStatusCode = SccBadRequest;
