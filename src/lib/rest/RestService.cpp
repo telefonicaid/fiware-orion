@@ -373,9 +373,9 @@ static bool compCheck(int components, const std::vector<std::string>& compV, int
 *
 * compErrorDetect - 
 */
-void compErrorDetect(int components, const std::vector<std::string>& compV, OrionError* oeP, int compErrorIx)
+bool compErrorDetect(int components, const std::vector<std::string>& compV, OrionError* oeP, int compErrorIx)
 {
-  std::string details = "empty component in ULR PATH";
+  std::string  details; 
 
   if ((compV[0] == "v2") && (compV[1] == "entities"))
   {
@@ -419,7 +419,13 @@ void compErrorDetect(int components, const std::vector<std::string>& compV, Orio
     }
   }
 
-  oeP->fill(SccBadRequest, details);
+  if (details != "")
+  {
+    oeP->fill(SccBadRequest, details);
+    return true;  // means: this was an error, stop here
+  }
+  
+  return false;
 }
 
 
@@ -455,11 +461,13 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   {
     OrionError oe;
 
-    compErrorDetect(components, compV, &oe, compErrorIx);
-    alarmMgr.badInput(clientIp, oe.details);
-    ciP->httpStatusCode = SccBadRequest;
-    restReply(ciP, oe.smartRender(ciP->apiVersion));
-    return "URL PATH component error";
+    if (compErrorDetect(components, compV, &oe, compErrorIx))
+    {
+      alarmMgr.badInput(clientIp, oe.details);
+      ciP->httpStatusCode = SccBadRequest;
+      restReply(ciP, oe.smartRender(ciP->apiVersion));
+      return "URL PATH component error";
+    }
   }
 
   for (unsigned int ix = 0; serviceV[ix].treat != NULL; ++ix)
