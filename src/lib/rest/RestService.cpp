@@ -34,6 +34,7 @@
 #include "common/statistics.h"
 #include "common/string.h"
 #include "common/limits.h"
+#include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/ParseData.h"
@@ -389,7 +390,7 @@ static bool compErrorDetect
 
       if (entityId == "")
       {
-        details = "entity id length: 0, min length supported: 1";
+        details = EMPTY_ENTITY_ID;
       }
     }
     else if ((components == 5) && (compV[3] == "attrs"))  // URL: /v2/entities/<entity-id>/attrs/<attr-name>
@@ -399,11 +400,11 @@ static bool compErrorDetect
 
       if (entityId == "")
       {
-        details = "entity id length: 0, min length supported: 1";
+        details = EMPTY_ENTITY_ID;
       }
       else if (attrName == "")
       {
-        details = "attribute name length: 0, min length supported: 1";
+        details = EMPTY_ATTR_NAME;
       }
     }
     else if ((components == 6) && (compV[3] == "attrs") && (compV[5] == "value")) // URL: /v2/entities/<entity-id>/attrs/<attr-name>/value
@@ -413,11 +414,11 @@ static bool compErrorDetect
 
       if (entityId == "")
       {
-        details = "entity id length: 0, min length supported: 1";
+        details = EMPTY_ENTITY_ID;
       }
       else if (attrName == "")
       {
-        details = "attribute name length: 0, min length supported: 1";
+        details = EMPTY_ATTR_NAME;
       }
     }
   }
