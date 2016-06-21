@@ -798,10 +798,10 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
   }
 
   //
-  // Remove '/' at end of URL path
+  // Remove ONE '/' at end of URL path
   //
   char* s = (char*) url.c_str();
-  while (s[strlen(s) - 1] == '/')
+  if (s[strlen(s) - 1] == '/')
   {
     s[strlen(s) - 1] = 0;
   }
