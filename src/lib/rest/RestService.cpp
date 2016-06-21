@@ -352,6 +352,80 @@ static void filterRelease(ParseData* parseDataP, RequestType request)
 
 /* ****************************************************************************
 *
+* compCheck - 
+*/
+static bool compCheck(int components, const std::vector<std::string>& compV, int* ixP)
+{
+  for (int ix = 0; ix < components; ++ix)
+  {
+    if (compV[ix] == "")
+    {
+      *ixP = ix;
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+/* ****************************************************************************
+*
+* compErrorDetect - 
+*/
+void compErrorDetect(int components, const std::vector<std::string>& compV, OrionError* oeP, int compErrorIx)
+{
+  std::string details = "empty component in ULR PATH";
+
+  if ((compV[0] == "v2") && (compV[1] == "entities"))
+  {
+    if (components == 4)
+    {
+      if (compV[3] == "attrs")
+      {
+        if (compV[2] == "")
+        {
+          details = "entity id length: 0, min length supported: 1";
+        }
+      }
+    }
+    else if (components == 5)
+    {
+      if (compV[3] == "attrs")
+      {
+        if (compV[2] == "")
+        {
+          details = "entity id length: 0, min length supported: 1";
+        }
+        else if (compV[4] == "")
+        {
+          details = "attribute name length: 0, min length supported: 1";
+        }
+      }
+    }
+    else if (components == 6)
+    {
+      if ((compV[3] == "attrs") && (compV[5] == "value"))
+      {
+        if (compV[2] == "")
+        {
+          details = "entity id length: 0, min length supported: 1";
+        }
+        else if (compV[4] == "")
+        {
+          details = "attribute name length: 0, min length supported: 1";
+        }
+      }
+    }
+  }
+
+  oeP->fill(SccBadRequest, details);
+}
+
+
+
+/* ****************************************************************************
+*
 * restService - 
 */
 std::string restService(ConnectionInfo* ciP, RestService* serviceV)
@@ -376,6 +450,17 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   ciP->httpStatusCode = SccOk;
 
   components = stringSplit(ciP->url, '/', compV);
+  int compErrorIx;
+  if (!compCheck(components, compV, &compErrorIx))
+  {
+    OrionError oe;
+
+    compErrorDetect(components, compV, &oe, compErrorIx);
+    alarmMgr.badInput(clientIp, oe.details);
+    ciP->httpStatusCode = SccBadRequest;
+    restReply(ciP, oe.smartRender(ciP->apiVersion));
+    return "URL PATH component error";
+  }
 
   for (unsigned int ix = 0; serviceV[ix].treat != NULL; ++ix)
   {
