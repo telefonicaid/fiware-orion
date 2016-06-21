@@ -255,15 +255,15 @@ Date: REGEX(.*)
 
 02a. /v2/entities//
 ===================
-HTTP/1.1 404 Not Found
-Content-Length: 95
+HTTP/1.1 400 Bad Request
+Content-Length: 83
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "The requested entity has not been found. Check type and id",
-    "error": "NotFound"
+    "description": "entity id length: 0, min length supported: 1",
+    "error": "BadRequest"
 }
 
 
@@ -395,15 +395,15 @@ Date: REGEX(.*)
 
 07a. /v2/types//
 ================
-HTTP/1.1 404 Not Found
-Content-Length: 58
+HTTP/1.1 400 Bad Request
+Content-Length: 85
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Entity type not found",
-    "error": "NotFound"
+    "description": "entity type length: 0, min length supported: 1",
+    "error": "BadRequest"
 }
 
 

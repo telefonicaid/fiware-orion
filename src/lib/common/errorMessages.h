@@ -26,7 +26,10 @@
 * Author: Orion dev team
 */
 
-#define MORE_MATCHING_ENT "More than one matching entity. Please refine your query"
-#define INVAL_CHAR_URI    "invalid character in URI"
+#define MORE_MATCHING_ENT   "More than one matching entity. Please refine your query"
+#define INVAL_CHAR_URI      "invalid character in URI"
+#define EMPTY_ENTITY_ID     "entity id length: 0, min length supported: 1"
+#define EMPTY_ATTR_NAME     "attribute name length: 0, min length supported: 1"
+#define EMPTY_ENTITY_TYPE   "entity type length: 0, min length supported: 1"
 
 #endif // SRC_LIB_COMMON_ERRORMESSAGES_H
