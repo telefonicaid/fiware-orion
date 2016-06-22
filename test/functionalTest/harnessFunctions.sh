@@ -942,7 +942,7 @@ function orionCurl()
   _tenant=''
   _origin=''
   _inFormat=''
-  _outFormat='--header "Accept: application/json"'  
+  _outFormat='--header "Accept: application/json"'
   _in='';
   _out='';
   _urlParams=''
