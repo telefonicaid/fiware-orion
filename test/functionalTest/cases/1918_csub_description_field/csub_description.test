@@ -227,7 +227,7 @@ Date: REGEX(.*)
 02. Get subscription (without desc)
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 434
+Content-Length: 426
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -260,7 +260,6 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
                 "idPattern": ".*",
                 "type": "Room"
             }
@@ -282,7 +281,7 @@ Date: REGEX(.*)
 04. Get subscription (see desc = one)
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 454
+Content-Length: 446
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -316,7 +315,6 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
                 "idPattern": ".*",
                 "type": "Room"
             }
@@ -338,7 +336,7 @@ Date: REGEX(.*)
 06. Get subscription (see desc = two)
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 454
+Content-Length: 446
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -372,7 +370,6 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
                 "idPattern": ".*",
                 "type": "Room"
             }
@@ -394,7 +391,7 @@ Date: REGEX(.*)
 08. Get subscription (without desc)
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 434
+Content-Length: 426
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -427,7 +424,6 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
                 "idPattern": ".*",
                 "type": "Room"
             }
@@ -450,7 +446,7 @@ Date: REGEX(.*)
 10. Get subscription (see desc = three)
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 456
+Content-Length: 448
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -484,7 +480,6 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
                 "idPattern": ".*",
                 "type": "Room"
             }
@@ -497,7 +492,7 @@ Date: REGEX(.*)
 11. Get subscriptions list (first csub without desc, second with desc = three)
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 893
+Content-Length: 877
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -531,7 +526,6 @@ Date: REGEX(.*)
             },
             "entities": [
                 {
-                    "id": "",
                     "idPattern": ".*",
                     "type": "Room"
                 }
@@ -568,7 +562,6 @@ Date: REGEX(.*)
             },
             "entities": [
                 {
-                    "id": "",
                     "idPattern": ".*",
                     "type": "Room"
                 }
