@@ -22,9 +22,14 @@
 *
 * Author: developer
 */
-
 #include "HttpStatusCode.h"
 
+
+
+/* ****************************************************************************
+*
+* httpStatusCodeString - 
+*/
 std::string httpStatusCodeString(HttpStatusCode code)
 {
   switch (code)

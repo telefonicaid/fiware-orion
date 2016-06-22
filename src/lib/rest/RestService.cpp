@@ -34,6 +34,7 @@
 #include "common/statistics.h"
 #include "common/string.h"
 #include "common/limits.h"
+#include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/ParseData.h"
@@ -352,6 +353,89 @@ static void filterRelease(ParseData* parseDataP, RequestType request)
 
 /* ****************************************************************************
 *
+* compCheck - 
+*/
+static bool compCheck(int components, const std::vector<std::string>& compV)
+{
+  for (int ix = 0; ix < components; ++ix)
+  {
+    if (compV[ix] == "")
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+/* ****************************************************************************
+*
+* compErrorDetect - 
+*/
+static bool compErrorDetect
+(
+  int                              components,
+  const std::vector<std::string>&  compV,
+  OrionError*                      oeP
+)
+{
+  std::string  details; 
+
+  if ((compV[0] == "v2") && (compV[1] == "entities"))
+  {
+    if ((components == 4) && (compV[3] == "attrs"))  // URL: /v2/entities/<entity-id>/attrs
+    {
+      std::string entityId = compV[2];
+
+      if (entityId == "")
+      {
+        details = EMPTY_ENTITY_ID;
+      }
+    }
+    else if ((components == 5) && (compV[3] == "attrs"))  // URL: /v2/entities/<entity-id>/attrs/<attr-name>
+    {
+      std::string entityId = compV[2];
+      std::string attrName = compV[4];
+
+      if (entityId == "")
+      {
+        details = EMPTY_ENTITY_ID;
+      }
+      else if (attrName == "")
+      {
+        details = EMPTY_ATTR_NAME;
+      }
+    }
+    else if ((components == 6) && (compV[3] == "attrs") && (compV[5] == "value")) // URL: /v2/entities/<entity-id>/attrs/<attr-name>/value
+    {
+      std::string entityId = compV[2];
+      std::string attrName = compV[4];
+
+      if (entityId == "")
+      {
+        details = EMPTY_ENTITY_ID;
+      }
+      else if (attrName == "")
+      {
+        details = EMPTY_ATTR_NAME;
+      }
+    }
+  }
+
+  if (details != "")
+  {
+    oeP->fill(SccBadRequest, details);
+    return true;  // means: this was an error, make the broker stop this request
+  }
+  
+  return false;  // No special error detected, let the broker continue with the request to detect the error later on
+}
+
+
+
+/* ****************************************************************************
+*
 * restService - 
 */
 std::string restService(ConnectionInfo* ciP, RestService* serviceV)
@@ -376,6 +460,18 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   ciP->httpStatusCode = SccOk;
 
   components = stringSplit(ciP->url, '/', compV);
+  if (!compCheck(components, compV))
+  {
+    OrionError oe;
+
+    if (compErrorDetect(components, compV, &oe))
+    {
+      alarmMgr.badInput(clientIp, oe.details);
+      ciP->httpStatusCode = SccBadRequest;
+      restReply(ciP, oe.smartRender(ciP->apiVersion));
+      return "URL PATH component error";
+    }
+  }
 
   for (unsigned int ix = 0; serviceV[ix].treat != NULL; ++ix)
   {

@@ -113,13 +113,13 @@ echo
 01. POST /v2/entities/E1 A (and check 404 Not Found)
 ====================================================
 HTTP/1.1 404 Not Found
-Content-Length: 58
+Content-Length: 95
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Entity does not exist",
+    "description": "The requested entity has not been found. Check type and id",
     "error": "NotFound"
 }
 

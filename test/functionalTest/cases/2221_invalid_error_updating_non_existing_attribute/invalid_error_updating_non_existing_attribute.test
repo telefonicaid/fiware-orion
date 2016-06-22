@@ -21,75 +21,78 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Entity not found in lying context provider, specific attr registered
+Replacing non existing attribute
 
 --SHELL-INIT--
 dbInit CB
-dbInit CP1
 brokerStart CB
-brokerStart CP1
 
 --SHELL--
 
 #
-# 01. Register E1/T1/A1 in CB, provApp: CP1
-# 02. Modify E1/A1 in CP1 via CB, using PUT /v2/entities/E1/attrs/A1?type=T1, see error
+# 01. Create E1/A1
+# 02. Attempt to replace E1/A2, see error about attribute not found
+# 03. Attempt to replace E2/A2, see another error, about the entity
 #
 
-echo "01. Register E1/T1/A1 in CB, provApp: CP1"
-echo "========================================="
+echo "01. Create E1/A1"
+echo "================"
 payload='{
-  "contextRegistrations": [
-  {
-    "entities": [
-      {
-         "type": "T1",
-         "isPattern": "false",
-         "id": "E1"
-      }
-    ],
-    "attributes": [
-      {
-        "name": "A1",
-        "type": "string",
-        "isDomain": "false"
-      }
-    ],
-    "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
-    }
- ],
- "duration": "P1M"
+  "id": "E1",
+  "type": "T1",
+  "A1": {
+    "type": "at1",
+    "value": "01"
+  }
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload"
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
-echo "02. Modify E1/A1 in CP1 via CB, using PUT /v2/entities/E1/attrs/A1?type=T1, see error"
-echo "====================================================================================="
-payload='{ "value": "05" }'
-orionCurl --url '/v2/entities/E1/attrs/A1?type=T1' --payload "$payload" -X PUT
+echo "02. Attempt to replace E1/A2, see error about attribute not found"
+echo "================================================================="
+payload='{ "value": false }'
+orionCurl --url /v2/entities/E1/attrs/A2 --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "03. Attempt to replace E2/A2, see another error, about the entity"
+echo "================================================================="
+payload='{ "value": false }'
+orionCurl --url /v2/entities/E2/attrs/A2 --payload "$payload" -X PUT
 echo
 echo
 
 
 --REGEXPECT--
-01. Register E1/T1/A1 in CB, provApp: CP1
-=========================================
-HTTP/1.1 200 OK
-Content-Length: 74
+01. Create E1/A1
+================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Attempt to replace E1/A2, see error about attribute not found
+=================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 79
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "P1M",
-    "registrationId": "REGEX([0-9a-f]{24})"
+    "description": "The entity does not have such an attribute",
+    "error": "NotFound"
 }
 
 
-02. Modify E1/A1 in CP1 via CB, using PUT /v2/entities/E1/attrs/A1?type=T1, see error
-=====================================================================================
+03. Attempt to replace E2/A2, see another error, about the entity 
+=================================================================
 HTTP/1.1 404 Not Found
 Content-Length: 95
 Content-Type: application/json
@@ -104,6 +107,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-brokerStop CP1
 dbDrop CB
-dbDrop CP1

@@ -1600,7 +1600,8 @@ A `subject` contains the following subfields:
     + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
       time, but at least one of them must be present.
     + `type`: Type of the affected entities (optional).
-+ `condition`: Condition to trigger notifications. It has two optional properties:
++ `condition`: Condition to trigger notifications. This field is optional and it may contain two
+  properties, both optional:
     + `attrs`: array of attribute names
     + `expression`: an expression composed of `q`, `georel`, `geometry` and `coords` (see "List
        entities" operation above about this field).
