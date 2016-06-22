@@ -941,7 +941,7 @@ function orionCurl()
   _noPayloadCheck='off'
   _tenant=''
   _origin=''
-  _inFormat='--header "Content-Type: application/json"'
+  _inFormat=''
   _outFormat='--header "Accept: application/json"'
   _in='';
   _out='';
@@ -978,6 +978,11 @@ function orionCurl()
     fi
     shift
   done
+
+  if [ "$_payload" != "" ]
+  then
+    _inFormat='--header "Content-Type: application/json"'
+  fi
 
   #
   # Check the parameters
