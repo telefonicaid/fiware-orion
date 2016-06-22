@@ -1128,6 +1128,21 @@ static int connectionTreat
   }
 
   //
+  // Check Content-Type and Content-Length for GET/DELETE requests
+  //
+  if ((ciP->httpHeaders.contentType != "") && (ciP->httpHeaders.contentLength == 0) && ((ciP->verb == GET) || (ciP->verb == DELETE)))
+  {
+    const char*  details = "Content-Type set but no payload supplied in GET/DELETE request";
+    OrionError   oe(SccBadRequest, details);
+
+    ciP->httpStatusCode = oe.code;
+    alarmMgr.badInput(clientIp, details);
+    restReply(ciP, oe.smartRender(ciP->version));
+    return MHD_YES;
+  }
+
+
+  //
   // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with two exceptions.
   //
   // - Old log requests  (URL contains '/log/')
