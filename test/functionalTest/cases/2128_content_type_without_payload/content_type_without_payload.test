@@ -118,13 +118,13 @@ Date: REGEX(.*)
 04. Send a GET with Content-Type application/json, see error 400
 ================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 101
+Content-Length: 131
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Content-Type set but no payload supplied in GET/DELETE request",
+    "description": "Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden",
     "error": "BadRequest"
 }
 
@@ -132,13 +132,13 @@ Date: REGEX(.*)
 05. Send a DELETE with Content-Type application/json, see error 400
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 101
+Content-Length: 131
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Content-Type set but no payload supplied in GET/DELETE request",
+    "description": "Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden",
     "error": "BadRequest"
 }
 

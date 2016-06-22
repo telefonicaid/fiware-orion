@@ -1132,7 +1132,7 @@ static int connectionTreat
   //
   if ((ciP->httpHeaders.contentType != "") && (ciP->httpHeaders.contentLength == 0) && ((ciP->verb == GET) || (ciP->verb == DELETE)))
   {
-    const char*  details = "Content-Type set but no payload supplied in GET/DELETE request";
+    const char*  details = "Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden";
     OrionError   oe(SccBadRequest, details);
 
     ciP->httpStatusCode = oe.code;
