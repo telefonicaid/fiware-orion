@@ -27,6 +27,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/errorMessages.h"
 
 #include "rest/OrionError.h"
 
@@ -41,7 +42,7 @@
 *
 * getEntityType -
 *
-* GET /v2/type/<entityType>
+* GET /v2/types/<entityType>
 *
 * Payload In:  None
 * Payload Out: EntityTypeResponse
@@ -57,6 +58,13 @@ std::string getEntityType
   EntityTypeResponse  response;
   std::string         entityTypeName = compV[2];
   std::string         answer;
+
+  if (entityTypeName == "")
+  {
+    OrionError oe(SccBadRequest, EMPTY_ENTITY_TYPE, "BadRequest");
+    ciP->httpStatusCode = oe.code;
+    return oe.toJson();
+  }
 
   TIMED_MONGO(mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion));
 

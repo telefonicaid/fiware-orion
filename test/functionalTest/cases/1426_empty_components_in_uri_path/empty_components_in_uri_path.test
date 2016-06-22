@@ -1,0 +1,314 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Empty components in URI PATH
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Empty entity-id: GET    /v2/entities//attrs/A1
+# 02. Empty entity-id: PUT    /v2/entities//attrs/A1
+# 03. Empty entity-id: DELETE /v2/entities//attrs/A1
+# 04. Empty entity-id: GET    /v2/entities//attrs
+# 05. Empty entity-id: POST   /v2/entities//attrs
+# 06. Empty entity-id: PUT    /v2/entities//attrs
+# 07. Empty entity-id: PATCH  /v2/entities//attrs
+# 08. Empty entity-id: GET    /v2/entities//attrs/A1/value
+# 09. Empty entity-id: PUT    /v2/entities//attrs/A1/value
+# 10. Empty attr-name: GET    /v2/entities/E1/attrs//value
+# 11. Empty attr-name: PUT    /v2/entities/E1/attrs//value
+#
+# FIXME P1: To be implemented, perhaps, some time in the future
+# 00. Empty entity-id:   /v1/registry/contextEntities//attributes
+# 00. Empty entity-id:   /v1/registry/contextEntities//attributes/A1
+# 00. Empty entity-type: /v1/registry/contextEntityTypes//attributes
+# 00. Empty entity-type: /v1/registry/contextEntityTypes//attributes/A1
+# 00. Empty entity-id:   /v1/contextEntities//attributes
+# 00. Empty entity-id:   /v1/contextEntities//attributes/A1
+# 00. Empty entity-id:   /v1/contextEntities//attributes/A1/ID
+# 00. Empty attr-name:   /v1/contextEntities/E1/attributes//ID
+# 00. Empty entity-type: /v1/contextEntityTypes//attributes
+# 00. Empty entity-type: /v1/contextEntityTypes//attributes/A1
+# 00. Empty entity-type: /v1/contextEntities/type//id/ID
+# 00. Empty entity-type: /v1/contextEntities/type//id/ID/attributes/A1
+# 00. Empty metaID:      /v1/contextEntities/type/T1/id//attributes/A1
+# 00. Empty entity-type: /v1/contextEntities/type//id/ID/attributes/A1/VALUE
+# 00. Empty metaID:      /v1/contextEntities/type/T1/id//attributes/A1/VALUE
+# 00. Empty attr-name:   /v1/contextEntities/type/T1/id/ID/attributes//VALUE
+# 00. Empty entity-type: /v1/registry/contextEntities/type//id/ID
+# 00. Empty entity-type: /v1/registry/contextEntities/type//id/ID/attributes/A1
+# 00. Empty metaID:      /v1/registry/contextEntities/type/T1/id//attributes/A1
+#
+
+echo "01. Empty entity-id: GET    /v2/entities//attrs/A1"
+echo "=================================================="
+orionCurl --url /v2/entities//attrs/A1
+echo
+echo
+
+
+echo "02. Empty entity-id: PUT    /v2/entities//attrs/A1"
+echo "=================================================="
+payload='{ "value": "05" }'
+orionCurl --url /v2/entities//attrs/A1 --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "03. Empty entity-id: DELETE /v2/entities//attrs/A1"
+echo "=================================================="
+orionCurl --url /v2/entities//attrs/A1 -X DELETE
+echo
+echo
+
+
+echo "04. Empty entity-id: GET    /v2/entities//attrs"
+echo "==============================================="
+orionCurl --url /v2/entities//attrs/ 
+echo
+echo
+
+
+echo "05. Empty entity-id: POST   /v2/entities//attrs"
+echo "==============================================="
+payload='{ "value": "05" }'
+orionCurl --url /v2/entities//attrs/ --payload "$payload"
+echo
+echo
+
+echo "06. Empty entity-id: PUT    /v2/entities//attrs"
+echo "==============================================="
+payload='{
+  "A1": {
+    "value": "05"
+  }
+}'
+orionCurl --url /v2/entities//attrs/ --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "07. Empty entity-id: PATCH  /v2/entities//attrs"
+echo "==============================================="
+payload='{
+  "A1": {
+    "value": "05"
+  }
+}'
+orionCurl --url /v2/entities//attrs/ --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "08. Empty entity-id: GET    /v2/entities//attrs/A1/value"
+echo "========================================================"
+orionCurl --url /v2/entities//attrs/A1/value 
+echo
+echo
+
+
+echo "09. Empty entity-id: PUT    /v2/entities//attrs/A1/value"
+echo "========================================================"
+payload='{ "value": "05" }'
+orionCurl --url /v2/entities//attrs/A1/value --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "10. Empty attr-name: GET    /v2/entities/E1/attrs//value"
+echo "========================================================"
+orionCurl --url /v2/entities/E1/attrs//value 
+echo
+echo
+
+
+echo "11. Empty attr-name: PUT    /v2/entities/E1/attrs//value"
+echo "========================================================"
+payload='{ "value": "05" }'
+orionCurl --url /v2/entities/E1/attrs//value --payload "$payload" -X PUT
+echo
+echo
+
+
+--REGEXPECT--
+01. Empty entity-id: GET    /v2/entities//attrs/A1
+==================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 83
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity id length: 0, min length supported: 1",
+    "error": "BadRequest"
+}
+
+
+02. Empty entity-id: PUT    /v2/entities//attrs/A1
+==================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 83
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity id length: 0, min length supported: 1",
+    "error": "BadRequest"
+}
+
+
+03. Empty entity-id: DELETE /v2/entities//attrs/A1
+==================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 83
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity id length: 0, min length supported: 1",
+    "error": "BadRequest"
+}
+
+
+04. Empty entity-id: GET    /v2/entities//attrs
+===============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 83
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity id length: 0, min length supported: 1",
+    "error": "BadRequest"
+}
+
+
+05. Empty entity-id: POST   /v2/entities//attrs
+===============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 83
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity id length: 0, min length supported: 1",
+    "error": "BadRequest"
+}
+
+
+06. Empty entity-id: PUT    /v2/entities//attrs
+===============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 83
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity id length: 0, min length supported: 1",
+    "error": "BadRequest"
+}
+
+
+07. Empty entity-id: PATCH  /v2/entities//attrs
+===============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 83
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity id length: 0, min length supported: 1",
+    "error": "BadRequest"
+}
+
+
+08. Empty entity-id: GET    /v2/entities//attrs/A1/value
+========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 83
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity id length: 0, min length supported: 1",
+    "error": "BadRequest"
+}
+
+
+09. Empty entity-id: PUT    /v2/entities//attrs/A1/value
+========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 83
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity id length: 0, min length supported: 1",
+    "error": "BadRequest"
+}
+
+
+10. Empty attr-name: GET    /v2/entities/E1/attrs//value
+========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 88
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "attribute name length: 0, min length supported: 1",
+    "error": "BadRequest"
+}
+
+
+11. Empty attr-name: PUT    /v2/entities/E1/attrs//value
+========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 88
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "attribute name length: 0, min length supported: 1",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

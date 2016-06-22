@@ -36,6 +36,7 @@
 #define SERVICE_NAME_MAX_LEN_STRING    "50"
 
 
+
 /* ****************************************************************************
 *
 * Service Path definitions - 
@@ -55,6 +56,7 @@
 #define SERVICE_PATH_MAX_LEVELS           10
 #define SERVICE_PATH_MAX_COMPONENT_LEN    50
 #define SERVICE_PATH_MAX_TOTAL            (((SERVICE_PATH_MAX_COMPONENT_LEN + 1) * SERVICE_PATH_MAX_LEVELS) + 2) * SERVICE_PATH_MAX_COMPONENTS
+
 
 
 /* ****************************************************************************
@@ -77,11 +79,13 @@
 #define MAX_DYN_MSG_SIZE (8 * 1024 * 1024)     // 8 MB  (maximum length of the HTTP request dynamic buffer)
 
 
+
 /* ****************************************************************************
 *
 * PAYLOAD_MAX_SIZE - 
 */
 #define PAYLOAD_MAX_SIZE   (1 * 1024 * 1024) // 1 MB Maximum size of the payload
+
 
 
 /* ****************************************************************************
@@ -92,6 +96,7 @@
 #define  LOCAL_IP_V4  "0.0.0.0"
 
 
+
 /* ****************************************************************************
 *
 * STATIC_BUFFER_SIZE - to avoid mallocs for "smaller" requests
@@ -99,13 +104,15 @@
 #define STATIC_BUFFER_SIZE (32 * 1024) // 32 KB 
 
 
+
 /* ****************************************************************************
 *
 * CONSTANTS RESTINIT - 
 */ 
-#define   DEFAULT_CONNECTION_MEM  	64   
-#define   DEFAULT_MAX_CONNECTIONS   	128   
-#define   DEFAULT_MHD_THREAD_POOLSIZE   128 
+#define   DEFAULT_CONNECTION_MEM        64
+#define   DEFAULT_MAX_CONNECTIONS       128
+#define   DEFAULT_MHD_THREAD_POOLSIZE   128
+
 
 
 /* ****************************************************************************
@@ -117,11 +124,13 @@
 #define HTTP_HEADER_HOST_MAX_LENGTH         256
 
 
+
 /* ****************************************************************************
 *
 * Default timeout - 5000 milliseconds
 */
 #define DEFAULT_TIMEOUT     5000
+
 
 
 /* ****************************************************************************
@@ -131,11 +140,13 @@
 #define MAX_PAGINATION_LIMIT            "1000"
 
 
+
 /* ****************************************************************************
 *
 * MAX_LEN_IP - 
 */
 #define MAX_LEN_IP  64
+
 
 
 /* ****************************************************************************
@@ -144,6 +155,7 @@
 */
 #define DEFAULT_PAGINATION_LIMIT        "20"
 #define DEFAULT_PAGINATION_LIMIT_INT     20 
+
 
 
 /* ****************************************************************************
@@ -155,17 +167,19 @@
 
 
 /* ****************************************************************************
- *
- * MAX_ID_LEN - max length of id and type for entities, attributes and metadata
- */
+*
+* MAX_ID_LEN - max length of id and type for entities, attributes and metadata
+*/
 #ifndef MAX_ID_LEN
 #define MAX_ID_LEN 256
 #endif
 
+
+
 /* ****************************************************************************
- *
- * MIN_ID_LEN - min length of id and type for entities, attributes and metadata
- */
+*
+* MIN_ID_LEN - min length of id and type for entities, attributes and metadata
+*/
 #ifndef MIN_ID_LEN
 #define MIN_ID_LEN 1
 #endif
@@ -177,7 +191,5 @@
 * MAX_DESCRIPTION_LENGTH -
 */
 #define MAX_DESCRIPTION_LENGTH  1024
-
-
 
 #endif  // SRC_LIB_COMMON_LIMITS_H_
