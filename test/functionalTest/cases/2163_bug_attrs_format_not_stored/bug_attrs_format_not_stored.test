@@ -159,7 +159,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID (and get keyValues)
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 300
+Content-Length: 282
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -185,9 +185,7 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
-                "idPattern": ".*",
-                "type": ""
+                "idPattern": ".*"
             }
         ]
     }
@@ -206,7 +204,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID (and get normalized)
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 301
+Content-Length: 283
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -232,9 +230,7 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
-                "idPattern": ".*",
-                "type": ""
+                "idPattern": ".*"
             }
         ]
     }
@@ -253,7 +249,7 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/ID (and get values)
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 297
+Content-Length: 279
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -279,9 +275,7 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
-                "idPattern": ".*",
-                "type": ""
+                "idPattern": ".*"
             }
         ]
     }
