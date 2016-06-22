@@ -161,7 +161,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions for 1 servicepath
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 351
+Content-Length: 321
 Content-Type: application/json
 Fiware-Total-Count: 1
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -191,12 +191,10 @@ Date: REGEX(.*)
             "entities": [
                 {
                     "id": "MyCar",
-                    "idPattern": "",
                     "type": "Car"
                 },
                 {
                     "id": "OtherCar",
-                    "idPattern": "",
                     "type": "Room"
                 }
             ]
@@ -208,7 +206,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions for /#
 ================================
 HTTP/1.1 200 OK
-Content-Length: 767
+Content-Length: 707
 Content-Type: application/json
 Fiware-Total-Count: 2
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -240,12 +238,10 @@ Date: REGEX(.*)
             "entities": [
                 {
                     "id": "ConferenceRoom",
-                    "idPattern": "",
                     "type": "Room"
                 },
                 {
                     "id": "OfficeRoom",
-                    "idPattern": "",
                     "type": "Room"
                 }
             ]
@@ -275,12 +271,10 @@ Date: REGEX(.*)
             "entities": [
                 {
                     "id": "MyCar",
-                    "idPattern": "",
                     "type": "Car"
                 },
                 {
                     "id": "OtherCar",
-                    "idPattern": "",
                     "type": "Room"
                 }
             ]

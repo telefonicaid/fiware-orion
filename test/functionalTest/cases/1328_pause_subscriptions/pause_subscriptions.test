@@ -242,7 +242,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID1 and see status "active"
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 410
+Content-Length: 402
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -272,7 +272,6 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
                 "idPattern": ".*",
                 "type": "Room"
             }
@@ -294,7 +293,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID1 and see status "inactive"
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 412
+Content-Length: 404
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -324,7 +323,6 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
                 "idPattern": ".*",
                 "type": "Room"
             }
@@ -347,7 +345,7 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/ID2 and see status "inactive"
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 435
+Content-Length: 427
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -380,7 +378,6 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
                 "idPattern": ".*",
                 "type": "Car"
             }
@@ -402,7 +399,7 @@ Date: REGEX(.*)
 08. GET /v2/subscriptions/ID2 and see status "active"
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 433
+Content-Length: 425
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -435,7 +432,6 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
                 "idPattern": ".*",
                 "type": "Car"
             }
@@ -457,7 +453,7 @@ Date: REGEX(.*)
 10. GET /v2/subscriptions/ID2 and see status "expired"
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 434
+Content-Length: 426
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -490,7 +486,6 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
                 "idPattern": ".*",
                 "type": "Car"
             }
@@ -512,7 +507,7 @@ Date: REGEX(.*)
 12. GET /v2/subscriptions/ID2 and see status "expired"
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 434
+Content-Length: 426
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -545,7 +540,6 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
                 "idPattern": ".*",
                 "type": "Car"
             }
@@ -567,7 +561,7 @@ Date: REGEX(.*)
 14. GET /v2/subscriptions/ID2 and see status "inactive"
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 435
+Content-Length: 427
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -600,7 +594,6 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
                 "idPattern": ".*",
                 "type": "Car"
             }

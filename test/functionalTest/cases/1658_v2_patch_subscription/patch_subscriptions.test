@@ -250,7 +250,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 434
+Content-Length: 426
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -283,7 +283,6 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
                 "idPattern": ".*",
                 "type": "Room"
             }
@@ -305,7 +304,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 462
+Content-Length: 454
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -340,7 +339,6 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
                 "idPattern": "xxx.*",
                 "type": "special"
             }
@@ -362,7 +360,7 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 459
+Content-Length: 451
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -397,7 +395,6 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
                 "idPattern": "xxx.*",
                 "type": "special"
             }
@@ -419,7 +416,7 @@ Date: REGEX(.*)
 08. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 460
+Content-Length: 452
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -454,7 +451,6 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
                 "idPattern": "xxx.*",
                 "type": "special"
             }
@@ -476,7 +472,7 @@ Date: REGEX(.*)
 10. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 459
+Content-Length: 451
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -511,7 +507,6 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
                 "idPattern": "xxx.*",
                 "type": "special"
             }
@@ -533,7 +528,7 @@ Date: REGEX(.*)
 12. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 434
+Content-Length: 426
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -566,7 +561,6 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "",
                 "idPattern": ".*",
                 "type": "Room"
             }

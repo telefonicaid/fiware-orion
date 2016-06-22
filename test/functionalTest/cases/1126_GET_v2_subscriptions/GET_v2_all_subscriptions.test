@@ -166,7 +166,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions?options=count
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 767
+Content-Length: 707
 Content-Type: application/json
 Fiware-Total-Count: 2
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -198,12 +198,10 @@ Date: REGEX(.*)
             "entities": [
                 {
                     "id": "ConferenceRoom",
-                    "idPattern": "",
                     "type": "Room"
                 },
                 {
                     "id": "OfficeRoom",
-                    "idPattern": "",
                     "type": "Room"
                 }
             ]
@@ -233,12 +231,10 @@ Date: REGEX(.*)
             "entities": [
                 {
                     "id": "MyCar",
-                    "idPattern": "",
                     "type": "Car"
                 },
                 {
                     "id": "OtherCar",
-                    "idPattern": "",
                     "type": "Room"
                 }
             ]
@@ -260,7 +256,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions (now seeing the timesSent and lastNotification in one sub)
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 826
+Content-Length: 766
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -291,12 +287,10 @@ Date: REGEX(.*)
             "entities": [
                 {
                     "id": "ConferenceRoom",
-                    "idPattern": "",
                     "type": "Room"
                 },
                 {
                     "id": "OfficeRoom",
-                    "idPattern": "",
                     "type": "Room"
                 }
             ]
@@ -328,12 +322,10 @@ Date: REGEX(.*)
             "entities": [
                 {
                     "id": "MyCar",
-                    "idPattern": "",
                     "type": "Car"
                 },
                 {
                     "id": "OtherCar",
-                    "idPattern": "",
                     "type": "Room"
                 }
             ]

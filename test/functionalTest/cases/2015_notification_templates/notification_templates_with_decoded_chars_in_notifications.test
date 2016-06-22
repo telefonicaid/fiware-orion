@@ -132,7 +132,7 @@ A string with double-quotes: "a1"=======================================
 04. GET the subscription to see the encoded chars in custom payload
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 440
+Content-Length: 415
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -165,9 +165,7 @@ Date: REGEX(.*)
         },
         "entities": [
             {
-                "id": "E1",
-                "idPattern": "",
-                "type": ""
+                "id": "E1"
             }
         ]
     }
