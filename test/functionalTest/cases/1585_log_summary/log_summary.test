@@ -169,11 +169,16 @@ Date: REGEX(.*)
 03. GETT /v2/entities - bad verb
 ================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
+Content-Length: 63
+Content-Type: application/json
 Allow: POST, GET
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
 
 
 04. POST /v2/entities without payload

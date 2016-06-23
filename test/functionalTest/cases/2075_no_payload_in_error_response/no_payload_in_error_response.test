@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-DEL Entity V2 /attrs (invalid method)
+Payload in error responses with 405
 
 --SHELL-INIT--
 dbInit CB
@@ -30,63 +30,87 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. POST /v2/entities to create 8787GHY entity
-# 02. DELETE /v2/entities/8787GHY/attrs
+# 01. PATCH /v2/entities/E1, see 405 with payload
+# 02. POST /v2/entities/E1, see 405 with payload
+# 03. PUT /v2/entities/E1, see 405 with payload
 #
 
-echo "01. POST /v2/entities to create 8787GHY entity"
-echo "=============================================="
+echo "01. PATCH /v2/entities/E1, see 405 with payload"
+echo "==============================================="
 payload='{
-  "id": "8787GHY",
-  "type": "Car",
-  "brand":{
-    "type": "string",
-    "value": "Mercedes Benz"
-  },
-  "speed":{
-    "type": "number",
-    "value" : "150"
-  },
-  "plateCountry": {
-    "value" : "ES"
-  },
-  "madeInCountry": {
-    "value" : "DE"
-  },
-  "model" : {
-    "type": "myString",
-    "value" : "Klasse C"
+  "A1": 
+  {
+    "value": 12
   }
 }'
-orionCurl --url /v2/entities --payload "$payload"
+orionCurl --url /v2/entities/E1 --payload "$payload" -X PATCH
 echo
 echo
 
 
-echo "02. DELETE /v2/entities/8787GHY/attrs"
-echo "====================================="
-orionCurl --url /v2/entities/8787GHY/attrs -X DELETE
+echo "02. POST /v2/entities/E1, see 405 with payload"
+echo "=============================================="
+payload='{
+  "A1": 
+  {
+    "value": 12
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload"
+echo
+echo
+
+
+echo "03. PUT /v2/entities/E1, see 405 with payload"
+echo "============================================="
+payload='{
+  "A1": 
+  {
+    "value": 12
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" -X PUT
 echo
 echo
 
 
 --REGEXPECT--
-01. POST /v2/entities to create 8787GHY entity
-==============================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/8787GHY?type=Car
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-02. DELETE /v2/entities/8787GHY/attrs
-=====================================
+01. PATCH /v2/entities/E1, see 405 with payload
+===============================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 63
 Content-Type: application/json
-Allow: GET, PATCH, POST, PUT
+Allow: GET, DELETE
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
+
+
+02. POST /v2/entities/E1, see 405 with payload
+==============================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 63
+Content-Type: application/json
+Allow: GET, DELETE
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
+
+
+03. PUT /v2/entities/E1, see 405 with payload
+=============================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 63
+Content-Type: application/json
+Allow: GET, DELETE
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

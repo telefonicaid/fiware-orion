@@ -27,11 +27,13 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/restReply.h"
+#include "rest/OrionError.h"
 #include "serviceRoutines/badVerbPostOnly.h"
 
 
@@ -48,7 +50,8 @@ std::string badVerbPostOnly
   ParseData*                 parseDataP
 )
 {
-  std::string details = std::string("bad verb for url '") + ciP->url + "', method '" + ciP->method + "'";
+  std::string  details = std::string("bad verb for url '") + ciP->url + "', method '" + ciP->method + "'";
+  OrionError   oe(SccBadVerb, BAD_VERB);
 
   ciP->httpHeader.push_back("Allow");
   ciP->httpHeaderValue.push_back("POST");
@@ -56,5 +59,5 @@ std::string badVerbPostOnly
 
   alarmMgr.badInput(clientIp, details);
 
-  return "";
+  return (ciP->apiVersion == "v1")? "" :  oe.smartRender(ciP->apiVersion);
 }
