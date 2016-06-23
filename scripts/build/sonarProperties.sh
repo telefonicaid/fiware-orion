@@ -42,7 +42,6 @@ echo sonar.language=c++
 echo sonar.exclusions=**/lib/parseArgs/**,**/lib/logMsg/**,/usr/**
 ### TESTS 
 echo sonar.cxx.xunit.reportPath=BUILD_UNITTEST/unit_test.xml
-#echo sonar.cxx.coverage.reportPath=coverage_sonar.xml
 echo sonar.cxx.coverage.reportPath=coverage.xml
 echo sonar.cxx.cppcheck.reportPath=cppcheck-result.xml
 ################################ SPECIFIC PROPERTIES:END"
