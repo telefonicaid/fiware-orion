@@ -101,19 +101,29 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
 
         /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
         out += JSON_STR("type") + ":" + ((type != "")? JSON_STR(type) : JSON_STR(DEFAULT_TYPE));
-
-        if (attributeVector.size() != 0)
-        {
-          out += ",";
-        }
       }
 
+      std::string attrsOut;
       if (attributeVector.size() != 0)
       {
         std::vector<std::string> attrsFilter;
         stringSplit(ciP->uriParam["attrs"], ',', attrsFilter);
 
-        out += attributeVector.toJson(true, renderFormat, attrsFilter);
+        attrsOut += attributeVector.toJson(true, renderFormat, attrsFilter);
+      }
+
+      // Note that just attributeVector.size() != 0 (used in previous versions) cannot be used
+      // as ciP->uriParam["attrs"] filter could remove all the attributes
+      if (attrsOut != "")
+      {
+        if (renderId)
+        {
+          out +=  "," + attrsOut;
+        }
+        else
+        {
+          out += attrsOut;
+        }
       }
 
       out += "}";

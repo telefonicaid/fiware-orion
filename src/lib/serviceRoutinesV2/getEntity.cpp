@@ -63,7 +63,6 @@ std::string getEntity
   ParseData*                 parseDataP
 )
 {
-   std::string attrs     = ciP->uriParam["attrs"];
    std::string type      = ciP->uriParam["type"];
    std::string entityId  = compV[2];
 
@@ -83,17 +82,6 @@ std::string getEntity
 
   // Fill in QueryContextRequest
   parseDataP->qcr.res.fill(entityId, type, "false", EntityTypeEmptyOrNotEmpty, "");
-
-  if (attrs != "")
-  {
-    std::vector<std::string> attrsV;
-
-    stringSplit(attrs, ',', attrsV);
-    for (std::vector<std::string>::const_iterator it = attrsV.begin(); it != attrsV.end(); ++it)
-    {
-      parseDataP->qcr.res.attributeList.push_back_if_absent(*it);
-    }
-  }
 
   // Call standard op postQueryContext
   postQueryContext(ciP, components, compV, parseDataP);
