@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Attribute Values And Multiple Accept Types For Bool Attribute
+Attribute Values And Multiple Accept Types For Vector Attribute
 
 --SHELL-INIT--
 dbInit CB

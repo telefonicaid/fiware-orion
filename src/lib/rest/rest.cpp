@@ -1156,11 +1156,6 @@ static int connectionTreat
 
     char tenant[SERVICE_NAME_MAX_LEN + 1];
     ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
-//    ciP->outMimeType          = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
-//    if (ciP->outMimeType == NOMIMETYPE)
-//    {
-//      ciP->outMimeType = JSON; // JSON is default output mimeType
-//    }
 
     ciP->outMimeType = mimeTypeSelect(ciP, "Normal");
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
