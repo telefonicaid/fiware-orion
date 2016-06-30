@@ -404,8 +404,11 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
 
 
   //
-  // And now the accept-extensions  (ignored for now)
+  // And now the accept-extensions  (which is ignored for now)
+  // FIXME P4: Implement treatment of accept-extensions
   //
+
+  // push the accept header and return true
   headerP->acceptHeaderV.push_back(acceptHeaderP);
   return true;
 }
@@ -454,11 +457,6 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
 
   acceptItemParse(ciP, itemStart);
 
-//  if (ciP->acceptHeaderError != "")
-//  {
-//    ciP->httpStatusCode    = SccNotAcceptable;
-//  }
-  
   if ((ciP->httpHeaders.acceptHeaderV.size() == 0) && (ciP->acceptHeaderError == ""))
   {
     ciP->httpStatusCode    = SccNotAcceptable;
