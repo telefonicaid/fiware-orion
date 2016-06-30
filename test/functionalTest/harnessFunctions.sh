@@ -939,6 +939,7 @@ function orionCurl()
   _xtra=''
   _headers=''
   _noPayloadCheck='off'
+  _forcedNoPayloadCheck='off'
   _tenant=''
   _origin=''
   _inFormat=''
@@ -960,7 +961,7 @@ function orionCurl()
     elif [ "$1" == "--urlParams" ]; then       _urlParams=$2; shift;
     elif [ "$1" == "-X" ]; then                _method="-X $2"; shift;
     elif [ "$1" == "--payload" ]; then         _payload=$2; shift;
-    elif [ "$1" == "--noPayloadCheck" ]; then  _noPayloadCheck='on';
+    elif [ "$1" == "--noPayloadCheck" ]; then  _noPayloadCheck='on'; _forcedNoPayloadCheck='on'
     elif [ "$1" == "--payloadCheck" ]; then    _payloadCheck=$2; _noPayloadCheck='off'; shift;
     elif [ "$1" == "--servicePath" ]; then     _servicePath='--header "Fiware-ServicePath: '${2}'"'; shift;
     elif [ "$1" == "--tenant" ]; then          _tenant='--header "Fiware-Service: '${2}'"'; shift;
@@ -1026,6 +1027,7 @@ function orionCurl()
   elif [ "$_out" == "json" ];  then _outFormat='--header "Accept: application/json"'; payloadCheckFormat='json'
   elif [ "$_out" == "text" ];  then _outFormat='--header "Accept: text/plain"'; _noPayloadCheck='on'
   elif [ "$_out" == "any" ];   then _outFormat='--header "Accept: */*"'; _noPayloadCheck='on'
+  elif [ "$_out" == "EMPTY" ]; then _outFormat='--header "Accept:"'
   elif [ "$_out" != "" ];      then _outFormat='--header "Accept: '${_out}'"'; _noPayloadCheck='off'
   fi
 
@@ -1033,6 +1035,11 @@ function orionCurl()
   then
     payloadCheckFormat=$_payloadCheck
     _noPayloadCheck='off'
+  fi
+
+  if [ "$_forcedNoPayloadCheck" == 'on' ]
+  then
+    _noPayloadCheck='on'
   fi
 
   dMsg $_in: $_in

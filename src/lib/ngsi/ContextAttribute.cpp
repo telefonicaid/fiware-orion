@@ -896,43 +896,13 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
 {
   std::string  out;
 
-  if (ciP->outMimeType == JSON)
+  if (compoundValueP == NULL)  // Not a compound - text/plain must be accepted
   {
-    if (compoundValueP != NULL)
-    {
-      if (compoundValueP->isVector())
-      {
-        out = "[" + compoundValueP->toJson(true) + "]";
-      }
-      else  // Object
-      {
-        out = "{" + compoundValueP->toJson(false) + "}";
-      }
-    }
-    else
-    {
-      OrionError oe(SccNotAcceptable, "accepted MIME types: text/plain", "NotAcceptable");
-      ciP->httpStatusCode = SccNotAcceptable;
-
-      out = oe.toJson();
-    }
-  }
-  else  // TEXT
-  {
-    if (compoundValueP != NULL)
-    {
-      if (compoundValueP->isVector())
-      {
-        out = "[" + compoundValueP->toJson(false) + "]";
-      }
-      else  // Object
-      {
-        out = "{" + compoundValueP->toJson(false) + "}";
-      }
-    }
-    else
+    if (ciP->httpHeaders.accepted("text/plain"))
     {
       char buf[64];
+
+      ciP->outMimeType = TEXT;
 
       switch (valueType)
       {
@@ -957,9 +927,44 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
         out = buf;
         break;
 
+      case orion::ValueTypeNone:
+        snprintf(buf, sizeof(buf), "%s", "null");
+        out = buf;
+        break;
+
       default:
         out = "ERROR";
         break;
+      }
+    }
+    else
+    {
+      OrionError oe(SccNotAcceptable, "accepted MIME types: text/plain", "NotAcceptable");
+      ciP->httpStatusCode = SccNotAcceptable;
+
+      out = oe.toJson();
+    }
+  }
+  else if (compoundValueP != NULL)  /// Compound: application/json OR text/plain must be accepted
+  {
+    if (!ciP->httpHeaders.accepted("application/json") && !ciP->httpHeaders.accepted("text/plain"))
+    {
+      OrionError oe(SccNotAcceptable, "accepted MIME types: application/json, text/plain", "NotAcceptable");
+      ciP->httpStatusCode = SccNotAcceptable;
+
+      out = oe.toJson();
+    }
+    else
+    {
+      ciP->outMimeType = ciP->httpHeaders.outformatSelect();
+
+      if (compoundValueP->isVector())
+      {
+        out = "[" + compoundValueP->toJson(true) + "]";
+      }
+      else  // Object
+      {
+        out = "{" + compoundValueP->toJson(false) + "}";
       }
     }
   }
@@ -1158,6 +1163,10 @@ std::string ContextAttribute::getValue(void) const
 
   case orion::ValueTypeBoolean:
     return boolValue ? "true" : "false";
+    break;
+
+  case orion::ValueTypeNone:
+    return "null";
     break;
 
   default:
