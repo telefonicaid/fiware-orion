@@ -1118,7 +1118,7 @@ static int connectionTreat
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
     
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
-    if (ciP->httpHeaders.accept == "")  // No Accept: given, treates as */*
+    if (ciP->httpHeaders.accept == "")  // No Accept: given, treated as */*
     {
       ciP->httpHeaders.accept = "*/*";
       acceptParse(ciP, "*/*");
