@@ -357,11 +357,16 @@ Date: REGEX(.*)
 15. PATCH /v2/entities/E1/attrs/A1 (empty payload)
 ==================================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
+Content-Length: 63
+Content-Type: application/json
 Allow: GET, PUT, DELETE
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
 
 
 --TEARDOWN--

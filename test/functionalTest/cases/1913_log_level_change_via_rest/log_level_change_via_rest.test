@@ -115,11 +115,16 @@ echo
 01. POST /admin/log and see error 'method not allowed'
 ======================================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
+Content-Length: 63
+Content-Type: application/json
 Allow: PUT
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
 
 
 02. PUT /admin/log and see error 'log level missing'

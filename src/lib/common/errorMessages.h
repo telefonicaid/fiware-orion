@@ -44,5 +44,6 @@
 #define EMPTY_ENTITY_ID     "entity id length: 0, min length supported: "      STR(MIN_ID_LEN)
 #define EMPTY_ATTR_NAME     "attribute name length: 0, min length supported: " STR(MIN_ID_LEN)
 #define EMPTY_ENTITY_TYPE   "entity type length: 0, min length supported: "    STR(MIN_ID_LEN)
+#define BAD_VERB            "method not allowed"
 
 #endif // SRC_LIB_COMMON_ERRORMESSAGES_H
