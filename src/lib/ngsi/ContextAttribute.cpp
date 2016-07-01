@@ -907,7 +907,14 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
       switch (valueType)
       {
       case orion::ValueTypeString:
-        out = stringValue;
+        if (ciP->apiVersion == "v2")
+        { 
+          out = '"' + stringValue + '"';
+        }
+        else
+        { 
+          out = stringValue;
+        }
         break;
 
       case orion::ValueTypeNumber:

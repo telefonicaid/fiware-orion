@@ -181,12 +181,12 @@ Date: REGEX(.*)
 06. GET /v2/entities/E1/attrs/A1/value?type=T1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 11
+Content-Length: 13
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-V1 A1 E1/T1
+"V1 A1 E1/T1"
 
 
 --TEARDOWN--

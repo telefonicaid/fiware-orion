@@ -127,78 +127,78 @@ Date: REGEX(.*)
 02. GET S with Accept header text/plain - see plain text
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 1
+Content-Length: 3
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-S
+"S"
 
 
 03. GET S with Accept header */* - see plain text
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 1
+Content-Length: 3
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-S
+"S"
 
 
 04. GET S with Accept header text/* - see plain text
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 1
+Content-Length: 3
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-S
+"S"
 
 
 05. GET S with Accept header text/plain, application/json - see plain text
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 1
+Content-Length: 3
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-S
+"S"
 
 
 06. GET S with Accept header application/json, text/plain - see plain text
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 1
+Content-Length: 3
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-S
+"S"
 
 
 07. GET S with Accept header text/*, application/json - see plain text
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 1
+Content-Length: 3
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-S
+"S"
 
 
 08. GET S with Accept header text/*;q=0.3,application/json;q=0.8 - see plain text (q is overridden)
 ===================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1
+Content-Length: 3
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-S
+"S"
 
 
 09. GET S with Accept header application/json - see error
