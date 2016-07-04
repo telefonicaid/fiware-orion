@@ -33,13 +33,13 @@ brokerStart CB 0
 # 01. GET /v2/entities with empty item in q (q=)
 # 02. GET /v2/entities with empty item in q (q=;)
 # 03. GET /v2/entities with empty item in q (q=;;)
-# 04. GET /v2/entities with empty item in q (q=a==55;)
+# 04. GET /v2/entities with non-empty item in q (q=a==55;)
 # 05. GET /v2/entities with empty item in q (q=a==55;;)
 # 06. GET /v2/entities with empty left-hand-side in q-item
 # 07. GET /v2/entities with empty right-hand-side in q-item
 # 08. GET /v2/entities with invalid char in q-item
 # 09. GET /v2/entities with only whitespace in q-item (q=   )
-# 10. GET /v2/entities with only whitespace in q-item (q=a==12;   )
+# 10. GET /v2/entities with trailing whitespace in q (q=a==12;   )
 #
 # 11. GET /v2/entities with > RANGE
 # 12. GET /v2/entities with == RANGE, but missing 'from'
@@ -79,8 +79,8 @@ echo
 echo
 
 
-echo "04. GET /v2/entities with empty item in q (q=a==55;)"
-echo "===================================================="
+echo "04. GET /v2/entities with non-empty item in q (q=a==55;)"
+echo "========================================================"
 q='q=a==55;'
 orionCurl --url "/v2/entities?$q"
 echo
@@ -127,8 +127,8 @@ echo
 echo
 
 
-echo "10. GET /v2/entities with only whitespace in q-item (q=a==12;   )"
-echo "================================================================="
+echo "10. GET /v2/entities with trailing whitespace in q (q=a==12;   )"
+echo "================================================================"
 q='q=a==12;   '
 orionCurl --url "/v2/entities?$q"
 echo
@@ -266,18 +266,15 @@ Date: REGEX(.*)
 }
 
 
-04. GET /v2/entities with empty item in q (q=a==55;)
-====================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 51
+04. GET /v2/entities with non-empty item in q (q=a==55;)
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 2
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "description": "empty q-item",
-    "error": "BadRequest"
-}
+[]
 
 
 05. GET /v2/entities with empty item in q (q=a==55;;)
@@ -350,18 +347,15 @@ Date: REGEX(.*)
 }
 
 
-10. GET /v2/entities with only whitespace in q-item (q=a==12;   )
-=================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 51
+10. GET /v2/entities with trailing whitespace in q (q=a==12;   )
+================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "description": "empty q-item",
-    "error": "BadRequest"
-}
+[]
 
 
 11. GET /v2/entities with > RANGE
