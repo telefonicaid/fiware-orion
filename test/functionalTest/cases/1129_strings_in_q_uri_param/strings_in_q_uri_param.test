@@ -32,8 +32,10 @@ brokerStart CB
 #
 # 01. Create E1 with a String attribute S == '123'
 # 02. Create E2 with a Number attribute S == 123
-# 03. Query with q=S:'123', see E1
-# 04. Query with q=S:123, see E2
+# 03a. Query with q=S:'123', see E1
+# 03b. Query with q=S=='123', see E1
+# 04a. Query with q=S:123, see E2
+# 04b. Query with q=S==123, see E2
 #
 
 echo "01. Create E1 with a String attribute S == '123'"
@@ -58,16 +60,30 @@ echo
 echo
 
 
-echo "03. Query with q=S:'123', see E1"
-echo "================================"
+echo "03a. Query with q=S:'123', see E1"
+echo "================================="
 orionCurl --url "/v2/entities?q=S:'123'&options=keyValues"
 echo
 echo
 
 
-echo "04. Query with q=S:123, see E2"
-echo "=============================="
+echo "03b. Query with q=S=='123', see E1"
+echo "=================================="
+orionCurl --url "/v2/entities?q=S=='123'&options=keyValues"
+echo
+echo
+
+
+echo "04a. Query with q=S:123, see E2"
+echo "==============================="
 orionCurl --url "/v2/entities?q=S:123&options=keyValues"
+echo
+echo
+
+
+echo "04b. Query with q=S==123, see E2"
+echo "================================"
+orionCurl --url "/v2/entities?q=S==123&options=keyValues"
 echo
 echo
 
@@ -93,8 +109,8 @@ Date: REGEX(.*)
 
 
 
-03. Query with q=S:'123', see E1
-================================
+03a. Query with q=S:'123', see E1
+=================================
 HTTP/1.1 200 OK
 Content-Length: 37
 Content-Type: application/json
@@ -110,8 +126,42 @@ Date: REGEX(.*)
 ]
 
 
-04. Query with q=S:123, see E2
-==============================
+03b. Query with q=S=='123', see E1
+==================================
+HTTP/1.1 200 OK
+Content-Length: 37
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "S": "123",
+        "id": "E1",
+        "type": "none"
+    }
+]
+
+
+04a. Query with q=S:123, see E2
+===============================
+HTTP/1.1 200 OK
+Content-Length: 35
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "S": 123,
+        "id": "E2",
+        "type": "none"
+    }
+]
+
+
+04b. Query with q=S==123, see E2
+================================
 HTTP/1.1 200 OK
 Content-Length: 35
 Content-Type: application/json
