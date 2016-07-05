@@ -26,6 +26,7 @@ Strings in q URI Param
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -36,10 +37,15 @@ brokerStart CB
 # 03b. Query with q=S=='123', see E1
 # 04a. Query with q=S:123, see E2
 # 04b. Query with q=S==123, see E2
-# 05a. Query with int-list: q=S:121,123,125 - see E2
+# 05a. Query with int-list: q=S:121,122,123 - see E2
 # 05b. Query with int-list: q=S:121,122,124 - see no hit
-# 06a. Query with string-list: q=S:'121','123','123' - see E1
+# 06a. Query with string-list: q=S:'121','122','123' - see E1
 # 06b. Query with string-list: q=S:'121','122','124' - see no hit
+#
+# 07. Create subscription with q=S:121,122,123
+# 08. Dump accumulator, see E2
+# 09. Create subscription with q=S:'121','122','123'
+# 10. Dump accumulator, see E1
 #
 
 echo "01. Create E1 with a String attribute S == '123'"
@@ -92,7 +98,7 @@ echo
 echo
 
 
-echo "05a. Query with int-list: q=S:121,123,125 - see E2"
+echo "05a. Query with int-list: q=S:121,122,123 - see E2"
 echo "=================================================="
 orionCurl --url "/v2/entities?q=S:121,123,125&options=keyValues"
 echo
@@ -116,6 +122,81 @@ echo
 echo "06b. Query with string-list: q=S:'121','122','124' - see no hit"
 echo "==============================================================="
 orionCurl --url "/v2/entities?q=S:'121','122','124'&options=keyValues"
+echo
+echo
+
+
+echo "07. Create subscription with q=S:121,122,123"
+echo "============================================"
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "q": "S:121,122,123"
+            }
+         }
+    },
+    "notification": {
+        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "08. Dump accumulator, see E2"
+echo "============================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+
+echo "09. Create subscription with q=S:'121','122','123'"
+echo "=================================================="
+filter="'121','122','123'"
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "q": "S:'$filter'"
+            }
+         }
+    },
+    "notification": {
+        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "10. Dump accumulator, see E1"
+echo "============================"
+accumulatorDump
 echo
 echo
 
@@ -209,7 +290,7 @@ Date: REGEX(.*)
 ]
 
 
-05a. Query with int-list: q=S:121,123,125 - see E2
+05a. Query with int-list: q=S:121,122,123 - see E2
 ==================================================
 HTTP/1.1 200 OK
 Content-Length: 35
@@ -265,6 +346,83 @@ Date: REGEX(.*)
 []
 
 
+07. Create subscription with q=S:121,122,123
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Dump accumulator, see E2
+============================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 126
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "S": {
+                "metadata": {},
+                "type": "none",
+                "value": 123
+            },
+            "id": "E2",
+            "type": "none"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+09. Create subscription with q=S:'121','122','123'
+==================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. Dump accumulator, see E1
+============================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 128
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "S": {
+                "metadata": {},
+                "type": "none",
+                "value": "123"
+            },
+            "id": "E1",
+            "type": "none"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
 --TEARDOWN--
 brokerStop CB
+accumulatorStop
 dbDrop CB
