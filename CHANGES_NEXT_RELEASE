@@ -19,6 +19,8 @@
 - Fix: 472 Unknown returned as HTTP status code by POST /v2/op/update in some cases (now using 404 Not Found).
 - Fix: Correctly returning error on present but empty attribute types in PATCH v2/entites/{id} operation (Issue #1785)
 - Fix: Error returned on encountering non-existing attributes in PATCH /v2/entities/<id>/attrs (Issue #1784)
+- Fix: Fixed a bug about string lists in URI parameter 'q' (strings treated as numbers, if possible. E.g. '123' => 123)
+- Fix: Fixed a bug about lists in URI parameter 'q' (last list item was skipped)
 - Fix: Error payload returned on encountering non-existing entity/attribute in PUT /v2/entities/<entity-id>/attrs/<attr-name> (Issue #1360)
 - Fix: invalid regex patterns detection (#968)
 - Fix: Better error returned on invalid geoquery (Issue #2174)
