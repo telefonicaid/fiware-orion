@@ -39,6 +39,7 @@
 using namespace mongo;
 
 
+
 /* ****************************************************************************
 *
 * StringFilterItem::StringFilterItem -
@@ -333,19 +334,10 @@ bool StringFilterItem::listParse(char* s, std::string* errorStringP)
   {
     if (*cP == '\'')
     {
-      if (!inString)
-      {
-        ++itemStart;
-        inString = true;
-      }
-      else
-      {
-        inString = false;
-        *cP = 0;
-      }
-      ++cP;
+      inString = (inString)? false :true;
     }
-    else if ((*cP == ',') && (inString == false))
+
+    if ((*cP == ',') && (inString == false))
     {
       *cP = 0;
 

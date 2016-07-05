@@ -36,6 +36,10 @@ brokerStart CB
 # 03b. Query with q=S=='123', see E1
 # 04a. Query with q=S:123, see E2
 # 04b. Query with q=S==123, see E2
+# 05a. Query with int-list: q=S:121,123,125 - see E2
+# 05b. Query with int-list: q=S:121,122,124 - see no hit
+# 06a. Query with string-list: q=S:'121','123','123' - see E1
+# 06b. Query with string-list: q=S:'121','122','124' - see no hit
 #
 
 echo "01. Create E1 with a String attribute S == '123'"
@@ -84,6 +88,34 @@ echo
 echo "04b. Query with q=S==123, see E2"
 echo "================================"
 orionCurl --url "/v2/entities?q=S==123&options=keyValues"
+echo
+echo
+
+
+echo "05a. Query with int-list: q=S:121,123,125 - see E2"
+echo "=================================================="
+orionCurl --url "/v2/entities?q=S:121,123,125&options=keyValues"
+echo
+echo
+
+
+echo "05b. Query with int-list: q=S:121,122,124 - see no hit"
+echo "======================================================"
+orionCurl --url "/v2/entities?q=S:121,122,124&options=keyValues"
+echo
+echo
+
+
+echo "06a. Query with string-list: q=S:'121','122','123' - see E1"
+echo "==========================================================="
+orionCurl --url "/v2/entities?q=S:'121','123','123'&options=keyValues"
+echo
+echo
+
+
+echo "06b. Query with string-list: q=S:'121','122','124' - see no hit"
+echo "==============================================================="
+orionCurl --url "/v2/entities?q=S:'121','122','124'&options=keyValues"
 echo
 echo
 
@@ -175,6 +207,62 @@ Date: REGEX(.*)
         "type": "none"
     }
 ]
+
+
+05a. Query with int-list: q=S:121,123,125 - see E2
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 35
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "S": 123,
+        "id": "E2",
+        "type": "none"
+    }
+]
+
+
+05b. Query with int-list: q=S:121,122,124 - see no hit
+======================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+06a. Query with string-list: q=S:'121','122','123' - see E1
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 37
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "S": "123",
+        "id": "E1",
+        "type": "none"
+    }
+]
+
+
+06b. Query with string-list: q=S:'121','122','124' - see no hit
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
 
 
 --TEARDOWN--
