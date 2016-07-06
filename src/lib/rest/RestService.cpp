@@ -437,6 +437,16 @@ static bool compErrorDetect
 /* ****************************************************************************
 *
 * restService - 
+*
+* NGSIv1 uses a case-insensitive URI PATH, while NGSIv2 is case-sensitive, so
+* before we can start to compare the URI PATH with the vector of supported services,
+* we need to know if it's v1 or v2.
+*
+* This is very easy, we just look at the first component of the URI PATH, and
+* if it is "v2" or "V2", then case-sensitive checks are used.
+*
+* Note that for NGSIv2 to be 'turned on', the URI PATH must start with exactly /v2.
+* If it starts with /V2, the request will not be considered a NGSIv2 request.
 */
 std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 {
@@ -459,6 +469,10 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
   ciP->httpStatusCode = SccOk;
 
+
+  //
+  // Split URI PATH into components
+  //
   components = stringSplit(ciP->url, '/', compV);
   if (!compCheck(components, compV))
   {
@@ -473,6 +487,21 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     }
   }
 
+
+  //
+  // Detect API version
+  //
+  std::string apiVersion = "v1";
+
+  if (strcasecmp(compV[0].c_str(), "v2") == 0)
+  {
+    apiVersion = "v2";
+  }
+
+
+  //
+  // Lookup the requested service
+  //
   for (unsigned int ix = 0; serviceV[ix].treat != NULL; ++ix)
   {
     if ((serviceV[ix].components != 0) && (serviceV[ix].components != components))
@@ -494,10 +523,21 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
         continue;
       }
 
-      if (strcasecmp(serviceV[ix].compV[compNo].c_str(), compV[compNo].c_str()) != 0)
+      if (apiVersion == "v1")
       {
-        match = false;
-        break;
+        if (strcasecmp(serviceV[ix].compV[compNo].c_str(), compV[compNo].c_str()) != 0)
+        {
+          match = false;
+          break;
+        }
+      }
+      else
+      {
+        if (strcmp(serviceV[ix].compV[compNo].c_str(), compV[compNo].c_str()) != 0)
+        {
+          match = false;
+          break;
+        }
       }
     }
 
