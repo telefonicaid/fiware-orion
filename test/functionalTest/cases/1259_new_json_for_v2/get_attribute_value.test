@@ -347,12 +347,12 @@ Date: REGEX(.*)
 10. GET /v2/entities/E1/attrs/A1/value as text: OK
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 6
+Content-Length: 8
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-STRING
+"STRING"
 
 
 11. PUT /v2/entities/E1/attrs/A1/value with TEXT Boolean payload
