@@ -20,6 +20,7 @@
 - Fix: Correctly returning error on present but empty attribute types in PATCH v2/entites/{id} operation (Issue #1785)
 - Fix: Error returned on encountering non-existing attributes in PATCH /v2/entities/<id>/attrs (Issue #1784)
 - Fix: Error payload returned on encountering non-existing entity/attribute in PUT /v2/entities/<entity-id>/attrs/<attr-name> (Issue #1360)
+- Fix: Added citation marks surrounding strings as response in text/plain.
 - Fix: invalid regex patterns detection (#968)
 - Fix: Better error returned on invalid geoquery (Issue #2174)
 - Fix: Better error returned on attribute not found in GET /v2/entities/<entity-id>/attrs/<attr-name>/value (Issue #2220)
@@ -30,4 +31,4 @@
 - Fix: Avoid rendering at the same time id and idPattern fields in NGSIv2 subscriptions
 - Fix: Error returned on GET/DELETE requests specifying Content-Type (Issue #2128)
 - Fix: Error responses with '405 Method Not Allowed' now return payload to describe the error, for v2 requests only (Issue #2075, #2078 and #2083)
-- Fix: Implemented more sofisticated HTTP Accept Header handling (Issue #1849)
+- Fix: Implemented more sofisticated HTTP Accept Header handling (Issues #1037, #1849, #1886, #2175, and #2208)
