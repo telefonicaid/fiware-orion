@@ -104,4 +104,4 @@ would use the following payload.json file:
 }
 ```
 
-More details on this can be found in [the following issue coment at github](https://github.com/telefonicaid/fiware-orion/issues/2142#issuecomment-228062834).
+More details on this can be found in [the following issue comment at github](https://github.com/telefonicaid/fiware-orion/issues/2142#issuecomment-228062834).
