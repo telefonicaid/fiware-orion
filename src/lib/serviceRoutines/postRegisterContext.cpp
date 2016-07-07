@@ -71,7 +71,7 @@ std::string postRegisterContext
     {
       if (isTrue(crP->entityIdVector[eIx]->isPattern))
       {
-        std::string  details = "isPattern set to true for a registration";
+        std::string  details = "isPattern set to true for registrations is currently not supported";
         OrionError   oe(SccBadRequest, details);
         
         alarmMgr.badInput(clientIp, details);

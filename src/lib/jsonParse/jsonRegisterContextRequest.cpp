@@ -123,7 +123,7 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
 
   if (isTrue(reqDataP->rcr.entityIdP->isPattern))
   {
-    return "isPattern set to true for a registration";
+    return "isPattern set to true for registrations is currently not supported";
   }
 
   return "OK";

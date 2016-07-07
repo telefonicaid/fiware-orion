@@ -66,7 +66,7 @@ echo
 01. Try to register using isPattern=true, see error
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 190
+Content-Length: 216
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -74,7 +74,7 @@ Date: REGEX(.*)
 {
     "errorCode": {
         "code": "400",
-        "details": "isPattern set to true for a registration",
+        "details": "isPattern set to true for registrations is currently not supported",
         "reasonPhrase": "Bad Request"
     },
     "registrationId": "000000000000000000000000"

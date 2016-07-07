@@ -181,7 +181,7 @@ std::string EntityId::check
 
   if ((requestType == RegisterContext) && (isTrue(isPattern)))
   {
-    return "isPattern set to true for a registration";
+    return "isPattern set to true for registrations is currently not supported";
   }
 
   if (isTrue(isPattern))
