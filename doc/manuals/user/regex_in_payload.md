@@ -33,9 +33,9 @@ POST /v2/op/query
 }
 ```
 
-The regular expressions language allows the usage of backlash (`\`). For example, `SENSOR\d{2}` matches
-strings containing SENSOR followed by two numbers. However, note that `\` is an special character in JSON,
-which, according to [the JSON specifciation](http://www.json.org), needs to be encoded as `\\`.
+The regular expression language allows the usage of backslash (`\`). For example, `SENSOR\d{2}` matches
+strings containing SENSOR followed by two digits. However, note that `\` is a special character in JSON,
+which, according to [the JSON specification](http://www.json.org), needs to be encoded as `\\`.
 
 ```
 POST /v1/queryContext
@@ -83,15 +83,15 @@ EOF
 ```
 
 In other words, the `SENSOR\\\\d{2}` string at shell level is transformed to `SENSOR\\d{2}` at payload level (i.e. the actual HTTP request
-that is send on the wire) which, in sequence, corresponds to the `SENSOR\d{2}` regular expression after JSON parsing stage at Orion. However, note that
-if you use a file for your payload the shell escaping hasn't to be used, that is:
+that is sent over the wire) which, in sequence, corresponds to the `SENSOR\d{2}` regular expression after JSON parsing stage at Orion. However, note that
+if you use a file for your payload, the shell escaping isn't needed, i.e.:
 
 ```
 curl localhost:1026/v2/op/query -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @payload.json
 ```
 
 
-will use the following payload.json file:
+would use the following payload.json file:
 
 ```
 {
@@ -104,4 +104,4 @@ will use the following payload.json file:
 }
 ```
 
-More detail on this can be found in [the following issue coment at github](https://github.com/telefonicaid/fiware-orion/issues/2142#issuecomment-228062834).
+More details on this can be found in [the following issue coment at github](https://github.com/telefonicaid/fiware-orion/issues/2142#issuecomment-228062834).
