@@ -33,7 +33,7 @@ brokerStart CB
 # 01. Create subscription with throttling set to 5
 # 02. Get the subscription, see throttling=5
 # 03. Modify subscription, setting throttling to 0
-# 04. Get the subscription, see throttling=0
+# 04. Get the subscription, see throttling=0 (throttling is not rendered in the response if it is zero)
 #
 
 echo "01. Create subscription with throttling set to 5"
@@ -80,8 +80,8 @@ echo
 echo
 
 
-echo "04. Get the subscription, see throttling=0"
-echo "=========================================="
+echo "04. Get the subscription, see throttling=0 (throttling is not rendered in the response if it is zero)"
+echo "====================================================================================================="
 orionCurl --url /v2/subscriptions/$subId
 echo
 echo
@@ -145,8 +145,8 @@ Date: REGEX(.*)
 
 
 
-04. Get the subscription, see throttling=0
-==========================================
+04. Get the subscription, see throttling=0 (throttling is not rendered in the response if it is zero)
+=====================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 277
 Content-Type: application/json
