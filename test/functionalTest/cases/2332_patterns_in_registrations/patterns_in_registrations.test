@@ -31,6 +31,7 @@ brokerStart CB
 
 #
 # 01. Try to register using isPattern=true, see error
+# 02. Try to register using isPattern=true AND isPattern=false, see error
 #
 
 echo "01. Try to register using isPattern=true, see error"
@@ -62,9 +63,74 @@ echo
 echo
 
 
+echo "02. Try to register using isPattern=true AND isPattern=false, see error"
+echo "======================================================================="
+payload='{
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+          "id": "E.*",
+          "isPattern": "true",
+          "type": "T1"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "string",
+          "isDomain": "false"
+        }
+      ],
+      "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
+    },
+    {
+      "entities": [
+        {
+          "id": "E2",
+          "isPattern": "false",
+          "type": "T1"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "A2",
+          "type": "string",
+          "isDomain": "false"
+        }
+      ],
+      "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
+    }
+
+  ],
+  "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload"
+echo
+echo
+
+
 --REGEXPECT--
 01. Try to register using isPattern=true, see error
 ===================================================
+HTTP/1.1 200 OK
+Content-Length: 216
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400",
+        "details": "isPattern set to true for registrations is currently not supported",
+        "reasonPhrase": "Bad Request"
+    },
+    "registrationId": "000000000000000000000000"
+}
+
+
+02. Try to register using isPattern=true AND isPattern=false, see error
+=======================================================================
 HTTP/1.1 200 OK
 Content-Length: 216
 Content-Type: application/json
