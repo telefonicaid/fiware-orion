@@ -58,6 +58,28 @@ std::string postRegisterContext
 {
   RegisterContextResponse  rcr;
   std::string              answer;
+  RegisterContextRequest*  rcrP = &parseDataP->rcr.res;
+
+  //
+  // Check for isPatterns in request
+  //
+  for (unsigned int crIx = 0; crIx < rcrP->contextRegistrationVector.size(); ++crIx)
+  {
+    ContextRegistration* crP = rcrP->contextRegistrationVector[crIx];
+
+    for (unsigned int eIx = 0; eIx < crP->entityIdVector.size(); ++eIx)
+    {
+      if (isTrue(crP->entityIdVector[eIx]->isPattern))
+      {
+        std::string  details = "isPattern set to true for a registration";
+        OrionError   oe(SccBadRequest, details);
+        
+        alarmMgr.badInput(clientIp, details);
+        ciP->httpStatusCode = SccBadRequest;
+        return oe.render();
+      }
+    }
+  }
 
   //
   // If more than ONE service-path is input, an error is returned as response.
