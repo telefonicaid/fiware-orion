@@ -201,7 +201,7 @@ Some additional comments:
 -   You can use the `-cprForwardLimit` [CLI parameter](admin/cli.md) to limit
     the maximum number of forwarded requests to Context Providers for a single client request.
     You can use 0 to disable Context Providers forwarding at all.
--   In NGSIv1 registrations, `isPattern` cannot be set to `true`.
+-   In NGSIv1 registrations, `isPattern` cannot be set to `"true"`.
     If so, the registration fails and an error is returned.
     The OMA specification allows for regular expressions in entity id in registrations but as of now,
     the Context Broker doesn't support this feature.
