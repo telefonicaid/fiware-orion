@@ -3,6 +3,6 @@
   "errorCode" : {
     "code" : "400",
     "reasonPhrase" : "Bad Request",
-    "details" : "no providing application"
+    "details" : "isPattern set to true for registrations is currently not supported"
   }
 }

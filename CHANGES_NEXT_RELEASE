@@ -1,4 +1,5 @@
 - Fix: NGSIv2 subscriptions payload validation (#1964, #1965, #1967, #1973, #1974, #1975, #1979, #1980, #1981, #1983, #1984, #1988, #2007, #2018, #2093, #2095, #2099, #2100)
+- Fix: Return error on NGSIv1 register requests with entity isPattern set to "true" (Issue #2332)
 - Fix: UTC as time in log file (Issue #2232)
 - Fix: Removed capping in NGSIv2 update forwarding (Issue #2193)
 - Fix: In some cases, compound attribute values were forwarded as empty strings (Issue #2237)
@@ -30,6 +31,7 @@
 - Fix: Better error returned on attribute not found in GET /v2/entities/<entity-id>/attrs/<attr-name>/value (Issue #2220)
 - Fix: Distinguish between strings and numbers in q string filter (Issue #1129)
 - Fix: proper response for 'GET /v2/entities/<id>?attrs=<attrName>' and 'GET /v2/entities/<id>/attrs?attrs=<attrName>' when <attrName> doesn't exist (#2241)
+- Fix: In error responses for ngsi9 registrations, the duration is no longer rendered.
 - Fix: Do not allow forbidden chars in description for subscription (#2308)
 - Fix: Correct error returned when trying to replace a non-existing attribute in PUT /v2/entities/<entity-id>/attrs/<attr-name> (Issue #2221)
 - Fix: Empty string detection for entity id, entity type and attribute name in NGSIv2 request URLs (#1426, #1487)

@@ -119,12 +119,12 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
     return "invalid isPattern value for entity: /" + value + "/";
   }
 
-  if (isTrue(value))
-  {
-    return "isPattern set to true for a registration";
-  }
-
   reqDataP->rcr.entityIdP->isPattern = value;
+
+  if (isTrue(reqDataP->rcr.entityIdP->isPattern))
+  {
+    return "isPattern set to true for registrations is currently not supported";
+  }
 
   return "OK";
 }
