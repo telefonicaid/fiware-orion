@@ -68,6 +68,17 @@ all: prepare_release release
 
 di: install_debug
 
+#
+# The 'dix' build target must only be used when fiddling with style_check.
+# It is necessary to be able to check that style_check modifications don't 
+# break the compilation.
+#
+# FIXME: As soon as all the source code is incorporated into style_check, this
+#        build target (dix) must be removed.
+#
+dix: prepare_debug
+	cd BUILD_DEBUG && make -j$(CPU_COUNT)
+
 compile_info:
 	./scripts/build/compileInfo.sh
 

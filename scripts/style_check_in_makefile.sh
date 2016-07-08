@@ -43,6 +43,6 @@ function style_check
 }
 
 style_check src/lib/logMsg
+style_check src/lib/parseArgs
 
-# style_check src/lib/parseArgs
 # FIXME: Just keep adding directories here until all of them are included ...
