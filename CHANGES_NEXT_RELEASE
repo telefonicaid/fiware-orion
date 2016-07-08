@@ -31,7 +31,7 @@
 - Fix: Better error returned on attribute not found in GET /v2/entities/<entity-id>/attrs/<attr-name>/value (Issue #2220)
 - Fix: Distinguish between strings and numbers in q string filter (Issue #1129)
 - Fix: proper response for 'GET /v2/entities/<id>?attrs=<attrName>' and 'GET /v2/entities/<id>/attrs?attrs=<attrName>' when <attrName> doesn't exist (#2241)
-- Fix: throttling set to zero (Issue #2030)
+- Fix: throttling set to zero (Issue #2030) (This issue was actually fixed for the release 1.2.0)
 - Fix: In error responses for ngsi9 registrations, the duration is no longer rendered.
 - Fix: Do not allow forbidden chars in description for subscription (#2308)
 - Fix: Correct error returned when trying to replace a non-existing attribute in PUT /v2/entities/<entity-id>/attrs/<attr-name> (Issue #2221)
