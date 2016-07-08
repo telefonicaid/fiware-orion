@@ -30,7 +30,7 @@
 #
 function style_check
 {
-  style_check.sh -d src/lib/logMsg
+  style_check.sh -d "$1"
   if [ "$?" != 0 ]
   then
     echo Lint Errors:
