@@ -438,8 +438,8 @@ const char* lmSemGet(void)
   {
     return "taken";
   }
-  
-  return "free";  
+
+  return "free";
 }
 
 

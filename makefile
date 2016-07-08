@@ -93,10 +93,14 @@ prepare_unit_test: compile_info
 	@echo '------------------------------- prepare_unit_test ended ---------------------------------'
 
 
-release: prepare_release
+style_check_included_in_make_steps:
+	./scripts/style_check_in_makefile.sh
+
+
+release: style_check_included_in_make_steps prepare_release
 	cd BUILD_RELEASE && make -j$(CPU_COUNT)
 
-debug: prepare_debug
+debug: style_check_included_in_make_steps prepare_debug
 	cd BUILD_DEBUG && make -j$(CPU_COUNT)
 
 # Requires root access, i.e. use 'sudo make install' to install
