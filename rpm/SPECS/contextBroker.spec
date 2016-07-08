@@ -187,7 +187,7 @@ fi
 - Fix: Expression lost after refreshing subscription cache (#2202)
 - Fix: Avoided a possible infinite loop in sub-cache synchronization function (subscriptions stopped working due to this bug)
 - Deprecated: /ngsi10 and /ngsi9 as URL path prefixes
-- Fix: throttling set to zero (Issue #2030)
+- Fix: throttling set to zero (#2030)
 
 * Tue May 03 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.1.0-1
 - Add: NGSIv2 notifications (#1875)
