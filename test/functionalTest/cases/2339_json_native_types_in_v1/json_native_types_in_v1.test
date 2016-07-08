@@ -42,24 +42,16 @@ echo "====================================================================="
 payload='{
   "id": "E1",
   "type": "T",
-  "String": "string",
-  "Integer":  3,
-  "Float": 3.14,
-  "Bool": true,
-  "Null": null,
-  "NumVec": [ 1,2,3 ],
-  "BoolVec": [ true, false, true ],
-  "NullVec": [ null, null, null ],
-  "Object": {
-    "String": "string",
-    "Integer":  3,
-    "Float": 3.14,
-    "Bool": true,
-    "Null": null,
-    "NumVec": [ 1,2,3 ],
-    "BoolVec": [ true, false, true ],
-    "NullVec": [ null, null, null  ],
-    "Object": {
+  "String":  { "value": "string" },
+  "Integer": { "value": 3 },
+  "Float":   { "value": 3.14 },
+  "Bool":    { "value": true },
+  "Null":    { "value": null },
+  "NumVec":  { "value": [ 1,2,3 ] },
+  "BoolVec": { "value": [ true, false, true ] },
+  "NullVec": { "value": [ null, null, null ] },
+  "Object":  {
+    "value": {
       "String": "string",
       "Integer":  3,
       "Float": 3.14,
@@ -69,10 +61,20 @@ payload='{
       "BoolVec": [ true, false, true ],
       "NullVec": [ null, null, null  ],
       "Object": {
-        "a": "1",
-        "b": null,
-        "c": true,
-        "d": 3.14
+        "String": "string",
+        "Integer":  3,
+        "Float": 3.14,
+        "Bool": true,
+        "Null": null,
+        "NumVec": [ 1,2,3 ],
+        "BoolVec": [ true, false, true ],
+        "NullVec": [ null, null, null  ],
+        "Object": {
+          "a": "1",
+          "b": null,
+          "c": true,
+          "d": 3.14
+        }
       }
     }
   },
@@ -80,15 +82,15 @@ payload='{
     "value": 14,
     "type": "mixed",
     "metadata": {
-      "String": "string",
-      "Integer":  3,
-      "Float": 3.14,
-      "Bool": true,
-      "Null": null
+      "String":  { "value": "string" },
+      "Integer": { "value": 3        },
+      "Float":   { "value": 3.14     },
+      "Bool":    { "value": true     },
+      "Null":    { "value": null     }
     }
   }
 }'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -153,7 +155,7 @@ Date: REGEX(.*)
 02. GET the entity using /v1/queryContext
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 3087
+Content-Length: 3503
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -270,19 +272,36 @@ Date: REGEX(.*)
                         "value": "string"
                     },
                     {
-                        "name": "attrWithMetadata",
-                        "type": "none",
-                        "value": {
-                            "metadata": {
-                                "Bool": true,
-                                "Float": 3.14,
-                                "Integer": 3,
-                                "Null": null,
-                                "String": "string"
+                        "metadatas": [
+                            {
+                                "name": "String",
+                                "type": "none",
+                                "value": "string"
                             },
-                            "type": "mixed",
-                            "value": 14
-                        }
+                            {
+                                "name": "Integer",
+                                "type": "none",
+                                "value": ""
+                            },
+                            {
+                                "name": "Float",
+                                "type": "none",
+                                "value": ""
+                            },
+                            {
+                                "name": "Bool",
+                                "type": "none",
+                                "value": ""
+                            },
+                            {
+                                "name": "Null",
+                                "type": "none",
+                                "value": ""
+                            }
+                        ],
+                        "name": "attrWithMetadata",
+                        "type": "mixed",
+                        "value": 14
                     }
                 ],
                 "id": "E1",
@@ -317,7 +336,7 @@ Date: REGEX(.*)
 04. Dump accumulator
 ====================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 3166
+Content-Length: 3582
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
@@ -434,21 +453,38 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                         "name": "String", 
                         "type": "none", 
                         "value": "string"
-                    },
+                    }, 
                     {
-                        "name": "attrWithMetadata", 
-                        "type": "none", 
-                        "value": {
-                            "metadata": {
-                                "Bool": true, 
-                                "Float": 3.1400000000000001, 
-                                "Integer": 3, 
-                                "Null": null, 
-                                "String": "string"
+                        "metadatas": [
+                            {
+                                "name": "String", 
+                                "type": "none", 
+                                "value": "string"
                             }, 
-                            "type": "mixed", 
-                            "value": 14
-                        }
+                            {
+                                "name": "Integer", 
+                                "type": "none", 
+                                "value": ""
+                            }, 
+                            {
+                                "name": "Float", 
+                                "type": "none", 
+                                "value": ""
+                            }, 
+                            {
+                                "name": "Bool", 
+                                "type": "none", 
+                                "value": ""
+                            }, 
+                            {
+                                "name": "Null", 
+                                "type": "none", 
+                                "value": ""
+                            }
+                        ], 
+                        "name": "attrWithMetadata", 
+                        "type": "mixed", 
+                        "value": 14
                     }
                 ], 
                 "id": "E1", 

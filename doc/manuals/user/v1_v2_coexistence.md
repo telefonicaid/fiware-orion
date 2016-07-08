@@ -17,7 +17,10 @@ setting `A=2` using NGSIv1 will actually store `A="2"` in the Orion database.
 
 However, NGSIv1 rendering is able to correctly retrieve attribute values stored using 
 non-string JSON native types. Thus, if you set `A=2` using NGSIv2 and retrieve that 
-attribute using NGSIv1, you will get `A=2`.
+attribute using NGSIv1, you will get `A=2`. Currently this works for any type of attribute value,
+while metadata values will be reported as the empty string is they are not of JSON string type.
+I.e. a metadata `md1=13` is rendered as   "md1" : { "value": "" }.
+Remember this is only in NGSIv1. In NGSIv2 everything works just fine.
 
 ## Filtering
 
