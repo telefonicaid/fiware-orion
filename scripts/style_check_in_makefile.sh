@@ -22,6 +22,9 @@
 #
 # Author: Ken Zangelin
 
+# NOTE: this script is designed to be launched from makefile targets. Thus,
+# the call to style_check.sh may break if you attempt to use it from a
+# different place. 
 
 
 # -----------------------------------------------------------------------------
@@ -30,7 +33,7 @@
 #
 function style_check
 {
-  style_check.sh -d "$1"
+  scripts/style_check.sh -d "$1"
   if [ "$?" != 0 ]
   then
     echo Lint Errors:
@@ -47,4 +50,24 @@ style_check src/lib/parseArgs
 style_check src/lib/cache
 style_check src/lib/alarmMgr
 
-# FIXME: Just keep adding directories here until all of them are included ...
+# FIXME: Just keep adding directories here until all of them are included:
+#
+# style_check src/lib/alarmMgr
+# style_check src/lib/apiTypesV2
+# style_check src/lib/cache
+# style_check src/lib/common
+# style_check src/lib/convenience
+# style_check src/lib/jsonParse
+# style_check src/lib/jsonParseV2
+# style_check src/lib/logSummary
+# style_check src/lib/mongoBackend
+# style_check src/lib/ngsi
+# style_check src/lib/ngsi10
+# style_check src/lib/ngsi9
+# style_check src/lib/ngsiNotify
+# style_check src/lib/orionTypes
+# style_check src/lib/parse
+# style_check src/lib/rest
+# style_check src/lib/serviceRoutines
+# style_check src/lib/serviceRoutinesV2
+# style_check src/app/contextBroker
