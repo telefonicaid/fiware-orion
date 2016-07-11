@@ -23,8 +23,9 @@
 # Author: Ken Zangelin
 
 # NOTE: this script is designed to be launched from makefile targets. Thus,
-# the call to style_check.sh may break if you attemp to use it from a
+# the call to style_check.sh may break if you attempt to use it from a
 # different place. 
+
 
 # -----------------------------------------------------------------------------
 #
