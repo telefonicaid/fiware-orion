@@ -22,7 +22,9 @@
 #
 # Author: Ken Zangelin
 
-
+# NOTE: this script is designed to be launched from makefile targets. Thus,
+# the call to style_check.sh may break if you attemp to use it from a
+# different place. 
 
 # -----------------------------------------------------------------------------
 #
@@ -30,7 +32,7 @@
 #
 function style_check
 {
-  style_check.sh -d "$1"
+  scripts/style_check.sh -d "$1"
   if [ "$?" != 0 ]
   then
     echo Lint Errors:
