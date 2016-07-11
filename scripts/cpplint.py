@@ -2685,14 +2685,17 @@ def CheckLanguage(filename, clean_lines, linenum, file_extension, include_state,
   if Search(r'\bsprintf\b', line):
     error(filename, linenum, 'runtime/printf', 5,
           'Never use sprintf.  Use snprintf instead.')
-  match = Search(r'\b(strcat)\b', line)  # KZ removed strcpy from the 'verboten list'
-  if match:
-    error(filename, linenum, 'runtime/printf', 4,
-          'Almost always, snprintf is better than %s' % match.group(1))
 
-  if Search(r'\bsscanf\b', line):
-    error(filename, linenum, 'runtime/printf', 1,
-          'sscanf can be ok, but is slow and can overflow buffers.')
+  # KZ removed strcpy, strcat and sscanf from the 'verboten list'
+
+  # match = Search(r'\b(strcpy|strcat)\b', line)
+  # if match:
+  #     error(filename, linenum, 'runtime/printf', 4,
+  #         'Almost always, snprintf is better than %s' % match.group(1))
+
+  # if Search(r'\bsscanf\b', line):
+  #     error(filename, linenum, 'runtime/printf', 1,
+  #         'sscanf can be ok, but is slow and can overflow buffers.')
 
   # Check if some verboten operator overloading is going on
   # TODO(unknown): catch out-of-line unary operator&:

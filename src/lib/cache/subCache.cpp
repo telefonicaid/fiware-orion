@@ -22,8 +22,11 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
+#include <sys/types.h>
 #include <regex.h>
+#include <string>
+#include <vector>
+#include <map>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -44,7 +47,6 @@ using std::map;
 /* ****************************************************************************
 *
 * subCacheState - maintains the state of the subscription cache
-* 
 */
 volatile SubCacheState subCacheState = ScsIdle;
 
@@ -70,10 +72,11 @@ volatile SubCacheState subCacheState = ScsIdle;
 
 /* ****************************************************************************
 *
-* EntityInfo::EntityInfo - 
+* EntityInfo::EntityInfo -
 */
-EntityInfo::EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern):
-  entityId(_entityId), entityType(_entityType)
+EntityInfo::EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern)
+:
+entityId(_entityId), entityType(_entityType)
 {
   isPattern    = (_isPattern == "true") || (_isPattern == "TRUE") || (_isPattern == "True");
 
@@ -102,7 +105,7 @@ EntityInfo::EntityInfo(const std::string& _entityId, const std::string& _entityT
 
 /* ****************************************************************************
 *
-* EntityInfo::match - 
+* EntityInfo::match -
 */
 bool EntityInfo::match
 (
@@ -132,7 +135,7 @@ bool EntityInfo::match
 
 /* ****************************************************************************
 *
-* EntityInfo::release - 
+* EntityInfo::release -
 */
 void EntityInfo::release(void)
 {
@@ -147,7 +150,7 @@ void EntityInfo::release(void)
 
 /* ****************************************************************************
 *
-* EntityInfo::present - 
+* EntityInfo::present -
 */
 void EntityInfo::present(const std::string& prefix)
 {
@@ -160,7 +163,7 @@ void EntityInfo::present(const std::string& prefix)
 
 /* ****************************************************************************
 *
-* SubCache - 
+* SubCache -
 */
 typedef struct SubCache
 {
@@ -178,7 +181,7 @@ typedef struct SubCache
 
 /* ****************************************************************************
 *
-* subCache - 
+* subCache -
 */
 static SubCache  subCache            = { NULL, NULL, 0 };
 bool             subCacheActive      = false;
@@ -188,7 +191,7 @@ bool             subCacheMultitenant = false;
 
 /* ****************************************************************************
 *
-* subCacheInit - 
+* subCacheInit -
 */
 void subCacheInit(bool multitenant)
 {
@@ -208,7 +211,7 @@ void subCacheInit(bool multitenant)
 
 /* ****************************************************************************
 *
-* subCacheItems - 
+* subCacheItems -
 */
 int subCacheItems(void)
 {
@@ -228,7 +231,7 @@ int subCacheItems(void)
 
 /* ****************************************************************************
 *
-* attributeMatch - 
+* attributeMatch -
 */
 static bool attributeMatch(CachedSubscription* cSubP, const std::vector<std::string>& attrV)
 {
@@ -260,7 +263,7 @@ static bool attributeMatch(CachedSubscription* cSubP, const std::vector<std::str
 
 /* ****************************************************************************
 *
-* servicePathMatch - 
+* servicePathMatch -
 */
 static bool servicePathMatch(CachedSubscription* cSubP, char* servicePath)
 {
@@ -305,7 +308,7 @@ static bool servicePathMatch(CachedSubscription* cSubP, char* servicePath)
   //            If equal upto the length of _servicePath, then it is a match
   //
   // Actually, there is more than one way to match here:
-  // If we have a servicePath of the subscription as 
+  // If we have a servicePath of the subscription as
   // "/a/b/#", then the following service-paths must match:
   //   1. /a/b
   //   2. /a/b/ AND /a/b/.+  (any path below /a/b/)
@@ -327,7 +330,7 @@ static bool servicePathMatch(CachedSubscription* cSubP, char* servicePath)
   {
     return true;
   }
-  
+
   return false;
 }
 
@@ -335,7 +338,7 @@ static bool servicePathMatch(CachedSubscription* cSubP, char* servicePath)
 
 /* ****************************************************************************
 *
-* subMatch - 
+* subMatch -
 */
 static bool subMatch
 (
@@ -410,7 +413,7 @@ static bool subMatch
 
 /* ****************************************************************************
 *
-* subCacheMatch - 
+* subCacheMatch -
 */
 void subCacheMatch
 (
@@ -433,7 +436,8 @@ void subCacheMatch
     if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV))
     {
       subVecP->push_back(cSubP);
-      LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
+      LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu",
+                         cSubP->subscriptionId, cSubP->lastNotificationTime));
     }
 
     cSubP = cSubP->next;
@@ -444,7 +448,7 @@ void subCacheMatch
 
 /* ****************************************************************************
 *
-* subCacheMatch - 
+* subCacheMatch -
 */
 void subCacheMatch
 (
@@ -463,7 +467,8 @@ void subCacheMatch
     if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV))
     {
       subVecP->push_back(cSubP);
-      LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
+      LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu",
+                         cSubP->subscriptionId, cSubP->lastNotificationTime));
     }
 
     cSubP = cSubP->next;
@@ -474,7 +479,7 @@ void subCacheMatch
 
 /* ****************************************************************************
 *
-* subCacheItemDestroy - 
+* subCacheItemDestroy -
 */
 void subCacheItemDestroy(CachedSubscription* cSubP)
 {
@@ -520,7 +525,7 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
 
 /* ****************************************************************************
 *
-* subCacheDestroy - 
+* subCacheDestroy -
 */
 void subCacheDestroy(void)
 {
@@ -555,7 +560,7 @@ void subCacheDestroy(void)
 
 /* ****************************************************************************
 *
-* tenantMatch - 
+* tenantMatch -
 */
 static bool tenantMatch(const char* tenant1, const char* tenant2)
 {
@@ -582,7 +587,7 @@ static bool tenantMatch(const char* tenant1, const char* tenant2)
 
 /* ****************************************************************************
 *
-* subCacheItemLookup - 
+* subCacheItemLookup -
 *
 * FIXME P7: lookups would be A LOT faster if the subCache used a hash-table instead of
 *           just a single linked link for the subscriptions.
@@ -611,7 +616,7 @@ CachedSubscription* subCacheItemLookup(const char* tenant, const char* subscript
 
 /* ****************************************************************************
 *
-* subCacheUpdateStatisticsIncrement - 
+* subCacheUpdateStatisticsIncrement -
 */
 void subCacheUpdateStatisticsIncrement(void)
 {
@@ -622,9 +627,9 @@ void subCacheUpdateStatisticsIncrement(void)
 
 /* ****************************************************************************
 *
-* subCacheItemInsert - 
+* subCacheItemInsert -
 *
-* First of all, insertion is done at the end of the list, so, 
+* First of all, insertion is done at the end of the list, so,
 * cSubP->next must ALWAYS be zero at insertion time
 *
 * Note that this is the insert function that *really inserts* the
@@ -641,7 +646,8 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 {
   cSubP->next = NULL;
 
-  LM_T(LmtSubCache, ("inserting sub '%s', lastNotificationTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
+  LM_T(LmtSubCache, ("inserting sub '%s', lastNotificationTime: %lu",
+                     cSubP->subscriptionId, cSubP->lastNotificationTime));
 
   ++subCache.noOfInserts;
 
@@ -666,7 +672,7 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 *
 * Note that 'count', which is the counter of how many times a notification has been
 * fired for a subscription is set to 0 or 1. It is set to 1 only if the subscription
-* has made a notification to be triggered/fired upon creation-time of the subscription. 
+* has made a notification to be triggered/fired upon creation-time of the subscription.
 */
 void subCacheItemInsert
 (
@@ -716,7 +722,7 @@ void subCacheItemInsert
     return;
   }
 
-    
+
   //
   // Now allocate the subscription
   //
@@ -751,7 +757,7 @@ void subCacheItemInsert
     //
     // NOTE
     //   Here, the cached subscription should have a String Filter but if 'fill()' fails, it won't.
-    //   The subscription is already in mongo and hopefully this erroneous situation is fixed 
+    //   The subscription is already in mongo and hopefully this erroneous situation is fixed
     //   once the sub-cache is refreshed.
     //
     //   This 'but' should be minimized once the issue 2082 gets implemented.
@@ -760,7 +766,8 @@ void subCacheItemInsert
     cSubP->expression.stringFilter.fill(stringFilterP, &errorString);
   }
 
-  LM_T(LmtSubCache, ("inserting a new sub in cache (%s). lastNotifictionTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
+  LM_T(LmtSubCache, ("inserting a new sub in cache (%s). lastNotifictionTime: %lu",
+                     cSubP->subscriptionId, cSubP->lastNotificationTime));
 
 
   //
@@ -779,13 +786,13 @@ void subCacheItemInsert
     eIdP = entityIdVector.vec[ix];
 
     EntityInfo* eP = new EntityInfo(eIdP->id, eIdP->type, eIdP->isPattern);
-    
+
     cSubP->entityIdInfos.push_back(eP);
   }
 
 
   //
-  // 4. Insert all attributes 
+  // 4. Insert all attributes
   //
   for (unsigned int ix = 0; ix < attributeList.attributeV.size(); ++ix)
   {
@@ -796,7 +803,8 @@ void subCacheItemInsert
   //
   // 5. Now, insert the subscription in the cache
   //
-  LM_T(LmtSubCache, ("Inserting NEW sub '%s', lastNotificationTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
+  LM_T(LmtSubCache, ("Inserting NEW sub '%s', lastNotificationTime: %lu",
+                     cSubP->subscriptionId, cSubP->lastNotificationTime));
   subCacheItemInsert(cSubP);
 }
 
@@ -832,7 +840,6 @@ void subCacheItemInsert
   bool                               blacklist
 )
 {
-
   NotifyConditionVector ncV;
   EntityIdVector        enV;
   AttributeList         attrL;
@@ -869,9 +876,18 @@ void subCacheItemInsert
 
 /* ****************************************************************************
 *
-* subCacheStatisticsGet - 
+* subCacheStatisticsGet -
 */
-void subCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* updates, int* items, char* list, int listSize)
+void subCacheStatisticsGet
+(
+  int*   refreshes,
+  int*   inserts,
+  int*   removes,
+  int*   updates,
+  int*   items,
+  char*  list,
+  int    listSize
+)
 {
   *refreshes = subCache.noOfRefreshes;
   *inserts   = subCache.noOfInserts;
@@ -887,7 +903,7 @@ void subCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* upda
   //   subCacheStatisticsGet returns that list for the response of "GET /cache/statistics".
   //   Minimum size of the list is set to 128 bytes and the needed size is detected later.
   //   If the list-buffer is not big enough to hold the entire list, a warning text is showed instead.
-  //   
+  //
   //
   *list = 0;
   if (listSize > 128)
@@ -920,7 +936,7 @@ void subCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* upda
         snprintf(list, listSize, "too many subscriptions");
         break;
       }
-      
+
       if (list[0] != 0)
         strcat(list, ", ");
 
@@ -931,7 +947,7 @@ void subCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* upda
   }
   else
   {
-    snprintf(list, listSize,"too many subscriptions");
+    snprintf(list, listSize, "too many subscriptions");
   }
 
   LM_T(LmtSubCache, ("Statistics: refreshes: %d (%d)", *refreshes, subCache.noOfRefreshes));
@@ -941,7 +957,7 @@ void subCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* upda
 
 /* ****************************************************************************
 *
-* subCacheStatisticsReset - 
+* subCacheStatisticsReset -
 */
 void subCacheStatisticsReset(const char* by)
 {
@@ -957,7 +973,7 @@ void subCacheStatisticsReset(const char* by)
 
 /* ****************************************************************************
 *
-* subCachePresent - 
+* subCachePresent -
 */
 void subCachePresent(const char* title)
 {
@@ -967,7 +983,12 @@ void subCachePresent(const char* title)
 
   while (cSubP != NULL)
   {
-    LM_T(LmtSubCache, ("o %s (tenant: %s, LNT: %lu, THR: %d)", cSubP->subscriptionId, cSubP->tenant, cSubP->lastNotificationTime, cSubP->throttling));
+    LM_T(LmtSubCache, ("o %s (tenant: %s, LNT: %lu, THR: %d)",
+                       cSubP->subscriptionId,
+                       cSubP->tenant,
+                       cSubP->lastNotificationTime,
+                       cSubP->throttling));
+
     cSubP = cSubP->next;
   }
 
@@ -978,7 +999,7 @@ void subCachePresent(const char* title)
 
 /* ****************************************************************************
 *
-* subCacheItemRemove - 
+* subCacheItemRemove -
 */
 int subCacheItemRemove(CachedSubscription* cSubP)
 {
@@ -1015,7 +1036,7 @@ int subCacheItemRemove(CachedSubscription* cSubP)
 
 /* ****************************************************************************
 *
-* subCacheRefresh - 
+* subCacheRefresh -
 *
 * WARNING
 *  The cache semaphore must be taken before this function is called:
@@ -1050,62 +1071,25 @@ void subCacheRefresh(void)
 
   ++subCache.noOfRefreshes;
   LM_T(LmtSubCache, ("Refreshed subscription cache [%d]", subCache.noOfRefreshes));
-
-
-  //
-  // FIXME P5: Remove this debugging code once the refresh works again
-  //
-#if 0
-
-  //
-  // DEBUG STARTS HERE
-  //
-  CachedSubscription* cSubP = subCache.head;
-  int                 items = 0;
-
-  while (cSubP != NULL)
-  {
-    LM_T(LmtSubCache, ("%s: TEN:%s, SPath:%s, THR:%lu, EXP:%lu, LNT:%lu REF:%s, Es:%d, As:%d, NCs:%d",
-                            cSubP->subscriptionId,
-                            cSubP->tenant,
-                            cSubP->servicePath,
-                            cSubP->throttling,
-                            cSubP->expirationTime,
-                            cSubP->lastNotificationTime,
-                            cSubP->httpInfo.url,
-                            cSubP->entityIdInfos.size(),
-                            cSubP->attributes.size(),
-                            cSubP->notifyConditionVector.size()));
-
-    cSubP = cSubP->next;
-    ++items;
-  }
-
-  LM_T(LmtSubCache, ("%d subs in sub.cache", items));
-
-  //
-  // DEBUG ENDS HERE
-  //
-#endif
 }
 
 
 
 /* ****************************************************************************
 *
-* CachedSubSaved - 
+* CachedSubSaved -
 */
 typedef struct CachedSubSaved
 {
-  long long    lastNotificationTime;
-  long long    count;
+  int64_t  lastNotificationTime;
+  int64_t  count;
 } CachedSubSaved;
 
 
 
 /* ****************************************************************************
 *
-* subCacheSync - 
+* subCacheSync -
 *
 * 1. Save subscriptionId, lastNotificationTime, and count for all items in cache (savedSubV)
 * 2. Refresh cache (count set to 0)
@@ -1126,7 +1110,7 @@ typedef struct CachedSubSaved
 *   execute until the point where the temporal objects are deleted (See '6. Free the vector savedSubV').
 *   To fix this little problem, we have created a variable 'subCacheState' that is set to ScsSynchronizing while
 *   the sub-cache synchronization is working.
-*   In serviceRoutines/exitTreat.cpp this variable is checked and if iot is set to ScsSynchronizing, then a 
+*   In serviceRoutines/exitTreat.cpp this variable is checked and if iot is set to ScsSynchronizing, then a
 *   sleep for a few seconds is performed beofre the broker exits (this is only for DEBUG compilations).
 */
 void subCacheSync(void)
@@ -1228,7 +1212,7 @@ void subCacheSync(void)
 
 /* ****************************************************************************
 *
-* subCacheRefresherThread - 
+* subCacheRefresherThread -
 */
 static void* subCacheRefresherThread(void* vP)
 {
@@ -1247,7 +1231,7 @@ static void* subCacheRefresherThread(void* vP)
 
 /* ****************************************************************************
 *
-* subCacheStart - 
+* subCacheStart -
 */
 void subCacheStart(void)
 {

@@ -51,7 +51,8 @@ __thread bool badInputSeen = false;
 *
 * AlarmManager::AlarmManager - 
 */
-AlarmManager::AlarmManager():
+AlarmManager::AlarmManager()
+:
   badInputs(0),
   badInputResets(0),
   notificationErrors(0),
