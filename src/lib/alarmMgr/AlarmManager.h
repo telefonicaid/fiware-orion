@@ -26,6 +26,7 @@
 * Author: Ken Zangelin
 */
 #include <semaphore.h>
+#include <sys/types.h>
 
 #include <string>
 #include <map>
@@ -38,13 +39,13 @@
 */
 class AlarmManager
 {
-private:
-  long long                   badInputs;
-  long long                   badInputResets;
-  long long                   notificationErrors;
-  long long                   notificationErrorResets;
-  long long                   dbErrors;
-  long long                   dbErrorResets;
+ private:
+  int64_t                     badInputs;
+  int64_t                     badInputResets;
+  int64_t                     notificationErrors;
+  int64_t                     notificationErrorResets;
+  int64_t                     dbErrors;
+  int64_t                     dbErrorResets;
   bool                        dbOk;
   std::map<std::string, int>  notificationV;
   std::map<std::string, int>  badInputV;
@@ -53,7 +54,7 @@ private:
   bool                        dbErrorLogAlways;
   sem_t                       sem;
 
-public:
+ public:
   AlarmManager();
 
   int  init(bool logAlreadyRaisedAlarms);
@@ -76,11 +77,11 @@ public:
   bool badInputReset(const std::string& ip);
 
   // Methods for Log Summary
-  void dbErrorsGet(bool* active, long long* raised, long long* released);
-  void badInputGet(long long* active, long long* raised, long long* released);
-  void notificationErrorGet(long long* active, long long* raised, long long* released);
+  void dbErrorsGet(bool* active, int64_t* raised, int64_t* released);
+  void badInputGet(int64_t* active, int64_t* raised, int64_t* released);
+  void notificationErrorGet(int64_t* active, int64_t* raised, int64_t* released);
 
-private:
+ private:
   int  semInit(void);
 };
 
