@@ -81,7 +81,6 @@ static char* commentStrip(char* s, char c)
 static int dirFind(char* dir, int dirLen)
 {
   char            path[512];
-  struct passwd*  pwP;
   uid_t           euid;
 
   /* Path to lookup RC file:
@@ -126,12 +125,16 @@ static int dirFind(char* dir, int dirLen)
   }
 
   /* 3. users home directory */
-  euid = geteuid();
-  if ((pwP = getpwuid(euid)) != NULL)
-  {
-    LM_T(LmtPaRcFile, ("checking home dir '%s'", pwP->pw_dir));
+  struct passwd   pw;
+  struct passwd*  pwP;
+  char            buf[64];
 
-    snprintf(dir, dirLen, "%s", pwP->pw_dir);
+  euid = geteuid();
+  if (getpwuid_r(euid, &pw, buf, sizeof(buf), &pwP) == 0)
+  {
+    LM_T(LmtPaRcFile, ("checking home dir '%s'", pw.pw_dir));
+
+    snprintf(dir, dirLen, "%s", pw.pw_dir);
     snprintf(path, sizeof(path), "%s/%s", dir, paRcFileName);
 
     if (access(path, R_OK) == 0)
@@ -141,7 +144,7 @@ static int dirFind(char* dir, int dirLen)
   }
   else
   {
-    LM_W(("geteuid or getpwuid failed"));
+    LM_W(("geteuid or getpwuid_r failed"));
   }
 
   /* 4. Generic RC file directory, if any ... */
