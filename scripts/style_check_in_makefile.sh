@@ -47,12 +47,12 @@ function style_check
 
 style_check src/lib/logMsg
 style_check src/lib/parseArgs
+style_check src/lib/cache
+style_check src/lib/alarmMgr
 
 # FIXME: Just keep adding directories here until all of them are included:
 #
-# style_check src/lib/alarmMgr
 # style_check src/lib/apiTypesV2
-# style_check src/lib/cache
 # style_check src/lib/common
 # style_check src/lib/convenience
 # style_check src/lib/jsonParse
