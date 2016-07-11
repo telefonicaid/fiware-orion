@@ -108,7 +108,7 @@ style_check_included_in_make_steps:
 	./scripts/style_check_in_makefile.sh
 
 
-release: style_check_included_in_make_steps prepare_release
+release: prepare_release
 	cd BUILD_RELEASE && make -j$(CPU_COUNT)
 
 debug: style_check_included_in_make_steps prepare_debug
