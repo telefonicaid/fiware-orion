@@ -365,7 +365,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "name": "Float", 
                         "type": "none", 
-                        "value": 3.1400000000000001
+                        "value": 3.14REGEX([01]*)
                     }, 
                     {
                         "name": "Integer", 
@@ -405,7 +405,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                                 false, 
                                 true
                             ], 
-                            "Float": 3.1400000000000001, 
+                            "Float": 3.14REGEX([01]*),
                             "Integer": 3, 
                             "Null": null, 
                             "NullVec": [
@@ -425,7 +425,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                                     false, 
                                     true
                                 ], 
-                                "Float": 3.1400000000000001, 
+                                "Float": 3.14REGEX([01]*), 
                                 "Integer": 3, 
                                 "Null": null, 
                                 "NullVec": [
@@ -442,7 +442,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                                     "a": "1", 
                                     "b": null, 
                                     "c": true, 
-                                    "d": 3.1400000000000001
+                                    "d": 3.14REGEX([01]*)
                                 }, 
                                 "String": "string"
                             }, 
