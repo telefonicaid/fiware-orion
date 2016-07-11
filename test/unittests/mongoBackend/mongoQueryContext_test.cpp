@@ -335,14 +335,16 @@ static void prepareDatabaseWithCustomMetadata(void) {
                        "attrNames" << BSON_ARRAY("A1" << "A2") <<
                        "attrs" << BSON(
                           "A1" << BSON("type" << "TA1" << "value" << "A" <<
-                               "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "1") <<
-                                                  BSON("name" << "MD2" << "type" << "TMD2" << "value" << "2")
-                                                 )
+                               "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << "1") <<
+                                            "MD2" << BSON("type" << "TMD2" << "value" << "2")
+                                            ) <<
+                               "mdNames" << BSON_ARRAY("MD1" << "MD2")
                                ) <<
                           "A2" << BSON("type" << "TA2" << "value" << "C" <<
-                               "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "5") <<
-                                                  BSON("name" << "MD2" << "type" << "TMD2" << "value" << "6")
-                                                 )
+                               "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << "5") <<
+                                            "MD2" << BSON("type" << "TMD2" << "value" << "6")
+                                           ) <<
+                               "mdNames" << BSON_ARRAY("MD1" << "MD2")
                                )
                           )
                       );
@@ -351,14 +353,16 @@ static void prepareDatabaseWithCustomMetadata(void) {
                        "attrNames" << BSON_ARRAY("A1" << "A2") <<
                        "attrs" << BSON(
                            "A1" << BSON("type" << "TA1" << "value" << "D" <<
-                                "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "7") <<
-                                                   BSON("name" << "MD2" << "type" << "TMD2" << "value" << "8")
-                                                  )
+                                "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << "7") <<
+                                             "MD2" << BSON("type" << "TMD2" << "value" << "8")
+                                            ) <<
+                                "mdNames" << BSON_ARRAY("MD1" << "MD2")
                                 ) <<
                            "A2" << BSON("type" << "TA2" << "value" << "F" <<
-                                "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "11") <<
-                                                   BSON("name" << "MD2" << "type" << "TMD2" << "value" << "12")
-                                                  )
+                                "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << "11") <<
+                                             "MD2" << BSON("type" << "TMD2" << "value" << "12")
+                                            ) <<
+                                "mdNames" << BSON_ARRAY("MD1" << "MD2")
                                 )
                           )
                       );
@@ -384,16 +388,18 @@ static void prepareDatabaseWithCustomMetadataNative(void) {
                        "attrNames" << BSON_ARRAY("A1" << "A2") <<
                        "attrs" << BSON(
                           "A1" << BSON("type" << "TA1" << "value" << "A" <<
-                               "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "val1") <<
-                                                  BSON("name" << "MD2" << "type" << "TMD2" << "value" << 2.1) <<
-                                                  BSON("name" << "MD3" << "type" << "TMD3" << "value" << false) <<
-                                                  BSON("name" << "MD4" << "type" << "TMD4" << "value" << BSONNULL)
-                                                 )
+                               "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << "val1") <<
+                                            "MD2" << BSON("type" << "TMD2" << "value" << 2.1) <<
+                                            "MD3" << BSON("type" << "TMD3" << "value" << false) <<
+                                            "MD4" << BSON("type" << "TMD4" << "value" << BSONNULL)
+                                           ) <<
+                               "mdNames" << BSON_ARRAY("MD1" << "MD2" << "MD3" << "MD4")
                                ) <<
                           "A2" << BSON("type" << "TA2" << "value" << "C" <<
-                               "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << false) <<
-                                                  BSON("name" << "MD2" << "type" << "TMD2" << "value" << 6.5)
-                                                 )
+                               "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << false) <<
+                                            "MD2" << BSON("type" << "TMD2" << "value" << 6.5)
+                                           ) <<
+                               "mdNames" << BSON_ARRAY("MD1" << "MD2")
                                )
                           )
                       );
@@ -402,14 +408,16 @@ static void prepareDatabaseWithCustomMetadataNative(void) {
                        "attrNames" << BSON_ARRAY("A1" << "A2") <<
                        "attrs" << BSON(
                            "A1" << BSON("type" << "TA1" << "value" << "D" <<
-                                "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "x") <<
-                                                   BSON("name" << "MD2" << "type" << "TMD2" << "value" << 8.7)
-                                                  )
+                                "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << "x") <<
+                                             "MD2" << BSON("type" << "TMD2" << "value" << 8.7)
+                                            ) <<
+                                "mdNames" << BSON_ARRAY("MD1" << "MD2")
                                 ) <<
                            "A2" << BSON("type" << "TA2" << "value" << "F" <<
-                                "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << true) <<
-                                                   BSON("name" << "MD2" << "type" << "TMD2" << "value" << "val2")
-                                                  )
+                                "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << true) <<
+                                             "MD2" << BSON("type" << "TMD2" << "value" << "val2")
+                                            ) <<
+                                "mdNames" << BSON_ARRAY("MD1" << "MD2")
                                 )
                           )
                       );

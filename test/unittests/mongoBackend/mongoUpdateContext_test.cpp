@@ -265,9 +265,10 @@ static void prepareDatabaseMd(void) {
                       "attrNames" << BSON_ARRAY("A1") <<
                        "attrs" << BSON(
                           "A1" << BSON("type" << "TA1" << "value" << "val1" <<
-                               "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "MD1val") <<
-                                                  BSON("name" << "MD2" << "type" << "TMD2" << "value" << "MD2val")
-                                                 )
+                               "md" << BSON("MD1" << BSON("type" << "TMD1" << "value" << "MD1val") <<
+                                            "MD2" << BSON("type" << "TMD2" << "value" << "MD2val")
+                                            ) <<
+                               "mdNames" << BSON_ARRAY("MD1" << "MD2")
                                )
                           )
                       );
@@ -401,11 +402,12 @@ static void prepareDatabaseDifferentMdNativeTypes(void) {
                     "attrNames" << BSON_ARRAY("A1") <<
                      "attrs" << BSON(
                         "A1" << BSON("type" << "TA1" << "value" << "val1" <<
-                             "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "T" << "value" << "s") <<
-                                                BSON("name" << "MD2" << "type" << "T" << "value" << 55.5) <<
-                                                BSON("name" << "MD3" << "type" << "T" << "value" << false) <<
-                                                BSON("name" << "MD4" << "type" << "T" << "value" << BSONNULL)
-                                               )
+                             "md" << BSON("MD1" << BSON("type" << "T" << "value" << "s") <<
+                                          "MD2" << BSON("type" << "T" << "value" << 55.5) <<
+                                          "MD3" << BSON("type" << "T" << "value" << false) <<
+                                          "MD4" << BSON("type" << "T" << "value" << BSONNULL)
+                                         ) <<
+                             "mdNames" << BSON_ARRAY("MD1" << "MD2" << "MD3" << "MD4")
                              )
                         )
                     );
@@ -4916,8 +4918,9 @@ TEST(mongoUpdateContextRequest, createEntityMd)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
     std::vector<BSONElement> attrNames;
+    std::vector<BSONElement> mdNames;
     ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -5006,14 +5009,18 @@ TEST(mongoUpdateContextRequest, createEntityMd)
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_TRUE(a1.hasField("creDate"));
     EXPECT_TRUE(a1.hasField("modDate"));
-    std::vector<BSONElement> mdV = a1.getField("md").Array();
-    ASSERT_EQ(2, mdV.size());
-    EXPECT_EQ("MD1", getStringField(mdV[0].embeddedObject(), "name"));
-    EXPECT_EQ("TMD1", getStringField(mdV[0].embeddedObject(), "type"));
-    EXPECT_EQ("MD1val", getStringField(mdV[0].embeddedObject(), "value"));
-    EXPECT_EQ("MD2", getStringField(mdV[1].embeddedObject(), "name"));
-    EXPECT_EQ("TMD2", getStringField(mdV[1].embeddedObject(), "type"));
-    EXPECT_EQ("MD2val", getStringField(mdV[1].embeddedObject(), "value"));
+    mds = a1.getField("md").embeddedObject();
+    mdNames = a1.getField("mdNames").Array();
+    ASSERT_EQ(2, mds.nFields());
+    ASSERT_EQ(2, mdNames.size());
+    EXPECT_TRUE(findAttr(mdNames, "MD1"));
+    EXPECT_TRUE(findAttr(mdNames, "MD2"));
+    EXPECT_TRUE(mds.hasField("MD1"));
+    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
+    EXPECT_EQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
+    EXPECT_TRUE(mds.hasField("MD2"));
+    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
+    EXPECT_EQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
@@ -7510,8 +7517,10 @@ TEST(mongoUpdateContextRequest, appendCreateEntWithMd)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
+    std::vector<BSONElement> mdNames;
     std::vector<BSONElement> attrNames;
+
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -7529,14 +7538,18 @@ TEST(mongoUpdateContextRequest, appendCreateEntWithMd)
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
-    std::vector<BSONElement> mdV = a1.getField("md").Array();
-    ASSERT_EQ(2, mdV.size());
-    EXPECT_EQ("MD1", getStringField(mdV[0].embeddedObject(), "name"));
-    EXPECT_EQ("TMD1", getStringField(mdV[0].embeddedObject(), "type"));
-    EXPECT_EQ("MD1val", getStringField(mdV[0].embeddedObject(), "value"));
-    EXPECT_EQ("MD2", getStringField(mdV[1].embeddedObject(), "name"));
-    EXPECT_EQ("TMD2", getStringField(mdV[1].embeddedObject(), "type"));
-    EXPECT_EQ("MD2val", getStringField(mdV[1].embeddedObject(), "value"));
+    mds = a1.getField("md").embeddedObject();
+    mdNames = a1.getField("mdNames").Array();
+    ASSERT_EQ(2, mds.nFields());
+    ASSERT_EQ(2, mdNames.size());
+    EXPECT_TRUE(findAttr(mdNames, "MD1"));
+    EXPECT_TRUE(findAttr(mdNames, "MD2"));
+    EXPECT_TRUE(mds.hasField("MD1"));
+    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
+    EXPECT_EQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
+    EXPECT_TRUE(mds.hasField("MD2"));
+    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
+    EXPECT_EQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
 
     utExit();
 }
@@ -7600,8 +7613,9 @@ TEST(mongoUpdateContextRequest, appendMdAllExisting)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
     std::vector<BSONElement> attrNames;
+    std::vector<BSONElement> mdNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -7618,15 +7632,19 @@ TEST(mongoUpdateContextRequest, appendMdAllExisting)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
-    EXPECT_FALSE(a1.hasField("creDate"));
-    std::vector<BSONElement> mdV = a1.getField("md").Array();
-    ASSERT_EQ(2, mdV.size());
-    EXPECT_EQ("MD1", getStringField(mdV[0].embeddedObject(), "name"));
-    EXPECT_EQ("TMD1", getStringField(mdV[0].embeddedObject(), "type"));
-    EXPECT_EQ("new_val", getStringField(mdV[0].embeddedObject(), "value"));
-    EXPECT_EQ("MD2", getStringField(mdV[1].embeddedObject(), "name"));
-    EXPECT_EQ("TMD2", getStringField(mdV[1].embeddedObject(), "type"));
-    EXPECT_EQ("MD2val", getStringField(mdV[1].embeddedObject(), "value"));
+    EXPECT_FALSE(a1.hasField("creDate"));    
+    mds = a1.getField("md").embeddedObject();
+    mdNames = a1.getField("mdNames").Array();
+    ASSERT_EQ(2, mds.nFields());
+    ASSERT_EQ(2, mdNames.size());
+    EXPECT_TRUE(findAttr(mdNames, "MD1"));
+    EXPECT_TRUE(findAttr(mdNames, "MD2"));
+    EXPECT_TRUE(mds.hasField("MD1"));
+    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
+    EXPECT_EQ("new_val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
+    EXPECT_TRUE(mds.hasField("MD2"));
+    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
+    EXPECT_EQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
 
     utExit();
 }
@@ -7690,8 +7708,9 @@ TEST(mongoUpdateContextRequest, updateMdAllExisting)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
     std::vector<BSONElement> attrNames;
+    std::vector<BSONElement> mdNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -7709,14 +7728,18 @@ TEST(mongoUpdateContextRequest, updateMdAllExisting)
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_FALSE(a1.hasField("creDate"));
-    std::vector<BSONElement> mdV = a1.getField("md").Array();
-    ASSERT_EQ(2, mdV.size());
-    EXPECT_EQ("MD1", getStringField(mdV[0].embeddedObject(), "name"));
-    EXPECT_EQ("TMD1", getStringField(mdV[0].embeddedObject(), "type"));
-    EXPECT_EQ("new_val", getStringField(mdV[0].embeddedObject(), "value"));
-    EXPECT_EQ("MD2", getStringField(mdV[1].embeddedObject(), "name"));
-    EXPECT_EQ("TMD2", getStringField(mdV[1].embeddedObject(), "type"));
-    EXPECT_EQ("MD2val", getStringField(mdV[1].embeddedObject(), "value"));
+    mds = a1.getField("md").embeddedObject();
+    mdNames = a1.getField("mdNames").Array();
+    ASSERT_EQ(2, mds.nFields());
+    ASSERT_EQ(2, mdNames.size());
+    EXPECT_TRUE(findAttr(mdNames, "MD1"));
+    EXPECT_TRUE(findAttr(mdNames, "MD2"));
+    EXPECT_TRUE(mds.hasField("MD1"));
+    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
+    EXPECT_EQ("new_val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
+    EXPECT_TRUE(mds.hasField("MD2"));
+    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
+    EXPECT_EQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
 
     utExit();
 }
@@ -7780,8 +7803,9 @@ TEST(mongoUpdateContextRequest, appendMdAllNew)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
     std::vector<BSONElement> attrNames;
+    std::vector<BSONElement> mdNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -7799,17 +7823,22 @@ TEST(mongoUpdateContextRequest, appendMdAllNew)
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_FALSE(a1.hasField("creDate"));
-    std::vector<BSONElement> mdV = a1.getField("md").Array();
-    ASSERT_EQ(3, mdV.size());
-    EXPECT_EQ("MD3", getStringField(mdV[0].embeddedObject(), "name"));
-    EXPECT_EQ("TMD3", getStringField(mdV[0].embeddedObject(), "type"));
-    EXPECT_EQ("new_val3", getStringField(mdV[0].embeddedObject(), "value"));
-    EXPECT_EQ("MD1", getStringField(mdV[1].embeddedObject(), "name"));
-    EXPECT_EQ("TMD1", getStringField(mdV[1].embeddedObject(), "type"));
-    EXPECT_EQ("MD1val", getStringField(mdV[1].embeddedObject(), "value"));
-    EXPECT_EQ("MD2", getStringField(mdV[2].embeddedObject(), "name"));
-    EXPECT_EQ("TMD2", getStringField(mdV[2].embeddedObject(), "type"));
-    EXPECT_EQ("MD2val", getStringField(mdV[2].embeddedObject(), "value"));
+    mds = a1.getField("md").embeddedObject();
+    mdNames = a1.getField("mdNames").Array();
+    ASSERT_EQ(3, mds.nFields());
+    ASSERT_EQ(3, mdNames.size());
+    EXPECT_TRUE(findAttr(mdNames, "MD1"));
+    EXPECT_TRUE(findAttr(mdNames, "MD2"));
+    EXPECT_TRUE(findAttr(mdNames, "MD3"));
+    EXPECT_TRUE(mds.hasField("MD1"));
+    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
+    EXPECT_EQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
+    EXPECT_TRUE(mds.hasField("MD2"));
+    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
+    EXPECT_EQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
+    EXPECT_TRUE(mds.hasField("MD3"));
+    EXPECT_EQ("TMD3", getStringField(mds.getField("MD3").embeddedObject(), "type"));
+    EXPECT_EQ("new_val3", getStringField(mds.getField("MD3").embeddedObject(), "value"));
 
     utExit();
 }
@@ -7873,8 +7902,9 @@ TEST(mongoUpdateContextRequest, updateMdAllNew)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
     std::vector<BSONElement> attrNames;
+    std::vector<BSONElement> mdNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -7892,17 +7922,22 @@ TEST(mongoUpdateContextRequest, updateMdAllNew)
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_FALSE(a1.hasField("creDate"));
-    std::vector<BSONElement> mdV = a1.getField("md").Array();
-    ASSERT_EQ(3, mdV.size());
-    EXPECT_EQ("MD3", getStringField(mdV[0].embeddedObject(), "name"));
-    EXPECT_EQ("TMD3", getStringField(mdV[0].embeddedObject(), "type"));
-    EXPECT_EQ("new_val3", getStringField(mdV[0].embeddedObject(), "value"));
-    EXPECT_EQ("MD1", getStringField(mdV[1].embeddedObject(), "name"));
-    EXPECT_EQ("TMD1", getStringField(mdV[1].embeddedObject(), "type"));
-    EXPECT_EQ("MD1val", getStringField(mdV[1].embeddedObject(), "value"));
-    EXPECT_EQ("MD2", getStringField(mdV[2].embeddedObject(), "name"));
-    EXPECT_EQ("TMD2", getStringField(mdV[2].embeddedObject(), "type"));
-    EXPECT_EQ("MD2val", getStringField(mdV[2].embeddedObject(), "value"));
+    mds = a1.getField("md").embeddedObject();
+    mdNames = a1.getField("mdNames").Array();
+    ASSERT_EQ(3, mds.nFields());
+    ASSERT_EQ(3, mdNames.size());
+    EXPECT_TRUE(findAttr(mdNames, "MD1"));
+    EXPECT_TRUE(findAttr(mdNames, "MD2"));
+    EXPECT_TRUE(findAttr(mdNames, "MD3"));
+    EXPECT_TRUE(mds.hasField("MD1"));
+    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
+    EXPECT_EQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
+    EXPECT_TRUE(mds.hasField("MD2"));
+    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
+    EXPECT_EQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
+    EXPECT_TRUE(mds.hasField("MD3"));
+    EXPECT_EQ("TMD3", getStringField(mds.getField("MD3").embeddedObject(), "type"));
+    EXPECT_EQ("new_val3", getStringField(mds.getField("MD3").embeddedObject(), "value"));
 
     utExit();
 }
@@ -7971,8 +8006,9 @@ TEST(mongoUpdateContextRequest, appendMdSomeNew)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
     std::vector<BSONElement> attrNames;
+    std::vector<BSONElement> mdNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -7990,17 +8026,22 @@ TEST(mongoUpdateContextRequest, appendMdSomeNew)
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_FALSE(a1.hasField("creDate"));
-    std::vector<BSONElement> mdV = a1.getField("md").Array();
-    ASSERT_EQ(3, mdV.size());
-    EXPECT_EQ("MD2", getStringField(mdV[0].embeddedObject(), "name"));
-    EXPECT_EQ("TMD2", getStringField(mdV[0].embeddedObject(), "type"));
-    EXPECT_EQ("new_val2", getStringField(mdV[0].embeddedObject(), "value"));
-    EXPECT_EQ("MD3", getStringField(mdV[1].embeddedObject(), "name"));
-    EXPECT_EQ("TMD3", getStringField(mdV[1].embeddedObject(), "type"));
-    EXPECT_EQ("new_val3", getStringField(mdV[1].embeddedObject(), "value"));
-    EXPECT_EQ("MD1", getStringField(mdV[2].embeddedObject(), "name"));
-    EXPECT_EQ("TMD1", getStringField(mdV[2].embeddedObject(), "type"));
-    EXPECT_EQ("MD1val", getStringField(mdV[2].embeddedObject(), "value"));
+    mds = a1.getField("md").embeddedObject();
+    mdNames = a1.getField("mdNames").Array();
+    ASSERT_EQ(3, mds.nFields());
+    ASSERT_EQ(3, mdNames.size());
+    EXPECT_TRUE(findAttr(mdNames, "MD1"));
+    EXPECT_TRUE(findAttr(mdNames, "MD2"));
+    EXPECT_TRUE(findAttr(mdNames, "MD3"));
+    EXPECT_TRUE(mds.hasField("MD1"));
+    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
+    EXPECT_EQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
+    EXPECT_TRUE(mds.hasField("MD2"));
+    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
+    EXPECT_EQ("new_val2", getStringField(mds.getField("MD2").embeddedObject(), "value"));
+    EXPECT_TRUE(mds.hasField("MD3"));
+    EXPECT_EQ("TMD3", getStringField(mds.getField("MD3").embeddedObject(), "type"));
+    EXPECT_EQ("new_val3", getStringField(mds.getField("MD3").embeddedObject(), "value"));
 
     utExit();
 }
@@ -8069,8 +8110,9 @@ TEST(mongoUpdateContextRequest, updateMdSomeNew)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
     std::vector<BSONElement> attrNames;
+    std::vector<BSONElement> mdNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -8088,17 +8130,22 @@ TEST(mongoUpdateContextRequest, updateMdSomeNew)
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_FALSE(a1.hasField("creDate"));
-    std::vector<BSONElement> mdV = a1.getField("md").Array();
-    ASSERT_EQ(3, mdV.size());
-    EXPECT_EQ("MD2", getStringField(mdV[0].embeddedObject(), "name"));
-    EXPECT_EQ("TMD2", getStringField(mdV[0].embeddedObject(), "type"));
-    EXPECT_EQ("new_val2", getStringField(mdV[0].embeddedObject(), "value"));
-    EXPECT_EQ("MD3", getStringField(mdV[1].embeddedObject(), "name"));
-    EXPECT_EQ("TMD3", getStringField(mdV[1].embeddedObject(), "type"));
-    EXPECT_EQ("new_val3", getStringField(mdV[1].embeddedObject(), "value"));
-    EXPECT_EQ("MD1", getStringField(mdV[2].embeddedObject(), "name"));
-    EXPECT_EQ("TMD1", getStringField(mdV[2].embeddedObject(), "type"));
-    EXPECT_EQ("MD1val", getStringField(mdV[2].embeddedObject(), "value"));
+    mds = a1.getField("md").embeddedObject();
+    mdNames = a1.getField("mdNames").Array();
+    ASSERT_EQ(3, mds.nFields());
+    ASSERT_EQ(3, mdNames.size());
+    EXPECT_TRUE(findAttr(mdNames, "MD1"));
+    EXPECT_TRUE(findAttr(mdNames, "MD2"));
+    EXPECT_TRUE(findAttr(mdNames, "MD3"));
+    EXPECT_TRUE(mds.hasField("MD1"));
+    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
+    EXPECT_EQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
+    EXPECT_TRUE(mds.hasField("MD2"));
+    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
+    EXPECT_EQ("new_val2", getStringField(mds.getField("MD2").embeddedObject(), "value"));
+    EXPECT_TRUE(mds.hasField("MD3"));
+    EXPECT_EQ("TMD3", getStringField(mds.getField("MD3").embeddedObject(), "type"));
+    EXPECT_EQ("new_val3", getStringField(mds.getField("MD3").embeddedObject(), "value"));
 
     utExit();
 }
@@ -8162,8 +8209,9 @@ TEST(mongoUpdateContextRequest, appendValueAndMd)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
     std::vector<BSONElement> attrNames;
+    std::vector<BSONElement> mdNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -8181,14 +8229,18 @@ TEST(mongoUpdateContextRequest, appendValueAndMd)
     EXPECT_STREQ("attr_new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_FALSE(a1.hasField("creDate"));
-    std::vector<BSONElement> mdV = a1.getField("md").Array();
-    ASSERT_EQ(2, mdV.size());
-    EXPECT_EQ("MD1", getStringField(mdV[0].embeddedObject(), "name"));
-    EXPECT_EQ("TMD1", getStringField(mdV[0].embeddedObject(), "type"));
-    EXPECT_EQ("new_val", getStringField(mdV[0].embeddedObject(), "value"));
-    EXPECT_EQ("MD2", getStringField(mdV[1].embeddedObject(), "name"));
-    EXPECT_EQ("TMD2", getStringField(mdV[1].embeddedObject(), "type"));
-    EXPECT_EQ("MD2val", getStringField(mdV[1].embeddedObject(), "value"));
+    mds = a1.getField("md").embeddedObject();
+    mdNames = a1.getField("mdNames").Array();
+    ASSERT_EQ(2, mds.nFields());
+    ASSERT_EQ(2, mdNames.size());
+    EXPECT_TRUE(findAttr(mdNames, "MD1"));
+    EXPECT_TRUE(findAttr(mdNames, "MD2"));
+    EXPECT_TRUE(mds.hasField("MD1"));
+    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
+    EXPECT_EQ("new_val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
+    EXPECT_TRUE(mds.hasField("MD2"));
+    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
+    EXPECT_EQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
 
     utExit();
 }
@@ -8252,8 +8304,9 @@ TEST(mongoUpdateContextRequest, updateValueAndMd)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
     std::vector<BSONElement> attrNames;
+    std::vector<BSONElement> mdNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -8271,14 +8324,18 @@ TEST(mongoUpdateContextRequest, updateValueAndMd)
     EXPECT_STREQ("attr_new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_FALSE(a1.hasField("creDate"));
-    std::vector<BSONElement> mdV = a1.getField("md").Array();
-    ASSERT_EQ(2, mdV.size());
-    EXPECT_EQ("MD1", getStringField(mdV[0].embeddedObject(), "name"));
-    EXPECT_EQ("TMD1", getStringField(mdV[0].embeddedObject(), "type"));
-    EXPECT_EQ("new_val", getStringField(mdV[0].embeddedObject(), "value"));
-    EXPECT_EQ("MD2", getStringField(mdV[1].embeddedObject(), "name"));
-    EXPECT_EQ("TMD2", getStringField(mdV[1].embeddedObject(), "type"));
-    EXPECT_EQ("MD2val", getStringField(mdV[1].embeddedObject(), "value"));
+    mds = a1.getField("md").embeddedObject();
+    mdNames = a1.getField("mdNames").Array();
+    ASSERT_EQ(2, mds.nFields());
+    ASSERT_EQ(2, mdNames.size());
+    EXPECT_TRUE(findAttr(mdNames, "MD1"));
+    EXPECT_TRUE(findAttr(mdNames, "MD2"));
+    EXPECT_TRUE(mds.hasField("MD1"));
+    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
+    EXPECT_EQ("new_val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
+    EXPECT_TRUE(mds.hasField("MD2"));
+    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
+    EXPECT_EQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
 
     utExit();
 }
@@ -8343,8 +8400,9 @@ TEST(mongoUpdateContextRequest, appendMdNoActualChanges)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
     std::vector<BSONElement> attrNames;
+    std::vector<BSONElement> mdNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -8362,14 +8420,18 @@ TEST(mongoUpdateContextRequest, appendMdNoActualChanges)
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
     EXPECT_FALSE(a1.hasField("creDate"));
-    std::vector<BSONElement> mdV = a1.getField("md").Array();
-    ASSERT_EQ(2, mdV.size());
-    EXPECT_EQ("MD1", getStringField(mdV[0].embeddedObject(), "name"));
-    EXPECT_EQ("TMD1", getStringField(mdV[0].embeddedObject(), "type"));
-    EXPECT_EQ("MD1val", getStringField(mdV[0].embeddedObject(), "value"));
-    EXPECT_EQ("MD2", getStringField(mdV[1].embeddedObject(), "name"));
-    EXPECT_EQ("TMD2", getStringField(mdV[1].embeddedObject(), "type"));
-    EXPECT_EQ("MD2val", getStringField(mdV[1].embeddedObject(), "value"));
+    mds = a1.getField("md").embeddedObject();
+    mdNames = a1.getField("mdNames").Array();
+    ASSERT_EQ(2, mds.nFields());
+    ASSERT_EQ(2, mdNames.size());
+    EXPECT_TRUE(findAttr(mdNames, "MD1"));
+    EXPECT_TRUE(findAttr(mdNames, "MD2"));
+    EXPECT_TRUE(mds.hasField("MD1"));
+    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
+    EXPECT_EQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
+    EXPECT_TRUE(mds.hasField("MD2"));
+    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
+    EXPECT_EQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
 
     utExit();
 }
@@ -8433,8 +8495,9 @@ TEST(mongoUpdateContextRequest, updateMdNoActualChanges)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
     std::vector<BSONElement> attrNames;
+    std::vector<BSONElement> mdNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -8452,14 +8515,18 @@ TEST(mongoUpdateContextRequest, updateMdNoActualChanges)
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
     EXPECT_FALSE(a1.hasField("creDate"));
-    std::vector<BSONElement> mdV = a1.getField("md").Array();
-    ASSERT_EQ(2, mdV.size());
-    EXPECT_EQ("MD1", getStringField(mdV[0].embeddedObject(), "name"));
-    EXPECT_EQ("TMD1", getStringField(mdV[0].embeddedObject(), "type"));
-    EXPECT_EQ("MD1val", getStringField(mdV[0].embeddedObject(), "value"));
-    EXPECT_EQ("MD2", getStringField(mdV[1].embeddedObject(), "name"));
-    EXPECT_EQ("TMD2", getStringField(mdV[1].embeddedObject(), "type"));
-    EXPECT_EQ("MD2val", getStringField(mdV[1].embeddedObject(), "value"));
+    mds = a1.getField("md").embeddedObject();
+    mdNames = a1.getField("mdNames").Array();
+    ASSERT_EQ(2, mds.nFields());
+    ASSERT_EQ(2, mdNames.size());
+    EXPECT_TRUE(findAttr(mdNames, "MD1"));
+    EXPECT_TRUE(findAttr(mdNames, "MD2"));
+    EXPECT_TRUE(mds.hasField("MD1"));
+    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
+    EXPECT_EQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
+    EXPECT_TRUE(mds.hasField("MD2"));
+    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
+    EXPECT_EQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
 
     utExit();
 }
@@ -8532,8 +8599,9 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
     std::vector<BSONElement> attrNames;
+    std::vector<BSONElement> mdNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -8688,8 +8756,9 @@ TEST(mongoUpdateContextRequest, notExistFilter)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
     std::vector<BSONElement> attrNames;
+    std::vector<BSONElement> mdNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -8859,8 +8928,9 @@ TEST(mongoUpdateContextRequest, createNativeTypes)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
     std::vector<BSONElement> attrNames;
+    std::vector<BSONElement> mdNames;
     ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -9072,8 +9142,9 @@ TEST(mongoUpdateContextRequest, updateNativeTypes)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
     std::vector<BSONElement> attrNames;
+    std::vector<BSONElement> mdNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -9352,8 +9423,9 @@ TEST(mongoUpdateContextRequest, createMdNativeTypes)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
     std::vector<BSONElement> attrNames;
+    std::vector<BSONElement> mdNames;
     ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -9442,20 +9514,26 @@ TEST(mongoUpdateContextRequest, createMdNativeTypes)
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_TRUE(a1.hasField("creDate"));
     EXPECT_TRUE(a1.hasField("modDate"));
-    std::vector<BSONElement> mdV = a1.getField("md").Array();
-    ASSERT_EQ(4, mdV.size());
-    EXPECT_EQ("MD1", getStringField(mdV[0].embeddedObject(), "name"));
-    EXPECT_EQ("T", getStringField(mdV[0].embeddedObject(), "type"));
-    EXPECT_EQ("s", getStringField(mdV[0].embeddedObject(), "value"));
-    EXPECT_EQ("MD2", getStringField(mdV[1].embeddedObject(), "name"));
-    EXPECT_EQ("T", getStringField(mdV[1].embeddedObject(), "type"));
-    EXPECT_EQ(55.5, mdV[1].embeddedObject().getField("value").Number());
-    EXPECT_EQ("MD3", getStringField(mdV[2].embeddedObject(), "name"));
-    EXPECT_EQ("T", getStringField(mdV[2].embeddedObject(), "type"));
-    EXPECT_FALSE(mdV[2].embeddedObject().getBoolField("value"));    
-    EXPECT_EQ("MD4", getStringField(mdV[3].embeddedObject(), "name"));
-    EXPECT_EQ("T", getStringField(mdV[3].embeddedObject(), "type"));
-    EXPECT_TRUE(mdV[3].embeddedObject().getField("value").isNull());
+    mds = a1.getField("md").embeddedObject();
+    mdNames = a1.getField("mdNames").Array();
+    ASSERT_EQ(4, mds.nFields());
+    ASSERT_EQ(4, mdNames.size());
+    EXPECT_TRUE(findAttr(mdNames, "MD1"));
+    EXPECT_TRUE(findAttr(mdNames, "MD2"));
+    EXPECT_TRUE(findAttr(mdNames, "MD3"));
+    EXPECT_TRUE(findAttr(mdNames, "MD4"));
+    EXPECT_TRUE(mds.hasField("MD1"));
+    EXPECT_EQ("T", getStringField(mds.getField("MD1").embeddedObject(), "type"));
+    EXPECT_EQ("s", getStringField(mds.getField("MD1").embeddedObject(), "value"));
+    EXPECT_TRUE(mds.hasField("MD2"));
+    EXPECT_EQ("T", getStringField(mds.getField("MD2").embeddedObject(), "type"));
+    EXPECT_EQ(55.5, mds.getField("MD2").embeddedObject().getField("value").Number());
+    EXPECT_TRUE(mds.hasField("MD3"));
+    EXPECT_EQ("T", getStringField(mds.getField("MD3").embeddedObject(), "type"));
+    EXPECT_FALSE(mds.getField("MD3").embeddedObject().getBoolField("value"));
+    EXPECT_TRUE(mds.hasField("MD4"));
+    EXPECT_EQ("T", getStringField(mds.getField("MD4").embeddedObject(), "type"));
+    EXPECT_TRUE(mds.getField("MD4").embeddedObject().getField("value").isNull());
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
@@ -9552,8 +9630,9 @@ TEST(mongoUpdateContextRequest, updateMdNativeTypes)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
     std::vector<BSONElement> attrNames;
+    std::vector<BSONElement> mdNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -9569,20 +9648,26 @@ TEST(mongoUpdateContextRequest, updateMdNativeTypes)
     EXPECT_STREQ("T",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val",C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
-    std::vector<BSONElement> mdV = a1.getField("md").Array();
-    ASSERT_EQ(4, mdV.size());
-    EXPECT_EQ("MD1", getStringField(mdV[0].embeddedObject(), "name"));
-    EXPECT_EQ("T", getStringField(mdV[0].embeddedObject(), "type"));
-    EXPECT_EQ("ss", getStringField(mdV[0].embeddedObject(), "value"));
-    EXPECT_EQ("MD2", getStringField(mdV[1].embeddedObject(), "name"));
-    EXPECT_EQ("T", getStringField(mdV[1].embeddedObject(), "type"));
-    EXPECT_EQ(44.4, mdV[1].embeddedObject().getField("value").Number());
-    EXPECT_EQ("MD3", getStringField(mdV[2].embeddedObject(), "name"));
-    EXPECT_EQ("T", getStringField(mdV[2].embeddedObject(), "type"));
-    EXPECT_TRUE(mdV[2].embeddedObject().getBoolField("value"));    
-    EXPECT_EQ("MD4", getStringField(mdV[3].embeddedObject(), "name"));
-    EXPECT_EQ("T", getStringField(mdV[3].embeddedObject(), "type"));
-    EXPECT_TRUE(mdV[3].embeddedObject().getField("value").isNull());
+    mds = a1.getField("md").embeddedObject();
+    mdNames = a1.getField("mdNames").Array();
+    ASSERT_EQ(4, mds.nFields());
+    ASSERT_EQ(4, mdNames.size());
+    EXPECT_TRUE(findAttr(mdNames, "MD1"));
+    EXPECT_TRUE(findAttr(mdNames, "MD2"));
+    EXPECT_TRUE(findAttr(mdNames, "MD3"));
+    EXPECT_TRUE(findAttr(mdNames, "MD4"));
+    EXPECT_TRUE(mds.hasField("MD1"));
+    EXPECT_EQ("T", getStringField(mds.getField("MD1").embeddedObject(), "type"));
+    EXPECT_EQ("ss", getStringField(mds.getField("MD1").embeddedObject(), "value"));
+    EXPECT_TRUE(mds.hasField("MD2"));
+    EXPECT_EQ("T", getStringField(mds.getField("MD2").embeddedObject(), "type"));
+    EXPECT_EQ(44.4, mds.getField("MD2").embeddedObject().getField("value").Number());
+    EXPECT_TRUE(mds.hasField("MD3"));
+    EXPECT_EQ("T", getStringField(mds.getField("MD3").embeddedObject(), "type"));
+    EXPECT_TRUE(mds.getField("MD3").embeddedObject().getBoolField("value"));
+    EXPECT_TRUE(mds.hasField("MD4"));
+    EXPECT_EQ("T", getStringField(mds.getField("MD4").embeddedObject(), "type"));
+    EXPECT_TRUE(mds.getField("MD4").embeddedObject().getField("value").isNull());
 
     utExit();
 }
@@ -9643,8 +9728,9 @@ TEST(mongoUpdateContextRequest, preservingMdNativeTypes)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
     std::vector<BSONElement> attrNames;
+    std::vector<BSONElement> mdNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -9660,20 +9746,26 @@ TEST(mongoUpdateContextRequest, preservingMdNativeTypes)
     EXPECT_STREQ("T", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_s", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
-    std::vector<BSONElement> mdV = a1.getField("md").Array();
-    ASSERT_EQ(4, mdV.size());
-    EXPECT_EQ("MD1", getStringField(mdV[0].embeddedObject(), "name"));
-    EXPECT_EQ("T", getStringField(mdV[0].embeddedObject(), "type"));
-    EXPECT_EQ("s", getStringField(mdV[0].embeddedObject(), "value"));
-    EXPECT_EQ("MD2", getStringField(mdV[1].embeddedObject(), "name"));
-    EXPECT_EQ("T", getStringField(mdV[1].embeddedObject(), "type"));
-    EXPECT_EQ(55.5, mdV[1].embeddedObject().getField("value").Number());
-    EXPECT_EQ("MD3", getStringField(mdV[2].embeddedObject(), "name"));
-    EXPECT_EQ("T", getStringField(mdV[2].embeddedObject(), "type"));
-    EXPECT_FALSE(mdV[2].embeddedObject().getBoolField("value"));
-    EXPECT_EQ("MD4", getStringField(mdV[3].embeddedObject(), "name"));
-    EXPECT_EQ("T", getStringField(mdV[3].embeddedObject(), "type"));
-    EXPECT_TRUE(mdV[3].embeddedObject().getField("value").isNull());
+    mds = a1.getField("md").embeddedObject();
+    mdNames = a1.getField("mdNames").Array();
+    ASSERT_EQ(4, mds.nFields());
+    ASSERT_EQ(4, mdNames.size());
+    EXPECT_TRUE(findAttr(mdNames, "MD1"));
+    EXPECT_TRUE(findAttr(mdNames, "MD2"));
+    EXPECT_TRUE(findAttr(mdNames, "MD3"));
+    EXPECT_TRUE(findAttr(mdNames, "MD4"));
+    EXPECT_TRUE(mds.hasField("MD1"));
+    EXPECT_EQ("T", getStringField(mds.getField("MD1").embeddedObject(), "type"));
+    EXPECT_EQ("s", getStringField(mds.getField("MD1").embeddedObject(), "value"));
+    EXPECT_TRUE(mds.hasField("MD2"));
+    EXPECT_EQ("T", getStringField(mds.getField("MD2").embeddedObject(), "type"));
+    EXPECT_EQ(55.5, mds.getField("MD2").embeddedObject().getField("value").Number());
+    EXPECT_TRUE(mds.hasField("MD3"));
+    EXPECT_EQ("T", getStringField(mds.getField("MD3").embeddedObject(), "type"));
+    EXPECT_FALSE(mds.getField("MD3").embeddedObject().getBoolField("value"));
+    EXPECT_TRUE(mds.hasField("MD4"));
+    EXPECT_EQ("T", getStringField(mds.getField("MD4").embeddedObject(), "type"));
+    EXPECT_TRUE(mds.getField("MD4").embeddedObject().getField("value").isNull());
 
     utExit();
 }
@@ -9755,8 +9847,9 @@ TEST(mongoUpdateContextRequest, replace)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;
+    BSONObj ent, attrs, mds;
     std::vector<BSONElement> attrNames;
+    std::vector<BSONElement> mdNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -10246,7 +10339,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     EXPECT_EQ("Internal Server Error", RES_CER_STATUS(0).reasonPhrase);
 
     EXPECT_EQ("Database Error (collection: utest.entities "
-              "- update(): <{ _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $in: [ /^/.*/, null ] } },{ $set: { attrs.A1: { value: \"new_val\", type: \"TA1\", modDate: 1360232700 }, modDate: 1360232700 }, $unset: { location: 1 } }> "
+              "- update(): <{ _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $in: [ /^/.*/, null ] } },{ $set: { attrs.A1: { value: \"new_val\", type: \"TA1\", mdNames: [], modDate: 1360232700 }, modDate: 1360232700 }, $unset: { location: 1 } }> "
               "- exception: boom!!)", RES_CER_STATUS(0).details);
 
     /* Restore real DB connection */
