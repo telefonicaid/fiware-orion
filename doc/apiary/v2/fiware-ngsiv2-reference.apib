@@ -566,7 +566,7 @@ The query returns all the entities that match all the matching conditions (AND l
 
 There are two kinds of statements: *unary statements* and *binary statements*.
 
-Binary statements are composed by an attribute path (e.g. "temperature"), an operator and a value
+Binary statements are composed by an attribute path (e.g. `temperature`), an operator and a value
 (whose format depends on the operator), e.g.:
 
 ```
@@ -574,78 +574,82 @@ temperature==50
 temperature<=20
 ```
 
-The attribute path is used to select the *element under evaluation* for the statement. Its general
-syntax consists of an attribute name optionally followed by a *navigation path* using the `.`
-character as delimiter, e.g. "temperature.accuracy.average" refers to the navigation path "accuracy.average"
-within the "temperature" attribute.
+The syntax of an attribute path consists of a list of tokens separated by the `.` character. This list of tokens
+addresses a JSON property name, in accordance with the following rules:
 
-How the navigation path is interpreted depends on where the Simple Query Language statement is used:
+* The first token is the name of an NGSI attribute (*target NGSI attribute*) of an entity.
+* If filtering by attribute value (i.e. the expression is used in a `q` query), the rest of tokens (if present)
+  represent the path to a sub-property of the *target NGSI attribute value* (which should be a JSON object).
+  Such sub-property is defined as the *target property*.
+* If filtering by metadata (i.e. the expression is used in a `q` query), the second token represents a metadata
+  name associated to the target NGSI attribute, *target metadata*, and the rest of tokens
+  (if present) represent the path to a sub-property of the *target metadata value* (which should be a
+  JSON object). Such sub-property is defined as the *target property*.
 
-* If used in a `q` query, then the navigation path refers to a sub-key of the attribute value
-  (assuming that the attribute value is a JSON object). If no navigation path is provided (i.e.
-  the attribute path doesn't have any `.`) then the attribute itself is taken into account.
-* If used in a `mq` query, then the first element of the navigation path is mandatory and it means the
-  name of a metadata of the attribute. Additional elements in the navigation path refer to a sub-key of
-  the metadata value (assuming that the metadata value is a JSON object). If no navigation path is provided
-  (beyond the first element which identifies the metadata name) then the metadata itself
-  is taken into account.
+The *target property value* is defined as the value of the JSON property addressed by the list of tokens described
+above i.e. the value of the *target property*.
+
+In case only one token is provided (two in the case of filtering by metadata), then the *target property* will
+be the target NGSI attribute itself (or the target metadata in the case of filtering by metadata) and the
+*target property value* will be the target NGSI attribute value (or the target metadata value in the case
+of filtering by metadata). It is assumed that the value of the target NGSI attribute (or the target metadata
+in the case of filtering by metadata) is not a JSON object in this case.
 
 The list of operators (and the format of the values they use) is as follows:
 
 + **Equal**: `==`. This operator accepts the following types of right-hand side:
-    + Single element, e.g. `temperature==40`. For an entity to match, it must contain an element
-      under evaluation with that exact name (temperature) and value (40) (or which includes the
-      value, in the case of elements under evaluation which value is an array).
+    + Single element, e.g. `temperature==40`. For an entity to match, it must contain the target
+      property (temperature) and its value be the query value (40) (or include the value, in the case
+      the target property value is an array).
     + A list of comma-separated values, e.g. `color==black,red`. For an entity to match, it must
-      contain an element under evaluation with that name and its value must be **any** of the
-      values in the list (OR clause) (or which includes **any** of the values in the case of
-      elements under evaluation which value is an array).
+      contain the target property and its value must be **any** of the values in the list (OR clause)
+      (or include **any** of the values in the list in the case the target property value is an array).
       E.g. entities with an attribute named `color`, whose value is `black` are a match, while
       entities with an attribute named `color` but whose value is `white` do not match.
     + A range, specified as a minimum and a maximum, separated by `..`, e.g. `temperature==10..20`.
-      For an entity to match, it must contain an element under evaluation with that name (temperature),
+      For an entity to match, it must contain the target property (temperature),
       and its value must be in the interval between the minimum and maximum of the range (both included).
-      Ranges can only be used with elements under evaluation that represent dates (in ISO8601 format),
+      Ranges can only be used with target properties that represent dates (in ISO8601 format),
       numbers or strings.
 + **Unequal**: `!=`. This operator accepts the following types of right-hand side:
-    + Single element, e.g. `temperature!=41`. For an entity to match, it must contain an element
-      under evaluation with that exact name (temperature) and whose value is **not** that exact value (41).
+    + Single element, e.g. `temperature!=41`. For an entity to match, it must contain the target
+      property (temperature) and its value must **not** be the query value (41).
     + A list of comma-separated values, e.g. `color!=black,red`. For an entity to match, it must
-      contain an element under evaluation with that name, and whose value is **not** any of the values
-      in the list (AND clause).
+      contain the target property, and its value is **not** any of the values
+      in the list (AND clause) (or not include **any** of the values in the list in the case the target
+      property value is an array).
       Eg. entities whose attribute `color` is set to `black` will not match, while entities whose
       attribute `color` is set to `white` will match.
     + A range, specified as a minimum and maximum separated by `..`, e.g. `temperature!=10..20`.
-      For an entity to match, it must contain an element under evaluation with that exact name
-      (temperature) and whose value is **not** in the interval between the minimum and the maximum
-      (both included). Ranges can only be used with elements under evaluation that represent dates
-      (in ISO8601 format), numbers or strings.
+      For an entity to match, it must contain target property (temperature) and its value must **not**
+      be in the interval between the minimum and the maximum (both included). Ranges can only be used
+      with elements target properties that represent dates (in ISO8601 format), numbers or strings.
 + **Greater than**: `>`. The right-hand side must be a single element, e.g. `temperature>42`.
-    For an entity to match, it must contain an element under evaluation with that exact name (temperature) and
-    whose value is strictly greater than that value (42).
-    This operation is only valid for elements under evaluation of type date, numbers or strings (used with
-    elements under evaluation of other types may lead to unpredictable results).
+    For an entity to match, it must contain the target property (temperature) and
+    its value must be strictly greater than that query value (42).
+    This operation is only valid for target properties of type date, numbers or strings (used with
+    target properties of other types may lead to unpredictable results).
 + **Less than**: `<`. The right-hand side must be a single element, e.g. `temperature<43`.
-    For an entity to match, it must contain an element under evaluation with that exact name (temperature) and
-    whose value is strictly less than that value (43).
-    This operation is only valid for elements under evaluation of type date, numbers or strings (used with
-    elements under evaluation of other types may lead to unpredictable results).
+    For an entity to match, it must contain the target property (temperature) and
+    its value must be strictly less than that value (43).
+    This operation is only valid for target properties of type date, numbers or strings (used with
+    target properties of other types may lead to unpredictable results).
 + **Greater or equal than**: `>=`. The right-hand side must be a single element, e.g. `temperature>=44`.
-    For an entity to match, it must contain an element under evaluation with that exact name (temperature) and
-    whose value is greater than or equal to that value (44).
-    This operation is only valid for elements under evaluation of type date, numbers or strings (used with
-    elements under evaluation of other types may lead to unpredictable results).
+    For an entity to match, it must contain the target property (temperature) and
+    its value must be greater than or equal to that value (44).
+    This operation is only valid for target properties of type date, numbers or strings (used with
+    target properties of other types may lead to unpredictable results).
 + **Less or equal than**: `<=`. The right-hand side must be a single element, e.g. `temperature<=45`.
-    For an entity to match, it must contain an element under evaluation with that exact name (temperature) and
-    whose value is less than or equal to that value (45).
-    This operation is only valid for elements under evaluation of type date, numbers or strings (used with
-    elements under evaluation of other types may lead to unpredictable results).
+    For an entity to match, it must contain the target property (temperature) and
+    its value must be less than or equal to that value (45).
+    This operation is only valid for target properties of type date, numbers or strings (used with
+    target properties of other types may lead to unpredictable results).
 + **Match pattern**: `~=`. The value matches a given pattern, expressed as a regular expression, e.g.
     `color~=ow`.
-    For an entity to match, it must contain an element under evaluation with that exact name (color), and
-    whose value matches the string in the right-hand side, 'ow' in this example (`brown` and `yellow`
+    For an entity to match, it must contain the target property (color), and
+    its value must match the string in the right-hand side, 'ow' in this example (`brown` and `yellow`
     would match, `black` and `white` would not).
-    This operation is only valid for elements under evaluation of type string.
+    This operation is only valid for target properties of type string.
 
 The symbol `:` can be used instead of `==`.
 
@@ -655,7 +659,7 @@ The first example would match a color with the exact value 'light,green' OR 'dee
 
 Unary negatory statements use the unary operator `!`, while affirmative unary statements use no
 operator at all.
-The unary statements are used to check for the existence of the element under evaluation.
+The unary statements are used to check for the existence of the target property.
 E.g. `temperature` matches entities that have an attribute called 'temperature' (no matter its
 value), while `!temperature` matches entities that do not have a temperature called 'attribute'.
  
