@@ -595,6 +595,10 @@ be the target NGSI attribute itself (or the target metadata in the case of filte
 of filtering by metadata). It is assumed that the value of the target NGSI attribute (or the target metadata
 in the case of filtering by metadata) is not a JSON object in this case.
 
+In the case some of the tokens include `.`, you can use simple quote (`'`) as separator. For example, the following
+attribute path `'a.b'.w.'x.y'` is composed by three tokens: the first token is `a.b`, the second token is `w` and
+the third token is `x.y`.
+
 The list of operators (and the format of the values they use) is as follows:
 
 + **Equal**: `==`. This operator accepts the following types of right-hand side:
