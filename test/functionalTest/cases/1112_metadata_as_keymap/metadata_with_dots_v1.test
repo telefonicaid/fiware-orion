@@ -30,7 +30,7 @@ brokerStart CB
 --SHELL--
 
 # 01. Create entity with metadata with dot in the name
-# 02. Retieve entity
+# 02. Retrieve entity
 # 03. Check the '=' in DB
 
 echo "01. Create entity with metadata with dot in the name"
@@ -70,8 +70,8 @@ echo
 echo
 
 
-echo "02. Retieve entity"
-echo "=================="
+echo "02. Retrieve entity"
+echo "==================="
 orionCurl --url "/v1/contextEntities/E"
 echo
 echo
@@ -129,8 +129,8 @@ Date: REGEX(.*)
 }
 
 
-02. Retieve entity
-==================
+02. Retrieve entity
+===================
 HTTP/1.1 200 OK
 Content-Length: 535
 Content-Type: application/json

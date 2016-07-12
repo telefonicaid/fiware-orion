@@ -351,7 +351,6 @@ void appendMetadata(BSONObjBuilder* mdBuilder, BSONArrayBuilder* mdNamesBuilder,
 
   if (type != "")
   {
-
     switch (mdP->valueType)
     {
     case orion::ValueTypeString:
@@ -489,7 +488,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   int      mdSize = 0;
   BSONObj  md;
   if (attr.hasField(ENT_ATTRS_MD))
-  {        
+  {
     std::set<std::string>  mdsSet;
 
     md = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
