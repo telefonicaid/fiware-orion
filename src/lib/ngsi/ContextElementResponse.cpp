@@ -271,7 +271,7 @@ ContextElementResponse::ContextElementResponse
       for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
       {
         std::string currentMd = *i;
-        Metadata*   md = new Metadata(currentMd, getFieldF(mds, currentMd).embeddedObject());
+        Metadata*   md = new Metadata(dbDotDecode(currentMd), getFieldF(mds, currentMd).embeddedObject());
         caP->metadataVector.push_back(md);
       }
     }
