@@ -901,11 +901,11 @@ to keep your client decoupled from implementation details.
 
 ### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,georel,geometry,coords,attrs,orderBy}]
 
-Retrieves a list of entities that match different criteria (by id, idPattern, type, typePattern or those which
-match a query or geographical query). A given entity has to match all the criteria to be retrieved
-(i.e., the criteria is combined in a logical AND way). Note that the id and idPattern parameters are
-incompatible - cannot be used together. The same incompatibility happens with type and typePattern.
-See [Simple Query Language](#simple_query_language) and [Geographical Queries](#geographical_queries).
+Retrieves a list of entities that match different criteria by id, type, pattern matching (either id or type)
+and/or those which match a query or geographical query. A given entity has to match all the criteria to be retrieved
+(i.e., the criteria is combined in a logical AND way). Note that pattern matching query parameters are incompatible
+(i.e. mutually exclusive) with their corresponding exact matching parameters, i.e. `idPattern` with `id` and
+`typePattern` with `type`.
 
 The response payload is an array containing one object per matching entity. Each entity follows
 the JSON entity representation format (described in "JSON Entity Representation" section).
@@ -923,13 +923,13 @@ Response code:
     
     + type: Room (optional, string) -  comma-separated list of elements.
       Retrieve entities whose type matches one of the elements in the list.
-      Incompatible with typePattern.
+      Incompatible with `typePattern`.
 
     + idPattern: Bode_.* (optional, string) - A correctly formated regular expression.
       Retrieve entities whose ID matches the regular expression. Incompatible with id.
 
     + typePattern: Room_.* (optional, string) - A correctly formated regular expression.
-      Retrieve entities whose type matches the regular expression. Incompatible with type.
+      Retrieve entities whose type matches the regular expression. Incompatible with `type`.
     
     + q: temperature>40 (optional, string) - A query expression, composed of a list of statements
       separated by `;`, i.e., q=statement;statements;statement.
