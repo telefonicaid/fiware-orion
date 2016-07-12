@@ -1,0 +1,179 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Metadata with dot in the name (NGSIv1)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+# 01. Create entity with metadata with dot in the name
+# 02. Retrieve entity
+# 03. Check the '=' in DB
+
+echo "01. Create entity with metadata with dot in the name"
+echo "===================================================="
+url="/v1/updateContext"
+payload='{
+    "contextElements": [
+    {
+        "type": "T",
+        "isPattern": "false",
+        "id": "E",
+        "attributes": [
+        {
+            "name": "A",
+            "type": "T",
+            "value": "foo",
+            "metadatas": [
+                {
+                    "name": "m.x",
+                    "type": "string",
+                    "value": "black"
+                },
+                {
+                    "name": "m.y",
+                    "type": "string",
+                    "value": "sweet"
+                }
+            ]
+        }
+        ]
+    }
+    ],
+    "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "${payload}"
+echo
+echo
+
+
+echo "02. Retrieve entity"
+echo "==================="
+orionCurl --url "/v1/contextEntities/E"
+echo
+echo
+
+
+echo "03. Check the '=' in DB"
+echo "======================="
+mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "E",  "type": "T", "servicePath" : "/" } }, {_id:0, attrs: 1})'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity with metadata with dot in the name
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 685
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "m.x",
+                                "type": "string",
+                                "value": "black"
+                            },
+                            {
+                                "name": "m.y",
+                                "type": "string",
+                                "value": "sweet"
+                            }
+                        ],
+                        "name": "A",
+                        "type": "T",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+02. Retrieve entity
+===================
+HTTP/1.1 200 OK
+Content-Length: 535
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "metadatas": [
+                    {
+                        "name": "m.x",
+                        "type": "string",
+                        "value": "black"
+                    },
+                    {
+                        "name": "m.y",
+                        "type": "string",
+                        "value": "sweet"
+                    }
+                ],
+                "name": "A",
+                "type": "T",
+                "value": "foo"
+            }
+        ],
+        "id": "E",
+        "isPattern": "false",
+        "type": "T"
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
+
+
+03. Check the '=' in DB
+=======================
+{ "attrs" : { "A" : { "type" : "T", "creDate" : REGEX(.*), "value" : "foo", "md" : { "m=x" : { "type" : "string", "value" : "black" }, "m=y" : { "type" : "string", "value" : "sweet" } }, "mdNames" : [ "m.x", "m.y" ] } } }
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

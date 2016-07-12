@@ -149,9 +149,9 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, bool _val
 *
 * Metadata::Metadata -
 */
-Metadata::Metadata(const BSONObj& mdB)
+Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 {
-  name = getStringFieldF(mdB, ENT_ATTRS_MD_NAME);
+  name = _name;
   type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringFieldF(mdB, ENT_ATTRS_MD_TYPE) : "";
 
   typeGiven = (type == "")? false : true;

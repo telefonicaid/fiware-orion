@@ -274,14 +274,9 @@ Date: REGEX(.*)
                     {
                         "metadatas": [
                             {
-                                "name": "String",
+                                "name": "Bool",
                                 "type": "none",
-                                "value": "string"
-                            },
-                            {
-                                "name": "Integer",
-                                "type": "none",
-                                "value": 3.0
+                                "value": true
                             },
                             {
                                 "name": "Float",
@@ -289,14 +284,19 @@ Date: REGEX(.*)
                                 "value": 3.14
                             },
                             {
-                                "name": "Bool",
+                                "name": "Integer",
                                 "type": "none",
-                                "value": true
+                                "value": 3.0
                             },
                             {
                                 "name": "Null",
                                 "type": "none",
                                 "value": null
+                            },
+                            {
+                                "name": "String",
+                                "type": "none",
+                                "value": "string"
                             }
                         ],
                         "name": "attrWithMetadata",
@@ -457,29 +457,29 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "String", 
-                                "type": "none", 
-                                "value": "string"
-                            }, 
-                            {
-                                "name": "Integer", 
-                                "type": "none", 
-                                "value": 3.0
-                            }, 
+                                "name": "Bool",
+                                "type": "none",
+                                "value": true
+                            },
                             {
                                 "name": "Float", 
                                 "type": "none", 
                                 "value": 3.14REGEX([01]*)
                             }, 
                             {
-                                "name": "Bool", 
-                                "type": "none", 
-                                "value": true
-                            }, 
+                                "name": "Integer",
+                                "type": "none",
+                                "value": 3.0
+                            },
                             {
                                 "name": "Null", 
                                 "type": "none", 
                                 "value": null
+                            },
+                            {
+                                "name": "String",
+                                "type": "none",
+                                "value": "string"
                             }
                         ], 
                         "name": "attrWithMetadata", 
