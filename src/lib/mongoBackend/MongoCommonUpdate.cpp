@@ -237,12 +237,13 @@ static bool equalMetadata(BSONObj& md1, BSONObj& md2)
 {
   std::set<std::string>  md1Set;
 
-  // Assuming that md1 and md2 are equal size, we can equally use md1 or md2 for the set
+  // Assuming that md1 and md2 are of equal size, we can equally use md1 or md2 for the set
   md1.getFieldNames(md1Set);
 
   for (std::set<std::string>::iterator i = md1Set.begin(); i != md1Set.end(); ++i)
   {
     std::string currentMd = *i;
+
     if (!md2.hasField(currentMd))
     {
       return false;

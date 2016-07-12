@@ -53,11 +53,11 @@ Fields:
     -   **md** (optional): custom metadata. This is a keymap of metadata
         objects. The key is generated with the metadata
         name (changing "." for "=", as "." is not a valid character in
-        MongoDB document keys), e.g. the metadata with name "m.x" will
-        use the following key: "m=x". The object value per each key has two
-        fields: **type** and **value** of the metadata.
-    -   **mdNames*: an array of strings. Its elements are the names of the
-        metadata of the attribute. In this case, the "." to "="
+        MongoDB document keys), e.g. a metadata with name "m.x" will
+        use the key "m=x". The object value of each key has two
+        fields: **type** and **value** (of the metadata).
+    -   **mdNames**: an array of strings. Its elements are the names of the
+        metadata of the attribute. Here the "." to "="
         replacement is not done.
     -   **creDate**: the timestamp corresponding to attribute creation
         (as a consequence of append).
