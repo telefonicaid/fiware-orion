@@ -56,7 +56,7 @@ Fields:
         MongoDB document keys), e.g. a metadata with name "m.x" will
         use the key "m=x". The object value of each key has two
         fields: **type** and **value** (of the metadata).
-    -   **mdNames*: an array of strings. Its elements are the names of the
+    -   **mdNames**: an array of strings. Its elements are the names of the
         metadata of the attribute. Here the "." to "="
         replacement is not done.
     -   **creDate**: the timestamp corresponding to attribute creation
