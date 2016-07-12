@@ -849,7 +849,8 @@ bool StringFilterItem::matchLessThan(ContextAttribute* caP)
 *
 * StringFilter::StringFilter - 
 */
-StringFilter::StringFilter()
+StringFilter::StringFilter(StringFilterType _type):
+  type(_type)
 {
 }
 
@@ -967,6 +968,8 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
 */
 bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
 {
+  LM_W(("KZ: filter type: %s", (type == SftQ)? "Q" : "MQ"));
+
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
   {
     StringFilterItem*  itemP = filters[ix];
@@ -976,6 +979,31 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     BSONObjBuilder     bb;
     BSONObjBuilder     bb2;
     BSONObj            f;
+
+    LM_W(("KZ: left: %s", itemP->left.c_str()));
+
+    //
+    // Left hand side might have to change, in case of Metadata filters (mq)
+    //
+    if (type == SftMq)
+    {
+      char* start = (char*) itemP->left.c_str();
+      char* dotP  = strchr(start, '.');
+
+      if (dotP == NULL)
+      {
+        *errorStringP = "no separator (dot) in left-hand-side - not valid for metadata filters";
+        return false;
+      }
+
+      *dotP = 0;
+      ++dotP;
+      std::string newLeft = std::string(start) + ".md." + dotP;
+      LM_W(("KZ: new left: %s", newLeft.c_str()));
+
+      itemP->left = newLeft;
+      LM_W(("KZ: new left: %s", itemP->left.c_str()));
+    }
 
     if (itemP->left == DATE_CREATED)
     {
@@ -1323,7 +1351,7 @@ bool StringFilter::match(ContextElementResponse* cerP)
 */
 StringFilter* StringFilter::clone(std::string* errorStringP)
 {
-  StringFilter* sfP = new StringFilter();
+  StringFilter* sfP = new StringFilter(type);
 
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
   {

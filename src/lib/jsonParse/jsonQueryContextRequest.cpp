@@ -240,7 +240,7 @@ static std::string scopeValue(const std::string& path, const std::string& value,
 
     reqDataP->qcr.scopeP->value = value;
 
-    reqDataP->qcr.scopeP->stringFilterP = new StringFilter();
+    reqDataP->qcr.scopeP->stringFilterP = new StringFilter(SftQ);
     bool b = reqDataP->qcr.scopeP->stringFilterP->parse(value.c_str(), &errorString);
 
     if (b != true)

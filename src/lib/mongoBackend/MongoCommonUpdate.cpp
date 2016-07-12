@@ -1302,7 +1302,7 @@ static bool addTriggeredSubscriptions_noCache
         // Parsing q
         if (q != "")
         {
-          StringFilter* stringFilterP = new StringFilter();
+          StringFilter* stringFilterP = new StringFilter(SftQ);
 
           if (stringFilterP->parse(q.c_str(), &err) == false)
           {

@@ -162,6 +162,18 @@ private:
 
 
 
+/* ****************************************************************************
+*
+* StringFilterType - 
+*/
+typedef enum StringFilterType
+{
+  SftQ,
+  SftMq
+} StringFilterType;
+
+
+
 class ContextElementResponse;
 /* ****************************************************************************
 *
@@ -192,8 +204,9 @@ class StringFilter
 public:
   std::vector<StringFilterItem*>  filters;
   std::vector<BSONObj>            mongoFilters;
+  StringFilterType                type;
 
-  StringFilter();
+  StringFilter(StringFilterType _type);
   ~StringFilter();
 
   bool  parse(const char* q, std::string* errorStringP);

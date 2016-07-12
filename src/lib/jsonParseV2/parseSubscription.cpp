@@ -688,7 +688,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
       std::string  errorString;
       Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, qString);
 
-      scopeP->stringFilterP = new StringFilter();
+      scopeP->stringFilterP = new StringFilter(SftQ);
       if (scopeP->stringFilterP->parse(scopeP->value.c_str(), &errorString) == false)
       {
         delete scopeP->stringFilterP;

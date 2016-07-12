@@ -42,7 +42,7 @@
 */
 struct SubscriptionExpression
 {
-  SubscriptionExpression(): isSet(false) {}
+SubscriptionExpression(): stringFilter(SftQ), isSet(false) {}
   ~SubscriptionExpression() {}
 
   std::string               q;
