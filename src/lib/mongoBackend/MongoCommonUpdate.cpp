@@ -115,21 +115,6 @@ static bool hasMetadata(std::string name, std::string type, ContextAttribute* ca
 }
 
 
-/* ****************************************************************************
-*
-* matchMetadata -
-*
-* Returns if two metadata elements have the same name and type, taking into account that
-* the type field could not be present (it is optional in NGSI)
-*/
-static bool matchMetadata(BSONObj& md1, BSONObj& md2)
-{
-
-  // Metadata is identified by name, type is not part of identity any more
-  return  getStringFieldF(md1, ENT_ATTRS_MD_NAME) == getStringFieldF(md2, ENT_ATTRS_MD_NAME);
-
-}
-
 
 /* ****************************************************************************
 *
@@ -241,46 +226,35 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
 
 /* ****************************************************************************
 *
-* equalMetadataVectors -
+* equalMetadata -
 *
-* Given two vectors with the same metadata names-types, check that all the values
+* Given two metadata object assuming they have the same size (i.e. number of elements). check that all the values
 * are equal, returning false otherwise.
 *
 * Arguments are passed by reference to avoid "heavy" copies
 */
-static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2)
+static bool equalMetadata(BSONObj& md1, BSONObj& md2)
 {
+  std::set<std::string>  md1Set;
 
-  bool found = false;
+  // Assuming that md1 and md2 are of equal size, we can equally use md1 or md2 for the set
+  md1.getFieldNames(md1Set);
 
-  for (BSONObj::iterator i1 = mdV1.begin(); i1.more();)
+  for (std::set<std::string>::iterator i = md1Set.begin(); i != md1Set.end(); ++i)
   {
-    BSONObj md1 = i1.next().embeddedObject();
+    std::string currentMd = *i;
 
-    for (BSONObj::iterator i2 = mdV2.begin(); i2.more();)
+    if (!md2.hasField(currentMd))
     {
-      BSONObj md2 = i2.next().embeddedObject();
-
-      /* Check metadata match */
-      if (matchMetadata(md1, md2))
-      {
-        if (!equalMetadataValues(md1, md2))
-        {
-          return false;
-        }
-        else
-        {
-          found = true;
-          break;  // loop in i2
-        }
-      }
+      return false;
     }
 
-    if (found)
+    BSONObj md1Item = getFieldF(md1, currentMd).embeddedObject();
+    BSONObj md2Item = getFieldF(md2, currentMd).embeddedObject();
+
+    if (!equalMetadataValues(md1Item, md2Item))
     {
-      /* Shortcut for early passing to the next attribute in i1 */
-      found = false;
-      continue;  // loop in i1
+      return false;
     }
   }
 
@@ -365,32 +339,35 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP, std::string apiVersi
 *
 * appendMetadata -
 */
-void appendMetadata(BSONArrayBuilder* mdVBuilder, const Metadata* mdP, bool useDefaultType)
+void appendMetadata(BSONObjBuilder* mdBuilder, BSONArrayBuilder* mdNamesBuilder, const Metadata* mdP, bool useDefaultType)
 {
   std::string type =  mdP->type;
   if (!mdP->typeGiven && useDefaultType)
   {
     type = DEFAULT_TYPE;
   }
+
+  mdNamesBuilder->append(mdP->name);
+  std::string effectiveName = dbDotEncode(mdP->name);
+
   if (type != "")
   {
-
     switch (mdP->valueType)
     {
     case orion::ValueTypeString:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->stringValue));
+      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->stringValue));
       return;
 
     case orion::ValueTypeNumber:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->numberValue));
+      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->numberValue));
       return;
 
     case orion::ValueTypeBoolean:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->boolValue));
+      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->boolValue));
       return;
 
     case orion::ValueTypeNone:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << BSONNULL));
+      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << BSONNULL));
       return;
 
     default:
@@ -403,19 +380,19 @@ void appendMetadata(BSONArrayBuilder* mdVBuilder, const Metadata* mdP, bool useD
     switch (mdP->valueType)
     {
     case orion::ValueTypeString:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << mdP->stringValue));
+      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mdP->stringValue));
       return;
 
     case orion::ValueTypeNumber:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << mdP->numberValue));
+      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mdP->numberValue));
       return;
 
     case orion::ValueTypeBoolean:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << mdP->boolValue));
+      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mdP->boolValue));
       return;
 
     case orion::ValueTypeNone:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << BSONNULL));
+      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << BSONNULL));
       return;
 
     default:
@@ -491,7 +468,8 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   }
 
   /* 3. Add metadata */
-  BSONArrayBuilder mdVBuilder;
+  BSONObjBuilder   mdBuilder;
+  BSONArrayBuilder mdNamesBuilder;
 
   /* First add the metadata elements coming in the request */
   for (unsigned int ix = 0; ix < caP->metadataVector.size() ; ++ix)
@@ -504,37 +482,41 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
       continue;
     }
 
-    appendMetadata(&mdVBuilder, mdP, apiVersion == "v2");
+    appendMetadata(&mdBuilder, &mdNamesBuilder, mdP, apiVersion == "v2");
   }
 
   /* Second, for each metadata previously in the metadata vector but *not included in the request*, add it as is */
-  int      mdVSize = 0;
-  BSONObj  mdV;
-
+  int      mdSize = 0;
+  BSONObj  md;
   if (attr.hasField(ENT_ATTRS_MD))
   {
-    mdV = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
+    std::set<std::string>  mdsSet;
 
-    for (BSONObj::iterator i = mdV.begin(); i.more();)
+    md = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
+    md.getFieldNames(mdsSet);
+
+    for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
     {
-      Metadata  md(i.next().embeddedObject());
+      std::string  currentMd = *i;
+      BSONObj      mdItem    = getObjectFieldF(md, currentMd);
 
-      mdVSize++;
+      Metadata    md(currentMd, mdItem);
+      mdSize++;
 
       if (!hasMetadata(md.name, md.type, caP))
       {
-        appendMetadata(&mdVBuilder, &md, apiVersion == "v2");
+        appendMetadata(&mdBuilder, &mdNamesBuilder, &md, apiVersion == "v2");
       }
     }
   }
 
-  BSONObj mdNewV = mdVBuilder.arr();
+  BSONObj mdNew = mdBuilder.obj();
 
-
-  if (mdVBuilder.arrSize() > 0)
+  if (mdNew.nFields() > 0)
   {
-    ab.appendArray(ENT_ATTRS_MD, mdNewV);
+    ab.append(ENT_ATTRS_MD, mdNew);
   }
+  ab.append(ENT_ATTRS_MDNAMES, mdNamesBuilder.arr());
 
   /* 4. Add creation date */
   if (attr.hasField(ENT_ATTRS_CREATION_DATE))
@@ -558,7 +540,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
       actualUpdate = (attrValueChanges(attr, caP, apiVersion) ||
                       ((caP->type != "") && (!attr.hasField(ENT_ATTRS_TYPE) ||
                                              getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
-                      mdVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV));
+                      mdNew.nFields() != mdSize || !equalMetadata(md, mdNew));
   }
   else
   {
@@ -597,9 +579,10 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 * If there is no custom metadata, then it returns false (true otherwise).
 *
 */
-static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, const ContextAttribute* ca, bool useDefaultType)
+static bool contextAttributeCustomMetadataToBson(BSONObj* md, BSONArray* mdNames, const ContextAttribute* ca, bool useDefaultType)
 {
-  BSONArrayBuilder  mdToAdd;
+  BSONObjBuilder    mdToAdd;
+  BSONArrayBuilder  mdNamesToAdd;
 
   for (unsigned int ix = 0; ix < ca->metadataVector.size(); ++ix)
   {
@@ -607,15 +590,17 @@ static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, const ContextAttr
 
     if (!isNotCustomMetadata(md->name))
     {
-      appendMetadata(&mdToAdd, md, useDefaultType);
+      appendMetadata(&mdToAdd, &mdNamesToAdd, md, useDefaultType);
       LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
                       md->name.c_str(), md->type.c_str(), md->toStringValue().c_str()));
     }
   }
 
-  if (mdToAdd.arrSize() > 0)
-  {
-    mdV = mdToAdd.arr();
+  *md      = mdToAdd.obj();
+  *mdNames = mdNamesToAdd.arr();
+
+  if (md->nFields() > 0)
+  {    
     return true;
   }
 
@@ -687,11 +672,13 @@ static bool updateAttribute
     caP->valueBson(newAttr);
 
     /* Custom metadata */
-    BSONObj mdV;
-    if (contextAttributeCustomMetadataToBson(mdV, caP, apiVersion == "v2"));
+    BSONObj    md;
+    BSONArray  mdNames;
+    if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == "v2"));
     {
-      newAttr.appendArray(ENT_ATTRS_MD, mdV);
+      newAttr.append(ENT_ATTRS_MD, md);
     }
+    newAttr.append(ENT_ATTRS_MDNAMES, mdNames);
 
     toSet->append(effectiveName, newAttr.obj());
     toPush->append(caP->name);
@@ -773,12 +760,14 @@ static bool appendAttribute
   }
 
   /* 3. Metadata */
-  BSONObj mdV;
+  BSONObj   md;
+  BSONArray mdNames;
 
-  if (contextAttributeCustomMetadataToBson(mdV, caP, apiVersion == "v2"))
+  if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == "v2"))
   {
-      ab.appendArray(ENT_ATTRS_MD, mdV);
+      ab.append(ENT_ATTRS_MD, md);
   }
+  ab.append(ENT_ATTRS_MDNAMES, mdNames);
 
   /* 4. Dates */
   int now = getCurrentTime();
@@ -2252,11 +2241,13 @@ static bool createEntity
                     attrsV[ix]->getValue().c_str()));
 
     /* Custom metadata */
-    BSONObj mdV;
-    if (contextAttributeCustomMetadataToBson(mdV, attrsV[ix], apiVersion == "v2"))
+    BSONObj   md;
+    BSONArray mdNames;
+    if (contextAttributeCustomMetadataToBson(&md, &mdNames, attrsV[ix], apiVersion == "v2"))
     {
-      bsonAttr.appendArray(ENT_ATTRS_MD, mdV);
+      bsonAttr.append(ENT_ATTRS_MD, md);
     }
+    bsonAttr.append(ENT_ATTRS_MDNAMES, mdNames);
 
     attrsToAdd.append(effectiveName, bsonAttr.obj());
     attrNamesToAdd.append(attrsV[ix]->name);
