@@ -112,7 +112,7 @@ processed   = 0
 
 total = db[COL].count()
 
-print "- processing entities collection (%d entities) changing attrs vectors to objects, this may take a while... " % total
+print "- processing entities collection (%d entities) changing metadata vectors to objects, this may take a while... " % total
 
 # The sort() is a way of ensuring that a modified document doesn't enters again at the end of the cursor (we have
 # observed that this may happen with large collections, e.g ~50,000 entities). In addition, we have to use
