@@ -1730,10 +1730,10 @@ bool condValueAttrMatch(const BSONObj& sub, const std::vector<std::string>& modi
 
   for (unsigned int ix = 0; ix < conds.size() ; ++ix)
   {
-    std::string condAtrr = conds[ix].String();
+    std::string condAttr = conds[ix].String();
     for (unsigned int jx = 0; jx < modifiedAttrs.size(); ++jx)
     {
-      if (condAtrr == modifiedAttrs[jx])
+      if (condAttr == modifiedAttrs[jx])
       {
         return true;
       }
