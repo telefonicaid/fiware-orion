@@ -1143,7 +1143,6 @@ static bool addTriggeredSubscriptions_noCache
   std::string entIdQ       = CSUB_ENTITIES   "." CSUB_ENTITY_ID;
   std::string entTypeQ     = CSUB_ENTITIES   "." CSUB_ENTITY_TYPE;
   std::string entPatternQ  = CSUB_ENTITIES   "." CSUB_ENTITY_ISPATTERN;
-  std::string condTypeQ    = CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
   std::string inRegex      = "{ $in: [ " + spathRegex + ", null ] }";
   BSONObj     spBson       = fromjson(inRegex);
 
@@ -1154,7 +1153,6 @@ static bool addTriggeredSubscriptions_noCache
                     BSON(entTypeQ << entityType) <<
                     BSON(entTypeQ << BSON("$exists" << false))) <<
                 entPatternQ << "false" <<
-                condTypeQ << ON_CHANGE_CONDITION <<
                 CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
                 CSUB_STATUS << BSON("$ne" << STATUS_INACTIVE) <<
                 CSUB_SERVICE_PATH << spBson);
@@ -1182,8 +1180,7 @@ static bool addTriggeredSubscriptions_noCache
 
   BSONObjBuilder  queryPattern;
 
-  queryPattern.append(entPatternQ, "true");
-  queryPattern.append(condTypeQ, ON_CHANGE_CONDITION);
+  queryPattern.append(entPatternQ, "true");  
   queryPattern.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
   queryPattern.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
   queryPattern.append(CSUB_SERVICE_PATH, spBson);
@@ -1249,12 +1246,9 @@ static bool addTriggeredSubscriptions_noCache
        * However, it is difficult to check this condition *OR* empty array (for the case of ONANYCHANGE)
        * at query level, so now do the check in the code.
        */
-      if (!someEmptyCondValue(sub))
+      if (!condValueAttrMatch(sub, modifiedAttrs))
       {
-        if (!condValueAttrMatch(sub, modifiedAttrs))
-        {
-          continue;
-        }
+        continue;
       }
 
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
