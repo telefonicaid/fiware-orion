@@ -166,7 +166,7 @@ float baStof(char* string)
 {
   float f;
 
-  sscanf(string, "%f", &f);
+  f = strtod(string, NULL);
 
   return f;
 }
@@ -181,7 +181,7 @@ double baStod(char* string)
 {
   double f;
 
-  sscanf(string, "%lf", &f);
+  f = strtod(string, NULL);
 
   return f;
 }

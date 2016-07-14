@@ -63,10 +63,17 @@ std::string getEntity
   ParseData*                 parseDataP
 )
 {
-   std::string attrs  = ciP->uriParam["attrs"];
-   std::string type   = ciP->uriParam["type"];
+   std::string type      = ciP->uriParam["type"];
+   std::string entityId  = compV[2];
 
-   if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
+   if (entityId == "")
+   {
+     OrionError oe(SccBadRequest, EMPTY_ENTITY_ID, "BadRequest");
+     ciP->httpStatusCode = oe.code;
+     return oe.toJson();
+   }
+
+   if (forbiddenIdChars(ciP->apiVersion, entityId.c_str(), NULL))
    {
      OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
      ciP->httpStatusCode = oe.code;
@@ -74,18 +81,7 @@ std::string getEntity
    }
 
   // Fill in QueryContextRequest
-  parseDataP->qcr.res.fill(compV[2], type, "false", EntityTypeEmptyOrNotEmpty, "");
-
-  if (attrs != "")
-  {
-    std::vector<std::string> attrsV;
-
-    stringSplit(attrs, ',', attrsV);
-    for (std::vector<std::string>::const_iterator it = attrsV.begin(); it != attrsV.end(); ++it)
-    {
-      parseDataP->qcr.res.attributeList.push_back_if_absent(*it);
-    }
-  }
+  parseDataP->qcr.res.fill(entityId, type, "false", EntityTypeEmptyOrNotEmpty, "");
 
   // Call standard op postQueryContext
   postQueryContext(ciP, components, compV, parseDataP);

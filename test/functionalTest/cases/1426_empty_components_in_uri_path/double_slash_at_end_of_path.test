@@ -1,0 +1,566 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Double slash at end of URI PATH
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01a. /v2//
+# 01b. /v2///
+# 02a. /v2/entities//
+# 02b. /v2/entities///
+# 03a. /v2/entities/E1//
+# 03b. /v2/entities/E1///
+# 04a. /v2/entities/E1/attrs//
+# 04b. /v2/entities/E1/attrs///
+# 05a. /v2/entities/E1/attrs/A1//
+# 05b. /v2/entities/E1/attrs/A1///
+# 06a. /v2/entities/E1/attrs/A1/value//
+# 06b. /v2/entities/E1/attrs/A1/value///
+# 07a. /v2/types//
+# 07b. /v2/types///
+# 08a. /v2/types/T1//
+# 08b. /v2/types/T1///
+# 09a. /v2/subscriptions//
+# 09b. /v2/subscriptions///
+# 10a. /v2/subscriptions/subId//
+# 10b. /v2/subscriptions/subId///
+# 11a. /v2/op/query//
+# 11b. /v2/op/query///
+# 12a. /v2/op/update//
+# 12b. /v2/op/update///
+#
+
+echo "01a. /v2//"
+echo "=========="
+orionCurl --url /v2//
+echo
+echo
+
+
+echo "01b. /v2///"
+echo "==========="
+orionCurl --url /v2///
+echo
+echo
+
+
+echo "02a. /v2/entities//"
+echo "==================="
+orionCurl --url /v2/entities//
+echo
+echo
+
+
+echo "02b. /v2/entities///"
+echo "===================="
+orionCurl --url /v2/entities///
+echo
+echo
+
+
+echo "03a. /v2/entities/E1//"
+echo "======================"
+orionCurl --url /v2/entities/E1//
+echo
+echo
+
+
+echo "03b. /v2/entities/E1///"
+echo "======================="
+orionCurl --url /v2/entities/E1///
+echo
+echo
+
+
+echo "04a. /v2/entities/E1/attrs//"
+echo "============================"
+orionCurl --url /v2/entities/E1/attrs//
+echo
+echo
+
+
+echo "04b. /v2/entities/E1/attrs///"
+echo "============================="
+orionCurl --url /v2/entities/E1/attrs///
+echo
+echo
+
+
+echo "05a. /v2/entities/E1/attrs/A1//"
+echo "==============================="
+orionCurl --url /v2/entities/E1/attrs/A1//
+echo
+echo
+
+
+echo "05b. /v2/entities/E1/attrs/A1///"
+echo "================================"
+orionCurl --url /v2/entities/E1/attrs/A1///
+echo
+echo
+
+
+echo "06a. /v2/entities/E1/attrs/A1/value//"
+echo "====================================="
+orionCurl --url /v2/entities/E1/attrs/A1/value//
+echo
+echo
+
+
+echo "06b. /v2/entities/E1/attrs/A1/value///"
+echo "======================================"
+orionCurl --url /v2/entities/E1/attrs/A1/value///
+echo
+echo
+
+
+echo "07a. /v2/types//"
+echo "================"
+orionCurl --url /v2/types//
+echo
+echo
+
+
+echo "07b. /v2/types///"
+echo "================="
+orionCurl --url /v2/types///
+echo
+echo
+
+
+echo "08a. /v2/types/T1//"
+echo "==================="
+orionCurl --url /v2/types/T1//
+echo
+echo
+
+
+echo "08b. /v2/types/T1///"
+echo "===================="
+orionCurl --url /v2/types/T1///
+echo
+echo
+
+
+echo "09a. /v2/subscriptions//"
+echo "========================"
+orionCurl --url /v2/subscriptions//
+echo
+echo
+
+
+echo "09b. /v2/subscriptions///"
+echo "========================="
+orionCurl --url /v2/subscriptions///
+echo
+echo
+
+
+echo "10a. /v2/subscriptions/subId//"
+echo "=============================="
+orionCurl --url /v2/subscriptions/subId//
+echo
+echo
+
+
+echo "10b. /v2/subscriptions/subId///"
+echo "==============================="
+orionCurl --url /v2/subscriptions/subId///
+echo
+echo
+
+
+echo "11a. /v2/op/query//"
+echo "==================="
+orionCurl --url /v2/op/query//
+echo
+echo
+
+
+echo "11b. /v2/op/query///"
+echo "===================="
+orionCurl --url /v2/op/query///
+echo
+echo
+
+
+echo "12a. /v2/op/update//"
+echo "===================="
+orionCurl --url /v2/op/update//
+echo
+echo
+
+
+echo "12b. /v2/op/update///"
+echo "====================="
+orionCurl --url /v2/op/update///
+echo
+echo
+
+
+--REGEXPECT--
+01a. /v2//
+==========
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+01b. /v2///
+===========
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+02a. /v2/entities//
+===================
+HTTP/1.1 400 Bad Request
+Content-Length: 83
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity id length: 0, min length supported: 1",
+    "error": "BadRequest"
+}
+
+
+02b. /v2/entities///
+====================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+03a. /v2/entities/E1//
+======================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+03b. /v2/entities/E1///
+=======================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+04a. /v2/entities/E1/attrs//
+============================
+HTTP/1.1 400 Bad Request
+Content-Length: 88
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "attribute name length: 0, min length supported: 1",
+    "error": "BadRequest"
+}
+
+
+04b. /v2/entities/E1/attrs///
+=============================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+05a. /v2/entities/E1/attrs/A1//
+===============================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+05b. /v2/entities/E1/attrs/A1///
+================================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+06a. /v2/entities/E1/attrs/A1/value//
+=====================================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+06b. /v2/entities/E1/attrs/A1/value///
+======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+07a. /v2/types//
+================
+HTTP/1.1 400 Bad Request
+Content-Length: 85
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity type length: 0, min length supported: 1",
+    "error": "BadRequest"
+}
+
+
+07b. /v2/types///
+=================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+08a. /v2/types/T1//
+===================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+08b. /v2/types/T1///
+====================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+09a. /v2/subscriptions//
+========================
+HTTP/1.1 400 Bad Request
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid subscription ID: bad length - 24 chars expected",
+    "error": "BadRequest"
+}
+
+
+09b. /v2/subscriptions///
+=========================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+10a. /v2/subscriptions/subId//
+==============================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+10b. /v2/subscriptions/subId///
+===============================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+11a. /v2/op/query//
+===================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+11b. /v2/op/query///
+====================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+12a. /v2/op/update//
+====================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+12b. /v2/op/update///
+=====================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

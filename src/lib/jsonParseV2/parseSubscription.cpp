@@ -110,6 +110,10 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     {
       return badInput(ciP, "max description length exceeded");
     }
+    if (forbiddenChars(descriptionString.c_str()))
+    {
+      return badInput(ciP, "forbidden characters in description");
+    }
 
     subsP->descriptionProvided = true;
     subsP->description = descriptionString;

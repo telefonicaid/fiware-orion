@@ -263,11 +263,15 @@ ContextElementResponse::ContextElementResponse
     /* Setting custom metadata (if any) */
     if (attr.hasField(ENT_ATTRS_MD))
     {
-      std::vector<BSONElement> metadataV = getFieldF(attr, ENT_ATTRS_MD).Array();
 
-      for (unsigned int ix = 0; ix < metadataV.size(); ++ix)
+      BSONObj                mds = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
+      std::set<std::string>  mdsSet;
+
+      mds.getFieldNames(mdsSet);
+      for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
       {
-        Metadata* md = new Metadata(metadataV[ix].embeddedObject());
+        std::string currentMd = *i;
+        Metadata*   md = new Metadata(dbDotDecode(currentMd), getFieldF(mds, currentMd).embeddedObject());
         caP->metadataVector.push_back(md);
       }
     }

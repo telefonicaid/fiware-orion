@@ -66,7 +66,6 @@ std::string getEntityAttributeValue
   Attribute    attribute;
   std::string  answer;
   std::string  type       = ciP->uriParam["type"];
-  bool         text       = (ciP->outMimeType == TEXT);
 
   if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL) || (forbiddenIdChars(ciP->apiVersion, compV[4].c_str() , NULL)))
   {
@@ -80,7 +79,6 @@ std::string getEntityAttributeValue
 
   // Call standard op postQueryContext
   postQueryContext(ciP, components, compV, parseDataP);
-
   attribute.fill(&parseDataP->qcrs.res, compV[4]);
 
   if (attribute.oe.code != SccNone)
@@ -91,7 +89,7 @@ std::string getEntityAttributeValue
   else
   {
     // save the original attribute type
-    std::string attributeType = attribute.pcontextAttribute->type ;
+    std::string attributeType = attribute.pcontextAttribute->type;
 
     // the same of the wrapped operation
     ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
@@ -100,7 +98,7 @@ std::string getEntityAttributeValue
     attribute.pcontextAttribute->type = "";
     attribute.pcontextAttribute->metadataVector.release();
 
-    if (!text)
+    if (ciP->outMimeType == JSON)
     {
       // Do not use attribute name, change to 'value'
       attribute.pcontextAttribute->name = "value";
@@ -124,19 +122,19 @@ std::string getEntityAttributeValue
       }
       else
       {
-
         if (attributeType == DATE_TYPE)
         {
           TIMED_RENDER(answer = isodate2str(attribute.pcontextAttribute->numberValue));
         }
         else
         {
-          TIMED_RENDER(answer =  attribute.pcontextAttribute->getValue());
+          TIMED_RENDER(answer = attribute.pcontextAttribute->getValue());
+          if (attribute.pcontextAttribute->valueType == orion::ValueTypeString)
+          {
+            answer = '"' + answer + '"';
+          }
         }
-
       }
-
-      ciP->outMimeType = TEXT;
     }
   }
 

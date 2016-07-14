@@ -185,9 +185,18 @@ namespace ngsiv2
   {
     JsonHelper jh;
 
-    jh.addString("id", this->id);
-    jh.addString("idPattern", this->idPattern);
-    jh.addString("type", this->type);
+    if (!this->id.empty())
+    {
+        jh.addString("id", this->id);
+    }
+    if (!this->idPattern.empty())
+    {
+      jh.addString("idPattern", this->idPattern);
+    }
+    if (!this->type.empty())
+    {
+      jh.addString("type", this->type);
+    }
 
     return jh.str();
   }

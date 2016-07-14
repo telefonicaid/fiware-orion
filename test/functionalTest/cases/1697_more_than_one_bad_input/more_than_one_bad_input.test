@@ -97,11 +97,16 @@ Date: REGEX(.*)
     "error": "ParseError"
 }
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
+Content-Length: 63
+Content-Type: application/json
 Allow: POST, GET
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
 HTTP/1.1 411 Length Required
 Content-Length: 98
 Content-Type: application/json

@@ -149,9 +149,9 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, bool _val
 *
 * Metadata::Metadata -
 */
-Metadata::Metadata(const BSONObj& mdB)
+Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 {
-  name = getStringFieldF(mdB, ENT_ATTRS_MD_NAME);
+  name = _name;
   type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringFieldF(mdB, ENT_ATTRS_MD_TYPE) : "";
 
   typeGiven = (type == "")? false : true;
@@ -193,12 +193,33 @@ std::string Metadata::render(const std::string& indent, bool comma)
 {
   std::string out     = "";
   std::string tag     = "contextMetadata";
-  std::string xValue  = stringValue;
+  std::string xValue  = toStringValue();
 
   out += startTag2(indent, tag, false, false);
   out += valueTag1(indent + "  ", "name", name, true);
   out += valueTag1(indent + "  ", "type", type, true);
-  out += valueTag1(indent + "  ", "value", xValue, false);
+
+  if (valueType == orion::ValueTypeString)
+  {
+    out += valueTag1(indent + "  ", "value", xValue, false);
+  }
+  else if (valueType == orion::ValueTypeNumber)
+  {
+    out += indent + "  " + JSON_STR("value") + ": " + xValue;
+  }
+  else if (valueType == orion::ValueTypeBoolean)
+  {
+    out += indent + "  " + JSON_STR("value") + ": " + xValue;
+  }
+  else if (valueType == orion::ValueTypeNone)
+  {
+    out += indent + "  " + JSON_STR("value") + ": " + xValue; 
+  }
+  else
+  {
+    out += indent + "  " + JSON_STR("value") + ": " + JSON_STR("unknown json type");
+  }
+
   out += endTag(indent, comma);
 
   return out;
@@ -347,6 +368,10 @@ std::string Metadata::toStringValue(void) const
 
   case orion::ValueTypeBoolean:
     return boolValue ? "true" : "false";
+    break;
+
+  case orion::ValueTypeNone:
+    return "null";
     break;
 
   default:

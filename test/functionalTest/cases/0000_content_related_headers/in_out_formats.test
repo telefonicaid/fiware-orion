@@ -75,8 +75,8 @@ echo
 echo
 
 
-echo "1.3: Unrecognized Content-Type, Accepts text/plain: 415, response in JSON"
-echo '========================================================================='
+echo "1.3: Unrecognized Content-Type, Accepts text/plain: 415, response in text/plain"
+echo '==============================================================================='
 orionCurl --url "$url" --payload "${payload}" --in "text/plain" --out "text/plain" --payloadCheck json
 echo
 echo
@@ -103,8 +103,8 @@ echo
 echo
 
 
-echo "2.3: Content-Type OK, Accepts text/plain: 406, Response in JSON"
-echo '==============================================================='
+echo "2.3: Content-Type OK, Accepts text/plain: 406, Response in text/plain"
+echo '====================================================================='
 orionCurl --url "$url" --payload "${payload}" --in "application/json" --out "text/plain" --payloadCheck json
 echo
 echo
@@ -205,11 +205,11 @@ Date: REGEX(.*)
 }
 
 
-1.3: Unrecognized Content-Type, Accepts text/plain: 415, response in JSON
-=========================================================================
+1.3: Unrecognized Content-Type, Accepts text/plain: 415, response in text/plain
+===============================================================================
 HTTP/1.1 415 Unsupported Media Type
 Content-Length: 151
-Content-Type: application/json
+Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -303,18 +303,18 @@ Date: REGEX(.*)
 }
 
 
-2.3: Content-Type OK, Accepts text/plain: 406, Response in JSON
-===============================================================
+2.3: Content-Type OK, Accepts text/plain: 406, Response in text/plain
+=====================================================================
 HTTP/1.1 406 Not Acceptable
-Content-Length: 182
-Content-Type: application/json
+Content-Length: 144
+Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "orionError": {
         "code": "406",
-        "details": "acceptable MIME types: application/json. Accept header in request: text/plain",
+        "details": "acceptable MIME types: application/json",
         "reasonPhrase": "Not Acceptable"
     }
 }

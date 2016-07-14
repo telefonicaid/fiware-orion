@@ -124,23 +124,23 @@ Date: REGEX(.*)
 03. Query E1/A1 in CB, using GET /v2/entities/E1/attrs/A1/value
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 9
+Content-Length: 11
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-A1 in CP1
+"A1 in CP1"
 
 
 04. Query E1/A1 in CB, using GET /v2/entities/E1/attrs/A1/value?type=T1
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 9
+Content-Length: 11
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-A1 in CP1
+"A1 in CP1"
 
 
 --TEARDOWN--

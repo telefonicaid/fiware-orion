@@ -181,17 +181,18 @@ TEST(RegisterContextRequest, json_emptyProvidingApplication)
 TEST(RegisterContextRequest, json_entityIdWithIsPatternTrue)
 {
   ParseData       parseData;
-  const char*     inFile = "ngsi9.registerContextRequest.entityIdWithIsPatternTrue.valid.json";
-  const char*     expect   = "OK";
+  const char*     inFile  = "ngsi9.registerContextRequest.entityIdWithIsPatternTrue.valid.json";
+  const char*     outFile = "ngsi9.registerContextResponse.entityIdWithIsPatternTrue.valid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inMimeType   = JSON;
   ci.outMimeType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
-  EXPECT_EQ(expect, result) << "entityIdWithIsPatternTrue error";
+  EXPECT_STREQ(expectedBuf, result.c_str()) << "entityIdWithIsPatternTrue error";
 }
 
 

@@ -39,6 +39,7 @@
 using namespace mongo;
 
 
+
 /* ****************************************************************************
 *
 * StringFilterItem::StringFilterItem -
@@ -333,19 +334,10 @@ bool StringFilterItem::listParse(char* s, std::string* errorStringP)
   {
     if (*cP == '\'')
     {
-      if (!inString)
-      {
-        ++itemStart;
-        inString = true;
-      }
-      else
-      {
-        inString = false;
-        *cP = 0;
-      }
-      ++cP;
+      inString = (inString)? false :true;
     }
-    else if ((*cP == ',') && (inString == false))
+
+    if ((*cP == ',') && (inString == false))
     {
       *cP = 0;
 
@@ -898,11 +890,25 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
     *errorStringP = "empty q";
     return false;
   }
-  
+
   if (strstr(q, ";;") != NULL)
   {
     *errorStringP = "empty q-item";
     return false;
+  }
+
+
+  //
+  // If q ends in single ';', just silently remove it to avoid error.
+  // Note that before this is done, a check for ';;' anywhere in 'q' is performed
+  // to detect empty items in 'q'
+  //
+  int   qLen      = strlen(q);
+  char* lastCharP = (char*) &q[qLen - 1];
+
+  if (*lastCharP == ';')
+  {
+    *lastCharP = 0;
   }
 
   char* str         = strdup(q);

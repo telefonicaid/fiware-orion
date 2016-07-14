@@ -31,6 +31,7 @@ SET (SOURCES
     HttpStatusCode.cpp
     ConnectionInfo.cpp
     StringFilter.cpp
+    HttpHeaders.cpp
 )
 
 SET (HEADERS

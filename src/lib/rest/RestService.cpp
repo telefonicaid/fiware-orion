@@ -34,6 +34,7 @@
 #include "common/statistics.h"
 #include "common/string.h"
 #include "common/limits.h"
+#include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/ParseData.h"
@@ -352,7 +353,100 @@ static void filterRelease(ParseData* parseDataP, RequestType request)
 
 /* ****************************************************************************
 *
+* compCheck - 
+*/
+static bool compCheck(int components, const std::vector<std::string>& compV)
+{
+  for (int ix = 0; ix < components; ++ix)
+  {
+    if (compV[ix] == "")
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+/* ****************************************************************************
+*
+* compErrorDetect - 
+*/
+static bool compErrorDetect
+(
+  int                              components,
+  const std::vector<std::string>&  compV,
+  OrionError*                      oeP
+)
+{
+  std::string  details; 
+
+  if ((compV[0] == "v2") && (compV[1] == "entities"))
+  {
+    if ((components == 4) && (compV[3] == "attrs"))  // URL: /v2/entities/<entity-id>/attrs
+    {
+      std::string entityId = compV[2];
+
+      if (entityId == "")
+      {
+        details = EMPTY_ENTITY_ID;
+      }
+    }
+    else if ((components == 5) && (compV[3] == "attrs"))  // URL: /v2/entities/<entity-id>/attrs/<attr-name>
+    {
+      std::string entityId = compV[2];
+      std::string attrName = compV[4];
+
+      if (entityId == "")
+      {
+        details = EMPTY_ENTITY_ID;
+      }
+      else if (attrName == "")
+      {
+        details = EMPTY_ATTR_NAME;
+      }
+    }
+    else if ((components == 6) && (compV[3] == "attrs") && (compV[5] == "value")) // URL: /v2/entities/<entity-id>/attrs/<attr-name>/value
+    {
+      std::string entityId = compV[2];
+      std::string attrName = compV[4];
+
+      if (entityId == "")
+      {
+        details = EMPTY_ENTITY_ID;
+      }
+      else if (attrName == "")
+      {
+        details = EMPTY_ATTR_NAME;
+      }
+    }
+  }
+
+  if (details != "")
+  {
+    oeP->fill(SccBadRequest, details);
+    return true;  // means: this was an error, make the broker stop this request
+  }
+  
+  return false;  // No special error detected, let the broker continue with the request to detect the error later on
+}
+
+
+
+/* ****************************************************************************
+*
 * restService - 
+*
+* NGSIv1 uses a case-insensitive URI PATH, while NGSIv2 is case-sensitive, so
+* before we can start to compare the URI PATH with the vector of supported services,
+* we need to know if it's v1 or v2.
+*
+* This is very easy, we just look at the first component of the URI PATH, and
+* if it is "v2" or "V2", then case-sensitive checks are used.
+*
+* Note that for NGSIv2 to be 'turned on', the URI PATH must start with exactly /v2.
+* If it starts with /V2, the request will not be considered a NGSIv2 request.
 */
 std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 {
@@ -375,8 +469,39 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
   ciP->httpStatusCode = SccOk;
 
-  components = stringSplit(ciP->url, '/', compV);
 
+  //
+  // Split URI PATH into components
+  //
+  components = stringSplit(ciP->url, '/', compV);
+  if (!compCheck(components, compV))
+  {
+    OrionError oe;
+
+    if (compErrorDetect(components, compV, &oe))
+    {
+      alarmMgr.badInput(clientIp, oe.details);
+      ciP->httpStatusCode = SccBadRequest;
+      restReply(ciP, oe.smartRender(ciP->apiVersion));
+      return "URL PATH component error";
+    }
+  }
+
+
+  //
+  // Detect API version
+  //
+  std::string apiVersion = "v1";
+
+  if (strcasecmp(compV[0].c_str(), "v2") == 0)
+  {
+    apiVersion = "v2";
+  }
+
+
+  //
+  // Lookup the requested service
+  //
   for (unsigned int ix = 0; serviceV[ix].treat != NULL; ++ix)
   {
     if ((serviceV[ix].components != 0) && (serviceV[ix].components != components))
@@ -398,10 +523,21 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
         continue;
       }
 
-      if (strcasecmp(serviceV[ix].compV[compNo].c_str(), compV[compNo].c_str()) != 0)
+      if (apiVersion == "v1")
       {
-        match = false;
-        break;
+        if (strcasecmp(serviceV[ix].compV[compNo].c_str(), compV[compNo].c_str()) != 0)
+        {
+          match = false;
+          break;
+        }
+      }
+      else
+      {
+        if (strcmp(serviceV[ix].compV[compNo].c_str(), compV[compNo].c_str()) != 0)
+        {
+          match = false;
+          break;
+        }
       }
     }
 

@@ -61,7 +61,7 @@
 #define ENT_ATTRS_CREATION_DATE      "creDate"
 #define ENT_ATTRS_MODIFICATION_DATE  "modDate"
 #define ENT_ATTRS_MD                 "md"
-#define ENT_ATTRS_MD_NAME            "name"
+#define ENT_ATTRS_MDNAMES            "mdNames"
 #define ENT_ATTRS_MD_TYPE            "type"
 #define ENT_ATTRS_MD_VALUE           "value"
 #define ENT_CREATION_DATE            "creDate"

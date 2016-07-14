@@ -163,13 +163,13 @@ echo
 01. PUT /v2/entities/E1/attrs/A1/value and see it fail
 ======================================================
 HTTP/1.1 404 Not Found
-Content-Length: 61
+Content-Length: 95
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "No context element found",
+    "description": "The requested entity has not been found. Check type and id",
     "error": "NotFound"
 }
 
