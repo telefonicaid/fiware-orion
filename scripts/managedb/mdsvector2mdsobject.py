@@ -21,7 +21,7 @@
 # iot_support at tid dot es
 
 
-# This script is inspired in old attrsvector2attrsobject.py
+# This script is inspired by old attrsvector2attrsobject.py
 
 __author__ = 'fermin'
 
@@ -129,7 +129,7 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
     n_sum_mds      = 0
     n_attrs        = 0
 
-    # It may happend that entity doesn't have any attribute. We early detect that situation and skip in that case
+    # It may happen that entity doesn't have any attribute. We early detect that situation and skip in that case
     if len(doc[ATTRS].keys()) == 0:
         #print '- %d: entity without attributes %s. Skipping' % (processed, json.dumps(doc['_id']))
         skipped_noattr += 1
@@ -168,7 +168,7 @@ for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePa
            name = md.pop('name')
 
            if name in mds:
-               print '- %d: dupplicate metadata detected in entity %s (attribute %s): <%s>. Skipping' % (processed, json.dumps(doc['_id']), attr, name)
+               print '- %d: duplicate metadata detected in entity %s (attribute %s): <%s>. Skipping' % (processed, json.dumps(doc['_id']), attr, name)
                need_fix = True
                to_skip = True
                skipped_dupmd += 1
@@ -223,4 +223,4 @@ print '  * error:               %d' % error
 
 if need_fix:
     print "------------------------------------------------------"
-    print "WARNING: some problem was found during the process. Please, check the documentation at https://fiware-orion.readthedocs.io/en/develop/admin/upgrading_crossing_1-3-0/index.html"
+    print "WARNING: some problem was found during the process. Please check the documentation at https://fiware-orion.readthedocs.io/en/develop/admin/upgrading_crossing_1-3-0/index.html"
