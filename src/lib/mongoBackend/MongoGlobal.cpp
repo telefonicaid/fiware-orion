@@ -1715,51 +1715,27 @@ bool isCondValueInContextElementResponse(ConditionValueList* condValues, Context
 
 /* ****************************************************************************
 *
-* someEmptyCondValue -
-*
-* This logic would be MUCH simpler in the case conditions was a single field instead of a vector.
-*/
-bool someEmptyCondValue(const BSONObj& sub)
-{
-  std::vector<BSONElement>  conds = getFieldF(sub, CSUB_CONDITIONS).Array();
-
-  for (unsigned int ix = 0; ix < conds.size() ; ++ix)
-  {
-    BSONObj cond = conds[ix].embeddedObject();
-    if (getFieldF(cond, CSUB_CONDITIONS_VALUE).Array().size() == 0)
-    {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
 * condValueAttrMatch -
 *
-* This logic would be MUCH simpler in the case conditions was a single field instead of a vector.
 */
 bool condValueAttrMatch(const BSONObj& sub, const std::vector<std::string>& modifiedAttrs)
 {
   std::vector<BSONElement>  conds = getFieldF(sub, CSUB_CONDITIONS).Array();
 
+  if (conds.size() == 0)
+  {
+    // ONANYCHANGE case: always match
+    return true;
+  }
+
   for (unsigned int ix = 0; ix < conds.size() ; ++ix)
   {
-    BSONObj cond = conds[ix].embeddedObject();
-    std::vector<BSONElement>  condValues = getFieldF(cond, CSUB_CONDITIONS_VALUE).Array();
-    for (unsigned int jx = 0; jx < condValues.size() ; ++jx)
+    std::string condAttr = conds[ix].String();
+    for (unsigned int jx = 0; jx < modifiedAttrs.size(); ++jx)
     {
-      std::string condValue = condValues[jx].String();
-      for (unsigned int kx = 0; kx < modifiedAttrs.size(); ++kx)
+      if (condAttr == modifiedAttrs[jx])
       {
-        if (condValue == modifiedAttrs[kx])
-        {
-          return true;
-        }
+        return true;
       }
     }
   }
@@ -1967,17 +1943,11 @@ BSONArray processConditionVector
 
     if (nc->type == ON_CHANGE_CONDITION)
     {
-      /* Create an array holding the list of condValues */
-      BSONArrayBuilder condValues;
 
       for (unsigned int jx = 0; jx < nc->condValueList.size(); ++jx)
       {
-        condValues.append(nc->condValueList[jx]);
+        conds.append(nc->condValueList[jx]);
       }
-
-      conds.append(BSON(CSUB_CONDITIONS_TYPE << ON_CHANGE_CONDITION <<
-                        CSUB_CONDITIONS_VALUE << condValues.arr()
-                        ));
 
       if ((status == STATUS_ACTIVE) &&
           (processOnChangeConditionForSubscription(enV,

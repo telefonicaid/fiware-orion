@@ -121,13 +121,9 @@ TEST(mongoCreateSubscriptions, createSubscriptionNotCustomOK)
   EXPECT_EQ("D", attrs[1].String());
 
   std::vector<BSONElement> conds = doc.getField("conditions").Array();
-  ASSERT_EQ(1, conds.size());
-  BSONObj cond0 = conds[0].embeddedObject();
-  EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-  std::vector<BSONElement> condValues = cond0.getField("value").Array();
-  ASSERT_EQ(2, condValues.size());
-  EXPECT_EQ("A", condValues[0].String());
-  EXPECT_EQ("B", condValues[1].String());
+  ASSERT_EQ(2, conds.size());
+  EXPECT_EQ("A", conds[0].String());
+  EXPECT_EQ("B", conds[1].String());
 
   utExit();
 }
@@ -237,13 +233,9 @@ TEST(mongoCreateSubscriptions, createSubscriptionCustomOK)
   EXPECT_EQ("D", attrs[1].String());
 
   std::vector<BSONElement> conds = doc.getField("conditions").Array();
-  ASSERT_EQ(1, conds.size());
-  BSONObj cond0 = conds[0].embeddedObject();
-  EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-  std::vector<BSONElement> condValues = cond0.getField("value").Array();
-  ASSERT_EQ(2, condValues.size());
-  EXPECT_EQ("A", condValues[0].String());
-  EXPECT_EQ("B", condValues[1].String());
+  ASSERT_EQ(2, conds.size());
+  EXPECT_EQ("A", conds[0].String());
+  EXPECT_EQ("B", conds[1].String());
 
   utExit();
 }
