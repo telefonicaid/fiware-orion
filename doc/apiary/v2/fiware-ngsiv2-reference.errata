@@ -22,3 +22,11 @@ o Line 661 (## Simple Query Language):
        if s string
     For
        if the string
+
+o General in ## Simple Query Language:
+    Change:
+      its value must be in the interval between the minimum and maximum of the range
+    For
+      its value must be between the upper and lower limits of the range (Ken's)
+      or
+      its value must be between the upper and lower bounds of the range (Cantera's)
