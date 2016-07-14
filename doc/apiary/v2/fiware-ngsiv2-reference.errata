@@ -4,4 +4,21 @@ o Line 564 (## Simple Query Language):
     For
       Each statement expresses a matching condition.
 
-o 
+o Line 660 (## Simple Query Language):
+    Change:
+      you can use simple quote
+    For
+      you can use single quote
+
+o Line 661 (## Simple Query Language):
+    Change:
+       In the case of equal or unequal
+    For
+       In case of equal or unequal
+    (An overall search for "case" in the whole document could help to detect other cases)
+
+o Line 661 (## Simple Query Language):
+    Change:
+       if s string
+    For
+       if the string
