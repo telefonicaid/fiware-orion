@@ -1,4 +1,4 @@
-FROM centos:6
+FROM centos:centos6.6
 
 MAINTAINER FIWARE Orion Context Broker Team. Telefónica I+D
 
@@ -11,7 +11,7 @@ WORKDIR /opt
 RUN \
     adduser --comment "${ORION_USER}" ${ORION_USER} && \
     # Install dependencies
-    yum -y install epel-release && yum update -y epel-release && \
+    yum -y install epel-release && \
     yum -y install \
       boost-devel \
       bzip2 \
@@ -106,7 +106,7 @@ RUN \
         boost-iostreams boost boost-date-time \
         boost-test boost-graph boost-signals \
         boost-program-options boost-math \
-        openssh openssh-clients libedit hwdata dbus-glib fipscheck* libicu *devel boost* sysvinit-tools \
+        openssh openssh-clients libedit hwdata dbus-glib fipscheck* *devel sysvinit-tools \
         && \
     rpm -qa groff | xargs -r rpm -e --nodeps && \
     yum clean all && \
