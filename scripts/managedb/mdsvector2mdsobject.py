@@ -80,7 +80,7 @@ def update_ok(doc, n_attrs, n_sum_md_names, n_sum_mds):
     return True
 
 if len(sys.argv) != 2:
-    print "missing db name"
+    print "invalid number of arguments, please check https://fiware-orion.readthedocs.io/en/develop/admin/upgrading_crossing_1-3-0/index.html"
     sys.exit()
 
 DB = sys.argv[1]
