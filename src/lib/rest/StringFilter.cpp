@@ -34,6 +34,8 @@
 #include "parse/forbiddenChars.h"
 #include "rest/StringFilter.h"
 #include "ngsi/ContextElementResponse.h"
+#include "ngsi/ContextAttribute.h"
+#include "ngsi/Metadata.h"
 #include "mongoBackend/dbConstants.h"
 
 using namespace mongo;
@@ -67,6 +69,7 @@ bool StringFilterItem::fill(StringFilterItem* sfiP, std::string* errorStringP)
   stringRangeFrom       = sfiP->stringRangeFrom;
   stringRangeTo         = sfiP->stringRangeTo;
   attributeName         = sfiP->attributeName;
+  metadataName          = sfiP->metadataName;
   compiledPattern       = sfiP->compiledPattern;
 
   if (compiledPattern)
@@ -463,7 +466,7 @@ bool StringFilterItem::valueGet
 *       !          Translates to DOES NOT EXIST (the string that comes after is the name of an attribute)
 *       NOTHING:   Translates to EXISTS (the string is the name of an attribute)
 */
-bool StringFilterItem::parse(char* qItem, std::string* errorStringP)
+bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilterType type)
 {
   char* s       = strdup(qItem);
   char* toFree  = s;
@@ -479,7 +482,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP)
   }
 
   //
-  // If string starts with single-quote it must also end with single-quoite and it is
+  // If string starts with single-quote it must also end with single-quote and it is
   // a string, of course.
   // Also, the resulting string after removing the quotes cannot contain any quotes ... ?
   //
@@ -556,7 +559,15 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP)
   }
   if (forbiddenChars(lhs, ""))
   {
-    *errorStringP = "invalid character found in URI param /q/";
+    if (type == SftQ)
+    {
+      *errorStringP = "invalid character found in URI param /q/";
+    }
+    else
+    {
+      *errorStringP = "invalid character found in URI param /mq/";
+    }
+
     free(toFree);
     return false;
   }
@@ -582,13 +593,56 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP)
   bool b = true;
   if ((op == SfopNotExists) || (op == SfopExists))
   {
-    attributeName = rhs;
+    if (type == SftMq)
+    {
+      std::string rhSide = std::string(rhs);
+      char*       start  = (char*) rhSide.c_str();
+      char*       dotP   = strchr(start, '.');
+
+      if (dotP == NULL)
+      {
+        *errorStringP = "no metadata in right-hand-side of q-item";
+        free(toFree);
+        return false;
+      }
+
+      *dotP = 0;
+      ++dotP;
+      attributeName = start;
+      metadataName  = dotP;
+    }
+    else
+    {
+      attributeName = rhs;
+    }
   }
   else
   {
     if      (strstr(rhs, "..") != NULL)   b = rangeParse(rhs, errorStringP);
     else if (strstr(rhs, ",")  != NULL)   b = listParse(rhs, errorStringP);
     else                                  b = valueParse(rhs, errorStringP);
+  }
+
+  //
+  // If this filter item belongs to a metadata string filter, split the
+  // left hand side info attrName and mdName, if not a unary operator.
+  //
+  if ((type == SftMq) && (op != SfopNotExists) && (op != SfopExists))
+  {
+    std::string lside  = std::string(lhs);
+    char*       start  = (char*) lside.c_str();
+    char*       dotP   = strchr(start, '.');
+
+    if (dotP == NULL)
+    {
+      *errorStringP = "no metadata in left-hand-side of q-item";
+      free(toFree);
+      return false;
+    }
+    *dotP = 0;
+    ++dotP;
+    attributeName = start;
+    metadataName  = dotP;
   }
 
   free(toFree);
@@ -643,6 +697,98 @@ const char* StringFilterItem::valueTypeName(void)
   }
 
   return "InvalidValueType";
+}
+
+
+
+/* ****************************************************************************
+*
+* StringFilterItem::matchEquals(Metadata*) - 
+*/
+bool StringFilterItem::matchEquals(Metadata* mdP)
+{
+  if ((valueType == SfvtNumberRange) || (valueType == SfvtDateRange))
+  {
+    if ((mdP->numberValue < numberRangeFrom) || (mdP->numberValue > numberRangeTo))
+    {
+      return false;
+    }
+  }
+  else if (valueType == SfvtStringRange)
+  {
+    if ((strcmp(mdP->stringValue.c_str(), stringRangeFrom.c_str()) < 0) ||
+        (strcmp(mdP->stringValue.c_str(), stringRangeTo.c_str())   > 0))
+    {
+      return false;
+    }
+  }
+  else if ((valueType == SfvtNumberList) || (valueType == SfvtDateList))
+  {
+    bool match = false;
+
+    // the attribute value has to match at least one of the elements in the vector (OR)
+    for (unsigned int vIx = 0; vIx < numberList.size(); ++vIx)
+    {
+      if (mdP->numberValue == numberList[vIx])
+      {
+        match = true;
+        break;
+      }
+    }
+
+    if (match == false)
+    {
+      return false;
+    }
+  }
+  else if (valueType == SfvtStringList)
+  {
+    bool match = false;
+
+    // the attribute value has to match at least one of the elements in the vector (OR)
+    for (unsigned int vIx = 0; vIx < stringList.size(); ++vIx)
+    {
+      if (mdP->stringValue == stringList[vIx])
+      {
+        match = true;
+        break;
+      }
+    }
+
+    if (match == false)
+    {
+      return false;
+    }
+  }
+  else if ((valueType == SfvtNumber) || (valueType == SfvtDate))
+  {
+    if (mdP->numberValue != numberValue)
+    {
+      return false;
+    }
+  }
+  else if (valueType == SfvtBool)
+  {
+    if (mdP->boolValue != boolValue)
+    {
+      return false;
+    }
+  }
+  else if (valueType == SfvtString)
+  {
+    if (mdP->stringValue != stringValue)
+    {
+      return false;
+    }
+  }
+  else
+  {
+    LM_E(("Runtime Error (valueType '%s' is not treated)", valueTypeName()));
+    return false;
+  }
+
+
+  return true;
 }
 
 
@@ -753,13 +899,30 @@ bool StringFilterItem::matchEquals(ContextAttribute* caP)
 */
 bool StringFilterItem::matchPattern(ContextAttribute* caP)
 {
-  // pattern evaluation only make sense for string attributes
+  // pattern evaluation only makes sense for string attributes
   if (caP->valueType != orion::ValueTypeString)
   {
     return false;
   }
 
   return (regexec(&patternValue, caP->stringValue.c_str(), 0, NULL, 0) == 0);
+}
+
+
+
+/* ****************************************************************************
+*
+* StringFilterItem::matchPattern -
+*/
+bool StringFilterItem::matchPattern(Metadata* mdP)
+{
+  // pattern evaluation only makes sense for string attributes
+  if (mdP->valueType != orion::ValueTypeString)
+  {
+    return false;
+  }
+
+  return (regexec(&patternValue, mdP->stringValue.c_str(), 0, NULL, 0) == 0);
 }
 
 
@@ -782,6 +945,29 @@ bool StringFilterItem::compatibleType(ContextAttribute* caP)
 
   return false;
 }
+
+
+
+/* ****************************************************************************
+*
+* StringFilterItem::compatibleType -
+*/
+bool StringFilterItem::compatibleType(Metadata* mdP)
+{
+  if ((mdP->valueType == orion::ValueTypeNumber) && ((valueType == SfvtNumber) || (valueType == SfvtDate)))
+  {
+    return true;
+  }
+
+  if ((mdP->valueType == orion::ValueTypeString) && (valueType == SfvtString))
+  {
+    return true;
+  }
+
+  return false;
+}
+
+
 
 /* ****************************************************************************
 *
@@ -816,6 +1002,37 @@ bool StringFilterItem::matchGreaterThan(ContextAttribute* caP)
 
 /* ****************************************************************************
 *
+* StringFilterItem::matchGreaterThan - 
+*/
+bool StringFilterItem::matchGreaterThan(Metadata* mdP)
+{
+  if (!compatibleType(mdP))
+  {
+    return false;
+  }
+
+  if (mdP->valueType == orion::ValueTypeNumber)
+  {
+    if (mdP->numberValue > numberValue)
+    {
+      return true;
+    }
+  }
+  else if (mdP->valueType == orion::ValueTypeString)
+  {
+    if (strcmp(mdP->stringValue.c_str(), stringValue.c_str()) > 0)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
 * StringFilterItem::matchLessThan - 
 */
 bool StringFilterItem::matchLessThan(ContextAttribute* caP)
@@ -835,6 +1052,37 @@ bool StringFilterItem::matchLessThan(ContextAttribute* caP)
   else if (caP->valueType == orion::ValueTypeString)
   {
     if (strcmp(caP->stringValue.c_str(), stringValue.c_str()) < 0)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* StringFilterItem::matchLessThan - 
+*/
+bool StringFilterItem::matchLessThan(Metadata* mdP)
+{
+  if (!compatibleType(mdP))
+  {
+    return false;
+  }
+
+  if (mdP->valueType == orion::ValueTypeNumber)
+  {
+    if (mdP->numberValue < numberValue)
+    {
+      return true;
+    }
+  }
+  else if (mdP->valueType == orion::ValueTypeString)
+  {
+    if (strcmp(mdP->stringValue.c_str(), stringValue.c_str()) < 0)
     {
       return true;
     }
@@ -942,7 +1190,7 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
 
     StringFilterItem* item = new StringFilterItem();
 
-    if (item->parse(s, errorStringP) == true)
+    if (item->parse(s, errorStringP, type) == true)
     {
       filters.push_back(item);
     }
@@ -968,8 +1216,6 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
 */
 bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
 {
-  LM_W(("KZ: filter type: %s", (type == SftQ)? "Q" : "MQ"));
-
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
   {
     StringFilterItem*  itemP = filters[ix];
@@ -979,57 +1225,57 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     BSONObjBuilder     bb;
     BSONObjBuilder     bb2;
     BSONObj            f;
-
-    LM_W(("KZ: left: %s", itemP->left.c_str()));
+    std::string        left = std::string(itemP->left.c_str());
 
     //
     // Left hand side might have to change, in case of Metadata filters (mq)
     //
     if (type == SftMq)
     {
-      char* start = (char*) itemP->left.c_str();
-      char* dotP  = strchr(start, '.');
-
-      if (dotP == NULL)
+      if (itemP->attributeName == "")
       {
-        *errorStringP = "no separator (dot) in left-hand-side - not valid for metadata filters";
+        *errorStringP = "no attribute name - not valid for metadata filters";
         return false;
       }
 
-      *dotP = 0;
-      ++dotP;
-      std::string newLeft = std::string(start) + ".md." + dotP;
-      LM_W(("KZ: new left: %s", newLeft.c_str()));
+      if (itemP->metadataName == "")
+      {
+        *errorStringP = "no metadata name - not valid for metadata filters";
+        return false;
+      }
 
-      itemP->left = newLeft;
-      LM_W(("KZ: new left: %s", itemP->left.c_str()));
+      left = itemP->attributeName + ".md." + itemP->metadataName;
+    }
+    else if ((itemP->op == SfopExists) || (itemP->op == SfopNotExists))
+    {
+      left = itemP->attributeName;
     }
 
-    if (itemP->left == DATE_CREATED)
+    if (left == DATE_CREATED)
     {
       k = ENT_CREATION_DATE;
     }
-    else if (itemP->left == DATE_MODIFIED)
+    else if (left == DATE_MODIFIED)
     {
       k = ENT_MODIFICATION_DATE;
     }
     else
     {
-      k = std::string(ENT_ATTRS) + "." + itemP->left + "." ENT_ATTRS_VALUE;
+      k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
     }
 
 
     switch (itemP->op)
     {
     case SfopExists:
-      k = std::string(ENT_ATTRS) + "." + itemP->attributeName;
+      k = std::string(ENT_ATTRS) + "." + left;
       bb.append("$exists", true);
       bob.append(k, bb.obj());
       f = bob.obj();
       break;
 
     case SfopNotExists:
-      k = std::string(ENT_ATTRS) + "." + itemP->attributeName;
+      k = std::string(ENT_ATTRS) + "." + left;
       bb.append("$exists", false);
       bob.append(k, bb.obj());
       f = bob.obj();
@@ -1237,8 +1483,96 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
 /* ****************************************************************************
 *
 * StringFilter::match - 
+*
+* This method is used in mongoBackend/MongoCommonUpdate.cpp, processSubscriptions()
+* to help decide whether a Notification is to be sent after updating an entity
 */
 bool StringFilter::match(ContextElementResponse* cerP)
+{
+  if (type == SftQ)
+  {
+    return qMatch(cerP);
+  }
+  else
+  {
+    return mqMatch(cerP);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* StringFilter::mqMatch - 
+*
+* NOTE
+*   The filters are ANDed together, so, if a 'no match' is encountered, we can safely
+*   return false (which means no match).
+*   HOWEVER, the value 'true' can never be retuirned from within the loop over the filter items.
+*   For the function to return 'true', ALL the filter items must be a match
+*/
+bool StringFilter::mqMatch(ContextElementResponse* cerP)
+{
+  for (unsigned int ix = 0; ix < filters.size(); ++ix)
+  {
+    StringFilterItem*  itemP = filters[ix];
+    ContextAttribute*  caP   = cerP->contextElement.getAttribute(itemP->attributeName);
+    Metadata*          mdP   = (caP == NULL)? NULL : caP->metadataVector.lookupByName(itemP->metadataName);
+
+    if ((itemP->op == SfopExists) && (mdP == NULL))
+    {
+      return false;
+    }        
+    else if ((itemP->op == SfopNotExists) && (mdP != NULL))
+    {
+      return false;
+    }
+    else if ((itemP->op == SfopEquals) && (itemP->matchEquals(mdP) == false))
+    {
+      return false;
+    }
+    else if ((itemP->op == SfopDiffers) && (itemP->matchEquals(mdP) == true))
+    {
+      return false;
+    }
+    else if ((itemP->op == SfopGreaterThan) && (itemP->matchGreaterThan(mdP) == false))
+    {
+      return false;
+    }
+    else if ((itemP->op == SfopLessThan) && (itemP->matchLessThan(mdP) == false))
+    {
+      return false;
+    }
+    else if ((itemP->op == SfopGreaterThanOrEqual) && (itemP->matchLessThan(mdP) == true))
+    {
+      return false;
+    }
+    else if ((itemP->op == SfopLessThanOrEqual) && (itemP->matchGreaterThan(mdP) == true))
+    {
+      return false;
+    }
+    else if ((itemP->op == SfopMatchPattern) && (itemP->matchPattern(mdP) == false))
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* StringFilter::qMatch - 
+*
+* NOTE
+*   The filters are ANDed together, so, if a 'no match' is encountered, we can safely
+*   return false (which means no match).
+*   HOWEVER, the value 'true' can never be retuirned from within the loop over the filter items.
+*   For the function to return 'true', ALL the filter items must be a match
+*/
+bool StringFilter::qMatch(ContextElementResponse* cerP)
 {
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
   {
@@ -1335,7 +1669,18 @@ bool StringFilter::match(ContextElementResponse* cerP)
       break;
 
     case SfopMatchPattern:
-      return itemP->matchPattern(caP);
+      //
+      // To not be forgotten for CNR (and discussed during PR-review):
+      //   This here is a bug fix.
+      //   If a 'q/mq' contains two expressions, a 'pattern' and an 'eq', and the eq gives false,
+      //   while the pattern gives true, then the total outcome will be true (before the bug fix),
+      //   because of the inconditional return that the bugfix removes.
+      //   The items in 'q/mq' are ANDed and as true AND false gives false, this was a bug.
+      //
+      if (itemP->matchPattern(caP) == false)
+      {
+        return false;
+      }
       break;
     }
   }

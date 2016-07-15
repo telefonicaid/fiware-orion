@@ -59,10 +59,12 @@ extern int mongoSubCacheItemInsert
   long long           expirationTime,
   const std::string&  status,
   const std::string&  q,
+  const std::string&  mq,
   const std::string&  geometry,
   const std::string&  coords,
   const std::string&  georel,
   StringFilter*       stringFilterP,
+  StringFilter*       mdStringFilterP,
   RenderFormat        renderFormat
 );
 

@@ -54,7 +54,8 @@ TriggeredSubscription::TriggeredSubscription
   attrL                   (_attrL),
   cacheSubId              (_cacheSubId),
   tenant                  ((_tenant == NULL)? "" : _tenant),
-  stringFilterP           (NULL)
+  stringFilterP           (NULL),
+  mdStringFilterP         (NULL)
 {
 }
 
@@ -79,7 +80,8 @@ TriggeredSubscription::TriggeredSubscription
   attrL                   (_attrL),
   cacheSubId              (""),
   tenant                  (""),
-  stringFilterP           (NULL)
+  stringFilterP           (NULL),
+  mdStringFilterP         (NULL)
 {
 }
 
@@ -95,6 +97,12 @@ TriggeredSubscription::~TriggeredSubscription()
   {
     delete stringFilterP;
     stringFilterP = NULL;
+  }
+
+  if (mdStringFilterP != NULL)
+  {
+    delete mdStringFilterP;
+    mdStringFilterP = NULL;
   }
 }
 
@@ -146,4 +154,17 @@ bool TriggeredSubscription::stringFilterSet(StringFilter* _stringFilterP, std::s
   stringFilterP = _stringFilterP->clone(errorStringP);
 
   return (stringFilterP == NULL)? false : true;
+}
+
+
+
+/* ****************************************************************************
+*
+* TriggeredSubscription::mdStringFilterSet - 
+*/
+bool TriggeredSubscription::mdStringFilterSet(StringFilter* _stringFilterP, std::string* errorStringP)
+{
+  mdStringFilterP = _stringFilterP->clone(errorStringP);
+
+  return (mdStringFilterP == NULL)? false : true;
 }

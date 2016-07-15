@@ -229,6 +229,21 @@ std::string parseScope(ConnectionInfo* ciP, Value::ConstValueIterator valueP, Sc
     if (b != true)
     {
       delete scopeP->stringFilterP;
+      scopeP->stringFilterP = NULL;
+      return errorString;
+    }
+  }
+  else if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY_MD)
+  {
+    std::string errorString;
+
+    scopeP->mdStringFilterP = new StringFilter(SftMq);
+    bool b = scopeP->mdStringFilterP->parse(scopeP->value.c_str(), &errorString);
+
+    if (b != true)
+    {
+      delete scopeP->mdStringFilterP;
+      scopeP->mdStringFilterP = NULL;
       return errorString;
     }
   }

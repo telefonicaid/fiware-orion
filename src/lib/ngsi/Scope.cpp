@@ -424,7 +424,7 @@ std::string Scope::check
     return "illegal chars in scope type";
   }
 
-  if (type != SCOPE_TYPE_SIMPLE_QUERY)
+  if ((type != SCOPE_TYPE_SIMPLE_QUERY) && (type != SCOPE_TYPE_SIMPLE_QUERY_MD))
   {
     if (forbiddenChars(value.c_str()))
     {

@@ -1871,6 +1871,8 @@ static bool processOnChangeConditionForSubscription
   ContextElementResponseVector  rawCerV;
   AttributeList                 emptyList;
 
+  LM_W(("In processOnChangeConditionForSubscription"));
+
   if (!blacklist && !entitiesQuery(enV, attrL, *resP, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
@@ -1988,6 +1990,9 @@ BSONArray processConditionVector
       conds.append(BSON(CSUB_CONDITIONS_TYPE << ON_CHANGE_CONDITION <<
                         CSUB_CONDITIONS_VALUE << condValues.arr()
                         ));
+
+      if (status == STATUS_ACTIVE)
+        LM_W(("Calling processOnChangeConditionForSubscription"));
 
       if ((status == STATUS_ACTIVE) &&
           (processOnChangeConditionForSubscription(enV,

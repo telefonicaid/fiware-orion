@@ -700,6 +700,39 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
       subsP->restriction.scopeVector.push_back(scopeP);
     }
 
+    if (expression.HasMember("mq"))
+    {
+      const Value& mq = expression["mq"];
+      std::string  mqString;
+
+      if (!mq.IsString())
+      {
+        return badInput(ciP, "mq is not a string");
+      }
+
+      mqString = mq.GetString();
+      if (mqString.empty())
+      {
+        return badInput(ciP, "mq is empty");
+      }
+
+      subsP->subject.condition.expression.mq = mqString;
+
+      std::string  errorString;
+      Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY_MD, mqString);
+
+      scopeP->mdStringFilterP = new StringFilter(SftMq);
+      if (scopeP->mdStringFilterP->parse(scopeP->value.c_str(), &errorString) == false)
+      {
+        delete scopeP->mdStringFilterP;
+        delete scopeP;
+
+        return badInput(ciP, errorString);
+      }
+
+      subsP->restriction.scopeVector.push_back(scopeP);
+    }
+
     // geometry
     {
       Opt<std::string> geometryOpt = getStringOpt(expression, "geometry");

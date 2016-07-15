@@ -33,14 +33,12 @@ brokerStart CB
 # 01. Create an entity E of type T, with attributes A1=11,A4=14,A5=15
 # 02. Create an entity E of type T2, with attributes A2=22,A5=25
 # 03. Create an entity E3 of type T, with attributes A3=33,A4=34,A5=35
-#
 # 04. POST /v2/op/query, with E.* and in a scope q:A1==11, see E/T
 # 05. Create an entity E5 without type, with attribute A5=45
 # 06. Create an entity E5 of type T4, with attribute A5=45 and attribute B
 # 07. POST /v2/op/query, with E.*, and with scopes q:B and q=A5==45, see E5/T4 and E5/none
 # 08. POST /v2/op/query, with E.* with scopes q:!B and q=A5==45, see NO entities
 #
-
 
 echo "01. Create an entity E of type T, with attributes A1=11,A4=14,A5=15"
 echo "==================================================================="
@@ -146,8 +144,8 @@ echo
 echo
 
 
-echo "08. POST /v2/op/query, with E.* with scopes q:!type and q=A5==45, see E5/none"
-echo "============================================================================="
+echo "08. POST /v2/op/query, with E.* with scopes q:!B and q=A5==45, see E5/none"
+echo "=========================================================================="
 payload='{
   "entities": [
     {
@@ -168,7 +166,6 @@ payload='{
 orionCurl --url /v2/op/query --payload "$payload"
 echo
 echo
-
 
 
 --REGEXPECT--
@@ -279,8 +276,8 @@ Date: REGEX(.*)
 ]
 
 
-08. POST /v2/op/query, with E.* with scopes q:!type and q=A5==45, see E5/none
-=============================================================================
+08. POST /v2/op/query, with E.* with scopes q:!B and q=A5==45, see E5/none
+==========================================================================
 HTTP/1.1 200 OK
 Content-Length: 73
 Content-Type: application/json

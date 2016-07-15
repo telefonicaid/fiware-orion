@@ -50,7 +50,6 @@ using namespace ngsiv2;
 /* ****************************************************************************
 *
 * setExpiration -
-*
 */
 static void setExpiration(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
 {
@@ -74,7 +73,6 @@ static void setExpiration(const SubscriptionUpdate& subUp, const BSONObj& subOri
 /* ****************************************************************************
 *
 * setHttpInfo -
-*
 */
 static void setHttpInfo(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
 {
@@ -129,7 +127,6 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
 /* ****************************************************************************
 *
 * setThrottling -
-*
 */
 static void setThrottling(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
 {
@@ -153,7 +150,6 @@ static void setThrottling(const SubscriptionUpdate& subUp, const BSONObj& subOri
 /* ****************************************************************************
 *
 * setDescription -
-*
 */
 static void setDescription(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
 {
@@ -177,7 +173,6 @@ static void setDescription(const SubscriptionUpdate& subUp, const BSONObj& subOr
 /* ****************************************************************************
 *
 * setStatus -
-*
 */
 static void setStatus(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
 {
@@ -201,7 +196,6 @@ static void setStatus(const SubscriptionUpdate& subUp, const BSONObj& subOrig, B
 /* ****************************************************************************
 *
 * setEntities -
-*
 */
 static void setEntities(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
 {
@@ -223,7 +217,6 @@ static void setEntities(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
 /* ****************************************************************************
 *
 * setAttrs -
-*
 */
 static void setAttrs(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
 {
@@ -246,7 +239,6 @@ static void setAttrs(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BS
 * setCondsAndInitialNotifyNgsiv1 -
 *
 * This method could be removed along with the rest of NGSIv1 stuff
-*
 */
 static void setCondsAndInitialNotifyNgsiv1
 (
@@ -324,10 +316,10 @@ static void setCondsAndInitialNotifyNgsiv1
 }
 
 
+
 /* ****************************************************************************
 *
 * setCondsAndInitialNotify -
-*
 */
 static void setCondsAndInitialNotify
 (
@@ -408,7 +400,6 @@ static void setCondsAndInitialNotify
 /* ****************************************************************************
 *
 * setCount -
-*
 */
 static void setCount(long long inc, const BSONObj& subOrig, BSONObjBuilder* b)
 {
@@ -432,7 +423,6 @@ static void setCount(long long inc, const BSONObj& subOrig, BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setLastNotification -
-*
 */
 static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
@@ -463,7 +453,6 @@ static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subC
 /* ****************************************************************************
 *
 * setExpression -
-*
 */
 static void setExpression(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
 {
@@ -484,7 +473,6 @@ static void setExpression(const SubscriptionUpdate& subUp, const BSONObj& subOri
 /* ****************************************************************************
 *
 * setFormat -
-*
 */
 static void setFormat(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
 {
@@ -503,7 +491,6 @@ static void setFormat(const SubscriptionUpdate& subUp, const BSONObj& subOrig, B
 /* ****************************************************************************
 *
 * setBlacklist -
-*
 */
 static void setBlacklist(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
 {
@@ -522,8 +509,6 @@ static void setBlacklist(const SubscriptionUpdate& subUp, const BSONObj& subOrig
 /* ****************************************************************************
 *
 * updateInCache -
-*
-
 */
 void updateInCache
 (
@@ -538,13 +523,19 @@ void updateInCache
   // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in subUp.restriction.scopeVector?
   // If so, set it as string filter to the sub-cache item
   //
-  StringFilter*  stringFilterP = NULL;
+  StringFilter*  stringFilterP   = NULL;
+  StringFilter*  mdStringFilterP = NULL;
 
   for (unsigned int ix = 0; ix < subUp.restriction.scopeVector.size(); ++ix)
   {
     if (subUp.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
       stringFilterP = subUp.restriction.scopeVector[ix]->stringFilterP;
+    }
+
+    if (subUp.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY_MD)
+    {
+      mdStringFilterP = subUp.restriction.scopeVector[ix]->mdStringFilterP;
     }
   }
 
@@ -593,10 +584,12 @@ void updateInCache
                                           doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
                                           doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_STATUS) : STATUS_ACTIVE,
                                           doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_Q) : "",
+                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_MQ) : "",
                                           doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_GEOM) : "",
                                           doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_COORDS) : "",
                                           doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_GEOREL) : "",
                                           stringFilterP,
+                                          mdStringFilterP,
                                           doc.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(doc, CSUB_FORMAT)) : NGSI_V2_NORMALIZED);
 
   if (subCacheP != NULL)
@@ -644,6 +637,7 @@ std::string mongoUpdateSubscription
   StatusCode     sc;
   OID            id;
   BSONObj        subOrig;
+
   if (!safeGetSubId(subId, &id, &sc))
   {
     reqSemGive(__FUNCTION__, "ngsiv2 update subscription request", reqSemTaken);
