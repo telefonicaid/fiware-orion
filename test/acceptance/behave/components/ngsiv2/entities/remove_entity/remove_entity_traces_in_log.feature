@@ -70,6 +70,10 @@ Feature: verify fields in log traces with remove entity request using NGSI v2.
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value           |
+      | Fiware-Service     | test_log_traces |
+      | Fiware-ServicePath | /test           |
     When delete an entity with id "room_1"
     Then verify that receive a "No Content" http code
     And verify that entities are not stored in mongo
