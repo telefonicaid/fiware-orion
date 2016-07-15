@@ -35,7 +35,7 @@ accumulatorStart --pretty-print
 # 02. Create entity without tenant
 # 03. Create entity with empty tenant
 # 04. Create entity with tenant abc
-# 05. Dump accelerator, see three notifications
+# 05. Dump accumulator, see three notifications
 #
 
 echo "01. Create a subcription to catch everything, for accumulator"
@@ -99,7 +99,7 @@ echo
 echo
 
 
-echo "05. Dump accelerator, see three notifications"
+echo "05. Dump accumulator, see three notifications"
 echo "============================================="
 accumulatorDump
 echo
@@ -147,7 +147,7 @@ Date: REGEX(.*)
 
 
 
-05. Dump accelerator, see three notifications
+05. Dump accumulator, see three notifications
 =============================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 125

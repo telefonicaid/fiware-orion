@@ -38,9 +38,9 @@ accumulatorStart --pretty-print
 # 05. Create a subscription for all entities/A1 AND mq=A1.M1==13
 # 06. Dump accumulator, see E2, then reset accumulator
 # 07. Modify E1/A1, setting A1/M1=13
-# 08. Dump accelerator, see E1, then reset accumulator
+# 08. Dump accumulator, see E1, then reset accumulator
 # 09. Update subscription, without really changing anything
-# 10. Dump accelerator, see E1 and E2, then reset accumulator
+# 10. Dump accumulator, see E1 and E2, then reset accumulator
 # 11. Check unary operator for mq: !A1.M1 - nothing found
 # 12. Check unary operator for mq: A1.M1 - all three entities
 # 13. Check unary operator for mq: !A1.M2 - all three entities
@@ -48,9 +48,9 @@ accumulatorStart --pretty-print
 # 15. Check unary operator for mq: A2.M9 - nothing found
 # 16. Check unary operator for mq: !A2.M9 - all three entities
 # 17. Create subscription with mq: !A2.M2
-# 18. Dump accelerator, see all three, then reset accumulator
+# 18. Dump accumulator, see all three, then reset accumulator
 # 19. Create subscription with mq: A2.M2
-# 20. Dump accelerator, see nothing
+# 20. Dump accumulator, see nothing
 #
 
 echo "01. Create an entity E1 with attr A1 with metadata M1=12"
@@ -169,7 +169,7 @@ echo
 echo
 
 
-echo "08. Dump accelerator, see E1"
+echo "08. Dump accumulator, see E1"
 echo "============================"
 accumulatorDump
 accumulatorReset
@@ -199,7 +199,7 @@ echo
 echo
 
 
-echo "10. Dump accelerator, see E1 and E2, then reset accumulator"
+echo "10. Dump accumulator, see E1 and E2, then reset accumulator"
 echo "==========================================================="
 accumulatorDump
 accumulatorReset
@@ -278,7 +278,7 @@ echo
 echo
 
 
-echo "18. Dump accelerator, see all three, then reset accumulator"
+echo "18. Dump accumulator, see all three, then reset accumulator"
 echo "==========================================================="
 accumulatorDump
 accumulatorReset
@@ -315,7 +315,7 @@ echo
 echo
 
 
-echo "20. Dump accelerator, see nothing"
+echo "20. Dump accumulator, see nothing"
 echo "================================="
 accumulatorDump
 accumulatorReset
@@ -432,7 +432,7 @@ Date: REGEX(.*)
 
 
 
-08. Dump accelerator, see E1
+08. Dump accumulator, see E1
 ============================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 159
@@ -474,7 +474,7 @@ Date: REGEX(.*)
 
 
 
-10. Dump accelerator, see E1 and E2, then reset accumulator
+10. Dump accumulator, see E1 and E2, then reset accumulator
 ===========================================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 264
@@ -726,7 +726,7 @@ Date: REGEX(.*)
 
 
 
-18. Dump accelerator, see all three, then reset accumulator
+18. Dump accumulator, see all three, then reset accumulator
 ===========================================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 369
@@ -797,7 +797,7 @@ Date: REGEX(.*)
 
 
 
-20. Dump accelerator, see nothing
+20. Dump accumulator, see nothing
 =================================
 
 
