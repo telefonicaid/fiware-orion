@@ -31,9 +31,10 @@
 
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
+#include "rest/uriParamNames.h"
+#include "rest/EntityTypeInfo.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
-#include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "alarmMgr/alarmMgr.h"
@@ -82,8 +83,8 @@ std::string getEntities
   std::string  pattern    = ".*"; // all entities, default value
   std::string  id         = ciP->uriParam["id"];
   std::string  idPattern  = ciP->uriParam["idPattern"];
-  std::string  q          = ciP->uriParam["q"];
-  std::string  mq         = ciP->uriParam["mq"];
+  std::string  q          = ciP->uriParam[URI_PARAM_Q];
+  std::string  mq         = ciP->uriParam[URI_PARAM_MQ];
   std::string  geometry   = ciP->uriParam["geometry"];
   std::string  coords     = ciP->uriParam["coords"];
   std::string  georel     = ciP->uriParam["georel"];

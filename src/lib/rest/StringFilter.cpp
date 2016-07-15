@@ -1230,6 +1230,8 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     //
     // Left hand side might have to change, in case of Metadata filters (mq)
     // The change consists in adding a '.md.' between attribute-name and metadata-name.
+    // [ Assuming ENT_ATTRS_MD has the value 'md' ]
+    //
     // This is to make the queries in mongo work.
     //
     if (type == SftMq)
@@ -1246,7 +1248,7 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
         return false;
       }
 
-      left = itemP->attributeName + ".md." + itemP->metadataName;
+      left = itemP->attributeName + "." + ENT_ATTRS_MD + "." + itemP->metadataName;
     }
     else if ((itemP->op == SfopExists) || (itemP->op == SfopNotExists))
     {
