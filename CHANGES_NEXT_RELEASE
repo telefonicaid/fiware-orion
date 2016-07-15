@@ -20,6 +20,8 @@
 - Fix: NGSIv2 geoquery syntax errors using 400 Bad Request instead of 422 Unprocessable Entity (according to rules defined in #1286)
 - Fix: NGSIv2 URI PATH must be all in lowercase, otherwise "service not found" (Issue #2057)
 - Add: New URI param 'mq' for matching in metadata (Issue #1156) 
+- Add: New param 'mq' (both in URI param for list all entities operation and expression sub-field in subscriptions) for matching in metadata (#1156)
+- Add: FIWARE::StringQuery::Metadata scope (#1156)
 - Fix: GET /v2/subscriptions/subId error for non existing subscriptions (now using 404 Not Found, previously using 400 Bad Request)
 - Fix: 472 Unknown returned as HTTP status code by POST /v2/op/update in some cases (now using 404 Not Found).
 - Fix: Correctly returning error on present but empty attribute types in PATCH v2/entites/{id} operation (Issue #1785)
