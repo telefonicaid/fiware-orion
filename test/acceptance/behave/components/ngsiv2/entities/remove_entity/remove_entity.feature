@@ -126,7 +126,7 @@ Feature: delete an entity request using NGSI v2 API. "DELETE" - /v2/entities/
       | <sdsd>                            |
       | (eeqweqwe)                        |
 
-  @with_empty_content_type @BUG_2364
+  @with_empty_content_type @BUG_2364 @skip
   Scenario: try to delete an entity using NGSI v2 API with content type header and empty value
     Given a definition of headers
       | parameter          | value                  |
