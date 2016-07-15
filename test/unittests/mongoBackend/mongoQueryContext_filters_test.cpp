@@ -1123,7 +1123,6 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  // servicePathVector.push_back("/#");  Line to be removed during PR
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
@@ -1177,7 +1176,6 @@ TEST(mongoQueryContextRequest_filters, stringsWithCommas)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  // servicePathVector.push_back("/#");  Line to be removed during PR
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
@@ -1228,7 +1226,6 @@ TEST(mongoQueryContextRequest_filters, combiningSeveralFilters)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  // servicePathVector.push_back("/#");  Line to be removed during PR
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
@@ -1276,7 +1273,6 @@ TEST(mongoQueryContextRequest_filters, repeatSameFilter)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  // servicePathVector.push_back("/#");  Line to be removed during PR
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
@@ -1325,7 +1321,6 @@ TEST(mongoQueryContextRequest_filters, rangeWithDecimals)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  // servicePathVector.push_back("/#");  Line to be removed during PR
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
