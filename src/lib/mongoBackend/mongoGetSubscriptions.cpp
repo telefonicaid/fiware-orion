@@ -98,17 +98,8 @@ static void setSubject(Subscription* s, const BSONObj& r)
   std::vector<BSONElement> conds = getFieldF(r, CSUB_CONDITIONS).Array();
   for (unsigned int ix = 0; ix < conds.size(); ++ix)
   {
-    BSONObj cond = conds[ix].embeddedObject();
-    // The ONCHANGE check is needed, as a subscription could mix different conditions types in DB
-    if (std::string(getStringFieldF(cond, CSUB_CONDITIONS_TYPE)) == ON_CHANGE_CONDITION)
-    {
-      std::vector<BSONElement> condValues = getFieldF(cond, CSUB_CONDITIONS_VALUE).Array();
-      for (unsigned int jx = 0; jx < condValues.size(); ++jx)
-      {
-        std::string attr = condValues[jx].String();
-        s->subject.condition.attributes.push_back(attr);
-      }
-    }
+    std::string attr = conds[ix].String();
+    s->subject.condition.attributes.push_back(attr);
   }
 
   if (r.hasField(CSUB_EXPR))
@@ -242,17 +233,16 @@ void mongoListSubscriptions
    * Note that expiration is not taken into account (in the future, a q= query
    * could be added to the operation in order to filter results) */
   std::auto_ptr<DBClientCursor>  cursor;
-  std::string                    err;
-  std::string                    conds = std::string(CSUB_CONDITIONS) + "." + CSUB_CONDITIONS_TYPE;
+  std::string                    err; 
   Query                          q;
 
   if (!servicePath.empty() && servicePath != "/#")
   {
-    q = Query(BSON(CSUB_SERVICE_PATH << servicePath << conds << ON_CHANGE_CONDITION));
+    q = Query(BSON(CSUB_SERVICE_PATH << servicePath));
   }
   else
   {
-    q = Query(BSON(conds << ON_CHANGE_CONDITION));
+    q = Query();
   }
 
   q.sort(BSON("_id" << 1));

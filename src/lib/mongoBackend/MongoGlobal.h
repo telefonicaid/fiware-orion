@@ -310,12 +310,7 @@ extern bool registrationsQuery
   long long*                          countP       = NULL
 );
 
-/* ****************************************************************************
-*
-* someEmptyCondValue -
-*
-*/
-extern bool someEmptyCondValue(const BSONObj& sub);
+
 
 /* ****************************************************************************
 *

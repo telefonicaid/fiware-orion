@@ -287,7 +287,7 @@ Fields:
 -   **blacklist**: a boolean field that expecifies if `attrs` has to be interpreted
     as a whitelist (if `blacklist` is equal to "false" or doesn't exist) or a
     blacklist (if `blacklist` is equal to "true").
--   **conditions**: a list of conditions that trigger notifications.
+-   **conditions**: a list of attributes that trigger notifications.
 -   **expression**: an expression used to evaluate if notifications has
     to be sent or not when updates come. It may be composed of the following
     fields: q, mq, georel, geometry and/or coords (optional)
@@ -324,14 +324,7 @@ Example document:
                 "humidity",
                 "temperature"
         ],
-        "conditions" : [
-                {
-                        "type" : "ONCHANGE",
-                        "value" : [
-                                "temperature "
-                        ]
-                }
-        ],
+        "conditions" : [ "temperature" ],
         "expression" : {
                 "q" : "temperature>40",
                 "mq" : "temperature.accuracy<1",

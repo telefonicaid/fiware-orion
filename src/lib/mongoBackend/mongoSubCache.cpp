@@ -224,33 +224,16 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
   //
   // 07. Fill in cSubP->notifyConditionVector from condVec
+  // FIXME #1851: CachedSubscription class must be modified to use just a std::vector<string> instead of NotifyCondition
   //
+  NotifyCondition* ncP = new NotifyCondition();
+  ncP->type = ON_CHANGE_CONDITION;
   for (unsigned int ix = 0; ix < condVec.size(); ++ix)
   {
-    BSONObj                   condition = condVec[ix].embeddedObject();
-    std::string               condType;
-    std::vector<BSONElement>  valueVec;
-
-    condType = getStringFieldF(condition, CSUB_CONDITIONS_TYPE);
-    if (condType != ON_CHANGE_CONDITION)
-    {
-      continue;
-    }
-
-    NotifyCondition* ncP = new NotifyCondition();
-    ncP->type = condType;
-
-    valueVec = getFieldF(condition, CSUB_CONDITIONS_VALUE).Array();
-    for (unsigned int vIx = 0; vIx < valueVec.size(); ++vIx)
-    {
-      std::string condValue;
-
-      condValue = valueVec[vIx].String();
-      ncP->condValueList.push_back(condValue);
-    }
-
-    cSubP->notifyConditionVector.push_back(ncP);
+    std::string attr = condVec[ix].String();
+    ncP->condValueList.push_back(attr);
   }
+  cSubP->notifyConditionVector.push_back(ncP);
 
   if (cSubP->notifyConditionVector.size() == 0)  // Cleanup
   {
@@ -444,33 +427,16 @@ int mongoSubCacheItemInsert
 
   //
   // 07. Fill in cSubP->notifyConditionVector from condVec
+  // FIXME #1851: CachedSubscription class must be modified to use just a std::vector<string> instead of NotifyCondition
   //
+  NotifyCondition* ncP = new NotifyCondition();
+  ncP->type = ON_CHANGE_CONDITION;
   for (unsigned int ix = 0; ix < condVec.size(); ++ix)
   {
-    BSONObj                   condition = condVec[ix].embeddedObject();
-    std::string               condType;
-    std::vector<BSONElement>  valueVec;
-
-    condType = getStringFieldF(condition, CSUB_CONDITIONS_TYPE);
-    if (condType != ON_CHANGE_CONDITION)
-    {
-      continue;
-    }
-
-    NotifyCondition* ncP = new NotifyCondition();
-    ncP->type = condType;
-
-    valueVec = getFieldF(condition, CSUB_CONDITIONS_VALUE).Array();
-    for (unsigned int vIx = 0; vIx < valueVec.size(); ++vIx)
-    {
-      std::string condValue;
-
-      condValue = valueVec[vIx].String();
-      ncP->condValueList.push_back(condValue);
-    }
-
-    cSubP->notifyConditionVector.push_back(ncP);
+    std::string attr = condVec[ix].String();
+    ncP->condValueList.push_back(attr);
   }
+  cSubP->notifyConditionVector.push_back(ncP);
 
   if (cSubP->notifyConditionVector.size() == 0)
   {
@@ -504,7 +470,7 @@ void mongoSubCacheRefresh(const std::string& database)
 {
   LM_T(LmtSubCache, ("Refreshing subscription cache for DB '%s'", database.c_str()));
 
-  BSONObj                   query       = BSON("conditions.type" << ON_CHANGE_CONDITION);
+  BSONObj                   query;      // empty query (all subscriptions)
   std::string               db          = database;
   std::string               tenant      = tenantFromDb(db);
   std::string               collection  = getSubscribeContextCollectionName(tenant);

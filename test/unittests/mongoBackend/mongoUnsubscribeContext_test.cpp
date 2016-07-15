@@ -75,10 +75,7 @@ static void prepareDatabase(void) {
                         "reference" << "http://notify1.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("AX1" << "AY1")
-                                                       ))
+                        "conditions" << BSON_ARRAY("AX1" << "AY1")
                         );
 
     BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
@@ -87,10 +84,7 @@ static void prepareDatabase(void) {
                         "reference" << "http://notify2.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("AX2" << "AY2")
-                                                       ))
+                        "conditions" << BSON_ARRAY("AX2" << "AY2")
                         );
 
     connection->insert(SUBSCRIBECONTEXT_COLL, sub1);

@@ -75,8 +75,6 @@
 #define CSUB_LASTNOTIFICATION   "lastNotification"
 #define CSUB_REFERENCE          "reference"
 #define CSUB_CONDITIONS         "conditions"
-#define CSUB_CONDITIONS_TYPE    "type"
-#define CSUB_CONDITIONS_VALUE   "value"
 #define CSUB_EXPR               "expression"
 #define CSUB_EXPR_Q             "q"
 #define CSUB_EXPR_MQ            "mq"
