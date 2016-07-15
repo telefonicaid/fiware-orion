@@ -125,7 +125,6 @@ Feature: delete an entity request using NGSI v2 API. "DELETE" - /v2/entities/
       | dsfsdfsdf                         |
       | <sdsd>                            |
       | (eeqweqwe)                        |
-      |                                   |
 
   # ------------------------ Service header ----------------------------------------------
   @service_delete
