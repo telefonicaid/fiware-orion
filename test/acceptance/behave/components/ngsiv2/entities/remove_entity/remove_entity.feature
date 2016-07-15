@@ -126,6 +126,42 @@ Feature: delete an entity request using NGSI v2 API. "DELETE" - /v2/entities/
       | <sdsd>                            |
       | (eeqweqwe)                        |
 
+  @with_empty_content_type @BUG_2364 @skip
+  Scenario: try to delete an entity using NGSI v2 API with content type header and empty value
+    Given a definition of headers
+      | parameter          | value                  |
+      | Fiware-Service     | test_delete_happy_path |
+      | Fiware-ServicePath | /test                  |
+      | Content-Type       | application/json       |
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | house       |
+      | entities_id       | room        |
+      | attributes_number | 3           |
+      | attributes_name   | temperature |
+      | attributes_value  | 45          |
+      | attributes_type   | celsius     |
+      | metadatas_number  | 2           |
+      | metadatas_name    | very_hot    |
+      | metadatas_type    | alarm       |
+      | metadatas_value   | hot         |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_delete_happy_path |
+      | Fiware-ServicePath | /test                  |
+      | Content-Type       |                        |
+    When delete an entity with id "room_1"
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                                                        |
+      | error       | BadRequest                                                                                   |
+      | description | Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden |
+
   # ------------------------ Service header ----------------------------------------------
   @service_delete
   Scenario Outline: Delete entities by ID using NGSI v2 with several service header values
