@@ -395,7 +395,7 @@ int mongoSubCacheItemInsert
   if (stringFilterP != NULL)
   {
     //
-    // NOTE (for both 'q' amd 'mq' string filters)
+    // NOTE (for both 'q' and 'mq' string filters)
     //   Here, the subscription should have a String Filter but if fill() fails, it won't.
     //   The subscription is already in mongo and hopefully this erroneous situation is fixed 
     //   once the sub-cache is refreshed.

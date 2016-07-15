@@ -726,7 +726,7 @@ bool StringFilterItem::matchEquals(Metadata* mdP)
   {
     bool match = false;
 
-    // the attribute value has to match at least one of the elements in the vector (OR)
+    // the metadata value has to match at least one of the elements in the vector (OR)
     for (unsigned int vIx = 0; vIx < numberList.size(); ++vIx)
     {
       if (mdP->numberValue == numberList[vIx])
@@ -745,7 +745,7 @@ bool StringFilterItem::matchEquals(Metadata* mdP)
   {
     bool match = false;
 
-    // the attribute value has to match at least one of the elements in the vector (OR)
+    // the metadata value has to match at least one of the elements in the vector (OR)
     for (unsigned int vIx = 0; vIx < stringList.size(); ++vIx)
     {
       if (mdP->stringValue == stringList[vIx])
@@ -899,7 +899,7 @@ bool StringFilterItem::matchEquals(ContextAttribute* caP)
 */
 bool StringFilterItem::matchPattern(ContextAttribute* caP)
 {
-  // pattern evaluation only makes sense for string attributes
+  // pattern evaluation only makes sense for attributes of type 'string'
   if (caP->valueType != orion::ValueTypeString)
   {
     return false;
@@ -916,7 +916,7 @@ bool StringFilterItem::matchPattern(ContextAttribute* caP)
 */
 bool StringFilterItem::matchPattern(Metadata* mdP)
 {
-  // pattern evaluation only makes sense for string attributes
+  // pattern evaluation only makes sense for metadatas of type 'string'
   if (mdP->valueType != orion::ValueTypeString)
   {
     return false;
@@ -1229,6 +1229,8 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
 
     //
     // Left hand side might have to change, in case of Metadata filters (mq)
+    // The change consists in adding a '.md.' between attribute-name and metadata-name.
+    // This is to make the queries in mongo work.
     //
     if (type == SftMq)
     {

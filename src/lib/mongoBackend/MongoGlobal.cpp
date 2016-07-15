@@ -1847,8 +1847,6 @@ static bool processOnChangeConditionForSubscription
   ContextElementResponseVector  rawCerV;
   AttributeList                 emptyList;
 
-  LM_W(("In processOnChangeConditionForSubscription"));
-
   if (!blacklist && !entitiesQuery(enV, attrL, *resP, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
