@@ -114,6 +114,7 @@ def send_a_cache_statistics_request(context):
     context.resp = context.cb.get_cache_statistics_request()
     __logger__.info("..Sent a statistics request correctly")
 
+
 @step(u'delete database in mongo')
 def delete_database_in_mongo(context):
     """
@@ -162,8 +163,8 @@ def check_in_log_label_and_text(context, label, text):
     __logger__.info("...confirmed traces in log")
 
 
-
 # ------------------------------------- validations ----------------------------------------------
+
 
 @step(u'verify that receive a.? "([^"]*)" http code')
 def verify_that_receive_an_http_code(context, http_code):
