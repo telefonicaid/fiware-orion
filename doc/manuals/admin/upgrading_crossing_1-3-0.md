@@ -31,7 +31,7 @@ at least one entity document **or** at least one context subscription document.
 
         python mdsvector2mdsobject.py orion
 
--   If you get some of the following messages, there is some problem that needs
+-   If you get any of the following messages, there is some problem that needs
     to be solved before going to the next step. Check the
     "Troubleshooting mdsvector2mdsobject" section below.
 
