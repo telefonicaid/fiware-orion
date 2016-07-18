@@ -11,14 +11,13 @@ This document explains some consideration to take into account regarding such co
 ## Native JSON types
 
 NGSIv2 allows to create/update attributes (and metadata) whose values use JSON native 
-types (number, boolean, string, etc.). However, NGSIv1 uses a JSON parser that converts 
+types (number, boolean, string, etc.). Unfortunately, NGSIv1 uses a JSON parser that converts 
 numbers and boolean values to string at creation/update time. Thus, an attempt of 
 setting `A=2` using NGSIv1 will actually store `A="2"` in the Orion database.
 
-However, NGSIv1 rendering is able to retrieve attributes values stored using 
-non-string JSON native types correctly. Thus, if you set `A=2` using NGSIv2 and retrieve that 
-attribute using NGSIv1 you will get `A=2`. Currently this work for attribute simple
-values, i.e. compound attribute values or metadata values always use string-based rendering.
+However, NGSIv1 rendering is able to correctly retrieve attribute values stored using 
+non-string JSON native types. Thus, if you set `A=2` using NGSIv2 and retrieve that 
+attribute using NGSIv1, you will get `A=2`.
 
 ## Filtering
 

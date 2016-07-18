@@ -207,10 +207,7 @@ static void prepareDatabase(void) {
                         "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("AX1" << "AY1")
-                                                       ))
+                        "conditions" << BSON_ARRAY("AX1" << "AY1")
                         );
 
     BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
@@ -220,10 +217,7 @@ static void prepareDatabase(void) {
                         "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("AX2" << "AY2")
-                                                       ))
+                        "conditions" << BSON_ARRAY("AX2" << "AY2")
                         );
 
     /* No type variant of sub2 */
@@ -234,10 +228,7 @@ static void prepareDatabase(void) {
                         "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("AX2" << "AY2")
-                                                       ))
+                        "conditions" << BSON_ARRAY("AX2" << "AY2")
                         );
 
     BSONObj sub3 = BSON("_id" << OID("51307b66f481db11bf860003") <<
@@ -248,10 +239,7 @@ static void prepareDatabase(void) {
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false") <<
                                                  BSON("id" << "E2" << "type" << "T2" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("AX3" << "AY3")
-                                                       ))
+                        "conditions" << BSON_ARRAY("AX3" << "AY3")
                         );
 
     BSONObj sub4 = BSON("_id" << OID("51307b66f481db11bf860004") <<
@@ -262,10 +250,7 @@ static void prepareDatabase(void) {
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false") <<
                                                  BSON("id" << "E2" << "type" << "T2" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("AX4" << "AY4")
-                                                       ))
+                        "conditions" << BSON_ARRAY("AX4" << "AY4")
                         );
     BSONObj sub5 = BSON("_id" << OID("51307b66f481db11bf860005") <<
                         "expiration" << 50000000 <<
@@ -275,10 +260,7 @@ static void prepareDatabase(void) {
                         "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("AX5" << "AY5")
-                                                       ))
+                        "conditions" << BSON_ARRAY("AX5" << "AY5")
                         );
 
     connection->insert(ENTITIES_COLL, en1);
@@ -380,10 +362,7 @@ static void prepareDatabasePatternTrue(void) {
                         "reference" << "http://notify1.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("AX1" << "AY1")
-                                                       ))
+                        "conditions" << BSON_ARRAY("AX1" << "AY1")
                         );
 
     BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
@@ -392,10 +371,7 @@ static void prepareDatabasePatternTrue(void) {
                         "reference" << "http://notify2.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E[1-2]" << "type" << "T" << "isPattern" << "true")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("AX2" << "AY2")
-                                                       ))
+                        "conditions" << BSON_ARRAY("AX2" << "AY2")
                         );
 
     /* No type variant of sub2 */
@@ -405,10 +381,7 @@ static void prepareDatabasePatternTrue(void) {
                         "reference" << "http://notify2.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E[1-2]" << "isPattern" << "true")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("AX2" << "AY2")
-                                                       ))
+                        "conditions" << BSON_ARRAY("AX2" << "AY2")
                         );
 
     BSONObj sub3 = BSON("_id" << OID("51307b66f481db11bf860003") <<
@@ -418,10 +391,7 @@ static void prepareDatabasePatternTrue(void) {
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false") <<
                                                  BSON("id" << "E2" << "type" << "T2" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("AX3" << "AY3")
-                                                       ))
+                        "conditions" << BSON_ARRAY("AX3" << "AY3")
                         );
 
     BSONObj sub4 = BSON("_id" << OID("51307b66f481db11bf860004") <<
@@ -431,10 +401,7 @@ static void prepareDatabasePatternTrue(void) {
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false") <<
                                                  BSON("id" << "E2" << "type" << "T2" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("AX4" << "AY4")
-                                                       ))
+                        "conditions" << BSON_ARRAY("AX4" << "AY4")
                         );
     BSONObj sub5 = BSON("_id" << OID("51307b66f481db11bf860005") <<
                         "expiration" << 50000000 <<
@@ -443,10 +410,7 @@ static void prepareDatabasePatternTrue(void) {
                         "reference" << "http://notify5.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("AX5" << "AY5")
-                                                       ))
+                        "conditions" << BSON_ARRAY("AX5" << "AY5")
                         );
 
     connection->insert(ENTITIES_COLL, en1);
@@ -578,14 +542,9 @@ TEST(mongoUpdateContextSubscription, updateDuration)
     EXPECT_EQ(0, attrs.size());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond, "type"));
-
-    std::vector<BSONElement> condValues = cond.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("AX1", condValues[0].String());
-    EXPECT_EQ("AY1", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("AX1", conds[0].String());
+    EXPECT_EQ("AY1", conds[1].String());
 
     delete notifierMock;
     delete timerMock;
@@ -668,13 +627,9 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
     EXPECT_EQ(0, attrs.size());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond, "type"));
-    std::vector<BSONElement> condValues = cond.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("AX5", condValues[0].String());
-    EXPECT_EQ("AY5", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("AX5", conds[0].String());
+    EXPECT_EQ("AY5", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -746,13 +701,9 @@ TEST(mongoUpdateContextSubscription, clearThrottling)
     EXPECT_EQ(0, attrs.size());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond, "type"));
-    std::vector<BSONElement> condValues = cond.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("AX5", condValues[0].String());
-    EXPECT_EQ("AY5", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("AX5", conds[0].String());
+    EXPECT_EQ("AY5", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -834,11 +785,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_C1)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
+    EXPECT_EQ("A10", conds[0].String());
 
     /* Release mocks */
     delete notifierMock;
@@ -921,11 +868,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_C1)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
+    EXPECT_EQ("A10", conds[0].String());
 
     /* Release mock */
     delete notifierMock;
@@ -1005,14 +948,9 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_CN)
     EXPECT_EQ(0, attrs.size());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    std::vector<BSONElement> condValues;
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());   
-    EXPECT_EQ("A20", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A10", conds[0].String());
+    EXPECT_EQ("A20", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -1091,13 +1029,9 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_CNbis)
     EXPECT_EQ(0, attrs.size());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_EQ("A20", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A10", conds[0].String());
+    EXPECT_EQ("A20", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -1180,15 +1114,10 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_CN)
     EXPECT_EQ("A1", attrs[0].String());
     EXPECT_EQ("A2", attrs[1].String());
 
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    std::vector<BSONElement> condValues;
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();    
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_EQ("A20", condValues[1].String());
+    std::vector<BSONElement> conds = sub.getField("conditions").Array();    
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A10", conds[0].String());
+    EXPECT_EQ("A20", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -1269,13 +1198,9 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_CNbis)
     EXPECT_EQ("A2", attrs[1].String());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_EQ("A20", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A10", conds[0].String());
+    EXPECT_EQ("A20", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -1360,11 +1285,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_C1)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
+    EXPECT_EQ("A10", conds[0].String());
 
     /* Release mock */
     delete notifierMock;
@@ -1449,11 +1370,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_C1)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
+    EXPECT_EQ("A10", conds[0].String());
 
     /* Release mock */
     delete notifierMock;
@@ -1537,15 +1454,10 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_CN)
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     EXPECT_EQ(0, attrs.size());
 
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    std::vector<BSONElement> condValues;
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_EQ("A20", condValues[1].String());
+    std::vector<BSONElement> conds = sub.getField("conditions").Array();    
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A10", conds[0].String());
+    EXPECT_EQ("A20", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -1624,13 +1536,9 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_CNbis)
     EXPECT_EQ(0, attrs.size());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_EQ("A20", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A10", conds[0].String());
+    EXPECT_EQ("A20", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -1714,15 +1622,10 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_CN)
     EXPECT_EQ("A1", attrs[0].String());
     EXPECT_EQ("A2", attrs[1].String());
 
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    std::vector<BSONElement> condValues;
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_EQ("A20", condValues[1].String());
+    std::vector<BSONElement> conds = sub.getField("conditions").Array();    
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A10", conds[0].String());
+    EXPECT_EQ("A20", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -1804,13 +1707,9 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_CNbis)
     EXPECT_EQ("A2", attrs[1].String());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_EQ("A20", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A10", conds[0].String());
+    EXPECT_EQ("A20", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -1903,11 +1802,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
+    EXPECT_EQ("A1", conds[0].String());
 
     /* Release mock */
     delete notifierMock;
@@ -2000,11 +1895,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1_JSON)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
+    EXPECT_EQ("A1", conds[0].String());
 
     /* Release mock */
     delete notifierMock;
@@ -2096,11 +1987,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
+    EXPECT_EQ("A1", conds[0].String());
 
     /* Release mock */
     delete notifierMock;
@@ -2191,11 +2078,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1_disjoint)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A3", condValues[0].String());
+    EXPECT_EQ("A3", conds[0].String());
 
     /* Release mock */
     delete notifierMock;
@@ -2301,11 +2184,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
+    EXPECT_EQ("A1", conds[0].String());
 
     /* Release mock */
     delete notifierMock;
@@ -2410,11 +2289,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1_disjoint)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A3", condValues[0].String());
+    EXPECT_EQ("A3", conds[0].String());
 
     /* Release mock */
     delete notifierMock;
@@ -2513,11 +2388,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
+    EXPECT_EQ("A1", conds[0].String());
 
     /* Release mock */
     delete notifierMock;
@@ -2616,11 +2487,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1_disjoint)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A3", condValues[0].String());
+    EXPECT_EQ("A3", conds[0].String());
 
     /* Release mock */
     delete notifierMock;
@@ -2731,11 +2598,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
+    EXPECT_EQ("A1", conds[0].String());
 
     /* Release mock */
     delete notifierMock;
@@ -2846,11 +2709,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1_disjoint)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A3", condValues[0].String());
+    EXPECT_EQ("A3", conds[0].String());
 
     /* Release mock */
     delete notifierMock;
@@ -2944,14 +2803,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN)
     EXPECT_EQ(0, attrs.size());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    std::vector<BSONElement> condValues;
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_EQ("A2", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A1", conds[0].String());
+    EXPECT_EQ("A2", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3045,14 +2899,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
     EXPECT_EQ(0, attrs.size());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    std::vector<BSONElement> condValues;
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_EQ("A5", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A1", conds[0].String());
+    EXPECT_EQ("A5", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3145,13 +2994,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CNbis)
     EXPECT_EQ(0, attrs.size());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_EQ("A2", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A1", conds[0].String());
+    EXPECT_EQ("A2", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3245,14 +3090,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_disjoint)
     EXPECT_EQ("A2", attrs[1].String());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    std::vector<BSONElement> condValues;
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_EQ("A3", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A1", conds[0].String());
+    EXPECT_EQ("A3", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3346,14 +3186,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial)
     EXPECT_EQ("A2", attrs[1].String());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    std::vector<BSONElement> condValues;
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_EQ("A5", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A1", conds[0].String());
+    EXPECT_EQ("A5", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3447,14 +3282,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial_disjoint)
     EXPECT_EQ("A2", attrs[1].String());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    std::vector<BSONElement> condValues;
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A3", condValues[0].String());
-    EXPECT_EQ("A5", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A3", conds[0].String());
+    EXPECT_EQ("A5", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3546,13 +3376,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CNbis)
     EXPECT_EQ("A2", attrs[1].String());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_EQ("A2", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A1", conds[0].String());
+    EXPECT_EQ("A2", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3651,14 +3477,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
     EXPECT_EQ("A2", attrs[1].String());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    std::vector<BSONElement> condValues;
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_EQ("A2", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A1", conds[0].String());
+    EXPECT_EQ("A2", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3764,11 +3585,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_C1)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
+    EXPECT_EQ("A1", conds[0].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3869,12 +3686,8 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_C1)
     EXPECT_EQ("A2", attrs[1].String());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
+    ASSERT_EQ(1, conds.size());    
+    EXPECT_EQ("A1", conds[0].String());
 
     /* Release mock */
     delete notifierMock;
@@ -3980,14 +3793,9 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CN)
     EXPECT_EQ(0, attrs.size());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    std::vector<BSONElement> condValues;
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();    
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_EQ("A2", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A1", conds[0].String());
+    EXPECT_EQ("A2", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -4091,13 +3899,9 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CNbis)
     EXPECT_EQ(0, attrs.size());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_EQ("A2", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A1", conds[0].String());
+    EXPECT_EQ("A2", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -4201,14 +4005,9 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
     EXPECT_EQ("A2", attrs[1].String());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    std::vector<BSONElement> condValues;
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();    
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_EQ("A2", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A1", conds[0].String());
+    EXPECT_EQ("A2", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -4308,13 +4107,9 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CNbis)
     EXPECT_EQ("A2", attrs[1].String());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_EQ("A2", condValues[1].String());
+    ASSERT_EQ(2, conds.size());
+    EXPECT_EQ("A1", conds[0].String());
+    EXPECT_EQ("A2", conds[1].String());
 
     /* Release mock */
     delete notifierMock;
@@ -4393,11 +4188,7 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A", condValues[0].String());
+    EXPECT_EQ("A", conds[0].String());
 
     /* Release mock */
     delete notifierMock;

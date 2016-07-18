@@ -107,11 +107,17 @@ std::string RegisterContextResponse::render(RequestType requestType, const std::
 
   out += startTag1(indent, tag, false);
 
-  out += duration.render(indent + "  ", true);
+  if (!errorCodeRendered)
+  {
+    out += duration.render(indent + "  ", true);
+  }
+
   out += registrationId.render(RegisterResponse, indent + "  ", errorCodeRendered);
 
   if (errorCodeRendered)
+  {
     out += errorCode.render(indent + "  ");
+  }
 
   out += endTag(indent);
 

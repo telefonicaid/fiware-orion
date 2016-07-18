@@ -238,34 +238,17 @@ static void prepareDatabase(bool useSubCache = true)
                       "reference" << "http://notify1.me" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                       "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
-                      "conditions" << BSON_ARRAY(BSON(
-                                                     "type" << "ONCHANGE" <<
-                                                     "value" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
-                                                     ))
+                      "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
                       );
 
+  // After the changes to simplify "condition" field (issue #1851) sub2 has become equal to sub1 and sub3
   BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
                       "expiration" << 2000000000 <<
                       "lastNotification" << 30000000 <<
                       "reference" << "http://notify2.me" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E2" << "type" << "T2" << "isPattern" << "false")) <<
                       "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
-                      "conditions" << BSON_ARRAY(BSON(
-                                                     "type" << "ONCHANGE" <<
-                                                     "value" << BSON_ARRAY("A1")
-                                                     ) <<
-                                                 BSON(
-                                                     "type" << "ONCHANGE" <<
-                                                     "value" << BSON_ARRAY("A2")
-                                                     ) <<
-                                                 BSON(
-                                                     "type" << "ONCHANGE" <<
-                                                     "value" << BSON_ARRAY("A4")
-                                                     ) <<
-                                                 BSON(
-                                                     "type" << "ONCHANGE" <<
-                                                     "value" << BSON_ARRAY("A5")
-                                                     ))
+                      "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
                       );
 
   BSONObj sub3 = BSON("_id" << OID("51307b66f481db11bf860003") <<
@@ -274,10 +257,7 @@ static void prepareDatabase(bool useSubCache = true)
                       "reference" << "http://notify3.me" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E[1-2]" << "type" << "T" << "isPattern" << "true")) <<
                       "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
-                      "conditions" << BSON_ARRAY(BSON(
-                                                     "type" << "ONCHANGE" <<
-                                                     "value" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
-                                                     ))
+                      "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
                       );
 
   LM_M(("Creating 5 entities"));
@@ -354,10 +334,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void)
                         "reference" << "http://notify4.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
-                                                       ))
+                        "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
                         );
 
     BSONObj sub5 = BSON("_id" << OID("51307b66f481db11bf860005") <<
@@ -366,10 +343,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void)
                         "reference" << "http://notify5.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E[2-3]" << "isPattern" << "true")) <<
                         "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
-                                                       ))
+                        "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
                         );
 
 

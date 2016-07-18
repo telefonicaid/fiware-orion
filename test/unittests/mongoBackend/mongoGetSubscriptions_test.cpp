@@ -79,10 +79,7 @@ static void prepareDatabaseV1Subs(void) {
                         "reference" << "http://notify1.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("AX1" << "AY1")
-                                                       ))
+                        "conditions" << BSON_ARRAY("AX1" << "AY1")
                         );
 
     BSONObj sub2 = BSON("_id" << OID(SUB_OID2) <<
@@ -92,10 +89,7 @@ static void prepareDatabaseV1Subs(void) {
                         "reference" << "http://notify2.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E.*" << "type" << "T2" << "isPattern" << "true")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("AX2" << "AY2")
-                                                       )) <<
+                        "conditions" << BSON_ARRAY("AX2" << "AY2") <<
                         "throttling" << 5
                         );
 
@@ -105,10 +99,7 @@ static void prepareDatabaseV1Subs(void) {
                         "reference" << "http://notify2.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E.*" << "type" << "T2" << "isPattern" << "true")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                     "type" << "ONCHANGE" <<
-                                                     "value" << BSON_ARRAY("ZZ2" << "WW2")
-                                                     ))
+                        "conditions" << BSON_ARRAY("ZZ2" << "WW2")
                         );
 
     connection->insert(SUBSCRIBECONTEXT_COLL, sub1);

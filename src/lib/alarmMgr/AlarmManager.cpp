@@ -24,6 +24,7 @@
 */
 #include <semaphore.h>
 #include <errno.h>
+#include <sys/types.h>
 
 #include <string>
 #include <map>
@@ -51,7 +52,8 @@ __thread bool badInputSeen = false;
 *
 * AlarmManager::AlarmManager - 
 */
-AlarmManager::AlarmManager():
+AlarmManager::AlarmManager()
+:
   badInputs(0),
   badInputResets(0),
   notificationErrors(0),
@@ -116,7 +118,7 @@ const char* AlarmManager::semGet(void)
   {
     return "taken";
   }
-  
+
   return "free";
 }
 
@@ -246,7 +248,7 @@ bool AlarmManager::dbErrorReset(void)
 * ALSO NOTE
 *   To read values, no semaphore is used.
 */
-void AlarmManager::dbErrorsGet(bool* active, long long* raised, long long* released)
+void AlarmManager::dbErrorsGet(bool* active, int64_t* raised, int64_t* released)
 {
   *active    = (dbOk == false)? true : false;
   *raised    = dbErrors;
@@ -262,7 +264,7 @@ void AlarmManager::dbErrorsGet(bool* active, long long* raised, long long* relea
 * NOTE
 *   To read values, no semaphore is used.
 */
-void AlarmManager::notificationErrorGet(long long* active, long long* raised, long long* released)
+void AlarmManager::notificationErrorGet(int64_t* active, int64_t* raised, int64_t* released)
 {
   *active    = notificationV.size();
   *raised    = notificationErrors;
@@ -278,7 +280,7 @@ void AlarmManager::notificationErrorGet(long long* active, long long* raised, lo
 * NOTE
 *   To read values, no semaphore is used.
 */
-void AlarmManager::badInputGet(long long* active, long long* raised, long long* released)
+void AlarmManager::badInputGet(int64_t* active, int64_t* raised, int64_t* released)
 {
   *active    = badInputV.size();
   *raised    = badInputs;
@@ -345,7 +347,7 @@ bool AlarmManager::notificationErrorReset(const std::string& url)
     semGive();
     return false;
   }
-  
+
   notificationV.erase(url);
   ++notificationErrorResets;
   semGive();

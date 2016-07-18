@@ -669,7 +669,7 @@ curl -v localhost:1026/v2/subscriptions -s -S --header 'Content-Type: applicatio
     ],
     "condition": {
       "attrs": [
-        "temperature"
+        "pressure"
       ]
     }
   },

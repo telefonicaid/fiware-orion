@@ -25,9 +25,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <regex.h>
 #include <string>
 #include <vector>
-#include <regex.h>
 
 #include "mongo/client/dbclient.h"
 
@@ -38,9 +38,6 @@
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 #include "apiTypesV2/Subscription.h"
-#include "apiTypesV2/HttpInfo.h"
-
-using namespace mongo;
 
 
 
@@ -305,7 +302,16 @@ extern void subCacheMatch
 *
 * subCacheStatisticsGet - 
 */
-extern void subCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* updates, int* items, char* list, int listSize);
+extern void subCacheStatisticsGet
+(
+  int*   refreshes,
+  int*   inserts,
+  int*   removes,
+  int*   updates,
+  int*   items,
+  char*  list,
+  int    listSize
+);
 
 
 

@@ -1027,6 +1027,7 @@ class NGSI:
         for item in subscription_context:   # used to remove quotes when are using raw mode
             if item != "condition_expression":
                 subscription_context[item] = remove_quote(subscription_context[item])
+
         # entities field and its sub-fields
         for e in range(int(subscription_context["subject_entities_number"])):
             # entities - idPattern
@@ -1053,6 +1054,7 @@ class NGSI:
                     assert curs["entities"][e]["type"] == subscription_context["subject_type"], \
                         u' ERROR - thetype field "%s" is not stored correctly' % subscription_context["subject_type"]
         __logger__.info("entities field an its sub-fields are verified successfully")
+
         # conditions fields
         if subscription_context["condition_attrs"] is not None:
             # conditions - type
@@ -1064,9 +1066,14 @@ class NGSI:
                     condition_attr =  "%s_%s" % (subscription_context["condition_attrs"], str(a))
                 else:
                     condition_attr = subscription_context["condition_attrs"]
-                assert condition_attr in curs["conditions"][0]["value"], \
+                if subscription_context["condition_attrs"] == "without condition field":
+                    assert len(curs["conditions"][0]["value"]) == 0, \
+                    u' ERROR - the condition attrs "%s" are not empty into DB' % str(curs["conditions"][0]["value"])
+                else:
+                    assert condition_attr in curs["conditions"][0]["value"], \
                     u' ERROR - the condition attr "%s" does not exist in conditions values into DB' % condition_attr
             __logger__.info("attributes in the \"conditions\" field are verified successfully")
+
         # expression field
         if subscription_context["condition_expression"] is not None and  subscription_context["condition_expression"] != "object is empty":
             exp_op = subscription_context["condition_expression"].split("&")
@@ -1081,43 +1088,70 @@ class NGSI:
             for k in keys:
               assert curs["expression"][k] == "", u' ERROR - the "%s" key in expression is not empty or not exists' % k
         __logger__.info("expressions in the \"conditions\" field are verified successfully")
+
         # reference field
         if subscription_context["notification_http_url"] is not None:
-            assert subscription_context["notification_http_url"] == curs["reference"], u' ERROR - the reference "%s" is not the expected' % curs["reference"]
+            assert subscription_context["notification_http_url"] == curs["reference"], \
+                u' ERROR - the http url "%s" is not the expected' % curs["reference"]
+            __logger__.info("notification http url field is verified successfully")
+        elif subscription_context["notification_http_custom_url"] is not None:
+            assert subscription_context["notification_http_custom_url"] == curs["reference"], \
+                u' ERROR - the httpCustom url "%s" is not the expected' % curs["reference"]
+            assert "custom" in curs, " ERROR - custom field does not exist in DB"
+            assert curs["custom"] == True, " ERROR - custom field \"%s\" in DB is not activated" % curs["custom"]
+            __logger__.info("notification httpCustom url field is verified successfully")
         else:
            assert EMPTY == curs["reference"], u' ERROR - the reference "%s" is not the expected' % curs["reference"]
-        __logger__.info("callback(reference) in the \"notification\" field is verified successfully")
+
         # throttling field
         if subscription_context["throttling"] is None:
             subscription_context["throttling"] = 0
         assert curs["throttling"] == int(subscription_context["throttling"]), u' ERROR - the throttling "%s" is not the expected' % curs["throttling"]
         __logger__.info("throttling in the \"notification\" field is verified successfully")
+
         # expiration field
-        if subscription_context["expires"] is not None:
+        if subscription_context["expires"] is None or subscription_context["expires"] == EMPTY:
+            ts_expires = 9000000000000000000
+        else:
             ts_expires = generate_timestamp(date=subscription_context["expires"], utc=True)
-            __logger__.info("expires: %s changed to timestamp: %s" % (subscription_context["expires"], ts_expires))
-            assert int(curs["expiration"]) == int(ts_expires), u' ERROR - the expiration "%s" is not the expected' % str(curs["expiration"])
-            __logger__.info("expiration field is verified successfully")
+        __logger__.info("expires: %s changed to timestamp: %s" % (subscription_context["expires"], ts_expires))
+        assert int(curs["expiration"]) == int(ts_expires), u' ERROR - the expiration "%s" is not the expected' % str(curs["expiration"])
+        __logger__.info("expiration field is verified successfully")
+
         # service path field
-            ALL_SERVICE_PATHS = u'/#'
-            if FIWARE_SERVICE_PATH_HEADER in headers:
-                if headers[FIWARE_SERVICE_PATH_HEADER] == EMPTY:
-                    service_path = ALL_SERVICE_PATHS
-                else:
-                    service_path = headers[FIWARE_SERVICE_PATH_HEADER]
-            else:
+        ALL_SERVICE_PATHS = u'/#'
+        if FIWARE_SERVICE_PATH_HEADER in headers:
+            if headers[FIWARE_SERVICE_PATH_HEADER] == EMPTY:
                 service_path = ALL_SERVICE_PATHS
-            assert curs["servicePath"] == service_path, u' ERROR the servicePath field "%s" is not the expected "%s"' % (curs["servicePath"], service_path)
-            __logger__.info("servicePath field is verified successfully")
-        # attrs field
+            else:
+                service_path = headers[FIWARE_SERVICE_PATH_HEADER]
+        else:
+            service_path = ALL_SERVICE_PATHS
+        assert curs["servicePath"] == service_path, u' ERROR the servicePath field "%s" is not the expected "%s"' % (curs["servicePath"], service_path)
+        __logger__.info("servicePath field is verified successfully")
+
+        # attrs and exceptAttrs fields
         for a in range(int(subscription_context["notification_attrs_number"])):
             if int(subscription_context["notification_attrs_number"]) > 1:
-                condition_attr =  "%s_%s" % (subscription_context["notification_attrs"], str(a))
+                if curs["blacklist"]:
+                    condition_attr = "%s_%s" % (subscription_context["notification_except_attrs"], str(a))
+                else:
+                    condition_attr = "%s_%s" % (subscription_context["notification_attrs"], str(a))
             else:
-                condition_attr = subscription_context["notification_attrs"]
+                if curs["blacklist"]:
+                    condition_attr = subscription_context["notification_except_attrs"]
+                else:
+                    condition_attr = subscription_context["notification_attrs"]
             assert condition_attr in curs["attrs"], \
                 u' ERROR - the notification attrs "%s" does not exist in attrs into DB' % condition_attr
         __logger__.info("attributes in the \"notification\" field are verified successfully")
+
+        # status field
+        if subscription_context["status"] is None:
+            subscription_context["status"] = "active"
+        assert subscription_context["status"] == curs["status"], " ERROR - the status \"%s\" does not match with the expected \"%s\"" \
+                                                                 % (curs["status"], subscription_context["status"])
+        __logger__.info("the subscription status is the expected: %s" % subscription_context["status"])
 
 
 

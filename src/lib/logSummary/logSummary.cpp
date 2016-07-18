@@ -27,6 +27,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <limits.h>
+#include <sys/types.h>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -40,14 +41,14 @@
 *
 * Global vars
 */
-static long long  transactionsAtLastSummary  = 0;
-static bool       logSummaryOn               = false;
-static long long  deRaisedInLastSummary      = 0;
-static long long  deReleasedInLastSummary    = 0;
-static long long  neRaisedInLastSummary      = 0;
-static long long  neReleasedInLastSummary    = 0;
-static long long  biRaisedInLastSummary      = 0;
-static long long  biReleasedInLastSummary    = 0;
+static int64_t  transactionsAtLastSummary  = 0;
+static bool     logSummaryOn               = false;
+static int64_t  deRaisedInLastSummary      = 0;
+static int64_t  deReleasedInLastSummary    = 0;
+static int64_t  neRaisedInLastSummary      = 0;
+static int64_t  neReleasedInLastSummary    = 0;
+static int64_t  biRaisedInLastSummary      = 0;
+static int64_t  biReleasedInLastSummary    = 0;
 
 
 
@@ -61,8 +62,8 @@ static void* logSummary(void* vP)
 
   while (1)
   {
-    long long transactionsNow;
-    long long diff;
+    int64_t transactionsNow;
+    int64_t diff;
 
     sleep(period);
 
@@ -91,14 +92,14 @@ static void* logSummary(void* vP)
     alarmMgr.semTake();
 
     bool       deActive;         // de: Database Error
-    long long  deRaised;
-    long long  deReleased;
-    long long  neActive;         // ne: Notification Error
-    long long  neRaised;
-    long long  neReleased;
-    long long  biActive;         // bi:  Bad Input
-    long long  biRaised;
-    long long  biReleased;
+    int64_t  deRaised;
+    int64_t  deReleased;
+    int64_t  neActive;         // ne: Notification Error
+    int64_t  neRaised;
+    int64_t  neReleased;
+    int64_t  biActive;         // bi:  Bad Input
+    int64_t  biRaised;
+    int64_t  biReleased;
 
     alarmMgr.dbErrorsGet(&deActive, &deRaised, &deReleased);
     alarmMgr.badInputGet(&biActive, &biRaised, &biReleased);
@@ -106,12 +107,12 @@ static void* logSummary(void* vP)
 
     alarmMgr.semGive();
 
-    long long deRaisedNew   = deRaised   - deRaisedInLastSummary;
-    long long deReleasedNew = deReleased - deReleasedInLastSummary;
-    long long neRaisedNew   = neRaised   - neRaisedInLastSummary;
-    long long neReleasedNew = neReleased - neReleasedInLastSummary;
-    long long biRaisedNew   = biRaised   - biRaisedInLastSummary;
-    long long biReleasedNew = biReleased - biReleasedInLastSummary;
+    int64_t deRaisedNew   = deRaised   - deRaisedInLastSummary;
+    int64_t deReleasedNew = deReleased - deReleasedInLastSummary;
+    int64_t neRaisedNew   = neRaised   - neRaisedInLastSummary;
+    int64_t neReleasedNew = neReleased - neReleasedInLastSummary;
+    int64_t biRaisedNew   = biRaised   - biRaisedInLastSummary;
+    int64_t biReleasedNew = biReleased - biReleasedInLastSummary;
 
     // Round the corner?
     if (deRaisedNew   < 0)  { deRaisedNew   = LONG_MAX - deRaisedInLastSummary   + deRaised;   }
