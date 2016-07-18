@@ -4,6 +4,17 @@ o Line 564 (## Simple Query Language):
     For
       Each statement expresses a matching condition.
 
+o There are several occurences of "Both cannot be used at the same time, but at least one of them must be present". It has been suggested
+  as alternative wording:
+  - "Both cannot be used at the same time, but one of them must be present"
+  - "Mandatory and mutually exclusive" (more concise)
+
+o Line 922 (### List entities):
+  Incompatible with idPattern ->  Incompatible with `idPattern`.
+
+o Line 932 (### List entities)
+  Incompatible with type -> Incompatible with `type`.
+
 o Line 660 (## Simple Query Language):
     Change:
       you can use simple quote
