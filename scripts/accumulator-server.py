@@ -148,6 +148,14 @@ def qnoresponse():
     sleep(10)
     return Response(status=200)
 
+# This response has been designed to test the #2360 case, but is general enough to be
+# used in other future cases
+@app.route("/badresponse/queryContext", methods=['POST'])
+def bad_response():
+    r = Response(status=404)
+    r.data = '{"name":"ENTITY_NOT_FOUND","message":"The entity with the requested id [qa_name_01] was not found."}'
+    return r
+
 @app.route("/v1/updateContext", methods=['POST'])
 @app.route("/v1/queryContext", methods=['POST'])
 @app.route(server_url, methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH'])
