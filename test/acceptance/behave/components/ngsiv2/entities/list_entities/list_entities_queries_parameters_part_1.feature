@@ -78,6 +78,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                |
+      | Fiware-Service     | test_list_only_limit |
+      | Fiware-ServicePath | /test                |
     When get all entities
       | parameter | value   |
       | limit     | <value> |
@@ -114,6 +118,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                |
+      | Fiware-Service     | test_list_only_limit |
+      | Fiware-ServicePath | /test                |
     When get all entities
       | parameter | value   |
       | limit     | <value> |
@@ -150,6 +158,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                |
+      | Fiware-Service     | test_list_only_limit |
+      | Fiware-ServicePath | /test                |
     When get all entities
     Then verify that receive an "OK" http code
     And verify that "20" entities are returned
@@ -179,6 +191,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                |
+      | Fiware-Service     | test_list_only_limit |
+      | Fiware-ServicePath | /test                |
     When get all entities
       | parameter | value |
       | limit     | 1001  |
@@ -211,6 +227,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                      |
+      | Fiware-Service     | test_list_only_limit_error |
+      | Fiware-ServicePath | /test                      |
     When get all entities
       | parameter | value   |
       | limit     | <limit> |
@@ -250,6 +270,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                      |
+      | Fiware-Service     | test_list_only_limit_error |
+      | Fiware-ServicePath | /test                      |
     When get all entities
       | parameter | value |
       | limit     | 0     |
@@ -284,6 +308,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                 |
+      | Fiware-Service     | test_list_only_offset |
+      | Fiware-ServicePath | /test                 |
     When get all entities
       | parameter | value    |
       | offset    | <offset> |
@@ -318,6 +346,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                       |
+      | Fiware-Service     | test_list_only_offset_error |
+      | Fiware-ServicePath | /test                       |
     When get all entities
       | parameter | value    |
       | offset    | <offset> |
@@ -359,6 +391,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_list_limit_offset |
+      | Fiware-ServicePath | /test                  |
     When get all entities
       | parameter | value    |
       | limit     | <limit>  |
@@ -428,6 +464,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And create an entity in raw and "normalized" modes
     And verify that receive a "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value             |
+      | Fiware-Service     | test_list_only_id |
+      | Fiware-ServicePath | /test             |
     When get all entities
       | parameter | value                                  |
       | id        | the same value of the previous request |
@@ -512,6 +552,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value             |
+      | Fiware-Service     | test_list_only_id |
+      | Fiware-ServicePath | /test             |
     When get all entities
       | parameter | value |
       | id        | <id>  |
@@ -573,6 +617,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And create an entity in raw and "normalized" modes
     And verify that receive a "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value             |
+      | Fiware-Service     | test_list_only_id |
+      | Fiware-ServicePath | /test             |
     When get all entities
       | parameter | value                                  |
       | id        | the same value of the previous request |
@@ -620,6 +668,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value             |
+      | Fiware-Service     | test_list_only_id |
+      | Fiware-ServicePath | /test             |
     When get all entities
       | parameter | value       |
       | id        | fdgfdgfdgfd |
@@ -650,6 +702,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value             |
+      | Fiware-Service     | test_list_only_id |
+      | Fiware-ServicePath | /test             |
     When get all entities
       | parameter | value       |
       | id        | <entity_id> |
@@ -725,6 +781,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value               |
+      | Fiware-Service     | test_list_only_type |
+      | Fiware-ServicePath | /test               |
     When get all entities
       | parameter | value                                  |
       | type      | the same value of the previous request |
@@ -809,6 +869,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value               |
+      | Fiware-Service     | test_list_only_type |
+      | Fiware-ServicePath | /test               |
     When get all entities
       | parameter | value  |
       | type      | <type> |
@@ -869,6 +933,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And create an entity in raw and "normalized" modes
     And verify that receive a "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value               |
+      | Fiware-Service     | test_list_same_type |
+      | Fiware-ServicePath | /test               |
     When get all entities
       | parameter | value                                  |
       | type      | the same value of the previous request |
@@ -917,6 +985,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value               |
+      | Fiware-Service     | test_list_only_type |
+      | Fiware-ServicePath | /test               |
     When get all entities
       | parameter | value       |
       | type      | fdgfdgfdgfd |
@@ -947,6 +1019,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value               |
+      | Fiware-Service     | test_list_only_type |
+      | Fiware-ServicePath | /test               |
     When get all entities
       | parameter | value       |
       | type      | <entity_id> |
@@ -1023,6 +1099,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                     |
+      | Fiware-Service     | test_list_only_id_pattern |
+      | Fiware-ServicePath | /test                     |
     When get all entities
       | parameter | value        |
       | idPattern | <id_pattern> |
@@ -1085,6 +1165,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                     |
+      | Fiware-Service     | test_list_only_id_pattern |
+      | Fiware-ServicePath | /test                     |
     When get all entities
       | parameter | value   |
       | idPattern | dfgdg.* |
@@ -1115,6 +1199,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                     |
+      | Fiware-Service     | test_list_only_id_pattern |
+      | Fiware-ServicePath | /test                     |
     When get all entities
       | parameter | value  |
       | id        | room1  |
@@ -1181,6 +1269,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value             |
+      | Fiware-Service     | test_list_id_type |
+      | Fiware-ServicePath | /test             |
     When get all entities
       | parameter | value                |
       | id        | <id>_0,<id>_1,<id>_4 |
@@ -1235,6 +1327,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value             |
+      | Fiware-Service     | test_list_id_type |
+      | Fiware-ServicePath | /test             |
     When get all entities
       | parameter | value        |
       | idPattern | <id_pattern> |
@@ -1306,6 +1402,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value             |
+      | Fiware-Service     | test_list_id_type |
+      | Fiware-ServicePath | /test             |
     When get all entities
       | parameter | value    |
       | limit     | <limit>  |
