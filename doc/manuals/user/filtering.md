@@ -10,7 +10,7 @@
   * [Entity type filter](#entity-type-filter)
   * [Geo-location filter](#geo-location-filter)
   * [Geo-location filter NGSIv2](#geo-location-filter-ngsiv2)
-  * [String query filter](#string-filter)
+  * [String query filter](#string-filters)
     
 ## Introduction
 
@@ -191,8 +191,8 @@ described in detail in [the following section](geolocation.md#geo-located-querie
 ### String filters
 
 Two different types of string filters are supported:
-* filtering over attributes (scope type: FIWARE::StringQuery) and
-* filtering over the metadatas of attributes (scope type: FIWARE::StringQuery::Metadata).
+* filtering over attributes (scope type: "FIWARE::StringQuery") and
+* filtering over the metadatas of attributes (scope type: "FIWARE::StringQuery::Metadata").
 
 These scopes allow to express filtering conditions such as equality, unequality,
 greater/less than, in-array, range or existence (of attributes and metadata of attributes).
@@ -200,8 +200,9 @@ greater/less than, in-array, range or existence (of attributes and metadata of a
 There isn't any URL parameter corresponding to these filters in NGSIv1.
 In NGSIv2 they correspond to the `q` and `mq` URI parameters.
 
-For a detailed syntax description of the `value` or `q` and `mq` parameters, see [NGSIv2 specification
-document](http://telefonicaid.github.io/fiware-orion/api/v2/stable).
+For a detailed syntax description of the value of the string filters or ofthe `q` and `mq`
+parameters, see
+[NGSIv2 specification document](http://telefonicaid.github.io/fiware-orion/api/v2/stable).
 
 You can use these scopes in NGSIv1, but take into account that in order to set attribute
 values to numbers, you need to use NGSIv2 (NGSIv1 always uses strings for values).

@@ -23,7 +23,7 @@ attribute using NGSIv1, you will get `A=2`.
 
 You can use the filtering capabilities developed for NGSIv2 (`GET /v2/entities?q=<query>`) also 
 in NGSIv1 using a Scope element in the payload of `POST /v1/queryContext`. See 
-[the following section](filtering.md#string-filter) for details.
+[the following section](filtering.md#string-filters) for details.
 
 However, take into account that some of the filters (e. g. greater/less, range, etc.) are thought
 for numeric values. Thus, in order to work properly, these filters (although using a 
