@@ -6,18 +6,16 @@ ENV ORION_USER orion
 ENV GIT_REV_ORION develop
 ENV CLEAN_DEV_TOOLS 1
 
-RUN adduser --comment "${ORION_USER}" ${ORION_USER}
-
 WORKDIR /opt
 
 RUN \
+    adduser --comment "${ORION_USER}" ${ORION_USER} && \
     # Install dependencies
     yum -y install epel-release && \
     yum -y install \
       boost-devel \
       bzip2 \
       cmake \
-      epel-release \
       gnutls-devel \
       libgcrypt-devel \
       libcurl-devel \
@@ -29,7 +27,6 @@ RUN \
       scons \
       tar \
       which && \
-    cd /opt && \
     # Install libmicrohttpd from source
     curl -kOL http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz && \
     tar xvf libmicrohttpd-0.9.48.tar.gz && \
@@ -93,8 +90,12 @@ RUN \
            /usr/local/lib/libgtest* \
            /usr/local/share/aclocal/gtest* \
            /opt/fiware-orion \
+           # We don't need manage Linux account passwords requisites: lenght, mays/mins, etc
+           /usr/share/cracklib \
+           # We don't need glibc locale data
+           /usr/share/i18n /usr/{lib,lib64}/gconv \
            && \
-    yum -y erase git perl rsync \
+    yum -y erase git perl* rsync \
         cmake libarchive \
         gcc-c++ cloog-ppl cpp gcc glibc-devel glibc-headers \
         kernel-headers libgomp libstdc++-devel mpfr ppl \
@@ -106,14 +107,23 @@ RUN \
         boost-iostreams boost boost-date-time \
         boost-test boost-graph boost-signals \
         boost-program-options boost-math \
-        openssh openssh-clients libedit \
+        openssh openssh-clients libedit hwdata dbus-glib fipscheck* *devel sysvinit-tools \
         && \
-    yum clean all && \
-    bash -c 'find /usr/share/locale -maxdepth 1 -mindepth 1 -type d | grep -v -e "en_US" | xargs rm -rfv' && \
+    # Erase without dependencies of the document formatting system (man)
+    rpm -qa groff | xargs -r rpm -e --nodeps && \
+    # Clean yum data
+    yum clean all && rm -rf /var/lib/yum/yumdb && rm -rf /var/lib/yum/history && \
+    # Rebuild rpm data files
+    rpm -vv --rebuilddb && \
+    # Delete unused locales. Only preserve en_US and the locale aliases
+    find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en_US' ! -name 'locale.alias' | xargs -r rm -r && \
     bash -c 'localedef --list-archive | grep -v -e "en_US" | xargs localedef --delete-from-archive' && \
-    mv -f /usr/lib/locale/locale-archive /usr/lib/locale/locale-archive.tmpl && \
-    build-locale-archive
+    /bin/cp -f /usr/lib/locale/locale-archive /usr/lib/locale/locale-archive.tmpl && \
+    build-locale-archive && \
+    # Don't need old log files inside docker images
+    rm -f /var/log/*log
 
 WORKDIR /
 ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice"]
 EXPOSE 1026
+
