@@ -298,7 +298,7 @@ Some operations use partial representation of entities:
 * `id` and `type` are not allowed in update operations, as they are immutable properties.
 
 * In requests where entity `type` is allowed, it may be omitted. When omitted in entity
-  creation operations, the default string value `none` is used for the type.
+  creation operations, the default string value `Thing` is used for the type.
 
 * In some cases, not all the attributes of the entity are shown, e.g. a query selecting a subset
   of the entity attributes.
@@ -307,7 +307,12 @@ Some operations use partial representation of entities:
   `null` value. In responses, the value is always present.
 
 * Attribute/metadata `type` may be omitted in requests. When omitted in attribute/metadata creation
-  or in update operations, the default string value `none` is used for the type.
+  or in update operations, a default is used for the type depending on the value:
+  * If value is a string, then type `Text` is used
+  * If value is a number, then type `Number` is used.
+  * If value is a boolean, then type `Boolean` is used.
+  * If value is an object or array, then `StructuredValue` is used.
+  * If value is null, then `None` is used.
 
 * Attribute `metadata` may be omitted in requests, meaning that there are no metadata elements
   associated to the attribute. In responses, this property is set to
@@ -774,7 +779,7 @@ is used:
       "type": "Room",
       "temperature": {
         "value": 23,
-        "type": "none",
+        "type": "Number",
         "metadata": {}
       },
       "humidity": {
@@ -788,7 +793,7 @@ is used:
       "type": "Room",
       "temperature": {
         "value": 24,
-        "type": "none",
+        "type": "Number",
         "metadata": {}
       }
     }
@@ -1004,7 +1009,7 @@ Response code:
            "id": "DC_S1-D41",
            "temperature": {
              "value": 35.6,
-             "type": "none",
+             "type": "Number",
              "metadata": {}
            }
          },
@@ -1013,7 +1018,7 @@ Response code:
            "id": "Boe-Idearium",
            "temperature": {
              "value": 22.5,
-             "type": "none",
+             "type": "Number",
              "metadata": {}
            }
          },
@@ -1026,7 +1031,7 @@ Response code:
              "metadata": {
                "accuracy": {
                  "value": 2,
-                 "type": "none"
+                 "type": "Number"
                },
                "timestamp": {
                  "value": "2015-06-04T07:20:27.378Z",
@@ -1126,11 +1131,11 @@ Response:
           "id": "Bcn_Welt",
           "temperature": {
             "value": 21.7,
-            "type": "none"
+            "type": "Number"
           },
           "humidity": {
             "value": 60,
-            "type": "none"
+            "type": "Number"
           },
           "location": {
             "value": "41.3763726, 2.1864475",
@@ -1138,7 +1143,7 @@ Response:
             "metadata": {
               "crs": {
                 "value": "WGS84",
-                "type": "none"
+                "type": "Text"
               }
             }
           }
@@ -1184,11 +1189,11 @@ Response:
         {
           "temperature": {
             "value": 21.7,
-            "type": "none"
+            "type": "Number"
           },
           "humidity": {
             "value": 60,
-            "type": "none"
+            "type": "Number"
           },
           "location": {
             "value": "41.3763726, 2.1864475",
@@ -1196,7 +1201,7 @@ Response:
             "metadata": {
               "crs": {
                 "value": "WGS84",
-                "type": "none"
+                "type": "String"
               }
             }
           }
@@ -1362,7 +1367,7 @@ Response:
 
         {
           "value": 21.7,
-          "type": "none",
+          "type": "Number",
           "metadata": {}
         }
 
@@ -1540,7 +1545,7 @@ Response code:
             "type": "Car",
             "attrs": {
               "speed": {
-                "types": [ "none" ]
+                "types": [ "Number" ]
               },
               "fuel": {
                 "types": [ "gasoline", "diesel" ]
@@ -1555,7 +1560,7 @@ Response code:
             "type": "Room",
             "attrs": {
               "pressure": {
-                "types": [ "none" ]
+                "types": [ "Number" ]
               },
               "humidity": {
                 "types": [ "percentage" ]
@@ -1594,7 +1599,7 @@ Response code:
           {
             "attrs": {
               "pressure": {
-                "types": [ "none" ]
+                "types": [ "Number" ]
               },
               "humidity": {
                 "types": [ "percentage" ]
@@ -1939,11 +1944,11 @@ Response:
             "metadata": {
               "providingService": {
                  "value": "weather.example.com",
-                 "type": "none"
+                 "type": "Text"
                },
               "providingAuthority": {
                  "value": "AEMET - Spain",
-                 "type": "none"
+                 "type": "Text"
                }
             },
             "duration": "PT1M"
@@ -2194,7 +2199,7 @@ Response code:
             "id": "DC_S1-D41",
             "temperature": {
               "value": 35.6,
-              "type": "none"
+              "type": "Number"
             }
           },
           {
@@ -2202,7 +2207,7 @@ Response code:
             "id": "Boe-Idearium",
             "temperature": {
               "value": 22.5,
-              "type": "none"
+              "type": "Number"
             }
           },
           {
