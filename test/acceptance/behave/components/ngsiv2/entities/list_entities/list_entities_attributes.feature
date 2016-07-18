@@ -50,389 +50,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
   Actions After the Feature:
   Setup: stop ContextBroker
 
-  @happy_path
-  Scenario:  list all entities using NGSI v2 (3 entity groups with 11 entities in total)
-    Given  a definition of headers
-      | parameter          | value            |
-      | Fiware-Service     | test_happy_path  |
-      | Fiware-ServicePath | /test            |
-      | Content-Type       | application/json |
-    And initialize entity groups recorder
-    And properties to entities
-      | parameter         | value       |
-      | entities_type     | home        |
-      | entities_id       | room1       |
-      | attributes_number | 2           |
-      | attributes_name   | temperature |
-      | attributes_value  | 34          |
-      | attributes_type   | celsius     |
-      | metadatas_number  | 2           |
-      | metadatas_name    | very_hot    |
-      | metadatas_type    | alarm       |
-      | metadatas_value   | random=10   |
-    And create entity group with "5" entities in "normalized" mode
-      | entity | prefix |
-      | id     | true   |
-    And verify that receive several "Created" http code
-    And record entity group
-    And properties to entities
-      | parameter         | value       |
-      | entities_type     | house       |
-      | entities_id       | room2       |
-      | attributes_number | 2           |
-      | attributes_name   | temperature |
-      | attributes_value  | 45          |
-      | attributes_type   | celsius     |
-      | metadatas_number  | 2           |
-      | metadatas_name    | very_hot    |
-      | metadatas_type    | alarm       |
-      | metadatas_value   | random=10   |
-    And create entity group with "5" entities in "normalized" mode
-      | entity | prefix |
-      | id     | true   |
-    And verify that receive several "Created" http code
-    And record entity group
-    And properties to entities
-      | parameter        | value      |
-      | entities_type    | "car"      |
-      | entities_id      | "vehicle"  |
-      | attributes_name  | "speed"    |
-      | attributes_value | 89         |
-      | attributes_type  | "km_h"     |
-      | metadatas_name   | "very_hot" |
-      | metadatas_type   | "alarm"    |
-      | metadatas_value  | "hot"      |
-    And create an entity in raw and "normalized" modes
-    And verify that receive several "Created" http code
-    And record entity group
-    When get all entities
-      | parameter | value    |
-      | limit     | 9        |
-      | offset    | 0        |
-      | type      | car      |
-      | id        | vehicle  |
-      | q         | speed>78 |
-      | options   | count    |
-    Then verify that receive an "OK" http code
-    And verify that "1" entities are returned
-    And verify headers in response
-      | parameter          | value |
-      | fiware-total-count | 1     |
-
-  @id_multiples @BUG_1720
-  Scenario:  try to list all entities using NGSI v2 (3 entity groups with 15 entities in total) but with id query parameter used as regexp
-    Given  a definition of headers
-      | parameter          | value             |
-      | Fiware-Service     | test_id_multiples |
-      | Fiware-ServicePath | /test             |
-      | Content-Type       | application/json  |
-    And initialize entity groups recorder
-    And properties to entities
-      | parameter         | value       |
-      | entities_type     | home        |
-      | entities_id       | room1       |
-      | attributes_number | 2           |
-      | attributes_name   | temperature |
-      | attributes_value  | 34          |
-      | attributes_type   | celsius     |
-      | metadatas_number  | 2           |
-      | metadatas_name    | very_hot    |
-      | metadatas_type    | alarm       |
-      | metadatas_value   | random=10   |
-    And create entity group with "5" entities in "normalized" mode
-      | entity | prefix |
-      | id     | true   |
-    And verify that receive several "Created" http code
-    And record entity group
-    And properties to entities
-      | parameter         | value       |
-      | entities_type     | house       |
-      | entities_id       | room2       |
-      | attributes_number | 2           |
-      | attributes_name   | temperature |
-      | attributes_value  | 56          |
-      | attributes_type   | celsius     |
-      | metadatas_number  | 2           |
-      | metadatas_name    | very_hot    |
-      | metadatas_type    | alarm       |
-      | metadatas_value   | random=10   |
-    And create entity group with "5" entities in "normalized" mode
-      | entity | prefix |
-      | id     | true   |
-    And verify that receive several "Created" http code
-    And record entity group
-    And properties to entities
-      | parameter         | value    |
-      | entities_type     | car      |
-      | entities_id       | vehicle  |
-      | attributes_number | 2        |
-      | attributes_name   | speed    |
-      | attributes_value  | 89       |
-      | attributes_type   | kmh      |
-      | metadatas_number  | 2        |
-      | metadatas_name    | very_hot |
-      | metadatas_type    | alarm    |
-      | metadatas_value   | hot      |
-    And create entity group with "5" entities in "normalized" mode
-      | entity | prefix |
-      | id     | true   |
-    And verify that receive several "Created" http code
-    And record entity group
-    When get all entities
-      | parameter | value   |
-      | limit     | 9       |
-      | offset    | 0       |
-      | type      | car     |
-      | id        | vehicle |
-      | options   | count   |
-    Then verify that receive an "OK" http code
-    And verify that "0" entities are returned
-
-   # ------------------------ Service ----------------------------------------------
-  @service.row<row.id>
-  @service
-  Scenario Outline:  list all entities using NGSI v2 with several services headers
-    Given  a definition of headers
-      | parameter          | value            |
-      | Fiware-Service     | <service>        |
-      | Fiware-ServicePath | /test            |
-      | Content-Type       | application/json |
-    And initialize entity groups recorder
-    And properties to entities
-      | parameter         | value       |
-      | entities_type     | home        |
-      | entities_id       | room1       |
-      | attributes_number | 2           |
-      | attributes_name   | temperature |
-      | attributes_value  | 34          |
-    And create entity group with "5" entities in "normalized" mode
-      | entity | prefix |
-      | id     | true   |
-    And verify that receive several "Created" http code
-    And record entity group
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
-    Then verify that receive an "OK" http code
-    And verify that "3" entities are returned
-    Examples:
-      | service            |
-      |                    |
-      | service            |
-      | service_12         |
-      | service_sr         |
-      | SERVICE            |
-      | max length allowed |
-
-  @service_without
-  Scenario:  list all entities using NGSI v2 without service header
-    Given  a definition of headers
-      | parameter          | value            |
-      | Fiware-ServicePath | /test            |
-      | Content-Type       | application/json |
-    And initialize entity groups recorder
-    And properties to entities
-      | parameter        | value       |
-      | entities_type    | home        |
-      | entities_id      | room1       |
-      | attributes_name  | temperature |
-      | attributes_value | 34          |
-    And create entity group with "5" entities in "normalized" mode
-      | entity | prefix |
-      | id     | true   |
-    And verify that receive several "Created" http code
-    And record entity group
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
-    Then verify that receive an "OK" http code
-    And verify that "3" entities are returned
-
-  @service_error @BUG_1873
-  Scenario Outline:  try to list all entities using NGSI v2 with several wrong services headers
-    Given  a definition of headers
-      | parameter          | value     |
-      | Fiware-Service     | <service> |
-      | Fiware-ServicePath | /test     |
-    When get all entities
-    Then verify that receive an "Bad Request" http code
-    And verify an error response
-      | parameter   | value                                                                                  |
-      | error       | BadRequest                                                                             |
-      | description | bad character in tenant name - only underscore and alphanumeric characters are allowed |
-    Examples:
-      | service     |
-      | service.sr  |
-      | Service-sr  |
-      | Service(sr) |
-      | Service=sr  |
-      | Service<sr> |
-      | Service,sr  |
-      | service#sr  |
-      | service%sr  |
-      | service&sr  |
-
-  @service_bad_length
-  Scenario:  try to list all entities using NGSI v2 with bad length services headers
-    Given  a definition of headers
-      | parameter          | value                           |
-      | Fiware-Service     | greater than max length allowed |
-      | Fiware-ServicePath | /test                           |
-    When get all entities
-    Then verify that receive an "Bad Request" http code
-    And verify an error response
-      | parameter   | value                                                    |
-      | error       | BadRequest                                               |
-      | description | bad length - a tenant name can be max 50 characters long |
-
- # ------------------------ Service path ----------------------------------------------
-  @service_path.row<row.id>
-  @service_path @BUG_1423
-  Scenario Outline:  list all entities using NGSI v2 with several service paths headers
-    Given  a definition of headers
-      | parameter          | value             |
-      | Fiware-Service     | test_service_path |
-      | Fiware-ServicePath | <service_path>    |
-      | Content-Type       | application/json  |
-    And initialize entity groups recorder
-    And properties to entities
-      | parameter        | value       |
-      | entities_type    | home        |
-      | entities_id      | room1       |
-      | attributes_name  | temperature |
-      | attributes_value | 34          |
-    And create entity group with "5" entities in "normalized" mode
-      | entity | prefix |
-      | id     | true   |
-    And verify that receive several "Created" http code
-    And record entity group
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
-    Then verify that receive an "OK" http code
-    And verify that "3" entities are returned
-    Examples:
-      | service_path                                                  |
-      |                                                               |
-      | /                                                             |
-      | /service_path                                                 |
-      | /service_path_12                                              |
-      | /Service_path                                                 |
-      | /SERVICE                                                      |
-      | /serv1/serv2/serv3/serv4/serv5/serv6/serv7/serv8/serv9/serv10 |
-      | max length allowed                                            |
-      | max length allowed and ten levels                             |
-
-  @service_path_without
-  Scenario:  list all entities using NGSI v2 without service path header
-    Given  a definition of headers
-      | parameter      | value                     |
-      | Fiware-Service | test_service_path_without |
-      | Content-Type   | application/json          |
-    And initialize entity groups recorder
-    And properties to entities
-      | parameter        | value       |
-      | entities_type    | home        |
-      | entities_id      | room1       |
-      | attributes_name  | temperature |
-      | attributes_value | 34          |
-    And create entity group with "5" entities in "normalized" mode
-      | entity | prefix |
-      | id     | true   |
-    And verify that receive several "Created" http code
-    And record entity group
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
-    Then verify that receive an "OK" http code
-    And verify that "3" entities are returned
-
-  @service_path_error
-  Scenario Outline:  try to list all entities using NGSI v2 with wrong service path header
-    Given  a definition of headers
-      | parameter          | value                        |
-      | Fiware-Service     | test_list_service_path_error |
-      | Fiware-ServicePath | <service_path>               |
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
-    Then verify that receive an "Bad Request" http code
-    And verify an error response
-      | parameter   | value                                                    |
-      | error       | BadRequest                                               |
-      | description | a component of ServicePath contains an illegal character |
-    Examples:
-      | service_path |
-      | /service.sr  |
-      | /service;sr  |
-      | /service=sr  |
-      | /Service-sr  |
-      | /serv<45>    |
-      | /serv(45)    |
-
-  @service_path_error
-  Scenario Outline:  try to list all entities using NGSI v2 with wrong service path header
-    Given  a definition of headers
-      | parameter          | value                        |
-      | Fiware-Service     | test_list_service_path_error |
-      | Fiware-ServicePath | <service_path>               |
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
-    Then verify that receive an "Bad Request" http code
-    And verify an error response
-      | parameter   | value                                                                    |
-      | error       | BadRequest                                                               |
-      | description | Only /absolute/ Service Paths allowed [a service path must begin with /] |
-    Examples:
-      | service_path |
-      | sdffsfs      |
-      | /service,sr  |
-
-  @service_path_error
-  Scenario Outline: try to list all entities using NGSI v2 with wrong service path header
-    Given  a definition of headers
-      | parameter          | value                        |
-      | Fiware-Service     | test_list_service_path_error |
-      | Fiware-ServicePath | <service_path>               |
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
-    Then verify that receive an "Bad Request" http code
-    And verify an error response
-      | parameter   | value                                  |
-      | error       | BadRequest                             |
-      | description | component-name too long in ServicePath |
-    Examples:
-      | service_path                                   |
-      | greater than max length allowed                |
-      | greater than max length allowed and ten levels |
-
-  @service_path_error
-  Scenario: try to list all entities using NGSI v2 with wrong service path header
-    Given  a definition of headers
-      | parameter          | value                                |
-      | Fiware-Service     | test_list_service_path_error         |
-      | Fiware-ServicePath | max length allowed and eleven levels |
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
-    Then verify that receive an "Bad Request" http code
-    And verify an error response
-      | parameter   | value                              |
-      | error       | BadRequest                         |
-      | description | too many components in ServicePath |
-
   # -------------- Attribute value -----------------------
-
   @attribute_value_without_attribute_type.row<row.id>
   @attribute_value_without_attribute_type
   Scenario Outline:  list all entities using NGSI v2 with several attribute values and without attribute type
@@ -453,6 +71,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                            |
+      | Fiware-Service     | test_list_without_attribute_type |
+      | Fiware-ServicePath | /test                            |
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -501,6 +123,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And create an entity in raw and "normalized" modes
     And verify that receive an "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                            |
+      | Fiware-Service     | test_list_without_attribute_type |
+      | Fiware-ServicePath | /test                            |
     When get all entities
     Then verify that receive an "OK" http code
     And verify an entity in raw mode with type "<type>" in attribute value from http response
@@ -545,6 +171,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                         |
+      | Fiware-Service     | test_list_with_attribute_type |
+      | Fiware-ServicePath | /test                         |
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -576,10 +206,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
   @attribute_value_compound_with_attribute_type @BUG_1106
   Scenario Outline:  list all entities using NGSI v2 with special attribute values and attribute type (compound, vector, boolean, etc)
     Given  a definition of headers
-      | parameter          | value                            |
-      | Fiware-Service     | test_list_without_attribute_type |
-      | Fiware-ServicePath | /test                            |
-      | Content-Type       | application/json                 |
+      | parameter          | value                         |
+      | Fiware-Service     | test_list_with_attribute_type |
+      | Fiware-ServicePath | /test                         |
+      | Content-Type       | application/json              |
     And initialize entity groups recorder
     And properties to entities
       | parameter        | value              |
@@ -591,6 +221,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And create an entity in raw and "normalized" modes
     And verify that receive an "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                         |
+      | Fiware-Service     | test_list_with_attribute_type |
+      | Fiware-ServicePath | /test                         |
     When get all entities
     Then verify that receive an "OK" http code
     And verify an entity in raw mode with type "<type>" in attribute value from http response
@@ -639,6 +273,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                 |
+      | Fiware-Service     | test_list_attr_w_meta |
+      | Fiware-ServicePath | /test                 |
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -689,6 +327,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And create an entity in raw and "normalized" modes
     And verify that receive an "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                            |
+      | Fiware-Service     | test_list_without_attribute_type |
+      | Fiware-ServicePath | /test                            |
     When get all entities
     Then verify that receive an "OK" http code
     And verify an entity in raw mode with type "<type>" in attribute value from http response
@@ -735,6 +377,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                           |
+      | Fiware-Service     | test_list_without_metadata_type |
+      | Fiware-ServicePath | /test                           |
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -784,6 +430,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And create an entity in raw and "normalized" modes
     And verify that receive an "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                            |
+      | Fiware-Service     | test_list_without_attribute_type |
+      | Fiware-ServicePath | /test                            |
     When get all entities
     Then verify that receive an "OK" http code
     And verify an entity in raw mode with type "<type>" in attribute value from http response
