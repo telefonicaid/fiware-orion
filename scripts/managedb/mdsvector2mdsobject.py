@@ -34,10 +34,16 @@ ATTRS     = 'attrs'
 MDS       = 'md'
 MD_NAMES  = 'mdNames'
 
-# The way in which Python manage dictionaries doesn't make easy to be sure
-# of field ordering, which is important for MongoDB in the case of using an
-# embedded document for _id. The flatten() function helps
 def flatten(_id):
+    """
+    The way in which Python manage dictionaries doesn't make easy to be sure
+    of field ordering, which is important for MongoDB in the case of using an
+    embedded document for _id. Thist function helps.
+
+    :param _id: JSON document containing id, type and servicePath
+    :return: a "flatten" version of the _id
+    """
+
     r = {'_id.id': _id['id']}
 
     if 'type' in _id:
@@ -53,6 +59,15 @@ def flatten(_id):
     return r
 
 def update_ok(doc, n_attrs, n_sum_md_names, n_sum_mds):
+    """
+    Check that entity document was updated correctly at DB.
+
+    :param doc: the doc to check
+    :param n_attrs: the expected number of attributes in attrNames vector
+    :param n_sum_md_names: the expected sum of elements in mdNames vectors
+    :param n_sum_mds: the expected sum of elements in md key-maps
+    :return: True if the check is ok, False otherwise
+    """
 
     if (not ATTRS in doc):
         print "debug1"

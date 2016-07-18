@@ -33,6 +33,13 @@ from time import sleep
 CONDITIONS = "conditions"
 
 def update_ok(doc, n_conditions):
+    """
+    Check that csub document was updated correctly at DB.
+
+    :param doc: the doc to check
+    :param n_conditions: the expected number of conditions in the document
+    :return: True if the check is ok, False otherwise
+    """
 
     if (not CONDITIONS in doc):
         print "debug1"
