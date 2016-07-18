@@ -74,7 +74,7 @@ bool forbiddenChars(const char* s, const char* exceptions)
       continue;
     }
 
-    if(commonForbidden(*s))
+    if (commonForbidden(*s))
     {
       return true;
     }
