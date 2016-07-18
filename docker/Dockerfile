@@ -90,7 +90,7 @@ RUN \
            /usr/local/lib/libgtest* \
            /usr/local/share/aclocal/gtest* \
            /opt/fiware-orion \
-           # We don't need manage Linux account passwords requisites: lenght, mays/mins, etc.
+           # We don't need to manage Linux account passwords requisites: lenght, mays/mins, etc.
            # This cannot be removed using yum as yum uses hard dependencies and doing so will 
            # uninstall essential packages
            /usr/share/cracklib \
@@ -122,8 +122,8 @@ RUN \
     # Delete unused locales. Only preserve en_US and the locale aliases
     find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en_US' ! -name 'locale.alias' | xargs -r rm -r && \
     bash -c 'localedef --list-archive | grep -v -e "en_US" | xargs localedef --delete-from-archive' && \
-    # We use cp instead of mv due to refresh locale changes for ssh connections. We use /bin/cp instead of 
-    # cp to avoid alias, that in some cases have been problematic
+    # We use cp instead of mv as to refresh locale changes for ssh connections. We use /bin/cp instead of 
+    # cp to avoid any alias substitution, which in some cases has been problematic
     /bin/cp -f /usr/lib/locale/locale-archive /usr/lib/locale/locale-archive.tmpl && \
     build-locale-archive && \
     # Don't need old log files inside docker images
