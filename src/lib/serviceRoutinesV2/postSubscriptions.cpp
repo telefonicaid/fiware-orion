@@ -74,7 +74,7 @@ extern std::string postSubscriptions
                           ciP->httpHeaders.correlator));
 
   // Check potential error
-  if (beError.code != SccNone )
+  if (beError.code != SccNone)
   {
     TIMED_RENDER(answer = beError.toJson());
     ciP->httpStatusCode = beError.code;

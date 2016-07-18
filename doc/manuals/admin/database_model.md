@@ -290,7 +290,7 @@ Fields:
 -   **conditions**: a list of attributes that trigger notifications.
 -   **expression**: an expression used to evaluate if notifications has
     to be sent or not when updates come. It may be composed of the following
-    fields: q, georel, geometry and/or coords (optional)
+    fields: q, mq, georel, geometry and/or coords (optional)
 -   **count**: the number of notifications sent associated to
     the subscription.   
 -   **format**: the format to use to send notification, possible values are **JSON**
@@ -327,6 +327,7 @@ Example document:
         "conditions" : [ "temperature" ],
         "expression" : {
                 "q" : "temperature>40",
+                "mq" : "temperature.accuracy<1",
                 "geometry" : "",
                 "coords" : "",
                 "georel" : ""

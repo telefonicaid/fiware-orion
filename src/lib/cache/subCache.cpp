@@ -689,6 +689,7 @@ void subCacheItemInsert
   bool                          notificationDone,
   int64_t                       lastNotificationTime,
   StringFilter*                 stringFilterP,
+  StringFilter*                 mdStringFilterP,
   const std::string&            status,
   const std::string&            q,
   const std::string&            geometry,
@@ -750,12 +751,12 @@ void subCacheItemInsert
   cSubP->blacklist             = blacklist;
   cSubP->httpInfo              = httpInfo;
 
+
+  std::string  errorString;
   if (stringFilterP != NULL)
   {
-    std::string  errorString;
-
     //
-    // NOTE
+    // NOTE (for both 'q' and 'mq' string filters)
     //   Here, the cached subscription should have a String Filter but if 'fill()' fails, it won't.
     //   The subscription is already in mongo and hopefully this erroneous situation is fixed
     //   once the sub-cache is refreshed.
@@ -764,6 +765,11 @@ void subCacheItemInsert
     //   [ Only reason for fill() to fail (apart from out-of-memory) seems to be an invalid regex ]
     //
     cSubP->expression.stringFilter.fill(stringFilterP, &errorString);
+  }
+
+  if (mdStringFilterP != NULL)
+  {
+    cSubP->expression.mdStringFilter.fill(mdStringFilterP, &errorString);
   }
 
   LM_T(LmtSubCache, ("inserting a new sub in cache (%s). lastNotifictionTime: %lu",
@@ -832,6 +838,7 @@ void subCacheItemInsert
   bool                               notificationDone,
   int64_t                            lastNotificationTime,
   StringFilter*                      stringFilterP,
+  StringFilter*                      mdStringFilterP,
   const std::string&                 status,
   const std::string&                 q,
   const std::string&                 geometry,
@@ -861,6 +868,7 @@ void subCacheItemInsert
                      notificationDone,
                      lastNotificationTime,
                      stringFilterP,
+                     mdStringFilterP,
                      status,
                      q,
                      geometry,

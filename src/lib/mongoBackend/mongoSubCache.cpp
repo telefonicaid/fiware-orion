@@ -59,6 +59,7 @@ using namespace mongo;
 *  -3:  No patterned entity found
 *  -4:  The vector of notify-conditions is empty
 *  -5:  Error parsing string filter
+*  -6:  Error parsing metadata string filter
 *
 * Note that the 'count' of the inserted subscription is set to ZERO.
 *
@@ -132,6 +133,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
     if (expression.hasField(CSUB_EXPR_Q))
     {
       std::string errorString;
+
       cSubP->expression.q = getFieldF(expression, CSUB_EXPR_Q).String();
       if (cSubP->expression.q != "")
       {
@@ -141,6 +143,23 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
           subCacheItemDestroy(cSubP);
           delete cSubP;
           return -5;
+        }
+      }
+    }
+
+    if (expression.hasField(CSUB_EXPR_MQ))
+    {
+      std::string errorString;
+
+      cSubP->expression.mq = getFieldF(expression, CSUB_EXPR_MQ).String();
+      if (cSubP->expression.mq != "")
+      {
+        if (!cSubP->expression.mdStringFilter.parse(cSubP->expression.mq.c_str(), &errorString))
+        {
+          LM_E(("Runtime Error (error parsing md string filter: %s)", errorString.c_str()));
+          subCacheItemDestroy(cSubP);
+          delete cSubP;
+          return -6;
         }
       }
     }
@@ -256,10 +275,12 @@ int mongoSubCacheItemInsert
   long long           expirationTime,
   const std::string&  status,
   const std::string&  q,
+  const std::string&  mq,
   const std::string&  geometry,
   const std::string&  coords,
   const std::string&  georel,
   StringFilter*       stringFilterP,
+  StringFilter*       mdStringFilterP,
   RenderFormat        renderFormat
 )
 {
@@ -351,6 +372,7 @@ int mongoSubCacheItemInsert
   cSubP->count                 = 0;
   cSubP->status                = status;
   cSubP->expression.q          = q;
+  cSubP->expression.mq         = mq;
   cSubP->expression.geometry   = geometry;
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
@@ -366,14 +388,14 @@ int mongoSubCacheItemInsert
 
 
   //
-  // String Filter
+  // String Filters
   //
+  std::string errorString;
+
   if (stringFilterP != NULL)
   {
-    std::string errorString;
-
     //
-    // NOTE
+    // NOTE (for both 'q' and 'mq' string filters)
     //   Here, the subscription should have a String Filter but if fill() fails, it won't.
     //   The subscription is already in mongo and hopefully this erroneous situation is fixed 
     //   once the sub-cache is refreshed.
@@ -382,6 +404,11 @@ int mongoSubCacheItemInsert
     //   [ Only reason for fill() to fail (apart from out-of-memory) seems to be an invalid regex ]
     //
     cSubP->expression.stringFilter.fill(stringFilterP, &errorString);
+  }
+
+  if (mdStringFilterP != NULL)
+  {
+    cSubP->expression.mdStringFilter.fill(mdStringFilterP, &errorString);
   }
 
   LM_T(LmtSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));

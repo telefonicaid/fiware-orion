@@ -60,6 +60,7 @@ class TriggeredSubscription
   std::string         cacheSubId;
   std::string         tenant;
   StringFilter*       stringFilterP;
+  StringFilter*       mdStringFilterP;
   bool                blacklist;
 
   // FIXME P5: This entire struct will be removed once geo-stuff is implemented the same way StringFilter was implemented (for Issue #1705)
@@ -86,6 +87,7 @@ class TriggeredSubscription
   // FIXME P5: This method will cease to exist once geo-stuff is implemented the same way StringFilter was implemented (for Issue #1705)
   void         fillExpression(const std::string& georel, const std::string& geometry, const std::string& coords);
   bool         stringFilterSet(StringFilter* _stringFilterP, std::string* errorStringP);
+  bool         mdStringFilterSet(StringFilter* _stringFilterP, std::string* errorStringP);
   std::string  toString(const std::string& delimiter);
 };
 

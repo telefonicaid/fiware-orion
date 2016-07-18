@@ -163,10 +163,11 @@ namespace ngsiv2
 
     JsonHelper jhe;
 
-    if (this->expression.q != "")         jhe.addString("q", this->expression.q);
+    if (this->expression.q        != "")  jhe.addString("q",        this->expression.q);
+    if (this->expression.mq       != "")  jhe.addString("mq",       this->expression.mq);
     if (this->expression.geometry != "")  jhe.addString("geometry", this->expression.geometry);
-    if (this->expression.coords != "")    jhe.addString("coords", this->expression.coords);
-    if (this->expression.georel != "")    jhe.addString("georel", this->expression.georel);
+    if (this->expression.coords   != "")  jhe.addString("coords",   this->expression.coords);
+    if (this->expression.georel   != "")  jhe.addString("georel",   this->expression.georel);
 
     std::string expressionString = jhe.str();
 

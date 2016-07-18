@@ -77,6 +77,7 @@
 #define CSUB_CONDITIONS         "conditions"
 #define CSUB_EXPR               "expression"
 #define CSUB_EXPR_Q             "q"
+#define CSUB_EXPR_MQ            "mq"
 #define CSUB_EXPR_GEOM          "geometry"
 #define CSUB_EXPR_COORDS        "coords"
 #define CSUB_EXPR_GEOREL        "georel"
@@ -111,9 +112,10 @@
 
 
 
-/*****************************************************************************
-* Constant string for field values acting as keywods */
-
+/* ****************************************************************************
+*
+* Constant strings for field values acting as keywords
+*/
 #define STATUS_ACTIVE        "active"
 #define STATUS_INACTIVE      "inactive"
 

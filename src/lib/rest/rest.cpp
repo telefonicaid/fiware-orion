@@ -207,7 +207,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       ciP->uriParamTypes.push_back(val);
     }
   }
-  else if (key != URI_PARAM_Q)  // FIXME P1: possible more known options here ...
+  else if ((key != URI_PARAM_Q) && (key != URI_PARAM_MQ))  // FIXME P1: possible more known options here ...
   {
     LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
   }
@@ -240,7 +240,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     containsForbiddenChars = forbiddenChars(val, ";");
   }
-  else if ((key != "q") && (key != "idPattern"))
+  else if ((key != URI_PARAM_Q) && (key != URI_PARAM_MQ) && (key != "idPattern"))
   {
     containsForbiddenChars = forbiddenChars(ckey) || forbiddenChars(val);
   }

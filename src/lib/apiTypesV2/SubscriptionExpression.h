@@ -42,15 +42,17 @@
 */
 struct SubscriptionExpression
 {
-  SubscriptionExpression(): isSet(false) {}
+  SubscriptionExpression(): stringFilter(SftQ), mdStringFilter(SftMq), isSet(false) {}
   ~SubscriptionExpression() {}
 
   std::string               q;
+  std::string               mq;
   std::string               geometry;
   std::string               coords;
   std::string               georel;
 
   StringFilter              stringFilter;
+  StringFilter              mdStringFilter;
   bool                      isSet;
 };
 

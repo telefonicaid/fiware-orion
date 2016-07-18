@@ -101,17 +101,21 @@ static void setSubject(Subscription* s, const BSONObj& r)
     std::string attr = conds[ix].String();
     s->subject.condition.attributes.push_back(attr);
   }
-  if (r.hasField(CSUB_EXPR)) {
+
+  if (r.hasField(CSUB_EXPR))
+  {
     mongo::BSONObj expression = getFieldF(r, CSUB_EXPR).Obj();
     std::string    q          = getFieldF(expression, CSUB_EXPR_Q).String();
+    std::string    mq         = getFieldF(expression, CSUB_EXPR_MQ).String();
     std::string    geo        = getFieldF(expression, CSUB_EXPR_GEOM).String();
     std::string    coords     = getFieldF(expression, CSUB_EXPR_COORDS).String();
     std::string    georel     = getFieldF(expression, CSUB_EXPR_GEOREL).String();
 
-    s->subject.condition.expression.q = q;
+    s->subject.condition.expression.q        = q;
+    s->subject.condition.expression.mq       = mq;
     s->subject.condition.expression.geometry = geo;
-    s->subject.condition.expression.coords = coords;
-    s->subject.condition.expression.georel = georel;
+    s->subject.condition.expression.coords   = coords;
+    s->subject.condition.expression.georel   = georel;
   }
 
 }

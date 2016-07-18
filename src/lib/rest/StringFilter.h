@@ -32,8 +32,21 @@
 #include "mongo/client/dbclient.h"
 
 struct ContextAttribute;
+struct Metadata;
 
 using namespace mongo;
+
+
+
+/* ****************************************************************************
+*
+* StringFilterType - 
+*/
+typedef enum StringFilterType
+{
+  SftQ,
+  SftMq
+} StringFilterType;
 
 
 
@@ -94,7 +107,8 @@ typedef enum StringFilterValueType
 *   numberRangeTo        upper limit for numeric ranges
 *   stringRangeFrom      lower limit for string ranges
 *   stringRangeTo        upper limit for string ranges
-*   attributeName        The name of the attribute, used for unary operators only
+*   attributeName        The name of the attribute, used for unary operators and for mq filters
+*   metadataName         The name of the metadata, used for mqfilters
 *
 * METHODS
 *   parse                parse a string, like 'a>14' into a StringFilterItem
@@ -128,14 +142,14 @@ public:
   double                    numberRangeTo;
   std::string               stringRangeFrom;
   std::string               stringRangeTo;
-  std::string               attributeName;  // Used for unary operators only
-
+  std::string               attributeName;  // Used for unary operators and for metadata filters
+  std::string               metadataName;   // Used for metadata filters
   bool                      compiledPattern;
 
   StringFilterItem();
   ~StringFilterItem();
 
-  bool                      parse(char* qItem, std::string* errorStringP);
+  bool                      parse(char* qItem, std::string* errorStringP, StringFilterType type);
   const char*               opName(void);
   const char*               valueTypeName(void);
 
@@ -151,13 +165,18 @@ public:
   bool                      listParse(char* s, std::string* errorStringP);
   bool                      listItemAdd(char* s, std::string* errorStringP);
   bool                      matchEquals(ContextAttribute* caP);
+  bool                      matchEquals(Metadata* mdP);
   bool                      matchPattern(ContextAttribute* caP);
+  bool                      matchPattern(Metadata* mdP);
   bool                      matchGreaterThan(ContextAttribute* caP);
+  bool                      matchGreaterThan(Metadata* mdP);
   bool                      matchLessThan(ContextAttribute* caP);
+  bool                      matchLessThan(Metadata* mdP);
   bool                      fill(StringFilterItem* sfiP, std::string* errorStringP);
 
 private:
   bool                      compatibleType(ContextAttribute* caP);
+  bool                      compatibleType(Metadata* mdP);
 };
 
 
@@ -192,13 +211,16 @@ class StringFilter
 public:
   std::vector<StringFilterItem*>  filters;
   std::vector<BSONObj>            mongoFilters;
+  StringFilterType                type;
 
-  StringFilter();
+  StringFilter(StringFilterType _type);
   ~StringFilter();
 
   bool  parse(const char* q, std::string* errorStringP);
   bool  mongoFilterPopulate(std::string* errorStringP);
   bool  match(ContextElementResponse* cerP);
+  bool  qMatch(ContextElementResponse* cerP);
+  bool  mqMatch(ContextElementResponse* cerP);
 
   StringFilter*  clone(std::string* errorStringP);
   bool           fill(StringFilter* sfP, std::string* errorStringP);

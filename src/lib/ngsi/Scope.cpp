@@ -55,6 +55,7 @@ Scope::Scope()
   georel.minDistance = -1;
 
   stringFilterP      = NULL;
+  mdStringFilterP    = NULL;
 }
 
 
@@ -74,6 +75,7 @@ Scope::Scope(const std::string& _type, const std::string& _value, const std::str
   georel.minDistance = -1;
 
   stringFilterP      = NULL;
+  mdStringFilterP    = NULL;
 }
 
 
@@ -422,7 +424,7 @@ std::string Scope::check
     return "illegal chars in scope type";
   }
 
-  if (type != SCOPE_TYPE_SIMPLE_QUERY)
+  if ((type != SCOPE_TYPE_SIMPLE_QUERY) && (type != SCOPE_TYPE_SIMPLE_QUERY_MD))
   {
     if (forbiddenChars(value.c_str()))
     {
@@ -692,6 +694,12 @@ void Scope::release(void)
   {
     delete stringFilterP;
     stringFilterP = NULL;
+  }
+
+  if (mdStringFilterP != NULL)
+  {
+    delete mdStringFilterP;
+    mdStringFilterP = NULL;
   }
 }
 

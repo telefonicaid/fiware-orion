@@ -339,6 +339,7 @@ void setCount(long long count, BSONObjBuilder* b)
 void setExpression(const Subscription& sub, BSONObjBuilder* b)
 {
   BSONObj expression = BSON(CSUB_EXPR_Q      << sub.subject.condition.expression.q        <<
+                            CSUB_EXPR_MQ     << sub.subject.condition.expression.mq       <<
                             CSUB_EXPR_GEOM   << sub.subject.condition.expression.geometry <<
                             CSUB_EXPR_COORDS << sub.subject.condition.expression.coords   <<
                             CSUB_EXPR_GEOREL << sub.subject.condition.expression.georel

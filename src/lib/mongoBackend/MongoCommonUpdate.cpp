@@ -1103,6 +1103,14 @@ static bool addTriggeredSubscriptions_withCache
       return false;
     }
 
+    if (!subP->mdStringFilterSet(&cSubP->expression.mdStringFilter, &errorString))
+    {
+      LM_E(("Runtime Error (error setting metadata string filter: %s)", errorString.c_str()));
+      delete subP;
+      cacheSemGive(__FUNCTION__, "match subs for notifications");
+      return false;
+    }
+
     subs.insert(std::pair<string, TriggeredSubscription*>(cSubP->subscriptionId, subP));
   }
 
@@ -1276,6 +1284,7 @@ static bool addTriggeredSubscriptions_noCache
         BSONObj expr = getObjectFieldF(sub, CSUB_EXPR);
 
         std::string q        = expr.hasField(CSUB_EXPR_Q)      ? getStringFieldF(expr, CSUB_EXPR_Q)      : "";
+        std::string mq       = expr.hasField(CSUB_EXPR_MQ)     ? getStringFieldF(expr, CSUB_EXPR_MQ)     : "";
         std::string georel   = expr.hasField(CSUB_EXPR_GEOREL) ? getStringFieldF(expr, CSUB_EXPR_GEOREL) : "";
         std::string geometry = expr.hasField(CSUB_EXPR_GEOM)   ? getStringFieldF(expr, CSUB_EXPR_GEOM)   : "";
         std::string coords   = expr.hasField(CSUB_EXPR_COORDS) ? getStringFieldF(expr, CSUB_EXPR_COORDS) : "";
@@ -1285,7 +1294,7 @@ static bool addTriggeredSubscriptions_noCache
         // Parsing q
         if (q != "")
         {
-          StringFilter* stringFilterP = new StringFilter();
+          StringFilter* stringFilterP = new StringFilter(SftQ);
 
           if (stringFilterP->parse(q.c_str(), &err) == false)
           {
@@ -1309,6 +1318,36 @@ static bool addTriggeredSubscriptions_noCache
             }
 
             delete stringFilterP;
+          }
+        }
+
+        // Parsing mq
+        if (mq != "")
+        {
+          StringFilter* mdStringFilterP = new StringFilter(SftMq);
+
+          if (mdStringFilterP->parse(mq.c_str(), &err) == false)
+          {
+            delete mdStringFilterP;
+          
+            LM_E(("Runtime Error (%s)", err.c_str()));
+            releaseMongoConnection(connection);
+            return false;
+          }
+          else
+          {
+            std::string errorString;
+
+            if (!trigs->mdStringFilterSet(mdStringFilterP, &errorString))
+            {
+              delete mdStringFilterP;
+
+              LM_E(("Runtime Error (error setting string filter: %s)", errorString.c_str()));
+              releaseMongoConnection(connection);
+              return false;
+            }
+
+            delete mdStringFilterP;
           }
         }
       }
@@ -1477,8 +1516,12 @@ static bool processSubscriptions
       }
     }
 
-    /* Check 2: String Filter */
+    /* Check 2: String Filters */
     if ((tSubP->stringFilterP != NULL) && (!tSubP->stringFilterP->match(notifyCerP)))
+    {
+      continue;
+    }
+    if ((tSubP->mdStringFilterP != NULL) && (!tSubP->mdStringFilterP->match(notifyCerP)))
     {
       continue;
     }
@@ -2914,13 +2957,13 @@ void processContextElement
       responseP->oe.fill(SccConflict, MORE_MATCHING_ENT, "TooManyResults");
       return;
     }
-
   }
 
   std::string err;
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
+
   if (!collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err))
   {
     releaseMongoConnection(connection);
@@ -2944,11 +2987,13 @@ void processContextElement
   while (moreSafe(cursor))
   {
     BSONObj r;
+
     if (!nextSafeOrErrorF(cursor, &r, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
+
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
@@ -2970,6 +3015,7 @@ void processContextElement
     // (see http://stackoverflow.com/questions/36917731/context-broker-crashing-with-certain-update-queries)
     results.push_back(r.getOwned());
   }
+
   releaseMongoConnection(connection);
 
   LM_T(LmtServicePath, ("Docs found: %d", results.size()));

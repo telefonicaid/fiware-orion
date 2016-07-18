@@ -88,5 +88,3 @@ std::string patchSubscription
 
   return answer;
 }
-
-

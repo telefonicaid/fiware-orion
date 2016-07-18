@@ -31,9 +31,10 @@
 
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
+#include "rest/uriParamNames.h"
+#include "rest/EntityTypeInfo.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
-#include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "alarmMgr/alarmMgr.h"
@@ -56,6 +57,7 @@
 *   - id
 *   - idPattern
 *   - q
+*   - mq
 *   - geometry
 *   - coords
 *   - georel
@@ -81,7 +83,8 @@ std::string getEntities
   std::string  pattern    = ".*"; // all entities, default value
   std::string  id         = ciP->uriParam["id"];
   std::string  idPattern  = ciP->uriParam["idPattern"];
-  std::string  q          = ciP->uriParam["q"];
+  std::string  q          = ciP->uriParam[URI_PARAM_Q];
+  std::string  mq         = ciP->uriParam[URI_PARAM_MQ];
   std::string  geometry   = ciP->uriParam["geometry"];
   std::string  coords     = ciP->uriParam["coords"];
   std::string  georel     = ciP->uriParam["georel"];
@@ -188,7 +191,7 @@ std::string getEntities
   //
   // String filter in URI param 'q' ?
   // If so, put it in a new Scope and parse the q-string.
-  // The plain q-string is saved uin Scope::value, just in case.
+  // The plain q-string is saved in Scope::value, just in case.
   // Might be useful for debugging, if nothing else.
   //
   if (q != "")
@@ -196,7 +199,7 @@ std::string getEntities
     Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, q);
     std::string  errorString;
 
-    scopeP->stringFilterP = new StringFilter();
+    scopeP->stringFilterP = new StringFilter(SftQ);
     if (scopeP->stringFilterP->parse(q.c_str(), &errorString) == false)
     {
       OrionError oe(SccBadRequest, errorString, "BadRequest");
@@ -213,6 +216,34 @@ std::string getEntities
     parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
   }
 
+
+  //
+  // Metadata string filter in URI param 'mq' ?
+  // If so, put it in a new Scope and parse the mq-string.
+  // The plain mq-string is saved in Scope::value, just in case.
+  // Might be useful for debugging, if nothing else.
+  //
+  if (mq != "")
+  {
+    Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY_MD, mq);
+    std::string  errorString;
+
+    scopeP->mdStringFilterP = new StringFilter(SftMq);
+    if (scopeP->mdStringFilterP->parse(mq.c_str(), &errorString) == false)
+    {
+      OrionError oe(SccBadRequest, errorString, "BadRequest");
+
+      alarmMgr.badInput(clientIp, errorString);
+      scopeP->release();
+      delete scopeP;
+
+      TIMED_RENDER(out = oe.toJson());
+      ciP->httpStatusCode = oe.code;
+      return out;
+    }
+
+    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
+  }
 
 
   //
