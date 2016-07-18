@@ -90,9 +90,10 @@ RUN \
            /usr/local/lib/libgtest* \
            /usr/local/share/aclocal/gtest* \
            /opt/fiware-orion \
+           # We don't need manage Linux account passwords requisites: lenght, mays/mins, etc
            /usr/share/cracklib \
-           /usr/share/i18n \
-           /usr/{lib,lib64}/gconv \
+           # We don't need glibc locale data
+           /usr/share/i18n /usr/{lib,lib64}/gconv \
            && \
     yum -y erase git perl* rsync \
         cmake libarchive \
@@ -108,13 +109,19 @@ RUN \
         boost-program-options boost-math \
         openssh openssh-clients libedit hwdata dbus-glib fipscheck* *devel sysvinit-tools \
         && \
+    # Erase without dependencies of the document formatting system (man)
     rpm -qa groff | xargs -r rpm -e --nodeps && \
-    yum clean all && \
-    rpm -vv --rebuilddb && rm -rf /var/lib/yum/yumdb && rm -rf /var/lib/yum/history && \
-    find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en_US' ! -name 'locale.alias' | xargs -r rm -r && rm -f /var/log/*log && \
+    # Clean yum data
+    yum clean all && rm -rf /var/lib/yum/yumdb && rm -rf /var/lib/yum/history && \
+    # Rebuild rpm data files
+    rpm -vv --rebuilddb && \
+    # Delete unused locales. Only preserve en_US and the locale aliases
+    find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en_US' ! -name 'locale.alias' | xargs -r rm -r && \
     bash -c 'localedef --list-archive | grep -v -e "en_US" | xargs localedef --delete-from-archive' && \
     /bin/cp -f /usr/lib/locale/locale-archive /usr/lib/locale/locale-archive.tmpl && \
-    build-locale-archive
+    build-locale-archive && \
+    # Don't need old log files inside docker images
+    rm -f /var/log/*log
 
 WORKDIR /
 ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice"]
