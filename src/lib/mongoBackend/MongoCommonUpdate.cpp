@@ -1326,7 +1326,7 @@ static bool addTriggeredSubscriptions_noCache
         {
           StringFilter* mdStringFilterP = new StringFilter(SftMq);
 
-          if (mdStringFilterP->parse(q.c_str(), &err) == false)
+          if (mdStringFilterP->parse(mq.c_str(), &err) == false)
           {
             delete mdStringFilterP;
           

@@ -43,6 +43,7 @@
 - Fix: Correct error returned when trying to replace a non-existing attribute in PUT /v2/entities/<entity-id>/attrs/<attr-name> (Issue #2221)
 - Fix: Empty string detection for entity id, entity type and attribute name in NGSIv2 request URLs (#1426, #1487)
 - Fix: Trailing slashes in URI path no longer silently removed, but considered and giving adequate error responses
+- Fix: Initial notifications were counted twice (which gave erroneous timesSent in GET /v2/subscriptions/<subId>)
 - Fix: Avoid rendering at the same time id and idPattern fields in NGSIv2 subscriptions
 - Fix: Error returned on GET/DELETE requests specifying Content-Type (Issue #2128)
 - Fix: Error responses with '405 Method Not Allowed' now return payload to describe the error, for v2 requests only (Issue #2075, #2078 and #2083)

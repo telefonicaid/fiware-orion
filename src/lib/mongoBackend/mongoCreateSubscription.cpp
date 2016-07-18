@@ -177,7 +177,7 @@ std::string mongoCreateSubscription
 
   if (!noCache)
   {
-    insertInCache(sub, subId, tenant, servicePath, notificationDone, lastNotification);
+    insertInCache(sub, subId, tenant, servicePath, false, lastNotification);
   }
 
   reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);

@@ -34,14 +34,15 @@ accumulatorStart --pretty-print
 # 01. Create entity E1, with attr A1=1, having metadata M1=1
 # 02. Create entity E2, with attr A1=1, having metadata M1=2
 # 03. Create entity E3, with attr A1=1, having metadata M2=3
-# 04. GET entities matching q=A1==1 AND mq=A1.M1==2, see E2
-# 05. GET entities matching q=A1 AND mq=A1.M1, see E1 and E2
-# 06. Create a subscription with q=A1==1 AND mq=A1.M1==2
-# 07. Dump accumulator, see E2, then reset accumulator
-# 08. Modify the subscription to have q=A1 AND mq=A1.M1
-# 09. Dump accumulator, see E1 and E2, then reset accumulator
-# 10. Update E3, adding M1 to A1
-# 11. Dump accumulator, see E3
+# 04. Create entity E4, with attr A1=2, having metadata M2=2 and M3=3 (never to be found)
+# 05. GET entities matching q=A1==1 AND mq=A1.M1==2, see E2
+# 06. GET entities matching q=A1 AND mq=A1.M1, see E1 and E2
+# 07. Create a subscription with q=A1==1 AND mq=A1.M1==2
+# 08. Dump accumulator, see E2, then reset accumulator
+# 09. Modify the subscription to have q=A1 AND mq=A1.M1
+# 10. Dump accumulator, see E1 and E2, then reset accumulator
+# 11. Update E3, adding M1 to A1
+# 12. Dump accumulator, see E3
 #
 
 echo "01. Create entity E1, with attr A1=1, having metadata M1=1"
@@ -98,21 +99,42 @@ echo
 echo
 
 
-echo "04. GET entities matching q=A1==1 AND mq=A1.M1==2, see E2"
+echo "04. Create entity E4, with attr A1=2, having metadata M2=2 and M3=3 (never to be found)"
+echo "======================================================================================="
+payload='{
+  "id": "E4",
+  "A1": {
+    "value": 2,
+    "metadata": {
+      "M2": {
+        "value": 2
+      },
+      "M3": {
+        "value": 3
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. GET entities matching q=A1==1 AND mq=A1.M1==2, see E2"
 echo "========================================================="
 orionCurl --url '/v2/entities?q=A1==1&mq=A1.M1==2'
 echo
 echo
 
 
-echo "05. GET entities matching q=A1 AND mq=A1.M1, see E1 and E2"
+echo "06. GET entities matching q=A1 AND mq=A1.M1, see E1 and E2"
 echo "=========================================================="
 orionCurl --url '/v2/entities?q=A1&mq=A1.M1'
 echo
 echo
 
 
-echo "06. Create a subscription with q=A1==1 AND mq=A1.M1==2"
+echo "07. Create a subscription with q=A1==1 AND mq=A1.M1==2"
 echo "======================================================"
 payload='
 {
@@ -143,7 +165,7 @@ echo
 echo
 
 
-echo "07. Dump accumulator, see E2, then reset accumulator"
+echo "08. Dump accumulator, see E2, then reset accumulator"
 echo "===================================================="
 accumulatorDump
 accumulatorReset
@@ -151,7 +173,7 @@ echo
 echo
 
 
-echo "08. Modify the subscription to have q=A1 AND mq=A1.M1"
+echo "09. Modify the subscription to have q=A1 AND mq=A1.M1"
 echo "====================================================="
 payload='{
   "subject": {
@@ -174,7 +196,7 @@ echo
 echo
 
 
-echo "09. Dump accumulator, see E1 and E2, then reset accumulator"
+echo "10. Dump accumulator, see E1 and E2, then reset accumulator"
 echo "==========================================================="
 accumulatorDump
 accumulatorReset
@@ -182,7 +204,7 @@ echo
 echo
 
 
-echo "10. Update E3, adding M1 to A1"
+echo "11. Update E3, adding M1 to A1"
 echo "=============================="
 payload='{
   "A1": {
@@ -198,7 +220,7 @@ echo
 echo
 
 
-echo "11. Dump accumulator, see E3"
+echo "12. Dump accumulator, see E3"
 echo "============================"
 accumulatorDump
 accumulatorReset
@@ -237,7 +259,17 @@ Date: REGEX(.*)
 
 
 
-04. GET entities matching q=A1==1 AND mq=A1.M1==2, see E2
+04. Create entity E4, with attr A1=2, having metadata M2=2 and M3=3 (never to be found)
+=======================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. GET entities matching q=A1==1 AND mq=A1.M1==2, see E2
 =========================================================
 HTTP/1.1 200 OK
 Content-Length: 102
@@ -263,7 +295,7 @@ Date: REGEX(.*)
 ]
 
 
-05. GET entities matching q=A1 AND mq=A1.M1, see E1 and E2
+06. GET entities matching q=A1 AND mq=A1.M1, see E1 and E2
 ==========================================================
 HTTP/1.1 200 OK
 Content-Length: 203
@@ -303,7 +335,7 @@ Date: REGEX(.*)
 ]
 
 
-06. Create a subscription with q=A1==1 AND mq=A1.M1==2
+07. Create a subscription with q=A1==1 AND mq=A1.M1==2
 ======================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -313,7 +345,7 @@ Date: REGEX(.*)
 
 
 
-07. Dump accumulator, see E2, then reset accumulator
+08. Dump accumulator, see E2, then reset accumulator
 ====================================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 155
@@ -346,7 +378,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-08. Modify the subscription to have q=A1 AND mq=A1.M1
+09. Modify the subscription to have q=A1 AND mq=A1.M1
 =====================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -355,7 +387,7 @@ Date: REGEX(.*)
 
 
 
-09. Dump accumulator, see E1 and E2, then reset accumulator
+10. Dump accumulator, see E1 and E2, then reset accumulator
 ===========================================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 256
@@ -402,7 +434,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-10. Update E3, adding M1 to A1
+11. Update E3, adding M1 to A1
 ==============================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -411,7 +443,7 @@ Date: REGEX(.*)
 
 
 
-11. Dump accumulator, see E3
+12. Dump accumulator, see E3
 ============================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 186

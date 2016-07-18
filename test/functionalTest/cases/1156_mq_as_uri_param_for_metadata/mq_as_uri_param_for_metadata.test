@@ -416,7 +416,7 @@ Date: REGEX(.*)
             "url": "http://localhost:REGEX(\d+)/notify"
         },
         "lastNotification": "REGEX(.*)",
-        "timesSent": 2
+        "timesSent": 1
     },
     "status": "active",
     "subject": {
@@ -850,5 +850,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-dbDrop CB
 accumulatorStop
