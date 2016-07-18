@@ -1673,14 +1673,6 @@ bool StringFilter::qMatch(ContextElementResponse* cerP)
       break;
 
     case SfopMatchPattern:
-      //
-      // To not be forgotten for CNR (and discussed during PR-review):
-      //   This here is a bug fix.
-      //   If a 'q/mq' contains two expressions, a 'pattern' and an 'eq', and the eq gives false,
-      //   while the pattern gives true, then the total outcome will be true (before the bug fix),
-      //   because of the inconditional return that the bugfix removes.
-      //   The items in 'q/mq' are ANDed and as true AND false gives false, this was a bug.
-      //
       if (itemP->matchPattern(caP) == false)
       {
         return false;

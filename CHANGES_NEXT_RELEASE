@@ -20,7 +20,6 @@
 - Fix: NGSIv2 geoquery syntax errors using 400 Bad Request instead of 422 Unprocessable Entity (according to rules defined in #1286)
 - Fix: NGSIv2 URI PATH must be all in lowercase, otherwise "service not found" (Issue #2057)
 - Fix: A bug fixed in URI param 'q', avoiding false matches when using string match operator (~=) that matches AND some operator that does not match.
-- Add: New URI param 'mq' for matching in metadata (Issue #1156) 
 - Add: New param 'mq' (both in URI param for list all entities operation and expression sub-field in subscriptions) for matching in metadata (#1156)
 - Add: FIWARE::StringQuery::Metadata scope (#1156)
 - Fix: GET /v2/subscriptions/subId error for non existing subscriptions (now using 404 Not Found, previously using 400 Bad Request)
@@ -43,7 +42,7 @@
 - Fix: Correct error returned when trying to replace a non-existing attribute in PUT /v2/entities/<entity-id>/attrs/<attr-name> (Issue #2221)
 - Fix: Empty string detection for entity id, entity type and attribute name in NGSIv2 request URLs (#1426, #1487)
 - Fix: Trailing slashes in URI path no longer silently removed, but considered and giving adequate error responses
-- Fix: Initial notifications were counted twice (which gave erroneous timesSent in GET /v2/subscriptions/<subId>)
+- Fix: Initial notifications were counted twice when running with subscription cache (which gave erroneous timesSent in GET /v2/subscriptions/<subId>)
 - Fix: Avoid rendering at the same time id and idPattern fields in NGSIv2 subscriptions
 - Fix: Error returned on GET/DELETE requests specifying Content-Type (Issue #2128)
 - Fix: Error responses with '405 Method Not Allowed' now return payload to describe the error, for v2 requests only (Issue #2075, #2078 and #2083)
