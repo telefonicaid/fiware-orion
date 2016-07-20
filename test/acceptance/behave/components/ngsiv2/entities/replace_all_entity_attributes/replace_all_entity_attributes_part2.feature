@@ -210,7 +210,7 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
       | error       | BadRequest        |
       | description | service not found |
 
-  @entity_id_replace_invalid @BUG_1782 @ISSUE_2075 @skip
+  @entity_id_replace_invalid @BUG_1782 @ISSUE_2075
   Scenario:  try to replace attributes by entity ID using NGSI v2 with invalid entity id values
     Given  a definition of headers
       | parameter          | value                  |
@@ -222,12 +222,12 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
       | parameter        | value    |
       | attributes_name  | pressure |
       | attributes_value | 80       |
-    When replace attributes by ID "house_/" if it exists and with "normalized" mode
+    When replace attributes by ID "house_#" if it exists and with "normalized" mode
     Then verify that receive an "Method not allowed" http code
     And verify an error response
-      | parameter   | value            |
-      | error       | MethodNotAllowed |
-      | description | No defined yet   |
+      | parameter   | value              |
+      | error       | MethodNotAllowed   |
+      | description | method not allowed |
 
   # --------------------- attribute name  ------------------------------------
 
