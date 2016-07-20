@@ -101,6 +101,10 @@ Feature: verify fields in log traces with list entities request using NGSI v2.
     And create an entity in raw and "normalized" modes
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value           |
+      | Fiware-Service     | test_log_traces |
+      | Fiware-ServicePath | /test           |
     When get all entities
       | parameter | value    |
       | limit     | 9        |
