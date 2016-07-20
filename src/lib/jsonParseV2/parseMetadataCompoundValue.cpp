@@ -64,7 +64,6 @@ std::string parseMetadataCompoundValue
   orion::CompoundValueNode*          parent
 )  
 {
-
   if (node->IsObject())
   {
     int counter  = 0;
@@ -82,8 +81,6 @@ std::string parseMetadataCompoundValue
       cvnP->level      = parent->level + 1;
       cvnP->siblingNo  = counter;
       cvnP->path       = parent->path + cvnP->name;
-
-      LM_W(("KZ: Got a '%s' value in an object (%s)", nodeType.c_str(), cvnP->name.c_str()));
 
       if (nodeType == "String")
       {
@@ -143,8 +140,6 @@ std::string parseMetadataCompoundValue
       cvnP->level      = parent->level + 1;
       cvnP->siblingNo  = counter;
       cvnP->path       = parent->path + "[" + itemNo + "]";
-
-      LM_W(("KZ: Got a '%s' value in a vector (%s)", nodeType.c_str(), cvnP->name.c_str()));
 
       if (nodeType == "String")
       {
@@ -243,8 +238,6 @@ std::string parseMetadataCompoundValue
       cvnP->siblingNo  = counter;
       cvnP->path       = parent->path + "[" + itemNo + "]";
 
-      LM_W(("KZ: Got a '%s' value in a vector (%s)", nodeType.c_str(), cvnP->name.c_str()));
-
       if (nodeType == "String")
       {
         cvnP->stringValue       = iter->GetString();
@@ -297,8 +290,6 @@ std::string parseMetadataCompoundValue
       cvnP->level      = parent->level + 1;
       cvnP->siblingNo  = counter;
       cvnP->path       = parent->path + cvnP->name;
-
-      LM_W(("KZ: Got a '%s' value in an object (%s)", nodeType.c_str(), cvnP->name.c_str()));
 
       if (nodeType == "String")
       {
@@ -370,7 +361,6 @@ std::string parseMetadataCompoundValueStandAlone
   orion::CompoundValueNode*   parent  = mdP->compoundValueP;
 
 
-  LM_W(("KZ: In parseMetadataCompoundValueStandAlone"));
   //
   // Children of the node
   //
@@ -393,8 +383,6 @@ std::string parseMetadataCompoundValueStandAlone
       cvnP->siblingNo  = counter;
       cvnP->path       = parent->path + "[" + itemNo + "]";
 
-
-      LM_W(("KZ: Got a '%s' value in a vector (%s)", nodeType.c_str(), cvnP->name.c_str()));
 
       if (nodeType == "String")
       {
@@ -452,8 +440,6 @@ std::string parseMetadataCompoundValueStandAlone
       cvnP->level      = parent->level + 1;
       cvnP->siblingNo  = counter;
       cvnP->path       = parent->path + cvnP->name;
-
-      LM_W(("KZ: Got a '%s' value in an object (%s)", nodeType.c_str(), cvnP->name.c_str()));
 
       if (nodeType == "String")
       {

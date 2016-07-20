@@ -54,7 +54,6 @@ void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONArra
   {
     orion::CompoundValueNode* child = children[ix];
 
-    LM_W(("KZ: In compoundValueBson. Child %d (%s) is of type %s", ix, child->name.c_str(), valueTypeName(child->valueType)));
     if (child->valueType == ValueTypeString)
     {
       b.append(child->stringValue);
@@ -81,15 +80,9 @@ void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONArra
     else if (child->valueType == ValueTypeObject)
     {
       BSONObjBuilder bo;
-      std::string    effectiveName = dbDotEncode(child->name);
 
-      LM_W(("KZ: **************** Calling compoundValueBson for Object"));
       compoundValueBson(child->childV, bo);
-      LM_W(("KZ: **************** Back from compoundValueBson for Object"));
-
-      LM_W(("KZ: ----------- Appending"));
       b.append(bo.obj());
-      LM_W(("KZ: ----------- Back from Appending"));
     }
     else
     {
@@ -106,7 +99,6 @@ void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONArra
 */
 void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjBuilder& b)
 {
-  LM_W(("KZ: In compoundValueBson for objects. %d children", children.size()));
   for (unsigned int ix = 0; ix < children.size(); ++ix)
   {
     orion::CompoundValueNode* child = children[ix];
@@ -148,7 +140,6 @@ void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjB
       LM_E(("Runtime Error (Unknown type in compound value)"));
     }
   }
-  LM_W(("KZ: From"));
 }
 
 

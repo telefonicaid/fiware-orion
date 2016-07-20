@@ -302,6 +302,7 @@ bool attributeTypeAbsent(ContextAttribute* caP)
 }
 
 
+
 /* ****************************************************************************
 *
 * changedAttr -
@@ -347,6 +348,8 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP, std::string apiVersi
   }
 }
 
+
+
 /* ****************************************************************************
 *
 * appendMetadata -
@@ -384,29 +387,19 @@ void appendMetadata(BSONObjBuilder* mdBuilder, BSONArrayBuilder* mdNamesBuilder,
       return;
 
     case orion::ValueTypeObject:
-      LM_W(("KZ: Metadata has a compound value"));
-      mdP->compoundValueP->shortShow("KZ3: ");
-
       if (mdP->compoundValueP->valueType == orion::ValueTypeVector)
       {
         BSONArrayBuilder ba;
-        LM_W(("KZ: metadata '%s' is an ARRAY", mdP->compoundValueP->name.c_str()));
-	      compoundValueBson(mdP->compoundValueP->childV, ba);
-        LM_W(("KZ: After compoundValueBson"));
+        compoundValueBson(mdP->compoundValueP->childV, ba);
         mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << ba.arr()));
-        LM_W(("KZ: After append"));
       }
       else
       {
         BSONObjBuilder bo;
 
-        LM_W(("KZ: matadata '%s' is an OBJECT", mdP->compoundValueP->name.c_str()));
         compoundValueBson(mdP->compoundValueP->childV, bo);
-        LM_W(("KZ: After compoundValueBson"));
         mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << bo.obj()));
-        LM_W(("KZ: After append"));
       }
-      mdP->compoundValueP->shortShow("KZ4: ");
       break;
 
     default:
@@ -434,26 +427,19 @@ void appendMetadata(BSONObjBuilder* mdBuilder, BSONArrayBuilder* mdNamesBuilder,
       return;
 
     case orion::ValueTypeObject:
-      LM_W(("KZ: Metadata has a compound value"));
       if (mdP->compoundValueP->isVector())
       {
         BSONArrayBuilder ba;
 
-        LM_W(("KZ: Before compoundValueBson"));
         compoundValueBson(mdP->compoundValueP->childV, ba);
-        LM_W(("KZ: After compoundValueBson"));
         mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << ba.arr()));
-        LM_W(("KZ: After append"));
       }
       else
       {
         BSONObjBuilder bo;
 
-        LM_W(("KZ: Before compoundValueBson"));
         compoundValueBson(mdP->compoundValueP->childV, bo);
-        LM_W(("KZ: After compoundValueBson"));
         mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << bo.obj()));
-        LM_W(("KZ: After append"));
       }
       break;
 
@@ -461,9 +447,9 @@ void appendMetadata(BSONObjBuilder* mdBuilder, BSONArrayBuilder* mdNamesBuilder,
       LM_E(("Runtime Error (unknown metadata type)"));
     }
   }
-
-  LM_W(("KZ: FROM"));
 }
+
+
 
 /* ****************************************************************************
 *

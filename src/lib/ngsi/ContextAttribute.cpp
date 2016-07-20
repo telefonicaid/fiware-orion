@@ -668,11 +668,8 @@ std::string ContextAttribute::toJson(bool isLastElement, RenderFormat renderForm
 {
   std::string  out;
 
-  LM_W(("KZ: In ContextAttribute::toJson"));
   if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_KEYVALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
   {
-    LM_W(("KZ: renderFormat == %d", renderFormat));
-
     out = (renderFormat == NGSI_V2_KEYVALUES)? JSON_STR(name) + ":" : "";
 
     if (compoundValueP != NULL)
@@ -771,7 +768,6 @@ std::string ContextAttribute::toJson(bool isLastElement, RenderFormat renderForm
     //
     // metadata
     //
-    LM_W(("KZ: rendering metadata, calling metadataVector.toJson(true)"));
     out += JSON_STR("metadata") + ":" + "{" + metadataVector.toJson(true) + "}";
 
     if (requestType != EntityAttributeResponse)

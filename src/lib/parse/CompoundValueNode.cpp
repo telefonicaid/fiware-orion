@@ -743,12 +743,9 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, const std::string& in
 */
 std::string CompoundValueNode::toJson(bool isLastElement)
 {
-  LM_W(("KZ: in CompoundValueNode::toJson. container: %p", container));
   std::string  out       = "";
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
   std::string  key       = (container->valueType == orion::ValueTypeVector)? "item" : name;
-
-  LM_W(("KZ: in CompoundValueNode::toJson"));
 
   // No "comma after" if toplevel
   if (container == this)

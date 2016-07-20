@@ -81,7 +81,6 @@ Metadata::Metadata(Metadata* mP, bool useDefaultType)
   boolValue       = mP->boolValue;
   typeGiven       = mP->typeGiven;
   compoundValueP  = mP->compoundValueP;
-  LM_W(("KZ: use mP->compoundValueP->clone() here ... ?"));
 
   if (useDefaultType && !typeGiven)
   {
@@ -201,6 +200,7 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 }
 
 
+
 /* ****************************************************************************
 *
 * Metadata::render -
@@ -210,8 +210,6 @@ std::string Metadata::render(const std::string& indent, bool comma)
   std::string out     = "";
   std::string tag     = "contextMetadata";
   std::string xValue  = toStringValue();
-
-  LM_W(("KZ: Metadata::render"));
 
   out += startTag2(indent, tag, false, false);
   out += valueTag1(indent + "  ", "name", name, true);
@@ -235,25 +233,18 @@ std::string Metadata::render(const std::string& indent, bool comma)
   }
   else if (valueType == orion::ValueTypeObject)
   {
-    LM_W(("KZ: valueType == orion::ValueTypeObject"));
-    compoundValueP->shortShow("KZ: ");
+    std::string part;
 
     if (compoundValueP->isObject())
     {
-      std::string part;
-      LM_W(("KZ: isObject"));
       part = compoundValueP->toJson(true);
-      out += part;
-      LM_W(("KZ: part: '%s'", part.c_str()));
     }
     else if (compoundValueP->isVector())
     {
-      std::string part;
-      LM_W(("KZ: isVector"));
       part = "[" + compoundValueP->toJson(true) + "]";
-      out += part;
-      LM_W(("KZ: part: '%s'", part.c_str()));
     }    
+
+    out += part;
   }
   else
   {
@@ -262,7 +253,6 @@ std::string Metadata::render(const std::string& indent, bool comma)
 
   out += endTag(indent, comma);
 
-  LM_W(("KZ: out: %s", out.c_str()));
   return out;
 }
 
@@ -434,7 +424,6 @@ std::string Metadata::toJson(bool isLastElement)
 {
   std::string  out;
 
-  LM_W(("KZ: Metadata::toJson"));
   out = JSON_STR(name) + ":{";
 
   /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
@@ -459,21 +448,17 @@ std::string Metadata::toJson(bool isLastElement)
   }
   else if (valueType == orion::ValueTypeObject)
   {
-    LM_W(("KZ: valueType == orion::ValueTypeObject"));
     if (compoundValueP->isObject())
     {
-      LM_W(("KZ: isObject"));
       out += compoundValueP->toJson(true);
     }
     else if (compoundValueP->isVector())
     {
-      LM_W(("KZ: isVector"));
       out += std::string("\"value\"") + ":[" + compoundValueP->toJson(true) + "]";
     }    
   }
   else
   {
-    LM_W(("KZ: invalid value type for metadata '%s'", name.c_str()));
     LM_E(("Runtime Error (invalid value type for metadata %s)", name.c_str()));
     out += JSON_VALUE("value", stringValue);
   }
@@ -485,6 +470,5 @@ std::string Metadata::toJson(bool isLastElement)
     out += ",";
   }
 
-  LM_W(("KZ: out: %s", out.c_str()));
   return out;
 }
