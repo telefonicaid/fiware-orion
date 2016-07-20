@@ -48,6 +48,7 @@ SET (SOURCES
     safeMongo.cpp    
     compoundResponses.cpp
     location.cpp
+    compoundValueBson.cpp
 )
 
 SET (HEADERS
@@ -80,6 +81,7 @@ SET (HEADERS
     dbFieldEncoding.h
     compoundResponses.h
     location.h
+    compoundValueBson.h
 )
 
 
