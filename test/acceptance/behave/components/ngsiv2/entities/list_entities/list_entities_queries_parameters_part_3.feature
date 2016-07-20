@@ -52,7 +52,6 @@ Feature: list all entities with get request and queries parameters using NGSI v2
 
   # ------------------ queries parameters -------------------------------
   # --- options = count ---
-  @qp_options_count.row<row.id>
   @qp_options_count
   Scenario Outline:  list entities using NGSI v2 with options=count query parameter only
     Given  a definition of headers
@@ -77,6 +76,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_list_only_options |
+      | Fiware-ServicePath | /test                  |
     When get all entities
       | parameter | value |
       | options   | count |
@@ -115,6 +118,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_list_only_options |
+      | Fiware-ServicePath | /test                  |
     When get all entities
       | parameter | value      |
       | options   | count      |
@@ -130,7 +137,6 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | 5        | 5        |
       | 30       | 30       |
 
-  @qp_options_count_offset_and_limit.row<row.id>
   @qp_options_count_offset_and_limit
   Scenario Outline:  list entities using NGSI v2 with options=count, offset and limit queries parameters
     Given  a definition of headers
@@ -155,6 +161,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_list_only_options |
+      | Fiware-ServicePath | /test                  |
     When get all entities
       | parameter | value    |
       | options   | count    |
@@ -196,6 +206,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_list_only_options |
+      | Fiware-ServicePath | /test                  |
     When get all entities
       | parameter | value     |
       | options   | keyValues |
@@ -229,6 +243,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_list_only_options |
+      | Fiware-ServicePath | /test                  |
     When get all entities
       | parameter | value     |
       | options   | keyValues |
@@ -261,13 +279,17 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_list_only_options |
+      | Fiware-ServicePath | /test                  |
     When get all entities
       | parameter | value                       |
       | attrs     | temperature_3,temperature_4 |
     Then verify that receive an "OK" http code
     And verify that "3" entities are returned
 
-  @qp_attrs_unknown @BUG_2245 @skip
+  @qp_attrs_unknown @BUG_2245
   Scenario:  list entities using NGSI v2 with unknown value in attrs query parameter
     Given  a definition of headers
       | parameter          | value                  |
@@ -292,6 +314,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_list_only_options |
+      | Fiware-ServicePath | /test                  |
     When get all entities
       | parameter | value    |
       | attrs     | fdgdfgdf |
@@ -323,6 +349,10 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_list_only_options |
+      | Fiware-ServicePath | /test                  |
     When get all entities
       | parameter | value                       |
       | attrs     | temperature_3,temperature_4 |
