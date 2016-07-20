@@ -43,13 +43,12 @@ brokerStart CB 101,38 IPv4 -statTiming
 # 00. Pre-call to GET /statistics to give VALGRIND a possibility
 #
 # 01. Second call to GET /statistics (gives time stat of FIRST request for /statistics)
-# 02. GET /statistics
-# 03. Create entity E2/A1-A5 (identical) with v1 JSON
-# 04. GET /statistics
-# 05. Create entity E3/A1-A5 (identical) with v2 JSON
-# 06. GET /statistics
-# 07. GET /v1/contextTypes
-# 08. GET /statistics
+# 02. Create entity E2/A1-A5 with v1 JSON
+# 03. GET /statistics
+# 04. Create entity E3/A1-A5 (identical) with v2 JSON
+# 05. GET /statistics
+# 06. GET /v1/contextTypes
+# 07. GET /statistics
 #
 
 # 00. Pre-call to GET /statistics to give VALGRIND a possibility
@@ -156,27 +155,27 @@ payload='{
   "A1": {
     "value": "1",
     "type": "string",
-    "metadata": { "ID": "ceiling" }
+    "metadata": { "ID": { "value": "ceiling" } }
   },
   "A2": {
     "value": "2",
     "type": "string",
-    "metadata": { "ID": "ceiling" }
+    "metadata": { "ID": { "value": "ceiling" } }
   },
   "A3": {
     "value": "3",
     "type": "string",
-    "metadata": { "ID": "ceiling" }
+    "metadata": { "ID": { "value": "ceiling" } }
   },
   "A4": {
     "value": "4",
     "type": "string",
-    "metadata": { "ID": "ceiling" }
+    "metadata": { "ID": { "value": "ceiling" } }
   },
   "A5": {
     "value": "5",
     "type": "string",
-    "metadata": { "ID": "ceiling" }
+    "metadata": { "ID": { "value": "ceiling" } }
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"

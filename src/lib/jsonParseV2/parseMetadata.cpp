@@ -132,9 +132,7 @@ std::string parseMetadata(const Value& val, Metadata* mdP)
 
   if (type != "Object")
   {
-    OrionError oe(SccBadRequest, "metadata must be a JSON object");
-
-    return oe.toJson();
+    return "metadata must be a JSON object";
   }
 
   mdP->type = DEFAULT_TYPE;

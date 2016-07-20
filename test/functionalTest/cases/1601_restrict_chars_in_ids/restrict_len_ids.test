@@ -46,8 +46,8 @@ VERY_LONG=$(printf 'a%.0s' {1..257})
 # 12. GET /v2/entities
 #
 
-echo "01. POST /v2/entities entityt with long id"
-echo "=========================================="
+echo "01. POST /v2/entities entity with long id"
+echo "========================================="
 payload='{
   "id": "VERY_LONG",
   "type": "T1",
@@ -55,9 +55,9 @@ payload='{
     "value": "06",
     "type":  "AT",
     "metadata": {
-      "m1": "m1",
-      "m2":  2,
-      "m3":  false
+      "m1": { "value": "m1"  },
+      "m2": { "value": 2     },
+      "m3": { "value": false }
     }
   }
 }'
@@ -83,9 +83,9 @@ payload='{
     "value": "06",
     "type":  "AT",
     "metadata": {
-      "m1": "m1",
-      "m2":  2,
-      "m3":  false
+      "m1": { "value": "m1"  },
+      "m2": { "value": 2     },
+      "m3": { "value": false }
     }
   }
 }'
@@ -111,9 +111,9 @@ payload='{
     "value": "06",
     "type":  "AT1",
     "metadata": {
-      "m1": "m1",
-      "m2":  2,
-      "m3":  false
+      "m1": { "value": "m1"  },
+      "m2": { "value": 2     },
+      "m3": { "value": false }
     }
   }
 }'
@@ -139,9 +139,9 @@ payload='{
     "value": "06",
     "type":  "VERY_LONG",
     "metadata": {
-      "m1": "m1",
-      "m2":  2,
-      "m3":  false
+      "m1": { "value": "m1"  },
+      "m2": { "value": 2     },
+      "m3": { "value": false }
     }
   }
 }'
@@ -212,8 +212,8 @@ echo
 
 
 --REGEXPECT--
-01. POST /v2/entities entityt with long id
-==========================================
+01. POST /v2/entities entity with long id
+=========================================
 HTTP/1.1 400 Bad Request
 Content-Length: 87
 Content-Type: application/json

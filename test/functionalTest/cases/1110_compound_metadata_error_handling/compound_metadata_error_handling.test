@@ -47,11 +47,8 @@ payload='{
     "type": "DateTime",
     "value": 19,
     "metadata": {
-      "meta1":
-      {
-        "value": { "compound": "value" }
-      },
-      "meta2": [ 1, 2, 3 ]
+      "meta1": 10,
+      "meta2": "a string"
     }
   }
 }'
@@ -64,13 +61,13 @@ echo
 01. POST /v2/entities with Compound Metadata
 ============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 85
+Content-Length: 69
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for attribute metadata value", 
+    "description": "metadata must be a JSON object",
     "error": "BadRequest"
 }
 

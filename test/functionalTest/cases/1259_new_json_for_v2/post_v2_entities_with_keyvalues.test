@@ -151,9 +151,9 @@ payload='{
     "value": "25",
     "type": "AT1",
     "metadata": {
-      "meta1": 24,
-      "meta2": false,
-      "meta3": "string"
+      "meta1": { "value": 24       },
+      "meta2": { "value": false    },
+      "meta3": { "value": "string" }
     }
   }
 }'
