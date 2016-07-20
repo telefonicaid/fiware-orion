@@ -141,6 +141,3 @@ void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjB
     }
   }
 }
-
-
-

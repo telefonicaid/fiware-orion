@@ -363,8 +363,7 @@ void appendMetadata(BSONObjBuilder* mdBuilder, BSONArrayBuilder* mdNamesBuilder,
   }
 
   mdNamesBuilder->append(mdP->name);
-
-  std::string      effectiveName = dbDotEncode(mdP->name);
+  std::string effectiveName = dbDotEncode(mdP->name);
 
   if (type != "")
   {

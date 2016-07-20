@@ -183,7 +183,6 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 
   case Object:
   case Array:
-    // valueType      = (bsonType == Object)? orion::ValueTypeObject : orion::ValueTypeVector;
     valueType      = orion::ValueTypeObject;
     compoundValueP = new orion::CompoundValueNode();
     compoundObjectResponse(compoundValueP, getFieldF(mdB, ENT_ATTRS_VALUE));
