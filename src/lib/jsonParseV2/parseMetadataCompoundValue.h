@@ -46,17 +46,4 @@ extern std::string parseMetadataCompoundValue
   orion::CompoundValueNode*          parent
 );
 
-
-
-/* ****************************************************************************
-*
-* parseMetadataCompoundValueStandAlone - 
-*/
-extern std::string parseMetadataCompoundValueStandAlone
-(
-  Document&            document,
-  Metadata*            mdP,
-  orion::ValueType     valueType
-);
-
 #endif  // SRC_LIB_JSONPARSEV2_PARSEMETADATACOMPOUNDVALUE_H_
