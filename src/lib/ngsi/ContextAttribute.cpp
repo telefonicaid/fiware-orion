@@ -52,20 +52,22 @@ using namespace orion;
 *
 * Forward declarations
 */
-static void compoundValueBson(std::vector<CompoundValueNode*> children, BSONObjBuilder& b);
+void compoundValueBson(std::vector<CompoundValueNode*> children, BSONObjBuilder& b);
 
 
 
 /* ****************************************************************************
 *
-* compoundValueBson (for arrays) -
+* compoundValueBson (for arrays) - to be moved elsewhere, as it is used by metadatas as well
 */
-static void compoundValueBson(std::vector<CompoundValueNode*> children, BSONArrayBuilder& b)
+void compoundValueBson(std::vector<CompoundValueNode*> children, BSONArrayBuilder& b)
 {
+  LM_W(("KZ: In compoundValueBson for arrays. %d children", children.size()));
   for (unsigned int ix = 0; ix < children.size(); ++ix)
   {
     CompoundValueNode* child = children[ix];
 
+    LM_W(("KZ: In compoundValueBson. Child %d (%s) is of type %s", ix, child->name.c_str(), valueTypeName(child->valueType)));
     if (child->valueType == ValueTypeString)
     {
       b.append(child->stringValue);
@@ -88,28 +90,40 @@ static void compoundValueBson(std::vector<CompoundValueNode*> children, BSONArra
 
       compoundValueBson(child->childV, ba);
       b.append(ba.arr());
+      LM_W(("KZ: Array: b: %s", b.obj().toString().c_str()));
     }
     else if (child->valueType == ValueTypeObject)
     {
       BSONObjBuilder bo;
+      std::string    effectiveName = dbDotEncode(child->name);
 
+      LM_W(("KZ: **************** Calling compoundValueBson for Object"));
       compoundValueBson(child->childV, bo);
+      LM_W(("KZ: **************** Back from compoundValueBson for Object"));
+
+      LM_W(("KZ: ----------- Appending"));
       b.append(bo.obj());
+      LM_W(("KZ: ----------- Back from Appending"));
+      
+      LM_W(("KZ: Object: %s. b: %s", bo.obj().toString().c_str(), b.obj().toString().c_str()));
     }
     else
     {
       LM_E(("Runtime Error (Unknown type in compound value)"));
     }
   }
+
+  LM_W(("KZ: In compoundValueBson. FROM"));
 }
 
 
 /* ****************************************************************************
 *
-* compoundValueBson -
+* compoundValueBson - to be moved elsewhere, as it is used by metadatas as well
 */
-static void compoundValueBson(std::vector<CompoundValueNode*> children, BSONObjBuilder& b)
+void compoundValueBson(std::vector<CompoundValueNode*> children, BSONObjBuilder& b)
 {
+  LM_W(("KZ: In compoundValueBson for objects. %d children", children.size()));
   for (unsigned int ix = 0; ix < children.size(); ++ix)
   {
     CompoundValueNode* child = children[ix];
@@ -151,7 +165,10 @@ static void compoundValueBson(std::vector<CompoundValueNode*> children, BSONObjB
       LM_E(("Runtime Error (Unknown type in compound value)"));
     }
   }
+  LM_W(("KZ: From"));
 }
+
+
 
 /* ****************************************************************************
 *
@@ -160,7 +177,7 @@ static void compoundValueBson(std::vector<CompoundValueNode*> children, BSONObjB
 */
 void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr) const
 {
-  switch(valueType)
+  switch (valueType)
   {
     case ValueTypeString:
       bsonAttr.append(ENT_ATTRS_VALUE, stringValue);
@@ -770,8 +787,11 @@ std::string ContextAttribute::toJson(bool isLastElement, RenderFormat renderForm
 {
   std::string  out;
 
+  LM_W(("KZ: In ContextAttribute::toJson"));
   if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_KEYVALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
   {
+    LM_W(("KZ: renderFormat == %d", renderFormat));
+
     out = (renderFormat == NGSI_V2_KEYVALUES)? JSON_STR(name) + ":" : "";
 
     if (compoundValueP != NULL)
@@ -870,6 +890,7 @@ std::string ContextAttribute::toJson(bool isLastElement, RenderFormat renderForm
     //
     // metadata
     //
+    LM_W(("KZ: rendering metadata, calling metadataVector.toJson(true)"));
     out += JSON_STR("metadata") + ":" + "{" + metadataVector.toJson(true) + "}";
 
     if (requestType != EntityAttributeResponse)

@@ -38,6 +38,7 @@ SET (SOURCES
     parseScope.cpp
     parseBatchUpdate.cpp
     utilsParse.cpp
+    parseMetadataCompoundValue.cpp
 )
 
 SET (HEADERS
@@ -58,6 +59,7 @@ SET (HEADERS
     parseScope.h
     parseBatchUpdate.h
     utilsParse.h
+    parseMetadataCompoundValue.h
 )
 
 

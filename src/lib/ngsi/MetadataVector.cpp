@@ -98,6 +98,7 @@ std::string MetadataVector::render(const std::string& indent, bool comma)
 */
 std::string MetadataVector::toJson(bool isLastElement)
 {
+  LM_W(("KZ: In MetadataVector::toJson. size of vector: %d", vec.size()));
   if (vec.size() == 0)
   {
     return "";
@@ -149,6 +150,7 @@ std::string MetadataVector::toJson(bool isLastElement)
     out += ",";
   }
 
+  LM_W(("KZ: out == '%s'", out.c_str()));
   return out;
 }
 

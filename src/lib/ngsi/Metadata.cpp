@@ -40,6 +40,7 @@
 
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
+#include "mongoBackend/compoundResponses.h"
 
 #include "rest/ConnectionInfo.h"
 
@@ -53,11 +54,12 @@ using namespace mongo;
 */
 Metadata::Metadata()
 {
-  name         = "";
-  type         = "";
-  stringValue  = "";
-  valueType    = orion::ValueTypeString;
-  typeGiven    = false;
+  name            = "";
+  type            = "";
+  stringValue     = "";
+  valueType       = orion::ValueTypeString;
+  typeGiven       = false;
+  compoundValueP  = NULL;
 }
 
 
@@ -71,13 +73,15 @@ Metadata::Metadata(Metadata* mP, bool useDefaultType)
 {
   LM_T(LmtClone, ("'cloning' a Metadata"));
 
-  name         = mP->name;
-  type         = mP->type;
-  valueType    = mP->valueType;
-  stringValue  = mP->stringValue;
-  numberValue  = mP->numberValue;
-  boolValue    = mP->boolValue;
-  typeGiven    = mP->typeGiven;
+  name            = mP->name;
+  type            = mP->type;
+  valueType       = mP->valueType;
+  stringValue     = mP->stringValue;
+  numberValue     = mP->numberValue;
+  boolValue       = mP->boolValue;
+  typeGiven       = mP->typeGiven;
+  compoundValueP  = mP->compoundValueP;
+  LM_W(("KZ: use mP->compoundValueP->clone() here ... ?"));
 
   if (useDefaultType && !typeGiven)
   {
@@ -156,7 +160,8 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 
   typeGiven = (type == "")? false : true;
 
-  switch (getFieldF(mdB, ENT_ATTRS_MD_VALUE).type())
+  BSONType bsonType = getFieldF(mdB, ENT_ATTRS_MD_VALUE).type();
+  switch (bsonType)
   {
   case String:
     valueType   = orion::ValueTypeString;
@@ -177,6 +182,17 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
     valueType = orion::ValueTypeNone;
     break;
 
+  case Object:
+  case Array:
+    // valueType      = (bsonType == Object)? orion::ValueTypeObject : orion::ValueTypeVector;
+    valueType      = orion::ValueTypeObject;
+    compoundValueP = new orion::CompoundValueNode();
+    compoundObjectResponse(compoundValueP, getFieldF(mdB, ENT_ATTRS_VALUE));
+    compoundValueP->container = compoundValueP;
+    compoundValueP->name      = "value";
+    compoundValueP->valueType = (bsonType == Object)? orion::ValueTypeObject : orion::ValueTypeVector;
+    break;
+
   default:
     valueType = orion::ValueTypeUnknown;
     LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", getFieldF(mdB, ENT_ATTRS_MD_VALUE).type()));
@@ -194,6 +210,8 @@ std::string Metadata::render(const std::string& indent, bool comma)
   std::string out     = "";
   std::string tag     = "contextMetadata";
   std::string xValue  = toStringValue();
+
+  LM_W(("KZ: Metadata::render"));
 
   out += startTag2(indent, tag, false, false);
   out += valueTag1(indent + "  ", "name", name, true);
@@ -215,6 +233,28 @@ std::string Metadata::render(const std::string& indent, bool comma)
   {
     out += indent + "  " + JSON_STR("value") + ": " + xValue; 
   }
+  else if (valueType == orion::ValueTypeObject)
+  {
+    LM_W(("KZ: valueType == orion::ValueTypeObject"));
+    compoundValueP->shortShow("KZ: ");
+
+    if (compoundValueP->isObject())
+    {
+      std::string part;
+      LM_W(("KZ: isObject"));
+      part = compoundValueP->toJson(true);
+      out += part;
+      LM_W(("KZ: part: '%s'", part.c_str()));
+    }
+    else if (compoundValueP->isVector())
+    {
+      std::string part;
+      LM_W(("KZ: isVector"));
+      part = "[" + compoundValueP->toJson(true) + "]";
+      out += part;
+      LM_W(("KZ: part: '%s'", part.c_str()));
+    }    
+  }
   else
   {
     out += indent + "  " + JSON_STR("value") + ": " + JSON_STR("unknown json type");
@@ -222,6 +262,7 @@ std::string Metadata::render(const std::string& indent, bool comma)
 
   out += endTag(indent, comma);
 
+  LM_W(("KZ: out: %s", out.c_str()));
   return out;
 }
 
@@ -393,6 +434,7 @@ std::string Metadata::toJson(bool isLastElement)
 {
   std::string  out;
 
+  LM_W(("KZ: Metadata::toJson"));
   out = JSON_STR(name) + ":{";
 
   /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
@@ -415,8 +457,23 @@ std::string Metadata::toJson(bool isLastElement)
   {
     out += JSON_STR("value") + ":null";
   }
+  else if (valueType == orion::ValueTypeObject)
+  {
+    LM_W(("KZ: valueType == orion::ValueTypeObject"));
+    if (compoundValueP->isObject())
+    {
+      LM_W(("KZ: isObject"));
+      out += compoundValueP->toJson(true);
+    }
+    else if (compoundValueP->isVector())
+    {
+      LM_W(("KZ: isVector"));
+      out += std::string("\"value\"") + ":[" + compoundValueP->toJson(true) + "]";
+    }    
+  }
   else
   {
+    LM_W(("KZ: invalid value type for metadata '%s'", name.c_str()));
     LM_E(("Runtime Error (invalid value type for metadata %s)", name.c_str()));
     out += JSON_VALUE("value", stringValue);
   }
@@ -428,5 +485,6 @@ std::string Metadata::toJson(bool isLastElement)
     out += ",";
   }
 
+  LM_W(("KZ: out: %s", out.c_str()));
   return out;
 }

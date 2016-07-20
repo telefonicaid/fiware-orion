@@ -68,6 +68,18 @@ using namespace orion;
 using namespace mongo;
 
 
+/* ****************************************************************************
+*
+* compoundValueBson
+*   These two functions was formerly used only for ContextAttribute.
+*   They were static functions in ContextAttribute.cpp
+*
+*   Now they are needed for Metadata as well and need to be moved to a more neutral place.
+*/
+extern void compoundValueBson(std::vector<CompoundValueNode*> children, BSONObjBuilder& b);
+extern void compoundValueBson(std::vector<CompoundValueNode*> children, BSONArrayBuilder& b);
+
+
 
 /* ****************************************************************************
 *
@@ -296,7 +308,7 @@ bool attributeTypeAbsent(ContextAttribute* caP)
 */
 bool attrValueChanges(BSONObj& attr, ContextAttribute* caP, std::string apiVersion)
 {
-  /* Not finding the attribute field at MongoDB is consideres as an implicit "" */
+  /* Not finding the attribute field at MongoDB is considered as an implicit "" */
   if (!attr.hasField(ENT_ATTRS_VALUE))
   {
     return (caP->valueType != ValueTypeString || caP->stringValue != "");
@@ -348,7 +360,8 @@ void appendMetadata(BSONObjBuilder* mdBuilder, BSONArrayBuilder* mdNamesBuilder,
   }
 
   mdNamesBuilder->append(mdP->name);
-  std::string effectiveName = dbDotEncode(mdP->name);
+
+  std::string      effectiveName = dbDotEncode(mdP->name);
 
   if (type != "")
   {
@@ -370,13 +383,38 @@ void appendMetadata(BSONObjBuilder* mdBuilder, BSONArrayBuilder* mdNamesBuilder,
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << BSONNULL));
       return;
 
+    case orion::ValueTypeObject:
+      LM_W(("KZ: Metadata has a compound value"));
+      mdP->compoundValueP->shortShow("KZ3: ");
+
+      if (mdP->compoundValueP->valueType == orion::ValueTypeVector)
+      {
+        BSONArrayBuilder ba;
+        LM_W(("KZ: metadata '%s' is an ARRAY", mdP->compoundValueP->name.c_str()));
+	      compoundValueBson(mdP->compoundValueP->childV, ba);
+        LM_W(("KZ: After compoundValueBson"));
+        mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << ba.arr()));
+        LM_W(("KZ: After append"));
+      }
+      else
+      {
+        BSONObjBuilder bo;
+
+        LM_W(("KZ: matadata '%s' is an OBJECT", mdP->compoundValueP->name.c_str()));
+        compoundValueBson(mdP->compoundValueP->childV, bo);
+        LM_W(("KZ: After compoundValueBson"));
+        mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << bo.obj()));
+        LM_W(("KZ: After append"));
+      }
+      mdP->compoundValueP->shortShow("KZ4: ");
+      break;
+
     default:
       LM_E(("Runtime Error (unknown metadata type: %d)", mdP->valueType));
     }
   }
   else
   {
-
     switch (mdP->valueType)
     {
     case orion::ValueTypeString:
@@ -395,10 +433,36 @@ void appendMetadata(BSONObjBuilder* mdBuilder, BSONArrayBuilder* mdNamesBuilder,
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << BSONNULL));
       return;
 
+    case orion::ValueTypeObject:
+      LM_W(("KZ: Metadata has a compound value"));
+      if (mdP->compoundValueP->isVector())
+      {
+        BSONArrayBuilder ba;
+
+        LM_W(("KZ: Before compoundValueBson"));
+        compoundValueBson(mdP->compoundValueP->childV, ba);
+        LM_W(("KZ: After compoundValueBson"));
+        mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << ba.arr()));
+        LM_W(("KZ: After append"));
+      }
+      else
+      {
+        BSONObjBuilder bo;
+
+        LM_W(("KZ: Before compoundValueBson"));
+        compoundValueBson(mdP->compoundValueP->childV, bo);
+        LM_W(("KZ: After compoundValueBson"));
+        mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << bo.obj()));
+        LM_W(("KZ: After append"));
+      }
+      break;
+
     default:
       LM_E(("Runtime Error (unknown metadata type)"));
     }
   }
+
+  LM_W(("KZ: FROM"));
 }
 
 /* ****************************************************************************

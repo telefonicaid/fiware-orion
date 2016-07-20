@@ -28,10 +28,11 @@
 #include <string>
 #include <vector>
 
+#include "mongo/client/dbclient.h"
+
 #include "orionTypes/OrionValueType.h"
 #include "ngsi/Request.h"
-
-#include "mongo/client/dbclient.h"
+#include "parse/CompoundValueNode.h"
 
 
 
@@ -58,12 +59,13 @@ typedef struct Metadata
   std::string  name;         // Mandatory
   std::string  type;         // Optional
 
-  // Mandatory
-  orion::ValueType   valueType;    // Type of value: taken from JSON parse
-  std::string        stringValue;  // "value" as a String
-  double             numberValue;  // "value" as a Number
-  bool               boolValue;    // "value" as a Boolean
-  bool               typeGiven;    // Was 'type' part of the incoming payload?
+  bool         typeGiven;    // Was 'type' part of the incoming payload?
+
+  orion::ValueType           valueType;    // Type of value: taken from JSON parse
+  std::string                stringValue;  // "value" as a String
+  double                     numberValue;  // "value" as a Number
+  bool                       boolValue;    // "value" as a Boolean
+  orion::CompoundValueNode*  compoundValueP;
 
   Metadata();
   Metadata(Metadata* mP, bool useDefaultType = false);
