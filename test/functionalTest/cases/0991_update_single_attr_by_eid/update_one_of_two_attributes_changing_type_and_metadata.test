@@ -72,7 +72,7 @@ echo
 
 echo "05. PUT /v2/entities/E1/attrs/A1 with metadata m1 and m2"
 echo "========================================================"
-payload='{ "value": 5, "metadata": { "m1": 55, "m2": "55" } }'
+payload='{ "value": 5, "metadata": { "m1": { "value": 55 }, "m2": { "value": "55" } } }'
 orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PUT
 echo
 echo

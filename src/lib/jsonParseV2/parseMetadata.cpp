@@ -29,7 +29,10 @@
 #include "orionTypes/OrionValueType.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/Metadata.h"
+#include "parse/CompoundValueNode.h"
+#include "rest/OrionError.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
+#include "jsonParseV2/parseMetadataCompoundValue.h"
 #include "jsonParseV2/parseMetadata.h"
 
 
@@ -38,7 +41,7 @@
 *
 * parseMetadataObject - 
 */
-static std::string parseMetadataObject(const Value& start, Metadata* mP)
+static std::string parseMetadataObject(const Value& start, Metadata* mdP)
 {
   for (Value::ConstMemberIterator iter = start.MemberBegin(); iter != start.MemberEnd(); ++iter)
   {
@@ -53,34 +56,44 @@ static std::string parseMetadataObject(const Value& start, Metadata* mP)
         return "invalid JSON type for attribute metadata type";
       }
 
-      mP->type      = iter->value.GetString();
-      mP->typeGiven = true;
+      mdP->type      = iter->value.GetString();
+      mdP->typeGiven = true;
     }
     else if (name == "value")
     {
       if (type == "String")
       {
-        mP->stringValue   = iter->value.GetString();
-        mP->valueType     = orion::ValueTypeString;
+        mdP->stringValue   = iter->value.GetString();
+        mdP->valueType     = orion::ValueTypeString;
       }
       else if (type == "Number")
       {
-        mP->valueType     = orion::ValueTypeNumber;
-        mP->numberValue   = iter->value.GetDouble();
+        mdP->valueType     = orion::ValueTypeNumber;
+        mdP->numberValue   = iter->value.GetDouble();
       }
       else if (type == "True")
       {
-        mP->valueType     = orion::ValueTypeBoolean;
-        mP->boolValue     = true;
+        mdP->valueType     = orion::ValueTypeBoolean;
+        mdP->boolValue     = true;
       }
       else if (type == "False")
       {
-        mP->valueType     = orion::ValueTypeBoolean;
-        mP->boolValue     = false;
+        mdP->valueType     = orion::ValueTypeBoolean;
+        mdP->boolValue     = false;
       }
       else if (type == "Null")
       {
-        mP->valueType     = orion::ValueTypeNone;
+        mdP->valueType     = orion::ValueTypeNone;
+      }
+      else if ((type == "Array") || (type == "Object"))
+      {
+        mdP->valueType = orion::ValueTypeObject;  // Used both for Array and Object ...
+        std::string r = parseMetadataCompoundValue(iter, mdP, NULL);
+        if (r != "OK")
+        {
+          alarmMgr.badInput(clientIp, "json parse error in Metadata compound value");
+          return "json parse error in Metadata compound value";
+        }
       }
       else
       {
@@ -97,13 +110,12 @@ static std::string parseMetadataObject(const Value& start, Metadata* mP)
   }
 
 
-  if (!mP->typeGiven)
+  if (!mdP->typeGiven)
   {
-    mP->type = DEFAULT_TYPE;
+    mdP->type = DEFAULT_TYPE;
   }
 
   return "OK";
-
 }
 
 
@@ -111,57 +123,19 @@ static std::string parseMetadataObject(const Value& start, Metadata* mP)
 /* ****************************************************************************
 *
 * parseMetadata - 
-*
-* Two options here:
-*   "m1": "123"    (Value is  string or boolean or number)
-*   "m1": { "value": "123", "type": "mt" }   (type is needed so a complex 'value' to the metadata)
-*
 */
-std::string parseMetadata(const Value& val, Metadata* mP)
+std::string parseMetadata(const Value& val, Metadata* mdP)
 {
   std::string type   = jsonParseTypeNames[val.GetType()];
+  std::string s;
 
-  if (type == "Object")
+  if (type != "Object")
   {
-    return parseMetadataObject(val, mP);
-  }
-
-  mP->type = "";
-
-  if (type == "String")
-  {
-    mP->stringValue  = val.GetString();
-    mP->valueType    = orion::ValueTypeString;
-  }
-  else if (type == "Number")
-  {
-    mP->valueType    = orion::ValueTypeNumber;
-    mP->numberValue  = val.GetDouble();
-  }
-  else if (type == "True")
-  {
-    mP->valueType    = orion::ValueTypeBoolean;
-    mP->boolValue    = true;
-  }
-  else if (type == "False")
-  {
-    mP->valueType    = orion::ValueTypeBoolean;
-    mP->boolValue    = false;
-  }
-  else if (type == "Null")
-  {
-    mP->valueType    = orion::ValueTypeNone;
-  }
-  else
-  {
-    alarmMgr.badInput(clientIp, "bad type for EntityId::ContextAttribute::Metadata");
-    return "invalid JSON type for attribute metadata value";
+    return "metadata must be a JSON object";
   }
 
-  if (!mP->typeGiven)
-  {
-    mP->type = DEFAULT_TYPE;
-  }
+  mdP->type = DEFAULT_TYPE;
+  s = parseMetadataObject(val, mdP);
 
-  return "OK";
+  return s;
 }

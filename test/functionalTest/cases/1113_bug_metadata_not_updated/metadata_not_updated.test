@@ -42,7 +42,7 @@ payload='{
   "id": "E1",
   "temp": {
     "value": "1",
-    "metadata": { "m1": 1 }
+    "metadata": { "m1": { "value": 1 } }
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -55,7 +55,7 @@ echo "====================================================="
 payload='{
   "temp": {
     "value": "1",
-    "metadata": { "m1": 2 }
+    "metadata": { "m1": { "value": 2 } }
   }
 }'
 orionCurl --url /v2/entities/E1/attrs --payload "$payload"

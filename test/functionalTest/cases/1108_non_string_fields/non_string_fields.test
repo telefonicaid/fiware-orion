@@ -34,10 +34,8 @@ brokerStart CB
 # 02. POST /v2/entities with non-string in entity::type
 # 03. POST /v2/entities with non-string in attribute::type
 # 04. POST /v2/entities with non-string in metadata::type
-# 05. POST /v2/entities with JSON object in metadata::value
-# 06. POST /v2/entities with invalid field in metadata
-#
-# FIXME P1: Once metadata::value can be a compound, step 06 must be removed.
+# 05. POST /v2/entities with invalid field in metadata
+# 06. POST /v2/entities with metadata value non-object
 #
 
 echo "01. POST /v2/entities with non-string in entity::id"
@@ -88,24 +86,24 @@ echo
 echo
 
 
-echo "05. POST /v2/entities with JSON object in metadata::value"
-echo "========================================================="
+echo "05. POST /v2/entities with invalid field in metadata"
+echo "===================================================="
 payload='{
   "type": "room",
   "id": "E1",
-  "temperature": { "type": "AT", "value": 25, "metadata": { "meta": { "type": "md", "value": [ 1, 2, 3 ] } } }
+  "temperature": { "type": "AT", "value": 25, "metadata": { "meta": { "type": "md", "value": 3, "invalid": true } } }
 }'
 orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
-echo "06. POST /v2/entities with invalid field in metadata"
+echo "06. POST /v2/entities with metadata value non-object"
 echo "===================================================="
 payload='{
   "type": "room",
   "id": "E1",
-  "temperature": { "type": "AT", "value": 25, "metadata": { "meta": { "type": "md", "value": 3, "invalid": true } } }
+  "temperature": { "type": "AT", "value": 25, "metadata": { "meta": 14 } } 
 }'
 orionCurl --url /v2/entities --payload "$payload"
 echo
@@ -169,21 +167,7 @@ Date: REGEX(.*)
 }
 
 
-05. POST /v2/entities with JSON object in metadata::value
-=========================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 85
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "invalid JSON type for attribute metadata value",
-    "error": "BadRequest"
-}
-
-
-06. POST /v2/entities with invalid field in metadata
+05. POST /v2/entities with invalid field in metadata
 ====================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 80
@@ -193,6 +177,20 @@ Date: REGEX(.*)
 
 {
     "description": "invalid JSON field for attribute metadata",
+    "error": "BadRequest"
+}
+
+
+06. POST /v2/entities with metadata value non-object
+====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 69
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "metadata must be a JSON object",
     "error": "BadRequest"
 }
 

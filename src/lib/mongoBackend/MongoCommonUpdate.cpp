@@ -68,6 +68,18 @@ using namespace orion;
 using namespace mongo;
 
 
+/* ****************************************************************************
+*
+* compoundValueBson
+*   These two functions was formerly used only for ContextAttribute.
+*   They were static functions in ContextAttribute.cpp
+*
+*   Now they are needed for Metadata as well and need to be moved to a more neutral place.
+*/
+extern void compoundValueBson(std::vector<CompoundValueNode*> children, BSONObjBuilder& b);
+extern void compoundValueBson(std::vector<CompoundValueNode*> children, BSONArrayBuilder& b);
+
+
 
 /* ****************************************************************************
 *
@@ -142,7 +154,8 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
     }
     switch (getFieldF(md1, ENT_ATTRS_MD_TYPE).type())
     {
-      /* FIXME not yet, issue #1068 Support array and object in metadata value
+      /* FIXME #643 P6: metadata array/object are now supported, but we haven't 
+         implemented yet the logic to compare compounds between them
       case Object:
         ...
         break;
@@ -290,13 +303,14 @@ bool attributeTypeAbsent(ContextAttribute* caP)
 }
 
 
+
 /* ****************************************************************************
 *
 * changedAttr -
 */
 bool attrValueChanges(BSONObj& attr, ContextAttribute* caP, std::string apiVersion)
 {
-  /* Not finding the attribute field at MongoDB is consideres as an implicit "" */
+  /* Not finding the attribute field at MongoDB is considered as an implicit "" */
   if (!attr.hasField(ENT_ATTRS_VALUE))
   {
     return (caP->valueType != ValueTypeString || caP->stringValue != "");
@@ -335,6 +349,8 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP, std::string apiVersi
   }
 }
 
+
+
 /* ****************************************************************************
 *
 * appendMetadata -
@@ -370,13 +386,28 @@ void appendMetadata(BSONObjBuilder* mdBuilder, BSONArrayBuilder* mdNamesBuilder,
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << BSONNULL));
       return;
 
+    case orion::ValueTypeObject:
+      if (mdP->compoundValueP->valueType == orion::ValueTypeVector)
+      {
+        BSONArrayBuilder ba;
+        compoundValueBson(mdP->compoundValueP->childV, ba);
+        mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << ba.arr()));
+      }
+      else
+      {
+        BSONObjBuilder bo;
+
+        compoundValueBson(mdP->compoundValueP->childV, bo);
+        mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << bo.obj()));
+      }
+      break;
+
     default:
       LM_E(("Runtime Error (unknown metadata type: %d)", mdP->valueType));
     }
   }
   else
   {
-
     switch (mdP->valueType)
     {
     case orion::ValueTypeString:
@@ -395,11 +426,30 @@ void appendMetadata(BSONObjBuilder* mdBuilder, BSONArrayBuilder* mdNamesBuilder,
       mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << BSONNULL));
       return;
 
+    case orion::ValueTypeObject:
+      if (mdP->compoundValueP->isVector())
+      {
+        BSONArrayBuilder ba;
+
+        compoundValueBson(mdP->compoundValueP->childV, ba);
+        mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << ba.arr()));
+      }
+      else
+      {
+        BSONObjBuilder bo;
+
+        compoundValueBson(mdP->compoundValueP->childV, bo);
+        mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << bo.obj()));
+      }
+      break;
+
     default:
       LM_E(("Runtime Error (unknown metadata type)"));
     }
   }
 }
+
+
 
 /* ****************************************************************************
 *
@@ -544,7 +594,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   }
   else
   {
-      // FIXME P6: in the case of compound value, it's more difficult to know if an attribute
+      // FIXME #643 P6: in the case of compound value, it's more difficult to know if an attribute
       // has really changed its value (many levels have to be traversed). Until we can develop the
       // matching logic, we consider actualUpdate always true.
       actualUpdate = true;

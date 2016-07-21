@@ -58,11 +58,6 @@ costly in terms of performance).
 
 Related with: https://github.com/telefonicaid/fiware-orion/issues/2073
 
-## Metadata vector and object values not implemented yet
-
-NGSIv2 specification allows metadata value to be JSON Array or Object. However, such datatypes are yet to be
-implemented for metadata values in Orion.
-
 ## Default type for entities, attributes and metadata
 
 Currently, Orion uses the string `none` as default for entities/attributes/metadata at creation/update time.

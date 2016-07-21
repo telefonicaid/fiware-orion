@@ -30,15 +30,11 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. POST /v2/entities with Compound Metadata
-#
-# FIXME P5: Once compound metadatas are allowed, this test must be modified to
-#           provoke the same error in some other way - making the error handling
-#           "return r", in that very same place.
+# 01. POST /v2/entities with key-values metadata
 #
 
-echo "01. POST /v2/entities with Compound Metadata"
-echo "============================================"
+echo "01. POST /v2/entities with key-values metadata"
+echo "=============================================="
 payload='{
   "type": "room",
   "id": "room_0",
@@ -47,11 +43,8 @@ payload='{
     "type": "DateTime",
     "value": 19,
     "metadata": {
-      "meta1":
-      {
-        "value": { "compound": "value" }
-      },
-      "meta2": [ 1, 2, 3 ]
+      "meta1": 10,
+      "meta2": "a string"
     }
   }
 }'
@@ -61,16 +54,16 @@ echo
 
 
 --REGEXPECT--
-01. POST /v2/entities with Compound Metadata
-============================================
+01. POST /v2/entities with key-values metadata
+==============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 85
+Content-Length: 69
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for attribute metadata value", 
+    "description": "metadata must be a JSON object",
     "error": "BadRequest"
 }
 

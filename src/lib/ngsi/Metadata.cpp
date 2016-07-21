@@ -40,6 +40,7 @@
 
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
+#include "mongoBackend/compoundResponses.h"
 
 #include "rest/ConnectionInfo.h"
 
@@ -53,11 +54,12 @@ using namespace mongo;
 */
 Metadata::Metadata()
 {
-  name         = "";
-  type         = "";
-  stringValue  = "";
-  valueType    = orion::ValueTypeString;
-  typeGiven    = false;
+  name            = "";
+  type            = "";
+  stringValue     = "";
+  valueType       = orion::ValueTypeString;
+  typeGiven       = false;
+  compoundValueP  = NULL;
 }
 
 
@@ -71,13 +73,14 @@ Metadata::Metadata(Metadata* mP, bool useDefaultType)
 {
   LM_T(LmtClone, ("'cloning' a Metadata"));
 
-  name         = mP->name;
-  type         = mP->type;
-  valueType    = mP->valueType;
-  stringValue  = mP->stringValue;
-  numberValue  = mP->numberValue;
-  boolValue    = mP->boolValue;
-  typeGiven    = mP->typeGiven;
+  name            = mP->name;
+  type            = mP->type;
+  valueType       = mP->valueType;
+  stringValue     = mP->stringValue;
+  numberValue     = mP->numberValue;
+  boolValue       = mP->boolValue;
+  typeGiven       = mP->typeGiven;
+  compoundValueP  = mP->compoundValueP;
 
   if (useDefaultType && !typeGiven)
   {
@@ -156,7 +159,8 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 
   typeGiven = (type == "")? false : true;
 
-  switch (getFieldF(mdB, ENT_ATTRS_MD_VALUE).type())
+  BSONType bsonType = getFieldF(mdB, ENT_ATTRS_MD_VALUE).type();
+  switch (bsonType)
   {
   case String:
     valueType   = orion::ValueTypeString;
@@ -177,12 +181,23 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
     valueType = orion::ValueTypeNone;
     break;
 
+  case Object:
+  case Array:
+    valueType      = orion::ValueTypeObject;
+    compoundValueP = new orion::CompoundValueNode();
+    compoundObjectResponse(compoundValueP, getFieldF(mdB, ENT_ATTRS_VALUE));
+    compoundValueP->container = compoundValueP;
+    compoundValueP->name      = "value";
+    compoundValueP->valueType = (bsonType == Object)? orion::ValueTypeObject : orion::ValueTypeVector;
+    break;
+
   default:
     valueType = orion::ValueTypeUnknown;
     LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", getFieldF(mdB, ENT_ATTRS_MD_VALUE).type()));
     break;
   }
 }
+
 
 
 /* ****************************************************************************
@@ -214,6 +229,21 @@ std::string Metadata::render(const std::string& indent, bool comma)
   else if (valueType == orion::ValueTypeNone)
   {
     out += indent + "  " + JSON_STR("value") + ": " + xValue; 
+  }
+  else if (valueType == orion::ValueTypeObject)
+  {
+    std::string part;
+
+    if (compoundValueP->isObject())
+    {
+      part = compoundValueP->toJson(true);
+    }
+    else if (compoundValueP->isVector())
+    {
+      part = "[" + compoundValueP->toJson(true) + "]";
+    }    
+
+    out += part;
   }
   else
   {
@@ -414,6 +444,17 @@ std::string Metadata::toJson(bool isLastElement)
   else if (valueType == orion::ValueTypeNone)
   {
     out += JSON_STR("value") + ":null";
+  }
+  else if (valueType == orion::ValueTypeObject)
+  {
+    if (compoundValueP->isObject())
+    {
+      out += compoundValueP->toJson(true);
+    }
+    else if (compoundValueP->isVector())
+    {
+      out += std::string("\"value\"") + ":[" + compoundValueP->toJson(true) + "]";
+    }    
   }
   else
   {

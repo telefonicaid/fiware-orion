@@ -44,114 +44,12 @@
 #include "mongo/client/dbclient.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"
+#include "mongoBackend/compoundValueBson.h"
 
 using namespace mongo;
 using namespace orion;
 
-/* ****************************************************************************
-*
-* Forward declarations
-*/
-static void compoundValueBson(std::vector<CompoundValueNode*> children, BSONObjBuilder& b);
 
-
-
-/* ****************************************************************************
-*
-* compoundValueBson (for arrays) -
-*/
-static void compoundValueBson(std::vector<CompoundValueNode*> children, BSONArrayBuilder& b)
-{
-  for (unsigned int ix = 0; ix < children.size(); ++ix)
-  {
-    CompoundValueNode* child = children[ix];
-
-    if (child->valueType == ValueTypeString)
-    {
-      b.append(child->stringValue);
-    }
-    else if (child->valueType == ValueTypeNumber)
-    {
-      b.append(child->numberValue);
-    }
-    else if (child->valueType == ValueTypeBoolean)
-    {
-      b.append(child->boolValue);
-    }
-    else if (child->valueType == ValueTypeNone)
-    {
-      b.appendNull();
-    }
-    else if (child->valueType == ValueTypeVector)
-    {
-      BSONArrayBuilder ba;
-
-      compoundValueBson(child->childV, ba);
-      b.append(ba.arr());
-    }
-    else if (child->valueType == ValueTypeObject)
-    {
-      BSONObjBuilder bo;
-
-      compoundValueBson(child->childV, bo);
-      b.append(bo.obj());
-    }
-    else
-    {
-      LM_E(("Runtime Error (Unknown type in compound value)"));
-    }
-  }
-}
-
-
-/* ****************************************************************************
-*
-* compoundValueBson -
-*/
-static void compoundValueBson(std::vector<CompoundValueNode*> children, BSONObjBuilder& b)
-{
-  for (unsigned int ix = 0; ix < children.size(); ++ix)
-  {
-    CompoundValueNode* child = children[ix];
-
-    std::string effectiveName = dbDotEncode(child->name);
-
-    if (child->valueType == ValueTypeString)
-    {
-      b.append(effectiveName, child->stringValue);
-    }
-    else if (child->valueType == ValueTypeNumber)
-    {
-      b.append(effectiveName, child->numberValue);
-    }
-    else if (child->valueType == ValueTypeBoolean)
-    {
-      b.append(effectiveName, child->boolValue);
-    }
-    else if (child->valueType == ValueTypeNone)
-    {
-      b.appendNull(effectiveName);
-    }
-    else if (child->valueType == ValueTypeVector)
-    {
-      BSONArrayBuilder ba;
-
-      compoundValueBson(child->childV, ba);
-      b.append(effectiveName, ba.arr());
-    }
-    else if (child->valueType == ValueTypeObject)
-    {
-      BSONObjBuilder bo;
-
-      compoundValueBson(child->childV, bo);
-      b.append(effectiveName, bo.obj());
-    }
-    else
-    {
-      LM_E(("Runtime Error (Unknown type in compound value)"));
-    }
-  }
-}
 
 /* ****************************************************************************
 *
@@ -160,7 +58,7 @@ static void compoundValueBson(std::vector<CompoundValueNode*> children, BSONObjB
 */
 void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr) const
 {
-  switch(valueType)
+  switch (valueType)
   {
     case ValueTypeString:
       bsonAttr.append(ENT_ATTRS_VALUE, stringValue);

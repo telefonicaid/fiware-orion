@@ -97,8 +97,8 @@ payload='{
   "value": 12,
   "type": "AT1",
   "metadata": {
-    "m1": 1,
-    "m2": "m2"
+    "m1": { "value": 1    },
+    "m2": { "value": "m2" }
   }
 }'
 orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PUT
