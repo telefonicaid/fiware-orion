@@ -91,8 +91,8 @@ static std::string parseMetadataObject(const Value& start, Metadata* mdP)
         std::string r = parseMetadataCompoundValue(iter, mdP, NULL);
         if (r != "OK")
         {
-          alarmMgr.badInput(clientIp, "json error in Metadata compound value");
-          return "json error in ContextAttributeObject::Vector";
+          alarmMgr.badInput(clientIp, "json parse error in Metadata compound value");
+          return "json parse error in Metadata compound value";
         }
       }
       else

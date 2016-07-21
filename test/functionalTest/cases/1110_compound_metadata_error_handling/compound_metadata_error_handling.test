@@ -30,15 +30,11 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. POST /v2/entities with Compound Metadata
-#
-# FIXME P5: Once compound metadatas are allowed, this test must be modified to
-#           provoke the same error in some other way - making the error handling
-#           "return r", in that very same place.
+# 01. POST /v2/entities with key-values metadata
 #
 
-echo "01. POST /v2/entities with Compound Metadata"
-echo "============================================"
+echo "01. POST /v2/entities with key-values metadata"
+echo "=============================================="
 payload='{
   "type": "room",
   "id": "room_0",
@@ -58,8 +54,8 @@ echo
 
 
 --REGEXPECT--
-01. POST /v2/entities with Compound Metadata
-============================================
+01. POST /v2/entities with key-values metadata
+==============================================
 HTTP/1.1 400 Bad Request
 Content-Length: 69
 Content-Type: application/json
