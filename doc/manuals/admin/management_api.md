@@ -8,7 +8,7 @@ API for management that allows to change the log level and the trace levels
 To change the log level:
 
 ```
-curl --request PUT <host>:<port>/admin/log?level=<fatal|error|warning|warn|info|debug|none>
+curl --request PUT <host>:<port>/admin/log?level=<FATAL|ERROR|WARNING|WARN|INFO|DEBUG|NONE>
 ```
 
 
