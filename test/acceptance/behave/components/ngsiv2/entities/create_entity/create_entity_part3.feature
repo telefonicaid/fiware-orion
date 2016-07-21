@@ -119,6 +119,39 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | españa        |
       | barça         |
 
+  @attributes_metadata_exists @BUG_1112
+  Scenario:  try to create entities using NGSI v2 if attributes metadata exists but without metadata type but the new one has metadata type
+    Given  a definition of headers
+      | parameter          | value              |
+      | Fiware-Service     | test_metadata_name |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 56          |
+      | metadatas_name   | very_hot    |
+      | metadatas_value  | true        |
+    When create entity group with "1" entities in "normalized" mode
+    Then verify that receive several "Created" http code
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 56          |
+      | metadatas_name   | very_hot    |
+      | metadatas_value  | true        |
+      | metadatas_type   | alarm       |
+    When create entity group with "1" entities in "normalized" mode
+    Then verify that receive several "Unprocessable Entity" http code
+    And verify several error responses
+      | parameter   | value          |
+      | error       | Unprocessable  |
+      | description | Already Exists |
+
   @attributes_metadata_name_with_type
   Scenario Outline:  create entities using NGSI v2 with several attributes metadata name with metadata type
     Given  a definition of headers

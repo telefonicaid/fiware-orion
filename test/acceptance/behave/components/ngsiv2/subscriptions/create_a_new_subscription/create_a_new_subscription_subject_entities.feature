@@ -142,6 +142,28 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | content-length | 0                    |
     And verify that the subscription is stored in mongo
 
+  @type_only @BUG_1939
+  Scenario:  create a new subscription using NGSI v2 with only type field and without id and idPattern fields
+    Given  a definition of headers
+      | parameter          | value              |
+      | Fiware-Service     | test_entities_type |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
+     # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter             | value                   |
+      | subject_type          | house                   |
+      | condition_attrs       | temperature             |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
+    When create a new subscription
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                   |
+      | error       | BadRequest                                              |
+      | description | subject entities element does not have id nor idPattern |
+
   @type_id_pattern
   Scenario Outline:  create new subscriptions using NGSI v2 with several type values and idPattern
     Given  a definition of headers
