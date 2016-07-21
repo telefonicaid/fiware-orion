@@ -144,12 +144,15 @@ public:
   std::string               stringRangeTo;
   std::string               attributeName;  // Used for unary operators and for metadata filters
   std::string               metadataName;   // Used for metadata filters
+  std::vector<std::string>  compoundPath;
   bool                      compiledPattern;
+  StringFilterType          type;
 
   StringFilterItem();
   ~StringFilterItem();
 
-  bool                      parse(char* qItem, std::string* errorStringP, StringFilterType type);
+  bool                      parse(char* qItem, std::string* errorStringP, StringFilterType _type);
+  void                      lhsParse(void);
   const char*               opName(void);
   const char*               valueTypeName(void);
 

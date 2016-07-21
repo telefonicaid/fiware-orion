@@ -71,6 +71,7 @@ bool StringFilterItem::fill(StringFilterItem* sfiP, std::string* errorStringP)
   attributeName         = sfiP->attributeName;
   metadataName          = sfiP->metadataName;
   compiledPattern       = sfiP->compiledPattern;
+  type                  = sfiP->type;
 
   if (compiledPattern)
   {
@@ -86,6 +87,15 @@ bool StringFilterItem::fill(StringFilterItem* sfiP, std::string* errorStringP)
       return false;
     }
   }    
+
+  // Copy the compoundPath?
+  if (sfiP->compoundPath.size() != 0)
+  {
+    for (unsigned int ix = 0; ix < sfiP->compoundPath.size(); ++ix)
+    {
+      compoundPath.push_back(sfiP->compoundPath[ix]);
+    }
+  }
 
   return true;
 }
@@ -465,13 +475,17 @@ bool StringFilterItem::valueGet
 *     - Unary operators:
 *       !          Translates to DOES NOT EXIST (the string that comes after is the name of an attribute)
 *       NOTHING:   Translates to EXISTS (the string is the name of an attribute)
+*
+* 
 */
-bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilterType type)
+bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilterType _type)
 {
   char* s       = strdup(qItem);
   char* toFree  = s;
   char* rhs     = NULL;
   char* lhs     = NULL;
+
+  type = _type;
 
   s = wsStrip(s);
   if (*s == 0)
@@ -575,6 +589,14 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   // Now, finally, set the name of the left-hand-side in this object
   left = lhs;
 
+
+  //
+  // Now, is the left hand side just the name of an attribute/metadata?
+  // Or, is it a path to an item in a complex value?
+  //
+  lhsParse();
+
+
   //
   // Check for empty RHS
   //
@@ -647,6 +669,48 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
 
   free(toFree);
   return b;
+}
+
+
+
+/* ****************************************************************************
+*
+* StringFilterItem::lhsParse - 
+*/
+void StringFilterItem::lhsParse(void)
+{
+  char* dotP = strchr((char*) left.c_str(), '.');
+
+  if (dotP == NULL)
+  {
+    return;
+  }
+
+  // If MQ, a second dot must be found in order for LHS to be about compounds
+  if (type == SftMq)
+  {
+    ++dotP;  // Step over the first dot
+    dotP = strchr(dotP, '.');
+
+    if (dotP == NULL)
+    {
+      return;
+    }
+  }
+
+  //
+  // So, now 'dotP' is pointing to the dot after attribute/metadata.
+  // The rest of the 'path' in lhs is about an item in a compound value
+  //
+  *dotP = 0;
+  ++dotP;
+  stringSplit(dotP, '.', compoundPath);
+
+  LM_W(("KZ: -----------------------------------------------"));
+  LM_W(("KZ: %s", left.c_str()));
+  for (unsigned int ix = 0; ix < compoundPath.size(); ++ix)
+    LM_W(("KZ:   %s", compoundPath[ix].c_str()));
+  LM_W(("KZ: -----------------------------------------------"));
 }
 
 
