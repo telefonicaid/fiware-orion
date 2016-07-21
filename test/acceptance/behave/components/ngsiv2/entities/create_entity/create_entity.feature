@@ -184,6 +184,22 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | description | payload size: 1048594, max size supported: 1048576 |
     And verify that entities are not stored in mongo
 
+  @length_required @BUG_1199 @BUG_1203
+  Scenario:  try to create several entities using NGSI v2 wihout payload
+    Given  a definition of headers
+      | parameter          | value                |
+      | Fiware-Service     | test_length_required |
+      | Fiware-ServicePath | /test                |
+      | Content-Type       | application/json     |
+    When create entity group with "1" entities in "normalized" mode
+    Then verify that receive several "Content Length Required" http code
+    And verify several error responses
+      | parameter   | value                                            |
+      | error       | ContentLengthRequired                            |
+      | description | Zero/No Content-Length in PUT/POST/PATCH request |
+
+   # ---------- Content-Type header --------------------------------
+
   @content_type_without @BUG_1199
   Scenario:  try to create entities using NGSI v2 without content-type header
     Given  a definition of headers
@@ -233,21 +249,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | <sdsd>                            |
       | (eeqweqwe)                        |
 
-  @length_required @BUG_1199 @BUG_1203
-  Scenario:  try to create several entities using NGSI v2 wihout payload
-    Given  a definition of headers
-      | parameter          | value                |
-      | Fiware-Service     | test_length_required |
-      | Fiware-ServicePath | /test                |
-      | Content-Type       | application/json     |
-    When create entity group with "1" entities in "normalized" mode
-    Then verify that receive several "Content Length Required" http code
-    And verify several error responses
-      | parameter   | value                                            |
-      | error       | ContentLengthRequired                            |
-      | description | Zero/No Content-Length in PUT/POST/PATCH request |
-
-  # ---------- Services --------------------------------
+  # ---------- Services header --------------------------------
 
   @service_without
   Scenario: create entities using NGSI v2 without service header
@@ -342,7 +344,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | error       | BadRequest                                               |
       | description | bad length - a tenant name can be max 50 characters long |
 
-  # ---------- Services path --------------------------------
+  # ---------- Services path header --------------------------------
 
   @service_path
   Scenario Outline:  create entities using NGSI v2 with several service paths headers

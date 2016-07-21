@@ -672,7 +672,7 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
       | error       | BadRequest                                                       |
       | description | attribute must be a JSON object, unless keyValues option is used |
 
-  @entity_id_empty @ISSUE_1426 @skip
+  @entity_id_empty @ISSUE_1426
   Scenario:  try to update an attribute by entity ID and attribute name using NGSI v2 API with empty entity_id
     Given  a definition of headers
       | parameter          | value                            |
@@ -686,9 +686,9 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
     When update an attribute by ID "" and attribute name "temperature_0" if it exists
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value             |
-      | error       | BadRequest        |
-      | description | service not found |
+      | parameter   | value                                        |
+      | error       | BadRequest                                   |
+      | description | entity id length: 0, min length supported: 1 |
 
  # --------------------- attribute name  ------------------------------------
 
