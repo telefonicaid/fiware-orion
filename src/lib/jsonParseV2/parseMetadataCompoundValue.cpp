@@ -182,7 +182,6 @@ std::string parseMetadataCompoundValue
     }
   }
 
-
   return "OK";
 }
 
