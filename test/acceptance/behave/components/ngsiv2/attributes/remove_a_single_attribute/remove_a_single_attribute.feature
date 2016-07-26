@@ -530,7 +530,7 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | description | More than one matching entity. Please refine your query |
 
   @entity_id_delete_invalid
-  Scenario Outline: Try to delete an attribute by entity ID using NGSI v2with invalid entity id values
+  Scenario Outline: Try to delete an attribute by entity ID using NGSI v2 with invalid entity id values
     Given a definition of headers
       | parameter          | value                  |
       | Fiware-Service     | test_replace_entity_id |
