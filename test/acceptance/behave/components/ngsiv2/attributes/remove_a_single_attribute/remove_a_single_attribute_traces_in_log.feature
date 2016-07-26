@@ -70,6 +70,10 @@ Feature: verify fields in log traces with remove a single attribute request usin
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value           |
+      | Fiware-Service     | test_log_traces |
+      | Fiware-ServicePath | /test           |
     When delete an attribute "temperature_0" in the entity with id "room_1"
     Then verify that receive an "No Content" http code
     And verify that the attribute is deleted into mongo in the defined entity
