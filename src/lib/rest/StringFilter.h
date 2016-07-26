@@ -144,7 +144,7 @@ public:
   std::string               stringRangeTo;
   std::string               attributeName;  // Used for unary operators and for metadata filters
   std::string               metadataName;   // Used for metadata filters
-  std::vector<std::string>  compoundPath;
+  std::string               compoundPath;
   bool                      compiledPattern;
   StringFilterType          type;
 
