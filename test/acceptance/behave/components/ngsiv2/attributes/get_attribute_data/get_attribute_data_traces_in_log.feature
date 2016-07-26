@@ -70,6 +70,10 @@ Feature: verify fields in log traces with get attribute data request using NGSI 
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value           |
+      | Fiware-Service     | test_log_traces |
+      | Fiware-ServicePath | /test           |
     When get an attribute "temperature_0" by ID "room_1"
     Then verify that receive an "OK" http code
     And verify that the attribute by ID is returned
