@@ -668,8 +668,7 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | random=100000         |
       | random=1000000        |
 
-  @metadata_compound_value @ISSUE_1712 @skip
-  # The json values still are not allowed.
+  @metadata_compound_value_object @ISSUE_1712 @ISSUE_1068
   Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attributes metadata json values without metadata type (null, boolean, etc)
     Given  a definition of headers
       | parameter          | value                       |
@@ -680,7 +679,7 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
     And properties to entities
       | parameter        | value         |
       | entities_type    | "room"        |
-      | entities_id      | <entity_id>   |
+      | entities_id      | "<entity_id>" |
       | attributes_name  | "temperature" |
       | attributes_value | "34"          |
       | metadatas_name   | "alarm"       |
@@ -692,21 +691,61 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
     And properties to entities
       | parameter        | value            |
       | attributes_name  | "temperature"    |
-      | metadatas_name   | "alarm"          |
       | attributes_value | 34               |
+      | metadatas_name   | "alarm"          |
       | metadatas_value  | <metadata_value> |
     When update or append attributes by ID "<entity_id>" in raw and "normalized" modes
     Then verify that receive an "No Content" http code
     Examples:
       | entity_id | metadata_value                                                                |
-      | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
-      | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
-      | "room9"   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
-      | "room10"  | {"x": "x1","x2": "b"}                                                         |
-      | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  |
-      | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
-      | "room13"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
-      | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
+      | room7     | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
+      | room8     | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
+      | room9     | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
+      | room10    | {"x": "x1","x2": "b"}                                                         |
+      | room11    | {"x": {"x1": "a","x2": "b"}}                                                  |
+      | room12    | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
+      | room13    | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
+      | room14    | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
+
+  @metadata_compound_value_object @ISSUE_1712 @ISSUE_1068
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attributes metadata json values with metadata type (null, boolean, etc)
+    Given  a definition of headers
+      | parameter          | value                       |
+      | Fiware-Service     | test_metadata_value_special |
+      | Fiware-ServicePath | /test                       |
+      | Content-Type       | application/json            |
+     # These properties below are used in create request
+    And properties to entities
+      | parameter        | value         |
+      | entities_type    | "room"        |
+      | entities_id      | "<entity_id>" |
+      | attributes_name  | "temperature" |
+      | attributes_value | "34"          |
+      | metadatas_name   | "alarm"       |
+      | metadatas_value  | 67            |
+      | metadatas_type   | "warning"     |
+    And create an entity in raw and "normalized" modes
+    And verify that receive an "Created" http code
+     # These properties below are used in update request
+    And properties to entities
+      | parameter        | value            |
+      | attributes_name  | "temperature"    |
+      | attributes_value | 34               |
+      | metadatas_name   | "alarm"          |
+      | metadatas_value  | <metadata_value> |
+      | metadatas_type   | "changed"        |
+    When update or append attributes by ID "<entity_id>" in raw and "normalized" modes
+    Then verify that receive an "No Content" http code
+    Examples:
+      | entity_id | metadata_value                                                                |
+      | room7     | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
+      | room8     | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
+      | room9     | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
+      | room10    | {"x": "x1","x2": "b"}                                                         |
+      | room11    | {"x": {"x1": "a","x2": "b"}}                                                  |
+      | room12    | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
+      | room13    | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
+      | room14    | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
 
   @metadata_value_update_special_wo_meta_type
   Scenario Outline:  update an attribute by entity ID using NGSI v2 with special metadata attribute values (compound, vector, boolean, etc) and without attribute metadata type
