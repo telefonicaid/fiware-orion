@@ -154,7 +154,8 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
     }
     switch (getFieldF(md1, ENT_ATTRS_MD_TYPE).type())
     {
-      /* FIXME not yet, issue #1068 Support array and object in metadata value
+      /* FIXME #643 P6: metadata array/object are now supported, but we haven't 
+         implemented yet the logic to compare compounds between them
       case Object:
         ...
         break;
@@ -593,7 +594,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   }
   else
   {
-      // FIXME P6: in the case of compound value, it's more difficult to know if an attribute
+      // FIXME #643 P6: in the case of compound value, it's more difficult to know if an attribute
       // has really changed its value (many levels have to be traversed). Until we can develop the
       // matching logic, we consider actualUpdate always true.
       actualUpdate = true;

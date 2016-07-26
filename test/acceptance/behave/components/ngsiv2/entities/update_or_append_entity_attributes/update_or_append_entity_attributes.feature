@@ -851,7 +851,7 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | error       | BadRequest        |
       | description | service not found |
 
-  @entity_id_update_invalid @BUG_1782 @BUG_1817 @ISSUE_2075 @skip
+  @entity_id_update_invalid @BUG_1782 @BUG_1817 @ISSUE_2075
   Scenario:  try to update or append attributes by entity ID using NGSI v2 with invalid entity id values
     Given  a definition of headers
       | parameter          | value                 |
@@ -866,9 +866,9 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
     When update or append attributes by ID "house_#" and with "normalized" mode
     Then verify that receive an "Method not allowed" http code
     And verify an error response
-      | parameter   | value            |
-      | error       | MethodNotAllowed |
-      | description | No defined yet   |
+      | parameter   | value              |
+      | error       | MethodNotAllowed   |
+      | description | method not allowed |
 
   # ----------------------- attributes ---------------------------------------
 

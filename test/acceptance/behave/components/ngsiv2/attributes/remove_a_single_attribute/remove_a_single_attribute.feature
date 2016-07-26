@@ -633,19 +633,18 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | room_11   | house_/         |
       | room_12   | house_#         |
 
-  @attribute_name_empty @ISSUE_2078 @skip
+  @attribute_name_empty @ISSUE_2078
   Scenario:  try to delete an attribute by entity ID using NGSI v2 API with empty attribute name
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_attribute_name_update_error |
       | Fiware-ServicePath | /test                            |
-      | Content-Type       | application/json                 |
     When delete an attribute "" in the entity with id "room"
     Then verify that receive an "Method not allowed" http code
     And verify an error response
-      | parameter   | value            |
-      | error       | MethodNotAllowed |
-      | description | No defined yet   |
+      | parameter   | value              |
+      | error       | MethodNotAllowed   |
+      | description | method not allowed |
 
    #   -------------- queries parameters ------------------------------------------
    #   ---  type query parameter ---

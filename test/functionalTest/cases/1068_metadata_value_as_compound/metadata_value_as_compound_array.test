@@ -26,6 +26,7 @@ Metadata value as compound array
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -33,6 +34,8 @@ brokerStart CB
 # 01. Create an entity E1 with attr A1 with metadata M1 = [ 1, 2 ]
 # 02. GET /v2/entities, to see the entity
 # 03. POST /v1/queryContext, to see all entities using NSGIv1
+# 04. Create a subscription to trigger a notification
+# 05. Dump accelerator to see the compound value of M1 correctly rendered in the notification
 #
 
 echo '01. Create an entity E2 with attr A1 with metadata M1 = [ 1, 2 ]'
@@ -57,6 +60,34 @@ echo
 echo "02. GET /v2/entities, to see the entity"
 echo "======================================="
 orionCurl --url /v2/entities  # --noPayloadCheck
+echo
+echo
+
+
+echo "04. Create a subscription to trigger a notification"
+echo "==================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E2"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. Dump accelerator to see the compound value of M1 correctly rendered in the notification"
+echo "==========================================================================================="
+accumulatorDump
 echo
 echo
 
@@ -101,6 +132,53 @@ Date: REGEX(.*)
 ]
 
 
+04. Create a subscription to trigger a notification
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Dump accelerator to see the compound value of M1 correctly rendered in the notification
+===========================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 162
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {
+                    "M1": {
+                        "type": "none", 
+                        "value": [
+                            1, 
+                            2
+                        ]
+                    }
+                }, 
+                "type": "none", 
+                "value": "01"
+            }, 
+            "id": "E2", 
+            "type": "none"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
 --TEARDOWN--
 brokerStop CB
-#dbDrop CB
+dbDrop CB
+accumulatorStop
