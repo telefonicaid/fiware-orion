@@ -30,94 +30,12 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# 01. Create E1 with A1 with compound value containing all JSON types
+# FIXME P2, once 'null' values are supported (issue #2359), this test should be enabled
 #
-# FIXME P2, once 'null' values are supported, these three test cases must change
+# 01. Create E1 with A1 with compound value containing all JSON types
 # 02. GET /v2/entities?q=A1.N:null, see E1
 # 03. GET /v2/entities?q=A1.N==null, see E1
 # 04. GET /v2/entities?q=A1.N!=null, see nothing
-#
-# Future REGEXPECT for steps 02-04:
-#
-#02. GET /v2/entities?q=A1.N:null, see E1
-#========================================
-#HTTP/1.1 200 OK
-#Content-Length: 210
-#Content-Type: application/json
-#Fiware-Correlator: REGEX([0-9a-f\-]{36})
-#Date: REGEX(.*)
-#
-#[
-#    {
-#        "A1": {
-#            "metadata": {},
-#            "type": "none",
-#            "value": {
-#                "D": "2016-07-22T10:42:42.00Z",
-#                "F": false,
-#                "N": null,
-#                "T": true,
-#                "f": 3.14,
-#                "i": 10,
-#                "s": "test_string"
-#            }
-#        },
-#        "A2": {
-#            "metadata": {},
-#            "type": "none",
-#            "value": 22
-#        },
-#        "id": "E1",
-#        "type": "none"
-#    }
-#]
-#
-#
-#03. GET /v2/entities?q=A1.N==null, see E1
-#=========================================
-#HTTP/1.1 200 OK
-#Content-Length: 210
-#Content-Type: application/json
-#Fiware-Correlator: REGEX([0-9a-f\-]{36})
-#Date: REGEX(.*)
-#
-#[
-#    {
-#        "A1": {
-#            "metadata": {},
-#            "type": "none",
-#            "value": {
-#                "D": "2016-07-22T10:42:42.00Z",
-#                "F": false,
-#                "N": null,
-#                "T": true,
-#                "f": 3.14,
-#                "i": 10,
-#                "s": "test_string"
-#            }
-#        },
-#        "A2": {
-#            "metadata": {},
-#            "type": "none",
-#            "value": 22
-#        },
-#        "id": "E1",
-#        "type": "none"
-#    }
-#]
-#
-#
-#04. GET /v2/entities?q=A1.N!=null, see nothing
-#==============================================
-#HTTP/1.1 200 OK
-#Content-Length: 2
-#Content-Type: application/json
-#Fiware-Correlator: REGEX([0-9a-f\-]{36})
-#Date: REGEX(.*)
-#
-#[]
-#
-#
 #
 
 echo "01. Create E1 with A1 with compound value containing all JSON types"
@@ -176,44 +94,81 @@ Date: REGEX(.*)
 
 02. GET /v2/entities?q=A1.N:null, see E1
 ========================================
-HTTP/1.1 400 Bad Request
-Content-Length: 64
+HTTP/1.1 200 OK
+Content-Length: 210
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "description": "null values not supported",
-    "error": "BadRequest"
-}
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "none",
+            "value": {
+                "D": "2016-07-22T10:42:42.00Z",
+                "F": false,
+                "N": null,
+                "T": true,
+                "f": 3.14,
+                "i": 10,
+                "s": "test_string"
+            }
+        },
+        "A2": {
+            "metadata": {},
+            "type": "none",
+            "value": 22
+        },
+        "id": "E1",
+        "type": "none"
+    }
+]
 
 
 03. GET /v2/entities?q=A1.N==null, see E1
 =========================================
-HTTP/1.1 400 Bad Request
-Content-Length: 64
+HTTP/1.1 200 OK
+Content-Length: 210
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "description": "null values not supported",
-    "error": "BadRequest"
-}
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "none",
+            "value": {
+                "D": "2016-07-22T10:42:42.00Z",
+                "F": false,
+                "N": null,
+                "T": true,
+                "f": 3.14,
+                "i": 10,
+                "s": "test_string"
+            }
+        },
+        "A2": {
+            "metadata": {},
+            "type": "none",
+            "value": 22
+        },
+        "id": "E1",
+        "type": "none"
+    }
+]
 
 
 04. GET /v2/entities?q=A1.N!=null, see nothing
 ==============================================
-HTTP/1.1 400 Bad Request
-Content-Length: 64
+HTTP/1.1 200 OK
+Content-Length: 2
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "description": "null values not supported",
-    "error": "BadRequest"
-}
+[]
 
 
 --TEARDOWN--

@@ -1337,7 +1337,7 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     {
       if (itemP->type == SftQ)
       {
-        left = std::string(ENT_ATTRS) + "." + itemP->attributeName + ".value." + itemP->compoundPath;
+        left = std::string(ENT_ATTRS) + "." + itemP->attributeName + "." + ENT_ATTRS_VALUE + "." + itemP->compoundPath;
         k = left;
       }
     }
