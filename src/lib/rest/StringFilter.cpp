@@ -42,6 +42,27 @@ using namespace mongo;
 
 
 
+// Temporary debug function
+const char* opName(StringFilterOp op)
+{
+  switch (op)
+  {
+  case SfopExists:              return "Exists";
+  case SfopNotExists:           return "NotExists";
+  case SfopEquals:              return "Equals";
+  case SfopDiffers:             return "Differs";
+  case SfopGreaterThan:         return "GreaterThan";
+  case SfopGreaterThanOrEqual:  return "GreaterThanOrEqual";
+  case SfopLessThan:            return "LessThan";
+  case SfopLessThanOrEqual:     return "LessThanOrEqual";
+  case SfopMatchPattern:        return "MatchPattern";
+  }
+
+  return "InvalidOperator";
+}
+
+
+
 /* ****************************************************************************
 *
 * StringFilterItem::StringFilterItem -
@@ -542,7 +563,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   else if ((opP = strstr(s, ">=")) != NULL)  { op  = SfopGreaterThanOrEqual;  rhs = &opP[2];        }
   else if ((opP = strstr(s, ">"))  != NULL)  { op  = SfopGreaterThan;         rhs = &opP[1];        }
   else if ((opP = strstr(s, ":"))  != NULL)  { op  = SfopEquals;              rhs = &opP[1];        }
-  else if (*s == '!')                        { op  = SfopNotExists;           rhs = &s[1]; opP = s; }
+  else if (*s == '!')                        { op  = SfopNotExists;           rhs = &s[1]; lhs = rhs; opP = s; }
   else                                       { op  = SfopExists;              rhs = s;              }
 
   // Mark the end of LHS
@@ -563,6 +584,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     free(toFree);
     return false;
   }
+
   if (forbiddenChars(lhs, ""))
   {
     if (type == SftQ)
@@ -587,7 +609,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   // Or, is it a path to an item in a complex value?
   //
   lhsParse();
-
 
   //
   // Check for empty RHS
@@ -663,6 +684,9 @@ void StringFilterItem::lhsParse(void)
 
   if (dotP == NULL)
   {
+    attributeName = start;
+    metadataName  = "";
+    compoundPath  = "";
     return;
   }
   
@@ -676,13 +700,16 @@ void StringFilterItem::lhsParse(void)
     ++dotP;  // Step over the first dot
     char* dot2P = strchr(dotP, '.');
 
+    metadataName  = dotP;
+
     if (dot2P == NULL)
     {
+      compoundPath  = "";
       return;
     }
 
     *dot2P = 0;
-    metadataName = dotP;
+    compoundPath = dotP;
     dotP = dot2P;
   }
 
@@ -1301,7 +1328,7 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       left = itemP->attributeName;
     }
 
-
+ 
     //
     // Also, if the left hand side contains a compound path, then we are
     // dealing with matching of a compound item.

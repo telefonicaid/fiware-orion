@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-String filters for compound values of attributes
+String filters for compound values of attributes: more than one filter in 'q'
 
 --SHELL-INIT--
 dbInit CB
@@ -30,19 +30,20 @@ brokerStart CB 0
 --SHELL--
 
 #
-# 01. Create E1 with A1 with compound value, including i==10 and s='test string'
+# 01. Create E1 with A1 with compound value, including i==10 and s='test_string'
 # 02. GET /v2/entities?q=A1.i:10, see E1
-# 03. GET /v2/entities?q=A1.i:10;A1.s:test string, see E1
+# 03. GET /v2/entities?q=A1.i:10;A1.s:test_string, see E1
+# 04. GET /v2/entities?q=A1.i:10;A1.s:teststring, see nothing
 #
 
-echo "01. Create E1 with A1 with compound value, including i==10 and s='test string'"
+echo "01. Create E1 with A1 with compound value, including i==10 and s='test_string'"
 echo "=============================================================================="
 payload='{
   "id": "E1",
   "A1": {
     "value": {
       "i": 10,
-      "s": "test string"
+      "s": "test_string"
     }
   }
 }'
@@ -58,15 +59,22 @@ echo
 echo
 
 
-echo "03. GET /v2/entities?q=A1.i:10;A1.s:test string, see E1"
+echo "03. GET /v2/entities?q=A1.i:10;A1.s:test_string, see E1"
 echo "======================================================="
-orionCurl --url '/v2/entities?q=A1.i:10;A1.s:test string'
+orionCurl --url '/v2/entities?q=A1.i:10;A1.s:test_string'
+echo
+echo
+
+
+echo "04. GET /v2/entities?q=A1.i:10;A1.s:teststring, see nothing"
+echo "==========================================================="
+orionCurl --url '/v2/entities?q=A1.i:10;A1.s:teststring'
 echo
 echo
 
 
 --REGEXPECT--
-01. Create E1 with A1 with compound value, including i==10 and s='test string'
+01. Create E1 with A1 with compound value, including i==10 and s='test_string'
 ==============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -91,7 +99,7 @@ Date: REGEX(.*)
             "type": "none",
             "value": {
                 "i": 10,
-                "s": "test string"
+                "s": "test_string"
             }
         },
         "id": "E1",
@@ -100,9 +108,9 @@ Date: REGEX(.*)
 ]
 
 
-03. GET /v2/entities?q=A1.i:10;A1.s:test string, see E1
+03. GET /v2/entities?q=A1.i:10;A1.s:test_string, see E1
 =======================================================
-HTTP/1.1 400 Bad Request
+HTTP/1.1 200 OK
 Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -115,13 +123,24 @@ Date: REGEX(.*)
             "type": "none",
             "value": {
                 "i": 10,
-                "s": "test string"
+                "s": "test_string"
             }
         },
         "id": "E1",
         "type": "none"
     }
 ]
+
+
+04. GET /v2/entities?q=A1.i:10;A1.s:teststring, see nothing
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
 
 
 --TEARDOWN--

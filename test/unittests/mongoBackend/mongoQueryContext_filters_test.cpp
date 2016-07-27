@@ -1049,6 +1049,8 @@ TEST(mongoQueryContextRequest_filters, DISABLED_outsideRange_d)
 */
 TEST(mongoQueryContextRequest_filters, withAttribute)
 {
+  utInit();
+  
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
@@ -1071,7 +1073,6 @@ TEST(mongoQueryContextRequest_filters, withAttribute)
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
-  servicePathVector.clear();
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
@@ -1081,7 +1082,7 @@ TEST(mongoQueryContextRequest_filters, withAttribute)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself */
   ASSERT_EQ(5, res.contextElementResponseVector.size());
   EXPECT_EQ("E1", RES_CER(0).entityId.id);
   EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -1091,6 +1092,8 @@ TEST(mongoQueryContextRequest_filters, withAttribute)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -1100,6 +1103,8 @@ TEST(mongoQueryContextRequest_filters, withAttribute)
 */
 TEST(mongoQueryContextRequest_filters, withoutAttribute)
 {
+  utInit();
+
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
@@ -1122,7 +1127,6 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
-  servicePathVector.clear();
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
@@ -1143,6 +1147,8 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 
@@ -1153,6 +1159,8 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
 */
 TEST(mongoQueryContextRequest_filters, stringsWithCommas)
 {
+  utInit();
+
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
@@ -1175,7 +1183,6 @@ TEST(mongoQueryContextRequest_filters, stringsWithCommas)
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
-  servicePathVector.clear();
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
@@ -1192,6 +1199,8 @@ TEST(mongoQueryContextRequest_filters, stringsWithCommas)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 
@@ -1203,6 +1212,8 @@ TEST(mongoQueryContextRequest_filters, stringsWithCommas)
 */
 TEST(mongoQueryContextRequest_filters, combiningSeveralFilters)
 {
+  utInit();
+
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
@@ -1225,7 +1236,6 @@ TEST(mongoQueryContextRequest_filters, combiningSeveralFilters)
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
-  servicePathVector.clear();
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
@@ -1241,6 +1251,8 @@ TEST(mongoQueryContextRequest_filters, combiningSeveralFilters)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -1250,6 +1262,8 @@ TEST(mongoQueryContextRequest_filters, combiningSeveralFilters)
 */
 TEST(mongoQueryContextRequest_filters, repeatSameFilter)
 {
+  utInit();
+
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
@@ -1272,7 +1286,6 @@ TEST(mongoQueryContextRequest_filters, repeatSameFilter)
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
-  servicePathVector.clear();
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
@@ -1289,6 +1302,8 @@ TEST(mongoQueryContextRequest_filters, repeatSameFilter)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -1298,6 +1313,8 @@ TEST(mongoQueryContextRequest_filters, repeatSameFilter)
 */
 TEST(mongoQueryContextRequest_filters, rangeWithDecimals)
 {
+  utInit();
+
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
@@ -1320,7 +1337,6 @@ TEST(mongoQueryContextRequest_filters, rangeWithDecimals)
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
-  servicePathVector.clear();
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
@@ -1337,5 +1353,7 @@ TEST(mongoQueryContextRequest_filters, rangeWithDecimals)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
