@@ -73,9 +73,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | id     | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_update_happy_path |
+      | Fiware-ServicePath | /test                  |
+      | Accept             | text/plain             |
     When get an attribute value by ID "room_1" and attribute name "temperature_0" if it exists
     Then verify that receive an "OK" http code
     And verify that the attribute value by ID is returned
@@ -107,15 +109,104 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | id     | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_update_happy_path |
+      | Fiware-ServicePath | /test                  |
+      | Accept             | text/plain             |
     When get an attribute value by ID "room_1" and attribute name "timestamp_0" if it exists
     Then verify that receive an "OK" http code
     And verify that the attribute value by ID is returned
 
-   # ------------------------ Accept header ----------------------------------------------
+  # ------------------------ Content-Type header ----------------------------------------------
+  @with_content_type @BUG_2128
+  Scenario Outline:  get an attribute value by entity ID and attribute name if it exists using NGSI v2 with Content-Type header
+    Given  a definition of headers
+      | parameter          | value                  |
+      | Fiware-Service     | test_update_happy_path |
+      | Fiware-ServicePath | /test                  |
+      | Content-Type       | application/json       |
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | house       |
+      | entities_id       | room        |
+      | attributes_number | 3           |
+      | attributes_name   | temperature |
+      | attributes_value  | 34.67       |
+      | attributes_type   | celsius     |
+      | metadatas_number  | 2           |
+      | metadatas_name    | very_hot    |
+      | metadatas_type    | alarm       |
+      | metadatas_value   | hot         |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    # These headers below are appended to previous headers in get request
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_update_happy_path |
+      | Fiware-ServicePath | /test                  |
+      | Accept             | text/plain             |
+      | Content-Type       | <content_type>         |
+    When get an attribute value by ID "room_1" and attribute name "temperature_0" if it exists
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                                                        |
+      | error       | BadRequest                                                                                   |
+      | description | Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden |
+    Examples:
+      | content_type                      |
+      | application/json                  |
+      | application/xml                   |
+      | application/x-www-form-urlencoded |
+      | multipart/form-data               |
+      | text/plain                        |
+      | text/html                         |
+      | dsfsdfsdf                         |
+      | <sdsd>                            |
+      | (eeqweqwe)                        |
 
+  @with_empty_content_type @BUG_2364 @skip
+  Scenario:  get an attribute value by entity ID and attribute name if it exists using NGSI v2 with Content-Type header and empty value
+    Given  a definition of headers
+      | parameter          | value                  |
+      | Fiware-Service     | test_update_happy_path |
+      | Fiware-ServicePath | /test                  |
+      | Content-Type       | application/json       |
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | house       |
+      | entities_id       | room        |
+      | attributes_number | 3           |
+      | attributes_name   | temperature |
+      | attributes_value  | 34.67       |
+      | attributes_type   | celsius     |
+      | metadatas_number  | 2           |
+      | metadatas_name    | very_hot    |
+      | metadatas_type    | alarm       |
+      | metadatas_value   | hot         |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    # These headers below are appended to previous headers in get request
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_update_happy_path |
+      | Fiware-ServicePath | /test                  |
+      | Accept             | text/plain             |
+      | Content-Type       |                        |
+    When get an attribute value by ID "room_1" and attribute name "temperature_0" if it exists
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                                                        |
+      | error       | BadRequest                                                                                   |
+      | description | Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden |
+
+   # ------------------------ Accept header ----------------------------------------------
   @accept_application_json
   Scenario Outline:  try to get an attribute value by entity ID and attribute name if it exists using NGSI v2 with text plain but with accept equals to application/json
     Given  a definition of headers
@@ -133,9 +224,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
     And create an entity in raw and "normalized" modes
     And verify that receive a "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value            |
-      | Accept    | application/json |
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_update_happy_path |
+      | Fiware-ServicePath | /test                  |
+      | Accept             | application/json       |
     When get an attribute value by ID "<entity_id>" and attribute name "temperature" if it exists
     Then verify that receive an "Not Acceptable" http code
     And verify an error response
@@ -178,12 +271,14 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    # These headers below are appended to previous headers in get request
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_update_happy_path |
+      | Fiware-ServicePath | /test                  |
     When get an attribute value by ID "room_1" and attribute name "temperature_0" if it exists
-    Then verify that receive an "Not Acceptable" http code
-    And verify an error response
-      | parameter   | value                           |
-      | error       | NotAcceptable                   |
-      | description | accepted MIME types: text/plain |
+    Then verify that receive an "OK" http code
+    And verify that the attribute value by ID is returned
 
   @wrong_accept @BUG_1886
   Scenario Outline:  try to get an attribute value by entity ID and attribute name if it exists using NGSI v2 with wrong Accept header
@@ -210,9 +305,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | id     | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value    |
-      | Accept    | <accept> |
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_update_happy_path |
+      | Fiware-ServicePath | /test                  |
+      | Accept             | <accept>               |
     When get an attribute value by ID "room_1" and attribute name "temperature_0" if it exists
     Then verify that receive an "Not Acceptable" http code
     And verify an error response
@@ -246,9 +343,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
     And create an entity in raw and "normalized" modes
     And verify that receive a "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value            |
-      | Accept    | application/json |
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_update_happy_path |
+      | Fiware-ServicePath | /test                  |
+      | Accept             | application/json       |
     When get an attribute value by ID "<entity_id>" and attribute name "temperature" if it exists
     Then verify that receive an "OK" http code
     And verify that the attribute value by ID is returned
@@ -262,7 +361,6 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | room6     | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
       | room7     | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
       | room8     | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
-
 
   @json_with_accept_text_plain
   Scenario Outline:  get an attribute value by entity ID and attribute name if it exists using NGSI v2 with text/plain in Accept and json object in value
@@ -281,9 +379,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
     And create an entity in raw and "normalized" modes
     And verify that receive a "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_update_happy_path |
+      | Fiware-ServicePath | /test                  |
+      | Accept             | text/plain             |
     When get an attribute value by ID "<entity_id>" and attribute name "temperature" if it exists
     Then verify that receive an "OK" http code
     And verify that the attribute value by ID is returned
@@ -333,9 +433,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | id     | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value                                  |
+      | Fiware-Service     | the same value of the previous request |
+      | Fiware-ServicePath | /test                                  |
+      | Accept             | text/plain                             |
     When get an attribute value by ID "room_1" and attribute name "temperature_0" if it exists
     Then verify that receive an "OK" http code
     And verify that the attribute value by ID is returned
@@ -372,9 +474,10 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | id     | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value      |
+      | Fiware-ServicePath | /test      |
+      | Accept             | text/plain |
     When get an attribute value by ID "room_1" and attribute name "temperature_0" if it exists
     Then verify that receive an "OK" http code
     And verify that the attribute value by ID is returned
@@ -387,9 +490,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value                                  |
+      | Fiware-Service     | the same value of the previous request |
+      | Fiware-ServicePath | /test                                  |
+      | Accept             | text/plain                             |
     When get an attribute value by ID "room_1" and attribute name "temperature_0" if it exists
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -416,9 +521,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | Fiware-ServicePath | /test                           |
       | Content-Type       | application/json                |
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value                                  |
+      | Fiware-Service     | the same value of the previous request |
+      | Fiware-ServicePath | /test                                  |
+      | Accept             | text/plain                             |
     When get an attribute value by ID "room_1" and attribute name "temperature_0" if it exists
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -427,7 +534,6 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | description | bad length - a tenant name can be max 50 characters long |
 
     # ------------------------ Service path header ----------------------------------------------
-
   @service_path
   Scenario Outline:  get an attribute value by entity ID and attribute name using NGSI v2 with several service path headers
     Given  a definition of headers
@@ -453,9 +559,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | id     | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value                                  |
+      | Fiware-Service     | test_attr_service_path                 |
+      | Fiware-ServicePath | the same value of the previous request |
+      | Accept             | text/plain                             |
     When get an attribute value by ID "room_1" and attribute name "temperature_0" if it exists
     Then verify that receive an "OK" http code
     And verify that the attribute value by ID is returned
@@ -495,9 +603,10 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | id     | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter      | value                          |
+      | Fiware-Service | test_attr_service_path_without |
+      | Accept         | text/plain                     |
     When get an attribute value by ID "room_1" and attribute name "temperature_0" if it exists
     Then verify that receive an "OK" http code
     And verify that the attribute value by ID is returned
@@ -508,7 +617,6 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | parameter          | value                        |
       | Fiware-Service     | test_attr_service_path_error |
       | Fiware-ServicePath | <service_path>               |
-      | Content-Type       | application/json             |
       | Accept             | text/plain                   |
     When get an attribute value by ID "room_1" and attribute name "temperature_0" if it exists
     Then verify that receive an "Bad Request" http code
@@ -531,7 +639,6 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | parameter          | value                        |
       | Fiware-Service     | test_attr_service_path_error |
       | Fiware-ServicePath | <service_path>               |
-      | Content-Type       | application/json             |
       | Accept             | text/plain                   |
     When get an attribute value by ID "room_1" and attribute name "temperature_0" if it exists
     Then verify that receive an "Bad Request" http code
@@ -550,7 +657,6 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | parameter          | value                        |
       | Fiware-Service     | test_attr_service_path_error |
       | Fiware-ServicePath | <service_path>               |
-      | Content-Type       | application/json             |
       | Accept             | text/plain                   |
     When get an attribute value by ID "room_1" and attribute name "temperature_0" if it exists
     Then verify that receive an "Bad Request" http code
@@ -569,7 +675,6 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | parameter          | value                                |
       | Fiware-Service     | test_attr_service_path_error         |
       | Fiware-ServicePath | max length allowed and eleven levels |
-      | Content-Type       | application/json                     |
       | Accept             | text/plain                           |
     When get an attribute value by ID "room_1" and attribute name "temperature_0" if it exists
     Then verify that receive an "Bad Request" http code
@@ -579,7 +684,6 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | description | too many components in ServicePath |
 
   #    -------------- entity Id ------------------------------------------
-
   @entity_id
   Scenario Outline:  get an attribute value by entity ID and attribute name using NGSI v2 with several entity id values
     Given  a definition of headers
@@ -605,9 +709,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | id     | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value               |
+      | Fiware-Service     | test_attr_entity_id |
+      | Fiware-ServicePath | /test               |
+      | Accept             | text/plain          |
     When get an attribute value by ID "<entity_id>" and attribute name "temperature_0" if it exists
     Then verify that receive an "OK" http code
     And verify that the attribute value by ID is returned
@@ -624,7 +730,6 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | parameter          | value               |
       | Fiware-Service     | test_attr_entity_id |
       | Fiware-ServicePath | /test               |
-      | Content-Type       | application/json    |
       | Accept             | text/plain          |
     When get an attribute value by ID "<entity_id>" and attribute name "temperature_0" if it exists
     Then verify that receive an "Bad Request" http code
@@ -657,10 +762,12 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
-     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    # These headers below are appended to previous headers in get request
+    And modify headers and keep previous values "false"
+      | parameter          | value                     |
+      | Fiware-Service     | test_attr_entity_unkwnown |
+      | Fiware-ServicePath | /test                     |
+      | Accept             | text/plain                |
     When get an attribute value by ID "fdgfdgfdgdfg" and attribute name "temperature_0" if it exists
     Then verify that receive an "Not Found" http code
     And verify an error response
@@ -671,10 +778,10 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
   @entity_id_multiples
   Scenario:  try to get an attribute value by entity ID and attribute name using NGSI v2 with multiples entity id
     Given  a definition of headers
-      | parameter          | value                     |
-      | Fiware-Service     | test_attr_entity_unkwnown |
-      | Fiware-ServicePath | /test                     |
-      | Content-Type       | application/json          |
+      | parameter          | value                         |
+      | Fiware-Service     | test_attr_entity_id_multiples |
+      | Fiware-ServicePath | /test                         |
+      | Content-Type       | application/json              |
   # These properties below are used in create request
     And properties to entities
       | parameter         | value       |
@@ -688,9 +795,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | type   | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value                         |
+      | Fiware-Service     | test_attr_entity_id_multiples |
+      | Fiware-ServicePath | /test                         |
+      | Accept             | text/plain                    |
     When get an attribute value by ID "room" and attribute name "temperature_0" if it exists
     Then verify that receive an "Conflict" http code
     And verify an error response
@@ -767,7 +876,6 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | description | The requested entity has not been found. Check type and id |
 
   #   -------------- attribute name ------------------------------------------
-
   @attribute_name
   Scenario Outline:  get an attribute value by entity ID and attribute name using NGSI v2 with several attribute name values
     Given  a definition of headers
@@ -793,9 +901,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | id     | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value                       |
+      | Fiware-Service     | test_id_attr_attribute_name |
+      | Fiware-ServicePath | /test                       |
+      | Accept             | text/plain                  |
     When get an attribute value by ID "room_1" and attribute name "<attribute_name>" if it exists
     Then verify that receive an "OK" http code
     And verify that the attribute value by ID is returned
@@ -826,9 +936,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | id     | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value                                 |
+      | Fiware-Service     | test_attr_attribute_name_without_type |
+      | Fiware-ServicePath | /test                                 |
+      | Accept             | text/plain                            |
     When get an attribute value by ID "room_1" and attribute name "the same value of the previous request" if it exists
     Then verify that receive an "OK" http code
     And verify that the attribute value by ID is returned
@@ -853,10 +965,10 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
   @attribute_name_not_ascii_plain
   Scenario Outline:  try to get an attribute value by entity ID and attribute name using NGSI v2 with not ascii plain attribute type
     Given  a definition of headers
-      | parameter          | value                                 |
-      | Fiware-Service     | test_attr_attribute_name_without_type |
-      | Fiware-ServicePath | /test                                 |
-      | Content-Type       | application/json                      |
+      | parameter          | value                                    |
+      | Fiware-Service     | test_attr_attribute_name_not_ascii_plain |
+      | Fiware-ServicePath | /test                                    |
+      | Content-Type       | application/json                         |
     # These properties below are used in create request
     And properties to entities
       | parameter        | value       |
@@ -869,9 +981,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | id     | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value                                    |
+      | Fiware-Service     | test_attr_attribute_name_not_ascii_plain |
+      | Fiware-ServicePath | /test                                    |
+      | Accept             | text/plain                               |
     When get an attribute value by ID "room_1" and attribute name "<attribute_name>" if it exists
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -904,9 +1018,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | id     | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value                              |
+      | Fiware-Service     | test_attr_attribute_name_with_type |
+      | Fiware-ServicePath | /test                              |
+      | Accept             | text/plain                         |
     When get an attribute value by ID "room_1" and attribute name "the same value of the previous request" if it exists
     Then verify that receive an "OK" http code
     And verify that the attribute value by ID is returned
@@ -951,9 +1067,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | id     | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value                                   |
+      | Fiware-Service     | test_attr_attribute_name_with_metadatas |
+      | Fiware-ServicePath | /test                                   |
+      | Accept             | text/plain                              |
     When get an attribute value by ID "room_1" and attribute name "the same value of the previous request" if it exists
     Then verify that receive an "OK" http code
     And verify that the attribute value by ID is returned
@@ -1076,7 +1194,6 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
 
    #   -------------- queries parameters ------------------------------------------
    #   ---  type query parameter ---
-
   @more_entities
   Scenario:  try to get an attribute value by entity ID and attribute name using NGSI v2 with more than one entity with the same id
     Given  a definition of headers
@@ -1096,9 +1213,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | type   | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value                   |
+      | Fiware-Service     | test_attr_more_entities |
+      | Fiware-ServicePath | /test                   |
+      | Accept             | text/plain              |
     When get an attribute value by ID "room" and attribute name "temperature_0" if it exists
     Then verify that receive an "Conflict" http code
     And verify an error response
@@ -1125,9 +1244,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | type   | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value             |
+      | Fiware-Service     | test_attr_type_qp |
+      | Fiware-ServicePath | /test             |
+      | Accept             | text/plain        |
     When get an attribute value by ID "room" and attribute name "temperature" if it exists
       | parameter | value   |
       | type      | house_1 |
@@ -1153,9 +1274,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | id     | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value             |
+      | Fiware-Service     | test_attr_type_qp |
+      | Fiware-ServicePath | /test             |
+      | Accept             | text/plain        |
     When get an attribute value by ID "room_1" and attribute name "temperature" if it exists
       | parameter | value |
       | type      |       |
@@ -1184,9 +1307,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | id     | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value             |
+      | Fiware-Service     | test_attr_type_qp |
+      | Fiware-ServicePath | /test             |
+      | Accept             | text/plain        |
     When get an attribute value by ID "room_1" and attribute name "temperature" if it exists
       | parameter   | value   |
       | <parameter> | house_1 |
@@ -1223,9 +1348,11 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | id     | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value             |
+      | Fiware-Service     | test_attr_type_qp |
+      | Fiware-ServicePath | /test             |
+      | Accept             | text/plain        |
     When get an attribute value by ID "room_1" and attribute name "temperature" if it exists
       | parameter   | value   |
       | <parameter> | house_1 |
@@ -1264,10 +1391,12 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
-    # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+     # These headers below are appended to previous headers in get request
+    And modify headers and keep previous values "false"
+      | parameter          | value             |
+      | Fiware-Service     | test_attr_type_qp |
+      | Fiware-ServicePath | /test             |
+      | Accept             | text/plain        |
     When get an attribute value by ID "room_1" and attribute name "temperature" if it exists
       | parameter | value   |
       | type      | gdfgdfg |
