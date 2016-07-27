@@ -269,7 +269,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 |                                                                                                                                                          |
 |**entities folder**                                                                                                                                       |
 | list_entities                               |    510       | GET     | /v2/entities/                                        | No        | Yes            |
-| create_entity                               |    693       | POST    | /v2/entities/                                        | Yes       | Yes            |    
+| create_entity                               |    695       | POST    | /v2/entities/                                        | Yes       | Yes            |    
 |                                                                                                                                                          |
 | retrieve_entity                             |    220       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |
 | retrieve_entity_attributes                  |    201       | GET     | /v2/entities/`<entity_id>`/attrs                     | No        | Yes            |
