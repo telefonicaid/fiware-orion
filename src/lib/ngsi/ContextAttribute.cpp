@@ -1093,3 +1093,55 @@ ContextAttribute* ContextAttribute::clone(void)
 {
   return new ContextAttribute(this);
 }
+
+
+
+/* ****************************************************************************
+*
+* ContextAttribute::compoundItemExists - 
+*/
+bool ContextAttribute::compoundItemExists(const std::string& compoundPath)
+{
+  std::vector<std::string>   compoundPathV;
+  orion::CompoundValueNode*  current = compoundValueP;
+  int                        levels;
+
+  if (compoundPath == "")
+  {
+    return false;
+  }
+
+  if (compoundValueP == NULL)
+  {
+    return false;
+  }
+
+  levels = stringSplit(compoundPath, '.', compoundPathV);
+
+  if ((compoundPathV.size() == 0) || (levels == 0))
+  {
+    return false;
+  }
+
+  for (int ix = 0; ix < levels; ++ix)
+  {
+    bool found = false;
+
+    for (unsigned int cIx = 0; cIx < current->childV.size(); ++cIx)
+    {
+      if (current->childV[cIx]->name == compoundPathV[ix])
+      {
+        current = current->childV[cIx];
+        found   = true;
+        break;
+      }
+    }
+
+    if (found == false)
+    {
+      return false;
+    }
+  }
+
+  return true;
+}

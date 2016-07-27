@@ -42,6 +42,27 @@ using namespace mongo;
 
 
 
+// FIXME PR: Temporary debug function
+const char* opName(StringFilterOp op)
+{
+  switch (op)
+  {
+  case SfopExists:              return "Exists";
+  case SfopNotExists:           return "NotExists";
+  case SfopEquals:              return "Equals";
+  case SfopDiffers:             return "Differs";
+  case SfopGreaterThan:         return "GreaterThan";
+  case SfopGreaterThanOrEqual:  return "GreaterThanOrEqual";
+  case SfopLessThan:            return "LessThan";
+  case SfopLessThanOrEqual:     return "LessThanOrEqual";
+  case SfopMatchPattern:        return "MatchPattern";
+  }
+
+  return "InvalidOperator";
+}
+
+
+
 /* ****************************************************************************
 *
 * StringFilterItem::StringFilterItem -
@@ -71,6 +92,8 @@ bool StringFilterItem::fill(StringFilterItem* sfiP, std::string* errorStringP)
   attributeName         = sfiP->attributeName;
   metadataName          = sfiP->metadataName;
   compiledPattern       = sfiP->compiledPattern;
+  type                  = sfiP->type;
+  compoundPath          = sfiP->compoundPath;
 
   if (compiledPattern)
   {
@@ -465,13 +488,17 @@ bool StringFilterItem::valueGet
 *     - Unary operators:
 *       !          Translates to DOES NOT EXIST (the string that comes after is the name of an attribute)
 *       NOTHING:   Translates to EXISTS (the string is the name of an attribute)
+*
+* 
 */
-bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilterType type)
+bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilterType _type)
 {
   char* s       = strdup(qItem);
   char* toFree  = s;
   char* rhs     = NULL;
   char* lhs     = NULL;
+
+  type = _type;
 
   s = wsStrip(s);
   if (*s == 0)
@@ -536,7 +563,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   else if ((opP = strstr(s, ">=")) != NULL)  { op  = SfopGreaterThanOrEqual;  rhs = &opP[2];        }
   else if ((opP = strstr(s, ">"))  != NULL)  { op  = SfopGreaterThan;         rhs = &opP[1];        }
   else if ((opP = strstr(s, ":"))  != NULL)  { op  = SfopEquals;              rhs = &opP[1];        }
-  else if (*s == '!')                        { op  = SfopNotExists;           rhs = &s[1]; opP = s; }
+  else if (*s == '!')                        { op  = SfopNotExists;           rhs = &s[1]; lhs = rhs; opP = s; }
   else                                       { op  = SfopExists;              rhs = s;              }
 
   // Mark the end of LHS
@@ -557,6 +584,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     free(toFree);
     return false;
   }
+
   if (forbiddenChars(lhs, ""))
   {
     if (type == SftQ)
@@ -574,6 +602,13 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
 
   // Now, finally, set the name of the left-hand-side in this object
   left = lhs;
+
+
+  //
+  // Now, is the left hand side just the name of an attribute/metadata?
+  // Or, is it a path to an item in a complex value?
+  //
+  lhsParse();
 
   //
   // Check for empty RHS
@@ -595,25 +630,12 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   {
     if (type == SftMq)
     {
-      std::string rhSide = std::string(rhs);
-      char*       start  = (char*) rhSide.c_str();
-      char*       dotP   = strchr(start, '.');
-
-      if (dotP == NULL)
+      if (metadataName == "")
       {
         *errorStringP = "no metadata in right-hand-side of q-item";
         free(toFree);
         return false;
       }
-
-      *dotP = 0;
-      ++dotP;
-      attributeName = start;
-      metadataName  = dotP;
-    }
-    else
-    {
-      attributeName = rhs;
     }
   }
   else
@@ -647,6 +669,57 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
 
   free(toFree);
   return b;
+}
+
+
+
+/* ****************************************************************************
+*
+* StringFilterItem::lhsParse - 
+*/
+void StringFilterItem::lhsParse(void)
+{
+  char* start = (char*) left.c_str();
+  char* dotP  = strchr(start, '.');
+
+  if (dotP == NULL)
+  {
+    attributeName = start;
+    metadataName  = "";
+    compoundPath  = "";
+    return;
+  }
+  
+  *dotP = 0;
+  
+  attributeName = start;
+
+  // If MQ, a second dot must be found in order for LHS to be about compounds
+  if (type == SftMq)
+  {
+    ++dotP;  // Step over the first dot
+    char* dot2P = strchr(dotP, '.');
+
+    metadataName  = dotP;
+
+    if (dot2P == NULL)
+    {
+      compoundPath  = "";
+      return;
+    }
+
+    *dot2P = 0;
+    compoundPath = dotP;
+    dotP = dot2P;
+  }
+
+  //
+  // So, now 'dotP' is pointing to the dot after attribute/metadata.
+  // The rest of the 'path' in lhs is about an item in a compound value
+  //
+  *dotP = 0;
+  ++dotP;
+  compoundPath = dotP;
 }
 
 
@@ -1255,7 +1328,20 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       left = itemP->attributeName;
     }
 
-    if (left == DATE_CREATED)
+ 
+    //
+    // Also, if the left hand side contains a compound path, then we are
+    // dealing with matching of a compound item.
+    //
+    if (itemP->compoundPath.size() != 0)
+    {
+      if (itemP->type == SftQ)
+      {
+        left = std::string(ENT_ATTRS) + "." + itemP->attributeName + "." + ENT_ATTRS_VALUE + "." + itemP->compoundPath;
+        k = left;
+      }
+    }
+    else if (left == DATE_CREATED)
     {
       k = ENT_CREATION_DATE;
     }
@@ -1268,86 +1354,75 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
     }
 
-
     switch (itemP->op)
     {
     case SfopExists:
-      k = std::string(ENT_ATTRS) + "." + left;
       bb.append("$exists", true);
       bob.append(k, bb.obj());
       f = bob.obj();
       break;
 
     case SfopNotExists:
-      k = std::string(ENT_ATTRS) + "." + left;
       bb.append("$exists", false);
       bob.append(k, bb.obj());
       f = bob.obj();
       break;
 
     case SfopEquals:
-      if ((itemP->valueType == SfvtNumberRange) || (itemP->valueType == SfvtDateRange))
+      switch (itemP->valueType)
       {
+      case SfvtNumberRange:
+      case SfvtDateRange:
         bb.append("$gte", itemP->numberRangeFrom).append("$lte", itemP->numberRangeTo);
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
-      else if (itemP->valueType == SfvtStringRange)
-      {
+        break;
+
+      case SfvtStringRange:
         bb.append("$gte", itemP->stringRangeFrom).append("$lte", itemP->stringRangeTo);
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
-      else if ((itemP->valueType == SfvtNumberList) || (itemP->valueType == SfvtDateList))
-      {
+        break;
+
+      case SfvtNumberList:
+      case SfvtDateList:
         for (unsigned int ix = 0; ix < itemP->numberList.size(); ++ix)
         {
           ba.append(itemP->numberList[ix]);
         }
-
         bb.append("$in", ba.arr());
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
-      else if (itemP->valueType == SfvtStringList)
-      {
+        break;
+
+      case SfvtStringList:
         for (unsigned int ix = 0; ix < itemP->stringList.size(); ++ix)
         {
           ba.append(itemP->stringList[ix]);
         }
-
         bb.append("$in", ba.arr());
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
-      else if (itemP->valueType == SfvtBool)
-      {
+        break;
+
+      case SfvtBool:
         bb.append("$exists", true).append("$in", BSON_ARRAY(itemP->boolValue));
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
-      else if (itemP->valueType == SfvtNull)
-      {
+        break;
+
+      case SfvtNull:
         *errorStringP = "null values not supported";
         return false;
-      }
-      else if ((itemP->valueType == SfvtNumber) || (itemP->valueType == SfvtDate))
-      {
+        break;
+
+      case SfvtNumber:
+      case SfvtDate:
         bb.append("$exists", true).append("$in", BSON_ARRAY(itemP->numberValue));
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
-      else if (itemP->valueType == SfvtString)
-      {
+        break;
+
+      case SfvtString:
         bb.append("$in", BSON_ARRAY(itemP->stringValue));
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
-      else
-      {
+        break;
+
+      default:
         *errorStringP = "invalid valueType for q-item";
         return false;
+        break;
       }
+
+      bob.append(k, bb.obj());
+      f = bob.obj();
       break;
 
     case SfopDiffers:
@@ -1587,13 +1662,29 @@ bool StringFilter::qMatch(ContextElementResponse* cerP)
     {
       ContextAttribute* caP = cerP->contextElement.getAttribute(itemP->attributeName);
 
-      if ((itemP->op == SfopExists) && (caP == NULL))
+      if (itemP->compoundPath.size() == 0)
       {
-        return false;
+        if ((itemP->op == SfopExists) && (caP == NULL))
+        {
+          return false;
+        }
+        else if ((itemP->op == SfopNotExists) && (caP != NULL))
+        {
+          return false;
+        }
       }
-      else if ((itemP->op == SfopNotExists) && (caP != NULL))
+      else  // compare with an item in the compound value
       {
-        return false;
+        bool exists = caP->compoundItemExists(itemP->compoundPath);
+        
+        if ((itemP->op == SfopExists) && (exists == false))
+        {
+          return false;
+        }
+        else if ((itemP->op == SfopNotExists) && (exists == true))
+        {
+          return false;
+        }
       }
     }
 
@@ -1602,6 +1693,7 @@ bool StringFilter::qMatch(ContextElementResponse* cerP)
     //   - 'dateCreated'     (use the creation date of the contextElement)
     //   - 'dateModified'    (use the modification date of the contextElement)
     //   - attribute name    (use the value of the attribute)
+    //   - compound path     (use the value of the item of the compound value)
     //
     ContextAttribute*  caP = NULL;
     ContextAttribute   ca;

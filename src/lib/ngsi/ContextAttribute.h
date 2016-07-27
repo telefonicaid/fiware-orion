@@ -101,6 +101,7 @@ public:
                      const std::string&  predetectedError,
                      int                 counter);
   ContextAttribute* clone();
+  bool              compoundItemExists(const std::string& compoundPath);
 
 private:
   void bsonAppendAttrValue(mongo::BSONObjBuilder& bsonAttr) const;
