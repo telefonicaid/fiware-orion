@@ -137,9 +137,9 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
     When replace attributes by ID "sdfdsfsd" if it exists and with "normalized" mode
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
+      | parameter   | value                                                      |
+      | error       | NotFound                                                   |
+      | description | The requested entity has not been found. Check type and id |
 
   @entity_id_replace_invalid
   Scenario Outline:  try to replace attributes by entity ID using NGSI v2 with invalid entity id values
@@ -223,7 +223,7 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
       | attributes_name  | pressure |
       | attributes_value | 80       |
     When replace attributes by ID "house_#" if it exists and with "normalized" mode
-    Then verify that receive an "Method not allowed" http code
+    Then verify that receive an "Method Not Allowed" http code
     And verify an error response
       | parameter   | value              |
       | error       | MethodNotAllowed   |
