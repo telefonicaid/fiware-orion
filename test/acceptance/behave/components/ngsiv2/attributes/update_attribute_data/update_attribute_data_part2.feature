@@ -545,7 +545,7 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
     Then verify that receive an "No Content" http code
     And verify that an entity is updated in mongo
 
-  @attribute_value_invalid @BUG_1424 @skip
+  @attribute_value_invalid_2 @BUG_1424
   Scenario Outline:  try to update an attribute by entity ID and attribute name using NGSI v2 without invalid attribute values in update request
     Given  a definition of headers
       | parameter          | value                        |

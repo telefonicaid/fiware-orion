@@ -51,7 +51,7 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
    #   -------------- queries parameters ------------------------------------------
    #   ---  type query parameter ---
 
-  @more_entities @BUG_1346  @skip
+  @more_entities @BUG_1346
   Scenario:  update an attribute by entity ID and attribute name using NGSI v2 with several attribute metadata name without attribute type nor metadatas previously in attribute
     Given  a definition of headers
       | parameter          | value                   |
@@ -229,5 +229,3 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
       | p(flat)             |
       | {\'a\':34}          |
       | [\'34\', \'a\', 45] |
-
-
