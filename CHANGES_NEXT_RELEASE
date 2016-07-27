@@ -22,6 +22,7 @@
 - Fix: A bug fixed in URI param 'q', avoiding false matches when using string match operator (~=) that matches AND some operator that does not match.
 - Add: New param 'mq' (both in URI param for list all entities operation and expression sub-field in subscriptions) for matching in metadata (#1156)
 - Add: FIWARE::StringQuery::Metadata scope (#1156)
+- Add: q-string filters for compound values of attributes (Issue #1156)
 - Add: accepting compound values for metadatas (Issue #1068)
 - Fix: no longer accepting 'keyValues-style' values for metadatas (e.g. "metadata": { "m1": 6 } )
 - Fix: GET /v2/subscriptions/subId error for non existing subscriptions (now using 404 Not Found, previously using 400 Bad Request)
@@ -36,7 +37,6 @@
 - Fix: invalid regex patterns detection (#968)
 - Fix: Better error returned on invalid geoquery (Issue #2174)
 - Fix: Better error returned on attribute not found in GET /v2/entities/<entity-id>/attrs/<attr-name>/value (Issue #2220)
-- Add: q-string filters for compound values of attributes (Issue #1156)
 - Fix: Metadata identification based on just name instead of name+type (metadata representation at DB changed from vector to object)  (#1112)
 - Fix: Distinguish between strings and numbers in q string filter (Issue #1129)
 - Fix: proper response for 'GET /v2/entities/<id>?attrs=<attrName>' and 'GET /v2/entities/<id>/attrs?attrs=<attrName>' when <attrName> doesn't exist (#2241)

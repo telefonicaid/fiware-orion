@@ -42,7 +42,7 @@ using namespace mongo;
 
 
 
-// Temporary debug function
+// FIXME PR: Temporary debug function
 const char* opName(StringFilterOp op)
 {
   switch (op)
