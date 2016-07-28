@@ -1141,7 +1141,7 @@ static bool addTriggeredSubscriptions_withCache
                                                            cSubP->tenant);
     subP->blacklist = cSubP->blacklist;
 
-    subP->fillExpression(cSubP->expression.geometry, cSubP->expression.coords, cSubP->expression.georel);
+    subP->fillExpression(cSubP->expression.georel, cSubP->expression.geometry, cSubP->expression.coords);
 
     std::string errorString;
 
@@ -1576,8 +1576,57 @@ static bool processSubscriptions
       continue;
     }
 
-    /* Check 3: expression (georel, which also uses geometry and coords) */
-    // TBD (issue #1678)
+    /* Check 3: expression (georel, which also uses geometry and coords) */   
+    if ((tSubP->expression.georel != "") && (tSubP->expression.coords != "") && (tSubP->expression.geometry != ""))
+    {
+      LM_I(("FGM: here we go..."));
+      Scope        geoScope;
+      std::string  filterErr;
+
+      if (geoScope.fill("v2", tSubP->expression.geometry, tSubP->expression.coords, tSubP->expression.georel, &filterErr) != 0)
+      {
+        // This has been already checked at subscription creation/update parsing time. Thus, the code cannot reach
+        // this part.
+        //
+        // (Probably the whole if clause will disapear when the missing part of #1705 gets implemented,
+        // moving geo-suff strings to a filter object in TriggeredSubscription class
+
+        LM_E(("Runtime Error (code cannot reach this point, error: %s)", filterErr.c_str()));
+        continue;
+      }
+
+      BSONObj areaFilter;
+      if (!processAreaScopeV2(&geoScope, areaFilter))
+      {
+        // Error in processAreaScopeV2 is intepreted as no-match (conservative approach)
+        continue;
+      }
+
+      // Look in the database of and entity that maches the geo-filters. Note that this query doesn't
+      // check any other filtering condition, asumming they are already checked in other steps.
+      std::string  keyId   = "_id." ENT_ENTITY_ID;
+      std::string  keyType = "_id." ENT_ENTITY_TYPE;
+      std::string  keySp   = "_id." ENT_SERVICE_PATH;
+      std::string  keyLoc  = ENT_LOCATION "." ENT_LOCATION_COORDS;
+      std::string  id      = notifyCerP->contextElement.entityId.id;
+      std::string  type    = notifyCerP->contextElement.entityId.type;
+      std::string  sp      = notifyCerP->contextElement.entityId.servicePath;
+
+      BSONObj query = BSON(keyId << id << keyType << type << keySp << sp << keyLoc << areaFilter);
+
+      unsigned long long n;
+      if (!collectionCount(getEntitiesCollectionName(tenant), query, &n, &filterErr))
+      {
+        // Error in database access is intepreted as no-match (conservative approach)
+        continue;
+      }
+
+      // No result? Then no-match
+      if (n == 0)
+      {
+        continue;
+      }
+    }
 
     /* Send notification */
     LM_T(LmtSubCache, ("NOT ignored: %s", tSubP->cacheSubId.c_str()));
