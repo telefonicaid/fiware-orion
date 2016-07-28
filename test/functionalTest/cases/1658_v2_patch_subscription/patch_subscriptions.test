@@ -159,8 +159,8 @@ echo
 echo
 
 
-echo "09. PATCH /v2/subscriptions (expresssion)"
-echo "========================================="
+echo "09. PATCH /v2/subscriptions (invalid expresssion)"
+echo "================================================="
 payload='
 {
     "subject": {
@@ -460,19 +460,24 @@ Date: REGEX(.*)
 }
 
 
-09. PATCH /v2/subscriptions (expresssion)
-=========================================
-HTTP/1.1 204 No Content
-Content-Length: 0
+09. PATCH /v2/subscriptions (invalid expresssion)
+=================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 137
+Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+{
+    "description": "error parsing geo-query fields: error parsing geometry: Invalid selector in geometry specification",
+    "error": "BadRequest"
+}
 
 
 10. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 451
+Content-Length: 452
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -499,10 +504,10 @@ Date: REGEX(.*)
                 "humidity"
             ],
             "expression": {
-                "coords": "-4.41,-31.51",
-                "geometry": "rectangles",
-                "georel": "far;maxDistance:2",
-                "q": "weight<140"
+                "coords": "-40.4,-3.5",
+                "geometry": "point",
+                "georel": "near;minDistance:5000",
+                "q": "temperature>40"
             }
         },
         "entities": [

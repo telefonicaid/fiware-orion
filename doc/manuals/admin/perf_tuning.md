@@ -11,6 +11,7 @@
 * [Mutex policy impact in performance](#mutex-policy-impact-in-performance)
 * [Outgoing HTTP connections timeout](#outgoing-http-connections-timeout)
 * [Subscription cache](#subscription-cache)
+* [Geo-subscription performance considerations](#geo-subscription-performance-considerations)
 
 ##  MongoDB configuration
 
@@ -279,5 +280,20 @@ to full consistency) but there is more stress on CB and DB. Large intervals mean
 propagate, but the stress on CB and DB is lower.
 
 As a final note, you can disable cache completely using the `-noCache` CLI option, but that is not a recommended configuration.
+
+[Top](#top)
+
+# [Geo-subscription performance considerations]
+
+Current support of georel, geometry and coords expression fields in NGSIv2 subscriptions (aka geo-subscriptions)
+relies in MongoDB geo-query capabilities. While all the other conditions associated to subscriptions (e.g. query filter,
+etc.) are evaluated on a memory image of the updated entity, the one related with the georel, geometry and coords of
+a given subscription needs a query on the DB.
+
+However, note that the impact on performance shouldn't be too heavy (the operation invoked in MongoDB is `count()`
+which is relatively light).
+
+Our [future plan](https://github.com/telefonicaid/fiware-orion/issues/xxxx) is to implement in memory matching
+for geo-subscriptions (as the rest of the conditions), but it is not a priority at the present moment.
 
 [Top](#top)

@@ -51,7 +51,7 @@ payload='
                "q": "temperature>40",
                "geometry": "point",
                "coords": "-40.4,-3.5",
-               "georel": "near;minDistance=5000"
+               "georel": "near;minDistance:5000"
             }
          }
     },
@@ -156,7 +156,7 @@ Date: REGEX(.*)
             "expression": {
                 "coords": "-40.4,-3.5",
                 "geometry": "point",
-                "georel": "near;minDistance=5000",
+                "georel": "near;minDistance:5000",
                 "q": "temperature>40"
             }
         },
@@ -210,7 +210,7 @@ Date: REGEX(.*)
             "expression": {
                 "coords": "-40.4,-3.5",
                 "geometry": "point",
-                "georel": "near;minDistance=5000",
+                "georel": "near;minDistance:5000",
                 "q": "temperature>40"
             }
         },
@@ -263,7 +263,7 @@ Date: REGEX(.*)
             "expression": {
                 "coords": "-40.4,-3.5",
                 "geometry": "point",
-                "georel": "near;minDistance=5000",
+                "georel": "near;minDistance:5000",
                 "q": "temperature>40"
             }
         },
