@@ -70,9 +70,11 @@ Feature: verify fields in log traces with retrieve entity request using NGSI v2.
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+        And modify headers and keep previous values "false"
+      | parameter          | value           |
+      | Fiware-Service     | test_log_traces |
+      | Fiware-ServicePath | /test           |
     When get an entity by ID "room_0"
- #     | parameter | value                       |
- #     | attrs     | temperature_0,temperature_1 |
     Then verify that receive an "OK" http code
     And verify that the entity by ID is returned
     And check in log, label "INFO" and message "Starting transaction from"
