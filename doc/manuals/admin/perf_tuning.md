@@ -286,14 +286,13 @@ As a final note, you can disable cache completely using the `-noCache` CLI optio
 # [Geo-subscription performance considerations]
 
 Current support of georel, geometry and coords expression fields in NGSIv2 subscriptions (aka geo-subscriptions)
-relies in MongoDB geo-query capabilities. While all the other conditions associated to subscriptions (e.g. query filter,
-etc.) are evaluated on a memory image of the updated entity, the one related with the georel, geometry and coords of
-a given subscription needs a query on the DB.
+relies on MongoDB geo-query capabilities. While all other conditions associated to subscriptions (e.g. query filter,
+etc.) are evaluated on a memory image of the updated entity, the ones related with the georel, geometry and coords of
+a given subscription need a query in the DB.
 
 However, note that the impact on performance shouldn't be too heavy (the operation invoked in MongoDB is `count()`
 which is relatively light).
 
-Our [future plan](https://github.com/telefonicaid/fiware-orion/issues/2396) is to implement in memory matching
-for geo-subscriptions (as the rest of the conditions), but it is not a priority at the present moment.
+Our [future plan](https://github.com/telefonicaid/fiware-orion/issues/2396) is to implement geo-subscription matching in memory (as the rest of the conditions), but this is not a priority at the moment.
 
 [Top](#top)
