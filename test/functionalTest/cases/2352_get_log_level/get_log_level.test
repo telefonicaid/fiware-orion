@@ -34,7 +34,7 @@ brokerStart CB 0-255
 # 02. Change log level to INFO
 # 03. GET log-level (INFO)
 # 04. Change log level to 'error'
-# 05. GET log-lvel (ERROR)
+# 05. GET log-level (ERROR)
 #
 
 echo "01. GET initial log-level (DEBUG)"
