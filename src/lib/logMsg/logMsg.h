@@ -38,6 +38,8 @@
 #include <time.h>
 #include <stdint.h>             /* int64, ...                                */
 
+#include <string>               /* std::string                               */
+
 #include "common/globals.h"     /* transactionIdSet,correlatorIdSet          */
 
 #include "common/limits.h"      // FIXME: this should be removed if this library wants to be generic again
@@ -262,10 +264,11 @@ typedef enum LogLevelMask
   LogLevelBug        = 0x00001
 } LogLevelMask;
 
-extern int  lmLevelMask;
-extern void lmLevelMaskSet(int levelMask);
-extern void lmLevelMaskSetString(char* level);
-extern int  lmLevelMaskGet(void);
+extern int         lmLevelMask;
+extern void        lmLevelMaskSet(int levelMask);
+extern void        lmLevelMaskSetString(char* level);
+extern int         lmLevelMaskGet(void);
+extern std::string lmLevelMaskStringGet(void);
 
 
 

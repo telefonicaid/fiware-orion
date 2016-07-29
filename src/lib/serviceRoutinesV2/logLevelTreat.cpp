@@ -42,9 +42,9 @@
 
 /* ****************************************************************************
 *
-* logLevelTreat -
+* changeLogLevel -
 */
-std::string logLevelTreat
+std::string changeLogLevel
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -95,4 +95,23 @@ std::string logLevelTreat
   }
 
   return "";
+}
+
+
+
+/* ****************************************************************************
+*
+* getLogLevel -
+*/
+std::string getLogLevel
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
+{
+  std::string  level = lmLevelMaskStringGet();
+
+  return "{\"level\":\"" + level + "\"}";
 }

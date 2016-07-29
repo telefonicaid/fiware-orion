@@ -1,0 +1,135 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Get log-level via REST
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. GET initial log-level (DEBUG)
+# 02. Change log level to INFO
+# 03. GET log-level (INFO)
+# 04. Change log level to 'error'
+# 05. GET log-level (ERROR)
+#
+
+echo "01. GET initial log-level (DEBUG)"
+echo "================================="
+orionCurl --url /admin/log
+echo
+echo
+
+
+echo "02. Change log level to INFO"
+echo "============================"
+orionCurl --url /admin/log?level=INFO -X PUT
+echo
+echo
+
+
+echo "03. GET log-level (INFO)"
+echo "========================"
+orionCurl --url /admin/log
+echo
+echo
+
+
+echo "04. Change log level to 'error'"
+echo "==============================="
+orionCurl --url /admin/log?level=error -X PUT
+echo
+echo
+
+
+echo "05. GET log-level (ERROR)"
+echo "========================"
+orionCurl --url /admin/log
+echo
+echo
+
+
+--REGEXPECT--
+01. GET initial log-level (DEBUG)
+=================================
+HTTP/1.1 200 OK
+Content-Length: 17
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "level": "DEBUG"
+}
+
+
+02. Change log level to INFO
+============================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. GET log-level (INFO)
+========================
+HTTP/1.1 200 OK
+Content-Length: 16
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "level": "INFO"
+}
+
+
+04. Change log level to 'error'
+===============================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. GET log-level (ERROR)
+========================
+HTTP/1.1 200 OK
+Content-Length: 17
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "level": "ERROR"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -19,14 +19,14 @@ The `-logLevel` option allows to choose which error messages are printed in the 
 
 - NONE: no log at all
 - ERROR: only ERROR messages are logged
-- WARNING (default): WARNING and ERROR messages are logged
-- INFO: INFO, WARNING and ERROR messages are logged
-- DEBUG: DEBUG, INFO, WARNING and ERROR messages are logged
+- WARN (default): WARN and ERROR messages are logged
+- INFO: INFO, WARN and ERROR messages are logged
+- DEBUG: DEBUG, INFO, WARN and ERROR messages are logged
 
 When Orion runs in foreground (i.e. with the `-fg` [CLI argument](cli.md)), it also prints the same log traces
 (but in a simplified way) on the standard output.
 
-The log level can be changed in run-time, using the [admin API](management_api.md) exposed by Orion.
+The log level can be changed (and retrieved) in run-time, using the [admin API](management_api.md) exposed by Orion.
 
 [Top](#top)
 
@@ -68,7 +68,7 @@ The different fields in each line are as follows:
         which designates very severe error events that will
         presumably lead the application to abort. The process can no
         longer work.
-    -   WARNING: This level designates potentially harmful situations.
+    -   WARN: This level designates potentially harmful situations.
         There is a minor problem that should be fixed.
     -   INFO: This level designates informational messages that
         highlight the progress of Orion.
@@ -133,13 +133,13 @@ The different fields in each line are as follows:
 
 Alarm conditions:
 
-| Alarm ID   | Severity   |   Detection strategy                                                                                              | Stop condition                                                                                                                                                                                                                            | Description                                                                                                  | Action
-|:---------- |:----------:|:----------------------------------------------------------------------------------------------------------------- |:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |:------------------------------------------------------------------------------------------------------------ |:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Alarm ID   | Severity   |   Detection strategy                                                                                              | Stop condition                                                                                                                                                                                                                            | Description                                                                                                   | Action
+|:---------- |:----------:|:----------------------------------------------------------------------------------------------------------------- |:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |:------------------------------------------------------------------------------------------------------------- |:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | 1          | CRITICAL   | A FATAL trace is found                                                                                            | N/A                                                                                                                                                                                                                                       | A problem has occurred at Orion Context Broker startup. The FATAL 'msg' field details the particular problem. | Solving the issue that is precluding Orion Context Broker startup, e.g. if the problem was due to the listening port is being used, the solution would be either changing Orion listening port or ending the process that is already using the port.
-| 2          | CRITICAL   | The following ERROR text appears in the 'msg' field: "Runtime Error (`<detail>`)"                                 | N/A                                                                                                                                                                                                                                       | Runtime Error. The `<detail>` text containts the detailed information.          | Restart Orion Context Broker. If it persists (e.g. new Runtime Errors appear within the next hour), scale up the problem to development team.
-| 3          | CRITICAL   | The following ERROR text appears in the 'msg' field: "Raising alarm DatabaseError: `<detail>`"                    | The following ERROR text appears in the 'msg' field: "Releasing alarm DatabaseError". Orion prints this trace when it detects that DB is ok again."                                                                                       | Database Error. The `<detail>` text contains the detailed information.         | Orion is unable to access MongoDB database and/or MongoDB database is not working properly. Check database connection and database status. Once the database is repaired and/or its connection to Orion, the problem should disappear (Orion service restart is not needed). No specific action has to be performed at Orion Context Broker service.
-| 4          | WARNING    | The following WARNING text appear in the 'msg' field: "Raising alarm BadInput `<ip>`: `<detail>`".                | The following WARNING text appears in the 'msg' field: "Releasing alarm BadInput `<ip>`", where <uip> is the same one that triggered the alarm. Orion prints this trace when it receives a correct request from that client.              | Bad Input. The `<detail>` text contains the detailed information.               | The client has sent a request to Orion that doesn't conform to the API specification, e.g. bad URL, bad payload, syntax/semantic error in the request, etc. Depending on the IP, it could correspond to a platform client or to an external third-party client. In any case, the client owner should be reported in order to know and fix the issue. No specific action has to be performed at Orion Context Broker service.
-| 5          | WARNING    | The following WARNING text appears in the 'msg' field: "Raising alarm NotificationError `<url>`: `<detail>`".     | The following WARNING text appears in the 'msg' field: "Releasing alarm NotificationError <url>", where <url> is the same one that triggered the alarm. Orion prints this trace when it successfully sent a notification to that URL.     | Notification Failure. The `<detail>`text contains the detailed information.     | Orion is trying to send the notification to a given receiver and some problem has occurred. It could be due to a problem with the network connectivity or on the receiver, e.g. the receiver is down. In the second case, the owner of the receiver of the notification should be reported. No specific action has to be performed at Orion Context Broker service.
+| 2          | CRITICAL   | The following ERROR text appears in the 'msg' field: "Runtime Error (`<detail>`)"                                 | N/A                                                                                                                                                                                                                                       | Runtime Error. The `<detail>` text containts the detailed information.                                        | Restart Orion Context Broker. If it persists (e.g. new Runtime Errors appear within the next hour), scale up the problem to development team.
+| 3          | CRITICAL   | The following ERROR text appears in the 'msg' field: "Raising alarm DatabaseError: `<detail>`"                    | The following ERROR text appears in the 'msg' field: "Releasing alarm DatabaseError". Orion prints this trace when it detects that DB is ok again."                                                                                       | Database Error. The `<detail>` text contains the detailed information.                                        | Orion is unable to access MongoDB database and/or MongoDB database is not working properly. Check database connection and database status. Once the database is repaired and/or its connection to Orion, the problem should disappear (Orion service restart is not needed). No specific action has to be performed at Orion Context Broker service.
+| 4          | WARNING    | The following WARN text appear in the 'msg' field: "Raising alarm BadInput `<ip>`: `<detail>`".                   | The following WARN text appears in the 'msg' field: "Releasing alarm BadInput `<ip>`", where <uip> is the same one that triggered the alarm. Orion prints this trace when it receives a correct request from that client.                 | Bad Input. The `<detail>` text contains the detailed information.                                             | The client has sent a request to Orion that doesn't conform to the API specification, e.g. bad URL, bad payload, syntax/semantic error in the request, etc. Depending on the IP, it could correspond to a platform client or to an external third-party client. In any case, the client owner should be reported in order to know and fix the issue. No specific action has to be performed at Orion Context Broker service.
+| 5          | WARNING    | The following WARN text appears in the 'msg' field: "Raising alarm NotificationError `<url>`: `<detail>`".        | The following WARN text appears in the 'msg' field: "Releasing alarm NotificationError <url>", where <url> is the same one that triggered the alarm. Orion prints this trace when it successfully sent a notification to that URL.        | Notification Failure. The `<detail>`text contains the detailed information.                                   | Orion is trying to send the notification to a given receiver and some problem has occurred. It could be due to a problem with the network connectivity or on the receiver, e.g. the receiver is down. In the second case, the owner of the receiver of the notification should be reported. No specific action has to be performed at Orion Context Broker service.
 
 By default, Orion only traces the origin (i.e. raising) and end (i.e. releasing) of an alarm, e.g:
 
@@ -148,12 +148,12 @@ By default, Orion only traces the origin (i.e. raising) and end (i.e. releasing)
 time=... | lvl=ERROR | ... Raising alarm DatabaseError: collection: orion.entities - query(): { ... } - exception: ....
 time=... | lvl=ERROR | ... Releasing alarm DatabaseError
 ...
-time=... | lvl=WARNING | ... Raising alarm BadInput 10.0.0.1: JSON Parse Error: <unspecified file>(1): expected object or array
-time=... | lvl=WARNING | ... Releasing alarm BadInput 10.0.0.1
+time=... | lvl=WARN  | ... Raising alarm BadInput 10.0.0.1: JSON Parse Error: <unspecified file>(1): expected object or array
+time=... | lvl=WARN  | ... Releasing alarm BadInput 10.0.0.1
 ...
 
-time=... | lvl=WARNING | ... Raising alarm NotificationError localhost:1028/accumulate: (curl_easy_perform failed: Couldn't connect to server)
-time=... | lvl=WARNING | ... Releasing alarm NotificationError localhost:1028/accumulate
+time=... | lvl=WARN  | ... Raising alarm NotificationError localhost:1028/accumulate: (curl_easy_perform failed: Couldn't connect to server)
+time=... | lvl=WARN  | ... Releasing alarm NotificationError localhost:1028/accumulate
 ```
 
 This means that if the condition that triggered the alarm (e.g. a new invalid request from the 10.0.0.1 client) occurs again between the raising
@@ -161,11 +161,11 @@ and releasing alarm messages, it wouldn't be traced again. However, this behavio
 `-relogAlarms` is used, a log trace is printed every time a triggering conditions happens, e.g:
 
 ```
-time=... | lvl=WARNING | ... Raising alarm BadInput 10.0.0.1: JSON parse error
-time=... | lvl=WARNING | ... Repeated BadInput 10.0.0.1: JSON parse error
-time=... | lvl=WARNING | ... Repeated BadInput 10.0.0.1: JSON parse error
-time=... | lvl=WARNING | ... Repeated BadInput 10.0.0.1: service '/v2/entitiesxx' not found
-time=... | lvl=WARNING | ... Releasing alarm BadInput 0.0.0.0
+time=... | lvl=WARN | ... Raising alarm BadInput 10.0.0.1: JSON parse error
+time=... | lvl=WARN | ... Repeated BadInput 10.0.0.1: JSON parse error
+time=... | lvl=WARN | ... Repeated BadInput 10.0.0.1: JSON parse error
+time=... | lvl=WARN | ... Repeated BadInput 10.0.0.1: service '/v2/entitiesxx' not found
+time=... | lvl=WARN | ... Releasing alarm BadInput 0.0.0.0
 ```
 
 Log traces between "Raising" and "Releasing" messages use "Repeated" in the message text. Note that the details part of the message is not necesarily the same
