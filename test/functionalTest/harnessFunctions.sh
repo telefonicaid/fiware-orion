@@ -518,7 +518,26 @@ function brokerStart()
   shift
   shift
 
-  extraParams=$*
+  # Check for --noCache and --cache options in 'extraParams'
+  xParams=""
+  while [ "$#" != 0 ]
+  do
+    if   [ "$1" == "--noCache" ];            then noCache=ON;
+    elif [ "$1" == "--cache" ];              then noCache=OFF;
+    elif [ "$1" == "-noCache" ];             then noCache=ON;
+    elif [ "$1" == "-cache" ];               then noCache=OFF;
+    else xParams=$xParams' '$1
+    fi
+    shift
+  done
+
+  if [ "$noCache" != "OFF" ]
+  then
+    if [ "$CB_NO_CACHE" == "ON" ] || [ "$noCache"  == "ON" ]
+    then
+      xParams=$xParams' -noCache'
+    fi
+  fi
 
   if [ "$role" == "" ]
   then
@@ -532,7 +551,7 @@ function brokerStart()
   fi
 
   localBrokerStop $role
-  localBrokerStart $role $traceLevels $ipVersion $extraParams
+  localBrokerStart $role $traceLevels $ipVersion $xParams
 }
 
 
