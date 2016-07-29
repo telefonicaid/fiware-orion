@@ -778,9 +778,9 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
     When update or append attributes by ID "trretre" and with "normalized" mode
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                 |
-      | error       | NotFound              |
-      | description | Entity does not exist |
+      | parameter   | value                                                      |
+      | error       | NotFound                                                   |
+      | description | The requested entity has not been found. Check type and id |
 
   @entity_id_update_invalid
   Scenario Outline:  try to update or append attributes by entity ID using NGSI v2 with invalid entity id values
@@ -864,7 +864,7 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | attributes_name  | humidity |
       | attributes_value | 80       |
     When update or append attributes by ID "house_#" and with "normalized" mode
-    Then verify that receive an "Method not allowed" http code
+    Then verify that receive an "Method Not Allowed" http code
     And verify an error response
       | parameter   | value              |
       | error       | MethodNotAllowed   |
