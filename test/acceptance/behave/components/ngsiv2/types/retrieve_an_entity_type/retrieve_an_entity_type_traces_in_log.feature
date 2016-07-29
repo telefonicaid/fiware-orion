@@ -144,6 +144,10 @@ Feature: verify fields in log traces with retrieve an entity type request using 
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value           |
+      | Fiware-Service     | test_log_traces |
+      | Fiware-ServicePath | /test           |
     When get an entity type by type "home"
     Then verify that receive an "OK" http code
     And verify headers in response
