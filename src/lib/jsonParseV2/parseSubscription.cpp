@@ -786,7 +786,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
       }
     }
 
-    // If geometry, coords and georel are filled, then attemp to create a filter scope
+    // If geometry, coords and georel are filled, then attempt to create a filter scope
     // with them
     SubscriptionExpression subExpr = subsP->subject.condition.expression;
     if ((subExpr.georel != "") && (subExpr.geometry != "") && (subExpr.coords != ""))

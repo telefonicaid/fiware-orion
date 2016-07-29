@@ -1590,7 +1590,7 @@ static bool processSubscriptions
         // this part.
         //
         // (Probably the whole if clause will disapear when the missing part of #1705 gets implemented,
-        // moving geo-suff strings to a filter object in TriggeredSubscription class
+        // moving geo-stuff strings to a filter object in TriggeredSubscription class
 
         LM_E(("Runtime Error (code cannot reach this point, error: %s)", filterErr.c_str()));
         continue;
@@ -1599,12 +1599,12 @@ static bool processSubscriptions
       BSONObj areaFilter;
       if (!processAreaScopeV2(&geoScope, areaFilter))
       {
-        // Error in processAreaScopeV2 is intepreted as no-match (conservative approach)
+        // Error in processAreaScopeV2 is interpreted as no-match (conservative approach)
         continue;
       }
 
-      // Look in the database of and entity that maches the geo-filters. Note that this query doesn't
-      // check any other filtering condition, asumming they are already checked in other steps.
+      // Look in the database of an entity that maches the geo-filters. Note that this query doesn't
+      // check any other filtering condition, assuming they are already checked in other steps.
       std::string  keyId   = "_id." ENT_ENTITY_ID;
       std::string  keyType = "_id." ENT_ENTITY_TYPE;
       std::string  keySp   = "_id." ENT_SERVICE_PATH;
@@ -1618,7 +1618,7 @@ static bool processSubscriptions
       unsigned long long n;
       if (!collectionCount(getEntitiesCollectionName(tenant), query, &n, &filterErr))
       {
-        // Error in database access is intepreted as no-match (conservative approach)
+        // Error in database access is interpreted as no-match (conservative approach)
         continue;
       }
 

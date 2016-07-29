@@ -159,7 +159,7 @@ echo
 echo
 
 
-echo "09. PATCH /v2/subscriptions (invalid expresssion)"
+echo "09. PATCH /v2/subscriptions (invalid expression)"
 echo "================================================="
 payload='
 {
@@ -460,7 +460,7 @@ Date: REGEX(.*)
 }
 
 
-09. PATCH /v2/subscriptions (invalid expresssion)
+09. PATCH /v2/subscriptions (invalid expression)
 =================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 137

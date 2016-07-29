@@ -31,11 +31,11 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create entity E1 insise area A
+# 01. Create entity E1 inside area A
 # 02. Create entity E2 outside area A
 # 03. Create subscription covering A (initial notification including E1)
 # 04. Modify E2 location to another point outside A (not notif)
-# 05. Modify E2 location to point insise A (notif)
+# 05. Modify E2 location to point inside A (notif)
 # 06. Modify E1 location to point outise A (not notif)
 # 07. Modify E1 location to point inside A (notif)
 # 08. Modify E1 location to another point inside A (notif)
@@ -68,7 +68,7 @@ accumulatorStart --pretty-print
 # Useful link: http://www.distancecalculator.net/
 #
 
-echo "01. Create entity E1 insise area A"
+echo "01. Create entity E1 inside area A"
 echo "=================================="
 payload='{
   "id": "E1",
@@ -156,7 +156,7 @@ echo
 echo
 
 
-echo "05. Modify E2 location to point insise A (notif)"
+echo "05. Modify E2 location to point inside A (notif)"
 echo "================================================"
 payload='{
   "city": {
@@ -296,7 +296,7 @@ echo
 
 
 --REGEXPECT--
-01. Create entity E1 insise area A
+01. Create entity E1 inside area A
 ==================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -335,7 +335,7 @@ Date: REGEX(.*)
 
 
 
-05. Modify E2 location to point insise A (notif)
+05. Modify E2 location to point inside A (notif)
 ================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
