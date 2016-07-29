@@ -126,7 +126,7 @@ echo
 
 echo "04. Check log-file to make sure the Bad Input alarm is active"
 echo "============================================================="
-grep "BadInput" /tmp/contextBroker.log | cut -d\| -f 9- | cut -d: -f 2-
+grep "BadInput" /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
 echo
 echo
 
@@ -161,7 +161,7 @@ echo
 
 echo "06. Check log-file to make sure the Bad Input alarm is reset"
 echo "============================================================"
-grep "BadInput" /tmp/contextBroker.log | cut -d\| -f 9- | cut -d: -f 2-
+grep "BadInput" /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
 echo
 echo
 
@@ -194,7 +194,7 @@ echo
 
 echo "10. Check log-file to make sure a Runtime Error was provoked due to the invalid subscription"
 echo "============================================================================================"
-grep "malformed URL" /tmp/contextBroker.log | cut -d\| -f 9- | cut -d: -f 2-
+grep "malformed URL" /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
 echo
 echo
 
@@ -244,7 +244,7 @@ Date: REGEX(.*)
 
 04. Check log-file to make sure the Bad Input alarm is active
 =============================================================
- Raising alarm BadInput 0.0.0.0: Invalid URL parsing notification url
+Raising alarm BadInput 0.0.0.0: Invalid URL parsing notification url
 
 
 05. Create a valid subscription for E1/A1
@@ -259,8 +259,8 @@ Date: REGEX(.*)
 
 06. Check log-file to make sure the Bad Input alarm is reset
 ============================================================
- Raising alarm BadInput 0.0.0.0: Invalid URL parsing notification url
- Releasing alarm BadInput 0.0.0.0
+Raising alarm BadInput 0.0.0.0: Invalid URL parsing notification url
+Releasing alarm BadInput 0.0.0.0
 
 
 07. Corrupt reference in subscription (using mongo)
@@ -284,7 +284,7 @@ Date: REGEX(.*)
 
 10. Check log-file to make sure a Runtime Error was provoked due to the invalid subscription
 ============================================================================================
- Runtime Error (not sending NotifyContextRequest: malformed URL: 'badReferenceForSubscription')
+Runtime Error (not sending NotifyContextRequest: malformed URL: 'badReferenceForSubscription')
 
 
 --TEARDOWN--

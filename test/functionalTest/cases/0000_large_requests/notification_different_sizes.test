@@ -176,7 +176,7 @@ grep "HTTP request to send is too large" /tmp/contextBroker.log | wc -l
 # Notification sizes. Note that if don't use the cut, some character in the log line prologue
 # breaks the test harness: @, :, [, ], ~, /, (, ), etc.
 echo "** Notification sizes:"
-grep "to HTTP server" /tmp/contextBroker.log | grep "Sending message" | awk -F\| '{ print $10 }' | awk -F: '{ printf "%s:%s\n", $2, $3 }'
+grep "to HTTP server" /tmp/contextBroker.log | grep "Sending message" | awk -F\| '{ print $10 }' | awk -F= '{ print $2 }'
 
 --REGEXPECT--
 HTTP/1.1 200 OK
@@ -240,9 +240,9 @@ Date: REGEX(.*)
 ** Too large errors:
 1
 ** Notification sizes:
- Sending message 1 to HTTP server: sending message of REGEX((19669|19670|19671|19672|19673|19674|19675)) bytes to HTTP server
- Sending message 2 to HTTP server: sending message of REGEX((21670|21671|21672|21673|21674|21675|21676)) bytes to HTTP server
- Sending message 3 to HTTP server: sending message of REGEX((8100671|8100672|8100673|8100674|8100675|8100676|8100677)) bytes to HTTP server
+Sending message 1 to HTTP server: sending message of REGEX((19669|19670|19671|19672|19673|19674|19675)) bytes to HTTP server
+Sending message 2 to HTTP server: sending message of REGEX((21670|21671|21672|21673|21674|21675|21676)) bytes to HTTP server
+Sending message 3 to HTTP server: sending message of REGEX((8100671|8100672|8100673|8100674|8100675|8100676|8100677)) bytes to HTTP server
 --TEARDOWN--
 #
 # NOTE: the six different sizes above is to cover for different sizes in the version string

@@ -38,24 +38,24 @@ The log format is designed to be processed by tools like
 Each line in the log file is composed by several key-value fields,
 separed by the pipe character (`|`). Example:
 
-    time=2014-07-18T16:39:06.265Z | lvl=INFO | corr=N/A | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=main | comp=Orion | msg=contextBroker.cpp[1217]: Orion Context Broker is running
-    time=2014-07-18T16:39:06.266Z | lvl=INFO | corr=N/A | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=mongoConnect | comp=Orion | msg=MongoGlobal.cpp[122]: Successful connection to database
-    time=2014-07-18T16:39:06.266Z | lvl=INFO | corr=N/A | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=mongoInit | comp=Orion | msg=contextBroker.cpp[1055]: Connected to mongo at localhost:orion
-    time=2014-07-18T16:39:06.452Z | lvl=INFO | corr=N/A | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=main | comp=Orion | msg=contextBroker.cpp[1290]: Startup completed
+    time=2014-07-18T16:39:06.265Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1217]:main | msg=Orion Context Broker is running
+    time=2014-07-18T16:39:06.266Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=MongoGlobal.cpp[122]:mongoConnect | msg=Successful connection to database
+    time=2014-07-18T16:39:06.266Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1055]:mongoInit | msg=Connected to mongo at localhost:orion
+    time=2014-07-18T16:39:06.452Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1290]:main | msg=Startup completed
     ...
-    time=2014-07-18T16:39:22.920Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=pending | subsrv=pending | from=pending | function=connectionTreat | comp=Orion | msg=rest.cpp[615]: Starting transaction from 10.0.0.1:v1/v1/updateContext
-    time=2014-07-18T16:39:22.922Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=processContextElement | comp=Orion | msg=MongoCommonUpdate.cpp[1499]: Database Operation Successful (...)
-    time=2014-07-18T16:39:22.922Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=createEntity | comp=Orion | msg=MongoCommonUpdate.cpp[1318]: Database Operation Successful (...)
-    time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=addTriggeredSubscriptions | comp=Orion | msg=MongoCommonUpdate.cpp[811]: Database Operation Successful (...)
-    time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=addTriggeredSubscriptions | comp=Orion | msg=MongoCommonUpdate.cpp[811]: Database Operation Successful (...)
-    time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=connectionTreat | comp=Orion | msg=rest.cpp[745]: Transaction ended
+    time=2014-07-18T16:39:22.920Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=pending | srv=pending | subsrv=pending | comp=Orion | op=rest.cpp[615]:connectionTreat | msg=Starting transaction from 10.0.0.1:v1/v1/updateContext
+    time=2014-07-18T16:39:22.922Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[1499]:processContextElement | msg=Database Operation Successful (...)
+    time=2014-07-18T16:39:22.922Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[1318]:createEntity | msg=Database Operation Successful (...)
+    time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[811]:addTriggeredSubscriptions | msg=Database Operation Successful (...)
+    time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[811]:addTriggeredSubscriptions | msg=Database Operation Successful (...)
+    time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=rest.cpp[745]:connectionTreat | msg=Transaction ended
     ...
-    time=2014-07-18T16:39:35.415Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | srv=pending | subsrv=pending | from=pending | function=connectionTreat | comp=Orion | msg=rest.cpp[615]: Starting transaction from 10.0.0.2:48373/v1/queryContext
-    time=2014-07-18T16:39:35.416Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | srv=s1 | subsrv=/A | from=10.0.0.2 | function=entitiesQuery | comp=Orion | msg=MongoGlobal.cpp[877]: Database Operation Successful (...)
-    time=2014-07-18T16:39:35.416Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | srv=s1 | subsrv=/A | from=10.0.0.2 | function=connectionTreat | comp=Orion | msg=rest.cpp[745]: Transaction ended
+    time=2014-07-18T16:39:35.415Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | from=pending | srv=pending | subsrv=pending | comp=Orion | op=rest.cpp[615]:connectionTreat | msg=Starting transaction from 10.0.0.2:48373/v1/queryContext
+    time=2014-07-18T16:39:35.416Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | from=10.0.0.2 | srv=s1 | subsrv=/A | comp=Orion | op=MongoGlobal.cpp[877]:entitiesQuery | msg=Database Operation Successful (...)
+    time=2014-07-18T16:39:35.416Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | from=10.0.0.2 | srv=s1 | subsrv=/A | comp=Orion | op=rest.cpp[745]:connectionTreat | msg=Transaction ended
     ...
-    time=2014-07-18T16:44:53.541Z | lvl=INFO | corr=N/A | trans=N/A | corr=N/A | srv=N/A | subsrv=N/A | from=N/A | function=sigHandler | comp=Orion | msg=contextBroker.cpp[968]: Signal Handler (caught signal 2)
-    time=2014-07-18T16:44:53.541Z | lvl=INFO | corr=N/A | trans=N/A | corr=N/A | srv=N/A | subsrv=N/A | from=N/A | function=sigHandler | comp=Orion | msg=contextBroker.cpp[974]: Orion context broker exiting due to receiving a signal
+    time=2014-07-18T16:44:53.541Z | lvl=INFO | corr=N/A | trans=N/A | corr=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[968]:sigHandler | msg=Signal Handler (caught signal 2)
+    time=2014-07-18T16:44:53.541Z | lvl=INFO | corr=N/A | trans=N/A | corr=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[974]:sigHandler | msg=Orion context broker exiting due to receiving a signal
 
 The different fields in each line are as follows:
 
@@ -112,16 +112,17 @@ The different fields in each line are as follows:
         reference element of the subscription, i.e. the URL of the
         callback to send the notification. The last message of both
         transaction types is "Transaction ended".
+-   **from**. Source IP of the HTTP request associated to the transaction, except
+    if the request includes `X-Forwarded-For` header (which overrides the former)
+    or `X-Real-IP` (which overrides `X-Forwarded-For` and source IP).
 -   **srv**. Service associated to the transaction, or "pending" if the
     transaction has started but the service has not been yet obtained.
 -   **subsrv**. Subservice associated to the transaction, or "pending" if the
     transaction has started but the subservice has not been yet obtained.
--   **from**. Source IP of the HTTP request associated to the transaction, except
-    if the request includes `X-Forwarded-For` header (which overrides the former).
--   **function**. The function in the source code that generated the
-    log message. This information is useful for developers only.
 -   **comp (component)**. Current version always uses "Orion" in
     this field.
+-   **op**. The function in the source code that generated the
+    log message. This information is useful for developers only.
 -   **msg (message)**. The actual log message. The text of the message
     include the name of the file and line number generating the trace
     (this information is useful mainly for Orion developers).
@@ -160,11 +161,11 @@ and releasing alarm messages, it wouldn't be traced again. However, this behavio
 `-relogAlarms` is used, a log trace is printed every time a triggering conditions happens, e.g:
 
 ```
-time=... | lvl=WARNING | Raising alarm BadInput 10.0.0.1: JSON parse error
-time=... | lvl=WARNING | Repeated BadInput 10.0.0.1: JSON parse error
-time=... | lvl=WARNING | Repeated BadInput 10.0.0.1: JSON parse error
-time=... | lvl=WARNING | Repeated BadInput 10.0.0.1: service '/v2/entitiesxx' not found
-time=... | lvl=WARNING | Releasing alarm BadInput 0.0.0.0
+time=... | lvl=WARNING | ... Raising alarm BadInput 10.0.0.1: JSON parse error
+time=... | lvl=WARNING | ... Repeated BadInput 10.0.0.1: JSON parse error
+time=... | lvl=WARNING | ... Repeated BadInput 10.0.0.1: JSON parse error
+time=... | lvl=WARNING | ... Repeated BadInput 10.0.0.1: service '/v2/entitiesxx' not found
+time=... | lvl=WARNING | ... Releasing alarm BadInput 0.0.0.0
 ```
 
 Log traces between "Raising" and "Releasing" messages use "Repeated" in the message text. Note that the details part of the message is not necesarily the same
