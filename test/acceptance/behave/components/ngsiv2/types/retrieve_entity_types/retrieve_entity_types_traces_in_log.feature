@@ -129,6 +129,10 @@ Feature: verify fields in log traces with retrieve entity types request using NG
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value           |
+      | Fiware-Service     | test_log_traces |
+      | Fiware-ServicePath | /test           |
     When get entity types
       | parameter | value |
       | options   | count |
