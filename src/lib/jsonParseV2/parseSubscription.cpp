@@ -785,6 +785,21 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
         subsP->subject.condition.expression.georel = georelOpt.value;
       }
     }
+
+    // If geometry, coords and georel are filled, then attempt to create a filter scope
+    // with them
+    SubscriptionExpression subExpr = subsP->subject.condition.expression;
+    if ((subExpr.georel != "") && (subExpr.geometry != "") && (subExpr.coords != ""))
+    {
+      Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
+      std::string  err;
+      if (scopeP->fill("v2", subExpr.geometry, subExpr.coords, subExpr.georel, &err) != 0)
+      {
+        delete scopeP;
+        return badInput(ciP, "error parsing geo-query fields: " + err);
+      }
+      subsP->restriction.scopeVector.push_back(scopeP);
+    }
   }
 
   return "";

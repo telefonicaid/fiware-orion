@@ -155,7 +155,7 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
       | error       | BadRequest                                           |
       | description | metadata name length: 257, max length supported: 256 |
 
-  @attribute_metadata_name_update_without_attr_value @BUG_1868 @skip
+  @attribute_metadata_name_update_without_attr_value @BUG_1868
   Scenario:  try to update an attribute by entity ID and attribute name using NGSI v2 with attribute metadata and  without attribute value
     Given  a definition of headers
       | parameter          | value                                 |
@@ -177,13 +177,9 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
       | metadatas_name  | my_meta |
       | metadatas_value | 5678    |
     When update an attribute by ID "room" and attribute name "temperature" if it exists
-    Then verify that receive an "Bad Request" http code
-    And verify an error response
-      | parameter   | value                                             |
-      | error       | BadRequest                                        |
-      | description | no 'value' for ContextAttribute without keyValues |
+    Then verify that receive an "No Content" http code
+    And verify that an entity is updated in mongo
 
-  @attribute_metadata_name_update_2.row<row.id>
   @attribute_metadata_name_update_2 @BUG_1217
   Scenario Outline:  update an attribute by entity ID and attribute name using NGSI v2 with several attribute metadata name with attribute type previously in attribute
     Given  a definition of headers

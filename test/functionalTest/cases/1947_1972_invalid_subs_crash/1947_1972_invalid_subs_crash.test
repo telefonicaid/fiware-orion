@@ -177,7 +177,7 @@ payload='
                "q": "temperature>40",
                "geometry": "point",
                "coords": "-40.4,-3.5",
-               "georel": "near;minDistance=5000"
+               "georel": "near;minDistance:5000"
             }
          }
     },
@@ -206,7 +206,7 @@ payload='
                "q": "temperature>40",
                "geometry": "point",
                "coords": "-40.4,-3.5",
-               "georel": "near;minDistance=5000"
+               "georel": "near;minDistance:5000"
             }
          }
     },
@@ -242,7 +242,7 @@ payload='
                "q": "temperature>40",
                "geometry": "point",
                "coords": "-40.4,-3.5",
-               "georel": "near;minDistance=5000"
+               "georel": "near;minDistance:5000"
             }
          }
     },
@@ -306,7 +306,7 @@ payload='
                "q": "temperature>40",
                "geometry": "point",
                "coords": "-40.4,-3.5",
-               "georel": "near;minDistance=5000"
+               "georel": "near;minDistance:5000"
             }
          }
     },
@@ -374,7 +374,7 @@ payload='
                "q": {},
                "geometry": "point",
                "coords": "-40.4,-3.5",
-               "georel": "near;minDistance=5000"
+               "georel": "near;minDistance:5000"
             }
          }
     },
@@ -446,7 +446,7 @@ payload='
                "q": "temperature>40",
                "geometry": 1.1,
                "coords": "-40.4,-3.5",
-               "georel": "near;minDistance=5000"
+               "georel": "near;minDistance:5000"
             }
          }
     },
@@ -482,7 +482,7 @@ payload='
                "q": "temperature>40",
                "geometry": "point",
                "coords": [-40.4,-3.5],
-               "georel": "near;minDistance=5000"
+               "georel": "near;minDistance:5000"
             }
          }
     },
@@ -518,7 +518,7 @@ payload='
                "q": "temperature>40",
                "geometry": "point",
                "coords": "-40.4,-3.5",
-               "georel": "near;minDistance=5000"
+               "georel": "near;minDistance:5000"
             }
          }
     },
@@ -554,7 +554,7 @@ payload='
                "q": "temperature>40",
                "geometry": "point",
                "coords": "-40.4,-3.5",
-               "georel": "near;minDistance=5000"
+               "georel": "near;minDistance:5000"
             }
          }
     },
@@ -590,7 +590,7 @@ payload='
                "q": "temperature>40",
                "geometry": "point",
                "coords": "-40.4,-3.5",
-               "georel": "near;minDistance=5000"
+               "georel": "near;minDistance:5000"
             }
          }
     },

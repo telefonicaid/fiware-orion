@@ -97,9 +97,9 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     When create entity group with "1" entities in "normalized" mode
     Then verify that receive several "Unprocessable Entity" http code
     And verify several error responses
-      | parameter   | value                 |
-      | error       | InvalidModification   |
-      | description | Entity already exists |
+      | parameter   | value          |
+      | error       | Unprocessable  |
+      | description | Already Exists |
 
   @already_exists_2 @BUG_1158
   Scenario:  try  to create an entity using NGSI v2 but this entity already exists with entity id and type
@@ -124,9 +124,9 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     When create entity group with "1" entities in "normalized" mode
     Then verify that receive several "Unprocessable Entity" http code
     And verify several error responses
-      | parameter   | value                 |
-      | error       | InvalidModification   |
-      | description | Entity already exists |
+      | parameter   | value          |
+      | error       | Unprocessable  |
+      | description | Already Exists |
 
   @already_exists_3 @BUG_1158
   Scenario:  try  to create an entity using NGSI v2 but this entity already exists with entity id and type and service_path
@@ -152,9 +152,9 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     When create entity group with "1" entities in "normalized" mode
     Then verify that receive several "Unprocessable Entity" http code
     And verify several error responses
-      | parameter   | value                 |
-      | error       | InvalidModification   |
-      | description | Entity already exists |
+      | parameter   | value          |
+      | error       | Unprocessable  |
+      | description | Already Exists |
 
   @maximum_size @BUG_1199
     # 8137 is a way of generating a request longer than 1MB (in fact, 1048594 bytes)
@@ -568,7 +568,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     And verify that entities are stored in mongo
     Examples:
       | attributes | metadatas |
-      | 1          | 1         |
+      | 2          | 2         |
       | 10         | 10        |
       | 50         | 50        |
       | 100        | 100       |

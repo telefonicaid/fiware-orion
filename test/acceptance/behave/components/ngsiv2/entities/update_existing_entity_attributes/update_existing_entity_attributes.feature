@@ -105,9 +105,9 @@ Feature: update attributes by entity ID if it exists using NGSI v2. "PATCH" - /v
     When update attributes by ID "speed" if it exists and with "normalized" mode
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
+      | parameter   | value                                                      |
+      | error       | NotFound                                                   |
+      | description | The requested entity has not been found. Check type and id |
 
   @more_entities_update @BUG_1260
   Scenario:  try to update attributes by entity ID using NGSI v2 with more than one entity with the same id
@@ -584,9 +584,9 @@ Feature: update attributes by entity ID if it exists using NGSI v2. "PATCH" - /v
     When update attributes by ID "<entity_id>" if it exists and with "normalized" mode
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
+      | parameter   | value                                                      |
+      | error       | NotFound                                                   |
+      | description | The requested entity has not been found. Check type and id |
     Examples:
       | entity_id |
       | room_0    |
@@ -626,9 +626,9 @@ Feature: update attributes by entity ID if it exists using NGSI v2. "PATCH" - /v
     When update attributes by ID "utyuty" if it exists and with "normalized" mode
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
+      | parameter   | value                                                      |
+      | error       | NotFound                                                   |
+      | description | The requested entity has not been found. Check type and id |
 
   @entity_id_update_invalid @BUG_1280
   Scenario Outline:  try to update attributes by entity ID using NGSI v2 with invalid entity id values
@@ -716,7 +716,7 @@ Feature: update attributes by entity ID if it exists using NGSI v2. "PATCH" - /v
       | attributes_name   | temperature |
       | attributes_value  | 80          |
     When update attributes by ID "house_#" if it exists and with "normalized" mode
-    Then verify that receive an "Method not allowed" http code
+    Then verify that receive an "Method Not Allowed" http code
     And verify an error response
       | parameter   | value              |
       | error       | MethodNotAllowed   |
@@ -926,9 +926,9 @@ Feature: update attributes by entity ID if it exists using NGSI v2. "PATCH" - /v
     When update attributes by ID "room_1" if it exists and with "normalized" mode
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
+      | parameter   | value                                      |
+      | error       | NotFound                                   |
+      | description | The entity does not have such an attribute |
 
   @append_attributes_with_attr_type @BUG_1784
   Scenario:  try to append new attributes by entity ID using NGSI v2 with attribute type but without metadata in update request
@@ -959,9 +959,9 @@ Feature: update attributes by entity ID if it exists using NGSI v2. "PATCH" - /v
     When update attributes by ID "room_1" if it exists and with "normalized" mode
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
+      | parameter   | value                                      |
+      | error       | NotFound                                   |
+      | description | The entity does not have such an attribute |
 
   @append_attributes_with_metatadata @BUG_1784
   Scenario:  try to append new attributes by entity ID using NGSI v2 with metadata in update request
@@ -995,6 +995,6 @@ Feature: update attributes by entity ID if it exists using NGSI v2. "PATCH" - /v
     When update attributes by ID "room_1" if it exists and with "normalized" mode
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
+      | parameter   | value                                      |
+      | error       | NotFound                                   |
+      | description | The entity does not have such an attribute |

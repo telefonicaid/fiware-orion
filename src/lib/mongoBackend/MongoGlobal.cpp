@@ -835,6 +835,60 @@ static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
 }
 
 
+
+
+/* *****************************************************************************
+*
+* addFilterScope -
+*/
+static void addFilterScope(const Scope* scoP, std::vector<BSONObj> &filters)
+{
+  std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
+
+  if (scoP->type == SCOPE_FILTER_EXISTENCE)
+  {
+    if (scoP->value == SCOPE_VALUE_ENTITY_TYPE)
+    {
+      BSONObj b = scoP->oper == SCOPE_OPERATOR_NOT ?
+            BSON(entityTypeString << BSON("$exists" << false)) :
+            BSON(entityTypeString << BSON("$exists" << true));
+      filters.push_back(b);
+    }
+    else
+    {
+      std::string details = std::string("unknown value for '") + SCOPE_FILTER_EXISTENCE + "' filter: '" + scoP->value + "'";
+      alarmMgr.badInput(clientIp, details);
+    }
+  }
+  else
+  {
+    std::string details = std::string("unknown filter type '") + scoP->type + "'";
+    alarmMgr.badInput(clientIp, details);
+  }
+}
+
+/* ****************************************************************************
+*
+* sortCriteria -
+*
+*/
+static std::string sortCriteria(const std::string& sortToken)
+{
+  if (sortToken == DATE_CREATED)
+  {
+    return ENT_CREATION_DATE;
+  }
+
+  if (sortToken == DATE_MODIFIED)
+  {
+    return ENT_MODIFICATION_DATE;
+  }
+
+  return std::string(ENT_ATTRS) + "." + sortToken + "." + ENT_ATTRS_VALUE;
+}
+
+
+
 /* *****************************************************************************
 *
 * processAreaScopeV2 -
@@ -842,7 +896,7 @@ static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
 * Returns true if areaQuery was filled, false otherwise
 *
 */
-static bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
+bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
 {
   if (!mongoLocationCapable())
   {
@@ -934,57 +988,6 @@ static bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
   }
 
   return true;
-}
-
-
-/* *****************************************************************************
-*
-* addFilterScope -
-*/
-static void addFilterScope(const Scope* scoP, std::vector<BSONObj> &filters)
-{
-  std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
-
-  if (scoP->type == SCOPE_FILTER_EXISTENCE)
-  {
-    if (scoP->value == SCOPE_VALUE_ENTITY_TYPE)
-    {
-      BSONObj b = scoP->oper == SCOPE_OPERATOR_NOT ?
-            BSON(entityTypeString << BSON("$exists" << false)) :
-            BSON(entityTypeString << BSON("$exists" << true));
-      filters.push_back(b);
-    }
-    else
-    {
-      std::string details = std::string("unknown value for '") + SCOPE_FILTER_EXISTENCE + "' filter: '" + scoP->value + "'";
-      alarmMgr.badInput(clientIp, details);
-    }
-  }
-  else
-  {
-    std::string details = std::string("unknown filter type '") + scoP->type + "'";
-    alarmMgr.badInput(clientIp, details);
-  }
-}
-
-/* ****************************************************************************
-*
-* sortCriteria -
-*
-*/
-static std::string sortCriteria(const std::string& sortToken)
-{
-  if (sortToken == DATE_CREATED)
-  {
-    return ENT_CREATION_DATE;
-  }
-
-  if (sortToken == DATE_MODIFIED)
-  {
-    return ENT_MODIFICATION_DATE;
-  }
-
-  return std::string(ENT_ATTRS) + "." + sortToken + "." + ENT_ATTRS_VALUE;
 }
 
 

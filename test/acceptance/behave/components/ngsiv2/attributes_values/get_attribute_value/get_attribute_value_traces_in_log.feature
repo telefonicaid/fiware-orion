@@ -71,9 +71,11 @@ Feature: verify fields in log traces with get attribute value request using NGSI
       | id     | true   |
     And verify that receive several "Created" http code
     # These headers below are appended to previous headers in get request
-    And modify headers and keep previous values "true"
-      | parameter | value      |
-      | Accept    | text/plain |
+    And modify headers and keep previous values "false"
+      | parameter          | value           |
+      | Fiware-Service     | test_log_traces |
+      | Fiware-ServicePath | /test           |
+      | Accept             | text/plain      |
     When get an attribute value by ID "room_1" and attribute name "temperature_0" if it exists
     Then verify that receive an "OK" http code
     And verify that the attribute value by ID is returned

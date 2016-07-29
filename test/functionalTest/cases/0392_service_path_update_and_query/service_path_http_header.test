@@ -73,7 +73,7 @@ echo
 # the final grep -v '/#', to make this functional test work both as normal functest and under the valgrind suite.
 #
 echo "+++++ 6: service paths from log file"
-grep servicePathSplit /tmp/contextBroker.log | awk -F\| '{ print $10 }' | awk -F: '{ printf "%s:%s\n", $2, $3 }' | grep -v '/#'
+grep servicePathSplit /tmp/contextBroker.log | awk -F\| '{ print $10 }' | awk -F= '{ print $2 }' | grep -v '/#'
 echo
 
 
@@ -171,15 +171,15 @@ Date: REGEX(.*)
 }
 
 +++++ 6: service paths from log file
- Service Path 0: '/h0123456789012345678901234567890123456789012345678/h1/h2/h3/h4/h5/h6/h7/h8/h9'
- Service Path 0: '/h01234567890123456789012345678901234567890123456789'
- Service Path 0: '/h1/h2/h3/h4/h5/h6/h7/h8/h9/h10/h11'
- Service Path 0: '/h-1/h2/h3/h4/h5/h6/h7/h8/h9/h9'
- Service Path 0: 'X'
- Service Path 0: '/home/kz/1'
- Service Path 1: '/home/kz/2'
- Service Path 2: '/home/kz/3'
- Service Path 3: '/home/kz/4'
+Service Path 0: '/h0123456789012345678901234567890123456789012345678/h1/h2/h3/h4/h5/h6/h7/h8/h9'
+Service Path 0: '/h01234567890123456789012345678901234567890123456789'
+Service Path 0: '/h1/h2/h3/h4/h5/h6/h7/h8/h9/h10/h11'
+Service Path 0: '/h-1/h2/h3/h4/h5/h6/h7/h8/h9/h9'
+Service Path 0: 'X'
+Service Path 0: '/home/kz/1'
+Service Path 1: '/home/kz/2'
+Service Path 2: '/home/kz/3'
+Service Path 3: '/home/kz/4'
 
 +++++ 7: eleven service paths
 HTTP/1.1 200 OK

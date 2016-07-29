@@ -269,10 +269,10 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 |                                                                                                                                                          |
 |**entities folder**                                                                                                                                       |
 | list_entities                               |    510       | GET     | /v2/entities/                                        | No        | Yes            |
-| create_entity                               |    693       | POST    | /v2/entities/                                        | Yes       | Yes            |    
+| create_entity                               |    695       | POST    | /v2/entities/                                        | Yes       | Yes            |    
 |                                                                                                                                                          |
-| retrieve_entity                             |    220       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |
-| retrieve_entity_attributes                  |    201       | GET     | /v2/entities/`<entity_id>`/attrs                     | No        | Yes            |
+| retrieve_entity                             |    231       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |
+| retrieve_entity_attributes                  |    250       | GET     | /v2/entities/`<entity_id>`/attrs                     | No        | Yes            |
 | update_or_append_entity_attributes          |    823       | POST    | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
 | update_existing_entity_attributes           |    642       | PATCH   | /v2/entities/`<entity_id>`                           | Yes       | Yes            |
 | replace_all_entity_attributes               |    586       | PUT     | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
@@ -280,12 +280,12 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 |                                                                                                                                                          |
 |**attributes folder**                                                                                                                                     |
 | get_attribute_data                          |    254       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | Yes            |   
-| update_attribute_data                       |    610       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | Yes       | Yes            |
-| remove_a_single_attribute                   |    121       | DELETE  | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | Yes            |
+| update_attribute_data                       |    651       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | Yes       | Yes            |
+| remove_a_single_attribute                   |    132       | DELETE  | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | Yes            |
 |                                                                                                                                                          |
 |**attributes_value folder**                                                                                                                               |
-| get_attribute_value                         |    190       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | No        | Yes            |  
-| update_attribute_value                      |    337       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes       | Yes            |
+| get_attribute_value                         |    201       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | No        | Yes            |  
+| update_attribute_value                      |    338       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes       | Yes            |
 |                                                                                                                                                          |
 |**types folder**                                                                                                                                          |
 | retrieve_entity_types                       |     76       | GET     | /v2/types/                                           | No        | Yes            |   
@@ -293,7 +293,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 |                                                                                                                                                          |
 |**subscriptions folder**                                                                                                                                  |
 | retrieve_subscriptions                      |  (pending)   | GET     | /v2/subscriptions                                    | No        | Yes            |   
-| create_a_new_subscription                   |    585       | POST    | /v2/subscriptions                                    | Yes       | No             |   
+| create_a_new_subscription                   |    788       | POST    | /v2/subscriptions                                    | Yes       | No             |   
 |                                                                                                                                                          |
 | retrieve_subscription                       |  (pending)   | GET     | /v2/subscriptions/`<subscription_id>`                | No        | No             |   
 | update_subscription                         |  (pending)   | PATCH   | /v2/subscriptions/`<subscription_id>`                | Yes       | No             |   

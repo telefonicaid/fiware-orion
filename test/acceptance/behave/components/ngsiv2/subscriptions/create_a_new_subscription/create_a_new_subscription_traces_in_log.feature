@@ -28,9 +28,9 @@
 #
 
 
-Feature: verify fields in log traces with retrieve entity request using NGSI v2.
+Feature: verify fields in log traces with update or append entity attributes request using NGSI v2.
   As a context broker user
-  I would like to verify fields in log traces with retrieve entity request using NGSI v2
+  I would like to verify fields in log traces with update or append entity attributes request using NGSI v2
   So that I can manage and use them in my scripts
 
   Actions Before the Feature:
@@ -47,36 +47,36 @@ Feature: verify fields in log traces with retrieve entity request using NGSI v2.
   Setup: stop ContextBroker
 
   @traces_in_log
-  Scenario:  verify log traces using NGSI v2 with retrieve entity request
+  Scenario:  verify log traces using NGSI v2 with create a new subscription request
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_log_traces  |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    # These properties below are used in create request
-    And properties to entities
-      | parameter         | value       |
-      | entities_type     | house       |
-      | entities_id       | room        |
-      | attributes_number | 3           |
-      | attributes_name   | temperature |
-      | attributes_value  | 34          |
-      | attributes_type   | celsius     |
-      | metadatas_number  | 2           |
-      | metadatas_name    | very_hot    |
-      | metadatas_type    | alarm       |
-      | metadatas_value   | hot         |
-    And create entity group with "3" entities in "normalized" mode
-      | entity | prefix |
-      | id     | true   |
-    And verify that receive several "Created" http code
-        And modify headers and keep previous values "false"
-      | parameter          | value           |
-      | Fiware-Service     | test_log_traces |
-      | Fiware-ServicePath | /test           |
-    When get an entity by ID "room_0"
-    Then verify that receive an "OK" http code
-    And verify that the entity by ID is returned
+    # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter                 | value                                                                               |
+      | description               | my first subscription                                                               |
+      | subject_type              | room                                                                                |
+      | subject_idPattern         | .*                                                                                  |
+      | subject_entities_number   | 2                                                                                   |
+      | subject_entities_prefix   | type                                                                                |
+      | condition_attrs           | temperature                                                                         |
+      | condition_attrs_number    | 3                                                                                   |
+      | condition_expression      | q>>>temperature>40&georel>>>near;minDistance:1000&geometry>>>point&coords>>>40,6391 |
+      | notification_http_url     | http://localhost:1234                                                               |
+      | notification_attrs        | temperature                                                                         |
+      | notification_attrs_number | 3                                                                                   |
+      | throttling                | 5                                                                                   |
+      | expires                   | 2016-04-05T14:00:00.00Z                                                             |
+      | status                    | active                                                                              |
+    When create a new subscription
+    Then verify that receive a "Created" http code
+    And verify headers in response
+      | parameter      | value                |
+      | location       | /v2/subscriptions/.* |
+      | content-length | 0                    |
+    And verify that the subscription is stored in mongo
     And check in log, label "INFO" and message "Starting transaction from"
       | trace    | value              |
       | time     | ignored            |
@@ -87,7 +87,7 @@ Feature: verify fields in log traces with retrieve entity request using NGSI v2.
       | from     | pending            |
       | function | lmTransactionStart |
       | comp     | Orion              |
-    And check in log, label "DEBUG" and message "--------------------- Serving request GET /v2/entities/room_0 -----------------"
+    And check in log, label "DEBUG" and message "--------------------- Serving request POST /v2/subscriptions -----------------"
       | trace    | value           |
       | time     | ignored         |
       | corr     | N/A             |

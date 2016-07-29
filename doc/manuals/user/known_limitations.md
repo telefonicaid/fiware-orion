@@ -70,5 +70,5 @@ constrains applies to the one that Orion supports in the NGSIv1 API (NGSIv2 does
 
 Due to underlying DB limitations (see details [here](https://github.com/telefonicaid/fiware-orion/issues/1289)),
 the combined size (sum) of entity id, entity type and entity service path cannot exceed 1014 characters (this is not a typo, 
-it corresponds to 1024 minus 10, details in the aforementioned link ;). If you attemp to overpass the limit you will get 
+it corresponds to 1024 minus 10, details in the aforementioned link ;). If you attempt to overpass the limit you will get
 a 400 BadRequest "Too long entity id/type/servicePath combination" error.

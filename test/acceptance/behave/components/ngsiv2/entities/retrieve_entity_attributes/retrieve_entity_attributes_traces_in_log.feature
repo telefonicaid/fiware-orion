@@ -71,6 +71,10 @@ Feature: verify fields in log traces with retrieve entity attributes request usi
       | id     | true   |
     And verify that receive several "Created" http code
     When get an entity by ID "room_0"
+    And modify headers and keep previous values "false"
+      | parameter          | value           |
+      | Fiware-Service     | test_log_traces |
+      | Fiware-ServicePath | /test           |
     When get attributes in an entity by ID "room_0"
     Then verify that receive an "OK" http code
     And verify that attributes in an entity by ID are returned

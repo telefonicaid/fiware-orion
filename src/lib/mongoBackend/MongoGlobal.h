@@ -258,6 +258,16 @@ extern bool includedEntity(EntityId en, const EntityIdVector& entityIdV);
 extern bool includedAttribute(const ContextRegistrationAttribute& attr, const AttributeList& attrsV);
 
 
+
+/* *****************************************************************************
+*
+* processAreaScopeV2 -
+*
+*/
+extern bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery);
+
+
+
 /* ****************************************************************************
 *
 * entitiesQuery -

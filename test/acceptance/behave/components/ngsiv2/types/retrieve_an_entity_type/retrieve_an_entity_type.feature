@@ -144,12 +144,249 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                |
+      | Fiware-Service     | test_type_happy_path |
+      | Fiware-ServicePath | /test                |
     When get an entity type by type "home"
     Then verify that receive an "OK" http code
     And verify headers in response
       | parameter         | value      |
       | fiware-correlator | [a-f0-9-]* |
     And verify that attributes types by entity type are returned in response based on the info in the recorder
+
+
+  # ------------------------ Content-Type header ----------------------------------------------
+  @with_content_type @BUG_2128
+  Scenario Outline:  get an entity type by type using NGSI v2 API with Content-Type header
+    Given  a definition of headers
+      | parameter          | value                |
+      | Fiware-Service     | test_type_happy_path |
+      | Fiware-ServicePath | /test                |
+      | Content-Type       | application/json     |
+    And initialize entity groups recorder
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | home        |
+      | entities_id       | room1       |
+      | attributes_number | 2           |
+      | attributes_name   | temperature |
+      | attributes_value  | 34          |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | home        |
+      | entities_id       | room2       |
+      | attributes_number | 2           |
+      | attributes_name   | temperature |
+      | attributes_value  | 34          |
+      | attributes_type   | celsius     |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value    |
+      | entities_type     | house    |
+      | entities_id       | room2    |
+      | attributes_number | 2        |
+      | attributes_name   | pressure |
+      | attributes_value  | low      |
+      | attributes_type   | bar      |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value                    |
+      | entities_id       | room3                    |
+      | attributes_number | 2                        |
+      | attributes_name   | timestamp                |
+      | attributes_value  | 2017-06-17T07:21:24.238Z |
+      | attributes_type   | DateTime                 |
+      | metadatas_number  | 2                        |
+      | metadatas_name    | very_hot                 |
+      | metadatas_type    | alarm                    |
+      | metadatas_value   | random=10                |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value     |
+      | entities_type     | car       |
+      | entities_id       | vehicle   |
+      | attributes_number | 2         |
+      | attributes_name   | brake     |
+      | attributes_value  | 25        |
+      | attributes_type   | seconds   |
+      | metadatas_number  | 2         |
+      | metadatas_name    | very_hot  |
+      | metadatas_type    | alarm     |
+      | metadatas_value   | random=10 |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value |
+      | entities_type     | car   |
+      | entities_id       | moto  |
+      | attributes_number | 2     |
+      | attributes_name   | speed |
+      | attributes_value  | 45    |
+      | attributes_type   | km_h  |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                |
+      | Fiware-Service     | test_type_happy_path |
+      | Fiware-ServicePath | /test                |
+      | Content-Type       | <content_type>       |
+    When get an entity type by type "home"
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                                                        |
+      | error       | BadRequest                                                                                   |
+      | description | Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden |
+    Examples:
+      | content_type                      |
+      | application/json                  |
+      | application/xml                   |
+      | application/x-www-form-urlencoded |
+      | multipart/form-data               |
+      | text/plain                        |
+      | text/html                         |
+      | dsfsdfsdf                         |
+      | <sdsd>                            |
+      | (eeqweqwe)                        |
+
+  @with_empty_content_type @BUG_2364 @skip
+  Scenario:  get an entity type by type using NGSI v2 API with Content-Type header and empty value
+    Given  a definition of headers
+      | parameter          | value                |
+      | Fiware-Service     | test_type_happy_path |
+      | Fiware-ServicePath | /test                |
+      | Content-Type       | application/json     |
+    And initialize entity groups recorder
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | home        |
+      | entities_id       | room1       |
+      | attributes_number | 2           |
+      | attributes_name   | temperature |
+      | attributes_value  | 34          |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | home        |
+      | entities_id       | room2       |
+      | attributes_number | 2           |
+      | attributes_name   | temperature |
+      | attributes_value  | 34          |
+      | attributes_type   | celsius     |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value    |
+      | entities_type     | house    |
+      | entities_id       | room2    |
+      | attributes_number | 2        |
+      | attributes_name   | pressure |
+      | attributes_value  | low      |
+      | attributes_type   | bar      |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value                    |
+      | entities_id       | room3                    |
+      | attributes_number | 2                        |
+      | attributes_name   | timestamp                |
+      | attributes_value  | 2017-06-17T07:21:24.238Z |
+      | attributes_type   | DateTime                 |
+      | metadatas_number  | 2                        |
+      | metadatas_name    | very_hot                 |
+      | metadatas_type    | alarm                    |
+      | metadatas_value   | random=10                |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value     |
+      | entities_type     | car       |
+      | entities_id       | vehicle   |
+      | attributes_number | 2         |
+      | attributes_name   | brake     |
+      | attributes_value  | 25        |
+      | attributes_type   | seconds   |
+      | metadatas_number  | 2         |
+      | metadatas_name    | very_hot  |
+      | metadatas_type    | alarm     |
+      | metadatas_value   | random=10 |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value |
+      | entities_type     | car   |
+      | entities_id       | moto  |
+      | attributes_number | 2     |
+      | attributes_name   | speed |
+      | attributes_value  | 45    |
+      | attributes_type   | km_h  |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                |
+      | Fiware-Service     | test_type_happy_path |
+      | Fiware-ServicePath | /test                |
+      | Content-Type       |                      |
+    When get an entity type by type "home"
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                                                        |
+      | error       | BadRequest                                                                                   |
+      | description | Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden |
 
   # ------------------------ Service header ----------------------------------------------
   @service
@@ -190,6 +427,10 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                                  |
+      | Fiware-Service     | the same value of the previous request |
+      | Fiware-ServicePath | /test                                  |
     When get an entity type by type "home"
     Then verify that receive an "OK" http code
     And verify headers in response
@@ -242,6 +483,9 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value |
+      | Fiware-ServicePath | /test |
     When get an entity type by type "home"
     Then verify that receive an "OK" http code
     And verify headers in response
@@ -325,6 +569,10 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                                  |
+      | Fiware-Service     | test_type_service_path                 |
+      | Fiware-ServicePath | the same value of the previous request |
     When get an entity type by type "home"
     Then verify that receive an "OK" http code
     And verify headers in response
@@ -380,6 +628,9 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter      | value                  |
+      | Fiware-Service | test_type_service_path |
     When get an entity type by type "home"
     Then verify that receive an "OK" http code
     And verify headers in response
@@ -478,6 +729,10 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value     |
+      | Fiware-Service     | test_type |
+      | Fiware-ServicePath | /test     |
     When get an entity type by type "the same value of the previous request"
     Then verify that receive an "OK" http code
     And verify headers in response
@@ -525,6 +780,10 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value     |
+      | Fiware-Service     | test_type |
+      | Fiware-ServicePath | /test     |
     When get an entity type by type "fdgdfgdfgdfgfd"
     Then verify that receive an "Not Found" http code
     And verify an error response
@@ -554,6 +813,10 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value     |
+      | Fiware-Service     | test_type |
+      | Fiware-ServicePath | /test     |
     When get an entity type by type ""
     Then verify that receive an "OK" http code
     And verify headers in response
@@ -583,6 +846,10 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value     |
+      | Fiware-Service     | test_type |
+      | Fiware-ServicePath | /test     |
     When get an entity type by type "<types>"
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -599,5 +866,3 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
       | house(flat)         |
       | {\'a\':34}          |
       | [\'34\', \'a\', 45] |
-
-
