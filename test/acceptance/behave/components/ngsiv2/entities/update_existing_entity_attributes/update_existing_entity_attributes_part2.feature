@@ -230,9 +230,9 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
     When update attributes by ID "room_1" if it exists and with "normalized" mode
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
+      | parameter   | value                                      |
+      | error       | NotFound                                   |
+      | description | The entity does not have such an attribute |
     Examples:
       | attributes_value |
       | 34               |
@@ -425,9 +425,9 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
     When update attributes by ID "<entity_id>_0" if it exists in raw and "normalized" modes
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
+      | parameter   | value                                      |
+      | error       | NotFound                                   |
+      | description | The entity does not have such an attribute |
     Examples:
       | entity_id | attributes_value                                                              |
       | room1     | true                                                                          |
@@ -680,9 +680,9 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
     When update attributes by ID "<entity_id>_0" if it exists in raw and "normalized" modes
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
+      | parameter   | value                                      |
+      | error       | NotFound                                   |
+      | description | The entity does not have such an attribute |
     Examples:
       | entity_id | attributes_value                                                              |
       | room1     | true                                                                          |
@@ -901,9 +901,9 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
     When update attributes by ID "room_1" if it exists and with "normalized" mode
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
+      | parameter   | value                                      |
+      | error       | NotFound                                   |
+      | description | The entity does not have such an attribute |
     Examples:
       | attributes_type |
       | 34              |

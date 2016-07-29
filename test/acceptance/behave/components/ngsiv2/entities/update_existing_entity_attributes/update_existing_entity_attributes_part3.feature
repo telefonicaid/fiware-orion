@@ -47,9 +47,7 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
   Setup: stop ContextBroker
 
   # --------------------- attribute metadata name  ------------------------------------
-
-  @attribute_metadata_name_without_meta_type_with_attr_value.row<row.id>
-  @attribute_metadata_name_without_meta_type_with_attr_value @BUG_1217 @ISSUE_1786
+  @attribute_metadata_name_without_meta_type @BUG_1217 @ISSUE_1786
   Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attribute metadata name without metadata type but with attribute value in update request
     Given  a definition of headers
       | parameter          | value                               |
@@ -79,7 +77,7 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | attributes_value | 106                    |
       | metadatas_number | 2                      |
       | metadatas_name   | <attributes_meta_name> |
-      | metadatas_value  | 5678                   |
+      | metadatas_value  | cold                   |
     When update attributes by ID "room_1" if it exists and with "normalized" mode
     Then verify that receive an "No Content" http code
     And verify that an entity is updated in mongo
@@ -87,18 +85,55 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | attributes_meta_name |
       | 34                   |
       | my_meta              |
-      | 34.4E-34             |
-      | temp.34              |
       | temp_34              |
       | temp-34              |
       | TEMP34               |
       | house_flat           |
-      | house.flat           |
       | house-flat           |
       | house@flat           |
       | random=10            |
       | random=100           |
       | random=254           |
+
+ @attribute_metadata_name_without_meta_type @BUG_1217 @ISSUE_1786 @BUG_2394 @skip
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attribute metadata name without metadata type but with attribute value in update request
+    Given  a definition of headers
+      | parameter          | value                               |
+      | Fiware-Service     | test_attribute_metadata_name_update |
+      | Fiware-ServicePath | /test                               |
+      | Content-Type       | application/json                    |
+    # These properties below are used in create request
+    And properties to entities
+      | parameter        | value                  |
+      | entities_type    | house                  |
+      | entities_id      | room                   |
+      | attributes_name  | temperature            |
+      | attributes_value | 345                    |
+      | attributes_type  | celsius                |
+      | metadatas_number | 2                      |
+      | metadatas_name   | <attributes_meta_name> |
+      | metadatas_type   | alarm                  |
+      | metadatas_value  | hot                    |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    # These properties below are used in update request
+    And properties to entities
+      | parameter        | value                  |
+      | attributes_name  | temperature            |
+      | attributes_value | 106                    |
+      | metadatas_number | 2                      |
+      | metadatas_name   | <attributes_meta_name> |
+      | metadatas_value  | cold                   |
+    When update attributes by ID "room_1" if it exists and with "normalized" mode
+    Then verify that receive an "No Content" http code
+    And verify that an entity is updated in mongo
+    Examples:
+      | attributes_meta_name |
+      | 34.4E-34             |
+      | temp.34              |
+      | house.flat           |
 
   @attribute_metadata_name_not_ascii_plain
   Scenario Outline:  try to update an attribute by entity ID using NGSI v2 with not ascii plain attribute metadata name without metadata type but with attribute value in update request
@@ -226,8 +261,7 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | error       | BadRequest                                           |
       | description | metadata name length: 257, max length supported: 256 |
 
-  @attribute_metadata_name_without_meta_type_with_attr_value.row<row.id>
-  @attribute_metadata_name_with_meta_type_with_attr_value @BUG_1217 @ISSUE_1786
+  @attribute_metadata_name_with_meta_type @BUG_1217 @ISSUE_1786
   Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attribute metadata name with metadata type and attribute value in update request
     Given  a definition of headers
       | parameter          | value                               |
@@ -266,18 +300,56 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | attributes_meta_name |
       | 34                   |
       | my_meta              |
-      | 34.4E-34             |
-      | temp.34              |
       | temp_34              |
       | temp-34              |
       | TEMP34               |
       | house_flat           |
-      | house.flat           |
       | house-flat           |
       | house@flat           |
       | random=10            |
       | random=100           |
       | random=254           |
+
+  @attribute_metadata_name_with_meta_type @BUG_1217 @ISSUE_1786 @BUG_2394 @skip
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attribute metadata name with metadata type and attribute value in update request
+    Given  a definition of headers
+      | parameter          | value                               |
+      | Fiware-Service     | test_attribute_metadata_name_update |
+      | Fiware-ServicePath | /test                               |
+      | Content-Type       | application/json                    |
+  # These properties below are used in create request
+    And properties to entities
+      | parameter        | value                  |
+      | entities_type    | house                  |
+      | entities_id      | room                   |
+      | attributes_name  | temperature            |
+      | attributes_value | 345                    |
+      | attributes_type  | celsius                |
+      | metadatas_number | 2                      |
+      | metadatas_name   | <attributes_meta_name> |
+      | metadatas_type   | alarm                  |
+      | metadatas_value  | hot                    |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+  # These properties below are used in update request
+    And properties to entities
+      | parameter        | value                  |
+      | attributes_name  | temperature            |
+      | attributes_value | 106                    |
+      | metadatas_number | 2                      |
+      | metadatas_name   | <attributes_meta_name> |
+      | metadatas_value  | 5678                   |
+      | metadatas_type   | nothing                |
+    When update attributes by ID "room_1" if it exists and with "normalized" mode
+    Then verify that receive an "No Content" http code
+    And verify that an entity is updated in mongo
+    Examples:
+      | attributes_meta_name |
+      | 34.4E-34             |
+      | temp.34              |
+      | house.flat           |
 
   @attribute_metadata_name_without_attr_value @BUG_1217 @ISSUE_1786 @BUG_1789
   Scenario:  try to update an attribute by entity ID using NGSI v2 with several attribute metadata name without metadata type nor attribute value
