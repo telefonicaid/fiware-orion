@@ -293,7 +293,7 @@ then
   fi
 
   vMsg "starting the accumulator"
-  ../../scripts/accumulator-server.py 6666 /test/sub > /tmp/accumulator-server.log 2>&1 &
+  ../../scripts/accumulator-server.py -p 6666 -u /test/sub > /tmp/accumulator-server.log 2>&1 &
   echo "accumulator started - log file in /tmp/accumulator-server.log"
   sleep 1
   vMsg "accumulator running"
@@ -301,7 +301,7 @@ else
   vMsg using external accumulator
 fi
 
-accPid=$(ps aux | grep 'accumulator-server.py 6666' | grep -v grep | awk '{ print $2 }')
+accPid=$(ps aux | grep 'accumulator-server.py -p 6666' | grep -v grep | awk '{ print $2 }')
 if [ "$accPid" == "" ]
 then
   echo "Sorry, cannot find the accumulator process"

@@ -36,15 +36,46 @@ __author__ = 'fermin'
 #   "Content-Type: application/x-www-form-urlencoded" has been problematic in the pass)
 
 from flask import Flask, request, Response
-from sys import argv, exit
+from getopt import getopt, GetoptError
 from datetime import datetime
 from math import trunc
 from time import sleep
+import sys
 import os
 import atexit
 import string
 import signal
 import json
+
+def usage_and_exit(msg):
+    """
+    Print usage message and exit"
+
+    :param msg: optional error message to print
+    """
+
+    if msg != '':
+        print msg
+        print
+
+    usage()
+    sys.exit(1)
+
+
+def usage():
+    """
+    Print usage message
+    """
+
+    print 'Usage: %s -h <host> -p <port> -u <server url> -p -v -h' % os.path.basename(__file__)
+    print ''
+    print 'Parameters:'
+    print "  -h <host> (or '--host <host>'): host to use database to use (default is '0.0.0.0')"
+    print "  -p <port> (or '--port <port'): port to use (default is 1028)"
+    print "  -u <server url> (or '--url <server url>'): server URL to use (default is /accumulate)"
+    print "  -r (or --pretty-print): pretty print mode"
+    print "  -v (or --verbose): verbose"
+    print "  -g (or --help): print this usage message"
 
 
 # This function is registered to be called upon termination
@@ -58,32 +89,30 @@ server_url = '/accumulate'
 verbose    = 0
 pretty     = False
 
-# FIXME: this is a mess... need to use a more ordered way of passing arguments
-if len(argv) > 1:
-    port       = int(argv[1])
+try:
+    opts, args = getopt(sys.argv[1:], 'h:p:u:vrg', ['host=', 'port=', 'url=', 'verbose', 'pretty-print', 'help' ])
+except GetoptError:
+    usage_and_exit('wrong parameter')
 
-if len(argv) > 2:
-    server_url = argv[2]
-
-if len(argv) > 3:
-    if argv[3] == 'on':
+for opt, arg in opts:
+    if opt in ('-g', '--help'):
+        usage()
+        sys.exit(0)
+    elif opt in ('-h', '--host'):
+        host = arg
+    elif opt in ('-u', '--url'):
+        server_url = arg
+    elif opt in ('-p', '--port'):
+        try:
+            port = int(arg)
+        except ValueError:
+            usage_and_exit('port parameter must be an integer')
+    elif opt in ('-v', '--verbose'):
         verbose = 1
-    if argv[3] == '--pretty-print':
+    elif opt in ('-r', '--pretty-printº'):
         pretty = True
     else:
-        host = argv[3]
-
-if len(argv) > 4:
-    if argv[4] == '--pretty-print':
-        pretty = True
-    if argv[4] == 'on':
-        verbose = 1
-
-if len(argv) > 5:
-    if argv[5] == '--pretty-print':
-        pretty = True
-    if argv[5] == 'on':
-        verbose = 1
+        usage_and_exit()
 
 if verbose:
     print "verbose mode is on"
