@@ -1581,7 +1581,6 @@ static bool processSubscriptions
      * (Issue #2396 should solve that) */
     if ((tSubP->expression.georel != "") && (tSubP->expression.coords != "") && (tSubP->expression.geometry != ""))
     {
-      LM_I(("FGM: here we go..."));
       Scope        geoScope;
       std::string  filterErr;
 
