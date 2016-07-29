@@ -293,7 +293,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 |                                                                                                                                                          |
 |**subscriptions folder**                                                                                                                                  |
 | retrieve_subscriptions                      |  (pending)   | GET     | /v2/subscriptions                                    | No        | Yes            |   
-| create_a_new_subscription                   |    585       | POST    | /v2/subscriptions                                    | Yes       | No             |   
+| create_a_new_subscription                   |    788       | POST    | /v2/subscriptions                                    | Yes       | No             |   
 |                                                                                                                                                          |
 | retrieve_subscription                       |  (pending)   | GET     | /v2/subscriptions/`<subscription_id>`                | No        | No             |   
 | update_subscription                         |  (pending)   | PATCH   | /v2/subscriptions/`<subscription_id>`                | Yes       | No             |   

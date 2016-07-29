@@ -197,7 +197,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | {"value": 34} |
       | 234324324     |
 
- @expires_forbidden_chars
+  @expires_forbidden_chars
   Scenario Outline:  create a new subscription using NGSI v2 with forbidden chars in expires
     Given  a definition of headers
       | parameter          | value             |
@@ -230,7 +230,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | 2016-04-05T14:00;00.00Z   |
       | 2016-04-05T(14):00:00.00Z |
 
-  @expires_bad_format @BUG_2303 @skip
+  @expires_bad_format
   Scenario Outline:  create a new subscription using NGSI v2 with bad format in expires
     Given  a definition of headers
       | parameter          | value             |
@@ -275,6 +275,31 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | 2016-04-05T14:10-00.00Z |
       | 2016-04-05T14:10:x0.00Z |
       | 2016-04-05T14:10:.00Z   |
+
+  @expires_bad_format @BUG_2303 @skip
+  Scenario Outline:  create a new subscription using NGSI v2 with bad format in expires
+    Given  a definition of headers
+      | parameter          | value             |
+      | Fiware-Service     | test_csub_expires |
+      | Fiware-ServicePath | /test             |
+      | Content-Type       | application/json  |
+    # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter              | value                 |
+      | description            | my first subscription |
+      | subject_type           | room                  |
+      | subject_idPattern      | .*                    |
+      | condition_attrs        | temperature           |
+      | condition_attrs_number | 3                     |
+      | notification_http_url  | http://localhost:1234 |
+      | notification_attrs     | temperature           |
+      | expires                | <expires>             |
+    When create a new subscription
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                         |
+      | error       | BadRequest                    |
+      | description | expires has an invalid format |
     Examples:
       | expires                  |
       | 2016-04-05T14:10:0x.00Z  |

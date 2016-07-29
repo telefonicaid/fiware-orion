@@ -125,7 +125,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | error       | BadRequest                      |
       | description | max description length exceeded |
 
-  @description_forbidden_chars @BUG_2308 @skip
+  @description_forbidden_chars @BUG_2308
   Scenario Outline:  try to create a new subscription using NGSI v2 with forbidden chars in description value
     Given  a definition of headers
       | parameter          | value            |
@@ -146,9 +146,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                                  |
-      | error       | BadRequest                             |
-      | description | description element has forbidden char |
+      | parameter   | value                               |
+      | error       | BadRequest                          |
+      | description | forbidden characters in description |
     Examples:
       | desc        |
       | house<flat> |
