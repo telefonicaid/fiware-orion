@@ -140,16 +140,18 @@ std::string ContextElement::toJson(RenderFormat renderFormat, const std::vector<
 *
 * ContextElement::getAttribute
 */
-ContextAttribute* ContextElement::getAttribute(std::string attrName)
+ContextAttribute* ContextElement::getAttribute(const std::string& attrName)
 {
   for (unsigned int ix = 0; ix < contextAttributeVector.size(); ++ix)
   {
     ContextAttribute* ca = contextAttributeVector[ix];
+
     if (ca->name == attrName)
     {
       return ca;
     }
   }
+
   return NULL;
 }
 

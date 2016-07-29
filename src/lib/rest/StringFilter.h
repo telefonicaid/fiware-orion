@@ -31,10 +31,20 @@
 
 #include "mongo/client/dbclient.h"
 
-struct ContextAttribute;
-struct Metadata;
+#include "parse/CompoundValueNode.h"
+
+
 
 using namespace mongo;
+
+
+
+/* ****************************************************************************
+*
+* Declaring structs for pointer-usage, to avoid include the headers
+*/
+struct ContextAttribute;
+struct Metadata;
 
 
 
@@ -119,11 +129,11 @@ typedef enum StringFilterValueType
 *   rangeParse           parse a range 'xxx..yyy' and check its validity
 *   listParse            parse a list 'a,b,c,d' and check its validity
 *   listItemAdd          add an item to a list - used by listParse
-*   matchEquals          returns true if '== comparison' with ContextAttribute gives a match
-*   matchPattern         returns true if '~= comparison' with ContextAttribute gives a match
-*   matchGreaterThan     returns true if '> comparison' with ContextAttribute gives a match
+*   matchEquals          returns true if '== comparison' gives a match
+*   matchPattern         returns true if '~= comparison' gives a match
+*   matchGreaterThan     returns true if '> comparison' gives a match
 *                        Note that '<= comparisons' use !matchGreaterThan()
-*   matchLessThan        returns true if '< comparison' with ContextAttribute gives a match
+*   matchLessThan        returns true if '< comparison' gives a match
 *                        Note that '>= comparisons' use !matchLessThan()
 */
 class StringFilterItem
@@ -169,17 +179,22 @@ public:
   bool                      listItemAdd(char* s, std::string* errorStringP);
   bool                      matchEquals(ContextAttribute* caP);
   bool                      matchEquals(Metadata* mdP);
+  bool                      matchEquals(orion::CompoundValueNode* cvP);
   bool                      matchPattern(ContextAttribute* caP);
   bool                      matchPattern(Metadata* mdP);
+  bool                      matchPattern(orion::CompoundValueNode* cvP);
   bool                      matchGreaterThan(ContextAttribute* caP);
   bool                      matchGreaterThan(Metadata* mdP);
+  bool                      matchGreaterThan(orion::CompoundValueNode* cvP);
   bool                      matchLessThan(ContextAttribute* caP);
   bool                      matchLessThan(Metadata* mdP);
+  bool                      matchLessThan(orion::CompoundValueNode* cvP);
   bool                      fill(StringFilterItem* sfiP, std::string* errorStringP);
 
 private:
   bool                      compatibleType(ContextAttribute* caP);
   bool                      compatibleType(Metadata* mdP);
+  bool                      compatibleType(orion::CompoundValueNode* cvP);
 };
 
 

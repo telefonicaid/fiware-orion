@@ -40,6 +40,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
 #include "rest/OrionError.h"
+#include "parse/CompoundValueNode.h"
 
 #include "mongo/client/dbclient.h"
 #include "mongoBackend/dbConstants.h"
@@ -1100,7 +1101,7 @@ ContextAttribute* ContextAttribute::clone(void)
 *
 * ContextAttribute::compoundItemExists - 
 */
-bool ContextAttribute::compoundItemExists(const std::string& compoundPath)
+bool ContextAttribute::compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP)
 {
   std::vector<std::string>   compoundPathV;
   orion::CompoundValueNode*  current = compoundValueP;
@@ -1141,6 +1142,11 @@ bool ContextAttribute::compoundItemExists(const std::string& compoundPath)
     {
       return false;
     }
+  }
+
+  if (compoundItemPP != NULL)
+  {
+    *compoundItemPP = current;
   }
 
   return true;
