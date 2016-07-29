@@ -84,7 +84,7 @@ echo
 
 echo "07. grep in log-file"
 echo "===================="
-egrep 'Raising alarm|Releasing alarm' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F']:' '{ print $2 }'
+egrep 'Raising alarm|Releasing alarm' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
 echo
 echo
 
@@ -175,9 +175,9 @@ Date: REGEX(.*)
 
 07. grep in log-file
 ====================
- Raising alarm BadInput 0.0.0.0: service '/v2/noService' not found
- Releasing alarm BadInput 0.0.0.0
- Raising alarm BadInput 0.0.0.0: bad verb for url '/v2/entities', method 'PROUST'
+Raising alarm BadInput 0.0.0.0: service '/v2/noService' not found
+Releasing alarm BadInput 0.0.0.0
+Raising alarm BadInput 0.0.0.0: bad verb for url '/v2/entities', method 'PROUST'
 
 
 --TEARDOWN--

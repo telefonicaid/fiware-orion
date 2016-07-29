@@ -499,6 +499,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "Origin") == 0)            headerP->origin         = value;
   else if (strcasecmp(key.c_str(), "Fiware-Service") == 0)    headerP->tenant         = value;
   else if (strcasecmp(key.c_str(), "X-Auth-Token") == 0)      headerP->xauthToken     = value;
+  else if (strcasecmp(key.c_str(), "X-Real-IP") == 0)         headerP->xrealIp        = value;
   else if (strcasecmp(key.c_str(), "X-Forwarded-For") == 0)   headerP->xforwardedFor  = value;
   else if (strcasecmp(key.c_str(), "Fiware-Correlator") == 0) headerP->correlator     = value;
   else if (strcasecmp(key.c_str(), "Fiware-Servicepath") == 0)
@@ -1141,15 +1142,19 @@ static int connectionTreat
     //
     lmTransactionStart("from", ip, port, url);  // Incoming REST request starts
 
-
-    /* X-Forwared-For (used by a potential proxy on top of Orion) overrides ip */
-    if (ciP->httpHeaders.xforwardedFor == "")
+    /* X-Real-IP and X-Forwared-For (used by a potential proxy on top of Orion) overrides ip.
+       X-Rreal-IP takes preference over X-Forwared-For, if both appear */
+    if (ciP->httpHeaders.xrealIp != "")
     {
-      lmTransactionSetFrom(ip);
+      lmTransactionSetFrom(ciP->httpHeaders.xrealIp.c_str());
+    }
+    else if (ciP->httpHeaders.xforwardedFor != "")
+    {
+      lmTransactionSetFrom(ciP->httpHeaders.xforwardedFor.c_str());
     }
     else
     {
-      lmTransactionSetFrom(ciP->httpHeaders.xforwardedFor.c_str());
+      lmTransactionSetFrom(ip);
     }
 
     char tenant[SERVICE_NAME_MAX_LEN + 1];
