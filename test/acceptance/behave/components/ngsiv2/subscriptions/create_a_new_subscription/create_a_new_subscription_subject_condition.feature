@@ -678,7 +678,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | my_time==2016-04-05T14:00:00.00Z...2017-04-05T14:00:00.00Z | invalid range: types mixed         |
 
   # ------------ subject - condition - expression - georel ---------------------
-  @condition_expression_georel
+  @condition_expression_georel  @condition_expression_georel.row<row.id>
   Scenario Outline: create a new subscription using NGSI v2 with "georel" condition expression and allowed values
     Given  a definition of headers
       | parameter          | value                            |
@@ -704,8 +704,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     And verify that the subscription is stored in mongo
     Examples:
       | georel                | geometry | coords                                                      |
-      | near;MaxDistance:1000 | point    | 25.774,-80.190                                              |
-      | near;MinDistance:1000 | point    | 25.774,-80.190                                              |
+      | near;maxDistance:1000 | point    | 25.774,-80.190                                              |
+      | near;minDistance:1000 | point    | 25.774,-80.190                                              |
       | coveredBy             | box      | 25.774,-80.190;18.466,-66.118                               |
       | coveredBy             | polygon  | 25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190 |
       | intersects            | point    | 25.774,-80.190                                              |
@@ -721,7 +721,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | disjoint              | box      | 25.774,-80.190;18.466,-66.118                               |
       | disjoint              | polygon  | 25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190 |
 
-  @condition_expression_georel_without_geometry @ISSUE_2002 @skip
+  @condition_expression_georel_without_geometry @ISSUE_2002 @ISSUE_2406 @skip
   Scenario Outline: try to create a new subscription using NGSI v2 with "georel" condition expression and without geometry field
     Given  a definition of headers
       | parameter          | value                                  |
@@ -753,7 +753,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | equals                |
       | disjoint              |
 
-  @condition_expression_georel_unknown @ISSUE_2002 @skip
+  @condition_expression_georel_unknown @ISSUE_2002
   Scenario: try to create a new subscription using NGSI v2 with "georel" condition expression and unknown value
     Given  a definition of headers
       | parameter          | value                                  |
@@ -773,11 +773,11 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                              |
-      | error       | BadRequest                                                         |
-      | description | Expression not supported: Invalid selector in georel specification |
+      | parameter   | value                                                                |
+      | error       | BadRequest                                                           |
+      | description | error parsing geo-query fields: Invalid modifier in georel parameter |
 
-  @condition_expression_geometry_not_allowed @ISSUE_2002 @skip
+  @condition_expression_georel_not_allowed @ISSUE_2002
   Scenario Outline: try to create a new subscription using NGSI v2 with "georel" condition expression and not allowed values
     Given  a definition of headers
       | parameter          | value                                  |
@@ -797,9 +797,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                              |
-      | error       | BadRequest                                                         |
-      | description | Expression not supported: Invalid selector in georel specification |
+      | parameter   | value                                                                |
+      | error       | BadRequest                                                           |
+      | description | error parsing geo-query fields: Invalid modifier in georel parameter |
     Examples:
       | georel     |
       | room       |
@@ -819,7 +819,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | random=100 |
       | random=256 |
 
-  @condition_expression_georel_near_only @ISSUE_2002 @skip
+  @condition_expression_georel_near_only @ISSUE_2002
   Scenario: try to create a new subscription using NGSI v2 with "georel" condition expression with "near" as value and without either minDistance nor maxDistance
     Given  a definition of headers
       | parameter          | value                                  |
@@ -839,11 +839,11 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                                              |
-      | error       | BadRequest                                                                         |
-      | description | Expression not supported: georel /near/ without either minDistance nor maxDistance |
+      | parameter   | value                                                                                    |
+      | error       | BadRequest                                                                               |
+      | description | error parsing geo-query fields: georel /near/ without either minDistance nor maxDistance |
 
-  @condition_expression_georel_near_not_point @ISSUE_2002 @skip
+  @condition_expression_georel_near_not_point @ISSUE_2002
   Scenario Outline: try to create a new subscription using NGSI v2 with "georel" condition expression with "near" as value and with geometry different of point value
     Given  a definition of headers
       | parameter          | value                                  |
@@ -863,16 +863,16 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                                           |
-      | error       | BadRequest                                                                      |
-      | description | Expression not supported: georel /near/ used with geometry different than point |
+      | parameter   | value                                                                                 |
+      | error       | BadRequest                                                                            |
+      | description | error parsing geo-query fields: georel /near/ used with geometry different than point |
     Examples:
       | geometry |
       | line     |
       | polygon  |
       | box      |
 
-  @condition_expression_georel_coveredBy_not_supported @ISSUE_2002 @skip
+  @condition_expression_georel_coveredBy_not_supported @ISSUE_2002
   Scenario Outline: try to create a new subscription using NGSI v2 with "georel" condition expression with "coveredBy" as value and with geometry value not supported
     Given  a definition of headers
       | parameter          | value                                  |
@@ -892,15 +892,15 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                                              |
-      | error       | BadRequest                                                                         |
-      | description | Expression not supported: <geometry> geometry cannot be used with coveredBy georel |
+      | parameter   | value                                                                                    |
+      | error       | BadRequest                                                                               |
+      | description | error parsing geo-query fields: <geometry> geometry cannot be used with coveredBy georel |
     Examples:
       | geometry | coords                        |
       | point    | 25.774,-80.190                |
       | line     | 25.774,-80.190;18.466,-66.118 |
 
-  @condition_expression_georel_near_not_point @ISSUE_2002 @skip
+  @condition_expression_georel_near_with_invalid_selector @ISSUE_2002
   Scenario Outline: try to create a new subscription using NGSI v2 with "georel" condition expression with "near" as value and with invalid selector
     Given  a definition of headers
       | parameter          | value                                  |
@@ -920,9 +920,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                              |
-      | error       | BadRequest                                                         |
-      | description | Expression not supported: Invalid selector in georel specification |
+      | parameter   | value                                                                |
+      | error       | BadRequest                                                           |
+      | description | error parsing geo-query fields: Invalid modifier in georel parameter |
     Examples:
       | separator |
       | ;         |
@@ -931,7 +931,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | _         |
       | -         |
 
-  @condition_expression_georel_empty @ISSUE_2002 @skip
+  @condition_expression_georel_empty @ISSUE_2002
   Scenario: try to create a new subscription using NGSI v2 with "georel" condition expression with empty value
     Given  a definition of headers
       | parameter          | value                                  |
@@ -951,11 +951,11 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                       |
-      | error       | BadRequest                                                  |
-      | description | Empty right-hand-side for /georel/ Expression not supported |
+      | parameter   | value           |
+      | error       | BadRequest      |
+      | description | georel is empty |
 
-  @condition_expression_georel_forbidden @ISSUE_2002 @skip
+  @condition_expression_georel_forbidden @ISSUE_2002
   Scenario Outline: try to create a new subscription using NGSI v2 with "georel" condition expression with forbidden values
     Given  a definition of headers
       | parameter          | value                                  |
@@ -975,9 +975,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                          |
-      | error       | BadRequest                                                     |
-      | description | Expression not supported: Invalid characters in /georel/ field |
+      | parameter   | value                                                                |
+      | error       | BadRequest                                                           |
+      | description | error parsing geo-query fields: Invalid modifier in georel parameter |
     Examples:
       | georel      |
       | house<flat> |
@@ -1014,8 +1014,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     And verify that the subscription is stored in mongo
     Examples:
       | georel                | geometry | coords                                                      |
-      | near;MaxDistance:1000 | point    | 40.6391                                                     |
-      | near;MinDistance:1000 | point    | 40.6391                                                     |
+      | near;maxDistance:1000 | point    | 25.774,-80.190                                              |
+      | near;minDistance:1000 | point    | 25.774,-80.190                                              |
       | intersects            | point    | 25.774,-80.190                                              |
       | equals                | point    | 25.774,-80.190                                              |
       | disjoint              | point    | 25.774,-80.190                                              |
@@ -1031,7 +1031,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | equals                | polygon  | 25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190 |
       | disjoint              | polygon  | 25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190 |
 
-  @condition_expression_geometry_wo_coords @ISSUE_1678 @skip
+  @condition_expression_geometry_wo_coords @ISSUE_1678 @ISSUE_2406 @skip
   Scenario: try to create a new subscription using NGSI v2 with "geometry" condition expression and without "coords" field
     Given  a definition of headers
       | parameter          | value                                    |
@@ -1055,7 +1055,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | error       | BadRequest                                                             |
       | description | Expression not supported: /geometry/ field used without /coords/ field |
 
-  @condition_expression_geometry_empty @ISSUE_1678 @skip
+  @condition_expression_geometry_empty @ISSUE_1678
   Scenario: try to create a new subscription using NGSI v2 with "geometry" condition expression and with empty value
     Given  a definition of headers
       | parameter          | value                                    |
@@ -1075,11 +1075,11 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                         |
-      | error       | BadRequest                                                    |
-      | description | Empty right-hand-side for /geometry/ Expression not supported |
+      | parameter   | value             |
+      | error       | BadRequest        |
+      | description | geometry is empty |
 
-  @condition_expression_geometry_not_allowed @BUG_1999 @skip
+  @condition_expression_geometry_not_allowed @BUG_1999
   Scenario Outline: try to create a new subscription using NGSI v2 with "geometry" condition expression and not allowed values
     Given  a definition of headers
       | parameter          | value                                    |
@@ -1099,9 +1099,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                                |
-      | error       | BadRequest                                                           |
-      | description | Expression not supported: Invalid selector in geometry specification |
+      | parameter   | value                                                                                              |
+      | error       | BadRequest                                                                                         |
+      | description | error parsing geo-query fields: error parsing geometry: Invalid selector in geometry specification |
     Examples:
       | geometry   |
       | room       |
@@ -1121,7 +1121,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | random=100 |
       | random=256 |
 
-  @condition_expression_geometry_forbidden @BUG_2000 @skip
+  @condition_expression_geometry_forbidden @BUG_2000
   Scenario Outline: try to create a new subscription using NGSI v2 with "geometry" condition expression and forbidden values
     Given  a definition of headers
       | parameter          | value                                    |
@@ -1141,9 +1141,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                                     |
-      | error       | BadRequest                                                                |
-      | description | Expression not supported: Invalid characters in in geometry specification |
+      | parameter   | value                                                                                              |
+      | error       | BadRequest                                                                                         |
+      | description | error parsing geo-query fields: error parsing geometry: Invalid selector in geometry specification |
     Examples:
       | geometry    |
       | house<flat> |
@@ -1154,7 +1154,31 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | house(flat) |
 
   # ------------ subject - condition - expression - coords ---------------------
-  @condition_expression_coords_invalid_point @ISSUE_1678 @skip
+  @condition_expression_coords_only @ISSUE_1678 @ISSUE_2406 @skip
+  Scenario: try to create a new subscription using NGSI v2 with only "coords" condition expression
+    Given  a definition of headers
+      | parameter          | value                            |
+      | Fiware-Service     | test_condition_expression_coords |
+      | Fiware-ServicePath | /test                            |
+      | Content-Type       | application/json                 |
+   # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter             | value                   |
+      | subject_type          | room                    |
+      | subject_idPattern     | .*                      |
+      | condition_attrs       | temperature             |
+      | condition_expression  | coords>>>25.774,-80.190 |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
+    When create a new subscription
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                               |
+      | error       | BadRequest                                                          |
+      | description | error parsing geo-query fields: invalid point in URI param /coords/ |
+
+  @condition_expression_coords_invalid_point @ISSUE_1678
   Scenario Outline: try to create a new subscription using NGSI v2 with "coords" condition expression and invalid point
     Given  a definition of headers
       | parameter          | value                            |
@@ -1174,9 +1198,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                     |
-      | error       | BadRequest                                                |
-      | description | Expression not supported: invalid point in /coords/ field |
+      | parameter   | value                                                               |
+      | error       | BadRequest                                                          |
+      | description | error parsing geo-query fields: invalid point in URI param /coords/ |
     Examples:
       | geometry |
       | point    |
@@ -1184,7 +1208,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | box      |
       | polygon  |
 
-  @condition_expression_coords_invalid_point @ISSUE_1678 @skip
+  @condition_expression_coords_invalid_point @ISSUE_1678
   Scenario Outline: try to create a new subscription using NGSI v2 with "coords" condition expression and invalid point
     Given  a definition of headers
       | parameter          | value                                  |
@@ -1204,16 +1228,15 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                     |
-      | error       | BadRequest                                                |
-      | description | Expression not supported: invalid point in /coords/ field |
+      | parameter   | value                                                               |
+      | error       | BadRequest                                                          |
+      | description | error parsing geo-query fields: invalid point in URI param /coords/ |
     Examples:
       | coords |
       | ,      |
       | .      |
-      | ;      |
 
-  @condition_expression_coords_invalid_coordenates @ISSUE_1678 @skip
+  @condition_expression_coords_invalid_coordenates @ISSUE_1678
   Scenario Outline: try to create a new subscription using NGSI v2 with "coords" condition expression and invalid number of coordinates
     Given  a definition of headers
       | parameter          | value                                  |
@@ -1233,18 +1256,17 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                                    |
-      | error       | BadRequest                                                               |
-      | description | Expression not supported: invalid number of coordinates for /<geometry>/ |
+      | parameter   | value                                                                          |
+      | error       | BadRequest                                                                     |
+      | description | error parsing geo-query fields: invalid number of coordinates for /<geometry>/ |
     Examples:
       | geometry | coords                                                      |
       | point    | 25.774,-80.190;18.466,-66.118                               |
       | point    | 25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190 |
       | line     | 25.774,-80.190                                              |
       | box      | 25.774,-80.190                                              |
-      | box      | 25.774,-80.190;18.466,-66.118;32.321,-64.757;               |
 
-  @condition_expression_coords_few_coords_polygon @ISSUE_1678 @skip
+  @condition_expression_coords_few_coords_polygon @ISSUE_1678
   Scenario Outline: try to create a new subscription using NGSI v2 with "coords" condition expression and too few coordinates for polygon
     Given  a definition of headers
       | parameter          | value                                  |
@@ -1264,11 +1286,38 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                     |
-      | error       | BadRequest                                                |
-      | description | Expression not supported: Too few coordinates for polygon |
+      | parameter   | value                                                           |
+      | error       | BadRequest                                                      |
+      | description | error parsing geo-query fields: Too few coordinates for polygon |
     Examples:
       | coords                                       |
       | 25.774,-80.190                               |
-      | 25.774,-80.190;18.466,-66.118;               |
       | 25.774,-80.190;18.466,-66.118;32.321,-64.757 |
+
+  @condition_expression_coords_invalid_coordenates @ISSUE_1678
+  Scenario Outline: try to create a new subscription using NGSI v2 with "coords" condition expression and invalid number of coordinates
+    Given  a definition of headers
+      | parameter          | value                                  |
+      | Fiware-Service     | test_condition_expression_coords_error |
+      | Fiware-ServicePath | /test                                  |
+      | Content-Type       | application/json                       |
+    # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter             | value                                                   |
+      | subject_type          | room                                                    |
+      | subject_idPattern     | .*                                                      |
+      | condition_attrs       | temperature                                             |
+      | condition_expression  | georel>>>equals&geometry>>><geometry>&coords>>><coords> |
+      | notification_http_url | http://localhost:1234                                   |
+      | notification_attrs    | temperature                                             |
+      | expires               | 2016-04-05T14:00:00.00Z                                 |
+    When create a new subscription
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                               |
+      | error       | BadRequest                                                          |
+      | description | error parsing geo-query fields: invalid point in URI param /coords/ |
+    Examples:
+      | geometry | coords                                        |
+      | polygon  | 25.774,-80.190;18.466,-66.118;                |
+      | box      | 25.774,-80.190;18.466,-66.118;32.321,-64.757; |
