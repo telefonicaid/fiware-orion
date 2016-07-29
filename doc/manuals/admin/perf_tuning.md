@@ -210,7 +210,7 @@ are mainly for Orion developers, to help to identify bugs in the code. Their val
 ## Log impact in performance
 
 [Logs](logs.md) can have a severe impact on performance. Thus, in high level scenarios, it is recommended to use `-logLevel`
-ERROR or WARNING. We have found in some situations that the saving between `-logLevel WARNING` and `-logLevel INFO`
+ERROR or WARN. We have found in some situations that the saving between `-logLevel WARN` and `-logLevel INFO`
 can be around 50% in performance.
 
 [Top](#top)
