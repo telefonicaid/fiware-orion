@@ -1142,8 +1142,8 @@ static int connectionTreat
     //
     lmTransactionStart("from", ip, port, url);  // Incoming REST request starts
 
-    /* X-Real-IP and X-Forwared-For (used by a potential proxy on top of Orion) overrides ip.
-       X-Rreal-IP takes preference over X-Forwared-For, if both appear */
+    /* X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides ip.
+       X-Real-IP takes preference over X-Forwarded-For, if both appear */
     if (ciP->httpHeaders.xrealIp != "")
     {
       lmTransactionSetFrom(ciP->httpHeaders.xrealIp.c_str());
