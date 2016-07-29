@@ -64,7 +64,7 @@ typedef struct ContextElement
   void         fill(const struct ContextElement& ce);
   void         fill(ContextElement* ceP, bool useDefaultType = false);
 
-  ContextAttribute* getAttribute(std::string attrName);
+  ContextAttribute* getAttribute(const std::string& attrName);
 
   std::string  check(ConnectionInfo* ciP,
                      RequestType         requestType,

@@ -101,7 +101,7 @@ public:
                      const std::string&  predetectedError,
                      int                 counter);
   ContextAttribute* clone();
-  bool              compoundItemExists(const std::string& compoundPath);
+  bool              compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
 private:
   void bsonAppendAttrValue(mongo::BSONObjBuilder& bsonAttr) const;

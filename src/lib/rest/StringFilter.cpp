@@ -32,6 +32,7 @@
 #include "common/wsStrip.h"
 #include "common/string.h"
 #include "parse/forbiddenChars.h"
+#include "parse/CompoundValueNode.h"
 #include "rest/StringFilter.h"
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi/ContextAttribute.h"
@@ -869,9 +870,125 @@ bool StringFilterItem::matchEquals(Metadata* mdP)
 /* ****************************************************************************
 *
 * StringFilterItem::matchEquals - 
+*
+* FIXME P2: Note that the Date type doesn't exist in compound values, but as
+*           this *might* be implemented some day, I leave the Data types just as for 
+*           non-compound comparisons. Doesn't really hurt.
+*           Right now, 'Date' in compounds are treated as strings.
+*/
+bool StringFilterItem::matchEquals(orion::CompoundValueNode* cvP)
+{
+  if ((valueType == SfvtNumberRange) || (valueType == SfvtDateRange))
+  {
+    if ((cvP->numberValue < numberRangeFrom) || (cvP->numberValue > numberRangeTo))
+    {
+      return false;
+    }
+  }
+  else if (valueType == SfvtStringRange)
+  {
+    if ((strcmp(cvP->stringValue.c_str(), stringRangeFrom.c_str()) < 0) ||
+        (strcmp(cvP->stringValue.c_str(), stringRangeTo.c_str())   > 0))
+    {
+      return false;
+    }
+  }
+  else if ((valueType == SfvtNumberList) || (valueType == SfvtDateList))
+  {
+    bool match = false;
+
+    // the attribute value has to match at least one of the elements in the vector (OR)
+    for (unsigned int vIx = 0; vIx < numberList.size(); ++vIx)
+    {
+      if (cvP->numberValue == numberList[vIx])
+      {
+        match = true;
+        break;
+      }
+    }
+
+    if (match == false)
+    {
+      return false;
+    }
+  }
+  else if (valueType == SfvtStringList)
+  {
+    bool match = false;
+
+    // the attribute value has to match at least one of the elements in the vector (OR)
+    for (unsigned int vIx = 0; vIx < stringList.size(); ++vIx)
+    {
+      if (cvP->stringValue == stringList[vIx])
+      {
+        match = true;
+        break;
+      }
+    }
+
+    if (match == false)
+    {
+      return false;
+    }
+  }
+  else if ((valueType == SfvtNumber) || (valueType == SfvtDate))
+  {
+    if (cvP->numberValue != numberValue)
+    {
+      return false;
+    }
+  }
+  else if (valueType == SfvtBool)
+  {
+    if (cvP->boolValue != boolValue)
+    {
+      return false;
+    }
+  }
+  else if (valueType == SfvtString)
+  {
+    if (cvP->stringValue != stringValue)
+    {
+      return false;
+    }
+  }
+  else
+  {
+    LM_E(("Runtime Error (valueType '%s' is not treated)", valueTypeName()));
+    return false;
+  }
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* StringFilterItem::matchEquals - 
 */
 bool StringFilterItem::matchEquals(ContextAttribute* caP)
 {
+  //
+  // First of all, are we treating with a compound?
+  // If so, check for errors and if all OK, delegate to other function
+  //
+  if (compoundPath.size() != 0)
+  {
+    orion::CompoundValueNode* compoundValueP;
+
+    if (caP->compoundItemExists(compoundPath, &compoundValueP) == false)
+    {
+      return false;
+    }
+
+    return matchEquals(compoundValueP);
+  }
+
+
+  //
+  // Comparison for non-compound attrribute values
+  //
   if ((valueType == SfvtNumberRange) || (valueType == SfvtDateRange))
   {
     if ((caP->numberValue < numberRangeFrom) || (caP->numberValue > numberRangeTo))
@@ -972,6 +1089,23 @@ bool StringFilterItem::matchEquals(ContextAttribute* caP)
 */
 bool StringFilterItem::matchPattern(ContextAttribute* caP)
 {
+  //
+  // First of all, are we treating with a compound?
+  // If so, check for errors and if all OK, delegate to other function
+  //
+  if (compoundPath.size() != 0)
+  {
+    orion::CompoundValueNode* compoundValueP;
+
+    if (caP->compoundItemExists(compoundPath, &compoundValueP) == false)
+    {
+      return false;
+    }
+
+    return matchPattern(compoundValueP);
+  }
+
+
   // pattern evaluation only makes sense for attributes of type 'string'
   if (caP->valueType != orion::ValueTypeString)
   {
@@ -979,6 +1113,23 @@ bool StringFilterItem::matchPattern(ContextAttribute* caP)
   }
 
   return (regexec(&patternValue, caP->stringValue.c_str(), 0, NULL, 0) == 0);
+}
+
+
+
+/* ****************************************************************************
+*
+* StringFilterItem::matchPattern -
+*/
+bool StringFilterItem::matchPattern(orion::CompoundValueNode* cvP)
+{
+  // pattern evaluation only makes sense for attributes of type 'string'
+  if (cvP->valueType != orion::ValueTypeString)
+  {
+    return false;
+  }
+
+  return (regexec(&patternValue, cvP->stringValue.c_str(), 0, NULL, 0) == 0);
 }
 
 
@@ -1044,10 +1195,47 @@ bool StringFilterItem::compatibleType(Metadata* mdP)
 
 /* ****************************************************************************
 *
+* StringFilterItem::compatibleType -
+*/
+bool StringFilterItem::compatibleType(orion::CompoundValueNode* cvP)
+{
+  if ((cvP->valueType == orion::ValueTypeNumber) && ((valueType == SfvtNumber) || (valueType == SfvtDate)))
+  {
+    return true;
+  }
+
+  if ((cvP->valueType == orion::ValueTypeString) && (valueType == SfvtString))
+  {
+    return true;
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
 * StringFilterItem::matchGreaterThan - 
 */
 bool StringFilterItem::matchGreaterThan(ContextAttribute* caP)
 {
+  //
+  // First of all, are we treating with a compound?
+  // If so, check for errors and if all OK, delegate to other function
+  //
+  if (compoundPath.size() != 0)
+  {
+    orion::CompoundValueNode* compoundValueP;
+
+    if (caP->compoundItemExists(compoundPath, &compoundValueP) == false)
+    {
+      return false;
+    }
+
+    return matchGreaterThan(compoundValueP);
+  }
+
   if (!compatibleType(caP))
   {
     return false;
@@ -1063,6 +1251,37 @@ bool StringFilterItem::matchGreaterThan(ContextAttribute* caP)
   else if (caP->valueType == orion::ValueTypeString)
   {
     if (strcmp(caP->stringValue.c_str(), stringValue.c_str()) > 0)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* StringFilterItem::matchGreaterThan - 
+*/
+bool StringFilterItem::matchGreaterThan(orion::CompoundValueNode* cvP)
+{
+  if (!compatibleType(cvP))
+  {
+    return false;
+  }
+
+  if (cvP->valueType == orion::ValueTypeNumber)
+  {
+    if (cvP->numberValue > numberValue)
+    {
+      return true;
+    }
+  }
+  else if (cvP->valueType == orion::ValueTypeString)
+  {
+    if (strcmp(cvP->stringValue.c_str(), stringValue.c_str()) > 0)
     {
       return true;
     }
@@ -1110,6 +1329,22 @@ bool StringFilterItem::matchGreaterThan(Metadata* mdP)
 */
 bool StringFilterItem::matchLessThan(ContextAttribute* caP)
 {
+  //
+  // First of all, are we treating with a compound?
+  // If so, check for errors and if all OK, delegate to other function
+  //
+  if (compoundPath.size() != 0)
+  {
+    orion::CompoundValueNode* compoundValueP;
+
+    if (caP->compoundItemExists(compoundPath, &compoundValueP) == false)
+    {
+      return false;
+    }
+
+    return matchLessThan(compoundValueP);
+  }
+
   if (!compatibleType(caP))
   {
     return false;
@@ -1125,6 +1360,37 @@ bool StringFilterItem::matchLessThan(ContextAttribute* caP)
   else if (caP->valueType == orion::ValueTypeString)
   {
     if (strcmp(caP->stringValue.c_str(), stringValue.c_str()) < 0)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* StringFilterItem::matchLessThan - 
+*/
+bool StringFilterItem::matchLessThan(orion::CompoundValueNode* cvP)
+{
+  if (!compatibleType(cvP))
+  {
+    return false;
+  }
+
+  if (cvP->valueType == orion::ValueTypeNumber)
+  {
+    if (cvP->numberValue < numberValue)
+    {
+      return true;
+    }
+  }
+  else if (cvP->valueType == orion::ValueTypeString)
+  {
+    if (strcmp(cvP->stringValue.c_str(), stringValue.c_str()) < 0)
     {
       return true;
     }
@@ -1568,14 +1834,18 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
 */
 bool StringFilter::match(ContextElementResponse* cerP)
 {
+  bool b;
+
   if (type == SftQ)
   {
-    return qMatch(cerP);
+    b = qMatch(cerP);
   }
   else
   {
-    return mqMatch(cerP);
+    b = mqMatch(cerP);
   }
+
+  return b;
 }
 
 
@@ -1675,8 +1945,8 @@ bool StringFilter::qMatch(ContextElementResponse* cerP)
       }
       else  // compare with an item in the compound value
       {
-        bool exists = caP->compoundItemExists(itemP->compoundPath);
-        
+        bool exists = (caP != NULL) && (caP->compoundItemExists(itemP->compoundPath) == true);
+
         if ((itemP->op == SfopExists) && (exists == false))
         {
           return false;
@@ -1706,7 +1976,7 @@ bool StringFilter::qMatch(ContextElementResponse* cerP)
     }
     else if (itemP->op != SfopNotExists)
     {
-      caP = cerP->contextElement.getAttribute(itemP->left);
+      caP = cerP->contextElement.getAttribute(itemP->attributeName);
 
       // If the attribute doesn't exist, no need to go further: filter fails
       if (caP == NULL)
