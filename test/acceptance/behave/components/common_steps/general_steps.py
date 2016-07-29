@@ -163,6 +163,17 @@ def check_in_log_label_and_text(context, label, text):
     __logger__.info("...confirmed traces in log")
 
 
+@step(u'delay for "([^"]*)" seconds')
+def delay_for_seconds(context, seconds):
+    """
+    delay for N seconds
+    :param
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.info("delay for \"%s\" seconds" % seconds)
+    time.sleep(int(seconds))
+
+
 # ------------------------------------- validations ----------------------------------------------
 
 
