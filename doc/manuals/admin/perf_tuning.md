@@ -293,7 +293,7 @@ a given subscription needs a query on the DB.
 However, note that the impact on performance shouldn't be too heavy (the operation invoked in MongoDB is `count()`
 which is relatively light).
 
-Our [future plan](https://github.com/telefonicaid/fiware-orion/issues/xxxx) is to implement in memory matching
+Our [future plan](https://github.com/telefonicaid/fiware-orion/issues/2396) is to implement in memory matching
 for geo-subscriptions (as the rest of the conditions), but it is not a priority at the present moment.
 
 [Top](#top)

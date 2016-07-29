@@ -1578,7 +1578,7 @@ static bool processSubscriptions
 
     /* Check 3: expression (georel, which also uses geometry and coords)
      * This should be always the last check, as it is the most expensive one, given that it interacts with DB
-     * (Issue #xxxx should solve that) */
+     * (Issue #2396 should solve that) */
     if ((tSubP->expression.georel != "") && (tSubP->expression.coords != "") && (tSubP->expression.geometry != ""))
     {
       LM_I(("FGM: here we go..."));
