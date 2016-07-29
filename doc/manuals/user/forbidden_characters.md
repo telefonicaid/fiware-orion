@@ -15,7 +15,7 @@ following characters are forbidden in any request:
 -   (
 -   )
 
-Any attemp of using them will result in a NGSI 400 Bad Request response
+Any attempt of using them will result in a NGSI 400 Bad Request response
 like this:
 
     {
