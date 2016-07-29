@@ -25,7 +25,7 @@ String filters for compound values of attributes: more than one filter in 'q'
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0
+brokerStart CB
 
 --SHELL--
 

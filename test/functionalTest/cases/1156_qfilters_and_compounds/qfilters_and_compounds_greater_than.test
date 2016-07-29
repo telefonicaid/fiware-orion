@@ -25,7 +25,7 @@ String filters for compound values of attributes: greater_than
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255
+brokerStart CB
 
 --SHELL--
 
