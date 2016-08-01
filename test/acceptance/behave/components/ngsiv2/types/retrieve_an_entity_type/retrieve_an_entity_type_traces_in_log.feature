@@ -155,30 +155,30 @@ Feature: verify fields in log traces with retrieve an entity type request using 
       | fiware-correlator | [a-f0-9-]* |
     And verify that attributes types by entity type are returned in response based on the info in the recorder
     And check in log, label "INFO" and message "Starting transaction from"
-      | trace    | value              |
-      | time     | ignored            |
-      | trans    | ignored            |
-      | srv      | pending            |
-      | subsrv   | pending            |
-      | from     | pending            |
-      | function | lmTransactionStart |
-      | comp     | Orion              |
+      | trace  | value              |
+      | time   | ignored            |
+      | trans  | ignored            |
+      | srv    | pending            |
+      | subsrv | pending            |
+      | from   | pending            |
+      | op     | lmTransactionStart |
+      | comp   | Orion              |
     And check in log, label "DEBUG" and message "--------------------- Serving request GET /v2/types/home -----------------"
-      | trace    | value           |
-      | time     | ignored         |
-      | corr     | N/A             |
-      | trans    | N/A             |
-      | srv      | N/A             |
-      | subsrv   | N/A             |
-      | from     | N/A             |
-      | function | connectionTreat |
-      | comp     | Orion           |
+      | trace  | value           |
+      | time   | ignored         |
+      | corr   | N/A             |
+      | trans  | N/A             |
+      | srv    | N/A             |
+      | subsrv | N/A             |
+      | from   | N/A             |
+      | op     | connectionTreat |
+      | comp   | Orion           |
     And check in log, label "INFO" and message "Transaction ended"
-      | trace    | value            |
-      | time     | ignored          |
-      | trans    | ignored          |
-      | srv      | test_log_traces  |
-      | subsrv   | /test            |
-      | from     | ignored          |
-      | function | lmTransactionEnd |
-      | comp     | Orion            |
+      | trace  | value            |
+      | time   | ignored          |
+      | trans  | ignored          |
+      | srv    | test_log_traces  |
+      | subsrv | /test            |
+      | from   | ignored          |
+      | op     | lmTransactionEnd |
+      | comp   | Orion            |

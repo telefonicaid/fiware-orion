@@ -78,32 +78,32 @@ Feature: verify fields in log traces with remove entity request using NGSI v2.
     Then verify that receive a "No Content" http code
     And verify that entities are not stored in mongo
     And check in log, label "INFO" and message "Starting transaction from"
-      | trace    | value              |
-      | time     | ignored            |
-      | corr     | ignored            |
-      | trans    | ignored            |
-      | srv      | pending            |
-      | subsrv   | pending            |
-      | from     | pending            |
-      | function | lmTransactionStart |
-      | comp     | Orion              |
+      | trace  | value              |
+      | time   | ignored            |
+      | corr   | ignored            |
+      | trans  | ignored            |
+      | srv    | pending            |
+      | subsrv | pending            |
+      | from   | pending            |
+      | op     | lmTransactionStart |
+      | comp   | Orion              |
     And check in log, label "DEBUG" and message "--------------------- Serving request DELETE /v2/entities/room_1 -----------------"
-      | trace    | value           |
-      | time     | ignored         |
-      | corr     | N/A             |
-      | trans    | N/A             |
-      | srv      | N/A             |
-      | subsrv   | N/A             |
-      | from     | N/A             |
-      | function | connectionTreat |
-      | comp     | Orion           |
+      | trace  | value           |
+      | time   | ignored         |
+      | corr   | N/A             |
+      | trans  | N/A             |
+      | srv    | N/A             |
+      | subsrv | N/A             |
+      | from   | N/A             |
+      | op     | connectionTreat |
+      | comp   | Orion           |
     And check in log, label "INFO" and message "Transaction ended"
-      | trace    | value            |
-      | time     | ignored          |
-      | corr     | ignored          |
-      | trans    | ignored          |
-      | srv      | test_log_traces  |
-      | subsrv   | /test            |
-      | from     | ignored          |
-      | function | lmTransactionEnd |
-      | comp     | Orion            |
+      | trace  | value            |
+      | time   | ignored          |
+      | corr   | ignored          |
+      | trans  | ignored          |
+      | srv    | test_log_traces  |
+      | subsrv | /test            |
+      | from   | ignored          |
+      | op     | lmTransactionEnd |
+      | comp   | Orion            |
