@@ -33,6 +33,10 @@ brokerStart CB
 # 01. Create subscription with errors in geo-fields, get error
 # 02. Create subscription, ok
 # 03. Update subscription with errors in geo-fields, get error
+# 04. Update subscription with partial geo-parameters (one parameter)
+# 05. Update subscription with partial geo-parameters (two parameters)
+# 06. Create subscription with partial geo-parameters (one parameter)
+# 07. Create subscription with partial geo-parameters (two parameters)
 #
 
 echo "01. Create subscription with errors in geo-fields, get error"
@@ -127,6 +131,118 @@ echo
 echo
 
 
+echo "04. Update subscription with partial geo-parameters (one parameter)"
+echo "==================================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "georel": "near;maxDistance:100"
+            }
+         }
+    }
+}
+'
+orionCurl -X PATCH --url "/v2/subscriptions/$subId" --payload "$payload"
+echo
+echo
+
+
+echo "05. Update subscription with partial geo-parameters (two parameters)"
+echo "===================================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "georel": "near;maxDistance:100",
+               "geometry": "point"
+            }
+         }
+    }
+}
+'
+orionCurl -X PATCH --url "/v2/subscriptions/$subId" --payload "$payload"
+echo
+echo
+
+
+echo "06. Create subscription with partial geo-parameters (one parameter)"
+echo "==================================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "georel": "near;maxDistance:100000"
+            }
+         }
+    },
+    "notification": {
+        "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"},
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "07. Create subscription with partial geo-parameters (two parameters)"
+echo "===================================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "georel": "near;maxDistance:100000",
+               "geometry": "point"
+            }
+         }
+    },
+    "notification": {
+        "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"},
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
 --REGEXPECT--
 01. Create subscription with errors in geo-fields, get error
 ============================================================
@@ -162,6 +278,62 @@ Date: REGEX(.*)
 
 {
     "description": "error parsing geo-query fields: invalid point in URI param /coords/",
+    "error": "BadRequest"
+}
+
+
+04. Update subscription with partial geo-parameters (one parameter)
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 119
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "partial geo expression; geometry, georel and coords have to be provided together",
+    "error": "BadRequest"
+}
+
+
+05. Update subscription with partial geo-parameters (two parameters)
+====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 119
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "partial geo expression; geometry, georel and coords have to be provided together",
+    "error": "BadRequest"
+}
+
+
+06. Create subscription with partial geo-parameters (one parameter)
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 119
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "partial geo expression; geometry, georel and coords have to be provided together",
+    "error": "BadRequest"
+}
+
+
+07. Create subscription with partial geo-parameters (two parameters)
+====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 119
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "partial geo expression; geometry, georel and coords have to be provided together",
     "error": "BadRequest"
 }
 

@@ -734,6 +734,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
     }
 
     // geometry
+    int nGeoItems = 0;
     {
       Opt<std::string> geometryOpt = getStringOpt(expression, "geometry");
 
@@ -748,6 +749,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
           return badInput(ciP, "geometry is empty");
         }
         subsP->subject.condition.expression.geometry = geometryOpt.value;
+        nGeoItems++;
       }
     }
 
@@ -766,6 +768,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
           return badInput(ciP, "coords is empty");
         }
         subsP->subject.condition.expression.coords = coordsOpt.value;
+        nGeoItems++;
       }
     }
 
@@ -783,7 +786,13 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
           return badInput(ciP, "georel is empty");
         }
         subsP->subject.condition.expression.georel = georelOpt.value;
+        nGeoItems++;
       }
+    }
+
+    if ((nGeoItems > 0) && (nGeoItems != 3))
+    {
+      return badInput(ciP, "partial geo expression; geometry, georel and coords have to be provided together");
     }
 
     // If geometry, coords and georel are filled, then attempt to create a filter scope
