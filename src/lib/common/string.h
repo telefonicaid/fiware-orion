@@ -27,7 +27,10 @@
 */
 #include <string>
 #include <sstream>
+#include <iomanip>
 #include <vector>
+
+#include "common/limits.h"
 
 // the same macro in parseArg library
 #define FT(x) (x == true)? "true" : "false"
@@ -169,6 +172,10 @@ extern bool str2double(const char* s, double* dP = NULL);
 template <typename T> std::string toString(T t)
 {      
   std::ostringstream ss;
+
+  /* Set format  for floats (it doesn't affect integers). Note that std::fixed
+   * is not used (we have found that it would add spurious decimals in some cases */
+  ss << std::setprecision(PRECISION_DIGITS);
 
   ss << t;
 

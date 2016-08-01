@@ -192,4 +192,14 @@
 */
 #define MAX_DESCRIPTION_LENGTH  1024
 
+
+
+/* ****************************************************************************
+*
+* PRECISION_DIGITS -
+*/
+#define PRECISION_DIGITS 9
+
+
+
 #endif  // SRC_LIB_COMMON_LIMITS_H_

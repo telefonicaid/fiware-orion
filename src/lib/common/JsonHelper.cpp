@@ -25,6 +25,7 @@
 
 #include "common/JsonHelper.h"
 #include "common/string.h"
+#include "common/limits.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -161,8 +162,9 @@ std::string objectToJson(std::map<std::string, std::string>& list)
 */
 JsonHelper::JsonHelper(): empty(true)
 {
-  /* Set format  for floats (it doesn't affect integers) */
-  ss << std::fixed << std::setprecision(9);
+  /* Set format  for floats (it doesn't affect integers). Note that std::fixed
+   * is not used (we have found that it would add spurious decimals in some cases */
+  ss << std::setprecision(PRECISION_DIGITS);
 
   ss << '{';
 }
