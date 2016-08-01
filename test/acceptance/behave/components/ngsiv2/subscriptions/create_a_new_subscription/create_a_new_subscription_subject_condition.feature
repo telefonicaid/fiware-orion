@@ -721,7 +721,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | disjoint              | box      | 25.774,-80.190;18.466,-66.118                               |
       | disjoint              | polygon  | 25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190 |
 
-  @condition_expression_georel_without_geometry @ISSUE_2002 @ISSUE_2406 @skip
+  @condition_expression_georel_without_geometry @ISSUE_2002 @ISSUE_2406
   Scenario Outline: try to create a new subscription using NGSI v2 with "georel" condition expression and without geometry field
     Given  a definition of headers
       | parameter          | value                                  |
@@ -741,9 +741,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                                  |
-      | error       | BadRequest                                                             |
-      | description | Expression not supported: /georel/ field used without /geometry/ field |
+      | parameter   | value                                                                            |
+      | error       | BadRequest                                                                       |
+      | description | partial geo expression; geometry, georel and coords have to be provided together |
     Examples:
       | georel                |
       | near;MaxDistance:1000 |
@@ -1031,7 +1031,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | equals                | polygon  | 25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190 |
       | disjoint              | polygon  | 25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190 |
 
-  @condition_expression_geometry_wo_coords @ISSUE_1678 @ISSUE_2406 @skip
+  @condition_expression_geometry_wo_coords @ISSUE_1678 @ISSUE_2406
   Scenario: try to create a new subscription using NGSI v2 with "geometry" condition expression and without "coords" field
     Given  a definition of headers
       | parameter          | value                                    |
@@ -1051,9 +1051,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                                  |
-      | error       | BadRequest                                                             |
-      | description | Expression not supported: /geometry/ field used without /coords/ field |
+      | parameter   | value                                                                            |
+      | error       | BadRequest                                                                       |
+      | description | partial geo expression; geometry, georel and coords have to be provided together |
 
   @condition_expression_geometry_empty @ISSUE_1678
   Scenario: try to create a new subscription using NGSI v2 with "geometry" condition expression and with empty value
@@ -1154,7 +1154,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | house(flat) |
 
   # ------------ subject - condition - expression - coords ---------------------
-  @condition_expression_coords_only @ISSUE_1678 @ISSUE_2406 @skip
+  @condition_expression_coords_only @ISSUE_1678 @ISSUE_2406
   Scenario: try to create a new subscription using NGSI v2 with only "coords" condition expression
     Given  a definition of headers
       | parameter          | value                            |
@@ -1174,9 +1174,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                               |
-      | error       | BadRequest                                                          |
-      | description | error parsing geo-query fields: invalid point in URI param /coords/ |
+      | parameter   | value                                                                            |
+      | error       | BadRequest                                                                       |
+      | description | partial geo expression; geometry, georel and coords have to be provided together |
 
   @condition_expression_coords_invalid_point @ISSUE_1678
   Scenario Outline: try to create a new subscription using NGSI v2 with "coords" condition expression and invalid point
