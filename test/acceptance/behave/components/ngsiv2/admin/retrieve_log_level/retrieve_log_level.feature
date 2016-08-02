@@ -46,6 +46,7 @@ Feature: retrieve the log level in Context Broker
   Setup: stop ContextBroker
 
   @retrieve_log_level
+  # In this scenario, the Context Broker must start with "DEBUG" level in "CB_EXTRA_OPS" field into properties.json file
   Scenario: retrieve the log level in Context Broker
     When retrieve the log level
     Then verify that receive an "OK" http code
