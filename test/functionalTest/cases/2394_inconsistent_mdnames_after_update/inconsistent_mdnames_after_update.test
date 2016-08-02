@@ -1,0 +1,128 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Inconsistent mdNames after update
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create E-temperature with metadata named 34.4E-34_1 and 34.4E-34_0
+# 02. Get from Database, only 2 metadata
+# 03. Update E-temperature, including metatata
+# 04. Get from Database, only 2 metadata
+#
+
+echo "01. Create E-temperature with metadata named 34.4E-34_1 and 34.4E-34_0"
+echo "======================================================================"
+payload='
+{
+  "id": "E",
+  "type": "Thing",
+  "temperature": {
+    "value": 345,
+    "metadata": {
+      "34.4E-34_1": {
+        "value": "hot"
+      },
+      "34.4E-34_0": {
+        "value": "hot"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Get from Database, only 2 metadata"
+echo "======================================"
+mongoCmd ${CB_DB_NAME} "db.entities.find({}, {_id:0, \"attrs.temperature.mdNames\":1})"
+echo
+echo
+
+
+echo "03. Update E-temperature, including metatata"
+echo "============================================"
+payload='{
+  "temperature": {
+    "value": 106,
+    "metadata": {
+      "34.4E-34_1": {
+        "value": 5678
+      },
+      "34.4E-34_0": {
+        "value": 5679
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "04. Get from Database, only 2 metadata"
+echo "======================================"
+mongoCmd ${CB_DB_NAME} "db.entities.find({}, {_id:0, \"attrs.temperature.mdNames\":1})"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E-temperature with metadata named 34.4E-34_1 and 34.4E-34_0
+======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Get from Database, only 2 metadata
+======================================
+{ "attrs" : { "temperature" : { "mdNames" : [ "34.4E-34_1", "34.4E-34_0" ] } } }
+
+
+03. Update E-temperature, including metatata
+============================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Get from Database, only 2 metadata
+======================================
+{ "attrs" : { "temperature" : { "mdNames" : [ "34.4E-34_1", "34.4E-34_0" ] } } }
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
