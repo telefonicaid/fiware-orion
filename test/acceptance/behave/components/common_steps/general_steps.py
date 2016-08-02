@@ -360,6 +360,8 @@ def verify_headers_in_response(context):
 def verify_if_the_log_level_is_the_expected(context, level):
     """
     verify if the log level is the expected
+
+    :param level: log level expected
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
     __logger__.debug("Verifying if the log level \"%s\" is the expected in response..." % level)
