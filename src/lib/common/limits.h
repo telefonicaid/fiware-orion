@@ -197,8 +197,10 @@
 /* ****************************************************************************
 *
 * PRECISION_DIGITS -
+*
+* Note that PRECISION DIGIT to 10 prints numbers with 9 decimals (not 10)
 */
-#define PRECISION_DIGITS 9
+#define PRECISION_DIGITS 10
 
 
 
