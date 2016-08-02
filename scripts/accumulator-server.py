@@ -67,15 +67,15 @@ def usage():
     Print usage message
     """
 
-    print 'Usage: %s -h <host> -p <port> -u <server url> -p -v -h' % os.path.basename(__file__)
+    print 'Usage: %s --host <host> --port <port> --url <server url> --pretty-print -v -u' % os.path.basename(__file__)
     print ''
     print 'Parameters:'
-    print "  -h <host> (or '--host <host>'): host to use database to use (default is '0.0.0.0')"
-    print "  -p <port> (or '--port <port'): port to use (default is 1028)"
-    print "  -u <server url> (or '--url <server url>'): server URL to use (default is /accumulate)"
-    print "  -r (or --pretty-print): pretty print mode"
-    print "  -v (or --verbose): verbose"
-    print "  -g (or --help): print this usage message"
+    print "  --host <host>: host to use database to use (default is '0.0.0.0')"
+    print "  --port <port>: port to use (default is 1028)"
+    print "  --url <server url>: server URL to use (default is /accumulate)"
+    print "  --pretty-print: pretty print mode"
+    print "  -v: verbose mode"
+    print "  -u: print this usage message"
 
 
 # This function is registered to be called upon termination
@@ -90,26 +90,26 @@ verbose    = 0
 pretty     = False
 
 try:
-    opts, args = getopt(sys.argv[1:], 'h:p:u:vrg', ['host=', 'port=', 'url=', 'verbose', 'pretty-print', 'help' ])
+    opts, args = getopt(sys.argv[1:], 'vu', ['host=', 'port=', 'url=', 'pretty-print' ])
 except GetoptError:
     usage_and_exit('wrong parameter')
 
 for opt, arg in opts:
-    if opt in ('-g', '--help'):
+    if opt == '-u':
         usage()
         sys.exit(0)
-    elif opt in ('-h', '--host'):
+    elif opt == '--host':
         host = arg
-    elif opt in ('-u', '--url'):
+    elif opt == '--url':
         server_url = arg
-    elif opt in ('-p', '--port'):
+    elif opt == '--port':
         try:
             port = int(arg)
         except ValueError:
             usage_and_exit('port parameter must be an integer')
-    elif opt in ('-v', '--verbose'):
+    elif opt == '-v':
         verbose = 1
-    elif opt in ('-r', '--pretty-printº'):
+    elif opt == '--pretty-print':
         pretty = True
     else:
         usage_and_exit()

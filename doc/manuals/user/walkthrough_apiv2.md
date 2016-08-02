@@ -128,7 +128,7 @@ command:
 ```
 # cd /dir/where/accumulator-server/is/downloaded
 # chmod a+x accumulator-server.py
-# ./accumulator-server.py -p 1028 -u /accumulate -h ::1 --pretty-print -v
+# ./accumulator-server.py --port 1028 --url /accumulate --host ::1 --pretty-print -v
 ```
 
 The accumulator-server.py is also part of the contextBroker-test package (see

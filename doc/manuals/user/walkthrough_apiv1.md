@@ -154,7 +154,7 @@ command:
 ```
 # cd /dir/where/accumulator-server/is/downloaded
 # chmod a+x accumulator-server.py
-# ./accumulator-server.py -p 1028 -u /accumulate -h ::1 -v
+# ./accumulator-server.py --port 1028 --url /accumulate --host ::1 -v
 ```
 
 The accumulator-server.py is also part of the contextBroker-test package (see [optional packages section in how to install](../admin/install.md#optional-packages)). The script is located at `/usr/share/contextBroker/tests/accumulator-server.py` after installation. However, if you only need the accumulator-server.py it uses to be simpler just downloading it from GitHub, as suggested above.
