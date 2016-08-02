@@ -27,6 +27,7 @@
 #include <string.h>
 #include <string>
 #include <vector>
+#include <math.h>    // modf
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -789,6 +790,68 @@ bool str2double(const char* s, double* dP)
   return true;
 }
 
+
+
+/* ****************************************************************************
+*
+* decimalDigits
+*
+* This function counts the number of decimal digits of a given float, to a maximum of
+* PRECISION_DIGITS. The algorithm is inspired in http://stackoverflow.com/a/1083316/1485926
+* but with a "cutting condition" needed due to float representation may have an infinite
+* number of decimals, e.g. 3.14 could be internally coded as 3.1399999..
+*/
+unsigned int decimalDigits(double d)
+{
+  unsigned int digits = 0;
+
+  double intPart;
+  double decimalPart = fabs(modf(d, &intPart));
+
+  while (decimalPart > 0)
+  {
+    digits++;
+    decimalPart *= 10;
+    decimalPart = modf(decimalPart, &intPart);
+    if (fabs(1 - decimalPart ) < 0.01)
+    {
+      // In the case of 3.139999..., after step 2 modf() will produce 0.999..., so
+      // the distance to 1 is less than 0.01 so we correctly end the loop
+      break;
+    }
+  }
+
+  if (digits > PRECISION_DIGITS)
+  {
+    return PRECISION_DIGITS;
+  }
+  else
+  {
+    return digits;
+  }
+}
+
+
+/* ****************************************************************************
+*
+* toString
+*
+* Specialized verion of the template for the double type
+*/
+template <> std::string toString(double f)
+{
+  std::ostringstream ss;
+
+  unsigned int digits = decimalDigits(f);
+  if (digits > 0)
+  {
+    ss << std::fixed << std::setprecision(digits);
+  }
+
+  ss << f;
+
+  return ss.str();
+}
 
 
 /*****************************************************************************

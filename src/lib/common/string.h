@@ -162,26 +162,36 @@ extern bool str2double(const char* s, double* dP = NULL);
 
 /* ****************************************************************************
 *
+* decimalDigits
+*
+*/
+extern unsigned int decimalDigits(double d);
+
+
+
+/* ****************************************************************************
+*
 * toString -
 *
 * If the generic ostringstream-based implementation would have performance
 * problems in the future, a set of per-type specialized functions could be
 * used without changing the toString() usage interface from existing callers
 *
+* In fact, we currently have an specizlized function for float, although not
+* due to performance (but due to special treatment of decimal numbers in the
+* float case)
+*
 */
 template <typename T> std::string toString(T t)
 {      
   std::ostringstream ss;
-
-  /* Set format  for floats (it doesn't affect integers). Note that std::fixed
-   * is not used (we have found that it would add spurious decimals in some cases */
-  ss << std::setprecision(PRECISION_DIGITS);
 
   ss << t;
 
   return ss.str();
 }
 
+template <> std::string toString(float f);
 
 
 /*****************************************************************************

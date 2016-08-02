@@ -162,10 +162,6 @@ std::string objectToJson(std::map<std::string, std::string>& list)
 */
 JsonHelper::JsonHelper(): empty(true)
 {
-  /* Set format  for floats (it doesn't affect integers). Note that std::fixed
-   * is not used (we have found that it would add spurious decimals in some cases */
-  ss << std::setprecision(PRECISION_DIGITS);
-
   ss << '{';
 }
 
@@ -224,12 +220,19 @@ void JsonHelper::addNumber(const std::string& key, long long value)
 * JsonHelper::addFloat -
 */
 void JsonHelper::addFloat(const std::string& key, float  value)
-{
+{  
+  unsigned int oldPrecision = ss.precision();
+  ss << std::fixed << std::setprecision(decimalDigits(value));
+
   if (!empty)
   {
     ss << ',';
   }  
   ss << toJsonString(key) << ':' << value;
+
+  // Reset stream to old parameters (whichever they are...)
+  ss.unsetf(std::ios_base::fixed);
+  ss << std::setprecision(oldPrecision);
 
   empty = false;
 }
