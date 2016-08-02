@@ -259,6 +259,11 @@ Took 5m52.659s
 
 The log is stored in `logs` folder (if this folder does not exist it is created) and is called `behave.log` see `logging.ini`.
 
+The Context Broker must start with "DEBUG" level in "CB_EXTRA_OPS" field into properties.json file. Ex:
+```
+    "CB_EXTRA_OPS": "\"-multiservice -t 0-255 -logLevel DEBUG\"",
+```
+
 
 ## Tests Suites Coverage (features):
 
