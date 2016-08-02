@@ -553,7 +553,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
       Metadata    md(currentMd, mdItem);
       mdSize++;
 
-      if (!hasMetadata(md.name, md.type, caP))
+      if (!hasMetadata(dbDotDecode(md.name), md.type, caP))
       {
         appendMetadata(&mdBuilder, &mdNamesBuilder, &md, apiVersion == "v2");
       }
