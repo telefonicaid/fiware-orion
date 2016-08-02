@@ -177,7 +177,7 @@ extern unsigned int decimalDigits(double d);
 * problems in the future, a set of per-type specialized functions could be
 * used without changing the toString() usage interface from existing callers
 *
-* In fact, we currently have an specizlized function for float, although not
+* In fact, we currently have an specialized function for float, although not
 * due to performance (but due to special treatment of decimal numbers in the
 * float case)
 *

@@ -31,7 +31,7 @@ brokerStart CB
 
 #
 # 01. Create entity with attributes A: 442.123456785551 and B: 200
-# 02. Get A value: 42.123456789 (9 decimals)
+# 02. Get A value: 442.123456786 (9 decimals)
 # 03. Get B value: 200 (0 decimals)
 # 04. Get whole entity, same results for A and B
 #
