@@ -808,7 +808,7 @@ unsigned int decimalDigits(double d)
   double intPart;
   double decimalPart = fabs(modf(d, &intPart));
 
-  while (decimalPart > 0)
+  while (decimalPart > PRECISSION)
   {
     digits++;
     decimalPart *= 10;

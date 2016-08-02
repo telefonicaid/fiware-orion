@@ -196,10 +196,10 @@
 
 /* ****************************************************************************
 *
-* PRECISION_DIGITS -
+* Precision constants -
 */
-#define PRECISION_DIGITS 9
-
+#define PRECISION_DIGITS  9
+#define PRECISSION        0.000000001  // it corresponds to 9 digits
 
 
 #endif  // SRC_LIB_COMMON_LIMITS_H_
