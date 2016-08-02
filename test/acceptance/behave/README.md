@@ -264,7 +264,17 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 
 |       FEATURE/REFERENCE                     |  TEST CASES  | METHOD  |            URL                                       |  PAYLOAD  | QUERIES PARAMS |
 |:--------------------------------------------|:------------:|--------:|:-----------------------------------------------------|:---------:|:--------------:|      
-|**api_entry_point**                                                                                                                                       |
+|**admin folder**                                                                                                                                          |
+|  retrieve_log_level                         |      1       | GET     | /admin/log                                           | No        | No             |
+|  change_log_level                           |   (pending)  | PUT     | /admin/log                                           | No        | Yes            |
+|                                                                                                                                                          |
+|  retrieve_trace_level                       |  (pending)   | GET     | /log/trace                                           | No        | No             |
+|  change_trace_level                         |  (pending)   | PUT     | /log/trace/`<trace_levels>`                          | No        | No             |
+|  delete_trace_level                         |  (pending)   | DELETE  | /log/trace/`<trace_levels>`                          | No        | No             |
+|                                                                                                                                                          |
+|  semaphore_list                             |  (pending)   | GET     | /admin/sem                                           | No        | No             |
+|                                                                                                                                                          |
+|**api_entry_point folder**                                                                                                                                |
 |  retrieve_api_resource                      |     19       | GET     | /version  /statistics  cache/statistics    /v2       | No        | No             |
 |                                                                                                                                                          |
 |**entities folder**                                                                                                                                       |
