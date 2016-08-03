@@ -428,7 +428,8 @@ Error list (HTTP response code in parenthesis):
   identification
   used in the request.
 * ContentLengthRequired (`411`). Zero/No Content-Length in PUT/POST/PATCH request.
-* RequestEntityTooLarge (`413`). Payload is too large.
+* RequestEntityTooLarge (`413`). Payload is too large. The specific limit to consider a payload too large depends
+                                 on the particular implementation.
 * UnsupportedMediaType  (`415`). Request content type is not supported.
 * InvalidModification   (`422`). Some piece of information is missing in payload.
 * NotSupportedQuery     (`422`). The implementation does not support the query issued.
