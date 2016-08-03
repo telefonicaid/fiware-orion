@@ -27,7 +27,7 @@
 - Add: New param 'mq' (both in URI param for list all entities operation and expression sub-field in subscriptions) for matching in metadata (#1156)
 - Add: FIWARE::StringQuery::Metadata scope (#1156)
 - Add: q-string filters for compound values of attributes, both for queries and subscriptions (Issue #1156)
-- Add: mq-string filters for compound values of metadata, for queries (Issue #1156)
+- Add: mq-string filters for compound values of metadata, both for queries and subscriptions (Issue #1156)
 - Add: accepting compound values for metadatas (Issue #1068)
 - Fix: no longer accepting 'keyValues-style' values for metadatas (e.g. "metadata": { "m1": 6 } )
 - Fix: GET /v2/subscriptions/subId error for non existing subscriptions (now using 404 Not Found, previously using 400 Bad Request)
@@ -38,6 +38,7 @@
 - Fix: use X-Real-IP header as preferred option for from= field in log traces (#2353)
 - Fix: use op= instead of function= in log traces (along with moving the file/line identification from msg= to op=) (#2353)
 - Fix: reorder field in log traces lo align with IoTP Operations requirements (#2353)
+- Fix: bug that provoked old compound values of metadatas to be sent in notifications
 - Fix: using WARN log level instead of WARNING log level to align with IoTP Operations requirements (#2353)
 - Fix: Fixed metadata rendering in NGSIv1, so that the JSON data type is taken into account and not empty string is returned for non-string values (Issue #1068, just a part of it)
 - Fix: Fixed a bug about lists in URI parameter 'q' (last list item was skipped)

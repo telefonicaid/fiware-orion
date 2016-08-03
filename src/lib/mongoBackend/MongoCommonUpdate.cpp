@@ -1824,8 +1824,10 @@ static void updateAttrInNotifyCer
         if (caP->compoundValueP != NULL)
         {
           delete caP->compoundValueP;
+          caP->compoundValueP = NULL;
         }
-        caP->compoundValueP = targetAttr->compoundValueP == NULL ? NULL : targetAttr->compoundValueP->clone();
+
+        caP->compoundValueP = (targetAttr->compoundValueP == NULL)? NULL : targetAttr->compoundValueP->clone();
       }
       if (targetAttr->type != "")
       {
@@ -1841,16 +1843,38 @@ static void updateAttrInNotifyCer
         for (unsigned int kx = 0; kx < caP->metadataVector.size(); kx++)
         {
           Metadata* mdP = caP->metadataVector[kx];
+
           if (mdP->name == targetMdP->name)
           {
             mdP->valueType   = targetMdP->valueType;
             mdP->stringValue = targetMdP->stringValue;
             mdP->boolValue   = targetMdP->boolValue;
             mdP->numberValue = targetMdP->numberValue;
+
+            // Free old value of compound, if any
+            if (mdP->compoundValueP != NULL)
+            {
+              delete mdP->compoundValueP;
+              mdP->compoundValueP = NULL;
+            }
+
+            // Set new compound value, if any
+            if (targetMdP->compoundValueP != NULL)
+            {
+              //
+              // FIXME PR: is it necessary to clone the compound or can we 'steal' it from targetMdP ?
+              //
+              // mdP->compoundValueP = targetMdP->compoundValueP->clone();
+              //
+              mdP->compoundValueP = targetMdP->compoundValueP->clone();
+              // targetMdP->compoundValueP = NULL;
+            }
+
             if (targetMdP->type != "")
             {
               mdP->type = targetMdP->type;
             }
+
             matchMd = true;
             break;   /* kx  loop */
           }

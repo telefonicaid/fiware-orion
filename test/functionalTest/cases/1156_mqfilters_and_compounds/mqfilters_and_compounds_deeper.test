@@ -45,8 +45,6 @@ accumulatorStart --pretty-print
 # 12. Non Existence: A1.M1.L1.L3: see E1
 # 13. Non Existence: A1.M1.L1.L2.Not: see E1
 # 14. Existence: A1.M1.L1.L2.Not: see nothing
-#
-# FIXME: Later, when subscriptions for metadata compound value filters is implemented
 # 15. Create subscription for A1.M1.L1.L2.T==true, giving a notification
 # 16. Dump and reset accumulator, see one notification
 # 17. Create subscription for A1.M1.L1.L2.i!=10, giving NO notification
@@ -173,73 +171,73 @@ echo
 echo
 
 
-#echo "15. Create subscription for A1.M1.L1.L2.T==true, giving a notification"
-#echo "======================================================================"
-#payload='{
-#    "subject": {
-#        "entities": [
-#            {
-#                "idPattern": "E.*"
-#            }
-#        ],
-#        "condition": {
-#            "attrs": [ ],
-#            "expression": {
-#               "mq": "A1.M1.L1.L2.T==true"
-#            }
-#         }
-#    },
-#    "notification": {
-#        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
-#        "attrs": [ ]
-#    },
-#    "expires": "2050-04-05T14:00:00.00Z"
-#}'
-#orionCurl --url /v2/subscriptions --payload "${payload}"
-#echo
-#echo
-#
-#
-#echo "16. Dump accumulator, see one notification"
-#echo "=========================================="
-#accumulatorDump
-#accumulatorReset
-#echo
-#echo
-#
-#
-#echo "17. Create subscription for A1.M1.L1.L2.i!=10, giving NO notification"
-#echo "====================================================================="
-#payload='{
-#    "subject": {
-#        "entities": [
-#            {
-#                "idPattern": "E.*"
-#            }
-#        ],
-#        "condition": {
-#            "attrs": [ ],
-#            "expression": {
-#               "mq": "A1.M1.L1.L2.i!=10"
-#            }
-#         }
-#    },
-#    "notification": {
-#        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
-#        "attrs": [ ]
-#    },
-#    "expires": "2050-04-05T14:00:00.00Z"
-#}'
-#orionCurl --url /v2/subscriptions --payload "${payload}"
-#echo
-#echo
-#
-#
-#echo "18. Dump accumulator, see nothing"
-#echo "================================="
-#accumulatorDump
-#echo
-#echo
+echo "15. Create subscription for A1.M1.L1.L2.T==true, giving a notification"
+echo "======================================================================"
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "mq": "A1.M1.L1.L2.T==true"
+            }
+         }
+    },
+    "notification": {
+        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+
+
+echo "16. Dump accumulator, see one notification"
+echo "=========================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "17. Create subscription for A1.M1.L1.L2.i!=10, giving NO notification"
+echo "====================================================================="
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "mq": "A1.M1.L1.L2.i!=10"
+            }
+         }
+    },
+    "notification": {
+        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+
+
+echo "18. Dump accumulator, see nothing"
+echo "================================="
+accumulatorDump
+echo
+echo
 
 
 --REGEXPECT--
@@ -682,82 +680,75 @@ Date: REGEX(.*)
 []
 
 
+15. Create subscription for A1.M1.L1.L2.T==true, giving a notification
+======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+16. Dump accumulator, see one notification
+==========================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 245
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {
+                    "M1": {
+                        "type": "none",
+                        "value": {
+                            "L1": {
+                                "L2": {
+                                    "F": false, 
+                                    "N": null, 
+                                    "T": true, 
+                                    "f": 3.14REGEX([01]*), 
+                                    "i": 10, 
+                                    "s": "test_string"
+                                }
+                            }
+                        }
+                    }
+                }, 
+                "type": "none", 
+                "value": "not important"
+            },
+            "id": "E1", 
+            "type": "none"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+17. Create subscription for A1.M1.L1.L2.i!=10, giving NO notification
+=====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+18. Dump accumulator, see nothing
+=================================
+
+
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
 dbDrop CB
-
-
-
-#
-# FIXME: for REGEXPECT later, see FIXME on top of file
-#
-#15. Create subscription for A1.M1.L1.L2.T==true, giving a notification
-#======================================================================
-#HTTP/1.1 201 Created
-#Content-Length: 0
-#Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-#Fiware-Correlator: REGEX([0-9a-f\-]{36})
-#Date: REGEX(.*)
-#
-#
-#
-#16. Dump accumulator, see one notification
-#==========================================
-#POST http://localhost:REGEX(\d+)/notify
-#Content-Length: 
-#User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-#Ngsiv2-Attrsformat: normalized
-#Host: localhost:REGEX(\d+)
-#Accept: application/json
-#Content-Type: application/json; charset=utf-8
-#Fiware-Correlator: REGEX([0-9a-f\-]{36})
-#
-#{
-#    "data": [
-#        {
-#            "A1": {
-#                "metadata": {
-#                    "M1": {
-#                        "type": "none",
-#                        "value": {
-#                            "L1": {
-#                                "L2": {
-#                                    "F": false, 
-#                                    "N": null, 
-#                                    "T": true, 
-#                                    "f": 3.14, 
-#                                    "i": 10, 
-#                                    "s": "test_string"
-#                                }
-#                            }
-#                        }
-#                    }
-#                }, 
-#                "type": "none", 
-#                "value": ""
-#            },
-#            "id": "E1", 
-#            "type": "none"
-#        }
-#    ],
-#    "subscriptionId": "REGEX([0-9a-f]{24})"
-#}
-#=======================================
-#
-#
-#17. Create subscription for A1.M1.L1.L2.i!=10, giving NO notification
-#=====================================================================
-#HTTP/1.1 201 Created
-#Content-Length: 0
-#Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-#Fiware-Correlator: REGEX([0-9a-f\-]{36})
-#Date: REGEX(.*)
-#
-#
-#
-#18. Dump accumulator, see nothing
-#=================================
-#
-#
-#
