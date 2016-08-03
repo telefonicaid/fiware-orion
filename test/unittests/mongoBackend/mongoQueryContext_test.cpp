@@ -112,6 +112,10 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * - queryIdMetadataPattern
 * - queryCustomMetadataPattern
 *
+* Some bacic test with typePattern true
+*
+*  - queryTypePattern
+*
 * Native types
 *
 * - queryNativeTypes
@@ -3740,6 +3744,91 @@ TEST(mongoQueryContextRequest, queryCustomMetadataPattern)
 
     utExit();
 }
+
+
+
+/* ****************************************************************************
+*
+* queryTypePattern -
+*
+* Query:     id pattern = E.* - type Pattern = T[1-2]$ - no attrs
+* Result:    E1 (all attributes) and E2 (all attributes)
+*
+*/
+TEST(mongoQueryContextRequest, queryTypePattern)
+{
+    utInit();
+
+    HttpStatusCode         ms;
+    QueryContextRequest   req;
+    QueryContextResponse  res;
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Forge the request (from "inside" to "outside") */
+    EntityId en("E.*", "T[1-2]$", "true", true);
+    req.entityIdVector.push_back(&en);
+
+    /* Invoke the function in mongoBackend library */
+    servicePathVector.clear();
+    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccNone, res.errorCode.code);
+    EXPECT_EQ("", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
+
+    ASSERT_EQ(2, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("T1", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->stringValue);
+    EXPECT_EQ(ValueTypeString, RES_CER_ATTR(0, 0)->valueType);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+
+    EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+    EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
+    EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->stringValue);
+    EXPECT_EQ(ValueTypeString, RES_CER_ATTR(0, 1)->valueType);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
+
+    /* Context Element response # 2 */
+    EXPECT_EQ("E2", RES_CER(1).entityId.id);
+    EXPECT_EQ("T2", RES_CER(1).entityId.type);
+    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
+
+    EXPECT_EQ("A2", RES_CER_ATTR(1, 0)->name);
+    EXPECT_EQ("TA2", RES_CER_ATTR(1, 0)->type);
+    EXPECT_EQ("val2bis", RES_CER_ATTR(1, 0)->stringValue);
+    EXPECT_EQ(ValueTypeString, RES_CER_ATTR(1, 0)->valueType);
+    EXPECT_EQ(0, RES_CER_ATTR(1, 0)->metadataVector.size());
+
+    EXPECT_EQ("A3", RES_CER_ATTR(1, 1)->name);
+    EXPECT_EQ("TA3", RES_CER_ATTR(1, 1)->type);
+    EXPECT_EQ("val3", RES_CER_ATTR(1, 1)->stringValue);
+    EXPECT_EQ(ValueTypeString, RES_CER_ATTR(1, 1)->valueType);
+    EXPECT_EQ(0, RES_CER_ATTR(1, 1)->metadataVector.size());
+
+    EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
+    EXPECT_EQ("", RES_CER_STATUS(1).details);
+
+    /* Release dynamic memory used by response (mongoBackend allocates it) */
+    res.contextElementResponseVector.release();
+
+    utExit();
+}
+
+
 
 /* ****************************************************************************
 *

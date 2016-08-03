@@ -38,7 +38,7 @@
 *
 * EntityId::EntityId -
 */
-EntityId::EntityId() : keyName("entityId")
+EntityId::EntityId()
 {
 }
 
@@ -48,7 +48,7 @@ EntityId::EntityId() : keyName("entityId")
 *
 * EntityId::EntityId -
 */
-EntityId::EntityId(EntityId* eP) : keyName("entityId")
+EntityId::EntityId(EntityId* eP)
 {
   fill(eP);
 }
@@ -63,23 +63,12 @@ EntityId::EntityId
   const std::string&  _id,
   const std::string&  _type,
   const std::string&  _isPattern,
-  const std::string&  _keyName
+  bool                _isTypePattern
 ) : id(_id),
     type(_type),
     isPattern(_isPattern),
-    keyName(_keyName)
+    isTypePattern(_isTypePattern)
 {
-}
-
-
-
-/* ****************************************************************************
-*
-* keyNameSet -
-*/
-void EntityId::keyNameSet(const std::string& _keyName)
-{
-  keyName = _keyName;
 }
 
 
@@ -202,11 +191,12 @@ std::string EntityId::check
 *
 * EntityId::fill -
 */
-void EntityId::fill(const std::string& _id, const std::string& _type, const std::string& _isPattern)
+void EntityId::fill(const std::string& _id, const std::string& _type, const std::string& _isPattern, bool _isTypePattern)
 {
-  id        = _id;
-  type      = _type;
-  isPattern = _isPattern;
+  id            = _id;
+  type          = _type;
+  isPattern     = _isPattern;
+  isTypePattern = _isTypePattern;
 }
 
 
@@ -217,10 +207,11 @@ void EntityId::fill(const std::string& _id, const std::string& _type, const std:
 */
 void EntityId::fill(const struct EntityId* eidP, bool useDefaultType)
 {
-  id          = eidP->id;
-  type        = eidP->type;
-  isPattern   = eidP->isPattern;
-  servicePath = eidP->servicePath;
+  id            = eidP->id;
+  type          = eidP->type;
+  isPattern     = eidP->isPattern;
+  isTypePattern = eidP->isTypePattern;
+  servicePath   = eidP->servicePath;
 
   if (useDefaultType && (type == ""))
   {
@@ -256,6 +247,9 @@ void EntityId::present(const std::string& indent, int ix)
   LM_T(LmtPresent, ("%s  isPattern:  '%s'", 
 		    indent.c_str(), 
 		    isPattern.c_str()));
+  LM_T(LmtPresent, ("%s  isTypePttern:  '%s'",
+            indent.c_str(),
+            isTypePattern? "true" : "false"));
 }
 
 
@@ -308,6 +302,11 @@ bool EntityId::equal(EntityId* eP)
   }
 
   if (eP->isPatternIsTrue() == isPatternIsTrue())
+  {
+    return true;
+  }
+
+  if (eP->isTypePattern == eP->isTypePattern)
   {
     return true;
   }
