@@ -646,28 +646,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     else                                  b = valueParse(rhs, errorStringP);
   }
 
-  //
-  // If this filter item belongs to a metadata string filter, split the
-  // left hand side info attrName and mdName, if not a unary operator.
-  //
-  if ((type == SftMq) && (op != SfopNotExists) && (op != SfopExists))
-  {
-    std::string lside  = std::string(lhs);
-    char*       start  = (char*) lside.c_str();
-    char*       dotP   = strchr(start, '.');
-
-    if (dotP == NULL)
-    {
-      *errorStringP = "no metadata in left-hand-side of q-item";
-      free(toFree);
-      return false;
-    }
-    *dotP = 0;
-    ++dotP;
-    attributeName = start;
-    metadataName  = dotP;
-  }
-
   free(toFree);
   return b;
 }
@@ -692,35 +670,35 @@ void StringFilterItem::lhsParse(void)
   }
   
   *dotP = 0;
+  ++dotP;  // Step over the dot
   
   attributeName = start;
 
   // If MQ, a second dot must be found in order for LHS to be about compounds
   if (type == SftMq)
   {
-    ++dotP;  // Step over the first dot
     char* dot2P = strchr(dotP, '.');
-
-    metadataName  = dotP;
 
     if (dot2P == NULL)
     {
+      metadataName  = dotP;
       compoundPath  = "";
       return;
     }
 
     *dot2P = 0;
-    compoundPath = dotP;
-    dotP = dot2P;
+    ++dot2P;
+    metadataName  = dotP;
+    compoundPath  = dot2P;
   }
-
-  //
-  // So, now 'dotP' is pointing to the dot after attribute/metadata.
-  // The rest of the 'path' in lhs is about an item in a compound value
-  //
-  *dotP = 0;
-  ++dotP;
-  compoundPath = dotP;
+  else
+  {
+    //
+    // So, now 'dotP' is pointing to the dot after attribute/metadata.
+    // The rest of the 'path' in lhs is about an item in a compound value
+    //
+    compoundPath = dotP;
+  }
 }
 
 
@@ -1594,7 +1572,6 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       left = itemP->attributeName;
     }
 
- 
     //
     // Also, if the left hand side contains a compound path, then we are
     // dealing with matching of a compound item.
@@ -1604,6 +1581,16 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       if (itemP->type == SftQ)
       {
         left = std::string(ENT_ATTRS) + "." + itemP->attributeName + "." + ENT_ATTRS_VALUE + "." + itemP->compoundPath;
+        k = left;
+      }
+      else if (itemP->type == SftMq)
+      {
+        left = std::string(ENT_ATTRS) + "." +
+               itemP->attributeName   + "." + 
+               ENT_ATTRS_MD           + "." + 
+               itemP->metadataName    + "." + 
+               ENT_ATTRS_MD_VALUE     + "." +
+               itemP->compoundPath;
         k = left;
       }
     }
