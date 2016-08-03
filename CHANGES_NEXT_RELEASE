@@ -25,6 +25,7 @@
 - Add: New param 'mq' (both in URI param for list all entities operation and expression sub-field in subscriptions) for matching in metadata (#1156)
 - Add: FIWARE::StringQuery::Metadata scope (#1156)
 - Add: q-string filters for compound values of attributes, both for queries and subscriptions (Issue #1156)
+- Add: mq-string filters for compound values of metadata, for queries (Issue #1156)
 - Add: accepting compound values for metadatas (Issue #1068)
 - Fix: no longer accepting 'keyValues-style' values for metadatas (e.g. "metadata": { "m1": 6 } )
 - Fix: GET /v2/subscriptions/subId error for non existing subscriptions (now using 404 Not Found, previously using 400 Bad Request)
