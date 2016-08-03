@@ -95,7 +95,7 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | random=100           |
       | random=254           |
 
- @attribute_metadata_name_without_meta_type @BUG_1217 @ISSUE_1786 @BUG_2394 @skip
+ @attribute_metadata_name_without_meta_type @BUG_1217 @ISSUE_1786 @BUG_2394
   Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attribute metadata name without metadata type but with attribute value in update request
     Given  a definition of headers
       | parameter          | value                               |
@@ -310,7 +310,7 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | random=100           |
       | random=254           |
 
-  @attribute_metadata_name_with_meta_type @BUG_1217 @ISSUE_1786 @BUG_2394 @skip
+  @attribute_metadata_name_with_meta_type @BUG_1217 @ISSUE_1786 @BUG_2394
   Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attribute metadata name with metadata type and attribute value in update request
     Given  a definition of headers
       | parameter          | value                               |
