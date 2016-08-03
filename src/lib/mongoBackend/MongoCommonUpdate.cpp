@@ -1827,7 +1827,12 @@ static void updateAttrInNotifyCer
           caP->compoundValueP = NULL;
         }
 
-        caP->compoundValueP = (targetAttr->compoundValueP == NULL)? NULL : targetAttr->compoundValueP->clone();
+        // Clone
+        // caP->compoundValueP = (targetAttr->compoundValueP == NULL)? NULL : targetAttr->compoundValueP->clone();
+
+        // Steal
+        caP->compoundValueP        = targetAttr->compoundValueP;
+        targetAttr->compoundValueP = NULL;
       }
       if (targetAttr->type != "")
       {
@@ -1838,7 +1843,8 @@ static void updateAttrInNotifyCer
       for (unsigned int jx = 0; jx < targetAttr->metadataVector.size(); jx++)
       {
         Metadata* targetMdP = targetAttr->metadataVector[jx];
-        /* Search for matching medatat in the CER attribute */
+
+        /* Search for matching metadata in the CER attribute */
         bool matchMd = false;
         for (unsigned int kx = 0; kx < caP->metadataVector.size(); kx++)
         {
@@ -1864,10 +1870,13 @@ static void updateAttrInNotifyCer
               //
               // FIXME PR: is it necessary to clone the compound or can we 'steal' it from targetMdP ?
               //
+
+              // Clone
               // mdP->compoundValueP = targetMdP->compoundValueP->clone();
-              //
-              mdP->compoundValueP = targetMdP->compoundValueP->clone();
-              // targetMdP->compoundValueP = NULL;
+
+              // Steal
+              mdP->compoundValueP       = targetMdP->compoundValueP;
+              targetMdP->compoundValueP = NULL;
             }
 
             if (targetMdP->type != "")
