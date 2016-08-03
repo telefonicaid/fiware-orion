@@ -271,7 +271,7 @@ The Context Broker must start with "DEBUG" level in "CB_EXTRA_OPS" field into pr
 |:--------------------------------------------|:------------:|--------:|:-----------------------------------------------------|:---------:|:--------------:|      
 |**admin folder**                                                                                                                                          |
 |  retrieve_log_level                         |      1       | GET     | /admin/log                                           | No        | No             |
-|  change_log_level                           |   (pending)  | PUT     | /admin/log                                           | No        | Yes            |
+|  change_log_level                           |     15       | PUT     | /admin/log                                           | No        | Yes            |
 |                                                                                                                                                          |
 |  retrieve_trace_level                       |  (pending)   | GET     | /log/trace                                           | No        | No             |
 |  change_trace_level                         |  (pending)   | PUT     | /log/trace/`<trace_levels>`                          | No        | No             |

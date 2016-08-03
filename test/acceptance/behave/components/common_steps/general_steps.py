@@ -189,6 +189,25 @@ def retrieve_the_log_level(context):
     context.resp = context.cb.retrieve_the_log_level()
     __logger__.info("..retrieved the log level in Context Broker")
 
+
+@step(u'change the log level')
+def change_the_log_level(context):
+    """
+    change the log level
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.info("changing the log level in Context Broker")
+    query_param = {}
+    if context.table is not None:
+        for row in context.table:
+            query_param[row["parameter"]] = row["value"]
+            __logger__.info("query param: %s = %s" % (row["parameter"], row["value"]))
+
+    context.props_cb_env = properties_class.read_properties()[CONTEXT_BROKER_ENV]
+    context.cb = CB(protocol=context.props_cb_env["CB_PROTOCOL"], host=context.props_cb_env["CB_HOST"], port=context.props_cb_env["CB_PORT"])
+    context.resp = context.cb.change_the_log_level(query_param)
+    __logger__.info("..changed the log level in Context Broker")
+
 # ------------------------------------- validations ----------------------------------------------
 
 
@@ -368,3 +387,16 @@ def verify_if_the_log_level_is_the_expected(context, level):
     ngsi = NGSI()
     ngsi.verify_log_level(context, level)
     __logger__.info("...Verified log level in response")
+
+
+@step(u'verify admin error "([^"]*)"')
+def verify_admin_error(context, error):
+    """
+    verify admin error message
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    :param error: error message expected
+    """
+    __logger__.debug("Verifying the admin error message: %s..." % error)
+    ngsi = NGSI()
+    ngsi.verify_admin_error(context, error)
+    __logger__.info("...Verified that the admin error message is the expected")
