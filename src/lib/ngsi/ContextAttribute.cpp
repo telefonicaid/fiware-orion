@@ -822,9 +822,8 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
           out = isodate2str(numberValue);
         }
         else // regular number
-        {
-          snprintf(buf, sizeof(buf), "%f", numberValue);
-          out = buf;
+        {          
+          out = toString(numberValue);
         }
         break;
 
@@ -1054,8 +1053,6 @@ std::string ContextAttribute::getName(void)
 */
 std::string ContextAttribute::getValue(void) const
 {
-  char buffer[64];
-
   switch (valueType)
   {
   case orion::ValueTypeString:
@@ -1063,8 +1060,7 @@ std::string ContextAttribute::getValue(void) const
     break;
 
   case orion::ValueTypeNumber:
-    snprintf(buffer, sizeof(buffer), "%f", numberValue);
-    return std::string(buffer);
+    return toString(numberValue);
     break;
 
   case orion::ValueTypeBoolean:

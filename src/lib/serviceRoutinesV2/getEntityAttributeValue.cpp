@@ -46,7 +46,7 @@
 *
 * getEntityAttributeValue -
 *
-* GET /v2/entities/<id>/attrs/<attrName>
+* GET /v2/entities/<id>/attrs/<attrName>/value
 *
 * Payload In:  None
 * Payload Out: Entity Attribute
