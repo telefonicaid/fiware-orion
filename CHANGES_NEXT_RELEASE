@@ -41,6 +41,7 @@
 - Fix: using WARN log level instead of WARNING log level to align with IoTP Operations requirements (#2353)
 - Fix: Fixed metadata rendering in NGSIv1, so that the JSON data type is taken into account and not empty string is returned for non-string values (Issue #1068, just a part of it)
 - Fix: Fixed a bug about lists in URI parameter 'q' (last list item was skipped)
+- Fix: render float values with 9 digits precision in all cases, avoding spurious decimals (#2207, #2176, #2383)
 - Fix: Error payload returned on encountering non-existing entity/attribute in PUT /v2/entities/<entity-id>/attrs/<attr-name> (Issue #1360)
 - Fix: Added citation marks surrounding strings as response in text/plain.
 - Fix: Return NGSIv2 error if citation-mark is missing in PUT /v2/entities/{id}/attrs/{attrName}/value payload for plain text (previously it was NGSIv1 error format) (#2386)

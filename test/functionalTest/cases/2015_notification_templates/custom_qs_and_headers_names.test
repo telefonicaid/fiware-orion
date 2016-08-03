@@ -110,7 +110,7 @@ POST http://127.0.0.1:REGEX(\d+)/notify?paramfoo=bar
 Fiware-Servicepath: /
 Content-Length: 278
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-X-Myheader: 23.000000
+X-Myheader: 23
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
