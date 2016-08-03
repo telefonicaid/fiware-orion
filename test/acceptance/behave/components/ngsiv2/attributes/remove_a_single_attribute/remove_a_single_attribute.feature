@@ -742,7 +742,7 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-Service     | test_attribute_name_update_error |
       | Fiware-ServicePath | /test                            |
     When delete an attribute "" in the entity with id "room"
-    Then verify that receive an "Method not allowed" http code
+    Then verify that receive an "Method Not Allowed" http code
     And verify an error response
       | parameter   | value              |
       | error       | MethodNotAllowed   |

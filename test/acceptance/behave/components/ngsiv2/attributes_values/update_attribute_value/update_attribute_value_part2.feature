@@ -856,7 +856,7 @@ Feature: update an attribute value by entity ID and attribute name if it exists 
       | TrUe             |
       | FaLsE            |
 
-  @attribute_value_missing_citation_mark @BUG_2386 @skip
+  @attribute_value_missing_citation_mark @BUG_2386
   Scenario:  try to update an attribute value by entity ID and attribute name using NGSI v2 and missing citation-mark in attribute values in update request
     Given  a definition of headers
       | parameter          | value                               |

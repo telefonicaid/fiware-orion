@@ -259,12 +259,27 @@ Took 5m52.659s
 
 The log is stored in `logs` folder (if this folder does not exist it is created) and is called `behave.log` see `logging.ini`.
 
+The Context Broker must start with "DEBUG" level in "CB_EXTRA_OPS" field into properties.json file, otherwise some test expecting that setup will fail. Ex:
+```
+    "CB_EXTRA_OPS": "\"-multiservice -t 0-255 -logLevel DEBUG\"",
+```
+
 
 ## Tests Suites Coverage (features):
 
 |       FEATURE/REFERENCE                     |  TEST CASES  | METHOD  |            URL                                       |  PAYLOAD  | QUERIES PARAMS |
 |:--------------------------------------------|:------------:|--------:|:-----------------------------------------------------|:---------:|:--------------:|      
-|**api_entry_point**                                                                                                                                       |
+|**admin folder**                                                                                                                                          |
+|  retrieve_log_level                         |      1       | GET     | /admin/log                                           | No        | No             |
+|  change_log_level                           |     15       | PUT     | /admin/log                                           | No        | Yes            |
+|                                                                                                                                                          |
+|  retrieve_trace_level                       |  (pending)   | GET     | /log/trace                                           | No        | No             |
+|  change_trace_level                         |  (pending)   | PUT     | /log/trace/`<trace_levels>`                          | No        | No             |
+|  delete_trace_level                         |  (pending)   | DELETE  | /log/trace/`<trace_levels>`                          | No        | No             |
+|                                                                                                                                                          |
+|  semaphore_list                             |  (pending)   | GET     | /admin/sem                                           | No        | No             |
+|                                                                                                                                                          |
+|**api_entry_point folder**                                                                                                                                |
 |  retrieve_api_resource                      |     19       | GET     | /version  /statistics  cache/statistics    /v2       | No        | No             |
 |                                                                                                                                                          |
 |**entities folder**                                                                                                                                       |
