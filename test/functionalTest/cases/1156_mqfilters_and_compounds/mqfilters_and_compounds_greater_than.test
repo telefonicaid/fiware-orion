@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-String filters for compound values of attributes: greater_than
+String filters for compound values of metadata: greater_than
 
 --SHELL-INIT--
 dbInit CB

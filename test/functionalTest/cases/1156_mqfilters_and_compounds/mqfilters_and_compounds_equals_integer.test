@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-String filters for compound values of attributes: equality of integers
+String filters for compound values of metadata: equality of integers
 
 --SHELL-INIT--
 dbInit CB
@@ -30,7 +30,7 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create E1 with A1 with compound value containing all JSON types
+# 01. Create E1 with A1 with M1 having a compound value containing all JSON types
 #
 # 02. Equal to Same Integer: GET /v2/entities?q=A1.M1.i:10, see E1
 # 03. Equal to Same Integer: GET /v2/entities?q=A1.M1.i==10, see E1
@@ -53,8 +53,8 @@ brokerStart CB
 #
 
 
-echo "01. Create E1 with A1 with compound value containing all JSON types"
-echo "==================================================================="
+echo "01. Create E1 with A1 with M1 having a compound value containing all JSON types"
+echo "==============================================================================="
 payload='{
   "id": "E1",
   "A1": {
@@ -206,8 +206,8 @@ echo
 
 
 --REGEXPECT--
-01. Create E1 with A1 with compound value containing all JSON types
-===================================================================
+01. Create E1 with A1 with M1 having a compound value containing all JSON types
+===============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=none

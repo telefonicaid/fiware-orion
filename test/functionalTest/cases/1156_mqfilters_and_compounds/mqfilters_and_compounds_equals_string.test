@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-String filters for compound values of attributes: equality of float
+String filters for compound values of metadata: equality of float
 
 --SHELL-INIT--
 dbInit CB
