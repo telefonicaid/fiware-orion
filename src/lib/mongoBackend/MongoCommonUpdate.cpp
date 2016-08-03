@@ -1827,10 +1827,7 @@ static void updateAttrInNotifyCer
           caP->compoundValueP = NULL;
         }
 
-        // Clone
-        // caP->compoundValueP = (targetAttr->compoundValueP == NULL)? NULL : targetAttr->compoundValueP->clone();
-
-        // Steal
+        // Steal compound value from targetAttr
         caP->compoundValueP        = targetAttr->compoundValueP;
         targetAttr->compoundValueP = NULL;
       }
@@ -1864,20 +1861,9 @@ static void updateAttrInNotifyCer
               mdP->compoundValueP = NULL;
             }
 
-            // Set new compound value, if any
-            if (targetMdP->compoundValueP != NULL)
-            {
-              //
-              // FIXME PR: is it necessary to clone the compound or can we 'steal' it from targetMdP ?
-              //
-
-              // Clone
-              // mdP->compoundValueP = targetMdP->compoundValueP->clone();
-
-              // Steal
-              mdP->compoundValueP       = targetMdP->compoundValueP;
-              targetMdP->compoundValueP = NULL;
-            }
+            // Steal compound value from targetMdP
+            mdP->compoundValueP       = targetMdP->compoundValueP;
+            targetMdP->compoundValueP = NULL;
 
             if (targetMdP->type != "")
             {
