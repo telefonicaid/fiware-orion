@@ -1289,8 +1289,7 @@ static bool addTriggeredSubscriptions_noCache
          "}" +
          "return false; " +
       "}";
-  //LM_T(LmtMongo, ("idNPtypeP function: %s", functionIdNPtypeP.c_str()));
-  LM_W(("idNPtypeP function: %s", functionIdNPtypeP.c_str()));
+  LM_T(LmtMongo, ("idNPtypeP function: %s", functionIdNPtypeP.c_str()));
 
   boNPP.append(entPatternQ, "false");
   boNPP.append(typePatternQ, true);
@@ -1316,8 +1315,7 @@ static bool addTriggeredSubscriptions_noCache
          "}" +
          "return false; " +
       "}";
-  //LM_T(LmtMongo, ("idPtypeP function: %s", functionIdPtypeP.c_str()));
-  LM_W(("idPtypeP function: %s", functionIdPtypeP.c_str()));
+  LM_T(LmtMongo, ("idPtypeP function: %s", functionIdPtypeP.c_str()));
 
   boPP.append(entPatternQ, "true");
   boPP.append(typePatternQ, true);
@@ -1330,49 +1328,6 @@ static bool addTriggeredSubscriptions_noCache
 
   /* Composing final query */
   BSONObj query = BSON("$or" << BSON_ARRAY(idNPtypeNP << idPtypeNP << idNPtypeP << idPtypeP));
-
-#if 0
-  /* Note the $or on entityType, to take into account matching in subscriptions with no entity type */
-  BSONObj queryNoPattern = BSON(
-                entIdQ << entityId <<
-                "$or" << BSON_ARRAY(
-                    BSON(entTypeQ << entityType) <<
-                    BSON(entTypeQ << BSON("$exists" << false))) <<
-                entPatternQ << "false" <<
-                CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
-                CSUB_STATUS << BSON("$ne" << STATUS_INACTIVE) <<
-                CSUB_SERVICE_PATH << spBson);
-
-  /* This is JavaScript code that runs in MongoDB engine.
-   * Note that although we are using a isPattern=true in the MongoDB query besides $where, we
-   * also need to check that in the if statement in the JavaScript function given that a given
-   * sub document could include both isPattern=true and isPattern=false documents */
-  std::string function = std::string("function()") +
-         "{" +
-            "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
-                "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"true\" && " +
-                    "(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \""+entityType+"\" || " +
-                        "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \"\" || " +
-                        "!(\""+CSUB_ENTITY_TYPE+"\" in this."+CSUB_ENTITIES+"[i])) && " +
-                    "\""+entityId+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+")) {" +
-                    "return true; " +
-                "}" +
-            "}" +
-            "return false; " +
-         "}";
-  LM_T(LmtMongo, ("JS function: %s", function.c_str()));
-
-  BSONObjBuilder  queryPattern;
-
-  queryPattern.append(entPatternQ, "true");  
-  queryPattern.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
-  queryPattern.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
-  queryPattern.append(CSUB_SERVICE_PATH, spBson);
-  queryPattern.appendCode("$where", function);
-
-  // FIXME: condTypeQ, condValueQ and servicePath part could be "factorized" out of the $or clause
-  BSONObj                   query       = BSON("$or" << BSON_ARRAY(queryNoPattern << queryPattern.obj()));
-#endif
 
   std::string               collection  = getSubscribeContextCollectionName(tenant);
   auto_ptr<DBClientCursor>  cursor;
