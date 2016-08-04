@@ -368,7 +368,7 @@ void Metadata::release(void)
 {
   if (compoundValueP != NULL)
   {
-    delete compoundValueP;
+    // delete compoundValueP;
     compoundValueP = NULL;
   }
 }
