@@ -80,7 +80,7 @@ Metadata::Metadata(Metadata* mP, bool useDefaultType)
   numberValue     = mP->numberValue;
   boolValue       = mP->boolValue;
   typeGiven       = mP->typeGiven;
-  compoundValueP  = mP->compoundValueP;
+  compoundValueP  = (mP->compoundValueP != NULL)? mP->compoundValueP->clone() : NULL;
 
   if (useDefaultType && !typeGiven)
   {
@@ -368,7 +368,7 @@ void Metadata::release(void)
 {
   if (compoundValueP != NULL)
   {
-    // delete compoundValueP;
+    delete compoundValueP;
     compoundValueP = NULL;
   }
 }
@@ -476,7 +476,7 @@ std::string Metadata::toJson(bool isLastElement)
       compoundValueP->name  = "value";
       compoundValueP->rootP = NULL;
 
-      out += compoundValueP->toJson(true);
+      out += compoundValueP->toJson(isLastElement, false);
     }
     else if (compoundValueP->isVector())
     {
