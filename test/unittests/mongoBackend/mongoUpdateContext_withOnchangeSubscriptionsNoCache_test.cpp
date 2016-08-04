@@ -269,7 +269,7 @@ static void prepareDatabase(void)
   BSONObj sub10 = BSON("_id" << OID("51307b66f481db11bf860010") <<
                       "expiration" << 1500000000 <<
                       "lastNotification" << 20000000 <<
-                      "reference" << "http://notify4.me" <<
+                      "reference" << "http://notify10.me" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E8" << "type" << "T[1-2]$" << "isPattern" << "false" << "isTypePattern" << true)) <<
                       "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
                       "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
@@ -522,9 +522,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_type
     ContextAttribute ca1("A4", "TA4", "new_val");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
     expectedNcr.contextElementResponseVector.push_back(&cer);
-    expectedNcr.subscriptionId.set("51307b66f481db11bf860004");
+    expectedNcr.subscriptionId.set("51307b66f481db11bf860010");
 
-    ngsiv2::HttpInfo          httpInfo("http://notify4.me");
+    ngsiv2::HttpInfo          httpInfo("http://notify10.me");
     std::vector<std::string>  attrsFilter;
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
@@ -552,7 +552,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_type
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    CHECK_LAST_NOTIFICATION("51307b66f481db11bf860001", 1360232700);
+    CHECK_LAST_NOTIFICATION("51307b66f481db11bf860010", 1360232700);
 
     delete notifierMock;
 

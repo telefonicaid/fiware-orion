@@ -1198,11 +1198,12 @@ static bool addTriggeredSubscriptions_noCache
 
 
   /* Build query */
-  std::string entIdQ       = CSUB_ENTITIES   "." CSUB_ENTITY_ID;
-  std::string entTypeQ     = CSUB_ENTITIES   "." CSUB_ENTITY_TYPE;
-  std::string entPatternQ  = CSUB_ENTITIES   "." CSUB_ENTITY_ISPATTERN;
-  std::string inRegex      = "{ $in: [ " + spathRegex + ", null ] }";
-  BSONObj     spBson       = fromjson(inRegex);
+  std::string entIdQ        = CSUB_ENTITIES   "." CSUB_ENTITY_ID;
+  std::string entTypeQ      = CSUB_ENTITIES   "." CSUB_ENTITY_TYPE;
+  std::string entPatternQ   = CSUB_ENTITIES   "." CSUB_ENTITY_ISPATTERN;
+  std::string typePatternQ  = CSUB_ENTITIES   "." CSUB_ENTITY_ISTYPEPATTERN;
+  std::string inRegex       = "{ $in: [ " + spathRegex + ", null ] }";
+  BSONObj     spBson        = fromjson(inRegex);
 
   /* Query is an $or of 4 sub-clauses:
    *
@@ -1213,33 +1214,46 @@ static bool addTriggeredSubscriptions_noCache
    *
    * The last three ones use $where to search for patterns in DB. As far as I know, this is the only
    * way to do a "reverse regex" query in MongoDB (see http://stackoverflow.com/questions/15966991/mongodb-reverse-regex/15989520).
-   * The first "if" in these function is due to entity vector may contain different pattern/no-pattern
-   * combinations
+   * The first part of the "if" in these function is used to ensure the function match the corresponding
+   * pattern/no-pattern combination, as the entities vector may contain a mix.
+   *
+   * Note we are using the construct
+   *
+   *   typePatternQ << BSON("$ne" << true)
+   *
+   * insteas of just
+   *
+   *   typePatternQ << false
+   *
+   * as the former also match documents without the typePatternQ (i.e. legacy sub documents created before the
+   * isTypePattern feature has been developed)
    *
    * FIXME: condTypeQ, condValueQ and servicePath part could be "factorized" out of the $or clause
    */
 
   BSONObj idNPtypeNP;
   BSONObj idPtypeNP;
-  //BSONObj idNPtypeP;
+  BSONObj idNPtypeP;
   //BSONObj idPtypeP;
 
   /* First clause: idNPtypeNP */
   idNPtypeNP = BSON(entIdQ << entityId <<
                    "$or" << BSON_ARRAY(BSON(entTypeQ << entityType) <<
-                                      BSON(entTypeQ << BSON("$exists" << false))) <<
+                                       BSON(entTypeQ << BSON("$exists" << false))) <<
                    entPatternQ << "false" <<
+                   typePatternQ << BSON("$ne" << true) <<
                    CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
                    CSUB_STATUS << BSON("$ne" << STATUS_INACTIVE) <<
                    CSUB_SERVICE_PATH << spBson);
 
   /* Second clause: idPtypeNP */
-  BSONObjBuilder bo;
+  BSONObjBuilder boPNP;
 
   std::string functionIdPtypeNP = std::string("function()") +
          "{" +
             "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
                 "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"true\" && " +
+                    "!this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISTYPEPATTERN+" && " +
                     "(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \""+entityType+"\" || " +
                         "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \"\" || " +
                         "!(\""+CSUB_ENTITY_TYPE+"\" in this."+CSUB_ENTITIES+"[i])) && " +
@@ -1251,23 +1265,47 @@ static bool addTriggeredSubscriptions_noCache
          "}";
   LM_T(LmtMongo, ("idTtypeNP function: %s", functionIdPtypeNP.c_str()));
 
-  bo.append(entPatternQ, "true");
-  bo.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
-  bo.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
-  bo.append(CSUB_SERVICE_PATH, spBson);
-  bo.appendCode("$where", functionIdPtypeNP);
+  boPNP.append(entPatternQ, "true");
+  boPNP.append(typePatternQ, BSON("$ne" << true));
+  boPNP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  boPNP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
+  boPNP.append(CSUB_SERVICE_PATH, spBson);
+  boPNP.appendCode("$where", functionIdPtypeNP);
 
-  idPtypeNP = bo.obj();
+  idPtypeNP = boPNP.obj();
 
   /* Third clause: idNPtypeP */
-  // TBD
+  BSONObjBuilder boNPP;
+
+  std::string functionIdNPtypeP = std::string("function()") +
+      "{" +
+         "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
+             "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"false\" && " +
+                 "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISTYPEPATTERN+" && " +
+                 "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+" == \""+entityId+"\" && " +
+                 "\""+entityType+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+")) {" +
+                 "return true; " +
+             "}" +
+         "}" +
+         "return false; " +
+      "}";
+  //LM_T(LmtMongo, ("idNPtypeP function: %s", functionIdNPtypeP.c_str()));
+  LM_W(("idNPtypeP function: %s", functionIdNPtypeP.c_str()));
+
+  boNPP.append(entPatternQ, "false");
+  boNPP.append(typePatternQ, true);
+  boNPP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  boNPP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
+  boNPP.append(CSUB_SERVICE_PATH, spBson);
+  boNPP.appendCode("$where", functionIdNPtypeP);
+
+  idNPtypeP = boNPP.obj();
 
   /* Fouth clause: idPtypeP */
   // TBD
 
   /* Composing final query */
-  BSONObj query = BSON("$or" << BSON_ARRAY(idNPtypeNP << idPtypeNP));
-
+  BSONObj query = BSON("$or" << BSON_ARRAY(idNPtypeNP << idPtypeNP << idNPtypeP));
 
 #if 0
   /* Note the $or on entityType, to take into account matching in subscriptions with no entity type */
