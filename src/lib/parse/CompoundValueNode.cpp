@@ -115,11 +115,11 @@ CompoundValueNode::CompoundValueNode
 }
 
 
+
 /* ****************************************************************************
 *
 * CompoundValueNode - constructor for all nodes except toplevel (char*)
 */
-
 CompoundValueNode::CompoundValueNode
 (
   CompoundValueNode*  _container,
@@ -183,6 +183,8 @@ CompoundValueNode::CompoundValueNode
                           orion::valueTypeName(valueType),
                           this));
 }
+
+
 
 /* ****************************************************************************
 *
