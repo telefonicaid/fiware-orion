@@ -1862,15 +1862,8 @@ static void updateAttrInNotifyCer
             }
 
             // Steal compound value from targetMdP
-            // mdP->compoundValueP       = targetMdP->compoundValueP;
-            // targetMdP->compoundValueP = NULL;
-
-            // Clone compound value of targetMdP
-            if (targetMdP->compoundValueP != NULL)
-            {
-              mdP->compoundValueP       = targetMdP->compoundValueP->clone();
-            }
-
+            mdP->compoundValueP       = targetMdP->compoundValueP;
+            targetMdP->compoundValueP = NULL;
 
             if (targetMdP->type != "")
             {

@@ -456,7 +456,7 @@ std::string Metadata::toJson(bool isLastElement)
   }
   else if (valueType == orion::ValueTypeObject)
   {
-    if (compoundValueP->isObject())
+    if ((compoundValueP->isObject()) || (compoundValueP->isVector()))
     {
       std::string out2;
 
@@ -478,10 +478,6 @@ std::string Metadata::toJson(bool isLastElement)
 
       out += compoundValueP->toJson(isLastElement, false);
     }
-    else if (compoundValueP->isVector())
-    {
-      out += std::string("\"value\"") + ":[" + compoundValueP->toJson(true) + "]";
-    }    
   }
   else
   {
