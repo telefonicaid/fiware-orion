@@ -1204,6 +1204,72 @@ static bool addTriggeredSubscriptions_noCache
   std::string inRegex      = "{ $in: [ " + spathRegex + ", null ] }";
   BSONObj     spBson       = fromjson(inRegex);
 
+  /* Query is an $or of 4 sub-clauses:
+   *
+   * idNPtypeNP -> id no pattern, type no pattern
+   * idPtypeNP  -> id pattern, type no pattern
+   * idNPtypeP  -> id no pattern, type pattern
+   * idPtypeP   -> id pattern, type pattern
+   *
+   * The last three ones use $where to search for patterns in DB. As far as I know, this is the only
+   * way to do a "reverse regex" query in MongoDB (see http://stackoverflow.com/questions/15966991/mongodb-reverse-regex/15989520).
+   * The first "if" in these function is due to entity vector may contain different pattern/no-pattern
+   * combinations
+   *
+   * FIXME: condTypeQ, condValueQ and servicePath part could be "factorized" out of the $or clause
+   */
+
+  BSONObj idNPtypeNP;
+  BSONObj idPtypeNP;
+  //BSONObj idNPtypeP;
+  //BSONObj idPtypeP;
+
+  /* First clause: idNPtypeNP */
+  idNPtypeNP = BSON(entIdQ << entityId <<
+                   "$or" << BSON_ARRAY(BSON(entTypeQ << entityType) <<
+                                      BSON(entTypeQ << BSON("$exists" << false))) <<
+                   entPatternQ << "false" <<
+                   CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
+                   CSUB_STATUS << BSON("$ne" << STATUS_INACTIVE) <<
+                   CSUB_SERVICE_PATH << spBson);
+
+  /* Second clause: idPtypeNP */
+  BSONObjBuilder bo;
+
+  std::string functionIdPtypeNP = std::string("function()") +
+         "{" +
+            "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
+                "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"true\" && " +
+                    "(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \""+entityType+"\" || " +
+                        "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \"\" || " +
+                        "!(\""+CSUB_ENTITY_TYPE+"\" in this."+CSUB_ENTITIES+"[i])) && " +
+                    "\""+entityId+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+")) {" +
+                    "return true; " +
+                "}" +
+            "}" +
+            "return false; " +
+         "}";
+  LM_T(LmtMongo, ("idTtypeNP function: %s", functionIdPtypeNP.c_str()));
+
+  bo.append(entPatternQ, "true");
+  bo.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  bo.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
+  bo.append(CSUB_SERVICE_PATH, spBson);
+  bo.appendCode("$where", functionIdPtypeNP);
+
+  idPtypeNP = bo.obj();
+
+  /* Third clause: idNPtypeP */
+  // TBD
+
+  /* Fouth clause: idPtypeP */
+  // TBD
+
+  /* Composing final query */
+  BSONObj query = BSON("$or" << BSON_ARRAY(idNPtypeNP << idPtypeNP));
+
+
+#if 0
   /* Note the $or on entityType, to take into account matching in subscriptions with no entity type */
   BSONObj queryNoPattern = BSON(
                 entIdQ << entityId <<
@@ -1215,9 +1281,7 @@ static bool addTriggeredSubscriptions_noCache
                 CSUB_STATUS << BSON("$ne" << STATUS_INACTIVE) <<
                 CSUB_SERVICE_PATH << spBson);
 
-  /* This is JavaScript code that runs in MongoDB engine. As far as I know, this is the only
-   * way to do a "reverse regex" query in MongoDB (see
-   * http://stackoverflow.com/questions/15966991/mongodb-reverse-regex/15989520).
+  /* This is JavaScript code that runs in MongoDB engine.
    * Note that although we are using a isPattern=true in the MongoDB query besides $where, we
    * also need to check that in the if statement in the JavaScript function given that a given
    * sub document could include both isPattern=true and isPattern=false documents */
@@ -1246,6 +1310,8 @@ static bool addTriggeredSubscriptions_noCache
 
   // FIXME: condTypeQ, condValueQ and servicePath part could be "factorized" out of the $or clause
   BSONObj                   query       = BSON("$or" << BSON_ARRAY(queryNoPattern << queryPattern.obj()));
+#endif
+
   std::string               collection  = getSubscribeContextCollectionName(tenant);
   auto_ptr<DBClientCursor>  cursor;
   std::string               errorString;
