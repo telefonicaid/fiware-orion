@@ -113,6 +113,8 @@ static void prepareDatabaseV1Subs(void) {
 */
 TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
 {
+  utInit();
+
   OrionError  oe;
   long long   count;
 
@@ -206,6 +208,7 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
   EXPECT_EQ(-1, s.throttling);
   EXPECT_EQ(20000000, s.expires);
 
+  utExit();
 }
 
 /* ****************************************************************************
@@ -214,6 +217,8 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
 */
 TEST(mongoGetSubscription, getSubscription)
 {
+  utInit();
+
   OrionError oe;
 
   /* Prepare database */
@@ -285,4 +290,5 @@ TEST(mongoGetSubscription, getSubscription)
   EXPECT_EQ(5, s.throttling);
   EXPECT_EQ(25000000, s.expires);
 
+  utExit();
 }

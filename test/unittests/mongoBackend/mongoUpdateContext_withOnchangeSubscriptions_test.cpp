@@ -392,11 +392,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
@@ -421,7 +416,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
 
     utExit();
 }
@@ -435,6 +429,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;    
@@ -462,11 +458,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
@@ -479,7 +470,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();   
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -491,7 +481,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch)
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -503,6 +494,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
@@ -526,11 +519,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
@@ -543,7 +531,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -556,7 +543,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -568,6 +556,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr1, expectedNcr2;
@@ -599,11 +589,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
@@ -616,7 +601,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -635,7 +619,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -647,6 +632,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr1, expectedNcr2;
@@ -680,11 +667,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
@@ -697,7 +679,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();   
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -716,7 +697,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -728,6 +710,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr1, expectedNcr2;
@@ -758,11 +742,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
@@ -775,7 +754,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -793,7 +771,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -806,6 +785,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
@@ -831,11 +812,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T", "false");
@@ -848,7 +824,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -863,7 +838,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -876,6 +852,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
@@ -902,11 +880,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T", "false");
@@ -919,7 +892,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -931,10 +903,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -946,6 +918,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
@@ -969,11 +943,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T", "false");
@@ -986,7 +955,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1000,7 +968,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1012,6 +981,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
@@ -1037,11 +1008,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E3", "T3", "false");
@@ -1054,7 +1020,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1068,7 +1033,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1080,6 +1046,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
@@ -1107,11 +1075,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E3", "T3", "false");
@@ -1124,7 +1087,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1138,7 +1100,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1150,6 +1113,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
@@ -1173,11 +1138,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E3", "T3", "false");
@@ -1190,7 +1150,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1204,7 +1163,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1216,6 +1176,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchDisjoint)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
@@ -1240,11 +1202,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchDisjoint)
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
@@ -1258,7 +1215,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchDisjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1272,7 +1228,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchDisjoint)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1284,6 +1241,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatchDisjoint)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
@@ -1308,11 +1267,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatchDisjoint)
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
@@ -1326,7 +1280,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatchDisjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1340,7 +1293,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatchDisjoint)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1352,6 +1306,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
@@ -1377,11 +1333,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
@@ -1394,7 +1345,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1408,7 +1358,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1421,6 +1372,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateNoMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -1429,11 +1382,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateNoMatch)
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
@@ -1447,7 +1395,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();   
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1461,7 +1408,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateNoMatch)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1474,6 +1422,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendNoMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -1482,11 +1432,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendNoMatch)
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
@@ -1500,7 +1445,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1513,7 +1457,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendNoMatch)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1526,6 +1471,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -1534,11 +1481,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */    
     ContextElement ce;
@@ -1552,7 +1494,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1565,7 +1506,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1578,6 +1520,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchWithoutChang
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -1586,11 +1530,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchWithoutChang
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
@@ -1604,7 +1543,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchWithoutChang
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1617,7 +1555,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchWithoutChang
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1629,6 +1568,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
@@ -1654,11 +1595,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
@@ -1673,7 +1609,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1685,10 +1620,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1700,6 +1635,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMixMatchNoMatch)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;    
@@ -1727,11 +1664,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMixMatchNoMatch)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */    
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
@@ -1746,7 +1678,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMixMatchNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1758,10 +1689,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMixMatchNoMatch)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1773,6 +1704,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
@@ -1796,11 +1729,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
@@ -1815,7 +1743,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1830,7 +1757,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1842,6 +1770,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notifica
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
@@ -1865,12 +1795,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notifica
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    setNotifier(notifierMock);  
 
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
@@ -1886,7 +1811,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notifica
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1902,7 +1826,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notifica
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1914,6 +1839,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notifica
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;   
@@ -1941,11 +1868,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notifica
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */    
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
@@ -1960,7 +1882,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notifica
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1973,10 +1894,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notifica
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
     EXPECT_EQ(1, subP->count);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1988,6 +1909,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notifica
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
@@ -2011,11 +1934,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notifica
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
@@ -2028,7 +1946,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notifica
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2040,10 +1957,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notifica
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2055,6 +1972,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatch)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
@@ -2080,11 +1999,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatch)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */    
     ContextElement ce;
     ce.entityId.fill("E2", "T2", "false");
@@ -2098,7 +2012,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2110,10 +2023,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatch)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2125,6 +2038,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatch)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;    
@@ -2152,11 +2067,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatch)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E2", "T2", "false");
@@ -2169,7 +2079,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2181,10 +2090,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatch)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2196,6 +2105,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
@@ -2219,11 +2130,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */    
     ContextElement ce;
     ce.entityId.fill("E2", "T2", "false");
@@ -2236,7 +2142,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2248,10 +2153,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2263,6 +2168,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchDisjoint)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;    
@@ -2287,11 +2194,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchDisjoint)
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
@@ -2305,7 +2207,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchDisjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2320,7 +2221,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchDisjoint)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2332,6 +2234,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatchDisjoint)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;    
@@ -2356,11 +2260,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatchDisjoint)
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(1);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
@@ -2374,7 +2273,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatchDisjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2386,10 +2284,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatchDisjoint)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2401,6 +2299,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;    
@@ -2426,11 +2326,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E2", "T2", "false");
@@ -2443,7 +2338,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2455,10 +2349,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2471,6 +2365,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateNoMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -2479,11 +2375,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateNoMatch)
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
@@ -2497,7 +2388,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2510,7 +2400,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateNoMatch)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2523,6 +2414,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendNoMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -2531,11 +2424,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendNoMatch)
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
@@ -2549,7 +2437,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2562,7 +2449,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendNoMatch)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2575,6 +2463,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -2583,11 +2473,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */    
     ContextElement ce;
@@ -2601,7 +2486,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2614,7 +2498,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2627,6 +2512,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchWithoutChang
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -2635,11 +2522,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchWithoutChang
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
@@ -2653,7 +2535,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchWithoutChang
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2666,7 +2547,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchWithoutChang
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2678,6 +2560,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMixMatchNoMatch)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr; 
@@ -2703,11 +2587,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMixMatchNoMatch)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */    
     ContextElement ce;
     ce.entityId.fill("E2", "T2", "false");
@@ -2722,7 +2601,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMixMatchNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2734,10 +2612,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMixMatchNoMatch)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2749,6 +2627,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMixMatchNoMatch)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;   
@@ -2776,11 +2656,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMixMatchNoMatch)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */    
     ContextElement ce;
     ce.entityId.fill("E2", "T2", "false");
@@ -2795,7 +2670,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMixMatchNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2807,10 +2681,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMixMatchNoMatch)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2822,6 +2696,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
@@ -2845,11 +2721,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E2", "T2", "false");
@@ -2864,7 +2735,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2876,10 +2746,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2891,6 +2761,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notifica
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
@@ -2916,11 +2788,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notifica
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E2", "T2", "false");
@@ -2935,7 +2802,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notifica
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2948,10 +2814,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notifica
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
     EXPECT_EQ(1, subP->count);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2963,6 +2829,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notifica
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
@@ -2990,11 +2858,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notifica
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */    
     ContextElement ce;
     ce.entityId.fill("E2", "T2", "false");
@@ -3009,7 +2872,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notifica
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -3022,10 +2884,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notifica
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
     EXPECT_EQ(1, subP->count);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -3037,6 +2899,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
@@ -3060,11 +2924,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E2", "T2", "false");
@@ -3077,7 +2936,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -3089,10 +2947,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -3110,6 +2968,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbQueryFail)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabase();
@@ -3138,7 +2998,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbQueryFail)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -3164,12 +3023,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbQueryFail)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(20000000, subP->lastNotificationTime);
 
-
     /* Restore real DB connection */
     setMongoConnectionForUnitTest(connectionDb);
 
     /* Release mock */
     delete notifierMock;
+
+    utExit();
 }
 
 /* ****************************************************************************

@@ -1481,7 +1481,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1_JSON)
     /* Prepare database */
     prepareDatabase();
 
-    /* Invoke the function in mongoBackend library */    
+    /* Invoke the function in mongoBackend library */
     ms = mongoSubscribeContext(&req, &res, "", "", servicePathVector);
 
     /* Check response is as expected */

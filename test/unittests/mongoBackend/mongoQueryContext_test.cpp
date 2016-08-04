@@ -2536,7 +2536,7 @@ TEST(mongoQueryContextRequest, queryNEntNAttr)
     req.attributeList.push_back("A1");
     req.attributeList.push_back("A3");
 
-    /* Invoke the function in mongoBackend library */    
+    /* Invoke the function in mongoBackend library */
     ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
     /* Check response is as expected */
@@ -2599,7 +2599,7 @@ TEST(mongoQueryContextRequest, query1Ent0AttrFail)
     EntityId en("E3", "T3", "false");
     req.entityIdVector.push_back(&en);
 
-    /* Invoke the function in mongoBackend library */    
+    /* Invoke the function in mongoBackend library */
     ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
     /* Check response is as expected */
@@ -2639,7 +2639,7 @@ TEST(mongoQueryContextRequest, query1Ent1AttrFail)
     req.entityIdVector.push_back(&en);
     req.attributeList.push_back("A3");
 
-    /* Invoke the function in mongoBackend library */    
+    /* Invoke the function in mongoBackend library */
     ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
     /* Check response is as expected */
@@ -2770,7 +2770,7 @@ TEST(mongoQueryContextRequest, queryNEntWA0Attr)
     req.entityIdVector.push_back(&en1);
     req.entityIdVector.push_back(&en2);
 
-    /* Invoke the function in mongoBackend library */    
+    /* Invoke the function in mongoBackend library */
     ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
     /* Check response is as expected */
@@ -2836,7 +2836,7 @@ TEST(mongoQueryContextRequest, queryNEntWA1Attr)
     req.entityIdVector.push_back(&en2);
     req.attributeList.push_back("A1");
 
-    /* Invoke the function in mongoBackend library */    
+    /* Invoke the function in mongoBackend library */
     ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
     /* Check response is as expected */
@@ -3325,7 +3325,7 @@ TEST(mongoQueryContextRequest, queryPatternNAttr)
     req.attributeList.push_back("A1");
     req.attributeList.push_back("A2");
 
-    /* Invoke the function in mongoBackend library */    
+    /* Invoke the function in mongoBackend library */
     ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
     /* Check response is as expected */

@@ -166,6 +166,8 @@ void utExit(void)
   setTimer(NULL);
   setNotifier(NULL);
 
+  subCacheDisable();
+
 #ifdef UT_DEBUG
   printf("**************** FROM utExit (%d inits, %d exits)\n", noOfInits, noOfExits);
 #endif
