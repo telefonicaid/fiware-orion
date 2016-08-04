@@ -240,11 +240,11 @@ std::string Metadata::render(const std::string& indent, bool comma)
 
     if (compoundValueP->isObject())
     {
-      part = compoundValueP->toJson(true);
+      part = compoundValueP->toJson(true, false);
     }
     else if (compoundValueP->isVector())
     {
-      part = "[" + compoundValueP->toJson(true) + "]";
+      part = "[" + compoundValueP->toJson(true, false) + "]";
     }    
 
     out += part;
