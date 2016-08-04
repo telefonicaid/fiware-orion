@@ -49,6 +49,7 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * - Cond1_updateMatch
 * - Cond1_appendMatch
 * - Cond1_appendMatch_typePattern
+* - Cond1_appendMatch_idAndtypePattern
 * - Cond1_deleteMatch
 * - Cond1_updateMatch_no_type
 * - Cond1_appendMatch_no_type
@@ -186,6 +187,11 @@ static void prepareDatabase(void)
    *     Entity: E8 - T[1-2]$
    *     Attribute: A1, A3, A4
    *     NotifyCond: ONCHANGE on [A1, A2, A4]
+   *
+   * - Sub11:
+   *     Entity: E[8-9] - T[1-2]$
+   *     Attribute: A1, A3, A4
+   *     NotifyCond: ONCHANGE on [A1, A2, A4]
    */
 
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
@@ -270,7 +276,16 @@ static void prepareDatabase(void)
                       "expiration" << 1500000000 <<
                       "lastNotification" << 20000000 <<
                       "reference" << "http://notify10.me" <<
-                      "entities" << BSON_ARRAY(BSON("id" << "E8" << "type" << "T[1-2]$" << "isPattern" << "false" << "isTypePattern" << true)) <<
+                      "entities" << BSON_ARRAY(BSON("id" << "E7" << "type" << "T[1-2]$" << "isPattern" << "false" << "isTypePattern" << true)) <<
+                      "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
+                      "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
+                      );
+
+  BSONObj sub11 = BSON("_id" << OID("51307b66f481db11bf860011") <<
+                      "expiration" << 1500000000 <<
+                      "lastNotification" << 20000000 <<
+                      "reference" << "http://notify11.me" <<
+                      "entities" << BSON_ARRAY(BSON("id" << "E[8-9]" << "type" << "T[1-2]$" << "isPattern" << "true" << "isTypePattern" << true)) <<
                       "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
                       "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
                       );
@@ -285,6 +300,7 @@ static void prepareDatabase(void)
   connection->insert(SUBSCRIBECONTEXT_COLL, sub2);
   connection->insert(SUBSCRIBECONTEXT_COLL, sub3);
   connection->insert(SUBSCRIBECONTEXT_COLL, sub10);
+  connection->insert(SUBSCRIBECONTEXT_COLL, sub11);
 
   noCache = true;
   subCacheDisable();
@@ -518,7 +534,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_type
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E8", "T1", "false");
+    cer.contextElement.entityId.fill("E7", "T1", "false");
     ContextAttribute ca1("A4", "TA4", "new_val");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
     expectedNcr.contextElementResponseVector.push_back(&cer);
@@ -537,7 +553,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_type
 
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
-    ce.entityId.fill("E8", "T1", "false");
+    ce.entityId.fill("E7", "T1", "false");
     ContextAttribute ca2("A4", "TA4", "new_val");
     ce.contextAttributeVector.push_back(&ca2);
     req.contextElementVector.push_back(&ce);
@@ -553,6 +569,65 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_type
     EXPECT_EQ(SccOk, ms);
 
     CHECK_LAST_NOTIFICATION("51307b66f481db11bf860010", 1360232700);
+
+    delete notifierMock;
+
+    utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* Cond1_appendMatch_idAndTypePattern -
+*/
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_idAndTypePattern)
+{
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
+
+    utInit();
+
+    /* Prepare mock */
+    NotifyContextRequest expectedNcr;
+    expectedNcr.originator.set("localhost");
+    ContextElementResponse cer;
+    cer.contextElement.entityId.fill("E9", "T1", "false");
+    ContextAttribute ca1("A4", "TA4", "new_val");
+    cer.contextElement.contextAttributeVector.push_back(&ca1);
+    expectedNcr.contextElementResponseVector.push_back(&cer);
+    expectedNcr.subscriptionId.set("51307b66f481db11bf860011");
+
+    ngsiv2::HttpInfo          httpInfo("http://notify11.me");
+    std::vector<std::string>  attrsFilter;
+    attrsFilter.push_back("A1");
+    attrsFilter.push_back("A3");
+    attrsFilter.push_back("A4");
+
+    NotifierMock* notifierMock = new NotifierMock();
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+            .Times(1);
+    setNotifier(notifierMock);
+
+    /* Forge the request (from "inside" to "outside") */
+    ContextElement ce;
+    ce.entityId.fill("E9", "T1", "false");
+    ContextAttribute ca2("A4", "TA4", "new_val");
+    ce.contextAttributeVector.push_back(&ca2);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("APPEND");
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    CHECK_LAST_NOTIFICATION("51307b66f481db11bf860011", 1360232700);
 
     delete notifierMock;
 

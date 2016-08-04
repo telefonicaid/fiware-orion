@@ -1234,7 +1234,7 @@ static bool addTriggeredSubscriptions_noCache
   BSONObj idNPtypeNP;
   BSONObj idPtypeNP;
   BSONObj idNPtypeP;
-  //BSONObj idPtypeP;
+  BSONObj idPtypeP;
 
   /* First clause: idNPtypeNP */
   idNPtypeNP = BSON(entIdQ << entityId <<
@@ -1302,10 +1302,34 @@ static bool addTriggeredSubscriptions_noCache
   idNPtypeP = boNPP.obj();
 
   /* Fouth clause: idPtypeP */
-  // TBD
+  BSONObjBuilder boPP;
+
+  std::string functionIdPtypeP = std::string("function()") +
+      "{" +
+         "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
+             "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"true\" && " +
+                 "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISTYPEPATTERN+" && " +
+                 "\""+entityId+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+") && " +
+                 "\""+entityType+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+")) {" +
+                 "return true; " +
+             "}" +
+         "}" +
+         "return false; " +
+      "}";
+  //LM_T(LmtMongo, ("idPtypeP function: %s", functionIdPtypeP.c_str()));
+  LM_W(("idPtypeP function: %s", functionIdPtypeP.c_str()));
+
+  boPP.append(entPatternQ, "true");
+  boPP.append(typePatternQ, true);
+  boPP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  boPP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
+  boPP.append(CSUB_SERVICE_PATH, spBson);
+  boPP.appendCode("$where", functionIdPtypeP);
+
+  idPtypeP = boPP.obj();
 
   /* Composing final query */
-  BSONObj query = BSON("$or" << BSON_ARRAY(idNPtypeNP << idPtypeNP << idNPtypeP));
+  BSONObj query = BSON("$or" << BSON_ARRAY(idNPtypeNP << idPtypeNP << idNPtypeP << idPtypeP));
 
 #if 0
   /* Note the $or on entityType, to take into account matching in subscriptions with no entity type */
