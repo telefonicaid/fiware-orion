@@ -35,9 +35,9 @@ accumulatorStart
 # 02. Create E1 with temperature: 34 (no decimals)
 # 03. Update E1 temperature: 34.4 (1 decimal)
 # 04. Update E1 temperature: 34.1234567 (7 decimals)
-# 05. Dump accumulator, see 3  notification, all them with the right number of decimals
+# 05. Dump accumulator, see 3 notifications, all of them with the correct number of decimals
 #
-# FIXME #2425: step 4 is not working fine and will be fixed when this issue got solved
+# FIXME #2425: step 4 is not working fine and will be fixed when this issue is solved
 #
 
 echo "01. Create subscription with custom notification"
@@ -98,8 +98,8 @@ echo
 echo
 
 
-echo "05. Dump accumulator, see 3  notification, all them with the right number of decimals"
-echo "====================================================================================="
+echo "05. Dump accumulator, see 3 notifications, all of them with the correct number of decimals"
+echo "=========================================================================================="
 accumulatorDump
 echo
 echo
@@ -144,8 +144,8 @@ Date: REGEX(.*)
 
 
 
-05. Dump accumulator, see 3  notification, all them with the right number of decimals
-=====================================================================================
+05. Dump accumulator, see 3 notifications, all of them with the correct number of decimals
+==========================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 29
@@ -170,7 +170,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 The temperature is 34.4 degrees=======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: REGEX(\d*)
+Content-Length: 39
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
@@ -178,7 +178,7 @@ Accept: application/json
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
-The temperature is 34.123REGEX(\d*) degrees=======================================
+The temperature is 34.123456700 degrees=======================================
 
 
 --TEARDOWN--
