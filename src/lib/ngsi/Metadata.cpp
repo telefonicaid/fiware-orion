@@ -366,6 +366,11 @@ void Metadata::present(const std::string& metadataType, int ix, const std::strin
 */
 void Metadata::release(void)
 {
+  if (compoundValueP != NULL)
+  {
+    delete compoundValueP;
+    compoundValueP = NULL;
+  }
 }
 
 
