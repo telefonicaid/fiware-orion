@@ -1824,8 +1824,12 @@ static void updateAttrInNotifyCer
         if (caP->compoundValueP != NULL)
         {
           delete caP->compoundValueP;
+          caP->compoundValueP = NULL;
         }
-        caP->compoundValueP = targetAttr->compoundValueP == NULL ? NULL : targetAttr->compoundValueP->clone();
+
+        // Steal compound value from targetAttr
+        caP->compoundValueP        = targetAttr->compoundValueP;
+        targetAttr->compoundValueP = NULL;
       }
       if (targetAttr->type != "")
       {
@@ -1836,21 +1840,36 @@ static void updateAttrInNotifyCer
       for (unsigned int jx = 0; jx < targetAttr->metadataVector.size(); jx++)
       {
         Metadata* targetMdP = targetAttr->metadataVector[jx];
-        /* Search for matching medatat in the CER attribute */
+
+        /* Search for matching metadata in the CER attribute */
         bool matchMd = false;
         for (unsigned int kx = 0; kx < caP->metadataVector.size(); kx++)
         {
           Metadata* mdP = caP->metadataVector[kx];
+
           if (mdP->name == targetMdP->name)
           {
             mdP->valueType   = targetMdP->valueType;
             mdP->stringValue = targetMdP->stringValue;
             mdP->boolValue   = targetMdP->boolValue;
             mdP->numberValue = targetMdP->numberValue;
+
+            // Free old value of compound, if any
+            if (mdP->compoundValueP != NULL)
+            {
+              delete mdP->compoundValueP;
+              mdP->compoundValueP = NULL;
+            }
+
+            // Steal compound value from targetMdP
+            mdP->compoundValueP       = targetMdP->compoundValueP;
+            targetMdP->compoundValueP = NULL;
+
             if (targetMdP->type != "")
             {
               mdP->type = targetMdP->type;
             }
+
             matchMd = true;
             break;   /* kx  loop */
           }

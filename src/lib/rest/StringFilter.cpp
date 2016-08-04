@@ -759,6 +759,23 @@ const char* StringFilterItem::valueTypeName(void)
 */
 bool StringFilterItem::matchEquals(Metadata* mdP)
 {
+  //
+  // First of all, are we treating with a compound?
+  // If so, check for errors and if all OK, delegate to other function
+  //
+  if (compoundPath.size() != 0)
+  {
+    orion::CompoundValueNode* compoundValueP;
+
+    if (mdP->compoundItemExists(compoundPath, &compoundValueP) == false)
+    {
+      return false;
+    }
+
+    return matchEquals(compoundValueP);
+  }
+
+
   if ((valueType == SfvtNumberRange) || (valueType == SfvtDateRange))
   {
     if ((mdP->numberValue < numberRangeFrom) || (mdP->numberValue > numberRangeTo))
@@ -1118,6 +1135,24 @@ bool StringFilterItem::matchPattern(orion::CompoundValueNode* cvP)
 */
 bool StringFilterItem::matchPattern(Metadata* mdP)
 {
+  //
+  // First of all, are we treating with a compound?
+  // If so, check for errors and if all OK, delegate to other function
+  //
+  if (compoundPath.size() != 0)
+  {
+    orion::CompoundValueNode* compoundValueP;
+
+    if (mdP->compoundItemExists(compoundPath, &compoundValueP) == false)
+    {
+      return false;
+    }
+
+    return matchPattern(compoundValueP);
+  }
+
+
+
   // pattern evaluation only makes sense for metadatas of type 'string'
   if (mdP->valueType != orion::ValueTypeString)
   {
@@ -1276,6 +1311,22 @@ bool StringFilterItem::matchGreaterThan(orion::CompoundValueNode* cvP)
 */
 bool StringFilterItem::matchGreaterThan(Metadata* mdP)
 {
+  //
+  // First of all, are we treating with a compound?
+  // If so, check for errors and if all OK, delegate to other function
+  //
+  if (compoundPath.size() != 0)
+  {
+    orion::CompoundValueNode* compoundValueP;
+
+    if (mdP->compoundItemExists(compoundPath, &compoundValueP) == false)
+    {
+      return false;
+    }
+
+    return matchGreaterThan(compoundValueP);
+  }
+
   if (!compatibleType(mdP))
   {
     return false;
@@ -1385,6 +1436,22 @@ bool StringFilterItem::matchLessThan(orion::CompoundValueNode* cvP)
 */
 bool StringFilterItem::matchLessThan(Metadata* mdP)
 {
+  //
+  // First of all, are we treating with a compound?
+  // If so, check for errors and if all OK, delegate to other function
+  //
+  if (compoundPath.size() != 0)
+  {
+    orion::CompoundValueNode* compoundValueP;
+
+    if (mdP->compoundItemExists(compoundPath, &compoundValueP) == false)
+    {
+      return false;
+    }
+
+    return matchLessThan(compoundValueP);
+  }
+
   if (!compatibleType(mdP))
   {
     return false;
