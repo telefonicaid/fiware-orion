@@ -230,7 +230,7 @@ Feature: feature name...
 
 ## Notification listener
 
-the notification listener is executed automatically (a HTTP server as a daemon) in local IP where test are executed. 
+The notification listener is executed automatically (a HTTP server as a daemon) in local IP where test are executed. 
 If you wish use the local IP in the url to notification, put in `notification_http_url` field the `replace_host` value, ex: 
     `http://replace_host:1234/notify` -->  it string is replaced internally by the local IP (used to notifications).
 

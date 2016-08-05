@@ -28,19 +28,23 @@ import logging
 import BaseHTTPServer
 import threading
 
+
 __logger__ = logging.getLogger("listener")
 
+
 # variables
-default_payload = json.dumps({"msg":"without notification received"})
-unknown_path = json.dumps({"error":"unknown path: %s"})
+default_payload = json.dumps({"msg": "without notification received"})
+unknown_path = json.dumps({"error": "unknown path: %s"})
 last_url = ""
 last_headers = {}
 last_payload = default_payload
 VERBOSE = True
 
+
 def get_last_data(s):
     """
     Store the request data (method, url, path, headers, payload)
+    :param s: it is a reference to the BaseHTTPServer object
     """
     global last_url, last_headers, last_payload
     # last url
@@ -55,6 +59,7 @@ def get_last_data(s):
     if length > 0:
         last_payload = str(s.rfile.read(length))
 
+
 def show_last_data():
     """
     display all data from request in log
@@ -64,51 +69,52 @@ def show_last_data():
     if VERBOSE:
         __logger__.debug("Request data received in listener:\n Url: %s\n Headers: %s\n Payload: %s\n" % (last_url, str(last_headers), last_payload))
 
+
 class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     """
     HTTP server
     """
-    def do_POST(s):
+    def do_POST(self):
         """
         POST request
         """
         global last_headers, last_payload, last_url, get_last_data, show_last_data
         __logger__.info("entro un POST")
-        s.send_response(200)
-        get_last_data(s)
+        self.send_response(200)
+        get_last_data(self)
         headers_prefix = u'last'
         for item in last_headers:
-            s.send_header("%s-%s" % (headers_prefix, item), last_headers[item])
-        s.send_header("%s-url" % headers_prefix, "%s" % (last_url))
+            self.send_header("%s-%s" % (headers_prefix, item), last_headers[item])
+        self.send_header("%s-url" % headers_prefix, "%s" % last_url)
 
         show_last_data()   # verify VERBOSE global variable
 
-        s.end_headers()
-        s.wfile.write(last_payload)
+        self.end_headers()
+        self.wfile.write(last_payload)
 
-    def do_GET(s):
+    def do_GET(self):
         """
         GET request
         """
         global last_headers, last_payload, unknown_path, last_url
         __logger__.info("entro un GET")
-        s.send_response(200)
-        if s.path == "/last_notification":
+        self.send_response(200)
+        if self.path == "/last_notification":
             headers_prefix = u'last'
             for item in last_headers:
-                s.send_header("%s-%s" % (headers_prefix, item), last_headers[item])
-            s.send_header("%s-url" % headers_prefix, "%s" % last_url)
-        elif s.path == "/reset":
+                self.send_header("%s-%s" % (headers_prefix, item), last_headers[item])
+            self.send_header("%s-url" % headers_prefix, "%s" % last_url)
+        elif self.path == "/reset":
             last_url = ""
             last_headers = {}
             last_payload = default_payload
         else:
-             last_payload = unknown_path % s.path
+            last_payload = unknown_path % self.path
 
         show_last_data()   # verify VERBOSE global variable
 
-        s.end_headers()
-        s.wfile.write(last_payload)
+        self.end_headers()
+        self.wfile.write(last_payload)
 
 
 class Daemon:
