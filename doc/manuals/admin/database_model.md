@@ -282,7 +282,9 @@ Fields:
 -   **throttling**: minimum interval between notifications. 0 or -1 means no throttling.
 -   **reference**: the URL for notifications
 -   **entities**: an array of entities (mandatory). The JSON for each
-    entity contains **id**, **type** and **isPattern**.
+    entity contains **id**, **type**, **isPattern** and **isTypePattern**. Note that,
+    due to legacy reasons, **isPattern** may be `"true"` or `"false"` (text) while
+    **isTypePattern** may be `true` or `false` (boolean).
 -   **attrs**: an array of attribute names (strings) (optional).
 -   **blacklist**: a boolean field that expecifies if `attrs` has to be interpreted
     as a whitelist (if `blacklist` is equal to "false" or doesn't exist) or a
@@ -317,7 +319,8 @@ Example document:
                 {
                         "id" : ".*",
                         "type" : "Room",
-                        "isPattern" : "true"
+                        "isPattern" : "true",
+                        "isTypePattern": false
                 }
         ],
         "attrs" : [
