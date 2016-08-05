@@ -228,6 +228,13 @@ Feature: feature name...
 ```
 
 
+## Notification listener
+
+the notification listener is executed automatically (a HTTP server as a daemon) in local IP where test are executed. 
+If you wish use the local IP in the url to notification, put in `notification_http_url` field the `replace_host` value, ex: 
+    `http://replace_host:1234/notify` -->  it string is replaced internally by the local IP (used to notifications).
+
+
 ## Summary of Features and Scenarios
 
 Finally, after each execution is displayed a summary (Optional) with all features executed and its scenarios status. See `environment.py` in root path.
@@ -411,6 +418,9 @@ The Context Broker must start with "DEBUG" level in "CB_EXTRA_OPS" field into pr
   - In expression value have multiples expressions uses `&` as separator, and in each operation use `>>>` as separator between the key and the value,
      ex:
          `| condition_expression | q>>>temperature>40&georel>>>near&geometry>>>point&coords>>>40.6391 |`
+  - If `notification_http_url` has `replace_host` value, ex: http://replace_host:1234/notify, it string is replaced internally by the hostname (used to notifications).
+  - If you do like to use the subscriptionId of the subscription created previously, use `previous subs` value
+ 
 
 ## Tags
 
