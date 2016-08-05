@@ -1172,17 +1172,198 @@ static bool addTriggeredSubscriptions_withCache
 
 /* ****************************************************************************
 *
+* BsonGroup - to avoid allocating too much on the stack 
+*/
+typedef struct BsonGroup
+{
+  BSONObj         idNPtypeNP;              // First clause: idNPtypeNP
+
+  BSONObj         idPtypeNP;               // Second clause: idPtypeNP
+  std::string     functionIdPtypeNP;
+  BSONObjBuilder  boPNP;
+
+  BSONObj         idNPtypeP;               // Third clause: idNPtypeP
+  std::string     functionIdNPtypeP;
+  BSONObjBuilder  boNPP;
+
+  std::string     functionIdPtypeP;        // Fourth clause: idPtypeP
+  BSONObj         idPtypeP;
+  BSONObjBuilder  boPP;
+
+  BSONObj         query;                   // Final query
+} BsonGroup;
+
+
+
+/* ****************************************************************************
+*
+* idNPtypeNP - 
+*/
+static void idNPtypeNP
+(
+  BsonGroup*          bgP,
+  const std::string&  entIdQ,
+  const std::string&  entityId,
+  const std::string&  entTypeQ,
+  const std::string&  entityType,
+  const std::string&  entPatternQ,
+  const std::string&  typePatternQ,
+  const BSONObj&      spBson
+)
+{
+  bgP->idNPtypeNP = BSON(entIdQ << entityId <<
+                         "$or" << BSON_ARRAY(BSON(entTypeQ << entityType) <<
+                                             BSON(entTypeQ << BSON("$exists" << false))) <<
+                         entPatternQ << "false" <<
+                         typePatternQ << BSON("$ne" << true) <<
+                         CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
+                         CSUB_STATUS << BSON("$ne" << STATUS_INACTIVE) <<
+                         CSUB_SERVICE_PATH << spBson);
+}
+
+
+
+/* ****************************************************************************
+*
+* idPtypeNP - 
+*/
+static void idPtypeNP
+(
+  BsonGroup*          bgP,
+  const std::string&  entIdQ,
+  const std::string&  entityId,
+  const std::string&  entTypeQ,
+  const std::string&  entityType,
+  const std::string&  entPatternQ,
+  const std::string&  typePatternQ,
+  const BSONObj&      spBson
+)
+{
+  bgP->functionIdPtypeNP = std::string("function()") +
+         "{" +
+            "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
+                "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"true\" && " +
+                    "!this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISTYPEPATTERN+" && " +
+                    "(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \""+entityType+"\" || " +
+                        "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \"\" || " +
+                        "!(\""+CSUB_ENTITY_TYPE+"\" in this."+CSUB_ENTITIES+"[i])) && " +
+                    "\""+entityId+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+")) {" +
+                    "return true; " +
+                "}" +
+            "}" +
+            "return false; " +
+         "}";
+  LM_T(LmtMongo, ("idTtypeNP function: %s", bgP->functionIdPtypeNP.c_str()));
+
+  bgP->boPNP.append(entPatternQ, "true");
+  bgP->boPNP.append(typePatternQ, BSON("$ne" << true));
+  bgP->boPNP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  bgP->boPNP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
+  bgP->boPNP.append(CSUB_SERVICE_PATH, spBson);
+  bgP->boPNP.appendCode("$where", bgP->functionIdPtypeNP);
+
+  bgP->idPtypeNP = bgP->boPNP.obj();
+}
+
+
+
+/* ****************************************************************************
+*
+* idNPtypeP - 
+*/
+static void idNPtypeP
+(
+  BsonGroup*          bgP,
+  const std::string&  entIdQ,
+  const std::string&  entityId,
+  const std::string&  entTypeQ,
+  const std::string&  entityType,
+  const std::string&  entPatternQ,
+  const std::string&  typePatternQ,
+  const BSONObj&      spBson
+)
+{
+  bgP->functionIdNPtypeP = std::string("function()") +
+      "{" +
+         "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
+             "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"false\" && " +
+                 "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISTYPEPATTERN+" && " +
+                 "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+" == \""+entityId+"\" && " +
+                 "\""+entityType+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+")) {" +
+                 "return true; " +
+             "}" +
+         "}" +
+         "return false; " +
+      "}";
+  LM_T(LmtMongo, ("idNPtypeP function: %s", bgP->functionIdNPtypeP.c_str()));
+
+  bgP->boNPP.append(entPatternQ, "false");
+  bgP->boNPP.append(typePatternQ, true);
+  bgP->boNPP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  bgP->boNPP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
+  bgP->boNPP.append(CSUB_SERVICE_PATH, spBson);
+  bgP->boNPP.appendCode("$where", bgP->functionIdNPtypeP);
+
+  bgP->idNPtypeP = bgP->boNPP.obj();
+}
+
+
+
+/* ****************************************************************************
+*
+* idPtypeP - 
+*/
+static void idPtypeP
+(
+  BsonGroup*          bgP,
+  const std::string&  entIdQ,
+  const std::string&  entityId,
+  const std::string&  entTypeQ,
+  const std::string&  entityType,
+  const std::string&  entPatternQ,
+  const std::string&  typePatternQ,
+  const BSONObj&      spBson
+)
+{
+  bgP->functionIdPtypeP = std::string("function()") +
+      "{" +
+         "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
+             "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"true\" && " +
+                 "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISTYPEPATTERN+" && " +
+                 "\""+entityId+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+") && " +
+                 "\""+entityType+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+")) {" +
+                 "return true; " +
+             "}" +
+         "}" +
+         "return false; " +
+      "}";
+  LM_T(LmtMongo, ("idPtypeP function: %s", bgP->functionIdPtypeP.c_str()));
+
+  bgP->boPP.append(entPatternQ, "true");
+  bgP->boPP.append(typePatternQ, true);
+  bgP->boPP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  bgP->boPP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
+  bgP->boPP.append(CSUB_SERVICE_PATH, spBson);
+  bgP->boPP.appendCode("$where", bgP->functionIdPtypeP);
+
+  bgP->idPtypeP = bgP->boPP.obj();
+}
+
+
+
+/* ****************************************************************************
+*
 * addTriggeredSubscriptions_noCache
 *
 */
 static bool addTriggeredSubscriptions_noCache
 (
-  std::string                               entityId,
-  std::string                               entityType,
+  const std::string&                        entityId,
+  const std::string&                        entityType,
   const std::vector<std::string>&           modifiedAttrs,
   std::map<string, TriggeredSubscription*>& subs,
   std::string&                              err,
-  std::string                               tenant,
+  const std::string&                        tenant,
   const std::vector<std::string>&           servicePathV
 )
 {
@@ -1208,126 +1389,44 @@ static bool addTriggeredSubscriptions_noCache
   /* Query is an $or of 4 sub-clauses:
    *
    * idNPtypeNP -> id no pattern, type no pattern
-   * idPtypeNP  -> id pattern, type no pattern
+   * idPtypeNP  -> id pattern,    type no pattern
    * idNPtypeP  -> id no pattern, type pattern
-   * idPtypeP   -> id pattern, type pattern
+   * idPtypeP   -> id pattern,    type pattern
    *
-   * The last three ones use $where to search for patterns in DB. As far as I know, this is the only
+   * The last three use $where to search for patterns in DB. As far as I know, this is the only
    * way to do a "reverse regex" query in MongoDB (see http://stackoverflow.com/questions/15966991/mongodb-reverse-regex/15989520).
-   * The first part of the "if" in these function is used to ensure the function match the corresponding
-   * pattern/no-pattern combination, as the entities vector may contain a mix.
+   * The first part of the "if" in these function is used to ensure that the function matches the corresponding
+   * pattern/no-pattern combination, as the entity vector may contain a mix.
    *
-   * Note we are using the construct
+   * Note that we are using the construct:
    *
    *   typePatternQ << BSON("$ne" << true)
    *
-   * insteas of just
+   * instead of just
    *
    *   typePatternQ << false
    *
-   * as the former also match documents without the typePatternQ (i.e. legacy sub documents created before the
-   * isTypePattern feature has been developed)
+   * as the former also matches documents without the typePatternQ (i.e. legacy sub documents created before the
+   * isTypePattern feature was developed)
    *
    * FIXME: condTypeQ, condValueQ and servicePath part could be "factorized" out of the $or clause
    */
 
-  BSONObj idNPtypeNP;
-  BSONObj idPtypeNP;
-  BSONObj idNPtypeP;
-  BSONObj idPtypeP;
+  //
+  // Allocating buffer to hold all these BIG variables, necessary for the population of 
+  // the four parts of the final query.
+  // The necessary variables are too big for the stack and thus moved to the head, inside BsonGroup.
+  //
+  BsonGroup* bgP = new BsonGroup();
 
-  /* First clause: idNPtypeNP */
-  idNPtypeNP = BSON(entIdQ << entityId <<
-                   "$or" << BSON_ARRAY(BSON(entTypeQ << entityType) <<
-                                       BSON(entTypeQ << BSON("$exists" << false))) <<
-                   entPatternQ << "false" <<
-                   typePatternQ << BSON("$ne" << true) <<
-                   CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
-                   CSUB_STATUS << BSON("$ne" << STATUS_INACTIVE) <<
-                   CSUB_SERVICE_PATH << spBson);
-
-  /* Second clause: idPtypeNP */
-  BSONObjBuilder boPNP;
-
-  std::string functionIdPtypeNP = std::string("function()") +
-         "{" +
-            "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
-                "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"true\" && " +
-                    "!this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISTYPEPATTERN+" && " +
-                    "(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \""+entityType+"\" || " +
-                        "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \"\" || " +
-                        "!(\""+CSUB_ENTITY_TYPE+"\" in this."+CSUB_ENTITIES+"[i])) && " +
-                    "\""+entityId+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+")) {" +
-                    "return true; " +
-                "}" +
-            "}" +
-            "return false; " +
-         "}";
-  LM_T(LmtMongo, ("idTtypeNP function: %s", functionIdPtypeNP.c_str()));
-
-  boPNP.append(entPatternQ, "true");
-  boPNP.append(typePatternQ, BSON("$ne" << true));
-  boPNP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
-  boPNP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
-  boPNP.append(CSUB_SERVICE_PATH, spBson);
-  boPNP.appendCode("$where", functionIdPtypeNP);
-
-  idPtypeNP = boPNP.obj();
-
-  /* Third clause: idNPtypeP */
-  BSONObjBuilder boNPP;
-
-  std::string functionIdNPtypeP = std::string("function()") +
-      "{" +
-         "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
-             "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"false\" && " +
-                 "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISTYPEPATTERN+" && " +
-                 "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+" == \""+entityId+"\" && " +
-                 "\""+entityType+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+")) {" +
-                 "return true; " +
-             "}" +
-         "}" +
-         "return false; " +
-      "}";
-  LM_T(LmtMongo, ("idNPtypeP function: %s", functionIdNPtypeP.c_str()));
-
-  boNPP.append(entPatternQ, "false");
-  boNPP.append(typePatternQ, true);
-  boNPP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
-  boNPP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
-  boNPP.append(CSUB_SERVICE_PATH, spBson);
-  boNPP.appendCode("$where", functionIdNPtypeP);
-
-  idNPtypeP = boNPP.obj();
-
-  /* Fouth clause: idPtypeP */
-  BSONObjBuilder boPP;
-
-  std::string functionIdPtypeP = std::string("function()") +
-      "{" +
-         "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
-             "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"true\" && " +
-                 "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISTYPEPATTERN+" && " +
-                 "\""+entityId+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+") && " +
-                 "\""+entityType+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+")) {" +
-                 "return true; " +
-             "}" +
-         "}" +
-         "return false; " +
-      "}";
-  LM_T(LmtMongo, ("idPtypeP function: %s", functionIdPtypeP.c_str()));
-
-  boPP.append(entPatternQ, "true");
-  boPP.append(typePatternQ, true);
-  boPP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
-  boPP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
-  boPP.append(CSUB_SERVICE_PATH, spBson);
-  boPP.appendCode("$where", functionIdPtypeP);
-
-  idPtypeP = boPP.obj();
+  // Populating bgP with the four clauses
+  idNPtypeNP(bgP, entIdQ, entityId, entTypeQ, entityType, entPatternQ, typePatternQ, spBson);
+  idPtypeNP(bgP,  entIdQ, entityId, entTypeQ, entityType, entPatternQ, typePatternQ, spBson);
+  idNPtypeP(bgP,  entIdQ, entityId, entTypeQ, entityType, entPatternQ, typePatternQ, spBson);
+  idPtypeP(bgP,   entIdQ, entityId, entTypeQ, entityType, entPatternQ, typePatternQ, spBson);
 
   /* Composing final query */
-  BSONObj query = BSON("$or" << BSON_ARRAY(idNPtypeNP << idPtypeNP << idNPtypeP << idPtypeP));
+  bgP->query = BSON("$or" << BSON_ARRAY(bgP->idNPtypeNP << bgP->idPtypeNP << bgP->idNPtypeP << bgP->idPtypeP));
 
   std::string               collection  = getSubscribeContextCollectionName(tenant);
   auto_ptr<DBClientCursor>  cursor;
@@ -1335,14 +1434,15 @@ static bool addTriggeredSubscriptions_noCache
 
   LM_T(LmtMongo, ("query() in '%s' collection: '%s'",
                   getSubscribeContextCollectionName(tenant).c_str(),
-                  query.toString().c_str()));
+                  bgP->query.toString().c_str()));
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
-  if (collectionQuery(connection, collection, query, &cursor, &errorString) != true)
+  if (collectionQuery(connection, collection, bgP->query, &cursor, &errorString) != true)
   {
     TIME_STAT_MONGO_READ_WAIT_STOP();
     releaseMongoConnection(connection);
+    delete bgP;
     return false;
   }
   TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -1353,9 +1453,10 @@ static bool addTriggeredSubscriptions_noCache
   {
     BSONObj     sub;
     std::string err;
+
     if (!nextSafeOrErrorF(cursor, &sub, &err))
     {
-      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), bgP->query.toString().c_str()));
       continue;
     }
     BSONElement  idField  = getFieldF(sub, "_id");
@@ -1432,6 +1533,7 @@ static bool addTriggeredSubscriptions_noCache
           if (stringFilterP->parse(q.c_str(), &err) == false)
           {
             delete stringFilterP;
+            delete bgP;
           
             LM_E(("Runtime Error (%s)", err.c_str()));
             releaseMongoConnection(connection);
@@ -1444,6 +1546,7 @@ static bool addTriggeredSubscriptions_noCache
             if (!trigs->stringFilterSet(stringFilterP, &errorString))
             {
               delete stringFilterP;
+              delete bgP;
 
               LM_E(("Runtime Error (error setting string filter: %s)", errorString.c_str()));
               releaseMongoConnection(connection);
@@ -1462,6 +1565,7 @@ static bool addTriggeredSubscriptions_noCache
           if (mdStringFilterP->parse(mq.c_str(), &err) == false)
           {
             delete mdStringFilterP;
+            delete bgP;
           
             LM_E(("Runtime Error (%s)", err.c_str()));
             releaseMongoConnection(connection);
@@ -1474,6 +1578,7 @@ static bool addTriggeredSubscriptions_noCache
             if (!trigs->mdStringFilterSet(mdStringFilterP, &errorString))
             {
               delete mdStringFilterP;
+              delete bgP;
 
               LM_E(("Runtime Error (error setting string filter: %s)", errorString.c_str()));
               releaseMongoConnection(connection);
@@ -1488,7 +1593,9 @@ static bool addTriggeredSubscriptions_noCache
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
     }
   }
+
   releaseMongoConnection(connection);
+  delete bgP;
 
   return true;
 }
