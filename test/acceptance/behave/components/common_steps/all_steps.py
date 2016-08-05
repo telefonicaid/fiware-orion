@@ -28,6 +28,7 @@ from components.common_steps.entities.create_update_replace_steps import *
 from components.common_steps.entities.get_steps import *
 from components.common_steps.entities.delete_steps import *
 from components.common_steps.subscriptions.create_update_steps import *
+from components.common_steps.subscriptions.notification_steps import *
 
 #  common steps
 # ---- initial_steps.py --------------------------------------------------------------

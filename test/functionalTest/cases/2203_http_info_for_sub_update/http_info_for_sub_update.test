@@ -294,7 +294,7 @@ Date: REGEX(.*)
 ====================
 PATCH http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 43
+Content-Length: 36
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
 Host: localhost:REGEX(\d+)
@@ -304,7 +304,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "What": "PAYLOAD2", 
-    "temp": "11.000000"
+    "temp": "11"
 }
 =======================================
 

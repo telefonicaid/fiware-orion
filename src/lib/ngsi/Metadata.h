@@ -81,6 +81,7 @@ typedef struct Metadata
   void         release(void);
   void         fill(const struct Metadata& md);
   std::string  toStringValue(void) const;
+  bool         compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
   std::string  check(ConnectionInfo*     ciP,
                      RequestType         requestType,

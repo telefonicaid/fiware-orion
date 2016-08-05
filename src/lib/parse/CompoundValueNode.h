@@ -160,7 +160,7 @@ class CompoundValueNode
   std::string         check(void);
   std::string         finish(void);
   std::string         render(ConnectionInfo* ciP, const std::string& indent);
-  std::string         toJson(bool isLastElement);
+  std::string         toJson(bool isLastElement, bool comma = true);
 
   void                shortShow(const std::string& indent);
   void                show(const std::string& indent);

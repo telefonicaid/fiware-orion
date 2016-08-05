@@ -127,78 +127,78 @@ Date: REGEX(.*)
 02. GET I with Accept header text/plain - see plain text
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 8
+Content-Length: 4
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-3.140000
+3.14
 
 
 03. GET I with Accept header */* - see plain text
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 8
+Content-Length: 4
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-3.140000
+3.14
 
 
 04. GET I with Accept header text/* - see plain text
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 8
+Content-Length: 4
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-3.140000
+3.14
 
 
 05. GET I with Accept header text/plain, application/json - see plain text
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 8
+Content-Length: 4
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-3.140000
+3.14
 
 
 06. GET I with Accept header application/json, text/plain - see plain text
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 8
+Content-Length: 4
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-3.140000
+3.14
 
 
 07. GET I with Accept header text/*, application/json - see plain text
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 8
+Content-Length: 4
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-3.140000
+3.14
 
 
 08. GET I with Accept header text/*;q=0.3,application/json;q=0.8 - see plain text (q is overridden)
 ===================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 8
+Content-Length: 4
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-3.140000
+3.14
 
 
 09. GET I with Accept header application/json - see error

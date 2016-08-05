@@ -96,6 +96,9 @@ class NGSI:
         __logger__.info("collection verified: %s" % collection)
         __logger__.info("query: %s" % str(query))
 
+        curs = None
+        curs_list = None
+
         mongo_driver.connect(database_name.lower())
         mongo_driver.choice_collection(collection)
         curs = mongo_driver.find_data(query)
@@ -138,11 +141,21 @@ class NGSI:
                 if entities_contexts["metadatas_number"] > 0:
                     md = entity[u'attrs'][attr_name][u'md']
                     for m in range(int(entities_contexts["metadatas_number"])):    # manages N metadatas
-                        assert entities_contexts["metadatas_value"] == md[m][u'value'], \
+                        if int(entities_contexts["metadatas_number"]) == 1:
+                            meta_name = entities_contexts["metadatas_name"]
+                        else:
+                            meta_name = "%s_%s" % (entities_contexts["metadatas_name"], str(m))
+                        # '.' char is forbidden in MongoDB keys, so it needs to be replaced in attribute name.
+                        # (we chose '=' as it is a forbidden character in the API). When returning information to user,
+                        # the '=' is translated back to '.', thus from user perspective all works fine.
+                        meta_name = meta_name.replace(".", "=")
+                        assert meta_name in md, \
+                            " ERROR - missing the metadata name \"%s\" " % meta_name
+                        assert entities_contexts["metadatas_value"] == md[meta_name][u'value'], \
                             " ERROR -- metadata value: %s is not stored successful in mongo" % entities_contexts["metadatas_value"]
                         if entities_contexts["metadatas_type"] != "none":
 
-                            assert entities_contexts["metadatas_type"] == md[m][u'type'], \
+                            assert entities_contexts["metadatas_type"] == md[meta_name][u'type'], \
                                 " ERROR -- metadata type: %s is not stored successful in mongo" % entities_contexts["metadatas_type"]
                 assert u'creDate' in entity[u'attrs'][attr_name],\
                     " ERROR -- creDate field into attribute does not exists in document"
@@ -414,6 +427,7 @@ class NGSI:
         types = []
         elements = {}
         group = []
+        attrs_qp = []
         options_key_values = False
         for entities_group in accumulate_entities_context:
             total += int(entities_group["entities_number"])
@@ -436,6 +450,8 @@ class NGSI:
             del types[:]
             types = convert_str_to_list(queries_parameters["type"], ",")
             elements["entities_type"] = queries_parameters["type"]
+        if "attrs" in queries_parameters:
+            attrs_qp = convert_str_to_list(queries_parameters["attrs"], ",")
         if "q" in queries_parameters:
             elements["q"] = queries_parameters["q"]
         if "options" in queries_parameters:
@@ -516,46 +532,47 @@ class NGSI:
                         # prefix plus _<consecutive>. ex: room1_2
                         for a in range(int(sub_group["attributes_number"])):
                             attr_name = "%s_%s" % (sub_group["attributes_name"], str(a))
-                    # verify attributes name
-                    assert attr_name in items_list[i], \
-                        'ERROR - attribute name "%s" does not exist in position:%s' % (attr_name, str(i))
-                    # verify attributes value and attribute type
-                    attribute = items_list[i][attr_name]
-                    try:
-                        # if attr_value is numeric is convert in float
-                        if str(sub_group["attributes_value"]).isdigit():
-                            sub_group["attributes_value"] = float(sub_group["attributes_value"])
-                        if str(attribute["value"]).isdigit():
-                            attribute["value"] = float(attribute["value"])
-                        if str(sub_group["attributes_value"]) in ("true", "false"):
-                            sub_group["attributes_value"] = convert_str_to_bool(sub_group["attributes_value"])
-                    except Exception, e:
-                        __logger__.warn(" WARN - the attribute value is not verified if it is digit: \n   - %s" % e)
-                    if not options_key_values:
-                        if sub_group["attributes_type"] != "none":
-                            assert sub_group["attributes_type"] == attribute["type"], \
-                                'ERROR - in attribute type "%s" in position: %s' % (sub_group["attributes_type"], str(i))
+                    if len(attrs_qp) > 0 and attr_name in attrs_qp:
+                        # verify attributes name
+                        assert attr_name in items_list[i], \
+                            'ERROR - attribute name "%s" does not exist in position:%s' % (attr_name, str(i))
+                        # verify attributes value and attribute type
+                        attribute = items_list[i][attr_name]
+                        try:
+                            # if attr_value is numeric is convert in float
+                            if str(sub_group["attributes_value"]).isdigit():
+                                sub_group["attributes_value"] = float(sub_group["attributes_value"])
+                            if str(attribute["value"]).isdigit():
+                                attribute["value"] = float(attribute["value"])
+                            if str(sub_group["attributes_value"]) in ("true", "false"):
+                                sub_group["attributes_value"] = convert_str_to_bool(sub_group["attributes_value"])
+                        except Exception, e:
+                            __logger__.warn(" WARN - the attribute value is not verified if it is digit: \n   - %s" % e)
+                        if not options_key_values:
+                            if sub_group["attributes_type"] != "none":
+                                assert sub_group["attributes_type"] == attribute["type"], \
+                                    'ERROR - in attribute type "%s" in position: %s' % (sub_group["attributes_type"], str(i))
 
-                            assert sub_group["attributes_value"] == attribute["value"], \
-                                'ERROR - in attribute value "%s" in position: %s' % (sub_group["attributes_value"], str(i))
+                                assert sub_group["attributes_value"] == attribute["value"], \
+                                    'ERROR - in attribute value "%s" in position: %s' % (sub_group["attributes_value"], str(i))
 
-                        # verify attribute metadatas
-                        if sub_group["metadatas_number"] > 0:
-                            for m in range(int(sub_group["metadatas_number"])):
-                                if int(sub_group["metadatas_number"]) > 1:
-                                    meta_name = "%s_%s" % (sub_group["metadatas_name"], str(m))
-                                else:
-                                    meta_name = sub_group["metadatas_name"]
+                            # verify attribute metadatas
+                            if sub_group["metadatas_number"] > 0:
+                                for m in range(int(sub_group["metadatas_number"])):
+                                    if int(sub_group["metadatas_number"]) > 1:
+                                        meta_name = "%s_%s" % (sub_group["metadatas_name"], str(m))
+                                    else:
+                                        meta_name = sub_group["metadatas_name"]
 
-                                assert meta_name in attribute["metadata"],  \
-                                    'ERROR - attribute metadata name "%s" does not exist' % meta_name
-                                metadata = attribute["metadata"][meta_name]
-                                if sub_group["metadatas_type"] != "none":
-                                    assert sub_group["metadatas_type"] == metadata["type"], \
-                                        'ERROR - in attribute metadata type "%s"' % sub_group["metadatas_type"]
-                                if sub_group["metadatas_value"] != "none":
-                                    assert sub_group["metadatas_value"] == metadata["value"], \
-                                        'ERROR - in attribute metadata value "%s"' % sub_group["metadatas_value"]
+                                    assert meta_name in attribute["metadata"],  \
+                                        'ERROR - attribute metadata name "%s" does not exist' % meta_name
+                                    metadata = attribute["metadata"][meta_name]
+                                    if sub_group["metadatas_type"] != "none":
+                                        assert sub_group["metadatas_type"] == metadata["type"], \
+                                            'ERROR - in attribute metadata type "%s"' % sub_group["metadatas_type"]
+                                    if sub_group["metadatas_value"] != "none":
+                                        assert sub_group["metadatas_value"] == metadata["value"], \
+                                            'ERROR - in attribute metadata value "%s"' % sub_group["metadatas_value"]
 
     def verify_headers_response(self, context):
         """
@@ -602,7 +619,9 @@ class NGSI:
         :param field_type: field type (bool | int | float | list | dict | str | NoneType)
         """
         assert resp.text != "[]", "ERROR - It has not returned any entity"
-        entity = convert_str_to_dict(resp.text, JSON)[0]   # in raw mode is used only one entity
+        entity = convert_str_to_dict(resp.text, JSON)
+        if type(entity) is not dict:
+            entity = entity[0]   # in raw mode is used only one entity
         assert remove_quote(entities_context["entities_id"]) == entity["id"],  \
             'ERROR - in id "%s" in raw mode' % (entity["id"])
         assert remove_quote(entities_context["entities_type"]) == entity["type"],  \
@@ -935,7 +954,6 @@ class NGSI:
                                                                                   % (str(item["count"]), types_count[item["type"]])
             __logger__.info(u'"count" field is verified successfully')
 
-
     def verify_attributes_types_by_entity_types(self, entity_type, accumulate_entities_context, resp):
         """
         verify attributes types by entity types  -- /v2/types/<entity_type>
@@ -965,7 +983,6 @@ class NGSI:
                                                                                   % (str(attrs_dict["count"]), entities_counter)
             __logger__.info(u'"count" field is verified successfully')
 
-
     def verify_log(self, context, line):
         """
         verify if traces match in the log line
@@ -982,42 +999,49 @@ class NGSI:
             if trace[key] != "ignored":
                 remote_log = Remote_Log()
                 line_value = remote_log.get_trace(line, key)
-                assert trace[key] == line_value, \
+                assert line_value.find(trace[key]) >= 0, \
                     u' ERROR - the "%s" value expected in the "%s" trace does not match with "%s" line value...' \
                     % (trace[key], key, line_value)
 
     def verify_subscription_stored_in_mongo(self, mongo_driver, subscription_context, headers, resp):
         """
         verify that the subscription is stored in mongo
+
         :param mongo_driver: mongo driver from steps
         :param subscription_contexts: subscription context (see constructor in cb_v2_utils.py)
         :param headers: headers used (see "definition_headers" method in cb_v2_utils.py)
         :param resp: http response
-           ex: mongo document
-           {
-                "_id": ObjectId("56f014684327a2c6a10762a7"),
-                "expiration": NumberLong(1459864800),
+           ex: mongo document (new format after of that BD has been migrated)
+            {
+                "status": "active",
+                "description": "my first subscription",
                 "reference": "http://localhost:1234",
-                "throttling": NumberLong(5),
-                "servicePath": "/test",
-                "entities": [{
-                    "id": ".*",
-                    "type": "Room",
-                    "isPattern": "true"
-                }],
-                "attrs": ["humidity", "temperature"],
-                "conditions": [{
-                    "type": "ONCHANGE",
-                    "value": ["temperature"]
-                }],
+                "throttling": 5L,
                 "expression": {
                     "q": "temperature>40",
-                    "geometry": "",
-                    "coords": "",
-                    "georel": ""
+                    "geometry": "point",
+                    "georel": "near;minDistance:1000",
+                    "coords": "40,6391",
+                    "mq": ""
                 },
-                "format": "JSON"
-            }
+                "format": "normalized",
+                "custom": False,
+                "blacklist": False,
+                "entities": [{
+                    "type": "room_0",
+                    "id": ".*",
+                    "isPattern": "true"
+                }, {
+                    "type": "room_1",
+                    "id": ".*",
+                    "isPattern": "true"
+                }],
+                "expiration": 1459864800L,
+                "servicePath": "/test",
+                "_id": ObjectId("579b1c000b759403c9464dc4"),
+                "conditions": ["temperature_0", "temperature_1", "temperature_2"],
+                "attrs": ["temperature_0", "temperature_1", "temperature_2"]
+             }
         """
         subs_id = resp.headers["location"].split("subscriptions/")[1]
         curs_list = self.__get_mongo_cursor(mongo_driver, headers, subs_id=subs_id)
@@ -1057,9 +1081,6 @@ class NGSI:
 
         # conditions fields
         if subscription_context["condition_attrs"] is not None:
-            # conditions - type
-            assert curs["conditions"][0]["type"] == "ONCHANGE", u' ERROR - the condition type "%s" is wrong in DB' % curs["conditions"][0]["type"]
-            __logger__.info("type in the \"conditions\" field are verified successfully")
             # conditions - attributes
             for a in range(int(subscription_context["condition_attrs_number"])):
                 if int(subscription_context["condition_attrs_number"]) > 1:
@@ -1067,10 +1088,10 @@ class NGSI:
                 else:
                     condition_attr = subscription_context["condition_attrs"]
                 if subscription_context["condition_attrs"] == "without condition field":
-                    assert len(curs["conditions"][0]["value"]) == 0, \
-                    u' ERROR - the condition attrs "%s" are not empty into DB' % str(curs["conditions"][0]["value"])
+                    assert len(curs["conditions"]) == 0, \
+                    u' ERROR - the condition attrs "%s" are not empty into DB' % str(curs["conditions"])
                 else:
-                    assert condition_attr in curs["conditions"][0]["value"], \
+                    assert condition_attr in curs["conditions"], \
                     u' ERROR - the condition attr "%s" does not exist in conditions values into DB' % condition_attr
             __logger__.info("attributes in the \"conditions\" field are verified successfully")
 
@@ -1153,8 +1174,27 @@ class NGSI:
                                                                  % (curs["status"], subscription_context["status"])
         __logger__.info("the subscription status is the expected: %s" % subscription_context["status"])
 
+    def verify_log_level(self, context, level):
+        """
+        verify if the log level is the expected
+        :param level: log level expected
+        """
+        resp_dict = convert_str_to_dict(context.resp.text, JSON)
+        assert resp_dict["level"] == level, " ERROR - the log level \"%s\" is not the expected: %s" % (resp_dict["level"], level)
 
+    def verify_admin_error(self, context, error):
+        """
+        verify admin error message
+        :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+        :param error: error message expected
+        """
+        msg = {}
+        __logger__.debug("Response: %s" % error)
 
+        resp_dict = convert_str_to_dict(context.resp.text, JSON)
+        assert "error" in resp_dict, "ERROR - error field does not exists"
+        assert error == resp_dict["error"], 'ERROR -  error: "%s" is not the expected: "%s"' % \
+                                                     (str(resp_dict["error"]), error)
 
 
 

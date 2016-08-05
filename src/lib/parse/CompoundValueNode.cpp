@@ -115,11 +115,11 @@ CompoundValueNode::CompoundValueNode
 }
 
 
+
 /* ****************************************************************************
 *
 * CompoundValueNode - constructor for all nodes except toplevel (char*)
 */
-
 CompoundValueNode::CompoundValueNode
 (
   CompoundValueNode*  _container,
@@ -183,6 +183,8 @@ CompoundValueNode::CompoundValueNode
                           orion::valueTypeName(valueType),
                           this));
 }
+
+
 
 /* ****************************************************************************
 *
@@ -740,15 +742,17 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, const std::string& in
 /* ****************************************************************************
 *
 * toJson -
+*
+* FIXME P3: isLastElement is not used and should be removed
 */
-std::string CompoundValueNode::toJson(bool isLastElement)
+std::string CompoundValueNode::toJson(bool isLastElement, bool comma)
 {
   std::string  out       = "";
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
   std::string  key       = (container->valueType == orion::ValueTypeVector)? "item" : name;
 
   // No "comma after" if toplevel
-  if (container == this)
+  if ((container == this) || (comma == false))
   {
     jsonComma = false;
   }

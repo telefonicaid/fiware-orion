@@ -92,7 +92,7 @@ public:
   /* Used to render attribute value to BSON */
   void valueBson(mongo::BSONObjBuilder& bsonAttr) const;
 
-  /* Helper method to be use in some places wher '%s' is needed. Maybe could be merged with toString? FIXME P2 */
+  /* Helper method to be use in some places wher '%s' is needed */
   std::string  getValue(void) const;
 
   std::string  check(ConnectionInfo*     ciP,

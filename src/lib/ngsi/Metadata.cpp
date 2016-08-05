@@ -80,7 +80,7 @@ Metadata::Metadata(Metadata* mP, bool useDefaultType)
   numberValue     = mP->numberValue;
   boolValue       = mP->boolValue;
   typeGiven       = mP->typeGiven;
-  compoundValueP  = mP->compoundValueP;
+  compoundValueP  = (mP->compoundValueP != NULL)? mP->compoundValueP->clone() : NULL;
 
   if (useDefaultType && !typeGiven)
   {
@@ -96,11 +96,12 @@ Metadata::Metadata(Metadata* mP, bool useDefaultType)
 */
 Metadata::Metadata(const std::string& _name, const std::string& _type, const char* _value)
 {
-  name         = _name;
-  type         = _type;
-  valueType    = orion::ValueTypeString;
-  stringValue  = std::string(_value);
-  typeGiven    = false;
+  name            = _name;
+  type            = _type;
+  valueType       = orion::ValueTypeString;
+  stringValue     = std::string(_value);
+  typeGiven       = false;
+  compoundValueP  = NULL;
 }
 
 
@@ -111,11 +112,12 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const cha
 */
 Metadata::Metadata(const std::string& _name, const std::string& _type, const std::string& _value)
 {
-  name         = _name;
-  type         = _type;
-  valueType    = orion::ValueTypeString;
-  stringValue  = _value;
-  typeGiven    = false;
+  name            = _name;
+  type            = _type;
+  valueType       = orion::ValueTypeString;
+  stringValue     = _value;
+  typeGiven       = false;
+  compoundValueP  = NULL;
 }
 
 
@@ -126,11 +128,12 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const std
 */
 Metadata::Metadata(const std::string& _name, const std::string& _type, double _value)
 {
-  name         = _name;
-  type         = _type;
-  valueType    = orion::ValueTypeNumber;
-  numberValue  = _value;
-  typeGiven    = false;
+  name            = _name;
+  type            = _type;
+  valueType       = orion::ValueTypeNumber;
+  numberValue     = _value;
+  typeGiven       = false;
+  compoundValueP  = NULL;
 }
 
 
@@ -141,11 +144,12 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, double _v
 */
 Metadata::Metadata(const std::string& _name, const std::string& _type, bool _value)
 {
-  name         = _name;
-  type         = _type;
-  valueType    = orion::ValueTypeBoolean;
-  boolValue    = _value;
-  typeGiven    = false;
+  name            = _name;
+  type            = _type;
+  valueType       = orion::ValueTypeBoolean;
+  boolValue       = _value;
+  typeGiven       = false;
+  compoundValueP  = NULL;
 }
 
 /* ****************************************************************************
@@ -154,10 +158,10 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, bool _val
 */
 Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 {
-  name = _name;
-  type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringFieldF(mdB, ENT_ATTRS_MD_TYPE) : "";
-
-  typeGiven = (type == "")? false : true;
+  name            = _name;
+  type            = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringFieldF(mdB, ENT_ATTRS_MD_TYPE) : "";
+  typeGiven       = (type == "")? false : true;
+  compoundValueP  = NULL;
 
   BSONType bsonType = getFieldF(mdB, ENT_ATTRS_MD_VALUE).type();
   switch (bsonType)
@@ -236,11 +240,11 @@ std::string Metadata::render(const std::string& indent, bool comma)
 
     if (compoundValueP->isObject())
     {
-      part = compoundValueP->toJson(true);
+      part = compoundValueP->toJson(true, false);
     }
     else if (compoundValueP->isVector())
     {
-      part = "[" + compoundValueP->toJson(true) + "]";
+      part = "[" + compoundValueP->toJson(true, false) + "]";
     }    
 
     out += part;
@@ -362,6 +366,11 @@ void Metadata::present(const std::string& metadataType, int ix, const std::strin
 */
 void Metadata::release(void)
 {
+  if (compoundValueP != NULL)
+  {
+    delete compoundValueP;
+    compoundValueP = NULL;
+  }
 }
 
 
@@ -447,14 +456,28 @@ std::string Metadata::toJson(bool isLastElement)
   }
   else if (valueType == orion::ValueTypeObject)
   {
-    if (compoundValueP->isObject())
+    if ((compoundValueP->isObject()) || (compoundValueP->isVector()))
     {
-      out += compoundValueP->toJson(true);
+      std::string out2;
+
+      //
+      // FIXME P1
+      //   These two 'funny' lines, modifying the compound, pretending it is not
+      //   toplevel, and setting its name to 'value' is to make toJson() work correctly
+      //   for metadata.
+      //
+      //   The toJson method must work both for attributes and metadata.
+      //   Attributes can be rendered with 'keyValues=on', and that special case we
+      //   don't want for metadata.
+      //
+      //   This 'hack' was the easiest way I could find to make the rendering of compounds
+      //   for metadata work - might not be the optimal way. A bool parameter coud be passed, for example.
+      //
+      compoundValueP->name  = "value";
+      compoundValueP->rootP = NULL;
+
+      out += compoundValueP->toJson(isLastElement, false);
     }
-    else if (compoundValueP->isVector())
-    {
-      out += std::string("\"value\"") + ":[" + compoundValueP->toJson(true) + "]";
-    }    
   }
   else
   {
@@ -470,4 +493,61 @@ std::string Metadata::toJson(bool isLastElement)
   }
 
   return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* Metadata::compoundItemExists - 
+*/
+bool Metadata::compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP)
+{
+  std::vector<std::string>   compoundPathV;
+  orion::CompoundValueNode*  current = compoundValueP;
+  int                        levels;
+
+  if (compoundPath == "")
+  {
+    return false;
+  }
+
+  if (compoundValueP == NULL)
+  {
+    return false;
+  }
+
+  levels = stringSplit(compoundPath, '.', compoundPathV);
+
+  if ((compoundPathV.size() == 0) || (levels == 0))
+  {
+    return false;
+  }
+
+  for (int ix = 0; ix < levels; ++ix)
+  {
+    bool found = false;
+
+    for (unsigned int cIx = 0; cIx < current->childV.size(); ++cIx)
+    {
+      if (current->childV[cIx]->name == compoundPathV[ix])
+      {
+        current = current->childV[cIx];
+        found   = true;
+        break;
+      }
+    }
+
+    if (found == false)
+    {
+      return false;
+    }
+  }
+
+  if (compoundItemPP != NULL)
+  {
+    *compoundItemPP = current;
+  }
+
+  return true;
 }

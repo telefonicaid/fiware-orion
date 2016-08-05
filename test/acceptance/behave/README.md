@@ -228,6 +228,13 @@ Feature: feature name...
 ```
 
 
+## Notification listener
+
+The notification listener is executed automatically (a HTTP server as a daemon) in local IP where test are executed. 
+If you wish use the local IP in the url to notification, put in `notification_http_url` field the `replace_host` value, ex: 
+    `http://replace_host:1234/notify` -->  it string is replaced internally by the local IP (used to notifications).
+
+
 ## Summary of Features and Scenarios
 
 Finally, after each execution is displayed a summary (Optional) with all features executed and its scenarios status. See `environment.py` in root path.
@@ -270,21 +277,21 @@ The Context Broker must start with "DEBUG" level in "CB_EXTRA_OPS" field into pr
 |       FEATURE/REFERENCE                     |  TEST CASES  | METHOD  |            URL                                       |  PAYLOAD  | QUERIES PARAMS |
 |:--------------------------------------------|:------------:|--------:|:-----------------------------------------------------|:---------:|:--------------:|      
 |**admin folder**                                                                                                                                          |
-|  retrieve_log_level                         |      1       | GET     | /admin/log                                           | No        | No             |
-|  change_log_level                           |     15       | PUT     | /admin/log                                           | No        | Yes            |
+| retrieve_log_level                          |      1       | GET     | /admin/log                                           | No        | No             |
+| change_log_level                            |     15       | PUT     | /admin/log                                           | No        | Yes            |
 |                                                                                                                                                          |
-|  retrieve_trace_level                       |  (pending)   | GET     | /log/trace                                           | No        | No             |
-|  change_trace_level                         |  (pending)   | PUT     | /log/trace/`<trace_levels>`                          | No        | No             |
-|  delete_trace_level                         |  (pending)   | DELETE  | /log/trace/`<trace_levels>`                          | No        | No             |
+| retrieve_trace_level                        |  (pending)   | GET     | /log/trace                                           | No        | No             |
+| change_trace_level                          |  (pending)   | PUT     | /log/trace/`<trace_levels>`                          | No        | No             |
+| delete_trace_level                          |  (pending)   | DELETE  | /log/trace/`<trace_levels>`                          | No        | No             |
 |                                                                                                                                                          |
-|  semaphore_list                             |  (pending)   | GET     | /admin/sem                                           | No        | No             |
+| semaphore_list                              |  (pending)   | GET     | /admin/sem                                           | No        | No             |
 |                                                                                                                                                          |
 |**api_entry_point folder**                                                                                                                                |
-|  retrieve_api_resource                      |     19       | GET     | /version  /statistics  cache/statistics    /v2       | No        | No             |
+| retrieve_api_resource                       |     19       | GET     | /version  /statistics  cache/statistics    /v2       | No        | No             |
 |                                                                                                                                                          |
 |**entities folder**                                                                                                                                       |
 | list_entities                               |    510       | GET     | /v2/entities/                                        | No        | Yes            |
-| create_entity                               |    695       | POST    | /v2/entities/                                        | Yes       | Yes            |    
+| create_entity                               |    785       | POST    | /v2/entities/                                        | Yes       | Yes            |    
 |                                                                                                                                                          |
 | retrieve_entity                             |    231       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |
 | retrieve_entity_attributes                  |    250       | GET     | /v2/entities/`<entity_id>`/attrs                     | No        | Yes            |
@@ -313,6 +320,8 @@ The Context Broker must start with "DEBUG" level in "CB_EXTRA_OPS" field into pr
 | retrieve_subscription                       |  (pending)   | GET     | /v2/subscriptions/`<subscription_id>`                | No        | No             |   
 | update_subscription                         |  (pending)   | PATCH   | /v2/subscriptions/`<subscription_id>`                | Yes       | No             |   
 | delete_subscription                         |  (pending)   | DELETE  | /v2/subscriptions/`<subscription_id>`                | No        | No             |   
+|                                                                                                                                                          |
+| notifications                               |  (pending)   |                                                                                             |   
 |                                                                                                                                                          |
 |**registration folder**                                                                                                                                   |
 | retrieve_registrations                      |  (pending)   | GET     | /v2/registrations                                    | No        | Yes            |   
@@ -409,6 +418,9 @@ The Context Broker must start with "DEBUG" level in "CB_EXTRA_OPS" field into pr
   - In expression value have multiples expressions uses `&` as separator, and in each operation use `>>>` as separator between the key and the value,
      ex:
          `| condition_expression | q>>>temperature>40&georel>>>near&geometry>>>point&coords>>>40.6391 |`
+  - If `notification_http_url` has `replace_host` value, ex: http://replace_host:1234/notify, it string is replaced internally by the hostname (used to notifications).
+  - If you do like to use the subscriptionId of the subscription created previously, use `previous subs` value
+ 
 
 ## Tags
 
