@@ -1,26 +1,26 @@
 # -*- coding: utf-8 -*-
 """
-Copyright 2016 Telefonica Investigación y Desarrollo, S.A.U
+ Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 
-This file is part of telefonica-iot-qa-tools
+ This file is part of Orion Context Broker.
 
-iot-qa-tools is free software: you can redistribute it and/or
-modify it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the License,
-or (at your option) any later version.
+ Orion Context Broker is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Affero General Public License as
+ published by the Free Software Foundation, either version 3 of the
+ License, or (at your option) any later version.
 
-iot-qa-tools is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Affero General Public License for more details.
+ Orion Context Broker is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+ General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public
-License along with iot-qa-tools.
-If not, seehttp://www.gnu.org/licenses/.
+ You should have received a copy of the GNU Affero General Public License
+ along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
 
-For those usages not covered by the GNU Affero General Public License
-please contact with::[iot_support@tid.es]
+ For those usages not covered by this license please contact with
+ iot_support at tid dot es
 """
+
 __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
 import json
@@ -132,7 +132,7 @@ class Daemon:
         verbose = kwargs.get("verbose", False)
         VERBOSE = verbose
         try:
-            self.d = threading.Thread(target=self.__listener, args=(port,ip_bind), name=name, verbose=verbose)
+            self.d = threading.Thread(target=self.__listener, args=(port, ip_bind), name=name, verbose=verbose)
             self.d.setDaemon(True)
             self.d.start()
 
@@ -142,8 +142,8 @@ class Daemon:
     def __listener(self, port, ip_bind):
         """
         execute a file (script)
-        :param file: file to execute
-        :param parameters: parameters list (arguments)
+        :param port: port where the listener is running
+        :param ip_bind: the server accepts TCP/IP connections on  server host IPv4 or/and IPv6 interfaces
         """
         server_class = BaseHTTPServer.HTTPServer
         httpd = server_class((ip_bind, int(port)), MyHandler)
