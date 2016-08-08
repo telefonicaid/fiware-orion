@@ -88,29 +88,35 @@ std::vector<std::string> servicePathVector;
 * utInit - unit test init
 *
 */
-void utInit(void)
+void utInit(bool notifierMocked, bool timerMocked)
 {
 #ifdef UT_DEBUG
   ++noOfInits;
   printf("**************** IN utInit (%d inits, %d exits)\n", noOfInits, noOfExits);
 #endif
 
-  notifierMock = new NotifierMock();
-  if (notifierMock == NULL)
+  if (notifierMocked)
   {
-    fprintf(stderr, "error allocating NotifierMock: %s\n", strerror(errno));
-    exit(1);
+    notifierMock = new NotifierMock();
+    if (notifierMock == NULL)
+    {
+      fprintf(stderr, "error allocating NotifierMock: %s\n", strerror(errno));
+      exit(1);
+    }
+    setNotifier(notifierMock);
   }
-  setNotifier(notifierMock);
-  
-  timerMock = new TimerMock();
-  if (timerMock == NULL)
+
+  if (timerMocked)
   {
-    fprintf(stderr, "error allocating TimerMock: %s\n", strerror(errno));
-    exit(1);
+    timerMock = new TimerMock();
+    if (timerMock == NULL)
+    {
+      fprintf(stderr, "error allocating TimerMock: %s\n", strerror(errno));
+      exit(1);
+    }
+    ON_CALL(*timerMock, getCurrentTime()).WillByDefault(Return(1360232700));
+    setTimer(timerMock);
   }
-  ON_CALL(*timerMock, getCurrentTime()).WillByDefault(Return(1360232700));
-  setTimer(timerMock);
 
   startTime       = getCurrentTime();
   statisticsTime  = getCurrentTime();

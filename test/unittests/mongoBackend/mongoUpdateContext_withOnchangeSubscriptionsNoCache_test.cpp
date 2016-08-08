@@ -403,7 +403,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
-    utInit();
+    utInit(false);
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;      
@@ -2900,7 +2900,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_delete2Matches1N
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
-    utInit();
+    utInit(false, true);  // No notifierMock to be prepared in utInit (first 'false')
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
