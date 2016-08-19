@@ -224,7 +224,7 @@ void EntityId::fill(const struct EntityId* eidP, bool useDefaultType)
 
   if (useDefaultType && (type == ""))
   {
-    type = DEFAULT_TYPE;
+    type = DEFAULT_ENTITY_TYPE;
   }
 }
 

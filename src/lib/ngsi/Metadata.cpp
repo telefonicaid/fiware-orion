@@ -84,7 +84,14 @@ Metadata::Metadata(Metadata* mP, bool useDefaultType)
 
   if (useDefaultType && !typeGiven)
   {
-    type = DEFAULT_TYPE;
+    if ((compoundValueP == NULL) || (compoundValueP->valueType != orion::ValueTypeVector))
+    {
+      type = defaultType(valueType);
+    }
+    else
+    {
+      type = defaultType(orion::ValueTypeVector);
+    }
   }
 }
 
@@ -435,7 +442,14 @@ std::string Metadata::toJson(bool isLastElement)
   out = JSON_STR(name) + ":{";
 
   /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
-  out += (type != "")? JSON_VALUE("type", type) : JSON_VALUE("type", DEFAULT_TYPE);
+  std::string defType = defaultType(valueType);
+
+  if (compoundValueP && compoundValueP->isVector())
+  {
+    defType = defaultType(orion::ValueTypeVector);
+  }
+
+  out += (type != "")? JSON_VALUE("type", type) : JSON_VALUE("type", defType);
   out += ",";
 
   if (valueType == orion::ValueTypeString)

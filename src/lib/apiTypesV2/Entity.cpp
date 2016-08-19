@@ -28,6 +28,7 @@
 #include "logMsg/traceLevels.h"
 #include "common/tag.h"
 #include "common/string.h"
+#include "common/globals.h"
 #include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 #include "parse/forbiddenChars.h"
@@ -100,7 +101,7 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
         out += ",";
 
         /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
-        out += JSON_STR("type") + ":" + ((type != "")? JSON_STR(type) : JSON_STR(DEFAULT_TYPE));
+        out += JSON_STR("type") + ":" + ((type != "")? JSON_STR(type) : JSON_STR(DEFAULT_ENTITY_TYPE));
       }
 
       std::string attrsOut;

@@ -54,5 +54,12 @@ typedef enum ValueType
 */
 extern const char* valueTypeName(const orion::ValueType _type);
 
+
+/* ****************************************************************************
+*
+* defaultType - 
+*/
+extern const char* defaultType(orion::ValueType valueType);
+
 }
 #endif  // SRC_LIB_ORIONTYPES_ORIONVALUETYPE_H_

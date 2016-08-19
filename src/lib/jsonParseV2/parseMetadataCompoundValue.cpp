@@ -327,10 +327,5 @@ std::string parseMetadataCompoundValue
     }
   }
 
-  if (!mdP->typeGiven)
-  {
-    mdP->type = DEFAULT_TYPE;
-  }
-
   return "OK";
 }
