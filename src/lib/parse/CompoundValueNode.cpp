@@ -589,6 +589,7 @@ void CompoundValueNode::check(void)
       return;
     }
 
+#if 0  // See Issue #2457
     for (uint64_t ix = 0; ix < childV.size() - 1; ++ix)
     {
       for (uint64_t ix2 = ix + 1; ix2 < childV.size(); ++ix2)
@@ -602,6 +603,8 @@ void CompoundValueNode::check(void)
         }
       }
     }
+#endif
+
   }
   else
   {

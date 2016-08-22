@@ -138,7 +138,7 @@ Date: REGEX(.*)
 02. Get subscriptions by /sp1 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 343
+Content-Length: 331
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -161,7 +161,6 @@ Date: REGEX(.*)
                 "expression": {
                     "coords": "",
                     "geometry": "",
-                    "georel": "",
                     "q": ""
                 }
             },
@@ -188,7 +187,7 @@ Date: REGEX(.*)
 04. Get subscriptions by /sp1 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 340
+Content-Length: 328
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -211,7 +210,6 @@ Date: REGEX(.*)
                 "expression": {
                     "coords": "",
                     "geometry": "",
-                    "georel": "",
                     "q": ""
                 }
             },
@@ -248,7 +246,7 @@ Date: REGEX(.*)
 07. Get subscriptions by /sp2 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 340
+Content-Length: 328
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -271,7 +269,6 @@ Date: REGEX(.*)
                 "expression": {
                     "coords": "",
                     "geometry": "",
-                    "georel": "",
                     "q": ""
                 }
             },

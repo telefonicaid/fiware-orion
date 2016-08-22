@@ -386,6 +386,7 @@ TEST(compoundValue, updateTwoStringsJson)
 *
 * updateTwoItemsSameNameInStruct - 
 */
+#if 0  // See Issue #2457
 TEST(compoundValue, updateTwoItemsSameNameInStruct)
 {
   ParseData       reqData;
@@ -404,13 +405,14 @@ TEST(compoundValue, updateTwoItemsSameNameInStruct)
 
   utExit();
 }
-
+#endif
 
 
 /* ****************************************************************************
 *
 * updateTwoItemsSameNameInStructJson - 
 */
+#if 0  // See Issue #2457
 TEST(compoundValue, updateTwoItemsSameNameInStructJson)
 {
   ParseData       reqData;
@@ -431,6 +433,7 @@ TEST(compoundValue, updateTwoItemsSameNameInStructJson)
 
   utExit();
 }
+#endif
 
 
 

@@ -26,7 +26,7 @@
 #   1. err: unknown path
 #   2. ok:  One string 's1' == 'STRING' as compound value (contextValue is a struct)
 #   3. ok:  's1' and 's2' (== 'STRING2')
-#   4. err: Two items with same name in struct 's1' + 's2' + 's1'
+#   4. err: Two items with same name in struct 's1' + 's2' + 's1' : DISABLED
 #   5. ok:  contextValue is a vector with one item
 #   6. ok:  contextValue is a vector with five items
 #   7. err: contextValue is a vector with five items + one item with a bad name
@@ -146,7 +146,7 @@ orionCurl --url "$url" --payload "${payload}"
 
 
 #   4. err: Two items with same name in struct 's1' + 's2' + 's1'
-echo "4: +++++++++++++++++++++++++++++++++"
+# echo "4: +++++++++++++++++++++++++++++++++"
 url='/v1/updateContext'
 payload='<?xml version="1.0"?>
 <updateContextRequest>
@@ -170,7 +170,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "${payload}"
+# orionCurl --url "$url" --payload "${payload}"
 
 
 #   5. ok:  contextValue is a vector with one item
@@ -392,20 +392,6 @@ Date: REGEX(.*)
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
-</updateContextResponse>
-4: +++++++++++++++++++++++++++++++++
-HTTP/1.1 200 OK
-Content-Length: 226
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<updateContextResponse>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>compound value error: duplicated tag-name: /s1/ in path: /</details>
-  </errorCode>
 </updateContextResponse>
 5: +++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK

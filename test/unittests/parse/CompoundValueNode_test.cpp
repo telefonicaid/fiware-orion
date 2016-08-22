@@ -176,7 +176,9 @@ TEST(CompoundValueNode, structInvalidAndOk)
   str->add(item2);
 
   tree->finish();
+#if 0  // See Issue #2457
   EXPECT_STREQ("duplicated tag-name: /structitem/ in path: /struct", tree->error.c_str());
+#endif
 
   item2->name = "structitem2";
   tree->finish();
