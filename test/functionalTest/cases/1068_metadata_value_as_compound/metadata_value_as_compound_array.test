@@ -33,9 +33,11 @@ accumulatorStart --pretty-print
 #
 # 01. Create an entity E1 with attr A1 with metadata M1 = [ 1, 2 ]
 # 02. GET /v2/entities, to see the entity
-# 03. POST /v1/queryContext, to see all entities using NSGIv1
-# 04. Create a subscription to trigger a notification
-# 05. Dump accelerator to see the compound value of M1 correctly rendered in the notification
+# 03. Create a subscription to trigger a notification (without entity type)
+# 04. Dump accumulator to see the compound value of M1 correctly rendered in the notification
+# 05. Reset accumulator
+# 06. Create a subscription to trigger a notification (with entity type as Thing)
+# 07. Dump accumulator to see the compound value of M1 correctly rendered in the notification
 #
 
 echo '01. Create an entity E2 with attr A1 with metadata M1 = [ 1, 2 ]'
@@ -59,13 +61,21 @@ echo
 
 echo "02. GET /v2/entities, to see the entity"
 echo "======================================="
+payload='{
+  "entities": [
+    {
+      "isPattern": "true",
+      "id": ".*"
+    }
+  ]
+}'
 orionCurl --url /v2/entities  # --noPayloadCheck
 echo
 echo
 
 
-echo "04. Create a subscription to trigger a notification"
-echo "==================================================="
+echo "03. Create a subscription to trigger a notification (without entity type)"
+echo "========================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -85,7 +95,44 @@ echo
 echo
 
 
-echo "05. Dump accelerator to see the compound value of M1 correctly rendered in the notification"
+echo "04. Dump accumulator to see the compound value of M1 correctly rendered in the notification"
+echo "==========================================================================================="
+accumulatorDump
+echo
+echo
+
+
+echo "05. Reset accumulator"
+echo "====================="
+accumulatorReset
+accumulatorDump  # just to make sure the accumulator is empty ...
+echo
+echo
+
+
+echo "06. Create a subscription to trigger a notification (with entity type as Thing)"
+echo "==============================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E2",
+        "type": "Thing"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "07. Dump accumulator to see the compound value of M1 correctly rendered in the notification"
 echo "==========================================================================================="
 accumulatorDump
 echo
@@ -132,8 +179,8 @@ Date: REGEX(.*)
 ]
 
 
-04. Create a subscription to trigger a notification
-===================================================
+03. Create a subscription to trigger a notification (without entity type)
+=========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -142,7 +189,57 @@ Date: REGEX(.*)
 
 
 
-05. Dump accelerator to see the compound value of M1 correctly rendered in the notification
+04. Dump accumulator to see the compound value of M1 correctly rendered in the notification
+===========================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 174
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue", 
+                        "value": [
+                            1, 
+                            2
+                        ]
+                    }
+                }, 
+                "type": "Text", 
+                "value": "01"
+            }, 
+            "id": "E2", 
+            "type": "Thing"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+05. Reset accumulator
+=====================
+
+
+06. Create a subscription to trigger a notification (with entity type as Thing)
+===============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Dump accumulator to see the compound value of M1 correctly rendered in the notification
 ===========================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 174
