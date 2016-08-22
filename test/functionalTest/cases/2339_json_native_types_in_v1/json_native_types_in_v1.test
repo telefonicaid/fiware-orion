@@ -155,7 +155,7 @@ Date: REGEX(.*)
 02. GET the entity using /v1/queryContext
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 3511
+Content-Length: 3569
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -167,12 +167,12 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "Bool",
-                        "type": "none",
+                        "type": "Boolean",
                         "value": true
                     },
                     {
                         "name": "BoolVec",
-                        "type": "none",
+                        "type": "StructuredValue",
                         "value": [
                             true,
                             false,
@@ -181,22 +181,22 @@ Date: REGEX(.*)
                     },
                     {
                         "name": "Float",
-                        "type": "none",
+                        "type": "Number",
                         "value": 3.14
                     },
                     {
                         "name": "Integer",
-                        "type": "none",
+                        "type": "Number",
                         "value": 3
                     },
                     {
                         "name": "Null",
-                        "type": "none",
+                        "type": "None",
                         "value": null
                     },
                     {
                         "name": "NullVec",
-                        "type": "none",
+                        "type": "StructuredValue",
                         "value": [
                             null,
                             null,
@@ -205,7 +205,7 @@ Date: REGEX(.*)
                     },
                     {
                         "name": "NumVec",
-                        "type": "none",
+                        "type": "StructuredValue",
                         "value": [
                             1,
                             2,
@@ -214,7 +214,7 @@ Date: REGEX(.*)
                     },
                     {
                         "name": "Object",
-                        "type": "none",
+                        "type": "StructuredValue",
                         "value": {
                             "Bool": true,
                             "BoolVec": [
@@ -268,34 +268,34 @@ Date: REGEX(.*)
                     },
                     {
                         "name": "String",
-                        "type": "none",
+                        "type": "Text",
                         "value": "string"
                     },
                     {
                         "metadatas": [
                             {
                                 "name": "Bool",
-                                "type": "none",
+                                "type": "Boolean",
                                 "value": true
                             },
                             {
                                 "name": "Float",
-                                "type": "none",
+                                "type": "Number",
                                 "value": 3.14
                             },
                             {
                                 "name": "Integer",
-                                "type": "none",
+                                "type": "Number",
                                 "value": 3.0
                             },
                             {
                                 "name": "Null",
-                                "type": "none",
+                                "type": "None",
                                 "value": null
                             },
                             {
                                 "name": "String",
-                                "type": "none",
+                                "type": "Text",
                                 "value": "string"
                             }
                         ],
@@ -336,7 +336,7 @@ Date: REGEX(.*)
 04. Dump accumulator
 ====================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 3590
+Content-Length: 3648
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
@@ -350,12 +350,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                 "attributes": [
                     {
                         "name": "Bool", 
-                        "type": "none", 
+                        "type": "Boolean", 
                         "value": true
                     }, 
                     {
                         "name": "BoolVec", 
-                        "type": "none", 
+                        "type": "StructuredValue", 
                         "value": [
                             true, 
                             false, 
@@ -364,22 +364,22 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     }, 
                     {
                         "name": "Float", 
-                        "type": "none", 
+                        "type": "Number", 
                         "value": 3.14REGEX([01]*)
                     }, 
                     {
                         "name": "Integer", 
-                        "type": "none", 
+                        "type": "Number", 
                         "value": 3
                     }, 
                     {
                         "name": "Null", 
-                        "type": "none", 
+                        "type": "None", 
                         "value": null
                     }, 
                     {
                         "name": "NullVec", 
-                        "type": "none", 
+                        "type": "StructuredValue", 
                         "value": [
                             null, 
                             null, 
@@ -388,7 +388,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     }, 
                     {
                         "name": "NumVec", 
-                        "type": "none", 
+                        "type": "StructuredValue", 
                         "value": [
                             1, 
                             2, 
@@ -397,7 +397,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     }, 
                     {
                         "name": "Object", 
-                        "type": "none", 
+                        "type": "StructuredValue", 
                         "value": {
                             "Bool": true, 
                             "BoolVec": [
@@ -451,34 +451,34 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     }, 
                     {
                         "name": "String", 
-                        "type": "none", 
+                        "type": "Text", 
                         "value": "string"
                     }, 
                     {
                         "metadatas": [
                             {
                                 "name": "Bool",
-                                "type": "none",
+                                "type": "Boolean",
                                 "value": true
                             },
                             {
                                 "name": "Float", 
-                                "type": "none", 
+                                "type": "Number", 
                                 "value": 3.14REGEX([01]*)
                             }, 
                             {
                                 "name": "Integer",
-                                "type": "none",
+                                "type": "Number",
                                 "value": 3.0
                             },
                             {
                                 "name": "Null", 
-                                "type": "none", 
+                                "type": "None", 
                                 "value": null
                             },
                             {
                                 "name": "String",
-                                "type": "none",
+                                "type": "Text",
                                 "value": "string"
                             }
                         ], 

@@ -372,12 +372,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A": {
                 "metadata": {},
-                "type": "none",
+                "type": "Text",
                 "value": "aaa"
             },
             "C": {
                 "metadata": {},
-                "type": "none",
+                "type": "Text",
                 "value": "ccc"
             },
             "id": "E",
@@ -401,12 +401,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A": {
                 "metadata": {},
-                "type": "none",
+                "type": "Text",
                 "value": "a2"
             },
             "C": {
                 "metadata": {},
-                "type": "none",
+                "type": "Text",
                 "value": "ccc"
             },
             "id": "E",
@@ -430,12 +430,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A": {
                 "metadata": {},
-                "type": "none",
+                "type": "Text",
                 "value": "a3"
             },
             "C": {
                 "metadata": {},
-                "type": "none",
+                "type": "Text",
                 "value": "ccc"
             },
             "id": "E",

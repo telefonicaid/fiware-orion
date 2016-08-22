@@ -309,7 +309,7 @@ echo
 ===============================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -328,7 +328,7 @@ Date: REGEX(.*)
 03. Dump and reset accumulator, see one notification
 ====================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 194
+Content-Length: 206
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -342,18 +342,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "none", 
+                        "type": "StructuredValue", 
                         "value": {
                             "i": 10, 
                             "s": "test_string"
                         }
                     }
                 }, 
-                "type": "none", 
+                "type": "Text", 
                 "value": "not important"
             }, 
             "id": "E1", 
-            "type": "none"
+            "type": "Thing"
         }
     ], 
     "subscriptionId": "REGEX([0-9a-f]{24})"
@@ -402,7 +402,7 @@ Date: REGEX(.*)
 09. Dump and reset accumulator, see one notification
 ====================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 194
+Content-Length: 206
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -416,18 +416,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "none", 
+                        "type": "StructuredValue", 
                         "value": {
                             "i": 10, 
                             "s": "test_string"
                         }
                     }
                 }, 
-                "type": "none", 
+                "type": "Text", 
                 "value": "not important"
             }, 
             "id": "E1", 
-            "type": "none"
+            "type": "Thing"
         }
     ], 
     "subscriptionId": "REGEX([0-9a-f]{24})"
@@ -462,7 +462,7 @@ Date: REGEX(.*)
 13. Dump and reset accumulator, see one notification
 ====================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 194
+Content-Length: 206
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -476,18 +476,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "none", 
+                        "type": "StructuredValue", 
                         "value": {
                             "i": 10, 
                             "s": "test_string"
                         }
                     }
                 }, 
-                "type": "none", 
+                "type": "Text", 
                 "value": "not important"
             }, 
             "id": "E1", 
-            "type": "none"
+            "type": "Thing"
         }
     ], 
     "subscriptionId": "REGEX([0-9a-f]{24})"
@@ -507,7 +507,7 @@ Date: REGEX(.*)
 15. Dump and reset accumulator, see three notifications
 =======================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 191
+Content-Length: 203
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -521,25 +521,25 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "none", 
+                        "type": "StructuredValue", 
                         "value": {
                             "i": 11, 
                             "s": "test_string2"
                         }
                     }
                 }, 
-                "type": "none", 
+                "type": "Text", 
                 "value": "new value"
             }, 
             "id": "E1", 
-            "type": "none"
+            "type": "Thing"
         }
     ], 
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 191
+Content-Length: 203
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -553,25 +553,25 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "none", 
+                        "type": "StructuredValue", 
                         "value": {
                             "i": 11, 
                             "s": "test_string2"
                         }
                     }
                 }, 
-                "type": "none", 
+                "type": "Text", 
                 "value": "new value"
             }, 
             "id": "E1", 
-            "type": "none"
+            "type": "Thing"
         }
     ], 
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 191
+Content-Length: 203
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -585,18 +585,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "none", 
+                        "type": "StructuredValue", 
                         "value": {
                             "i": 11, 
                             "s": "test_string2"
                         }
                     }
                 }, 
-                "type": "none", 
+                "type": "Text", 
                 "value": "new value"
             }, 
             "id": "E1", 
-            "type": "none"
+            "type": "Thing"
         }
     ], 
     "subscriptionId": "REGEX([0-9a-f]{24})"

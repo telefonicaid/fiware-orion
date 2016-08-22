@@ -112,7 +112,7 @@ Date: REGEX(.*)
 03. GET /v1/contextEntities/E1
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 449
+Content-Length: 460
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -122,7 +122,7 @@ Date: REGEX(.*)
         "attributes": [
             {
                 "name": "compattr",
-                "type": "none",
+                "type": "StructuredValue",
                 "value": {
                     "x": {
                         "x1": "a",
@@ -150,7 +150,7 @@ Date: REGEX(.*)
 04. GET /v1/contextEntities/E2
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 498
+Content-Length: 509
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -160,7 +160,7 @@ Date: REGEX(.*)
         "attributes": [
             {
                 "name": "compattr",
-                "type": "none",
+                "type": "StructuredValue",
                 "value": [
                     22,
                     false,

@@ -203,7 +203,7 @@ echo
 ============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E24?type=none
+Location: /v2/entities/E24?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -213,7 +213,7 @@ Date: REGEX(.*)
 ============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E23?type=none
+Location: /v2/entities/E23?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -223,7 +223,7 @@ Date: REGEX(.*)
 ============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E22?type=none
+Location: /v2/entities/E22?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -232,7 +232,7 @@ Date: REGEX(.*)
 04. GET entities with birthdate=2016-02-24T10:00:00.00Z, see E24
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 66
+Content-Length: 67
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -241,7 +241,7 @@ Date: REGEX(.*)
     {
         "birthdate": "2016-02-24T10:00:00.00Z",
         "id": "E24",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -249,7 +249,7 @@ Date: REGEX(.*)
 04b. GET entities with birthdate=2016-02-24T10:00:00.00Z, see E24 (without keyValues)
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 108
+Content-Length: 109
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -262,7 +262,7 @@ Date: REGEX(.*)
             "value": "2016-02-24T10:00:00.00Z"
         },
         "id": "E24",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -292,7 +292,7 @@ Date: REGEX(.*)
 06. GET entities with birthdate<2016-02-25T10:00:00.00Z, see all three
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 196
+Content-Length: 199
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -301,17 +301,17 @@ Date: REGEX(.*)
     {
         "birthdate": "2016-02-24T10:00:00.00Z",
         "id": "E24",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "birthdate": "2016-02-23T10:00:00.00Z",
         "id": "E23",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "birthdate": "2016-02-22T10:00:00.00Z",
         "id": "E22",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -319,7 +319,7 @@ Date: REGEX(.*)
 06b. GET entities with birthdate<2016-02-25T10:00:00.00Z, see all three (without keyValues)
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 322
+Content-Length: 325
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -332,7 +332,7 @@ Date: REGEX(.*)
             "value": "2016-02-24T10:00:00.00Z"
         },
         "id": "E24",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "birthdate": {
@@ -341,7 +341,7 @@ Date: REGEX(.*)
             "value": "2016-02-23T10:00:00.00Z"
         },
         "id": "E23",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "birthdate": {
@@ -350,7 +350,7 @@ Date: REGEX(.*)
             "value": "2016-02-22T10:00:00.00Z"
         },
         "id": "E22",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -358,7 +358,7 @@ Date: REGEX(.*)
 07. GET entities with birthdate>=2016-02-23T10:00:00.00Z, see E23 and E24
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 131
+Content-Length: 133
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -367,12 +367,12 @@ Date: REGEX(.*)
     {
         "birthdate": "2016-02-24T10:00:00.00Z",
         "id": "E24",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "birthdate": "2016-02-23T10:00:00.00Z",
         "id": "E23",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -380,7 +380,7 @@ Date: REGEX(.*)
 07b. GET entities with birthdate>=2016-02-23T10:00:00.00Z, see E23 and E24 (without keyValues)
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 215
+Content-Length: 217
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -393,7 +393,7 @@ Date: REGEX(.*)
             "value": "2016-02-24T10:00:00.00Z"
         },
         "id": "E24",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "birthdate": {
@@ -402,7 +402,7 @@ Date: REGEX(.*)
             "value": "2016-02-23T10:00:00.00Z"
         },
         "id": "E23",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -410,7 +410,7 @@ Date: REGEX(.*)
 08. GET entities with birthdate<=2016-02-23T10:00:00.00Z, see E22 and E23
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 131
+Content-Length: 133
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -419,12 +419,12 @@ Date: REGEX(.*)
     {
         "birthdate": "2016-02-23T10:00:00.00Z",
         "id": "E23",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "birthdate": "2016-02-22T10:00:00.00Z",
         "id": "E22",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -432,7 +432,7 @@ Date: REGEX(.*)
 08b. GET entities with birthdate<=2016-02-23T10:00:00.00Z, see E22 and E23 (without keyValues)
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 215
+Content-Length: 217
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -445,7 +445,7 @@ Date: REGEX(.*)
             "value": "2016-02-23T10:00:00.00Z"
         },
         "id": "E23",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "birthdate": {
@@ -454,7 +454,7 @@ Date: REGEX(.*)
             "value": "2016-02-22T10:00:00.00Z"
         },
         "id": "E22",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -474,7 +474,7 @@ Date: REGEX(.*)
 ==========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E25?type=none
+Location: /v2/entities/E25?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -494,7 +494,7 @@ Date: REGEX(.*)
 12. GET entities with birthdate=2016-02-25T10:00:00.00Z, see E25
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 106
+Content-Length: 107
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -507,7 +507,7 @@ Date: REGEX(.*)
             "value": "2016-02-25T10:00:00.00Z"
         },
         "id": "E25",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 

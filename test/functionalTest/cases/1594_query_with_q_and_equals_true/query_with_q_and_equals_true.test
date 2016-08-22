@@ -130,7 +130,7 @@ echo
 ==============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -140,7 +140,7 @@ Date: REGEX(.*)
 ===============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2?type=none
+Location: /v2/entities/E2?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -150,7 +150,7 @@ Date: REGEX(.*)
 ==============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E3?type=none
+Location: /v2/entities/E3?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -159,7 +159,7 @@ Date: REGEX(.*)
 04. GET all entities (3 entities)
 =================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 236
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -168,29 +168,29 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Boolean",
             "value": true
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Boolean",
             "value": false
         },
         "id": "E2",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Boolean",
             "value": true
         },
         "id": "E3",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -198,7 +198,7 @@ Date: REGEX(.*)
 05. GET entities with q=A1==true (2 hits)
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 149
+Content-Length: 157
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -207,20 +207,20 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Boolean",
             "value": true
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Boolean",
             "value": true
         },
         "id": "E3",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -228,7 +228,7 @@ Date: REGEX(.*)
 06. GET entities with q=A1==false (1 hit)
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 80
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -237,11 +237,11 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Boolean",
             "value": false
         },
         "id": "E2",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -260,7 +260,7 @@ Date: REGEX(.*)
 08. GET entities with q=A1!=true (1 hit)
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 80
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -269,11 +269,11 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Boolean",
             "value": false
         },
         "id": "E2",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -281,7 +281,7 @@ Date: REGEX(.*)
 09. GET entities with q=A1!=false (2 hits)
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 149
+Content-Length: 157
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -290,20 +290,20 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Boolean",
             "value": true
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Boolean",
             "value": true
         },
         "id": "E3",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 

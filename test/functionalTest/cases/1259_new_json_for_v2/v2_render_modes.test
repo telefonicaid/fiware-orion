@@ -155,7 +155,7 @@ echo
 =================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -164,7 +164,7 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 936
+Content-Length: 947
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -204,7 +204,7 @@ Date: REGEX(.*)
         "type": "TA1",
         "value": true
     },
-    "type": "none",
+    "type": "Thing",
     "vector_object": {
         "metadata": {},
         "type": "TA1",
@@ -216,15 +216,15 @@ Date: REGEX(.*)
     "with_metadata01": {
         "metadata": {
             "md_false": {
-                "type": "none",
+                "type": "Boolean",
                 "value": false
             },
             "md_float:": {
-                "type": "none",
+                "type": "Number",
                 "value": 2.01
             },
             "md_int": {
-                "type": "none",
+                "type": "Number",
                 "value": 1
             },
             "md_object_false": {
@@ -248,11 +248,11 @@ Date: REGEX(.*)
                 "value": true
             },
             "md_string": {
-                "type": "none",
+                "type": "Text",
                 "value": "STRING"
             },
             "md_true": {
-                "type": "none",
+                "type": "Boolean",
                 "value": true
             }
         },
@@ -265,7 +265,7 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1?options=keyValues
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 198
+Content-Length: 199
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -281,7 +281,7 @@ Date: REGEX(.*)
     },
     "string_object": "a1",
     "true_object": true,
-    "type": "none",
+    "type": "Thing",
     "vector_object": [
         "a",
         "b"
@@ -319,7 +319,7 @@ Date: REGEX(.*)
 05. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 938
+Content-Length: 949
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -360,7 +360,7 @@ Date: REGEX(.*)
             "type": "TA1",
             "value": true
         },
-        "type": "none",
+        "type": "Thing",
         "vector_object": {
             "metadata": {},
             "type": "TA1",
@@ -372,15 +372,15 @@ Date: REGEX(.*)
         "with_metadata01": {
             "metadata": {
                 "md_false": {
-                    "type": "none",
+                    "type": "Boolean",
                     "value": false
                 },
                 "md_float:": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 2.01
                 },
                 "md_int": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 1
                 },
                 "md_object_false": {
@@ -404,11 +404,11 @@ Date: REGEX(.*)
                     "value": true
                 },
                 "md_string": {
-                    "type": "none",
+                    "type": "Text",
                     "value": "STRING"
                 },
                 "md_true": {
-                    "type": "none",
+                    "type": "Boolean",
                     "value": true
                 }
             },
@@ -422,7 +422,7 @@ Date: REGEX(.*)
 06. GET /v2/entities?options=keyValues
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 200
+Content-Length: 201
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -439,7 +439,7 @@ Date: REGEX(.*)
         },
         "string_object": "a1",
         "true_object": true,
-        "type": "none",
+        "type": "Thing",
         "vector_object": [
             "a",
             "b"

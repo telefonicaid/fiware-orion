@@ -109,7 +109,7 @@ echo
 =====================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -118,7 +118,7 @@ Date: REGEX(.*)
 02. GET /v2/entities, to see the entity
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 559
+Content-Length: 593
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -129,7 +129,7 @@ Date: REGEX(.*)
         "mixCompound": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "StructuredValue",
                     "value": {
                         "a": "1",
                         "b": 2,
@@ -168,13 +168,13 @@ Date: REGEX(.*)
                     }
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "02"
         },
         "objCompound": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "StructuredValue",
                     "value": {
                         "x": {
                             "x1": "a",
@@ -187,13 +187,13 @@ Date: REGEX(.*)
                     }
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "02"
         },
         "objCompound2": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "StructuredValue",
                     "value": {
                         "22": 22,
                         "o": {
@@ -210,10 +210,10 @@ Date: REGEX(.*)
                     }
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "01"
         },
-        "type": "none"
+        "type": "Thing"
     }
 ]
 

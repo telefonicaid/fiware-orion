@@ -251,7 +251,7 @@ Date: REGEX(.*)
 07. Query R and C entities ending with 2 or 3, A>25 and max distance 13.5 km to P: R3/R and C2/C
 ================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 284
+Content-Length: 288
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -260,7 +260,7 @@ Date: REGEX(.*)
     {
         "A": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 30
         },
         "id": "R3",
@@ -274,7 +274,7 @@ Date: REGEX(.*)
     {
         "A": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 200
         },
         "id": "C2",

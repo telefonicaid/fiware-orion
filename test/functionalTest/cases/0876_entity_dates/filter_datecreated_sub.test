@@ -221,7 +221,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A": {
                 "metadata": {},
-                "type": "none",
+                "type": "Text",
                 "value": "foo2"
             },
             "id": "E2",
@@ -245,7 +245,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A": {
                 "metadata": {},
-                "type": "none",
+                "type": "Text",
                 "value": "foo3"
             },
             "id": "E3",
@@ -269,7 +269,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A": {
                 "metadata": {},
-                "type": "none",
+                "type": "Text",
                 "value": "foo4"
             },
             "id": "E4",

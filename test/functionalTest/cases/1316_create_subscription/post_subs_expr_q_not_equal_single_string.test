@@ -182,7 +182,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "id": "E1",
             "status": {
                 "metadata": {},
-                "type": "none",
+                "type": "Text",
                 "value": "off"
             },
             "type": "T"
@@ -206,7 +206,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "id": "E1",
             "status": {
                 "metadata": {},
-                "type": "none",
+                "type": "Text",
                 "value": "fail"
             },
             "type": "T"

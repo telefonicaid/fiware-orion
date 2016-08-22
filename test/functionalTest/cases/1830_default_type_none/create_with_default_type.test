@@ -31,9 +31,9 @@ brokerStart CB 0-255
 
 #
 # 01. Create entity E with A1 (without metadata) and A2 (with metadata M2)
-# 02. Get entity: E, A1, A2 and M2 types are "none"
+# 02. Get entity: E, A1, A2 and M2 types with their respective default values
 # 03. Append new attribute A3 (without metadata) and A4 (with metadata M4)
-# 04. Get entity: E, A1, A2, A4, A4, M2, M4 types are "none"
+# 04. Get entity: E, A1, A2, A4, A4, M2, M4 types with their respective default values
 #
 
 
@@ -58,8 +58,8 @@ echo
 echo
 
 
-echo "02. Get entity: E, A1, A2 and M2 types are none"
-echo "==============================================="
+echo "02. Get entity: E, A1, A2 and M2 types with their respective default values"
+echo "==========================================================================="
 orionCurl --url /v2/entities/E
 echo
 echo
@@ -85,8 +85,8 @@ echo
 echo
 
 
-echo "04. Get entity: E, A1, A2, A4, A4, M2, M4 types are none"
-echo "========================================================"
+echo "04. Get entity: E, A1, A2, A4, A4, M2, M4 types with their respective default values"
+echo "===================================================================================="
 orionCurl --url /v2/entities/E
 echo
 echo
@@ -97,16 +97,16 @@ echo
 ========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E?type=none
+Location: /v2/entities/E?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-02. Get entity: E, A1, A2 and M2 types are none
-===============================================
+02. Get entity: E, A1, A2 and M2 types with their respective default values
+===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 159
+Content-Length: 160
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -114,21 +114,21 @@ Date: REGEX(.*)
 {
     "A1": {
         "metadata": {},
-        "type": "none",
+        "type": "Text",
         "value": "foo1"
     },
     "A2": {
         "metadata": {
             "M2": {
-                "type": "none",
+                "type": "Text",
                 "value": "bar2"
             }
         },
-        "type": "none",
+        "type": "Text",
         "value": "foo2"
     },
     "id": "E",
-    "type": "none"
+    "type": "Thing"
 }
 
 
@@ -141,10 +141,10 @@ Date: REGEX(.*)
 
 
 
-04. Get entity: E, A1, A2, A4, A4, M2, M4 types are none
-========================================================
+04. Get entity: E, A1, A2, A4, A4, M2, M4 types with their respective default values
+====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 294
+Content-Length: 295
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -152,36 +152,36 @@ Date: REGEX(.*)
 {
     "A1": {
         "metadata": {},
-        "type": "none",
+        "type": "Text",
         "value": "foo1"
     },
     "A2": {
         "metadata": {
             "M2": {
-                "type": "none",
+                "type": "Text",
                 "value": "bar2"
             }
         },
-        "type": "none",
+        "type": "Text",
         "value": "foo2"
     },
     "A3": {
         "metadata": {},
-        "type": "none",
+        "type": "Text",
         "value": "foo3"
     },
     "A4": {
         "metadata": {
             "M4": {
-                "type": "none",
+                "type": "Text",
                 "value": "bar4"
             }
         },
-        "type": "none",
+        "type": "Text",
         "value": "foo4"
     },
     "id": "E",
-    "type": "none"
+    "type": "Thing"
 }
 
 

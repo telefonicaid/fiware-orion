@@ -128,7 +128,7 @@ Date: REGEX(.*)
 {
     "A1": {
         "metadata": {},
-        "type": "none",
+        "type": "Text",
         "value": "02"
     },
     "id": "E1",

@@ -30,6 +30,9 @@ brokerStart CB 0-255
 --SHELL--
 
 #
+# FIXME P6: steps 04, 06, 08, 10, 12, 14, 16 18, and 20 in REGEXPECT of this test must change once the
+#           issue #2451 is resolved
+#
 # 01. POST /v2/entities creating E1 A1=1
 # 02. PUT /v2/entities/E1/attrs/A1/value with erroneous JSON payload
 # 03. PUT /v2/entities/E1/attrs/A1/value with JSON object as payload
@@ -293,7 +296,7 @@ echo
 ======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -325,14 +328,14 @@ Date: REGEX(.*)
 04. Check that A1 == "that JSON object"
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 53
+Content-Length: 55
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "Number",
     "value": {
         "a": "1",
         "b": 2
@@ -352,14 +355,14 @@ Date: REGEX(.*)
 06. Check that A1 == "that JSON array"
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 51
+Content-Length: 53
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "Number",
     "value": [
         "a",
         "b",
@@ -380,14 +383,14 @@ Date: REGEX(.*)
 08. Check that A1 == "STRING"
 =============================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 48
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "Number",
     "value": "STRING"
 }
 
@@ -404,14 +407,14 @@ Date: REGEX(.*)
 10. Check that A1 == true
 =========================
 HTTP/1.1 200 OK
-Content-Length: 42
+Content-Length: 44
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "Number",
     "value": true
 }
 
@@ -428,14 +431,14 @@ Date: REGEX(.*)
 12. Check that A1 == true
 =========================
 HTTP/1.1 200 OK
-Content-Length: 42
+Content-Length: 44
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "Number",
     "value": true
 }
 
@@ -452,14 +455,14 @@ Date: REGEX(.*)
 14. Check that A1 == true
 =========================
 HTTP/1.1 200 OK
-Content-Length: 42
+Content-Length: 44
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "Number",
     "value": true
 }
 
@@ -476,14 +479,14 @@ Date: REGEX(.*)
 16. Check that A1 == false
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 43
+Content-Length: 45
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "Number",
     "value": false
 }
 
@@ -500,14 +503,14 @@ Date: REGEX(.*)
 18. Check that A1 == false
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 43
+Content-Length: 45
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "Number",
     "value": false
 }
 
@@ -524,14 +527,14 @@ Date: REGEX(.*)
 20. Check that A1 == false
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 43
+Content-Length: 45
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "Number",
     "value": false
 }
 
@@ -548,14 +551,14 @@ Date: REGEX(.*)
 22. Check that A1 == 123
 ========================
 HTTP/1.1 200 OK
-Content-Length: 41
+Content-Length: 43
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "Number",
     "value": 123
 }
 
@@ -572,14 +575,14 @@ Date: REGEX(.*)
 24. Check that A1 == 3.14
 =========================
 HTTP/1.1 200 OK
-Content-Length: 42
+Content-Length: 44
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "Number",
     "value": 3.14
 }
 
@@ -601,14 +604,14 @@ Date: REGEX(.*)
 26. Check that A1 == 3.14 still
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 42
+Content-Length: 44
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "Number",
     "value": 3.14
 }
 
@@ -625,14 +628,14 @@ Date: REGEX(.*)
 28. Check that A1 == -12.1
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 43
+Content-Length: 45
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "Number",
     "value": -12.1
 }
 
@@ -649,14 +652,14 @@ Date: REGEX(.*)
 30. Check that A1 == 3.2e2
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 41
+Content-Length: 43
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "Number",
     "value": 320
 }
 

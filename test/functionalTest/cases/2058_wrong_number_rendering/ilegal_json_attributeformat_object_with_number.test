@@ -78,7 +78,7 @@ Date: REGEX(.*)
 02. Get entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 535
+Content-Length: 540
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -88,22 +88,22 @@ Date: REGEX(.*)
         "attributes": [
             {
                 "name": "A",
-                "type": "none",
+                "type": "Text",
                 "value": "foo"
             },
             {
                 "name": "B",
-                "type": "none",
+                "type": "Number",
                 "value": 30
             },
             {
                 "name": "C",
-                "type": "none",
+                "type": "Boolean",
                 "value": true
             },
             {
                 "name": "D",
-                "type": "none",
+                "type": "None",
                 "value": null
             }
         ],
@@ -121,7 +121,7 @@ Date: REGEX(.*)
 02. Get entity with attributeFormat=object
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 471
+Content-Length: 476
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -130,19 +130,19 @@ Date: REGEX(.*)
     "contextElement": {
         "attributes": {
             "A": {
-                "type": "none",
+                "type": "Text",
                 "value": "foo"
             },
             "B": {
-                "type": "none",
+                "type": "Number",
                 "value": 30
             },
             "C": {
-                "type": "none",
+                "type": "Boolean",
                 "value": true
             },
             "D": {
-                "type": "none",
+                "type": "None",
                 "value": null
             }
         },

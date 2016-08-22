@@ -247,7 +247,7 @@ Date: REGEX(.*)
 08. Dump accumulator (1 notification with E1+E2)
 ================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 419
+Content-Length: 427
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -260,18 +260,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "humidity": {
                 "metadata": {}, 
-                "type": "none", 
+                "type": "Number", 
                 "value": 80
             }, 
             "id": "E1", 
             "status": {
                 "metadata": {}, 
-                "type": "none", 
+                "type": "Text", 
                 "value": "OK"
             }, 
             "temperature": {
                 "metadata": {}, 
-                "type": "none", 
+                "type": "Number", 
                 "value": 20
             }, 
             "type": "T"
@@ -279,18 +279,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "humidity": {
                 "metadata": {}, 
-                "type": "none", 
+                "type": "Number", 
                 "value": 70
             }, 
             "id": "E2", 
             "status": {
                 "metadata": {}, 
-                "type": "none", 
+                "type": "Text", 
                 "value": "ERR"
             }, 
             "temperature": {
                 "metadata": {}, 
-                "type": "none", 
+                "type": "Number", 
                 "value": 30
             }, 
             "type": "T"

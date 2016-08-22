@@ -131,7 +131,7 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1 to see E1/T1/A1=1,A2=1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 113
+Content-Length: 117
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -139,12 +139,12 @@ Date: REGEX(.*)
 {
     "A1": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 1
     },
     "A2": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 1
     },
     "id": "E1",
@@ -164,7 +164,7 @@ Date: REGEX(.*)
 04. GET /v2/entities/E1 to see E1/T1/A1=3,A2=1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 113
+Content-Length: 117
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -172,12 +172,12 @@ Date: REGEX(.*)
 {
     "A1": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 3
     },
     "A2": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 1
     },
     "id": "E1",
@@ -202,7 +202,7 @@ Date: REGEX(.*)
 06. GET /v2/entities/E1 to see E1/T1/A1=3,A2=1, showing that step 05 did nothing
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 113
+Content-Length: 117
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -210,12 +210,12 @@ Date: REGEX(.*)
 {
     "A1": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 3
     },
     "A2": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 1
     },
     "id": "E1",

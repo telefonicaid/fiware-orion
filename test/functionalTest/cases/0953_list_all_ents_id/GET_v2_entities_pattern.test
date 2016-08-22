@@ -184,7 +184,7 @@ Date: REGEX(.*)
 06. GET /v2/entities?idPattern=E(1|2)
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 163
+Content-Length: 174
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -202,7 +202,7 @@ Date: REGEX(.*)
     {
         "A0": {
             "metadata": {},
-            "type": "none",
+            "type": "StructuredValue",
             "value": {
                 "i1": 1,
                 "s1": "s"
@@ -217,7 +217,7 @@ Date: REGEX(.*)
 07. GET /v2/entities?idPattern=E\[23\]
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 86
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -226,7 +226,7 @@ Date: REGEX(.*)
     {
         "A0": {
             "metadata": {},
-            "type": "none",
+            "type": "StructuredValue",
             "value": {
                 "i1": 1,
                 "s1": "s"

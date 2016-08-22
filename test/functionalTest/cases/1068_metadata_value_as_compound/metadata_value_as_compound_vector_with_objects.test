@@ -73,7 +73,7 @@ echo
 ================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -82,7 +82,7 @@ Date: REGEX(.*)
 02. GET /v2/entities, to see the entity
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 130
+Content-Length: 144
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -90,11 +90,11 @@ Date: REGEX(.*)
 [
     {
         "id": "E1",
-        "type": "none",
+        "type": "Thing",
         "vecCompound": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "StructuredValue",
                     "value": [
                         {
                             "a": 12
@@ -105,7 +105,7 @@ Date: REGEX(.*)
                     ]
                 }
             },
-            "type": "none",
+            "type": "Number",
             "value": 44
         }
     }

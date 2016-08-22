@@ -221,7 +221,7 @@ Date: REGEX(.*)
 05. Get sorted by age: User4, User3, User1, User2
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 2367
+Content-Length: 2375
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -233,17 +233,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 18
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Thompson"
                     }
                 ],
@@ -261,17 +261,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 27
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Simpson"
                     }
                 ],
@@ -289,17 +289,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 36
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Doe"
                     }
                 ],
@@ -317,17 +317,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 37
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Smith"
                     }
                 ],
@@ -347,7 +347,7 @@ Date: REGEX(.*)
 06. Get sorted by age in reverse order: User2, User1, User3, User4
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 2367
+Content-Length: 2375
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -359,17 +359,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 37
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Smith"
                     }
                 ],
@@ -387,17 +387,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 36
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Doe"
                     }
                 ],
@@ -415,17 +415,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 27
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Simpson"
                     }
                 ],
@@ -443,17 +443,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 18
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Thompson"
                     }
                 ],
@@ -473,7 +473,7 @@ Date: REGEX(.*)
 07. Get sorted by name, then age: User4, User3, User1, User2
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 2367
+Content-Length: 2375
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -485,17 +485,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 18
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Thompson"
                     }
                 ],
@@ -513,17 +513,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 27
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Simpson"
                     }
                 ],
@@ -541,17 +541,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 36
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Doe"
                     }
                 ],
@@ -569,17 +569,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 37
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Smith"
                     }
                 ],
@@ -599,7 +599,7 @@ Date: REGEX(.*)
 08. Get sorted by reverse name, then age: User1, User2, User4, User3
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 2367
+Content-Length: 2375
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -611,17 +611,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 36
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Doe"
                     }
                 ],
@@ -639,17 +639,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 37
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Smith"
                     }
                 ],
@@ -667,17 +667,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 18
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Thompson"
                     }
                 ],
@@ -695,17 +695,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 27
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Simpson"
                     }
                 ],
@@ -725,7 +725,7 @@ Date: REGEX(.*)
 09. Get sorted by name, then reserve age: User3, User4, User2, User1
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 2367
+Content-Length: 2375
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -737,17 +737,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 27
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Simpson"
                     }
                 ],
@@ -765,17 +765,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 18
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Thompson"
                     }
                 ],
@@ -793,17 +793,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 37
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Smith"
                     }
                 ],
@@ -821,17 +821,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "none",
+                        "type": "Number",
                         "value": 36
                     },
                     {
                         "name": "name",
-                        "type": "none",
+                        "type": "Text",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "none",
+                        "type": "Text",
                         "value": "Doe"
                     }
                 ],

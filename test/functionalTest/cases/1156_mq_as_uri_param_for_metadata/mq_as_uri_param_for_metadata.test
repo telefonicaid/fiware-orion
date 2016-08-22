@@ -336,7 +336,7 @@ echo
 ========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -346,7 +346,7 @@ Date: REGEX(.*)
 ========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2?type=none
+Location: /v2/entities/E2?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -356,7 +356,7 @@ Date: REGEX(.*)
 ========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E3?type=none
+Location: /v2/entities/E3?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -365,7 +365,7 @@ Date: REGEX(.*)
 04. Lookup all entities having A1.M1==12, see E1
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 106
+Content-Length: 109
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -375,15 +375,15 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 12
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "01"
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -440,7 +440,7 @@ Date: REGEX(.*)
 06. Dump accumulator, see E2, then reset accumulator
 ====================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 159
+Content-Length: 162
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -454,15 +454,15 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "none", 
+                        "type": "Number", 
                         "value": 13
                     }
                 }, 
-                "type": "none", 
+                "type": "Text", 
                 "value": "02"
             }, 
             "id": "E2", 
-            "type": "none"
+            "type": "Thing"
         }
     ], 
     "subscriptionId": "REGEX([0-9a-f]{24})"
@@ -482,7 +482,7 @@ Date: REGEX(.*)
 08. Dump accumulator, see E1
 ============================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 159
+Content-Length: 162
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -496,15 +496,15 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "none", 
+                        "type": "Number", 
                         "value": 13
                     }
                 }, 
-                "type": "none", 
+                "type": "Text", 
                 "value": "07"
             }, 
             "id": "E1", 
-            "type": "none"
+            "type": "Thing"
         }
     ], 
     "subscriptionId": "REGEX([0-9a-f]{24})"
@@ -524,7 +524,7 @@ Date: REGEX(.*)
 10. Dump accumulator, see E1 and E2, then reset accumulator
 ===========================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 264
+Content-Length: 270
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -538,29 +538,29 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "none", 
+                        "type": "Number", 
                         "value": 13
                     }
                 }, 
-                "type": "none", 
+                "type": "Text", 
                 "value": "07"
             }, 
             "id": "E1", 
-            "type": "none"
+            "type": "Thing"
         }, 
         {
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "none", 
+                        "type": "Number", 
                         "value": 13
                     }
                 }, 
-                "type": "none", 
+                "type": "Text", 
                 "value": "02"
             }, 
             "id": "E2", 
-            "type": "none"
+            "type": "Thing"
         }
     ], 
     "subscriptionId": "REGEX([0-9a-f]{24})"
@@ -582,7 +582,7 @@ Date: REGEX(.*)
 12. Check unary operator for mq: A1.M1 - all three entities
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 316
+Content-Length: 325
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -592,43 +592,43 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 13
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "07"
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "A1": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 13
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "02"
         },
         "id": "E2",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "A1": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 14
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "03"
         },
         "id": "E3",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -636,7 +636,7 @@ Date: REGEX(.*)
 13. Check unary operator for mq: !A1.M2 - all three entities
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 316
+Content-Length: 325
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -646,43 +646,43 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 13
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "07"
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "A1": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 13
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "02"
         },
         "id": "E2",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "A1": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 14
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "03"
         },
         "id": "E3",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -712,7 +712,7 @@ Date: REGEX(.*)
 16. Check unary operator for mq: !A2.M9 - all three entities
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 316
+Content-Length: 325
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -722,43 +722,43 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 13
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "07"
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "A1": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 13
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "02"
         },
         "id": "E2",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "A1": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 14
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "03"
         },
         "id": "E3",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -776,7 +776,7 @@ Date: REGEX(.*)
 18. Dump accumulator, see all three, then reset accumulator
 ===========================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 369
+Content-Length: 378
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -790,43 +790,43 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "none", 
+                        "type": "Number", 
                         "value": 13
                     }
                 }, 
-                "type": "none", 
+                "type": "Text", 
                 "value": "07"
             }, 
             "id": "E1", 
-            "type": "none"
+            "type": "Thing"
         }, 
         {
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "none", 
+                        "type": "Number", 
                         "value": 13
                     }
                 }, 
-                "type": "none", 
+                "type": "Text", 
                 "value": "02"
             }, 
             "id": "E2", 
-            "type": "none"
+            "type": "Thing"
         },
         {
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "none", 
+                        "type": "Number", 
                         "value": 14
                     }
                 }, 
-                "type": "none", 
+                "type": "Text", 
                 "value": "03"
             }, 
             "id": "E3", 
-            "type": "none"
+            "type": "Thing"
         }
     ], 
     "subscriptionId": "REGEX([0-9a-f]{24})"
