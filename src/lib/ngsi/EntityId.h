@@ -50,8 +50,8 @@ class EntityId
   EntityId(EntityId* eP);
   EntityId(const std::string&  _id,
            const std::string&  _type,
-           const std::string&  _isPattern = "",
-           bool                 isTypePatter = false);
+           const std::string&  _isPattern     = "",
+           bool                _isTypePattern = false);
 
   void         fill(const std::string& _id, const std::string& _type, const std::string& _isPattern, bool _isTypePattern = false);
   void         fill(const struct EntityId* eidP, bool useDefaultType = false);
