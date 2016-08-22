@@ -67,7 +67,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   LM_T(LmtServiceOutPayload, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answer.length(), ciP->httpStatusCode));
   LM_T(LmtServiceOutPayload, ("Response payload: '%s'", answer.c_str()));
 
-#if 0  // See Issue #2457
+#if 0  // See Issue #2457 - this change as MHD_create_response_from_data is DEPRECATED
   if (answer == "")
     response = MHD_create_response_from_data(answer.length(), (void*) answer.c_str(), MHD_NO, MHD_NO);
   else
