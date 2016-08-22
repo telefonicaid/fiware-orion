@@ -301,17 +301,17 @@ bool EntityId::equal(EntityId* eP)
     return false;
   }
 
-  if (eP->isPatternIsTrue() == isPatternIsTrue())
+  if (eP->isPatternIsTrue() != isPatternIsTrue())
   {
-    return true;
+    return false;
   }
 
-  if (eP->isTypePattern == eP->isTypePattern)
+  if (eP->isTypePattern != eP->isTypePattern)
   {
-    return true;
+    return false;
   }
 
-  return false;
+  return true;
 }
 
 
