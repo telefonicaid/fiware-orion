@@ -117,10 +117,6 @@ std::string getLogLevel
   {
     level = "FATAL";
   }
-  else if (level == "Warning")
-  {
-    level = "WARN";
-  }
 
   return "{\"level\":\"" + level + "\"}";
 }
