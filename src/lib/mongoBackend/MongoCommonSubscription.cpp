@@ -202,33 +202,43 @@ void setEntities(const Subscription& sub, BSONObjBuilder* b)
   BSONArrayBuilder entities;
   for (unsigned int ix = 0; ix < sub.subject.entities.size(); ++ix)
   {
-    EntID en = sub.subject.entities[ix];
+    EntID       en        = sub.subject.entities[ix];
+    std::string finalId;
+    std::string finalType;
+    std::string isIdPattern;
+    std::string isTypePattern;
 
-    if (en.type == "")
+    if (en.idPattern != "")
     {
-      if (en.id != "")
-      {
-        entities.append(BSON(CSUB_ENTITY_ID << en.id << CSUB_ENTITY_ISPATTERN << "false"));
-      }
-      else // idPattern
-      {
-        entities.append(BSON(CSUB_ENTITY_ID << en.idPattern << CSUB_ENTITY_ISPATTERN << "true"));
-      }
+      finalId = en.idPattern;
+      isIdPattern = "true";
     }
-    else // type != ""
+    else if (en.id != "")
     {
-      if (en.id != "")
-      {
-        entities.append(BSON(CSUB_ENTITY_ID << en.id <<
-                             CSUB_ENTITY_TYPE << en.type <<
-                             CSUB_ENTITY_ISPATTERN << "false"));
-      }
-      else // idPattern
-      {
-        entities.append(BSON(CSUB_ENTITY_ID << en.idPattern <<
-                             CSUB_ENTITY_TYPE << en.type <<
-                             CSUB_ENTITY_ISPATTERN << "true"));
-      }
+      finalId = en.id;
+      isIdPattern = "false";
+    }
+
+    if (en.typePattern != "")
+    {
+      finalType = en.typePattern;
+      isTypePattern = "true";
+    }
+    else if (en.type != "")
+    {
+      finalType = en.type;
+      isTypePattern = "false";
+    }
+
+    if (finalType.empty()) // no type provided
+    {
+      entities.append(BSON(CSUB_ENTITY_ID << finalId << CSUB_ENTITY_ISPATTERN << isIdPattern));
+    }
+    else // type provided
+    {
+      entities.append(BSON(   CSUB_ENTITY_ID   << finalId   << CSUB_ENTITY_ISPATTERN << isIdPattern
+                           << CSUB_ENTITY_TYPE << finalType << CSUB_ENTITY_ISTYPEPAT << isTypePattern
+                           ));
     }
   }
   BSONArray entitiesArr = entities.arr();

@@ -307,9 +307,16 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
       return badInput(ciP, "subject entities element has id and idPattern");
     }
 
+    if (iter->HasMember("type") && iter->HasMember("typePattern"))
+    {
+      return badInput(ciP, "subject entities element has type and typePattern");
+    }
+
+
     std::string  id;
     std::string  idPattern;
     std::string  type;
+    std::string  typePattern;
 
     {
       Opt<std::string> idOpt = getStringOpt(*iter, "id", "subject entities element id");
@@ -360,25 +367,53 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
       }
     }
 
-    Opt<std::string> typeOpt = getStringOpt(*iter, "type", "subject entities element type");
-    if (!typeOpt.ok())
     {
-      return badInput(ciP, typeOpt.error);
-    }
-    else if (typeOpt.given)
-    {
-      if (forbiddenIdCharsV2(typeOpt.value.c_str()))
+      Opt<std::string> typeOpt = getStringOpt(*iter, "type", "subject entities element type");
+      if (!typeOpt.ok())
       {
-        return badInput(ciP, "forbidden characters in subject entities element type");
+        return badInput(ciP, typeOpt.error);
       }
-      if (typeOpt.value.length() > MAX_ID_LEN)
+      else if (typeOpt.given)
       {
-        return badInput(ciP, "max type length exceeded");
+        if (forbiddenIdCharsV2(typeOpt.value.c_str()))
+        {
+          return badInput(ciP, "forbidden characters in subject entities element type");
+        }
+        if (typeOpt.value.length() > MAX_ID_LEN)
+        {
+          return badInput(ciP, "max type length exceeded");
+        }
+        type = typeOpt.value;
       }
-      type = typeOpt.value;
     }
 
-    EntID  eid(id, idPattern, type);
+    {
+      Opt<std::string> typePatOpt = getStringOpt(*iter, "typePattern", "subject entities element typePattern");
+      if (!typePatOpt.ok())
+      {
+        return badInput(ciP, typePatOpt.error);
+      }
+      else if (typePatOpt.given)
+      {
+        if (typePatOpt.value.empty())
+        {
+          return badInput(ciP, "subject entities element typePattern is empty");
+        }
+
+        typePattern =typePatOpt.value;
+
+        // FIXME P5: Keep the regex and propagate to sub-cache
+        regex_t re;
+        if (regcomp(&re, typePattern.c_str(), REG_EXTENDED) != 0)
+        {
+          return badInput(ciP, "Invalid regex for entity id pattern");
+        }
+        regfree(&re);  // As the regex is not yet propagated ...
+      }
+    }
+
+
+    EntID  eid(id, idPattern, type, typePattern);
 
     if (std::find(eivP->begin(), eivP->end(), eid) == eivP->end()) // if not already included
     {
