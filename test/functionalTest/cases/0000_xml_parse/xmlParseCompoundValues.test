@@ -303,7 +303,8 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "${payload}"
 
 # 8. Compound contextValue with struct that has two fields with the same name
-echo "8: +++++++++++++++++++++++++++++++++"
+# DISABLED
+#echo "8: +++++++++++++++++++++++++++++++++"
 url='/v1/updateContext'
 payload='<?xml version="1.0"?>
 <updateContextRequest>
@@ -329,7 +330,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "${payload}"
+#orionCurl --url "$url" --payload "${payload}"
 
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++++++
@@ -474,20 +475,6 @@ Date: REGEX(.*)
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
-</updateContextResponse>
-8: +++++++++++++++++++++++++++++++++
-HTTP/1.1 200 OK
-Content-Length: 233
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<updateContextResponse>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>compound value error: duplicated tag-name: /int/ in path: /struct</details>
-  </errorCode>
 </updateContextResponse>
 --TEARDOWN--
 brokerStop CB
