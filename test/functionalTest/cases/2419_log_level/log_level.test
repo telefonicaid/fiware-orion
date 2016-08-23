@@ -31,9 +31,9 @@ brokerStart CB
 
 #
 # 01. Set log level to FATAL (which the broker does not really support)
-# 02. GET log level
+# 02. GET log level, see FATAL
 # 03. Set log level to WARN
-# 04. GET log level
+# 04. GET log level, see WARN
 #
 
 echo "01. Set log level to FATAL (which the broker does not really support)"
@@ -43,8 +43,8 @@ echo
 echo
 
 
-echo "02. GET log level"
-echo "================="
+echo "02. GET log level, see FATAL"
+echo "============================"
 orionCurl --url /admin/log
 echo
 echo
@@ -57,8 +57,8 @@ echo
 echo
 
 
-echo "04. GET log level"
-echo "================="
+echo "04. GET log level, see WARN"
+echo "==========================="
 orionCurl --url /admin/log
 echo
 echo
@@ -74,8 +74,8 @@ Date: REGEX(.*)
 
 
 
-02. GET log level
-=================
+02. GET log level, see FATAL
+============================
 HTTP/1.1 200 OK
 Content-Length: 17
 Content-Type: application/json
@@ -96,8 +96,8 @@ Date: REGEX(.*)
 
 
 
-04. GET log level
-=================
+04. GET log level, see WARN
+===========================
 HTTP/1.1 200 OK
 Content-Length: 16
 Content-Type: application/json
