@@ -296,6 +296,7 @@ orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
 echo
 echo
 
+
 echo "15. Dump and reset accumulator, see three notifications"
 echo "======================================================="
 accumulatorDump

@@ -549,14 +549,16 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
     {
       std::string  currentMd = *i;
       BSONObj      mdItem    = getObjectFieldF(md, currentMd);
+      Metadata     md(currentMd, mdItem);
 
-      Metadata    md(currentMd, mdItem);
       mdSize++;
 
       if (!hasMetadata(dbDotDecode(md.name), md.type, caP))
       {
         appendMetadata(&mdBuilder, &mdNamesBuilder, &md, apiVersion == "v2");
       }
+
+      // Any compound values in md is released by Metadata::~Metadata
     }
   }
 
