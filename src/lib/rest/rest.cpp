@@ -109,7 +109,6 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     std::string  errorString = std::string("Empty right-hand-side for URI param /") + ckey + "/";
 
-    LM_W(("KZ: apiVersion: %s", ciP->apiVersion.c_str()));
     if (ciP->apiVersion == "v2")
     {
       OrionError error(SccBadRequest, errorString);
