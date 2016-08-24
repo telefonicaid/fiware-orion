@@ -32,6 +32,8 @@ brokerStart CB
 #
 # 01. GET /v2/entities/E1_#/attrs/A1/value
 # 02. GET /v2/entities/E1/attrs/A1_#/value
+# 03. GET /v2/entities/E1_#/attrs/A1/value, Accept text/plain
+# 04. GET /v2/entities/E1/attrs/A1_#/value, Accept text/plain
 #
 
 echo '01. GET /v2/entities/E1_#/attrs/A1/value'
@@ -44,6 +46,20 @@ echo
 echo '02. GET /v2/entities/E1/attrs/A1_#/value'
 echo '========================================'
 orionCurl --url '/v2/entities/E1/attrs/A1_#/value'
+echo
+echo
+
+
+echo '03. GET /v2/entities/E1_#/attrs/A1/value, Accept text/plain'
+echo '==========================================================='
+orionCurl --url '/v2/entities/E1_#/attrs/A1/value' --out text/plain
+echo
+echo
+
+
+echo '04. GET /v2/entities/E1/attrs/A1_#/value, Accept text/plain'
+echo '==========================================================='
+orionCurl --url '/v2/entities/E1/attrs/A1_#/value' --out text/plain
 echo
 echo
 
@@ -75,6 +91,28 @@ Date: REGEX(.*)
     "description": "invalid character in URI",
     "error": "BadRequest"
 }
+
+
+03. GET /v2/entities/E1_#/attrs/A1/value, Accept text/plain
+===========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{"error":"BadRequest","description":"invalid character in URI"}
+
+
+04. GET /v2/entities/E1/attrs/A1_#/value, Accept text/plain
+===========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{"error":"BadRequest","description":"invalid character in URI"}
 
 
 --TEARDOWN--
