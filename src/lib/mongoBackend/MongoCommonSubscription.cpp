@@ -237,7 +237,7 @@ void setEntities(const Subscription& sub, BSONObjBuilder* b)
     else // type provided
     {
       entities.append(BSON(   CSUB_ENTITY_ID   << finalId   << CSUB_ENTITY_ISPATTERN << isIdPattern
-                           << CSUB_ENTITY_TYPE << finalType << CSUB_ENTITY_ISTYPEPAT << isTypePattern
+                           << CSUB_ENTITY_TYPE << finalType << CSUB_ENTITY_ISTYPEPATTERN << isTypePattern
                            ));
     }
   }
