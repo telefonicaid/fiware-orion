@@ -32,7 +32,8 @@ brokerStart CB
 #
 # 01. POST /v2/subscriptions
 # 02. GET /v2/subscriptions/ID
-
+# 03. PATCH /v2/subscriptions (subject)
+# 04. GET /v2/subscriptions/ID
 
 echo "01. POST /v2/subscriptions"
 echo "=========================="
@@ -71,6 +72,41 @@ echo
 
 idSubscription=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 echo "02. GET /v2/subscriptions/ID"
+echo "============================"
+orionCurl --url "/v2/subscriptions/${idSubscription}"
+echo
+echo
+
+
+echo "03. PATCH /v2/subscriptions (subject)"
+echo "====================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+               "idPattern": "xxx.*",
+               "type": "special"
+            }
+        ],
+        "condition": {
+            "attrs": [ "temperature", "pressure", "humidity" ],
+            "expression": {
+               "q": "temperature>40",
+               "geometry": "point",
+               "coords": "-40.4,-3.5",
+               "georel": "near;minDistance:5000"
+            }
+         }
+    }
+}
+'
+orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "04. GET /v2/subscriptions/ID"
 echo "============================"
 orionCurl --url "/v2/subscriptions/${idSubscription}"
 echo
@@ -126,6 +162,62 @@ Date: REGEX(.*)
             {
                 "idPattern": ".*",
                 "typePattern": "Room.*"
+            }
+        ]
+    },
+    "throttling": 5
+}
+
+
+03. PATCH /v2/subscriptions (subject)
+=====================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. GET /v2/subscriptions/ID
+============================
+HTTP/1.1 200 OK
+Content-Length: 454
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "expires": "2050-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [
+            "temperature",
+            "humidity"
+        ],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:1234"
+        }
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [
+                "temperature",
+                "pressure",
+                "humidity"
+            ],
+            "expression": {
+                "coords": "-40.4,-3.5",
+                "geometry": "point",
+                "georel": "near;minDistance:5000",
+                "q": "temperature>40"
+            }
+        },
+        "entities": [
+            {
+                "idPattern": "xxx.*",
+                "type": "special"
             }
         ]
     },
