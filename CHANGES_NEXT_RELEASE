@@ -52,6 +52,7 @@
 - Fix: Bug in log level configuration via REST fixed (Issue #2419)
 - Fix: Distinguish between strings and numbers in q string filter (Issue #1129)
 - Fix: proper response for 'GET /v2/entities/<id>?attrs=<attrName>' and 'GET /v2/entities/<id>/attrs?attrs=<attrName>' when <attrName> doesn't exist (#2241)
+- Fix: correct error response for missing value in URI param in /admin/ requests (Issue #2420)
 - Fix: In error responses for ngsi9 registrations, the duration is no longer rendered.
 - Fix: Do not allow forbidden chars in description for subscription (#2308)
 - Fix: Correct error returned when trying to replace a non-existing attribute in PUT /v2/entities/<entity-id>/attrs/<attr-name> (Issue #2221)
