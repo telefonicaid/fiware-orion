@@ -1172,9 +1172,9 @@ static bool addTriggeredSubscriptions_withCache
 
 /* ****************************************************************************
 *
-* BsonGroup - to avoid allocating too much on the stack 
+* CSubQueryGroup - to avoid allocating too much on the stack in addTriggeredSubscriptions_noCache function
 */
-typedef struct BsonGroup
+typedef struct CSubQueryGroup
 {
   BSONObj         idNPtypeNP;              // First clause: idNPtypeNP
 
@@ -1191,17 +1191,17 @@ typedef struct BsonGroup
   BSONObjBuilder  boPP;
 
   BSONObj         query;                   // Final query
-} BsonGroup;
+} CSubQueryGroup;
 
 
 
 /* ****************************************************************************
 *
-* idNPtypeNP - 
+* fill_idNPtypeNP -
 */
-static void idNPtypeNP
+static void fill_idNPtypeNP
 (
-  BsonGroup*          bgP,
+  CSubQueryGroup*     bgP,
   const std::string&  entIdQ,
   const std::string&  entityId,
   const std::string&  entTypeQ,
@@ -1225,14 +1225,12 @@ static void idNPtypeNP
 
 /* ****************************************************************************
 *
-* idPtypeNP - 
+* fill_idPtypeNP -
 */
-static void idPtypeNP
+static void fill_idPtypeNP
 (
-  BsonGroup*          bgP,
-  const std::string&  entIdQ,
+  CSubQueryGroup*     bgP,
   const std::string&  entityId,
-  const std::string&  entTypeQ,
   const std::string&  entityType,
   const std::string&  entPatternQ,
   const std::string&  typePatternQ,
@@ -1269,14 +1267,12 @@ static void idPtypeNP
 
 /* ****************************************************************************
 *
-* idNPtypeP - 
+* fill_idNPtypeP -
 */
-static void idNPtypeP
+static void fill_idNPtypeP
 (
-  BsonGroup*          bgP,
-  const std::string&  entIdQ,
+  CSubQueryGroup*     bgP,
   const std::string&  entityId,
-  const std::string&  entTypeQ,
   const std::string&  entityType,
   const std::string&  entPatternQ,
   const std::string&  typePatternQ,
@@ -1311,11 +1307,11 @@ static void idNPtypeP
 
 /* ****************************************************************************
 *
-* idPtypeP - 
+* fill_idPtypeP -
 */
-static void idPtypeP
+static void fill_idPtypeP
 (
-  BsonGroup*          bgP,
+  CSubQueryGroup*     bgP,
   const std::string&  entIdQ,
   const std::string&  entityId,
   const std::string&  entTypeQ,
@@ -1417,13 +1413,13 @@ static bool addTriggeredSubscriptions_noCache
   // the four parts of the final query.
   // The necessary variables are too big for the stack and thus moved to the head, inside BsonGroup.
   //
-  BsonGroup* bgP = new BsonGroup();
+  CSubQueryGroup* bgP = new CSubQueryGroup();
 
   // Populating bgP with the four clauses
-  idNPtypeNP(bgP, entIdQ, entityId, entTypeQ, entityType, entPatternQ, typePatternQ, spBson);
-  idPtypeNP(bgP,  entIdQ, entityId, entTypeQ, entityType, entPatternQ, typePatternQ, spBson);
-  idNPtypeP(bgP,  entIdQ, entityId, entTypeQ, entityType, entPatternQ, typePatternQ, spBson);
-  idPtypeP(bgP,   entIdQ, entityId, entTypeQ, entityType, entPatternQ, typePatternQ, spBson);
+  fill_idNPtypeNP(bgP, entIdQ, entityId, entTypeQ, entityType, entPatternQ, typePatternQ, spBson);
+  fill_idPtypeP(bgP,   entIdQ, entityId, entTypeQ, entityType, entPatternQ, typePatternQ, spBson);
+  fill_idPtypeNP(bgP,  entityId, entityType, entPatternQ, typePatternQ, spBson);
+  fill_idNPtypeP(bgP,  entityId, entityType, entPatternQ, typePatternQ, spBson);
 
   /* Composing final query */
   bgP->query = BSON("$or" << BSON_ARRAY(bgP->idNPtypeNP << bgP->idPtypeNP << bgP->idNPtypeP << bgP->idPtypeP));
