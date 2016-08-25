@@ -20,7 +20,7 @@
 - Fix: missing error payload for TooManyResults error in 'DELETE /v2/entities/<eId>' operation (Issue #1346)
 - Fix: correctly rending as JSON error responses that were being rendered as plain text (#1989, #1991) 
 - Fix: NGSIv2 "InvalidModification" errors changed to "Unprocessable" (according to rules defined in #1286)
-- Fix: Using default values for types of Entities, Attributes, and Metadata aligned with the type names used by schema.org (Issue #2223)
+- Fix: Using default values for types of Entities, Attributes, and Metadata aligned with the type names used by schema.org, except for StructuredValue. (Issue #2223)
 - Fix: Allowing trailing semicolon in a string filter, but only one (Issue #2086)
 - Fix: NGSIv2 geoquery syntax errors using 400 Bad Request instead of 422 Unprocessable Entity (according to rules defined in #1286)
 - Fix: NGSIv2 URI PATH must be all in lowercase, otherwise "service not found" (Issue #2057)
