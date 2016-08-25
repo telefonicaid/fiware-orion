@@ -861,19 +861,23 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | error       | BadRequest        |
       | description | service not found |
 
-  @entity_id_wrong  @BUG_1887 @skip
-  Scenario:  try to get an attribute value by entity ID and attribute name using NGSI v2 with wrong entity id
+  @entity_id_wrong @BUG_1887
+  Scenario Outline:  try to get an attribute value by entity ID and attribute name using NGSI v2 with wrong entity id
     Given  a definition of headers
       | parameter          | value                  |
       | Fiware-Service     | test_id_entity_invalid |
       | Fiware-ServicePath | /test                  |
-      | Accept             | text/plain             |
-    When get an attribute value by ID "house_#" and attribute name "temperature_0" if it exists
-    Then verify that receive an "Not Found" http code
+      | Accept             | <accept>               |
+    When get an attribute value by ID "house_%22" and attribute name "temperature_0" if it exists
+    Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                      |
-      | error       | NotFound                                                   |
-      | description | The requested entity has not been found. Check type and id |
+      | parameter   | value                    |
+      | error       | BadRequest               |
+      | description | invalid character in URI |
+    Examples:
+      | accept           |
+      | application/json |
+      | text/plain       |
 
   #   -------------- attribute name ------------------------------------------
   @attribute_name
@@ -1164,19 +1168,23 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | error       | BadRequest        |
       | description | service not found |
 
-  @attribute_name_invalid @BUG_1887 @skip
-  Scenario:  try to get an attribute value by entity ID and attribute name using NGSI v2 with invalid attribute_name
+  @attribute_name_invalid @BUG_1887
+  Scenario Outline:  try to get an attribute value by entity ID and attribute name using NGSI v2 with invalid attribute_name
     Given  a definition of headers
       | parameter          | value                 |
       | Fiware-Service     | test_update_entity_id |
       | Fiware-ServicePath | /test                 |
-      | Accept             | text/plain            |
-    When get an attribute value by ID "room_1" and attribute name "house_#" if it exists
+      | Accept             | <accept>              |
+    When get an attribute value by ID "room_1" and attribute name "house_%22" if it exists
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value             |
-      | error       | BadRequest        |
-      | description | service not found |
+      | parameter   | value                    |
+      | error       | BadRequest               |
+      | description | invalid character in URI |
+    Examples:
+      | accept           |
+      | application/json |
+      | text/plain       |
 
   @attribute_name_wrong
   Scenario:  try to get an attribute value by entity ID and attribute name using NGSI v2 with wrong attribute_name
