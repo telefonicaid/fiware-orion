@@ -107,9 +107,20 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 
   if (val == NULL || *val == 0)
   {
-    OrionError error(SccBadRequest, std::string("Empty right-hand-side for URI param /") + ckey + "/");
-    ciP->httpStatusCode = error.code;
-    ciP->answer         = error.smartRender(ciP->apiVersion);
+    std::string  errorString = std::string("Empty right-hand-side for URI param /") + ckey + "/";
+
+    if (ciP->apiVersion == "v2")
+    {
+      OrionError error(SccBadRequest, errorString);
+      ciP->httpStatusCode = error.code;
+      ciP->answer         = error.smartRender(ciP->apiVersion);
+    }
+    else if (ciP->apiVersion == "admin")
+    {
+      ciP->httpStatusCode = SccBadRequest;
+      ciP->answer         = "{" + JSON_STR("error") + ":" + JSON_STR(errorString) + "}";
+    }
+
     return MHD_YES;
   }
 
@@ -207,7 +218,9 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       ciP->uriParamTypes.push_back(val);
     }
   }
-  else if ((key != URI_PARAM_Q) && (key != URI_PARAM_MQ))  // FIXME P1: possible more known options here ...
+  else if ((key != URI_PARAM_Q)       &&
+           (key != URI_PARAM_MQ)      &&
+           (key != URI_PARAM_LEVEL))  // FIXME P1: possible more known options here ...
   {
     LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
   }
@@ -914,7 +927,7 @@ static std::string apiVersionGet(const char* path)
 
   if (strcmp(path, "/admin/log") == 0)
   {
-    return "v2";
+    return "admin";
   }
 
   return "v1";

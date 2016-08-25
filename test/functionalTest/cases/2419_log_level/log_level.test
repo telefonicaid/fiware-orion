@@ -1,0 +1,115 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Log level via REST
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Set log level to FATAL (which the broker does not really support)
+# 02. GET log level, see FATAL
+# 03. Set log level to WARN
+# 04. GET log level, see WARN
+#
+
+echo "01. Set log level to FATAL (which the broker does not really support)"
+echo "====================================================================="
+orionCurl --url /admin/log?level=FATAL -X PUT
+echo
+echo
+
+
+echo "02. GET log level, see FATAL"
+echo "============================"
+orionCurl --url /admin/log
+echo
+echo
+
+
+echo "03. Set log level to WARN"
+echo "========================="
+orionCurl --url /admin/log?level=WARN -X PUT
+echo
+echo
+
+
+echo "04. GET log level, see WARN"
+echo "==========================="
+orionCurl --url /admin/log
+echo
+echo
+
+
+--REGEXPECT--
+01. Set log level to FATAL (which the broker does not really support)
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. GET log level, see FATAL
+============================
+HTTP/1.1 200 OK
+Content-Length: 17
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "level": "FATAL"
+}
+
+
+03. Set log level to WARN
+=========================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. GET log level, see WARN
+===========================
+HTTP/1.1 200 OK
+Content-Length: 16
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "level": "WARN"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+

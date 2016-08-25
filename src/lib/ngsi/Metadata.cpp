@@ -50,6 +50,17 @@ using namespace mongo;
 
 /* ****************************************************************************
 *
+* Metadata::~Metadata -
+*/
+Metadata::~Metadata()
+{
+  release();
+}
+
+
+
+/* ****************************************************************************
+*
 * Metadata::Metadata -
 */
 Metadata::Metadata()
@@ -67,7 +78,6 @@ Metadata::Metadata()
 /* ****************************************************************************
 *
 * Metadata::Metadata -
-*
 */
 Metadata::Metadata(Metadata* mP, bool useDefaultType)
 {
@@ -158,6 +168,8 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, bool _val
   typeGiven       = false;
   compoundValueP  = NULL;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -392,6 +404,8 @@ void Metadata::fill(const struct Metadata& md)
   type         = md.type;
   stringValue  = md.stringValue;
 }
+
+
 
 /* ****************************************************************************
 *
