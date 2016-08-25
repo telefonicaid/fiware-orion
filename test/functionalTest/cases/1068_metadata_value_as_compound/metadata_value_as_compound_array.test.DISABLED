@@ -61,15 +61,7 @@ echo
 
 echo "02. GET /v2/entities, to see the entity"
 echo "======================================="
-payload='{
-  "entities": [
-    {
-      "isPattern": "true",
-      "id": ".*"
-    }
-  ]
-}'
-orionCurl --url /v2/entities  # --noPayloadCheck
+orionCurl --url /v2/entities
 echo
 echo
 
