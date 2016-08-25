@@ -74,7 +74,8 @@ volatile SubCacheState subCacheState = ScsIdle;
 *
 * EntityInfo::EntityInfo -
 */
-EntityInfo::EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern)
+EntityInfo::EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern,
+                       const std::string& _isTypePattern)
 :
 entityId(_entityId), entityType(_entityType)
 {
@@ -99,6 +100,28 @@ entityId(_entityId), entityType(_entityType)
   {
     entityIdPatternToBeFreed = false;
   }
+
+  isTypePattern    = (_isTypePattern == "true") || (_isTypePattern == "TRUE") || (_isTypePattern == "True");
+
+  if (isTypePattern)
+  {
+    // FIXME P5: recomp error should be captured? have a look to other usages of regcomp()
+    // in order to see how it works
+    if (regcomp(&entityTypePattern, _entityType.c_str(), REG_EXTENDED) != 0)
+    {
+      alarmMgr.badInput(clientIp, "invalid regular expression for typePattern");
+      isTypePattern = false;  // FIXME P6: this entity should not be let into the system. Must be stopped before.
+                          //           Right here, best thing to do is simply to say it is not a regex
+    }
+    else
+    {
+      entityTypePatternToBeFreed = true;
+    }
+  }
+  else
+  {
+    entityTypePatternToBeFreed = false;
+  }
 }
 
 
@@ -113,22 +136,43 @@ bool EntityInfo::match
   const std::string&  type
 )
 {
-  //
-  // If type non-empty - perfect match is mandatory
-  // If type is empty - always matches
-  //
-  if ((type != "") && (entityType != type) && (entityType != ""))
-  {
-    return false;
-  }
+  bool matchedType = false;
+  bool matchedId   = false;
 
+  // Check id
   if (isPattern)
   {
     // REGEX-comparison this->entityIdPattern VS id
-    return regexec(&entityIdPattern, id.c_str(), 0, NULL, 0) == 0;
+    matchedId =  (regexec(&entityIdPattern, id.c_str(), 0, NULL, 0) == 0);
+  }
+  else if (id == entityId)
+  {
+    matchedId =  true;
+  }
+  else {
+    matchedId = false;
   }
 
-  return (id == entityId);
+  // short-circuit, optimization
+  if (matchedId)
+  {
+    // Check type
+    if (isTypePattern)
+    {
+      // REGEX-comparison this->entityTypePattern VS type
+      matchedType = (regexec(&entityTypePattern, type.c_str(), 0, NULL, 0) == 0);
+    }
+    else if ((type != "")  && (entityType != "") && (entityType != type))
+    {
+      matchedType = false;
+    }
+    else
+    {
+      matchedType = true;
+    }
+  }
+
+  return matchedId && matchedType;
 }
 
 
@@ -144,6 +188,12 @@ void EntityInfo::release(void)
     regfree(&entityIdPattern);
     entityIdPatternToBeFreed = false;
   }
+
+  if (entityTypePatternToBeFreed)
+  {
+    regfree(&entityTypePattern);
+    entityTypePatternToBeFreed = false;
+  }
 }
 
 
@@ -157,6 +207,7 @@ void EntityInfo::present(const std::string& prefix)
   LM_T(LmtPresent, ("%sid:        %s", prefix.c_str(), entityId.c_str()));
   LM_T(LmtPresent, ("%sisPattern: %s", prefix.c_str(), FT(isPattern)));
   LM_T(LmtPresent, ("%stype:      %s", prefix.c_str(), entityType.c_str()));
+   LM_T(LmtPresent, ("%sisTypePattern: %s", prefix.c_str(), FT(isTypePattern)));
 }
 
 

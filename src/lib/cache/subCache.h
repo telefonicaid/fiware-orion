@@ -65,14 +65,20 @@ typedef enum SubCacheState
 */
 struct EntityInfo
 {
+  std::string   entityId;
   bool          isPattern;
   regex_t       entityIdPattern;
-  std::string   entityId;
-  std::string   entityType;
   bool          entityIdPatternToBeFreed;
 
+  std::string   entityType;
+  bool          isTypePattern;
+  regex_t       entityTypePattern;
+  bool          entityTypePatternToBeFreed;
+
+
   EntityInfo() {}
-  EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern);
+  EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern,
+             const std::string& _isTypePattern = "false");
   ~EntityInfo() { release(); }
 
   bool          match(const std::string& idPattern, const std::string& type);
