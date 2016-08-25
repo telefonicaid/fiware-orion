@@ -275,6 +275,7 @@ static void prepareDatabase(bool useSubCache = true)
   /* Given that preparation including csubs, we have to init cache */
   if (useSubCache == true)
   {
+    noCache = false;
     subCacheInit();
     subCacheRefresh();
   }
