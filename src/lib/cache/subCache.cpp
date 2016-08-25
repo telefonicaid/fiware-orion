@@ -856,7 +856,7 @@ void subCacheItemInsert
 
     eIdP = entityIdVector.vec[ix];
 
-    EntityInfo* eP = new EntityInfo(eIdP->id, eIdP->type, eIdP->isPattern);
+    EntityInfo* eP = new EntityInfo(eIdP->id, eIdP->type, eIdP->isPattern, eIdP->isTypePattern ? "true" : "false");
 
     cSubP->entityIdInfos.push_back(eP);
   }
