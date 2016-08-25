@@ -1451,7 +1451,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateNoMatch)
 
     utInit();
 
-    ngsiv2::HttpInfo          httpInfo("http://notify1.me");
     std::vector<std::string>  attrsFilter;
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
@@ -1461,8 +1460,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateNoMatch)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _))
             .Times(0);
-    //EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", "", JSON))
-    //        .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1502,7 +1499,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendNoMatch)
 
     utInit();
 
-    ngsiv2::HttpInfo          httpInfo("http://notify1.me");
     std::vector<std::string>  attrsFilter;
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
@@ -1512,8 +1508,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendNoMatch)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _))
             .Times(0);
-    //EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", "", JSON))
-    //        .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1553,7 +1547,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteNoMatch)
 
     utInit();
 
-    ngsiv2::HttpInfo          httpInfo("http://notify1.me");
     std::vector<std::string>  attrsFilter;
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
@@ -1563,8 +1556,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteNoMatch)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _))
             .Times(0);
-    //EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", "", JSON))
-    //        .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */    
@@ -1604,7 +1595,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatchWitho
 
     utInit();
 
-    ngsiv2::HttpInfo          httpInfo("http://notify1.me");
     std::vector<std::string>  attrsFilter;
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
@@ -1614,8 +1604,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatchWitho
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _))
             .Times(0);
-    //EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", "", JSON))
-    //        .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2386,7 +2374,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateNoMatch)
 
     utInit();
 
-    ngsiv2::HttpInfo          httpInfo("http://notify2.me");
     std::vector<std::string>  attrsFilter;
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
@@ -2396,8 +2383,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateNoMatch)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _))
             .Times(0);
-    //EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", "", JSON))
-    //        .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2437,7 +2422,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendNoMatch)
 
     utInit();
 
-    ngsiv2::HttpInfo          httpInfo("http://notify2.me");
     std::vector<std::string>  attrsFilter;
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
@@ -2447,8 +2431,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendNoMatch)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _))
             .Times(0);
-    //EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", "", JSON))
-    //        .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2488,7 +2470,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteNoMatch)
 
     utInit();
 
-    ngsiv2::HttpInfo          httpInfo("http://notify2.me");
     std::vector<std::string>  attrsFilter;
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
@@ -2498,8 +2479,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteNoMatch)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _))
             .Times(0);
-    //EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", "", JSON))
-    //        .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */    
@@ -2539,7 +2518,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMatchWitho
 
     utInit();
 
-    ngsiv2::HttpInfo          httpInfo("http://notify2.me");
     std::vector<std::string>  attrsFilter;
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
@@ -2549,8 +2527,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMatchWitho
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _))
             .Times(0);
-    //EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", "", JSON))
-    //        .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */

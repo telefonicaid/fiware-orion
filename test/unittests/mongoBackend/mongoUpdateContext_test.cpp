@@ -10263,7 +10263,7 @@ bool firstTimeTrue(void)
 
 /* ****************************************************************************
 *
-* mongoDbUpdateFail - KZ: SIGSEGV
+* mongoDbUpdateFail -
 */
 TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
 {
@@ -10346,7 +10346,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
 
     /* Release mocks */
     delete connectionMock;    
-    // delete cursorMockCsub;  // KZ: HERE we have s SIGSEGV
+    delete cursorMockCsub;
 
     utExit();
 
