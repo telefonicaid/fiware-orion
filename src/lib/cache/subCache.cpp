@@ -211,6 +211,20 @@ void subCacheInit(bool multitenant)
 
 /* ****************************************************************************
 *
+* subCacheDisable -
+*
+*/
+#ifdef UNIT_TEST
+void subCacheDisable(void)
+{
+  subCacheActive = false;
+}
+#endif
+
+
+
+/* ****************************************************************************
+*
 * subCacheItems -
 */
 int subCacheItems(void)

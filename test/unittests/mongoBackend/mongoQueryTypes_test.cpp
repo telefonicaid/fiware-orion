@@ -316,7 +316,7 @@ TEST(mongoQueryTypes, queryAllPaginationDetails)
     /* Prepare database */
     prepareDatabase();
 
-    /* Invoke the function in mongoBackend library */    
+    /* Invoke the function in mongoBackend library */
     /* Using default offset/limit */
     unsigned int totalTypes = 0;  // enables count details
     ms = mongoEntityTypes(&res, "", servicePathVector, uriParams, "v1", &totalTypes);
@@ -434,7 +434,7 @@ TEST(mongoQueryTypes, queryAllPaginationAll)
     /* Prepare database */
     prepareDatabase();
 
-    /* Invoke the function in mongoBackend library */    
+    /* Invoke the function in mongoBackend library */
     /* Using default offset/limit */
     ms = mongoEntityTypes(&res, "", servicePathVector, uriParams, "v1", NULL);
 
@@ -844,7 +844,7 @@ TEST(mongoQueryTypes, queryAllPaginationNonExistingDetails)
     /* Prepare database */
     prepareDatabase();
 
-    /* Invoke the function in mongoBackend library */    
+    /* Invoke the function in mongoBackend library */
     uriParams[URI_PARAM_PAGINATION_OFFSET] = "7";
     uriParams[URI_PARAM_PAGINATION_LIMIT]  = "3";
     unsigned int totalTypes                = 0;  // enables count details

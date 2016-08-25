@@ -144,6 +144,17 @@ extern void subCacheDestroy(void);
 
 /* ****************************************************************************
 *
+* subCacheDisable -
+*
+*/
+#ifdef UNIT_TEST
+void subCacheDisable(void);
+#endif
+
+
+
+/* ****************************************************************************
+*
 * subCacheItemDestroy - 
 */
 extern void subCacheItemDestroy(CachedSubscription* cSubP);

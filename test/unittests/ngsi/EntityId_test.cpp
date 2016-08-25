@@ -40,9 +40,6 @@ TEST(EntityId, render)
 
   utInit();
 
-  eId.keyNameSet("eId");
-  EXPECT_STREQ("eId", eId.keyName.c_str());
-
   out = eId.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
@@ -62,7 +59,6 @@ TEST(EntityId, present)
 
   utInit();
 
-  eId.keyNameSet("entityId");
   eId.present("", -1);
   eId.present("", 0);
 

@@ -72,7 +72,7 @@ extern std::vector<std::string> servicePathVector;
 *
 * utInit - unit test init
 */
-extern void utInit(void);
+extern void utInit(bool notifierMocked = true, bool timerMocked = true);
 
 
 

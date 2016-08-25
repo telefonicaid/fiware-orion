@@ -10267,18 +10267,17 @@ bool firstTimeTrue(void)
 */
 TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
 {
-
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;    
 
-    utInit();
+    utInit(false);
 
     /* Set database */
     setupDatabase();
 
     /* Prepare mock */
-    /* FIXME: cursorMockCsub is probably unnecesary if we solve the problem of Invoke() the real
+    /* FIXME: cursorMockCsub is probably unnecessary if we solve the problem of Invoke() the real
      * functionality in the DBClientConnectionMockUpdateContext declaration */
     const DBException e = DBException("boom!!", 33);
     BSONObj fakeEn = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
