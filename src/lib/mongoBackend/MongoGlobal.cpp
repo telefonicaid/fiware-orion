@@ -667,7 +667,14 @@ static void fillQueryEntity(BSONArrayBuilder& ba, const EntityId* enP)
 
   if ((enP->type != "") && (enP->type != "Thing"))  // FIXME PR: Is this OK (Thing)? (POST /v2/op/query needs it ...)
   {
-    ent.append(typeString, enP->type);
+    if (enP->isTypePattern)
+    {
+      ent.appendRegex(typeString, enP->type);
+    }
+    else
+    {
+      ent.append(typeString, enP->type);
+    }
   }
 
   BSONObj entObj = ent.obj();
