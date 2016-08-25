@@ -291,27 +291,10 @@ std::string EntityId::toString(bool useIsPattern, const std::string& delimiter)
 */
 bool EntityId::equal(EntityId* eP)
 {
-  if (eP->id != id)
-  {
-    return false;
-  }
-
-  if (eP->type != type)
-  {
-    return false;
-  }
-
-  if (eP->isPatternIsTrue() != isPatternIsTrue())
-  {
-    return false;
-  }
-
-  if (eP->isTypePattern != eP->isTypePattern)
-  {
-    return false;
-  }
-
-  return true;
+  return ((eP->id                == id)                &&
+          (eP->type              == type)              &&
+          (eP->isPatternIsTrue() == isPatternIsTrue()) &&
+          (eP->isTypePattern     == isTypePattern));
 }
 
 
