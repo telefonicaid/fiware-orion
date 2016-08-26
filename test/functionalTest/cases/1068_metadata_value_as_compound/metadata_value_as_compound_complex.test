@@ -99,7 +99,7 @@ echo
 
 echo "02. GET /v2/entities, to see the entity"
 echo "======================================="
-orionCurl --url /v2/entities  # --noPayloadCheck
+orionCurl --url /v2/entities
 echo
 echo
 

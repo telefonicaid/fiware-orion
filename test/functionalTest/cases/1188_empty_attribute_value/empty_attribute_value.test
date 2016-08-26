@@ -30,9 +30,6 @@ brokerStart CB
 --SHELL--
 
 #
-# FIXME P6: step 06 in REGEXPECT of this test must change once the
-#           issue #2451 is resolved
-#
 # 01. POST /v2/entities to create E1/A1=1
 # 02. GET /v2/entities/E1 to see A1==1
 # 03. PUT /v2/entities/E1/attrs/A1/value (="")

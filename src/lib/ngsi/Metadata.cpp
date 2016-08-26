@@ -486,24 +486,7 @@ std::string Metadata::toJson(bool isLastElement)
   {
     if ((compoundValueP->isObject()) || (compoundValueP->isVector()))
     {
-      std::string out2;
-
-      //
-      // FIXME P1
-      //   These two 'funny' lines, modifying the compound, pretending it is not
-      //   toplevel, and setting its name to 'value' is to make toJson() work correctly
-      //   for metadata.
-      //
-      //   The toJson method must work both for attributes and metadata.
-      //   Attributes can be rendered with 'keyValues=on', and that special case we
-      //   don't want for metadata.
-      //
-      //   This 'hack' was the easiest way I could find to make the rendering of compounds
-      //   for metadata work - might not be the optimal way. A bool parameter coud be passed, for example.
-      //
-      compoundValueP->name  = "value";
-      compoundValueP->rootP = NULL;
-
+      compoundValueP->renderName = true;
       out += compoundValueP->toJson(isLastElement, false);
     }
   }

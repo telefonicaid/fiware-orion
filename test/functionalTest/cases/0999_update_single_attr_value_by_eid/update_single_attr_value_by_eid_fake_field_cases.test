@@ -30,9 +30,6 @@ brokerStart CB
 --SHELL--
 
 #
-# FIXME P6: steps 04 and 06 in REGEXPECT of this test must change once the
-#           issue #2451 is resolved
-#
 # 01. BADVERB /v2/entities/E1/attrs/A1/value to see BAD METHOD, only GET, PUT 
 # 02. Create E1-A1
 # 03. PUT /v2/entities/E1/attrs/A1/value without 'value' in payload

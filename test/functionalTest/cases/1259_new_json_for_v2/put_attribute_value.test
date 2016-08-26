@@ -30,9 +30,6 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# FIXME P6: steps 04, 06, 08, 10, 12, 14, 16 18, and 20 in REGEXPECT of this test must change once the
-#           issue #2451 is resolved
-#
 # 01. POST /v2/entities creating E1 A1=1
 # 02. PUT /v2/entities/E1/attrs/A1/value with erroneous JSON payload
 # 03. PUT /v2/entities/E1/attrs/A1/value with JSON object as payload

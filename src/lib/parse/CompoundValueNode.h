@@ -93,6 +93,7 @@ class CompoundValueNode
 
   // Needed for JSON rendering
   int                                siblingNo;
+  bool                               renderName;
 
   // Fields that may not be necessary
   // FIXME P4: when finally sure, remove the unnecessary fields

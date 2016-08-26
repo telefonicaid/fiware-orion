@@ -665,7 +665,7 @@ static void fillQueryEntity(BSONArrayBuilder& ba, const EntityId* enP)
     ent.append(idString, enP->id);
   }
 
-  if ((enP->type != "") && (enP->type != "Thing"))  // FIXME PR: Is this OK (Thing)? (POST /v2/op/query needs it ...)
+  if (enP->type != "")
   {
     if (enP->isTypePattern)
     {
