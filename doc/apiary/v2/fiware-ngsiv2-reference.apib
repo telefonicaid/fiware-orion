@@ -1,10 +1,10 @@
 FORMAT: 1A
 HOST: http://orion.lab.fiware.org
-TITLE: FIWARE-NGSI v2 Specification
-DATE: 30 September 2015
-VERSION: 2.0-latest
-PREVIOUS_VERSION: <placeholder>
-APIARY_PROJECT: fiware-ngsi-v2
+TITLE: FIWARE-NGSI v2 Specification (WIP)
+DATE: to be fixed upon next RC production
+VERSION: latest
+PREVIOUS_VERSION: stable
+APIARY_PROJECT: orioncontextbroker
 SPEC_URL: https://telefonicaid.github.io/fiware-orion/api/v2/
 GITHUB_SOURCE: http://github.com/telefonicaid/fiware-orion.git
 
@@ -47,7 +47,7 @@ In addition, note that a list of currently open discussions is available at
 
 Copyright (c) 2011-2016 Telecom Italia, Telefónica I+D and NEC. 
 
-## Legal Notice
+## License
 
 This specification is licensed under the
 [FIWARE Open Specification License (implicit patent license)]
@@ -1015,7 +1015,7 @@ Response code:
 
 + Response 200 (application/json)
 
-       [
+        [
          {
            "type": "Room",
            "id": "DC_S1-D41",
@@ -1052,7 +1052,7 @@ Response code:
              }
            }
          }
-       ]
+        ]
 
 ### Create entity [POST /v2/entities{?options}]
 
@@ -1706,7 +1706,7 @@ Notification rules are as follow:
 
 ## Subscription List [/v2/subscriptions]
 
-### Retrieve subscriptions [GET /v2/subscriptions]
+### Retrieve subscriptions [GET /v2/subscriptions{?limit,offset,options}]
 
 Returns a list of all the subscriptions present in the system.
 
