@@ -144,7 +144,7 @@ echo
 ==========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -154,7 +154,7 @@ Date: REGEX(.*)
 ==========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2?type=none
+Location: /v2/entities/E2?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -164,7 +164,7 @@ Date: REGEX(.*)
 ==========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E3?type=none
+Location: /v2/entities/E3?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -174,7 +174,7 @@ Date: REGEX(.*)
 =======================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E4?type=none
+Location: /v2/entities/E4?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -183,7 +183,7 @@ Date: REGEX(.*)
 05. GET entities matching q=A1==1 AND mq=A1.M1==2, see E2, using /v1/queryContext
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 554
+Content-Length: 559
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -197,18 +197,18 @@ Date: REGEX(.*)
                         "metadatas": [
                             {
                                 "name": "M1",
-                                "type": "none",
+                                "type": "Number",
                                 "value": 2.0
                             }
                         ],
                         "name": "A1",
-                        "type": "none",
+                        "type": "Number",
                         "value": 1
                     }
                 ],
                 "id": "E2",
                 "isPattern": "false",
-                "type": "none"
+                "type": "Thing"
             },
             "statusCode": {
                 "code": "200",

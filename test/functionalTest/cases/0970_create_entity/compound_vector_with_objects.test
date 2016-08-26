@@ -87,7 +87,7 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 282
+Content-Length: 304
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -95,7 +95,7 @@ Date: REGEX(.*)
 {
     "attr01": {
         "metadata": {},
-        "type": "none",
+        "type": "StructuredValue",
         "value": {
             "objAndVecInVec": [
                 {
@@ -115,7 +115,7 @@ Date: REGEX(.*)
     },
     "attr2": {
         "metadata": {},
-        "type": "none",
+        "type": "StructuredValue",
         "value": {
             "objAndVecInObj": {
                 "nestedObj": {

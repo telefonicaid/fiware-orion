@@ -101,7 +101,7 @@ Date: REGEX(.*)
         "id": "8787GHY",
         "madeInCountry": {
             "metadata": {},
-            "type": "none",
+            "type": "Text",
             "value": "DE"
         },
         "model": {
@@ -111,7 +111,7 @@ Date: REGEX(.*)
         },
         "plateCountry": {
             "metadata": {},
-            "type": "none",
+            "type": "Text",
             "value": "ES"
         },
         "speed": {

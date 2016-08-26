@@ -77,7 +77,7 @@ Date: REGEX(.*)
 02. GET /v2/entities?q=humidity:567; - OK
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 83
+Content-Length: 85
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -86,7 +86,7 @@ Date: REGEX(.*)
     {
         "humidity": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 567
         },
         "id": "room1",

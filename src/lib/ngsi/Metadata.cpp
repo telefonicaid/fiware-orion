@@ -94,7 +94,14 @@ Metadata::Metadata(Metadata* mP, bool useDefaultType)
 
   if (useDefaultType && !typeGiven)
   {
-    type = DEFAULT_TYPE;
+    if ((compoundValueP == NULL) || (compoundValueP->valueType != orion::ValueTypeVector))
+    {
+      type = defaultType(valueType);
+    }
+    else
+    {
+      type = defaultType(orion::ValueTypeVector);
+    }
   }
 }
 
@@ -449,7 +456,14 @@ std::string Metadata::toJson(bool isLastElement)
   out = JSON_STR(name) + ":{";
 
   /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
-  out += (type != "")? JSON_VALUE("type", type) : JSON_VALUE("type", DEFAULT_TYPE);
+  std::string defType = defaultType(valueType);
+
+  if (compoundValueP && compoundValueP->isVector())
+  {
+    defType = defaultType(orion::ValueTypeVector);
+  }
+
+  out += (type != "")? JSON_VALUE("type", type) : JSON_VALUE("type", defType);
   out += ",";
 
   if (valueType == orion::ValueTypeString)
@@ -472,24 +486,7 @@ std::string Metadata::toJson(bool isLastElement)
   {
     if ((compoundValueP->isObject()) || (compoundValueP->isVector()))
     {
-      std::string out2;
-
-      //
-      // FIXME P1
-      //   These two 'funny' lines, modifying the compound, pretending it is not
-      //   toplevel, and setting its name to 'value' is to make toJson() work correctly
-      //   for metadata.
-      //
-      //   The toJson method must work both for attributes and metadata.
-      //   Attributes can be rendered with 'keyValues=on', and that special case we
-      //   don't want for metadata.
-      //
-      //   This 'hack' was the easiest way I could find to make the rendering of compounds
-      //   for metadata work - might not be the optimal way. A bool parameter coud be passed, for example.
-      //
-      compoundValueP->name  = "value";
-      compoundValueP->rootP = NULL;
-
+      compoundValueP->renderName = true;
       out += compoundValueP->toJson(isLastElement, false);
     }
   }

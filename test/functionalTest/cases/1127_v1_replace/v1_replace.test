@@ -107,12 +107,12 @@ Date: REGEX(.*)
 {
     "attr1": {
         "metadata": {},
-        "type": "none",
+        "type": "Text",
         "value": "1"
     },
     "attr2": {
         "metadata": {},
-        "type": "none",
+        "type": "Text",
         "value": "2"
     },
     "id": "E1",
@@ -168,12 +168,12 @@ Date: REGEX(.*)
 {
     "attr3": {
         "metadata": {},
-        "type": "none",
+        "type": "Text",
         "value": "3"
     },
     "attr4": {
         "metadata": {},
-        "type": "none",
+        "type": "Text",
         "value": "4"
     },
     "id": "E1",

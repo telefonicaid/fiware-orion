@@ -75,11 +75,11 @@ Date: REGEX(.*)
     "temperature": {
         "metadata": {
             "alarm": {
-                "type": "none",
+                "type": "None",
                 "value": null
             }
         },
-        "type": "none",
+        "type": "Text",
         "value": "34"
     },
     "type": "room"

@@ -104,7 +104,7 @@ echo
 ====================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -113,7 +113,7 @@ Date: REGEX(.*)
 02. end-match: GET /v2/entities?mq=A1.M1.s~=ing, see E1
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 178
+Content-Length: 190
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -123,7 +123,7 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "StructuredValue",
                     "value": {
                         "F": false,
                         "N": null,
@@ -134,11 +134,11 @@ Date: REGEX(.*)
                     }
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "not important"
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -146,7 +146,7 @@ Date: REGEX(.*)
 03. start-match: GET /v2/entities?mq=A1.M1.s~=test_, see E1
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 178
+Content-Length: 190
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -156,7 +156,7 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "StructuredValue",
                     "value": {
                         "F": false,
                         "N": null,
@@ -167,11 +167,11 @@ Date: REGEX(.*)
                     }
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "not important"
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -179,7 +179,7 @@ Date: REGEX(.*)
 04. middle-match: GET /v2/entities?mq=A1.M1.s~=t_st, see E1
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 178
+Content-Length: 190
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -189,7 +189,7 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "StructuredValue",
                     "value": {
                         "F": false,
                         "N": null,
@@ -200,11 +200,11 @@ Date: REGEX(.*)
                     }
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "not important"
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -212,7 +212,7 @@ Date: REGEX(.*)
 05. one-char-match: GET /v2/entities?mq=A1.M1.s~=_, see E1
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 178
+Content-Length: 190
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -222,7 +222,7 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "StructuredValue",
                     "value": {
                         "F": false,
                         "N": null,
@@ -233,11 +233,11 @@ Date: REGEX(.*)
                     }
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "not important"
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 

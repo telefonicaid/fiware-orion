@@ -24,6 +24,7 @@
 */
 #include "rapidjson/document.h"
 
+#include "common/globals.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
@@ -212,7 +213,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 
   if (!eP->typeGiven)
   {
-    eP->type = DEFAULT_TYPE;
+    eP->type = DEFAULT_ENTITY_TYPE;
   }
 
   return "OK";

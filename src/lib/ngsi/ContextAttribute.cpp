@@ -217,7 +217,20 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
 
   if (useDefaultType && !typeGiven)
   {
-    type = DEFAULT_TYPE;
+    //
+    // NOTE:
+    //   Compound values all have attribute type == orion::ValueTypeObject.
+    //   So, if compound, we need to step down into the compound to see whether it is 
+    //   an object or a vector.
+    //
+    if ((valueType != orion::ValueTypeObject) || (compoundValueP == NULL) || (compoundValueP->valueType != orion::ValueTypeVector))
+    {
+      type = defaultType(valueType);
+    }
+    else
+    {
+      type = defaultType(orion::ValueTypeVector);
+    }
   }
 }
 
@@ -718,8 +731,16 @@ std::string ContextAttribute::toJson(bool isLastElement, RenderFormat renderForm
     //
     // type
     //
-    /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
-    out += (type != "")? JSON_VALUE("type", type) : JSON_VALUE("type", DEFAULT_TYPE);
+    // This is needed for entities coming from NGSIv1 (which allows empty or missing types)
+    //
+    std::string defType = defaultType(valueType);
+
+    if (compoundValueP && compoundValueP->isVector())
+    {
+      defType = defaultType(orion::ValueTypeVector);
+    }
+
+    out += (type != "")? JSON_VALUE("type", type) : JSON_VALUE("type", defType);
     out += ",";
 
 

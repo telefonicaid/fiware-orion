@@ -131,7 +131,7 @@ echo
 ========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E?type=none
+Location: /v2/entities/E?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -154,7 +154,7 @@ Date: REGEX(.*)
 03. Make sure step 2 DID NOT modify E/A1
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 76
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -166,7 +166,7 @@ Date: REGEX(.*)
         "value": 1
     },
     "id": "E",
-    "type": "none"
+    "type": "Thing"
 }
 
 
@@ -187,7 +187,7 @@ Date: REGEX(.*)
 05. Make sure step 4 DID NOT modify E/A1
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 76
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -199,7 +199,7 @@ Date: REGEX(.*)
         "value": 1
     },
     "id": "E",
-    "type": "none"
+    "type": "Thing"
 }
 
 
@@ -220,7 +220,7 @@ Date: REGEX(.*)
 07. Make sure step 5 DID NOT modify E/A1
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 76
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -232,7 +232,7 @@ Date: REGEX(.*)
         "value": 1
     },
     "id": "E",
-    "type": "none"
+    "type": "Thing"
 }
 
 
@@ -253,7 +253,7 @@ Date: REGEX(.*)
 09. Make sure step 7 DID NOT modify E/A1
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 76
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -265,7 +265,7 @@ Date: REGEX(.*)
         "value": 1
     },
     "id": "E",
-    "type": "none"
+    "type": "Thing"
 }
 
 

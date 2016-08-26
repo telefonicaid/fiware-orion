@@ -31,7 +31,7 @@ brokerStart CB
 
 #
 # 01. Create entity with attribute without type
-# 02. Check attribute has type none
+# 02. Check attribute has type Number
 # 03. Create entity with attribute with type empty string
 #
 
@@ -49,8 +49,8 @@ echo
 echo
 
 
-echo "02. Check attribute has type none"
-echo "================================="
+echo "02. Check attribute has type Number"
+echo "==================================="
 orionCurl --url /v2/entities/E
 echo
 echo
@@ -81,10 +81,10 @@ Date: REGEX(.*)
 
 
 
-02. Check attribute has type none
-=================================
+02. Check attribute has type Number
+===================================
 HTTP/1.1 200 OK
-Content-Length: 66
+Content-Length: 68
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -92,7 +92,7 @@ Date: REGEX(.*)
 {
     "A1": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 1
     },
     "id": "E",

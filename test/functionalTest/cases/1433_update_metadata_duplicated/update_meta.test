@@ -116,7 +116,7 @@ Date: REGEX(.*)
 02. GET the entity to make sure the creation worked
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 232
+Content-Length: 234
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -124,7 +124,7 @@ Date: REGEX(.*)
 {
     "humidity": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 78
     },
     "id": "Room10",
@@ -158,7 +158,7 @@ Date: REGEX(.*)
 04. GET the entity to make sure the creation worked
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 232
+Content-Length: 234
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -166,18 +166,18 @@ Date: REGEX(.*)
 {
     "humidity": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 78
     },
     "id": "Room10",
     "temperature": {
         "metadata": {
             "house_flat_0": {
-                "type": "none",
+                "type": "Text",
                 "value": "1234"
             },
             "house_flat_1": {
-                "type": "none",
+                "type": "Text",
                 "value": "5678"
             }
         },

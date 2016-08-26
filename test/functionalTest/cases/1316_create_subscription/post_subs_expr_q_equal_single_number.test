@@ -169,7 +169,7 @@ Date: REGEX(.*)
 06. Get accumulator dump (2 notifications)
 ==========================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 127
+Content-Length: 129
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -183,7 +183,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "id": "E1",
             "status": {
                 "metadata": {},
-                "type": "none",
+                "type": "Number",
                 "value": 22
             },
             "type": "T"
@@ -193,7 +193,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 127
+Content-Length: 129
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -207,7 +207,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "id": "E1",
             "status": {
                 "metadata": {},
-                "type": "none",
+                "type": "Number",
                 "value": 22
             },
             "type": "T"

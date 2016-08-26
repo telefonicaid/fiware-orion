@@ -183,7 +183,7 @@ Date: REGEX(.*)
 06. v1 Query: temperature<60;humidity==61..83;status==ERR -> E2
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 614
+Content-Length: 618
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -195,17 +195,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "humidity",
-                        "type": "none",
+                        "type": "Number",
                         "value": 70
                     },
                     {
                         "name": "status",
-                        "type": "none",
+                        "type": "Text",
                         "value": "ERR"
                     },
                     {
                         "name": "temperature",
-                        "type": "none",
+                        "type": "Number",
                         "value": 30
                     }
                 ],

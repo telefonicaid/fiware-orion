@@ -156,7 +156,7 @@ Date: REGEX(.*)
 03. Get entity using NGSIv2 operation
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 105
+Content-Length: 106
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -165,15 +165,15 @@ Date: REGEX(.*)
     "A": {
         "metadata": {
             "M": {
-                "type": "none",
+                "type": "Text",
                 "value": "bar"
             }
         },
-        "type": "none",
+        "type": "Text",
         "value": "foo"
     },
     "id": "E",
-    "type": "none"
+    "type": "Thing"
 }
 
 

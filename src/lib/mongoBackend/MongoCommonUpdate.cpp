@@ -358,9 +358,17 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP, std::string apiVersi
 void appendMetadata(BSONObjBuilder* mdBuilder, BSONArrayBuilder* mdNamesBuilder, const Metadata* mdP, bool useDefaultType)
 {
   std::string type =  mdP->type;
+
   if (!mdP->typeGiven && useDefaultType)
   {
-    type = DEFAULT_TYPE;
+    if ((mdP->compoundValueP == NULL) || (mdP->compoundValueP->valueType != orion::ValueTypeVector))
+    {
+      type = defaultType(mdP->valueType);
+    }
+    else
+    {
+      type = defaultType(orion::ValueTypeVector);
+    }
   }
 
   mdNamesBuilder->append(mdP->name);
@@ -712,7 +720,18 @@ static bool updateAttribute
 
     if (!caP->typeGiven && (apiVersion == "v2"))
     {
-      newAttr.append(ENT_ATTRS_TYPE, DEFAULT_TYPE);
+      std::string attrType;
+
+      if ((caP->compoundValueP == NULL) || (caP->compoundValueP->valueType != orion::ValueTypeVector))
+      {
+        attrType = defaultType(caP->valueType);
+      }
+      else
+      {
+        attrType = defaultType(orion::ValueTypeVector);
+      }
+
+      newAttr.append(ENT_ATTRS_TYPE, attrType);
     }
     else
     {
@@ -804,7 +823,18 @@ static bool appendAttribute
   /* 2. Type */
   if ((apiVersion == "v2") && !caP->typeGiven)
   {
-    ab.append(ENT_ATTRS_TYPE, DEFAULT_TYPE);
+    std::string attrType;
+
+    if ((caP->compoundValueP == NULL) || (caP->compoundValueP->valueType != orion::ValueTypeVector))
+    {
+      attrType = defaultType(caP->valueType);
+    }
+    else
+    {
+      attrType = defaultType(orion::ValueTypeVector);
+    }
+
+    ab.append(ENT_ATTRS_TYPE, attrType);
   }
   else
   {
@@ -2561,7 +2591,18 @@ static bool createEntity
 
     if (!attrsV[ix]->typeGiven && (apiVersion == "v2"))
     {
-      bsonAttr.append(ENT_ATTRS_TYPE, DEFAULT_TYPE);
+      std::string attrType;
+
+      if ((attrsV[ix]->compoundValueP == NULL) || (attrsV[ix]->compoundValueP->valueType != orion::ValueTypeVector))
+      {
+        attrType = defaultType(attrsV[ix]->valueType);
+      }
+      else
+      {
+        attrType = defaultType(orion::ValueTypeVector);
+      }
+
+      bsonAttr.append(ENT_ATTRS_TYPE, attrType);
     }
     else
     {
@@ -2606,7 +2647,7 @@ static bool createEntity
     if (apiVersion == "v2")
     {
       // NGSIv2 uses default entity type
-      bsonId.append(ENT_ENTITY_TYPE, DEFAULT_TYPE);
+      bsonId.append(ENT_ENTITY_TYPE, DEFAULT_ENTITY_TYPE);
     }
   }
   else

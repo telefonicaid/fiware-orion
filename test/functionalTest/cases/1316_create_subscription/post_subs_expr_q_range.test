@@ -228,7 +228,7 @@ Date: REGEX(.*)
 09. Get accumulator dump (4 notifications)
 ==========================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 132
+Content-Length: 134
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -242,7 +242,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "id": "E1",
             "temperature": {
                 "metadata": {},
-                "type": "none",
+                "type": "Number",
                 "value": 20
             },
             "type": "T"
@@ -252,7 +252,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 132
+Content-Length: 134
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -266,7 +266,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "id": "E1",
             "temperature": {
                 "metadata": {},
-                "type": "none",
+                "type": "Number",
                 "value": 25
             },
             "type": "T"
@@ -276,7 +276,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 132
+Content-Length: 134
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -290,7 +290,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "id": "E1",
             "temperature": {
                 "metadata": {},
-                "type": "none",
+                "type": "Number",
                 "value": 35
             },
             "type": "T"
@@ -300,7 +300,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 132
+Content-Length: 134
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -314,7 +314,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "id": "E1",
             "temperature": {
                 "metadata": {},
-                "type": "none",
+                "type": "Number",
                 "value": 40
             },
             "type": "T"

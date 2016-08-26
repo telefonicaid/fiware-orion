@@ -117,7 +117,7 @@ echo
 
 echo "07. Check attributes in DB"
 echo "=========================="
-mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "E1",  "type": "none", "servicePath" : "/" } }, {_id:0, attrNames: 1})'
+mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "E1",  "type": "Thing", "servicePath" : "/" } }, {_id:0, attrNames: 1})'
 echo
 echo
 
@@ -127,7 +127,7 @@ echo
 ===================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -136,7 +136,7 @@ Date: REGEX(.*)
 02. Make sure E1 is as created
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 120
+Content-Length: 125
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -144,23 +144,23 @@ Date: REGEX(.*)
 {
     "A1.X": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 1
     },
     "A2..y": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 2
     },
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 
 02b. Now look at E1 with options=keyValues
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 44
+Content-Length: 45
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -169,7 +169,7 @@ Date: REGEX(.*)
     "A1.X": 1,
     "A2..y": 2,
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 
@@ -185,7 +185,7 @@ Date: REGEX(.*)
 04. Make sure E1 is as modified
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 120
+Content-Length: 125
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -193,23 +193,23 @@ Date: REGEX(.*)
 {
     "A2..y": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 2
     },
     "A3.Z": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 3
     },
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 
 04b. Now look at E1 with options=keyValues
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 44
+Content-Length: 45
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -218,21 +218,21 @@ Date: REGEX(.*)
     "A2..y": 2,
     "A3.Z": 3,
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 
 05. GET attribute A2..y
 =======================
 HTTP/1.1 200 OK
-Content-Length: 39
+Content-Length: 41
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "Number",
     "value": 2
 }
 
@@ -253,14 +253,14 @@ Date: REGEX(.*)
 06. GET attribute A3.Z
 ======================
 HTTP/1.1 200 OK
-Content-Length: 39
+Content-Length: 41
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "Number",
     "value": 3
 }
 

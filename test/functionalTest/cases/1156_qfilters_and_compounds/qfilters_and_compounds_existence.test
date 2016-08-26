@@ -102,7 +102,7 @@ echo
 ==============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -111,7 +111,7 @@ Date: REGEX(.*)
 02. GET /v2/entities?q=A1.i, see E1
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 97
+Content-Length: 109
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -120,14 +120,14 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "StructuredValue",
             "value": {
                 "i": 10,
                 "s": "test_string"
             }
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -157,7 +157,7 @@ Date: REGEX(.*)
 05. GET /v2/entities?q=!A1.i2, see E1
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 97
+Content-Length: 109
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -166,14 +166,14 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "StructuredValue",
             "value": {
                 "i": 10,
                 "s": "test_string"
             }
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -192,7 +192,7 @@ Date: REGEX(.*)
 07. GET /v2/entities?q=!A2.i, see E1
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 97
+Content-Length: 109
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -201,14 +201,14 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "StructuredValue",
             "value": {
                 "i": 10,
                 "s": "test_string"
             }
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 

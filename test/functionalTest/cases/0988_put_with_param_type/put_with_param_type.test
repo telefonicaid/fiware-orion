@@ -163,7 +163,7 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Text",
             "value": "V1 A1 E1/T1"
         },
         "id": "E1",
@@ -172,7 +172,7 @@ Date: REGEX(.*)
     {
         "A-PUT": {
             "metadata": {},
-            "type": "none",
+            "type": "Text",
             "value": "REPLACED"
         },
         "id": "E1",
@@ -202,7 +202,7 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Text",
             "value": "REPLACED A1"
         },
         "id": "E1",
@@ -211,7 +211,7 @@ Date: REGEX(.*)
     {
         "A-PUT": {
             "metadata": {},
-            "type": "none",
+            "type": "Text",
             "value": "REPLACED"
         },
         "id": "E1",
@@ -241,7 +241,7 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Text",
             "value": "REPLACED A1"
         },
         "id": "E1",
@@ -250,7 +250,7 @@ Date: REGEX(.*)
     {
         "A-PUT": {
             "metadata": {},
-            "type": "none",
+            "type": "Text",
             "value": "VALUE REPLACED"
         },
         "id": "E1",

@@ -53,6 +53,7 @@ CompoundValueNode::CompoundValueNode():
   container   (NULL),
   rootP       (NULL),
   siblingNo   (0),
+  renderName  (false),
   path        ("Unset"),
   level       (0)
 {
@@ -73,6 +74,7 @@ CompoundValueNode::CompoundValueNode(orion::ValueType _type):
   container   (this),
   rootP       (this),
   siblingNo   (0),
+  renderName  (false),
   path        ("/"),
   level       (0)
 {
@@ -103,6 +105,7 @@ CompoundValueNode::CompoundValueNode
   container   (_container),
   rootP       (container->rootP),
   siblingNo   (_siblingNo),
+  renderName  (false),
   path        (_path),
   level       (container->level + 1)
 {
@@ -138,6 +141,7 @@ CompoundValueNode::CompoundValueNode
   container   (_container),
   rootP       (container->rootP),
   siblingNo   (_siblingNo),
+  renderName  (false),
   path        (_path),
   level       (container->level + 1)
 {
@@ -173,6 +177,7 @@ CompoundValueNode::CompoundValueNode
   container   (_container),
   rootP       (container->rootP),
   siblingNo   (_siblingNo),
+  renderName  (false),
   path        (_path),
   level       (container->level + 1)
 {
@@ -208,6 +213,7 @@ CompoundValueNode::CompoundValueNode
   container   (_container),
   rootP       (container->rootP),
   siblingNo   (_siblingNo),
+  renderName  (false),
   path        (_path),
   level       (container->level + 1)
 {
@@ -807,6 +813,16 @@ std::string CompoundValueNode::toJson(bool isLastElement, bool comma)
       out = JSON_STR(key) + ":" + "null";
     }
   }
+  else if ((valueType == orion::ValueTypeVector) && (renderName == true))
+  {
+    out += JSON_STR(name) + ":[";
+    for (uint64_t ix = 0; ix < childV.size(); ++ix)
+    {
+      out += childV[ix]->toJson(false);
+    }
+
+    out += "]";
+  }
   else if ((valueType == orion::ValueTypeVector) && (container == this))
   {
     //
@@ -839,6 +855,22 @@ std::string CompoundValueNode::toJson(bool isLastElement, bool comma)
     }
 
     out += "]";
+  }
+  else if ((valueType == orion::ValueTypeObject) && (renderName == true))
+  {
+    if (name == "toplevel")
+    {
+      name ="value";
+    }
+
+    out += JSON_STR(name) + ":{";
+
+    for (uint64_t ix = 0; ix < childV.size(); ++ix)
+    {
+      out += childV[ix]->toJson(ix == childV.size() - 1);
+    }
+
+    out += "}";
   }
   else if ((valueType == orion::ValueTypeObject) && (container->valueType == orion::ValueTypeVector))
   {

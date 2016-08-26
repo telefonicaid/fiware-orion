@@ -22,6 +22,7 @@
 *
 * Author: Ken Zangelin
 */
+#include "common/globals.h"
 #include "orionTypes/OrionValueType.h"
 
 
@@ -48,6 +49,28 @@ const char* valueTypeName(const orion::ValueType _type)
   }
 
   return "Invalid";
+}
+
+
+
+/* ****************************************************************************
+*
+* defaultType - 
+*/
+const char* defaultType(ValueType valueType)
+{
+  switch (valueType)
+  {
+  case ValueTypeUnknown:    return "Unknown";
+  case ValueTypeString:     return DEFAULT_ATTR_STRING_TYPE;
+  case ValueTypeNumber:     return DEFAULT_ATTR_NUMBER_TYPE;
+  case ValueTypeBoolean:    return DEFAULT_ATTR_BOOL_TYPE;
+  case ValueTypeVector:     return DEFAULT_ATTR_ARRAY_TYPE;
+  case ValueTypeObject:     return DEFAULT_ATTR_OBJECT_TYPE;
+  case ValueTypeNone:       return DEFAULT_ATTR_NULL_TYPE; 
+  }
+
+  return "Unknown";
 }
 
 }
