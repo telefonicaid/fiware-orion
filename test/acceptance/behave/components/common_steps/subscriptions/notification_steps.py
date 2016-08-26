@@ -21,7 +21,6 @@
  iot_support at tid dot es
 """
 
-
 __author__ = 'Ivan Arias Leon (ivan dot ariasleon at telefonica dot com)'
 
 import behave
@@ -30,6 +29,7 @@ from behave import step
 import requests
 
 from tools.notification_listener import Daemon
+from tools.NGSI_v2 import NGSI
 
 
 behave.use_step_matcher("re")
@@ -37,6 +37,7 @@ __logger__ = logging.getLogger("steps")
 
 # constants
 NOTIFICATION_ENDPOINT = u'http://localhost:%s'
+
 
 @step(u'start the subscription listener as a daemon using the port "([^"]*)"')
 def start_the_subscription_listener_as_a_daemon(context, port):
@@ -79,11 +80,40 @@ def verify_subscription_listener_is_started_successfully(context):
     __logger__.debug("url: GET %s" % url)
     try:
         r = requests.get(url).text
+        __logger__.debug("Response: %s" % r.text)
         assert r.find("without notification received") >= 0, " ERROR - the notification listener is not started correctly"
     except Exception, e:
         __logger__.error("NOTIFICATION_LISTENER: %s" % str(e))
     __logger__.info("The notification listener is verified that it is running correctly")
 
+
+@step(u'verify that no notification is received')
+def verify_that_no_notification_is_received(context):
+    """
+    verify that no notification is received
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.debug("verifying if no notification is received...")
+    assert context.resp.text.find(
+        "without notification received") >= 0, " ERROR - some notification is received: \n %s" % context.resp.text
+    __logger__.info("...verified that no notification is received...")
+
+
+@step(u'verify the notification in "([^"]*)" format')
+def verify_the_notification_in_a_given_format(context, notif_format):
+    """
+    verify the notification in a given format
+    :param notif_format: format expected (normalized | keyValues | values | legacy)
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.debug("verify the notification in \"%s\" format..." % notif_format)
+    entity_context = context.cb.get_entity_context()
+    subsc_context = context.cb.get_subscription_context()
+    payload = context.resp.text
+    headers = context.resp.headers
+    ngsi = NGSI()
+    ngsi.verify_notification(notif_format, payload, headers, entity_context, subsc_context)
+    __logger__.debug("...verified the notification in \"%s\" format" % notif_format)
 
 
 
