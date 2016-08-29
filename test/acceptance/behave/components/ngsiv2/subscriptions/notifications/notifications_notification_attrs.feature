@@ -28,9 +28,9 @@
 #
 
 
-Feature: verify notifications from subscriptions with diferent formats using NGSIv2
+Feature: verify notifications from subscriptions with with different notification attribute values using NGSIv2
   As a context broker user
-  I would like toverify notifications from subscriptions with diferent formats using NGSIv2
+  I would like to verify notifications from subscriptions with different notification attribute values using NGSIv2
   So that I can manage and use them in my scripts
 
   Actions Before the Feature:
@@ -54,10 +54,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @notification_attrs_without
   Scenario:  send a notification using NGSI v2 without notification attributes field
     Given  a definition of headers
-      | parameter          | value              |
-      | Fiware-Service     | test_notif_expires |
-      | Fiware-ServicePath | /test              |
-      | Content-Type       | application/json   |
+      | parameter          | value                  |
+      | Fiware-Service     | test_notif_notif_attrs |
+      | Fiware-ServicePath | /test                  |
+      | Content-Type       | application/json       |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter             | value                           |
@@ -87,10 +87,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @notification_attrs_only_one
   Scenario Outline:  send a notification using NGSI v2 with only one notification attribute
     Given  a definition of headers
-      | parameter          | value              |
-      | Fiware-Service     | test_notif_expires |
-      | Fiware-ServicePath | /test              |
-      | Content-Type       | application/json   |
+      | parameter          | value                  |
+      | Fiware-Service     | test_notif_notif_attrs |
+      | Fiware-ServicePath | /test                  |
+      | Content-Type       | application/json       |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter             | value                           |
@@ -136,10 +136,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @notification_attrs_with_several @BUG_2463
   Scenario:  send a notification using NGSI v2 with several notification attributes
     Given  a definition of headers
-      | parameter          | value              |
-      | Fiware-Service     | test_notif_expires |
-      | Fiware-ServicePath | /test              |
-      | Content-Type       | application/json   |
+      | parameter          | value                  |
+      | Fiware-Service     | test_notif_notif_attrs |
+      | Fiware-ServicePath | /test                  |
+      | Content-Type       | application/json       |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter                 | value                           |
@@ -171,10 +171,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @notification_attrs_unknown
   Scenario:  not send a notification using NGSI v2 with unknown notification attribute
     Given  a definition of headers
-      | parameter          | value              |
-      | Fiware-Service     | test_notif_expired |
-      | Fiware-ServicePath | /test              |
-      | Content-Type       | application/json   |
+      | parameter          | value                      |
+      | Fiware-Service     | test_notif_notif_attrs_not |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter             | value                           |
@@ -205,10 +205,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @notification_attrs_except_only_one
   Scenario:  send a notification using NGSI v2 with only one notification except attribute
     Given  a definition of headers
-      | parameter          | value              |
-      | Fiware-Service     | test_notif_expires |
-      | Fiware-ServicePath | /test              |
-      | Content-Type       | application/json   |
+      | parameter          | value                  |
+      | Fiware-Service     | test_notif_notif_attrs |
+      | Fiware-ServicePath | /test                  |
+      | Content-Type       | application/json       |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter                 | value                           |
@@ -239,10 +239,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @notification_attrs_except_several
   Scenario:  send a notification using NGSI v2 with several notification except attributes
     Given  a definition of headers
-      | parameter          | value              |
-      | Fiware-Service     | test_notif_expires |
-      | Fiware-ServicePath | /test              |
-      | Content-Type       | application/json   |
+      | parameter          | value                  |
+      | Fiware-Service     | test_notif_notif_attrs |
+      | Fiware-ServicePath | /test                  |
+      | Content-Type       | application/json       |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter                 | value                           |
@@ -274,10 +274,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @notification_except_attrs_unknown
   Scenario:  send a notification using NGSI v2 with unknown notification except attribute
     Given  a definition of headers
-      | parameter          | value              |
-      | Fiware-Service     | test_notif_expires |
-      | Fiware-ServicePath | /test              |
-      | Content-Type       | application/json   |
+      | parameter          | value                  |
+      | Fiware-Service     | test_notif_notif_attrs |
+      | Fiware-ServicePath | /test                  |
+      | Content-Type       | application/json       |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter                 | value                           |

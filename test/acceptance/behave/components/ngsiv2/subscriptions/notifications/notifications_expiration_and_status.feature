@@ -28,9 +28,9 @@
 #
 
 
-Feature: verify notifications from subscriptions with diferent formats using NGSIv2
+Feature: verify notifications from subscriptions with different expires and status values using NGSIv2
   As a context broker user
-  I would like toverify notifications from subscriptions with diferent formats using NGSIv2
+  I would like to verify notifications from subscriptions with different expires and status values using NGSIv2
   So that I can manage and use them in my scripts
 
   Actions Before the Feature:
