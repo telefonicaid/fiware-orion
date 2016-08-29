@@ -58,11 +58,6 @@ costly in terms of performance).
 
 Related with: https://github.com/telefonicaid/fiware-orion/issues/2073
 
-## Default type for entities, attributes and metadata
-
-Currently, Orion uses the string `none` as default for entities/attributes/metadata at creation/update time.
-However, this may change in the future, as described in https://github.com/telefonicaid/fiware-orion/issues/2223.
-
 ## Scope functionality
 
 Orion implements a `scope` field in the `POST /v2/op/update` operation (you can see
