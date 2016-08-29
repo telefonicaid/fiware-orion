@@ -206,7 +206,7 @@ void setEntities(const Subscription& sub, BSONObjBuilder* b)
     std::string finalId;
     std::string finalType;
     std::string isIdPattern;
-    std::string isTypePattern;
+    bool        isTypePattern = false;
 
     if (en.idPattern != "")
     {
@@ -222,12 +222,12 @@ void setEntities(const Subscription& sub, BSONObjBuilder* b)
     if (en.typePattern != "")
     {
       finalType = en.typePattern;
-      isTypePattern = "true";
+      isTypePattern = true;
     }
     else if (en.type != "")
     {
       finalType = en.type;
-      isTypePattern = "false";
+      isTypePattern = false;
     }
 
     if (finalType.empty()) // no type provided

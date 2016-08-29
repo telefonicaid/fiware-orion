@@ -79,8 +79,8 @@ static void setSubject(Subscription* s, const BSONObj& r)
     std::string id            = getStringFieldF(ent, CSUB_ENTITY_ID);
     std::string type          = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
     std::string isPattern     = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
-    std::string isTypePattern = ent.hasField(CSUB_ENTITY_ISTYPEPATTERN)?
-                                  getStringFieldF(ent, CSUB_ENTITY_ISTYPEPATTERN) : "";
+    bool        isTypePattern = ent.hasField(CSUB_ENTITY_ISTYPEPATTERN)?
+                                  getBoolFieldF(ent, CSUB_ENTITY_ISTYPEPATTERN) : false;
 
     EntID en;
     if (isFalse(isPattern))
@@ -92,11 +92,11 @@ static void setSubject(Subscription* s, const BSONObj& r)
       en.idPattern = id;
     }
 
-    if (isFalse(isTypePattern))
+    if (!isTypePattern)
     {
       en.type = type;
     }
-    else
+    else // isTypePattern
     {
       en.typePattern = type;
     }

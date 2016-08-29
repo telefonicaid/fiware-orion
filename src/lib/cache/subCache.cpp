@@ -75,9 +75,9 @@ volatile SubCacheState subCacheState = ScsIdle;
 * EntityInfo::EntityInfo -
 */
 EntityInfo::EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern,
-                       const std::string& _isTypePattern)
+                       bool _isTypePattern)
 :
-entityId(_entityId), entityType(_entityType)
+entityId(_entityId), entityType(_entityType), isTypePattern(_isTypePattern)
 {
   isPattern    = (_isPattern == "true") || (_isPattern == "TRUE") || (_isPattern == "True");
 
@@ -100,8 +100,6 @@ entityId(_entityId), entityType(_entityType)
   {
     entityIdPatternToBeFreed = false;
   }
-
-  isTypePattern    = (_isTypePattern == "true") || (_isTypePattern == "TRUE") || (_isTypePattern == "True");
 
   if (isTypePattern)
   {
@@ -149,7 +147,8 @@ bool EntityInfo::match
   {
     matchedId =  true;
   }
-  else {
+  else
+  {
     matchedId = false;
   }
 
@@ -207,7 +206,7 @@ void EntityInfo::present(const std::string& prefix)
   LM_T(LmtPresent, ("%sid:        %s", prefix.c_str(), entityId.c_str()));
   LM_T(LmtPresent, ("%sisPattern: %s", prefix.c_str(), FT(isPattern)));
   LM_T(LmtPresent, ("%stype:      %s", prefix.c_str(), entityType.c_str()));
-   LM_T(LmtPresent, ("%sisTypePattern: %s", prefix.c_str(), FT(isTypePattern)));
+  LM_T(LmtPresent, ("%sisTypePattern: %s", prefix.c_str(), FT(isTypePattern)));
 }
 
 

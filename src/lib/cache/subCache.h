@@ -78,7 +78,7 @@ struct EntityInfo
 
   EntityInfo() {}
   EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern,
-             const std::string& _isTypePattern);
+             bool _isTypePattern);
   ~EntityInfo() { release(); }
 
   bool          match(const std::string& idPattern, const std::string& type);
