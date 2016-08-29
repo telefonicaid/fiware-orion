@@ -1,0 +1,90 @@
+/* this file overwrite CSS rules for pdf */
+*{
+	overflow: visible !important;
+}
+
+section h1{
+  page-break-before:always;
+}
+
+tr{
+	page-break-inside:avoid;
+}
+
+h1, h2, h3, h4, h5, h6{
+	page-break-inside:avoid !important;
+	page-break-after: avoid;
+	box-sizing: content-box;
+
+}
+
+div.header{
+	page-break-inside:avoid;
+	display:block;
+	padding-bottom: 5px;
+}
+
+div.header *{
+	page-break-inside:avoid;
+	display:block;
+}
+.exampleButtons:after{
+	clear: both;
+}
+
+@media print{
+@page{
+	margin-bottom: 20%;
+}
+}
+
+pre code{
+
+}
+.resourceGroup{
+	page-break-inside: avoid;
+}
+
+.resource{
+	page-break-inside: avoid;
+}
+
+.goApiary{
+  clear:both;
+  padding-top: 15px;
+  line-height: 2.2em;
+  display:none;
+}
+
+.goExample{
+  display:none;
+}
+
+.goActions{
+  display:none;
+}
+
+#top-source-buttons{
+  display:none;
+}
+
+#TOC-container{
+  display: none;
+}
+
+/* show url for links only if they are externals*/
+
+#references a:link[href^="http://"]:after, a:visited[href^="http://"]:after, 
+#references a:link[href^="https://"]:after, a:visited[href^="https://"]:after,
+#references a:link[href^="ftp://"]:after, a:visited[href^="ftp://"]:after { 
+	content:" (" attr(href) ") "; 
+}
+
+pre, pre code{
+	page-break-inside: auto !important;
+}
+
+.goActions a::after, .goApiary a::after, .goExample a::after{
+    font-family: FontAwesome;
+    content:''
+}

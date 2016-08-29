@@ -1,0 +1,541 @@
+
+body {
+  margin: 0;
+  font-family: verdana !important;
+  color:#404040;
+}
+
+:link { color: #00C; background: transparent }
+:visited { color: #609; background: transparent }
+a:active { color: #C00; background: transparent }
+
+a:link img, a:visited img { border-style: none } 
+
+a{color:#00275a }
+a:hover{color:#00d3de !important}
+
+a img {
+    color: white; 
+}
+
+@media all {                   
+  a img { 
+    color: inherit; 
+    }
+
+}
+
+h1, h2, h3, h4, h5, h6 {
+    text-align: left;
+    color:#00275a !important;font-family:"Neo Tech W02 Medium" !important;
+    word-break: break-word;
+    word-wrap: normal;
+}
+
+h1, h2, h3 {
+    color:#00275a;
+}
+
+
+h1 { 
+    font: 170%;  
+}
+
+h2 { 
+    font: 140%;  
+}
+
+h3 {
+    font: 120%;
+}
+
+h4 {
+    font: bold 100%;
+}
+
+h5 {
+    font: italic 100%;
+}
+
+h6 {
+    font: small-caps 100%;
+}
+
+.header h3, .header span{
+    display: inline-block !important;
+}
+
+.header span{
+    font-weight: bold;
+    margin-bottom: 1em;
+}
+
+table, td, th {
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    border-collapse: collapse;
+    padding: 0.15em;
+    margin-bottom: 16px;
+}
+@media print {
+    .goExample, .goActions {
+        display: none;
+    }
+    
+    /* show url for links only if they are externals*/
+    a:link[href^="http://"]:after, a:visited[href^="http://"]:after, 
+    a:link[href^="https://"]:after, a:visited[href^="https://"]:after,
+    a:link[href^="ftp://"]:after, a:visited[href^="ftp://"]:after { 
+        content:" (" attr(href) ") "; 
+    } 
+}
+
+.packetType{
+    word-break: break-all;
+    word-wrap: break-word;
+}
+
+.selfContainedLink:after{
+    content: "" !important;
+}
+
+#top-source-buttons{
+    margin-top: 5px;
+}
+
+@media speech {
+ h1, h2, h3 {
+    voice-stress: moderate;
+    }
+ .hide {
+    speak: none;
+ }
+ dt { pause-before: 63ms; }
+}
+
+@media (min-width: 980px) {
+  .container{
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+    }
+
+  #TOC-container{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 20%;
+    height: 100%;
+    overflow: auto;
+    min-width: 20%;
+    max-width: 40%;
+    resize:horizontal;
+    background-color: #00275a;
+  }
+
+  #API-content{
+    margin-left: calc(22%);
+  }
+  #API-content{
+    margin-left: calc(20% + 15px);
+  }
+
+  #fiware-logo-container{
+    height: 90px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 600;
+    width: 20%;
+  }
+  #fiware-logo{
+    height: 80px;
+    background: url(../img/fiware.png) no-repeat center center; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    z-index: 600;
+    }
+
+    #fiware-logo::after{
+        position: absolute;
+        top:80px;
+        left: 0;
+        width: 100%;
+        height: 10px;
+        background-color: #00275a;
+        z-index: 500;
+        content: " ";
+    }
+    #toc{
+        margin-top: 90px;
+        height: calc(100% - 95px);/*90 margin 5 resize button */
+        overflow: auto;
+        width: calc(100%);
+        resize: none;
+        background-color: #f5f5f5;
+    }
+    #toc>ul{
+        border: 0px !important;
+    }
+
+  #top-source-buttons{
+    position: fixed;
+    top: 5px;
+    right: 10px;
+  }
+}
+
+#fiware-logo-container{
+    height: 80px;
+  }
+
+#fiware-logo{
+    height: 80px;
+    background-color: white!important;
+    background: url(../img/fiware2.png) no-repeat center center; 
+    -webkit-background-size: contain;
+    -moz-background-size: contain;
+    -o-background-size: contain;
+    background-size: contain;
+}
+
+#TOC-container{
+    background-color: #F5F5F5;
+}
+
+#TOC-container ul{
+    padding-left: 0px !important;
+    margin-left: 0 !important;
+}
+
+#TOC-container ul li{
+    width: 100%;
+    display: block;
+}
+
+#TOC-container li a{
+    display: block;
+    padding-top: 0.37em;
+    padding-bottom: 0.37em;
+    color: #333 ;
+    max-width: 100%;
+    width: 100%;
+    text-decoration: none;
+}
+
+#TOC-container li a:hover{
+    color: #ffffff !important;
+    background-color: #4e4a4a !important;
+    text-decoration: none;
+}
+
+#toc li{
+    font-weight: normal;
+    font-size: 0.97em;
+    line-height: 18px;
+}
+
+#toc>ul>li>a{
+   color: #00275a !important;
+   font-weight: bold;
+
+}
+#TOC-container li a{
+    padding-left: 15px;
+}
+
+#TOC-container li li a{
+    padding-left: 30px;
+}
+
+#TOC-container li li li a{
+    padding-left: 45px;
+}
+
+#TOC-container li li li li a{
+    padding-left: 60px;
+}
+
+#TOC-container li li li li li a{
+    padding-left: 75px;
+}
+
+
+
+#TOC-container h2{
+    margin-left: 15px;
+}
+
+ul.toc, ol.toc {
+  list-style: disc;
+  list-style: none;
+}
+
+.toc li{
+  overflow: hidden;
+  text-overflow: ellipsis; 
+}
+
+
+#toc>ul
+{
+    border-top:10px #00275a solid;
+}
+
+dd{
+    margin-left: 1.2em;
+}
+
+dd dl{
+    margin-bottom: 0px;
+}
+
+.packetType{
+    font-weight: bold;
+    font-style: italic;
+}
+
+.rest-packet-div{
+    margin-top: 15px;
+}
+.parameters-title{
+    font-weight: bold;
+    font-size: 1.1em;
+    display: block;
+}
+
+.parameters-title+dl dl{
+    margin-left:2em;
+}
+
+.parameter-name {
+	padding: 2px 4px;
+	font-size: 90%;
+	color: #C7254E;
+	background-color: #F9F2F4;
+	border-radius: 4px;
+}
+
+.parameter-attributes {
+	font-weight: normal;
+}
+
+.attributes-title{
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.attributes-title+dl dl{
+    margin-left:2em;
+}
+
+.resource{
+    border-left: 5px darkgray solid;
+    margin-top: 5px;
+    padding-left: 5px;
+    background-color: #f7f7f7;
+    margin-bottom: 45px;
+}
+
+.resource dl dd>p{
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.action{
+    border-left: 2px blue solid;
+    margin-top: 5px;
+    margin-bottom: 25px;
+    padding-left: 5px;
+    padding-bottom: 15px;
+}
+
+.action dl dd>p{
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.action:nth-child(even){
+    border-left: 2px orange solid;
+}
+
+.action-header{
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.action.GET{
+    border-left: 2px green solid;
+    background-color:#dff0d8;
+}
+
+.action.POST{
+    border-left: 2px blue solid;
+    background-color:#d9edf7;
+}
+
+.action.PUT{
+    border-left: 2px orange solid;
+    background-color:#fcf8e3;
+}
+
+.action.PATCH{
+    border-left: 2px orange solid;
+    background-color:#fcf8e3;
+}
+
+.action.DELETE{
+    border-left: 2px red solid;
+    background-color:#f2dede;
+}
+
+.action h4, .actionExample h5{
+    font-size: 1.05em;
+    font-style: italic;
+    text-decoration: underline;
+    font-weight: bold;
+}   
+
+.resourceExample{
+    border-left: 5px darkgray solid;
+    margin-top: 5px;
+    padding-left: 5px;
+    background-color: #f7f7f7;
+    margin-bottom: 45px;
+}
+
+.resourceExample dl dd>p{
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.actionExample{
+    border-left: 2px blue solid;
+    margin-top: 5px;
+    margin-bottom: 25px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-bottom: 15px;
+    padding:5px;
+}
+
+.actionExample dl dd>p{
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.actionExample h4{
+    font-size: 1.05em;
+    font-style: italic;
+    text-decoration: underline;
+    font-weight: bold;
+}   
+
+.actionExample.GET{
+    border-left: 2px green solid;
+    background-color:#dff0d8;
+}
+
+.actionExample.POST{
+    border-left: 2px blue solid;
+    background-color:#d9edf7;
+}
+
+.actionExample.PUT{
+    border-left: 2px orange solid;
+    background-color:#fcf8e3;
+}
+
+.actionExample.PATCH{
+    border-left: 2px orange solid;
+    background-color:#fcf8e3;
+}
+
+.actionExample.DELETE{
+    border-left: 2px red solid;
+    background-color:#f2dede;
+}
+
+.payload-title{
+    font-size: 1.08em;
+    font-weight: normal;
+    text-decoration: underline;
+    margin-bottom: 7px;
+    display: block;
+}
+
+.packetType ~ .payload-title{
+    font-size: 1em;
+    display: block;
+    margin-top: 5px;
+}
+
+.action{
+    overflow: hidden;
+}
+
+.btn-neutral{background-color:#00d3de !important;color:#fff !important}
+.btn{box-shadow:0 0 0 !important;border:0 !important;border-radius:0 !important}
+.btn-neutral:hover{background-color:#00d3de !important;color:#fff !important}
+
+.goExample{
+    margin-top: 20px;
+    margin-right: 10px;
+    display: inline-block;
+}
+
+
+.goApiary {
+    margin-top: 20px;
+    display: inline-block;
+}
+
+
+
+.goActions {
+    margin-top: 20px;
+}
+
+
+.goActions a, .goApiary a, .goExample a, #top-source-buttons a{
+    padding: 0.25em;
+    background-color:#00d3de !important;
+    color:black !important;
+    border: 0;
+    text-decoration: none;
+}
+.goActions a::after, .goApiary a::after, .goExample a::after, #top-source-buttons a::after{
+    font-family: FontAwesome;
+    content:' \f0a9'
+}
+
+.goActions a:hover, .goApiary a:hover, .goExample a:hover, #top-source-buttons a:hover{
+    color:#fff !important;
+    text-decoration: none;
+}
+
+
+.dateLabel, .dateValue{
+    font-size: 1.2em;
+    color: #ababab;
+}
+
+.versionValue{
+    margin-left: 20px;
+}
+
+
+.api-summary .actionMethod{
+    width: 4em;
+    display: inline-table;
+}
+
