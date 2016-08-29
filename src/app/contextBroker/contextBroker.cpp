@@ -407,6 +407,7 @@ PaArgument paArgs[] =
 static const char* validLogLevels[] = 
 {
   "NONE",
+  "FATAL",
   "ERROR",
   "WARN",
   "INFO",

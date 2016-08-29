@@ -76,11 +76,7 @@ std::string changeLogLevel
       (strcasecmp(levelP, "info")    == 0) ||
       (strcasecmp(levelP, "debug")   == 0))
   {
-    if (strcasecmp(levelP, "fatal") == 0)
-    {
-      level = "NONE";
-    }
-    else if (strcasecmp(levelP, "warning") == 0)
+    if (strcasecmp(levelP, "warning") == 0)
     {
       level = "WARN";
     }
@@ -112,11 +108,6 @@ std::string getLogLevel
 )
 {
   std::string  level = lmLevelMaskStringGet();
-
-  if (level == "NONE")
-  {
-    level = "FATAL";
-  }
 
   return "{\"level\":\"" + level + "\"}";
 }

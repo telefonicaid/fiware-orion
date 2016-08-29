@@ -78,7 +78,7 @@ char            paLogLevel[256];
 #define PAI_REST         PafUnchanged, { 'N', 'a', 'm', 'e', 0 }, 0, 0, false, false, false, true, false, false, 0
 #define PAI_REST_U       PafUnchanged, { 'N', 'a', 'm', 'e', 0 }, 0, 0, false, false, false, true, false, true,  0
 #define PAI_END_OF_ARGS  { "^D", NULL, "NADA", PaLastArg, PaReq, 0, 0, 0, "", PAI_REST }
-#define LOGLEVEL_DESC    "initial log level (NONE, ERROR, WARN, INFO, DEBUG)"
+#define LOGLEVEL_DESC    "initial log level (NONE, FATAL, ERROR, WARN, INFO, DEBUG)"
 
 /* ****************************************************************************
 *
