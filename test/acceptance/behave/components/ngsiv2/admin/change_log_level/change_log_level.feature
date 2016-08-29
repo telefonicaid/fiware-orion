@@ -46,7 +46,7 @@ Feature: change the log level in Context Broker
   Setup: stop ContextBroker
 
 
-  @change_log_level @BUG_2419 @skip
+  @change_log_level @BUG_2419
   Scenario Outline: change the log level in Context Broker
     When change the log level
       | parameter | value       |
@@ -70,20 +70,27 @@ Feature: change the log level in Context Broker
     Then verify that receive an "Bad Request" http code
     And verify admin error "log level missing"
 
-  @change_log_level_unknown @ISSUE_2420 @skip
-  Scenario Outline: try to change the log level in Context Broker with unknown level
+  @change_log_level_unknown @ISSUE_2420
+  Scenario: try to change the log level in Context Broker with unknown level
     When change the log level
-      | parameter | value       |
-      | level     | <log_level> |
+      | parameter | value    |
+      | level     | vcbvcbvc |
     Then verify that receive an "Bad Request" http code
     And verify admin error "invalid log level"
-    Examples:
-      | log_level |
-      |           |
-      | vcbvcbvc  |
 
-  @change_log_level_traces  @BUG_2419 @skip
+  @change_log_level_empty @ISSUE_2420
+  Scenario: try to change the log level in Context Broker with emtpty value
+    When change the log level
+      | parameter | value |
+      | level     |       |
+    Then verify that receive an "Bad Request" http code
+    And verify admin error "Empty right-hand-side for URI param /level/"
+
+  @change_log_level_traces @BUG_2419
   Scenario Outline: change the log level in Context Broker and verify log traces
+    Given change the log level
+      | parameter | value |
+      | level     | DEBUG |
     When change the log level
       | parameter | value       |
       | level     | <log_level> |
