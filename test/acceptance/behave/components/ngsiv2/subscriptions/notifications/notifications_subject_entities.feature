@@ -118,9 +118,9 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @without_service_path
   Scenario:  send a notification using NGSI v2 without service path header
     Given  a definition of headers
-      | parameter      | value              |
-      | Fiware-Service | test_notif_expires |
-      | Content-Type   | application/json   |
+      | parameter      | value               |
+      | Fiware-Service | test_notif_entities |
+      | Content-Type   | application/json    |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter             | value                           |
@@ -184,10 +184,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @id
   Scenario Outline:  send a notification using NGSI v2 with subject-id field
     Given  a definition of headers
-      | parameter          | value              |
-      | Fiware-Service     | test_notif_expires |
-      | Fiware-ServicePath | /test              |
-      | Content-Type       | application/json   |
+      | parameter          | value               |
+      | Fiware-Service     | test_notif_entities |
+      | Fiware-ServicePath | /test               |
+      | Content-Type       | application/json    |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter             | value                           |
@@ -233,10 +233,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @id_multiples
   Scenario:  send a notification using NGSI v2 with subject-id field
     Given  a definition of headers
-      | parameter          | value              |
-      | Fiware-Service     | test_notif_expires |
-      | Fiware-ServicePath | /test              |
-      | Content-Type       | application/json   |
+      | parameter          | value               |
+      | Fiware-Service     | test_notif_entities |
+      | Fiware-ServicePath | /test               |
+      | Content-Type       | application/json    |
    # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter             | value                           |
@@ -269,10 +269,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @id_entities_multiples
   Scenario:  send a notification using NGSI v2 with multiples subject-entities field
     Given  a definition of headers
-      | parameter          | value              |
-      | Fiware-Service     | test_notif_expires |
-      | Fiware-ServicePath | /test              |
-      | Content-Type       | application/json   |
+      | parameter          | value               |
+      | Fiware-Service     | test_notif_entities |
+      | Fiware-ServicePath | /test               |
+      | Content-Type       | application/json    |
    # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter               | value                           |
@@ -307,10 +307,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @id_pattern
   Scenario Outline:  send a notification using NGSI v2 with subject-idPattern field
     Given  a definition of headers
-      | parameter          | value              |
-      | Fiware-Service     | test_notif_expires |
-      | Fiware-ServicePath | /test              |
-      | Content-Type       | application/json   |
+      | parameter          | value               |
+      | Fiware-Service     | test_notif_entities |
+      | Fiware-ServicePath | /test               |
+      | Content-Type       | application/json    |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter             | value                           |
@@ -354,10 +354,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @type
   Scenario Outline:  send a notification using NGSI v2 with subject-type field
     Given  a definition of headers
-      | parameter          | value              |
-      | Fiware-Service     | test_notif_expires |
-      | Fiware-ServicePath | /test              |
-      | Content-Type       | application/json   |
+      | parameter          | value               |
+      | Fiware-Service     | test_notif_entities |
+      | Fiware-ServicePath | /test               |
+      | Content-Type       | application/json    |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter             | value                           |
@@ -404,10 +404,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @type_multiples
   Scenario:  send a notification using NGSI v2 with subject-type field
     Given  a definition of headers
-      | parameter          | value              |
-      | Fiware-Service     | test_notif_expires |
-      | Fiware-ServicePath | /test              |
-      | Content-Type       | application/json   |
+      | parameter          | value               |
+      | Fiware-Service     | test_notif_entities |
+      | Fiware-ServicePath | /test               |
+      | Content-Type       | application/json    |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter             | value                           |
@@ -441,10 +441,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @type_entities_multiples
   Scenario:  send a notification using NGSI v2 with multiples subject-entities field
     Given  a definition of headers
-      | parameter          | value              |
-      | Fiware-Service     | test_notif_expires |
-      | Fiware-ServicePath | /test              |
-      | Content-Type       | application/json   |
+      | parameter          | value               |
+      | Fiware-Service     | test_notif_entities |
+      | Fiware-ServicePath | /test               |
+      | Content-Type       | application/json    |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter               | value                           |
@@ -480,10 +480,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @type_pattern @ISSUE_1853 @skip
   Scenario Outline:  send a notification using NGSI v2 with subject-typePattern field
     Given  a definition of headers
-      | parameter          | value              |
-      | Fiware-Service     | test_notif_expires |
-      | Fiware-ServicePath | /test              |
-      | Content-Type       | application/json   |
+      | parameter          | value               |
+      | Fiware-Service     | test_notif_entities |
+      | Fiware-ServicePath | /test               |
+      | Content-Type       | application/json    |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter             | value                           |
