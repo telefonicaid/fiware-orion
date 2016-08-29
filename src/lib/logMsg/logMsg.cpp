@@ -557,6 +557,10 @@ void lmLevelMaskSetString(char* level)
   {
     lmLevelMask = 0;
   }
+  else if (strcasecmp(level, "FATAL") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+  }
   else if (strcasecmp(level, "ERROR") == 0)
   {
     lmLevelMask  = LogLevelExit;
@@ -648,6 +652,10 @@ std::string lmLevelMaskStringGet(void)
   else if (lmLevelMask & LogLevelError)
   {
     return "ERROR";
+  }
+  else if (lmLevelMask & LogLevelExit)
+  {
+    return "FATAL";
   }
   else
   {
