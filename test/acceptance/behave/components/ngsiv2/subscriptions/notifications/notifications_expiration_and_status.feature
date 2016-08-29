@@ -55,10 +55,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @expires
   Scenario:  send a notification using NGSI v2 with expires field
     Given  a definition of headers
-      | parameter          | value             |
-      | Fiware-Service     | test_csub_expires |
-      | Fiware-ServicePath | /test             |
-      | Content-Type       | application/json  |
+      | parameter          | value              |
+      | Fiware-Service     | test_notif_expires |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter             | value                           |
@@ -89,10 +89,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @expires_without
   Scenario:  send a notification using NGSI v2 without expires field (permanent)
     Given  a definition of headers
-      | parameter          | value             |
-      | Fiware-Service     | test_csub_expires |
-      | Fiware-ServicePath | /test             |
-      | Content-Type       | application/json  |
+      | parameter          | value              |
+      | Fiware-Service     | test_notif_expires |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter             | value                           |
@@ -123,10 +123,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @expires_expired
   Scenario:  not send a notification using NGSI v2 with expires field with the date expired
     Given  a definition of headers
-      | parameter          | value             |
-      | Fiware-Service     | test_csub_expired |
-      | Fiware-ServicePath | /test             |
-      | Content-Type       | application/json  |
+      | parameter          | value              |
+      | Fiware-Service     | test_notif_expired |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter             | value                           |
@@ -158,10 +158,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @status
   Scenario:  send a notification using NGSI v2 without status field
     Given  a definition of headers
-      | parameter          | value             |
-      | Fiware-Service     | test_csub_expires |
-      | Fiware-ServicePath | /test             |
-      | Content-Type       | application/json  |
+      | parameter          | value              |
+      | Fiware-Service     | test_notif_expires |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter             | value                           |
@@ -191,10 +191,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @status_active
   Scenario:  send a notification using NGSI v2 with status field equals to active
     Given  a definition of headers
-      | parameter          | value             |
-      | Fiware-Service     | test_csub_expires |
-      | Fiware-ServicePath | /test             |
-      | Content-Type       | application/json  |
+      | parameter          | value              |
+      | Fiware-Service     | test_notif_expires |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter             | value                           |
@@ -225,10 +225,10 @@ Feature: verify notifications from subscriptions with diferent formats using NGS
   @status_inactive
   Scenario:  send a notification using NGSI v2 with status field equals to inactive
     Given  a definition of headers
-      | parameter          | value             |
-      | Fiware-Service     | test_csub_expired |
-      | Fiware-ServicePath | /test             |
-      | Content-Type       | application/json  |
+      | parameter          | value              |
+      | Fiware-Service     | test_notif_expired |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
     # These properties below are used in subscriptions request
     And properties to subscriptions
       | parameter             | value                           |
