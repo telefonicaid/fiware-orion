@@ -400,7 +400,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
           return badInput(ciP, "subject entities element typePattern is empty");
         }
 
-        typePattern =typePatOpt.value;
+        typePattern = typePatOpt.value;
 
         // FIXME P5: Keep the regex and propagate to sub-cache
         regex_t re;
