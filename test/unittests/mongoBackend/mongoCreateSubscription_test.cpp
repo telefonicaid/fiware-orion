@@ -57,8 +57,8 @@ TEST(mongoCreateSubscriptions, createSubscriptionNotCustomOK)
   sub.throttling  = 5;
   sub.attrsFormat = NGSI_V2_NORMALIZED;
 
-  EntID en1("E1", "", "T1");
-  EntID en2("", "E.*", "T2");
+  EntID en1("E1", "", "T1", "");
+  EntID en2("", "E.*", "T2", "");
   sub.subject.entities.push_back(en1);
   sub.subject.entities.push_back(en2);
   sub.subject.condition.attributes.push_back("A");
@@ -148,8 +148,8 @@ TEST(mongoCreateSubscriptions, createSubscriptionCustomOK)
   sub.throttling  = 5;
   sub.attrsFormat = NGSI_V2_NORMALIZED;
 
-  EntID en1("E1", "", "T1");
-  EntID en2("", "E.*", "T2");
+  EntID en1("E1", "", "T1", "");
+  EntID en2("", "E.*", "T2", "");
   sub.subject.entities.push_back(en1);
   sub.subject.entities.push_back(en2);
   sub.subject.condition.attributes.push_back("A");

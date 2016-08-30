@@ -198,6 +198,10 @@ namespace ngsiv2
     {
       jh.addString("type", this->type);
     }
+    if (!this->typePattern.empty())
+    {
+      jh.addString("typePattern", this->typePattern);
+    }
 
     return jh.str();
   }
