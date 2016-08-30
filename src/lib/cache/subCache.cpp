@@ -90,6 +90,7 @@ entityId(_entityId), entityType(_entityType), isTypePattern(_isTypePattern)
       alarmMgr.badInput(clientIp, "invalid regular expression for idPattern");
       isPattern = false;  // FIXME P6: this entity should not be let into the system. Must be stopped before.
                           //           Right here, best thing to do is simply to say it is not a regex
+      entityIdPatternToBeFreed = false;
     }
     else
     {
@@ -110,6 +111,7 @@ entityId(_entityId), entityType(_entityType), isTypePattern(_isTypePattern)
       alarmMgr.badInput(clientIp, "invalid regular expression for typePattern");
       isTypePattern = false;  // FIXME P6: this entity should not be let into the system. Must be stopped before.
                           //           Right here, best thing to do is simply to say it is not a regex
+      entityTypePatternToBeFreed = false;
     }
     else
     {
