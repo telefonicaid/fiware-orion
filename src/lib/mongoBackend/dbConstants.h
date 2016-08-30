@@ -99,7 +99,6 @@
 #define CSUB_QS                    "qs"
 #define CSUB_PAYLOAD               "payload"
 #define CSUB_BLACKLIST             "blacklist"
-
 #define CASUB_EXPIRATION        "expiration"
 #define CASUB_REFERENCE         "reference"
 #define CASUB_ENTITIES          "entities"

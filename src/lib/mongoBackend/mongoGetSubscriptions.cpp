@@ -75,10 +75,12 @@ static void setSubject(Subscription* s, const BSONObj& r)
   std::vector<BSONElement> ents = getFieldF(r, CSUB_ENTITIES).Array();
   for (unsigned int ix = 0; ix < ents.size(); ++ix)
   {
-    BSONObj ent           = ents[ix].embeddedObject();
-    std::string id        = getStringFieldF(ent, CSUB_ENTITY_ID);
-    std::string type      = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
-    std::string isPattern = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
+    BSONObj ent               = ents[ix].embeddedObject();
+    std::string id            = getStringFieldF(ent, CSUB_ENTITY_ID);
+    std::string type          = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
+    std::string isPattern     = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
+    bool        isTypePattern = ent.hasField(CSUB_ENTITY_ISTYPEPATTERN)?
+                                  getBoolFieldF(ent, CSUB_ENTITY_ISTYPEPATTERN) : false;
 
     EntID en;
     if (isFalse(isPattern))
@@ -89,7 +91,16 @@ static void setSubject(Subscription* s, const BSONObj& r)
     {
       en.idPattern = id;
     }
-    en.type = type;
+
+    if (!isTypePattern)
+    {
+      en.type = type;
+    }
+    else // isTypePattern
+    {
+      en.typePattern = type;
+    }
+
 
     s->subject.entities.push_back(en);
   }
