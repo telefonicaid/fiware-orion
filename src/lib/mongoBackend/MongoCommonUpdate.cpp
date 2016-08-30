@@ -1086,7 +1086,7 @@ static bool addTriggeredSubscriptions_withCache
   std::string                               tenant,
   const std::vector<std::string>&           servicePathV
 )
-{  
+{
   std::string                       servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::vector<CachedSubscription*>  subVec;
 
