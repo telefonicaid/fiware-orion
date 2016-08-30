@@ -208,6 +208,9 @@ void setEntities(const Subscription& sub, BSONObjBuilder* b)
     std::string isIdPattern;
     bool        isTypePattern = false;
 
+    // Note that, due to legacy reasons, isPattern may be "true" or "false" (text)
+    // while isTypePattern may be true or false (boolean).
+
     if (en.idPattern != "")
     {
       finalId = en.idPattern;
