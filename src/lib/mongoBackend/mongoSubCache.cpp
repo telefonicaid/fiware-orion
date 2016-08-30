@@ -57,7 +57,6 @@ using namespace mongo;
 *  -1:  Database Error - id-field not found
 *  -2:  Out of memory (either returns -2 or exit the entire broker)
 *  -3:  No patterned entity found
-*  -4:  The vector of notify-conditions is empty
 *  -5:  Error parsing string filter
 *  -6:  Error parsing metadata string filter
 *
@@ -223,24 +222,12 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
 
   //
-  // 07. Fill in cSubP->notifyConditionVector from condVec
-  // FIXME #1851: CachedSubscription class must be modified to use just a std::vector<string> instead of NotifyCondition
+  // 07. Fill in cSubP->notifyConditionV from condVec
   //
-  NotifyCondition* ncP = new NotifyCondition();
-  ncP->type = ON_CHANGE_CONDITION;
   for (unsigned int ix = 0; ix < condVec.size(); ++ix)
   {
     std::string attr = condVec[ix].String();
-    ncP->condValueList.push_back(attr);
-  }
-  cSubP->notifyConditionVector.push_back(ncP);
-
-  if (cSubP->notifyConditionVector.size() == 0)  // Cleanup
-  {
-    LM_E(("ERROR (empty notifyConditionVector) - cleaning up"));
-    subCacheItemDestroy(cSubP);
-    delete cSubP;
-    return -4;
+    cSubP->notifyConditionV.push_back(attr);
   }
 
   subCacheItemInsert(cSubP);
@@ -426,19 +413,14 @@ int mongoSubCacheItemInsert
 
 
   //
-  // 07. Fill in cSubP->notifyConditionVector from condVec
-  // FIXME #1851: CachedSubscription class must be modified to use just a std::vector<string> instead of NotifyCondition
+  // 07. Fill in cSubP->notifyConditionV from condVec
   //
-  NotifyCondition* ncP = new NotifyCondition();
-  ncP->type = ON_CHANGE_CONDITION;
   for (unsigned int ix = 0; ix < condVec.size(); ++ix)
   {
-    std::string attr = condVec[ix].String();
-    ncP->condValueList.push_back(attr);
+    cSubP->notifyConditionV.push_back(condVec[ix].String());
   }
-  cSubP->notifyConditionVector.push_back(ncP);
 
-  if (cSubP->notifyConditionVector.size() == 0)
+  if (cSubP->notifyConditionV.size() == 0)
   {
     subCacheItemDestroy(cSubP);
     delete cSubP;
@@ -500,7 +482,6 @@ void mongoSubCacheRefresh(const std::string& database)
     }
 
     int r = mongoSubCacheItemInsert(tenant.c_str(), sub);
-
     if (r == 0)
     {
       ++subNo;

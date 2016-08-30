@@ -196,7 +196,6 @@ bool             subCacheMultitenant = false;
 void subCacheInit(bool multitenant)
 {
   LM_T(LmtSubCache, ("Initializing subscription cache"));
-
   subCacheMultitenant = multitenant;
 
   subCache.head   = NULL;
@@ -249,23 +248,18 @@ int subCacheItems(void)
 */
 static bool attributeMatch(CachedSubscription* cSubP, const std::vector<std::string>& attrV)
 {
-  for (unsigned int ncvIx = 0; ncvIx < cSubP->notifyConditionVector.size(); ++ncvIx)
+  if (cSubP->notifyConditionV.size() == 0)
   {
-    NotifyCondition* ncP = cSubP->notifyConditionVector[ncvIx];
+    return true;
+  }
 
-    if (ncP->condValueList.size() == 0)
+  for (unsigned int ncvIx = 0; ncvIx < cSubP->notifyConditionV.size(); ++ncvIx)
+  {
+    for (unsigned int aIx = 0; aIx < attrV.size(); ++aIx)
     {
-      return true;
-    }
-
-    for (unsigned int cvIx = 0; cvIx < ncP->condValueList.size(); ++cvIx)
-    {
-      for (unsigned int aIx = 0; aIx < attrV.size(); ++aIx)
+      if (cSubP->notifyConditionV[ncvIx] == attrV[aIx])
       {
-        if (ncP->condValueList[cvIx] == attrV[aIx])
-        {
-          return true;
-        }
+        return true;
       }
     }
   }
@@ -529,8 +523,7 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
   }
   cSubP->attributes.clear();
 
-  cSubP->notifyConditionVector.release();
-  cSubP->notifyConditionVector.vec.clear();
+  cSubP->notifyConditionV.clear();
 
   cSubP->next = NULL;
 }
@@ -690,57 +683,33 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 */
 void subCacheItemInsert
 (
-  const char*                   tenant,
-  const char*                   servicePath,
-  const ngsiv2::HttpInfo&       httpInfo,
-  const EntityIdVector&         entityIdVector,
-  const AttributeList&          attributeList,
-  const NotifyConditionVector&  notifyConditionVector,
-  const char*                   subscriptionId,
-  int64_t                       expirationTime,
-  int64_t                       throttling,
-  RenderFormat                  renderFormat,
-  bool                          notificationDone,
-  int64_t                       lastNotificationTime,
-  StringFilter*                 stringFilterP,
-  StringFilter*                 mdStringFilterP,
-  const std::string&            status,
-  const std::string&            q,
-  const std::string&            geometry,
-  const std::string&            coords,
-  const std::string&            georel,
-  bool                          blacklist
+  const char*                      tenant,
+  const char*                      servicePath,
+  const ngsiv2::HttpInfo&          httpInfo,
+  const EntityIdVector&            entityIdVector,
+  const AttributeList&             attributeList,
+  const std::vector<std::string>&  notifyConditionV,
+  const char*                      subscriptionId,
+  int64_t                          expirationTime,
+  int64_t                          throttling,
+  RenderFormat                     renderFormat,
+  bool                             notificationDone,
+  int64_t                          lastNotificationTime,
+  StringFilter*                    stringFilterP,
+  StringFilter*                    mdStringFilterP,
+  const std::string&               status,
+  const std::string&               q,
+  const std::string&               geometry,
+  const std::string&               coords,
+  const std::string&               georel,
+  bool                             blacklist
 )
 {
   //
   // Add the subscription to the subscription cache.
-  // But only if any of the entities in entityIdVector is pattern based -
-  // AND it is a subscription of type ONCHANGE
+  // But only if any of the entities in entityIdVector is pattern based - is this true?
   //
 
-  //
-  // 00. Check that the subscription is pattern based an ONCHANGE
-  //
-  bool onchange = false;
-
-  for (unsigned int ix = 0; ix < notifyConditionVector.size(); ++ix)
-  {
-    if (strcasecmp(notifyConditionVector[ix]->type.c_str(), ON_CHANGE_CONDITION) == 0)
-    {
-      onchange = true;
-      break;
-    }
-  }
-
-  if (!onchange)
-  {
-    return;
-  }
-
-
-  //
-  // Now allocate the subscription
-  //
   CachedSubscription* cSubP = new CachedSubscription();
   LM_T(LmtSubCache,  ("allocated CachedSubscription at %p", cSubP));
 
@@ -765,7 +734,16 @@ void subCacheItemInsert
   cSubP->blacklist             = blacklist;
   cSubP->httpInfo              = httpInfo;
 
+  // cSubP->notifyConditionV = notifyConditionV; ???
+  for (unsigned int ix = 0; ix < notifyConditionV.size(); ++ix)
+  {
+    cSubP->notifyConditionV.push_back(notifyConditionV[ix]);
+  }
 
+
+  //
+  // 2. String filters
+  //
   std::string  errorString;
   if (stringFilterP != NULL)
   {
@@ -788,12 +766,6 @@ void subCacheItemInsert
 
   LM_T(LmtSubCache, ("inserting a new sub in cache (%s). lastNotifictionTime: %lu",
                      cSubP->subscriptionId, cSubP->lastNotificationTime));
-
-
-  //
-  // 2. Then the values that have functions/methods for filling/parsing
-  //
-  cSubP->notifyConditionVector.fill(notifyConditionVector);
 
 
   //
@@ -825,6 +797,7 @@ void subCacheItemInsert
   //
   LM_T(LmtSubCache, ("Inserting NEW sub '%s', lastNotificationTime: %lu",
                      cSubP->subscriptionId, cSubP->lastNotificationTime));
+
   subCacheItemInsert(cSubP);
 }
 
@@ -861,11 +834,9 @@ void subCacheItemInsert
   bool                               blacklist
 )
 {
-  NotifyConditionVector ncV;
   EntityIdVector        enV;
   AttributeList         attrL;
 
-  attrsStdVector2NotifyConditionVector(condAttributes, &ncV);
   entIdStdVector2EntityIdVector(entities, &enV);
   attrL.fill(notifAttributes);
 
@@ -874,7 +845,7 @@ void subCacheItemInsert
                      httpInfo,
                      enV,
                      attrL,
-                     ncV,
+                     condAttributes,
                      subscriptionId,
                      expiration,
                      throttling,
@@ -891,7 +862,6 @@ void subCacheItemInsert
                      blacklist);
 
   enV.release();
-  ncV.release();
 }
 
 
