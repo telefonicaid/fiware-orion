@@ -759,7 +759,6 @@ void subCacheItemInsert
 {
   //
   // Add the subscription to the subscription cache.
-  // But only if any of the entities in entityIdVector is pattern based - is this true?
   //
 
   CachedSubscription* cSubP = new CachedSubscription();
@@ -785,12 +784,7 @@ void subCacheItemInsert
   cSubP->expression.georel     = georel;
   cSubP->blacklist             = blacklist;
   cSubP->httpInfo              = httpInfo;
-
-  // cSubP->notifyConditionV = notifyConditionV; ???
-  for (unsigned int ix = 0; ix < notifyConditionV.size(); ++ix)
-  {
-    cSubP->notifyConditionV.push_back(notifyConditionV[ix]);
-  }
+  cSubP->notifyConditionV      = notifyConditionV;
 
 
   //
