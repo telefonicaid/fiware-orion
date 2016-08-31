@@ -268,7 +268,9 @@ std::string getEntities
 
   if (!typePattern.empty())
   {
-    EntityId* entityId = new EntityId(pattern, typePattern, idPattern == ""?"false":"true", true);
+
+    bool      isIdPattern = (idPattern != "" || pattern == ".*");
+    EntityId* entityId    = new EntityId(pattern, typePattern, isIdPattern ? "true" : "false", true);
 
     parseDataP->qcr.res.entityIdVector.push_back(entityId);
   }
