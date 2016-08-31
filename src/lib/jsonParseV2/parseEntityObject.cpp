@@ -99,6 +99,23 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
       eP->type      = iter->value.GetString();
       eP->typeGiven = true;
     }
+    else if (name == "typePattern")
+    {
+      if (type != "String")
+      {
+        return "invalid JSON type for entity typePattern";
+      }
+
+      regex_t re;
+      if (regcomp(&re, iter->value.GetString(), REG_EXTENDED) != 0)
+      {
+        return "invalid regex for entity type pattern";
+      }
+      regfree(&re);
+
+      eP->type          = iter->value.GetString();
+      eP->isTypePattern = true;
+    }
     else
     {
       std::string r;

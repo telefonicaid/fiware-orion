@@ -33,9 +33,9 @@ brokerStart CB
 # 01. Create E1 with type T1
 # 02. Create E2 with type T12
 # 03. Create E3 with type T2
-# 04. GET /v2/entities?type=T.* - see all three
-# 05. GET /v2/entities?type=T1.* - see E1 and E2
-# 06. GET /v2/entities?type=T1.*&idPattern=E.* - see E1 and E2
+# 04. GET /v2/entities?typePattern=T.* - see all three
+# 05. GET /v2/entities?typePattern=T1.* - see E1 and E2
+# 06. GET /v2/entities?typePattern=T1.*&idPattern=E.* - see E1 and E2
 # 07. GET entities with type T.*, using POST /v2/op/query - see all three
 # 08. GET entities with type T1.*, using POST /v2/op/query - see all E1 and E2
 # 09. GET entities with id E.* and type T.*, using POST /v2/op/query - see all three
@@ -75,23 +75,23 @@ echo
 echo
 
 
-echo "04. GET /v2/entities?type=T.* - see all three"
-echo "============================================="
-orionCurl --url '/v2/entities?type=T.*'
+echo "04. GET /v2/entities?typePattern=T.* - see all three"
+echo "===================================================="
+orionCurl --url '/v2/entities?typePattern=T.*'
 echo
 echo
 
 
-echo "05. GET /v2/entities?type=T1.* - see E1 and E2"
-echo "=============================================="
-orionCurl --url '/v2/entities?type=T1.*'
+echo "05. GET /v2/entities?typePattern=T1.* - see E1 and E2"
+echo "====================================================="
+orionCurl --url '/v2/entities?typePattern=T1.*'
 echo
 echo
 
 
-echo "06. GET /v2/entities?type=T1.*&idPattern=E.* - see E1 and E2"
-echo "============================================================"
-orionCurl --url '/v2/entities?type=T1.*&idPattern=E.*'
+echo "06. GET /v2/entities?typePattern=T1.*&idPattern=E.* - see E1 and E2"
+echo "==================================================================="
+orionCurl --url '/v2/entities?typePattern=T1.*&idPattern=E.*'
 echo
 echo
 
@@ -173,10 +173,10 @@ Date: REGEX(.*)
 
 
 
-04. GET /v2/entities?type=T.* - see all three
-=============================================
+04. GET /v2/entities?typePattern=T.* - see all three
+====================================================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 74
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -197,10 +197,10 @@ Date: REGEX(.*)
 ]
 
 
-05. GET /v2/entities?type=T1.* - see E1 and E2
-==============================================
+05. GET /v2/entities?typePattern=T1.* - see E1 and E2
+=====================================================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 50
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -217,10 +217,10 @@ Date: REGEX(.*)
 ]
 
 
-06. GET /v2/entities?type=T1.*&idPattern=E.* - see E1 and E2
-============================================================
+06. GET /v2/entities?typePattern=T1.*&idPattern=E.* - see E1 and E2
+===================================================================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 50
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -235,13 +235,12 @@ Date: REGEX(.*)
         "type": "T12"
     }
 ]
-
 
 
 07. GET entities with type T.*, using POST /v2/op/query - see all three
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length:
+Content-Length: 74
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -265,7 +264,7 @@ Date: REGEX(.*)
 08. GET entities with type T1.*, using POST /v2/op/query - see all E1 and E2
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length:
+Content-Length: 50
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -285,7 +284,7 @@ Date: REGEX(.*)
 09. GET entities with id E.* and type T.*, using POST /v2/op/query - see all three
 ==================================================================================
 HTTP/1.1 200 OK
-Content-Length:
+Content-Length: 74
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
