@@ -30,10 +30,11 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
 #include "common/sem.h"
 #include "common/string.h"
 #include "apiTypesV2/HttpInfo.h"
-#include "apiTypesV2/ngsiWrappers.h"
+#include "apiTypesV2/Subscription.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/SubscribeContextRequest.h"
@@ -74,8 +75,13 @@ volatile SubCacheState subCacheState = ScsIdle;
 *
 * EntityInfo::EntityInfo -
 */
-EntityInfo::EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern,
-                       bool _isTypePattern)
+EntityInfo::EntityInfo
+(
+  const std::string&  _entityId,
+  const std::string&  _entityType,
+  const std::string&  _isPattern,
+  bool                _isTypePattern
+)
 :
 entityId(_entityId), entityType(_entityType), isTypePattern(_isTypePattern)
 {
@@ -735,26 +741,26 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 */
 void subCacheItemInsert
 (
-  const char*                      tenant,
-  const char*                      servicePath,
-  const ngsiv2::HttpInfo&          httpInfo,
-  const EntityIdVector&            entityIdVector,
-  const AttributeList&             attributeList,
-  const std::vector<std::string>&  notifyConditionV,
-  const char*                      subscriptionId,
-  int64_t                          expirationTime,
-  int64_t                          throttling,
-  RenderFormat                     renderFormat,
-  bool                             notificationDone,
-  int64_t                          lastNotificationTime,
-  StringFilter*                    stringFilterP,
-  StringFilter*                    mdStringFilterP,
-  const std::string&               status,
-  const std::string&               q,
-  const std::string&               geometry,
-  const std::string&               coords,
-  const std::string&               georel,
-  bool                             blacklist
+  const char*                        tenant,
+  const char*                        servicePath,
+  const ngsiv2::HttpInfo&            httpInfo,
+  const std::vector<ngsiv2::EntID>&  entIdVector,
+  const std::vector<std::string>&    attributes,
+  const std::vector<std::string>&    conditionAttrs,
+  const char*                        subscriptionId,
+  int64_t                            expirationTime,
+  int64_t                            throttling,
+  RenderFormat                       renderFormat,
+  bool                               notificationDone,
+  int64_t                            lastNotificationTime,
+  StringFilter*                      stringFilterP,
+  StringFilter*                      mdStringFilterP,
+  const std::string&                 status,
+  const std::string&                 q,
+  const std::string&                 geometry,
+  const std::string&                 coords,
+  const std::string&                 georel,
+  bool                               blacklist
 )
 {
   //
@@ -766,7 +772,7 @@ void subCacheItemInsert
 
 
   //
-  // 1. First the non-complex values
+  // First the non-complex values
   //
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->servicePath           = strdup(servicePath);
@@ -784,11 +790,12 @@ void subCacheItemInsert
   cSubP->expression.georel     = georel;
   cSubP->blacklist             = blacklist;
   cSubP->httpInfo              = httpInfo;
-  cSubP->notifyConditionV      = notifyConditionV;
+  cSubP->notifyConditionV      = conditionAttrs;
+  cSubP->attributes            = attributes;
 
 
   //
-  // 2. String filters
+  // String filters
   //
   std::string  errorString;
   if (stringFilterP != NULL)
@@ -810,104 +817,32 @@ void subCacheItemInsert
     cSubP->expression.mdStringFilter.fill(mdStringFilterP, &errorString);
   }
 
-  LM_T(LmtSubCache, ("inserting a new sub in cache (%s). lastNotifictionTime: %lu",
-                     cSubP->subscriptionId, cSubP->lastNotificationTime));
 
 
   //
-  // 3. Convert all EntityIds to EntityInfo
+  // Convert all EntIds to EntityInfo
   //
-  for (unsigned int ix = 0; ix < entityIdVector.vec.size(); ++ix)
+  for (unsigned int ix = 0; ix < entIdVector.size(); ++ix)
   {
-    EntityId* eIdP;
+    const ngsiv2::EntID* eIdP = &entIdVector[ix];
+    std::string          isPattern      = (eIdP->id   == "")? "true" : "false";
+    bool                 isTypePattern  = (eIdP->type == "");
+    std::string          id             = (eIdP->id   == "")? eIdP->idPattern   : eIdP->id;
+    std::string          type           = (eIdP->type == "")? eIdP->typePattern : eIdP->type;
 
-    eIdP = entityIdVector.vec[ix];
-
-    EntityInfo* eP = new EntityInfo(eIdP->id, eIdP->type, eIdP->isPattern, eIdP->isTypePattern);
+    EntityInfo* eP = new EntityInfo(id, type, isPattern, isTypePattern);
 
     cSubP->entityIdInfos.push_back(eP);
   }
 
 
   //
-  // 4. Insert all attributes
-  //
-  for (unsigned int ix = 0; ix < attributeList.attributeV.size(); ++ix)
-  {
-    cSubP->attributes.push_back(attributeList.attributeV[ix]);
-  }
-
-
-  //
-  // 5. Now, insert the subscription in the cache
+  // Insert the subscription in the cache
   //
   LM_T(LmtSubCache, ("Inserting NEW sub '%s', lastNotificationTime: %lu",
                      cSubP->subscriptionId, cSubP->lastNotificationTime));
 
   subCacheItemInsert(cSubP);
-}
-
-
-
-/* ****************************************************************************
-*
-* subCacheItemInsert -
-*
-* NGSIv2 wrapper
-*
-*/
-void subCacheItemInsert
-(
-  const char*                        tenant,
-  const char*                        servicePath,
-  const ngsiv2::HttpInfo&            httpInfo,
-  const std::vector<ngsiv2::EntID>&  entities,
-  const std::vector<std::string>&    notifAttributes,
-  const std::vector<std::string>&    condAttributes,
-  const char*                        subscriptionId,
-  int64_t                            expiration,
-  int64_t                            throttling,
-  RenderFormat                       renderFormat,
-  bool                               notificationDone,
-  int64_t                            lastNotificationTime,
-  StringFilter*                      stringFilterP,
-  StringFilter*                      mdStringFilterP,
-  const std::string&                 status,
-  const std::string&                 q,
-  const std::string&                 geometry,
-  const std::string&                 coords,
-  const std::string&                 georel,
-  bool                               blacklist
-)
-{
-  EntityIdVector        enV;
-  AttributeList         attrL;
-
-  entIdStdVector2EntityIdVector(entities, &enV);
-  attrL.fill(notifAttributes);
-
-  subCacheItemInsert(tenant,
-                     servicePath,
-                     httpInfo,
-                     enV,
-                     attrL,
-                     condAttributes,
-                     subscriptionId,
-                     expiration,
-                     throttling,
-                     renderFormat,
-                     notificationDone,
-                     lastNotificationTime,
-                     stringFilterP,
-                     mdStringFilterP,
-                     status,
-                     q,
-                     geometry,
-                     coords,
-                     georel,
-                     blacklist);
-
-  enV.release();
 }
 
 

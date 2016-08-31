@@ -185,40 +185,7 @@ extern void subCachePresent(const char* title);
 
 /* ****************************************************************************
 *
-* subCacheItemInsert - 
-*/
-extern void subCacheItemInsert
-(
-  const char*                      tenant,
-  const char*                      servicePath,
-  const ngsiv2::HttpInfo&          httpInfo,
-  const EntityIdVector&            entityIdVector,
-  const AttributeList&             attributeList,
-  const std::vector<std::string>&  notifyConditionVector,
-  const char*                      subscriptionId,
-  int64_t                          expiration,
-  int64_t                          throttling,
-  RenderFormat                     renderFormat,
-  bool                             notificationDone,
-  int64_t                          lastNotificationTime,
-  StringFilter*                    stringFilterP,
-  StringFilter*                    mdStringFilterP,
-  const std::string&               status,
-  const std::string&               q,
-  const std::string&               geometry,
-  const std::string&               coords,
-  const std::string&               georel,
-  bool                             blacklist = false
-);
-
-
-
-/* ****************************************************************************
-*
 * subCacheItemInsert -
-*
-* NGSIv2 wrapper
-*
 */
 extern void subCacheItemInsert
 (
@@ -227,7 +194,7 @@ extern void subCacheItemInsert
   const ngsiv2::HttpInfo&            httpInfo,
   const std::vector<ngsiv2::EntID>&  entities,
   const std::vector<std::string>&    attributes,
-  const std::vector<std::string>&    condAttributes,
+  const std::vector<std::string>&    conditionAttrs,
   const char*                        subscriptionId,
   int64_t                            expiration,
   int64_t                            throttling,
