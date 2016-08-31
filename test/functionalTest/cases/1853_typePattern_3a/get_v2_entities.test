@@ -240,7 +240,7 @@ Date: REGEX(.*)
 07. GET entities with type T.*, using POST /v2/op/query - see all three
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length:
+Content-Length: 74
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -264,7 +264,7 @@ Date: REGEX(.*)
 08. GET entities with type T1.*, using POST /v2/op/query - see all E1 and E2
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length:
+Content-Length: 50
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -284,7 +284,7 @@ Date: REGEX(.*)
 09. GET entities with id E.* and type T.*, using POST /v2/op/query - see all three
 ==================================================================================
 HTTP/1.1 200 OK
-Content-Length:
+Content-Length: 74
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

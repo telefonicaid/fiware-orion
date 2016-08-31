@@ -244,7 +244,7 @@ void EntityIdVector::fill(EntityVector& _vec)
   for (unsigned int ix = 0; ix < _vec.size(); ++ix)
   {
     Entity*   entityP   = _vec[ix];
-    EntityId* entityIdP = new EntityId(entityP->id, entityP->type, entityP->isPattern);
+    EntityId* entityIdP = new EntityId(entityP->id, entityP->type, entityP->isPattern, entityP->isTypePattern);
 
     vec.push_back(entityIdP);
   }
