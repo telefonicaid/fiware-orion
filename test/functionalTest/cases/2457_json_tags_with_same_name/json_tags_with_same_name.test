@@ -31,7 +31,8 @@ brokerStart CB
 
 #
 # 01. Try to create an entity E1 with attr A1 with compound value { "a": 1, "a": 2 } - see error
-# 02. Create an entity E1 with attr A1 with compound value { "a": 1, "b": { "a": 2 } } - OK
+# 02. Create an entity E2 with attr A1 with compound value { "a": 1, "b": { "a": 2 } } - OK
+# 03. Try to create an entity E3 with attr A1 with compound value { "a": 1, "b": { "b": 2 } } - OK
 #
 
 echo '01. Try to create an entity E1 with attr A1 with compound value { "a": 1, "a": 2 } - see error'
@@ -60,6 +61,18 @@ echo
 echo
 
 
+echo '03. Try to create an entity E3 with attr A1 with compound value { "a": 1, "b": { "b": 2 } } - OK'
+echo '================================================================================================'
+payload='{
+  "id": "E3",
+  "A1": {
+    "value": { "a": 1, "b": { "b": 2 } }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
 
 --REGEXPECT--
 01. Try to create an entity E1 with attr A1 with compound value { "a": 1, "a": 2 } - see error
@@ -81,6 +94,16 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E2?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Try to create an entity E3 with attr A1 with compound value { "a": 1, "b": { "b": 2 } } - OK
+================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
