@@ -34,7 +34,6 @@
 #include "common/sem.h"
 #include "common/string.h"
 #include "apiTypesV2/HttpInfo.h"
-#include "apiTypesV2/ngsiWrappers.h"
 #include "apiTypesV2/Subscription.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubCache.h"
