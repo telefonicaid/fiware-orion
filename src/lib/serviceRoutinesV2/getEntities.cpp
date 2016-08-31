@@ -80,14 +80,16 @@ std::string getEntities
 {
   Entities     entities;
   std::string  answer;
-  std::string  pattern    = ".*"; // all entities, default value
-  std::string  id         = ciP->uriParam["id"];
-  std::string  idPattern  = ciP->uriParam["idPattern"];
-  std::string  q          = ciP->uriParam[URI_PARAM_Q];
-  std::string  mq         = ciP->uriParam[URI_PARAM_MQ];
-  std::string  geometry   = ciP->uriParam["geometry"];
-  std::string  coords     = ciP->uriParam["coords"];
-  std::string  georel     = ciP->uriParam["georel"];
+  std::string  pattern     = ".*"; // all entities, default value
+  std::string  id          = ciP->uriParam["id"];
+  std::string  idPattern   = ciP->uriParam["idPattern"];
+  std::string  type        = ciP->uriParam["type"];
+  std::string  typePattern = ciP->uriParam["typePattern"];
+  std::string  q           = ciP->uriParam[URI_PARAM_Q];
+  std::string  mq          = ciP->uriParam[URI_PARAM_MQ];
+  std::string  geometry    = ciP->uriParam["geometry"];
+  std::string  coords      = ciP->uriParam["coords"];
+  std::string  georel      = ciP->uriParam["georel"];
   std::string  out;
 
   if ((idPattern != "") && (id != ""))
@@ -127,6 +129,14 @@ std::string getEntities
     pattern   = idPattern;
   }
 
+  if ((typePattern != "") && (type != ""))
+  {
+    OrionError oe(SccBadRequest, "Incompatible parameters: type, typePattern", "BadRequest");
+
+    TIMED_RENDER(answer = oe.toJson());
+    ciP->httpStatusCode = oe.code;
+    return answer;
+  }
 
   //
   // Making sure geometry, georel and coords are not used individually
@@ -256,13 +266,23 @@ std::string getEntities
   // 2. Used with a single type name, so add it to the fill
   // 3. Used and with more than ONE typename
 
-  if (ciP->uriParamTypes.size() == 0)
+  if (!typePattern.empty())
+  {
+    EntityId* entityId = new EntityId(pattern, typePattern, idPattern == ""?"false":"true", true);
+
+    parseDataP->qcr.res.entityIdVector.push_back(entityId);
+  }
+  else if (ciP->uriParamTypes.size() == 0)
   {
     parseDataP->qcr.res.fill(pattern, "", "true", EntityTypeEmptyOrNotEmpty, "");
   }
   else if (ciP->uriParamTypes.size() == 1)
   {
-    parseDataP->qcr.res.fill(pattern, ciP->uriParam["type"], "true", EntityTypeNotEmpty, "");
+    parseDataP->qcr.res.fill(pattern, type, "true", EntityTypeNotEmpty, "");
+  }
+  else if (ciP->uriParamTypes.size() == 1)
+  {
+    parseDataP->qcr.res.fill(pattern, type, "true", EntityTypeNotEmpty, "");
   }
   else
   {
