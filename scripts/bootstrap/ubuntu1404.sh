@@ -39,7 +39,8 @@ sudo scons install --prefix=/usr/local        # This puts .h files in /usr/local
 cd ..
 
 # Install Google Test & Google Mock
-wget http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2
+# URL was http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 but google removed tha package in late August 2016
+wget https://www.fiware.org/shared-content/public/gmock-1.5.0.tar.bz2
 tar xfvj gmock-1.5.0.tar.bz2
 cd gmock-1.5.0
 ./configure

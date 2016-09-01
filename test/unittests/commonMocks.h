@@ -48,7 +48,7 @@ public:
     DBClientConnectionMock() {
         /* By default, all methods are redirected to the parent ones. We use the
          * technique described at
-         * http://code.google.com/p/googlemock/wiki/CookBook#Delegating_Calls_to_a_Parent_Class */
+         * https://github.com/google/googletest/blob/master/googlemock/docs/CookBook.md#delegating-calls-to-a-parent-class */
         ON_CALL(*this, count(_,_,_,_,_))
                 .WillByDefault(Invoke(this, &DBClientConnectionMock::parent_count));
         ON_CALL(*this, findOne(_,_,_,_))

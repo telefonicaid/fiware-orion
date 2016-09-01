@@ -44,18 +44,6 @@ RUN \
     curl -kOL https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz && \
     tar xfz v1.0.2.tar.gz && \
     mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include && \
-    # Install Google Test/Mock from source
-    # FIXME: this is not actually needed for building orion from sources. Recently, it has
-    # caused problems due to the URL is now broken. A definitive solution is pending on
-    # issue 2470
-    #curl -kOL http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 && \
-    #tar xfj gmock-1.5.0.tar.bz2 && \
-    #cd gmock-1.5.0 && \
-    #./configure && \
-    #make && \
-    #make install && \
-    #ldconfig && \
-    #cd /opt && \
     # Install orion from source
     git clone https://github.com/telefonicaid/fiware-orion && \
     cd fiware-orion && \
@@ -83,16 +71,6 @@ RUN \
            /opt/rapidjson-1.0.2 \
            /opt/v1.0.2.tar.gz \
            /usr/local/include/rapidjson \
-           # FIXME: pending on issue 2470
-           #/opt/gmock-1.5.0.tar.bz2 \
-           #/opt/gmock-1.5.0 \
-           #/usr/local/bin/gmock* \
-           #/usr/local/bin/gtest* \
-           #/usr/local/include/gmock \
-           #/usr/local/include/gtest \
-           #/usr/local/lib/libgmock* \
-           #/usr/local/lib/libgtest* \
-           #/usr/local/share/aclocal/gtest* \
            /opt/fiware-orion \
            # We don't need to manage Linux account passwords requisites: lenght, mays/mins, etc.
            # This cannot be removed using yum as yum uses hard dependencies and doing so will 
