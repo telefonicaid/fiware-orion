@@ -30,7 +30,7 @@ Let's illustrate this with an example.
 -     First (message number 1), the application (maybe on behalf of a
       Context Provider) registers the Context Provider at Orion for the
       Street4 temperature. Let's assume that the Context Provider exposes
-      its API on <http://sensor48.mycity.com/ngsi10>
+      its API on <http://sensor48.mycity.com/v1>
       
 ```
 (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \
@@ -109,7 +109,7 @@ EOF
 ``` 
 
 
--     The Context Provider at <http://sensor48.mycity.com/ngsi10> responds
+-     The Context Provider at <http://sensor48.mycity.com/v1> responds
       with the data (message number 4).
 
 ``` 
@@ -163,7 +163,7 @@ EOF
             },
             "statusCode": {
                 "code": "200",
-                "details": "Redirected to context provider http://sensor48.mycity.com/ngsi10",
+                "details": "Redirected to context provider http://sensor48.mycity.com/v1",
                 "reasonPhrase": "OK"
             }
         }
