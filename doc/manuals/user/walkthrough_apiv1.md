@@ -117,8 +117,7 @@ tutorials.
 ### Starting the broker for the tutorials
 
 Before starting, you need to install the broker as described in the
-[Installation and Administration
-Guide](../../../README.md#installation).
+[Installation and Administration Guide](../admin/install.md).
 
 The tutorials assume that you don't have any previous content in the
 Orion Context Broker database. In order to do so, follow the [delete
