@@ -121,7 +121,7 @@ Feature: verify notifications from subscriptions with different expires and stat
     And verify the notification in "normalized" format
 
   @expires_expired
-  Scenario:  not is sent a notification using NGSI v2 with expires field with the date expired
+  Scenario:  it is not sent a notification using NGSI v2 with expires field with the date expired
     Given  a definition of headers
       | parameter          | value              |
       | Fiware-Service     | test_notif_expired |
@@ -223,7 +223,7 @@ Feature: verify notifications from subscriptions with different expires and stat
     And verify the notification in "normalized" format
 
   @status_inactive
-  Scenario:  not is sent a notification using NGSI v2 with status field equals to inactive
+  Scenario:  it is not sent a notification using NGSI v2 with status field equals to inactive
     Given  a definition of headers
       | parameter          | value              |
       | Fiware-Service     | test_notif_expired |
@@ -258,7 +258,7 @@ Feature: verify notifications from subscriptions with different expires and stat
 
   # ----------------------- throttling ---------------------------
   @throttling_before_end
-  Scenario:  not is sent a second notification using NGSI v2 using throttling field but the second entity is sent before that the throttling time is ended
+  Scenario:  it is not sent a second notification using NGSI v2 using throttling field but the second entity is sent before that the throttling time is ended
     Given  a definition of headers
       | parameter          | value                 |
       | Fiware-Service     | test_notif_throttling |
