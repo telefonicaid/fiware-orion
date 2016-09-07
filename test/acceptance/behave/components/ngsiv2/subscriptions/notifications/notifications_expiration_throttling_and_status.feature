@@ -121,7 +121,7 @@ Feature: verify notifications from subscriptions with different expires and stat
     And verify the notification in "normalized" format
 
   @expires_expired
-  Scenario:  not send a notification using NGSI v2 with expires field with the date expired
+  Scenario:  not is sent a notification using NGSI v2 with expires field with the date expired
     Given  a definition of headers
       | parameter          | value              |
       | Fiware-Service     | test_notif_expired |
@@ -223,7 +223,7 @@ Feature: verify notifications from subscriptions with different expires and stat
     And verify the notification in "normalized" format
 
   @status_inactive
-  Scenario:  send a notification using NGSI v2 with status field equals to inactive
+  Scenario:  not is sent a notification using NGSI v2 with status field equals to inactive
     Given  a definition of headers
       | parameter          | value              |
       | Fiware-Service     | test_notif_expired |
@@ -255,3 +255,101 @@ Feature: verify notifications from subscriptions with different expires and stat
     And verify that receive several "Created" http code
     Then get notification sent to listener
     And verify that no notification is received
+
+  # ----------------------- throttling ---------------------------
+  @throttling_before_end
+  Scenario:  not is sent a second notification using NGSI v2 using throttling field but the second entity is sent before that the throttling time is ended
+    Given  a definition of headers
+      | parameter          | value                 |
+      | Fiware-Service     | test_notif_throttling |
+      | Fiware-ServicePath | /test                 |
+      | Content-Type       | application/json      |
+    # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter             | value                           |
+      | subject_idPattern     | .*                              |
+      | condition_attrs       | without condition field         |
+      | notification_http_url | http://replace_host:1045/notify |
+      | throttling            | 30                              |
+    And create a new subscription
+    And verify that receive a "Created" http code
+    # First entity. These properties below are used in entity request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | random=3    |
+      | entities_id       | room1       |
+      | attributes_number | 3           |
+      | attributes_name   | temperature |
+      | attributes_value  | random=5    |
+      | attributes_type   | celsius     |
+      | metadatas_number  | 2           |
+      | metadatas_name    | very_hot    |
+      | metadatas_type    | alarm       |
+      | metadatas_value   | hot         |
+    And create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    And get notification sent to listener
+    And verify subscription listener is started successfully
+    And verify the notification in "normalized" format
+    # Second entity. These properties below are used in entity request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | random=3    |
+      | entities_id       | room2       |
+      | attributes_number | 3           |
+      | attributes_name   | temperature |
+      | attributes_value  | random=5    |
+    When create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    Then get notification sent to listener
+    And verify that no notification is received
+
+  @throttling_after_end
+  Scenario:  send a second notification using NGSI v2 using throttling field but the second entity wait to be sent after the throttling time is ended (10s)
+    Given  a definition of headers
+      | parameter          | value                 |
+      | Fiware-Service     | test_notif_throttling |
+      | Fiware-ServicePath | /test                 |
+      | Content-Type       | application/json      |
+    # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter             | value                           |
+      | subject_idPattern     | .*                              |
+      | condition_attrs       | without condition field         |
+      | notification_http_url | http://replace_host:1045/notify |
+      | throttling            | 10                              |
+    And create a new subscription
+    And verify that receive a "Created" http code
+    # First entity. These properties below are used in entity request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | random=3    |
+      | entities_id       | room1       |
+      | attributes_number | 3           |
+      | attributes_name   | temperature |
+      | attributes_value  | random=5    |
+      | attributes_type   | celsius     |
+      | metadatas_number  | 2           |
+      | metadatas_name    | very_hot    |
+      | metadatas_type    | alarm       |
+      | metadatas_value   | hot         |
+    And create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    And get notification sent to listener
+    And verify subscription listener is started successfully
+    And verify the notification in "normalized" format
+    # Second entity. These properties below are used in entity request
+    And delay for "10" seconds
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | random=3    |
+      | entities_id       | room2       |
+      | attributes_number | 3           |
+      | attributes_name   | temperature |
+      | attributes_value  | random=5    |
+    When create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    Then get notification sent to listener
+    And verify the notification in "normalized" format
+
+
