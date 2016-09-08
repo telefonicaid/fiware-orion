@@ -413,8 +413,7 @@ void Metadata::fill(const struct Metadata& md)
 */
 std::string Metadata::toStringValue(void) const
 {
-  //char buffer[64];
-  std::string effectiveValue;
+  char buffer[64];
 
   switch (valueType)
   {
@@ -425,14 +424,13 @@ std::string Metadata::toStringValue(void) const
   case orion::ValueTypeNumber:
     if (type == DATE_TYPE)
     {
-      effectiveValue = JSON_STR(isodate2str(numberValue));
+      return JSON_STR(isodate2str(numberValue));
     }
     else // regular number
     {
-      effectiveValue = toString(numberValue);
-      //snprintf(buffer, sizeof(buffer), "%f", numberValue);
-    }
-    return effectiveValue;
+      snprintf(buffer, sizeof(buffer), "%f", numberValue);
+      return std::string(buffer);
+    }    
     break;
 
   case orion::ValueTypeBoolean:
