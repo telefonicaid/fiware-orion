@@ -113,6 +113,21 @@ static std::string parseMetadataObject(const Value& start, Metadata* mdP)
     }
   }
 
+  // Is it a date?
+  if (mdP->type == DATE_TYPE)
+  {
+    mdP->numberValue =  parse8601Time(mdP->stringValue);
+
+    if (mdP->numberValue == -1)
+    {
+      alarmMgr.badInput(clientIp, "date has invalid format");
+      return "date has invalid format";
+    }
+
+    // Probably reseting stringValue is not needed, but let's do it for cleanliness
+    mdP->stringValue = "";
+    mdP->valueType   = orion::ValueTypeNumber;
+  }
 
   if (!mdP->typeGiven)
   {
