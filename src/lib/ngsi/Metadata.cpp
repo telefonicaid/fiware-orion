@@ -422,8 +422,15 @@ std::string Metadata::toStringValue(void) const
     break;
 
   case orion::ValueTypeNumber:
-    snprintf(buffer, sizeof(buffer), "%f", numberValue);
-    return std::string(buffer);
+    if (type == DATE_TYPE)
+    {
+      return JSON_STR(isodate2str(numberValue));
+    }
+    else // regular number
+    {
+      snprintf(buffer, sizeof(buffer), "%f", numberValue);
+      return std::string(buffer);
+    }    
     break;
 
   case orion::ValueTypeBoolean:
@@ -472,7 +479,16 @@ std::string Metadata::toJson(bool isLastElement)
   }
   else if (valueType == orion::ValueTypeNumber)
   {
-    out += JSON_VALUE_NUMBER("value", toString(numberValue));
+    std::string effectiveValue;
+    if (type == DATE_TYPE)
+    {
+      effectiveValue = JSON_STR(isodate2str(numberValue));
+    }
+    else // regular number
+    {
+      effectiveValue = toString(numberValue);
+    }
+    out += JSON_VALUE_NUMBER("value", effectiveValue);
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
