@@ -405,14 +405,15 @@ Feature: verify notifications from subscriptions with different conditions value
       | [34,56,78,90]           | temperature!=64           |
       | ["one","two","three"]   | temperature!='five'       |
     Examples:  # @BUG_2442
-      | attr_value_compound   | q_expression        |
-      | [34,56,78,90]         | temperature==34     |
-      | [34,56,78,90]         | temperature==30..99 |
-      | ["one","two","three"] | temperature=='one'  |
-      | ["one","two","three"] | temperature==one    |
+      | attr_value_compound   | q_expression          |
+      | [34,56,78,90]         | temperature==34       |
+      | [34,56,78,90]         | temperature==30..99   |
+      | [34,56,78,90]         | temperature==30,56,99 |
+      | ["one","two","three"] | temperature=='one'    |
+      | ["one","two","three"] | temperature==one      |
 
    # ----------------------- condition - mq  ---------------------------
-  @condition_mq @BUG_2445 @skip
+  @condition_mq @BUG_2445
   Scenario Outline:  send a notification using NGSI v2 with "mq" condition field
     Given  a definition of headers
       | parameter          | value                |
