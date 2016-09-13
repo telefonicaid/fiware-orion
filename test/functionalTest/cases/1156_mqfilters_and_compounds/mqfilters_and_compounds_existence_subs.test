@@ -25,7 +25,6 @@ String filters for compound values of attributes: existence in subscriptions
 
 --SHELL-INIT--
 dbInit CB
-#brokerStart CB 0 IPv4 -noCache
 brokerStart CB
 accumulatorStart --pretty-print
 
@@ -46,7 +45,8 @@ accumulatorStart --pretty-print
 # 12. Create subscription 6 for mq=!A1.M2.i - notification
 # 13. Dump and reset accumulator, see one notification
 # 14. Update E1, to provoke another 3 notifications
-# 15. Dump and reset accumulator, see three notifications
+# 15. Dump and reset accumulator, see three notifications (sub1, sub4 and sub6)
+# 16. Check sub counts in order to see sub1, sub4 and sub6 has been triggered twice
 #
 
 echo "01. Create E1 with A1 with metadata M1 with compound value, including i==10 and s='test_string'"
@@ -96,6 +96,8 @@ orionCurl --url /v2/subscriptions --payload "${payload}"
 echo
 echo
 
+SUB1_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
 
 echo "03. Dump and reset accumulator, see one notification"
 echo "===================================================="
@@ -131,6 +133,8 @@ orionCurl --url /v2/subscriptions --payload "${payload}"
 echo
 echo
 
+SUB2_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
 
 echo "05. Dump accumulator, see no notification"
 echo "========================================="
@@ -165,6 +169,8 @@ orionCurl --url /v2/subscriptions --payload "${payload}"
 echo
 echo
 
+SUB3_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
 
 echo "07. Dump accumulator, see no notification"
 echo "========================================="
@@ -198,6 +204,8 @@ payload='{
 orionCurl --url /v2/subscriptions --payload "${payload}"
 echo
 echo
+
+SUB4_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 
 echo "09. Dump and reset accumulator, see one notification"
@@ -234,6 +242,8 @@ orionCurl --url /v2/subscriptions --payload "${payload}"
 echo
 echo
 
+SUB5_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
 
 echo "11. Dump accumulator, see no notification"
 echo "========================================="
@@ -268,6 +278,8 @@ orionCurl --url /v2/subscriptions --payload "${payload}"
 echo
 echo
 
+SUB6_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
 
 echo "13. Dump and reset accumulator, see one notification"
 echo "===================================================="
@@ -297,10 +309,23 @@ echo
 echo
 
 
-echo "15. Dump and reset accumulator, see three notifications"
-echo "======================================================="
+echo "15. Dump and reset accumulator, see three notifications (sub1, sub4 and sub6)"
+echo "============================================================================="
 accumulatorDump
 accumulatorReset
+echo
+echo
+
+
+echo "16. Check sub counts in order to see sub1, sub4 and sub6 has been triggered twice"
+echo "================================================================================="
+orionCurl --url /v2/subscriptions/$SUB1_ID
+echo
+echo
+orionCurl --url /v2/subscriptions/$SUB4_ID
+echo
+echo
+orionCurl --url /v2/subscriptions/$SUB6_ID
 echo
 echo
 
@@ -505,8 +530,8 @@ Date: REGEX(.*)
 
 
 
-15. Dump and reset accumulator, see three notifications
-=======================================================
+15. Dump and reset accumulator, see three notifications (sub1, sub4 and sub6)
+=============================================================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 203
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -603,6 +628,113 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
+
+
+16. Check sub counts in order to see sub1, sub4 and sub6 has been triggered twice
+=================================================================================
+HTTP/1.1 200 OK
+Content-Length: 347
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "expires": "2050-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/notify"
+        },
+        "lastNotification": "REGEX(.*)",
+        "timesSent": 2
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "expression": {
+                "mq": "A1.M1.i"
+            }
+        },
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ]
+    }
+}
+
+
+HTTP/1.1 200 OK
+Content-Length: 349
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "expires": "2050-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/notify"
+        },
+        "lastNotification": "REGEX(.*)",
+        "timesSent": 2
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "expression": {
+                "mq": "!A1.M1.i2"
+            }
+        },
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ]
+    }
+}
+
+
+HTTP/1.1 200 OK
+Content-Length: 348
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "expires": "2050-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/notify"
+        },
+        "lastNotification": "REGEX(.*)",
+        "timesSent": 2
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "expression": {
+                "mq": "!A1.M2.i"
+            }
+        },
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ]
+    }
+}
 
 
 --TEARDOWN--

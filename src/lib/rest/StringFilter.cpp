@@ -1922,12 +1922,38 @@ bool StringFilter::mqMatch(ContextElementResponse* cerP)
     ContextAttribute*  caP   = cerP->contextElement.getAttribute(itemP->attributeName);
     Metadata*          mdP   = (caP == NULL)? NULL : caP->metadataVector.lookupByName(itemP->metadataName);
 
-    if ((itemP->op == SfopExists) && (mdP == NULL))
+    if ((itemP->op == SfopExists) || (itemP->op == SfopNotExists))
     {
-      return false;
-    }        
-    else if ((itemP->op == SfopNotExists) && (mdP != NULL))
+
+      if (itemP->compoundPath.size() == 0)
+      {
+        if ((itemP->op == SfopExists) && (mdP == NULL))
+        {
+          return false;
+        }
+        else if ((itemP->op == SfopNotExists) && (mdP != NULL))
+        {
+          return false;
+        }
+      }
+      else  // compare with an item in the compound value
+      {
+        bool exists = (mdP != NULL) && (mdP->compoundItemExists(itemP->compoundPath) == true);
+
+        if ((itemP->op == SfopExists) && (exists == false))
+        {
+          return false;
+        }
+        else if ((itemP->op == SfopNotExists) && (exists == true))
+        {
+          return false;
+        }
+      }
+    }
+    else if (mdP == NULL)
     {
+      // Next checkings need an actual metadata to evaluate matching condition. This
+      // "shorcut" checking for NULL will avoid crashes
       return false;
     }
     else if ((itemP->op == SfopEquals) && (itemP->matchEquals(mdP) == false))
