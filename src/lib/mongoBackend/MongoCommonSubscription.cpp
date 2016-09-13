@@ -375,6 +375,8 @@ void setFormat(const Subscription& sub, BSONObjBuilder* b)
   LM_T(LmtMongo, ("Subscription format: %s", format.c_str()));
 }
 
+
+
 /* ****************************************************************************
 *
 * setBlacklist -
@@ -385,4 +387,18 @@ void setBlacklist(const Subscription& sub, BSONObjBuilder* b)
   bool bl = sub.notification.blacklist;
   b->append(CSUB_BLACKLIST, bl);
   LM_T(LmtMongo, ("Subscription blacklist: %s", bl ? "true" : "false"));
+}
+
+
+
+/* ****************************************************************************
+*
+* setMetadataFlags -
+*
+*/
+void setMetadataFlags(const Subscription& sub, BSONObjBuilder* b)
+{
+  bool metadataFlags = sub.notification.metadataFlags;
+  b->append(CSUB_METADATA_FLAGS, metadataFlags);
+  LM_T(LmtMongo, ("Subscription metadataFlags: %s", metadataFlags ? "true" : "false"));
 }

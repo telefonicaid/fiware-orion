@@ -1172,6 +1172,7 @@ static bool addTriggeredSubscriptions_withCache
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant);
     subP->blacklist = cSubP->blacklist;
+    //FIXME: metadataFlags
 
     subP->fillExpression(cSubP->expression.georel, cSubP->expression.geometry, cSubP->expression.coords);
 

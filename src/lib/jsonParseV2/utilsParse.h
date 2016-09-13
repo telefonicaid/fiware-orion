@@ -38,6 +38,22 @@ struct Opt {
   bool ok() { return error.empty(); }
 };
 
+
+
+/*
+ * getBoolMust -  get a mandatory bool from the rapidjson node
+ */
+Opt<bool> getBoolMust(const rapidjson::Value& parent, const char* field,const std::string& description = "");
+
+
+
+/*
+ * getBoolOpt - get a optional bol from the rapidjson node
+ */
+Opt<bool> getBoolOpt(const rapidjson::Value& parent, const char* field, const std::string& description = "");
+
+
+
 /*
  * getStringMust -  get a mandatory string from the rapidjson node
  */

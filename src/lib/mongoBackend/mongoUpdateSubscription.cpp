@@ -506,6 +506,28 @@ static void setBlacklist(const SubscriptionUpdate& subUp, const BSONObj& subOrig
   }
 }
 
+
+
+/* ****************************************************************************
+*
+* setMetadataFlags -
+*/
+static void setMetadataFlags(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
+{
+  if (subUp.notificationProvided)
+  {
+    setMetadataFlags(subUp, b);
+  }
+  else
+  {
+    bool metadataFlags = subOrig.hasField(CSUB_METADATA_FLAGS)? getBoolFieldF(subOrig, CSUB_METADATA_FLAGS) : false;
+    b->append(CSUB_METADATA_FLAGS, metadataFlags);
+    LM_T(LmtMongo, ("Subscription metadataFlags: %s", metadataFlags? "true" : "false"));
+  }
+}
+
+
+
 /* ****************************************************************************
 *
 * updateInCache -
@@ -692,6 +714,7 @@ std::string mongoUpdateSubscription
   setEntities(subUp, subOrig, &b);
   setAttrs(subUp, subOrig, &b);
   setBlacklist(subUp, subOrig, &b);
+  setMetadataFlags(subUp, subOrig, &b);
   setCondsAndInitialNotify(subUp, subOrig, tenant, servicePathV, xauthToken, fiwareCorrelator,
                            &b, &notificationDone);
 

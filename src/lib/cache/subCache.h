@@ -108,6 +108,7 @@ struct CachedSubscription
   RenderFormat                renderFormat;
   SubscriptionExpression      expression;
   bool                        blacklist;
+  bool                        metadataFlags;
   ngsiv2::HttpInfo            httpInfo;
 
   struct CachedSubscription*  next;
@@ -208,7 +209,8 @@ extern void subCacheItemInsert
   const std::string&                 geometry,
   const std::string&                 coords,
   const std::string&                 georel,
-  bool                               blacklist
+  bool                               blacklist,
+  bool                               metadataFlags
 );
 
 

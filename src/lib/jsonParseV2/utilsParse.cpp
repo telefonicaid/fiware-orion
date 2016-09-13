@@ -33,6 +33,54 @@ using std::string;
 
 /* ****************************************************************************
 *
+* getBoolAux -
+*/
+static Opt<bool> getBoolAux(const Value& parent, const char* field, const string& description, bool optional)
+{
+  if (parent.HasMember(field))
+  {
+    const Value& value = parent[field];
+    if (!value.IsBool())
+    {
+      return Opt<bool>((!description.empty() ? description : field) + " is not a bool");
+    }
+
+    return Opt<bool>(value.GetBool(), true);
+  }
+  else if (!optional)
+  {
+     return Opt<bool>((!description.empty() ? description : field) + " is missing");
+  }
+
+  return Opt<bool>("", false);
+}
+
+
+
+/* ****************************************************************************
+*
+* getBoolMust - get a mandatory bool from the rapidjson node
+*/
+extern Opt<bool> getBoolMust(const rapidjson::Value& parent, const char* field, const std::string& description)
+{
+  return getBoolAux(parent, field, description, false);
+}
+
+
+
+/* ****************************************************************************
+*
+* getBoolOpt - get a optional bool from the rapidjson node
+*/
+extern Opt<bool> getBoolOpt(const rapidjson::Value& parent, const char* field, const std::string& description)
+{
+  return getBoolAux(parent, field, description, true);
+}
+
+
+
+/* ****************************************************************************
+*
 * getStringAux - 
 */
 static Opt<string> getStringAux(const Value& parent, const char* field, const string& description, bool optional)

@@ -72,6 +72,7 @@ struct Notification
   bool                     blacklist;
   long long                timesSent;
   long long                lastNotification;
+  bool                     metadataFlags;
   HttpInfo                 httpInfo;
   std::string              toJson(const std::string& attrsFormat);
   Notification():

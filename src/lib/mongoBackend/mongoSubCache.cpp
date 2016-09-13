@@ -367,6 +367,7 @@ int mongoSubCacheItemInsert
   cSubP->expression.georel     = georel;
   cSubP->next                  = NULL;
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+  cSubP->metadataFlags         = sub.hasField(CSUB_METADATA_FLAGS)? getBoolFieldF(sub, CSUB_METADATA_FLAGS) : false;
 
   //
   // httpInfo

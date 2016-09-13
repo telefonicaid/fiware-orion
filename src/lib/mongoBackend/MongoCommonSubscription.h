@@ -177,4 +177,14 @@ extern void setFormat(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b)
 extern void setBlacklist(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
 
 
+
+/* ****************************************************************************
+*
+* setMdFlags -
+*
+*/
+extern void setMetadataFlags(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
+
+
+
 #endif // SRC_LIB_MONGO_BACKEND_MONGOCOMMONSUBSCRIPTION_H

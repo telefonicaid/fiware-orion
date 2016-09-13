@@ -760,7 +760,8 @@ void subCacheItemInsert
   const std::string&                 geometry,
   const std::string&                 coords,
   const std::string&                 georel,
-  bool                               blacklist
+  bool                               blacklist,
+  bool                               metadataFlags
 )
 {
   //
@@ -789,6 +790,7 @@ void subCacheItemInsert
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
   cSubP->blacklist             = blacklist;
+  cSubP->metadataFlags         = metadataFlags;
   cSubP->httpInfo              = httpInfo;
   cSubP->notifyConditionV      = conditionAttrs;
   cSubP->attributes            = attributes;

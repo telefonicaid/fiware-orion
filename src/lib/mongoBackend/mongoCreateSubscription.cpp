@@ -104,7 +104,8 @@ static void insertInCache
                      sub.subject.condition.expression.geometry,
                      sub.subject.condition.expression.coords,
                      sub.subject.condition.expression.georel,
-                     sub.notification.blacklist);
+                     sub.notification.blacklist,
+                     sub.notification.metadataFlags);
 
   cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
 }
@@ -149,6 +150,7 @@ std::string mongoCreateSubscription
   setEntities(sub, &b);
   setAttrs(sub, &b);
   setBlacklist(sub, &b);
+  setMetadataFlags(sub, &b);
 
   std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
   setCondsAndInitialNotify(sub, subId, status, sub.notification.httpInfo, sub.attrsFormat,
