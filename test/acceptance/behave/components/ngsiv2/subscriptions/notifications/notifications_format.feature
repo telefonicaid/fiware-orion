@@ -51,7 +51,7 @@ Feature: verify notifications from subscriptions with different formats using NG
   Setup: stop ContextBroker
 
 
-  # ----------------------- expiration ---------------------------
+  # ----------------------- formats  ---------------------------
   @formats_without
   Scenario:  send a notification using NGSI v2 without format defined (normalized by default)
     Given  a definition of headers
