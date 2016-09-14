@@ -377,8 +377,7 @@ static void setCondsAndInitialNotify
       // In NGSIv1 is legal updating conditions without updating entities, which is not possible
       // in NGSIv2 (as both entities and coditions are part of 'subject' and they are updated as
       // a whole). In addition, NGSIv1 doesn't allow to update notification attributes. Both
-      // (entities and notification attributes) are passed in subOrig. Note that metadataFlags
-      // doesn't make sense in the NGSIv1 case as this field is not part of that API.
+      // (entities and notification attributes) are passed in subOrig.
       //
       // See: https://fiware-orion.readthedocs.io/en/develop/user/updating_regs_and_subs/index.html
       setCondsAndInitialNotifyNgsiv1(subUp, subOrig, subUp.id, status, httpInfo.url, attrsFormat,
