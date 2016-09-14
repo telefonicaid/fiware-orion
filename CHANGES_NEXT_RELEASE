@@ -1,1 +1,3 @@
-Fix: supporting DateTime filters for metadata (#2443, #2445)
+- Fix: crash when creating entity with metadata when subscription is in place with "mq" on a different metadata (#2496)
+- Fix: supporting DateTime filters for metadata (#2443, #2445)
+- Fix: wrong matching in metadata existence and not existence filters with compounds
