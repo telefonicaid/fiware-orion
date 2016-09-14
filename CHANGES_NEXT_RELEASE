@@ -1,0 +1,1 @@
+Hotfix: remove attribute detail in get types operations (only NGSIv2 API) (hardwired solution for #2073)

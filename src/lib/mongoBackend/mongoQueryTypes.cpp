@@ -52,6 +52,10 @@ static void getAttributeTypes
   std::vector<std::string>*             attrTypes
 )
 {
+  // Avoid attribute type detail, just ""
+  attrTypes->push_back("");
+
+#if 0
   std::string  idType         = std::string("_id.")    + ENT_ENTITY_TYPE;
   std::string  idServicePath  = std::string("_id.")    + ENT_SERVICE_PATH;
 
@@ -120,6 +124,7 @@ static void getAttributeTypes
 
   }
   releaseMongoConnection(connection);
+#endif
 }
 
 
