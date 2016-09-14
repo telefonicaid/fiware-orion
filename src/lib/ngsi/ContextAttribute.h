@@ -67,6 +67,9 @@ public:
   orion::CompoundValueNode*  compoundValueP;
   bool                       typeGiven;               // Was 'type' part of the incoming payload?
 
+  bool                       onUpdate;                // Used by the metadata flags on notifications functionality
+  bool                       onChange;                // Used by the metadata flags on notifications functionality
+
   ~ContextAttribute();
   ContextAttribute();
   ContextAttribute(ContextAttribute* caP, bool useDefaultType = false);

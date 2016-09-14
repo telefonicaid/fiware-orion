@@ -1171,8 +1171,8 @@ static bool addTriggeredSubscriptions_withCache
                                                            aList,
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant);
-    subP->blacklist = cSubP->blacklist;
-    //FIXME: metadataFlags
+    subP->blacklist     = cSubP->blacklist;
+    subP->metadataFlags = cSubP->metadataFlags;
 
     subP->fillExpression(cSubP->expression.georel, cSubP->expression.geometry, cSubP->expression.coords);
 
@@ -1540,7 +1540,8 @@ static bool addTriggeredSubscriptions_noCache
           httpInfo,
           subToAttributeList(sub), "", "");
 
-      trigs->blacklist = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+      trigs->blacklist     = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+      trigs->metadataFlags = sub.hasField(CSUB_METADATA_FLAGS)? getBoolFieldF(sub, CSUB_METADATA_FLAGS) : false;
 
       if (sub.hasField(CSUB_EXPR))
       {
@@ -1741,6 +1742,32 @@ static bool processOnChangeConditionForUpdateContext
 
 /* ****************************************************************************
 *
+* setMetadataForFlags -
+*/
+static void setMetadataForFlags(ContextElementResponse* notifyCerP)
+{
+  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
+
+    if (caP->onUpdate)
+    {
+      Metadata* newMdP = new Metadata(NGSI_MD_NOTIF_ONUPDATE, DEFAULT_ATTR_BOOL_TYPE, true);
+      caP->metadataVector.push_back(newMdP);
+    }
+
+    if (caP->onChange)
+    {
+      Metadata* newMdP = new Metadata(NGSI_MD_NOTIF_ONCHANGE, DEFAULT_ATTR_BOOL_TYPE, true);
+      caP->metadataVector.push_back(newMdP);
+    }
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * processSubscriptions - send a notification for each subscription in the map
 */
 static bool processSubscriptions
@@ -1847,6 +1874,9 @@ static bool processSubscriptions
         continue;
       }
     }
+
+    /* Set metadata corresponding to notification flags */
+    setMetadataForFlags(notifyCerP);
 
     /* Send notification */
     LM_T(LmtSubCache, ("NOT ignored: %s", tSubP->cacheSubId.c_str()));
@@ -2022,7 +2052,8 @@ static void updateAttrInNotifyCer
 (
   ContextElementResponse* notifyCerP,
   ContextAttribute*       targetAttr,
-  bool                    useDefaultType
+  bool                    useDefaultType,
+  bool                    actualUpdate
 )
 {
   /* Try to find the attribute in the notification CER */
@@ -2053,6 +2084,13 @@ static void updateAttrInNotifyCer
       if (targetAttr->type != "")
       {
         caP->type = targetAttr->type;
+      }
+
+      /* Metadata flags for notifications */
+      caP->onUpdate = true;
+      if (actualUpdate)
+      {
+        caP->onChange = true;
       }
 
       /* Metadata */
@@ -2208,7 +2246,7 @@ static bool updateContextAttributeItem
     return false;
   }
 
-  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2");
+  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2", actualUpdate);
 
   return true;
 }
@@ -2276,7 +2314,7 @@ static bool appendContextAttributeItem
   // Note that updateAttrInNotifyCer() may "ruin" targetAttr, as compoundValueP is moved
   // (not copied) to the structure in the notifyCerP and null-ified in targetAttr. Thus, it has
   // to be called after the location processing logic (as this logic may need the compoundValueP
-  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2");
+  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2", actualUpdate);
 
   return true;
 }

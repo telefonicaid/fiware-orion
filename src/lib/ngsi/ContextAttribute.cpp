@@ -164,6 +164,8 @@ ContextAttribute::ContextAttribute()
   found                 = false;
   skip                  = false;
   typeGiven             = false;
+  onUpdate              = false;
+  onChange              = false;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -198,6 +200,8 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
   found                 = caP->found;
   skip                  = false;
   typeGiven             = caP->typeGiven;
+  onUpdate              = caP->onUpdate;
+  onChange              = caP->onChange;
 
   providingApplication.set(caP->providingApplication.get());
   providingApplication.setMimeType(caP->providingApplication.getMimeType());
@@ -261,6 +265,8 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  onUpdate              = false;
+  onChange              = false;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -293,6 +299,8 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  onUpdate              = false;
+  onChange              = false;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -325,6 +333,8 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  onUpdate              = false;
+  onChange              = false;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -357,6 +367,8 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  onUpdate              = false;
+  onChange              = false;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -385,6 +397,8 @@ ContextAttribute::ContextAttribute
   valueType             = orion::ValueTypeObject;  // FIXME P6: Could be ValueTypeVector ...
   skip                  = false;
   typeGiven             = false;
+  onUpdate              = false;
+  onChange              = false;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
