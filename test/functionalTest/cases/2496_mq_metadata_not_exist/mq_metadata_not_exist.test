@@ -1,0 +1,139 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+mq condition field with a metadata unknown.
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create subscription without mq on a given metadata
+# 02. Create entity not included the given metadata
+# 03. Get entity to ensure CB has not crashed
+#
+
+echo "01. Create subscription without mq on a given metadata"
+echo "======================================================"
+payload='{
+  "notification": {
+    "http": {
+      "url": "http://localhost:1045/notify"
+    }
+  },
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*"
+      }
+    ],
+    "condition": {
+      "expression": {
+        "mq": "temperature.sdfdfs==56"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '02. Create entity not included the given metadata'
+echo '================================================='
+payload='{
+  "type": "house",
+  "id": "room15",
+  "temperature": {
+    "type": "celsius",
+    "metadata": {
+      "meta_temperature": {
+        "value": 34,
+        "type": "alarm"
+      }
+    },
+    "value": 34
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Get entity to ensure CB has not crashed"
+echo "==========================================="
+orionCurl --url /v2/entities/room15
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription without mq on a given metadata
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity not included the given metadata
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/room15?type=house
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Get entity to ensure CB has not crashed
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 134
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "room15",
+    "temperature": {
+        "metadata": {
+            "meta_temperature": {
+                "type": "alarm",
+                "value": 34
+            }
+        },
+        "type": "celsius",
+        "value": 34
+    },
+    "type": "house"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

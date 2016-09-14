@@ -1818,6 +1818,27 @@ AttributeList subToAttributeList(const BSONObj& sub)
 
 /* ****************************************************************************
 *
+* setOnSubscriptionMetadata -
+*/
+static void setOnSubscriptionMetadata(ContextElementResponseVector* cerVP)
+{
+  for (unsigned int ix = 0; ix < cerVP->size(); ix++)
+  {
+    ContextElementResponse* cerP = (*cerVP)[ix];
+
+    for (unsigned int jx = 0; jx < cerP->contextElement.contextAttributeVector.size(); jx++)
+    {
+      ContextAttribute* caP = cerP->contextElement.contextAttributeVector[jx];
+      Metadata* newMdP = new Metadata(NGSI_MD_NOTIF_ONSUBCHANGE, DEFAULT_ATTR_BOOL_TYPE, true);
+      caP->metadataVector.push_back(newMdP);
+    }
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * processOnChangeConditionForSubscription -
 *
 * This function is called from initial processing of an ONCHANGE condition in
@@ -1849,7 +1870,8 @@ static bool processOnChangeConditionForSubscription
   const Restriction*               resP,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist = false
+  bool                             blacklist,
+  bool                             metadataFlags
 )
 {
   std::string                   err;
@@ -1875,6 +1897,12 @@ static bool processOnChangeConditionForSubscription
   /* Prune "not found" CERs */
   pruneContextElements(rawCerV, &ncr.contextElementResponseVector);
   rawCerV.release();
+
+  /* Append notification metadata */
+  if (metadataFlags)
+  {
+    setOnSubscriptionMetadata(&ncr.contextElementResponseVector);
+  }
 
   if (ncr.contextElementResponseVector.size() > 0)
   {
@@ -1950,7 +1978,8 @@ BSONArray processConditionVector
   const std::string&               status,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist
+  bool                             blacklist,
+  bool                             metadataFlags
 )
 {
   BSONArrayBuilder conds;
@@ -1982,7 +2011,8 @@ BSONArray processConditionVector
                                                    resP,
                                                    fiwareCorrelator,
                                                    attrsOrder,
-                                                   blacklist)))
+                                                   blacklist,
+                                                   metadataFlags)))
       {
         *notificationDone = true;
       }
@@ -2023,7 +2053,8 @@ BSONArray processConditionVector
   const std::string&               status,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist
+  bool                             blacklist,
+  bool                             metadataFlags
 )
 {
   NotifyConditionVector ncV;
@@ -2048,7 +2079,8 @@ BSONArray processConditionVector
                                          status,
                                          fiwareCorrelator,
                                          attrsOrder,
-                                         blacklist);
+                                         blacklist,
+                                         metadataFlags);
 
   enV.release();
   ncV.release();

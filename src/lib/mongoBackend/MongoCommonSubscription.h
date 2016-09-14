@@ -122,6 +122,7 @@ extern void setCondsAndInitialNotify
   const std::string&               subId,
   const std::string&               status,
   const ngsiv2::HttpInfo&          httpInfo,
+  bool                             metadataFlags,
   RenderFormat                     attrsFormat,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,

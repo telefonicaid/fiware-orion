@@ -309,7 +309,8 @@ static void setCondsAndInitialNotifyNgsiv1
                                             status,
                                             fiwareCorrelator,
                                             sub.notification.attributes,
-                                            sub.notification.blacklist);
+                                            sub.notification.blacklist,
+                                            sub.notification.metadataFlags);
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
@@ -349,13 +350,16 @@ static void setCondsAndInitialNotify
     }
 
     HttpInfo httpInfo;
+    bool     metadataFlags;
     if (subUp.notificationProvided)
     {
-      httpInfo = subUp.notification.httpInfo;
+      httpInfo      = subUp.notification.httpInfo;
+      metadataFlags = subUp.notification.metadataFlags;
     }
     else
     {
       httpInfo.fill(subOrig);
+      metadataFlags = subOrig.hasField(CSUB_METADATA_FLAGS)? getBoolFieldF(subOrig, CSUB_METADATA_FLAGS) : false;
     }
 
     RenderFormat attrsFormat;
@@ -373,7 +377,8 @@ static void setCondsAndInitialNotify
       // In NGSIv1 is legal updating conditions without updating entities, which is not possible
       // in NGSIv2 (as both entities and coditions are part of 'subject' and they are updated as
       // a whole). In addition, NGSIv1 doesn't allow to update notification attributes. Both
-      // (entities and notification attributes) are pased in subOrig
+      // (entities and notification attributes) are passed in subOrig. Note that metadataFlags
+      // doesn't make sense in the NGSIv1 case as this field is not part of that API.
       //
       // See: https://fiware-orion.readthedocs.io/en/develop/user/updating_regs_and_subs/index.html
       setCondsAndInitialNotifyNgsiv1(subUp, subOrig, subUp.id, status, httpInfo.url, attrsFormat,
@@ -382,7 +387,7 @@ static void setCondsAndInitialNotify
     }
     else
     {
-      setCondsAndInitialNotify(subUp, subUp.id, status, httpInfo, attrsFormat,
+      setCondsAndInitialNotify(subUp, subUp.id, status, httpInfo, metadataFlags, attrsFormat,
                                tenant, servicePathV, xauthToken, fiwareCorrelator,
                                b, notificationDone);
     }

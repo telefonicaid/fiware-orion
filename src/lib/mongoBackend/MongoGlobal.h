@@ -371,7 +371,8 @@ extern BSONArray processConditionVector
   const std::string&               status,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsFilter,
-  bool                             blacklist = false
+  bool                             blacklist,
+  bool                             metadataFlags
 );
 
 
@@ -399,7 +400,8 @@ extern BSONArray processConditionVector
   const std::string&                 status,
   const std::string&                 fiwareCorrelator,
   const std::vector<std::string>&    attrsOrder,
-  bool                               blacklist = false
+  bool                               blacklist,
+  bool                               metadataFlags
 );
 
 

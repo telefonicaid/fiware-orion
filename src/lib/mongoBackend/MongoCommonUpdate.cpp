@@ -1876,7 +1876,10 @@ static bool processSubscriptions
     }
 
     /* Set metadata corresponding to notification flags */
-    setMetadataForFlags(notifyCerP);
+    if (tSubP->metadataFlags)
+    {
+      setMetadataForFlags(notifyCerP);
+    }
 
     /* Send notification */
     LM_T(LmtSubCache, ("NOT ignored: %s", tSubP->cacheSubId.c_str()));
@@ -3244,6 +3247,24 @@ static bool contextElementPreconditionsCheck
 
 }
 
+
+
+/* ****************************************************************************
+*
+* setCreateAndUpdateFlags -
+*/
+static void setCreateAndUpdateFlags(ContextElementResponse* notifyCerP)
+{
+  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
+    caP->onUpdate = true;
+    caP->onChange = true;
+  }
+}
+
+
+
 /* ****************************************************************************
 *
 * processContextElement -
@@ -3534,6 +3555,9 @@ void processContextElement
         // one item, so it should be safe to get item 0
         //
         ContextElementResponse* notifyCerP = new ContextElementResponse(ceP, apiVersion == "v2");
+
+        // Set metadata flags
+        setCreateAndUpdateFlags(notifyCerP);
 
         notifyCerP->contextElement.creDate = now;
         notifyCerP->contextElement.modDate = now;
