@@ -513,7 +513,7 @@ Feature: verify notifications from subscriptions with different conditions value
     Then get notification sent to listener
     And verify that no notification is received
 
-  @condition_mq_attribute_not_exist @BUG_2496 @skip
+  @condition_mq_attribute_not_exist @BUG_2496
   Scenario:  not send a notification using NGSI v2 with "mq" condition field, but attribute does not exist
     Given  a definition of headers
       | parameter          | value                    |
