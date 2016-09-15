@@ -399,6 +399,16 @@ The following strings must not be used as attribute names:
 
 * Virtual attribute names (see specific section on "Virtual Attributes")
 
+## Metadata names restrictions
+
+The following strings must not be used as metadata names:
+
+* `ngsi:onArrival`, as it has an special use (see "Notification metadata marks" section).
+
+* `ngsi:onChange`, as it has an special use (see "Notification metadata marks" section).
+
+* `ngsi:onSubscriptionChange`, as it has an special use (see "Notification metadata marks" section).
+
 ## Ordering Results
 
 Operations that retrieve lists of entities permit the `orderBy` URI parameter to specify the
@@ -912,6 +922,21 @@ Some considerations to take into account:
 Note that if a custom payload is used for the notification (the field `payload` is given in the
 corresponding subscription), then a value of `custom` is used for the `Ngsiv2-AttrsFormat` header
 in the notification.
+
+## Notification metadata marks
+
+In the case of using `metadataFlags` to `true` in the subscription, the following metadata
+are automatically inserted in the notification messages:
+
+* For these attributes included in the update triggering the notification, no matter if the actually
+  changed or not, `ngsi:onArrival` with boolean value `true` and type `"Boolean"` is inserted.
+
+* For these attributes included in the update triggering the notification that actually changed their
+  values, `ngsi:onChange` with boolean value `true` and type `"Boolean"` is inserted.
+
+* For these attributes notififed as a consecuence of an initial creation or update of the
+  subscription, `ngsi:onSubscriptionChange` with boolean value `true` and type `"Boolean"`
+  is inserted.
 
 ## Group API Entry Point
 
@@ -1670,6 +1695,9 @@ A `notification` object contains the following subfields:
   Accepted values are `normalized` (default), `keyValues` or `values`.
   If `attrsFormat` takes any value different
   than those, an error is raised. See detail in "Notification Messages" section.
++ `metadataFlags` (optional): a boolean field that specifies if notification metadata marks has to be
+  included in notifications (if set to `true`) or not (if set to `false` or omitted). See "Notification
+  metadata marks" section. Only shown in subscription retrieve operations when its value is `true`.
 + `timesSent` (not editable, only present in GET operations): Number of notifications sent due to
    this subscription.
 + `lastNotification` (not editable, only present in GET operations): Last notification date in ISO8601 format.

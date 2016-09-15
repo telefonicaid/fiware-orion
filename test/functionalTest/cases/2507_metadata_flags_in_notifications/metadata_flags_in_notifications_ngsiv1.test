@@ -35,7 +35,7 @@ accumulatorStart --pretty-print
 #
 # 01. Create E1 with attributes A:1, B:2, C:3, D:4
 # 02. Subscribe to E.* for A, B and C; triggered by B, C or D
-# 03. Dump and reset: see initial notification with ngsi:onSubscriptionChanges for A, B and C
+# 03. Dump and reset: see initial notification with ngsi:onSubscriptionChange for A, B and C
 # 04. Update B:20
 # 05. Dump and reset: see notification with ngsi:onArrival and ngsi:onChange for B
 # 06. Update B:20, C:30
@@ -47,7 +47,7 @@ accumulatorStart --pretty-print
 # 12. Create E2 with attributes A:x, B:y, C:z, D:u
 # 13. Dump and reset: see notification with ngsi:onArrival and ngsi:onChange for A, B, C
 # 14. Update subscription conditions (to re-trigger initial notification)
-# 15. Dump and reset: see notification with 2 entities with ngsi:onSubscriptionChanges for A, B and C
+# 15. Dump and reset: see notification with 2 entities with ngsi:onSubscriptionChange for A, B and C
 #
 
 echo "01. Create E1 with attributes A:1, B:2, C:3, D:4"
@@ -107,8 +107,8 @@ echo
 SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 
-echo "03. Dump and reset: see initial notification with ngsi:onSubscriptionChanges for A, B and C"
-echo "==========================================================================================="
+echo "03. Dump and reset: see initial notification with ngsi:onSubscriptionChange for A, B and C"
+echo "=========================================================================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -266,8 +266,8 @@ echo
 echo
 
 
-echo "15. Dump and reset: see notification with 2 entities with ngsi:onSubscriptionChanges for A, B and C"
-echo "==================================================================================================="
+echo "15. Dump and reset: see notification with 2 entities with ngsi:onSubscriptionChange for A, B and C"
+echo "=================================================================================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -295,10 +295,10 @@ Date: REGEX(.*)
 
 
 
-03. Dump and reset: see initial notification with ngsi:onSubscriptionChanges for A, B and C
-===========================================================================================
+03. Dump and reset: see initial notification with ngsi:onSubscriptionChange for A, B and C
+==========================================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 1256
+Content-Length: 1253
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -313,7 +313,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "ngsi:onSubscriptionChanges",
+                                "name": "ngsi:onSubscriptionChange",
                                 "type": "Boolean",
                                 "value": true
                             }
@@ -325,7 +325,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "ngsi:onSubscriptionChanges",
+                                "name": "ngsi:onSubscriptionChange",
                                 "type": "Boolean",
                                 "value": true
                             }
@@ -337,7 +337,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "ngsi:onSubscriptionChanges",
+                                "name": "ngsi:onSubscriptionChange",
                                 "type": "Boolean",
                                 "value": true
                             }
@@ -740,10 +740,10 @@ Date: REGEX(.*)
 
 
 
-15. Dump and reset: see notification with 2 entities with ngsi:onSubscriptionChanges for A, B and C
-===================================================================================================
+15. Dump and reset: see notification with 2 entities with ngsi:onSubscriptionChange for A, B and C
+==================================================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 3007
+Content-Length: 2999
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -758,7 +758,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "ngsi:onSubscriptionChanges",
+                                "name": "ngsi:onSubscriptionChange",
                                 "type": "Boolean",
                                 "value": true
                             }
@@ -770,7 +770,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "ngsi:onSubscriptionChanges",
+                                "name": "ngsi:onSubscriptionChange",
                                 "type": "Boolean",
                                 "value": true
                             }
@@ -782,7 +782,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "ngsi:onSubscriptionChanges",
+                                "name": "ngsi:onSubscriptionChange",
                                 "type": "Boolean",
                                 "value": true
                             }
@@ -794,7 +794,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "ngsi:onSubscriptionChanges",
+                                "name": "ngsi:onSubscriptionChange",
                                 "type": "Boolean",
                                 "value": true
                             }
@@ -819,7 +819,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "ngsi:onSubscriptionChanges",
+                                "name": "ngsi:onSubscriptionChange",
                                 "type": "Boolean",
                                 "value": true
                             }
@@ -831,7 +831,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "ngsi:onSubscriptionChanges",
+                                "name": "ngsi:onSubscriptionChange",
                                 "type": "Boolean",
                                 "value": true
                             }
@@ -843,7 +843,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "ngsi:onSubscriptionChanges",
+                                "name": "ngsi:onSubscriptionChange",
                                 "type": "Boolean",
                                 "value": true
                             }
@@ -855,7 +855,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "ngsi:onSubscriptionChanges",
+                                "name": "ngsi:onSubscriptionChange",
                                 "type": "Boolean",
                                 "value": true
                             }
