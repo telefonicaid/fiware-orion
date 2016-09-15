@@ -349,17 +349,27 @@ static void setCondsAndInitialNotify
       status = subOrig.hasField(CSUB_STATUS)? getStringFieldF(subOrig, CSUB_STATUS) : STATUS_ACTIVE;
     }
 
-    HttpInfo httpInfo;
-    bool     metadataFlags;
+    HttpInfo                  httpInfo;
+    bool                      metadataFlags;
+    bool                      blacklist;
+    std::vector<std::string>  notifAttributesV;
     if (subUp.notificationProvided)
     {
-      httpInfo      = subUp.notification.httpInfo;
-      metadataFlags = subUp.notification.metadataFlags;
+      httpInfo         = subUp.notification.httpInfo;
+      blacklist        = subUp.notification.blacklist;
+      metadataFlags    = subUp.notification.metadataFlags;
+      notifAttributesV = subUp.notification.attributes;
     }
     else
     {
       httpInfo.fill(subOrig);
+      blacklist     = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(subOrig, CSUB_BLACKLIST) : false;
       metadataFlags = subOrig.hasField(CSUB_METADATA_FLAGS)? getBoolFieldF(subOrig, CSUB_METADATA_FLAGS) : false;
+      std::vector<BSONElement> attrs = getFieldF(subOrig, CSUB_ATTRS).Array();
+      for (unsigned int ix = 0; ix < attrs.size(); ++ix)
+      {
+        notifAttributesV.push_back(attrs[ix].String());
+      }
     }
 
     RenderFormat attrsFormat;
@@ -386,9 +396,9 @@ static void setCondsAndInitialNotify
     }
     else
     {
-      setCondsAndInitialNotify(subUp, subUp.id, status, httpInfo, metadataFlags, attrsFormat,
-                               tenant, servicePathV, xauthToken, fiwareCorrelator,
-                               b, notificationDone);
+      setCondsAndInitialNotify(subUp, subUp.id, status, notifAttributesV, httpInfo, blacklist,
+                               metadataFlags, attrsFormat, tenant, servicePathV, xauthToken,
+                               fiwareCorrelator, b, notificationDone);
     }
   }
   else

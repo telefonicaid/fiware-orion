@@ -153,9 +153,9 @@ std::string mongoCreateSubscription
   setMetadataFlags(sub, &b);
 
   std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
-  setCondsAndInitialNotify(sub, subId, status, sub.notification.httpInfo, sub.notification.metadataFlags,
-                           sub.attrsFormat, tenant, servicePathV, xauthToken, fiwareCorrelator,
-                           &b, &notificationDone);
+  setCondsAndInitialNotify(sub, subId, status, sub.notification.attributes, sub.notification.httpInfo,
+                           sub.notification.blacklist, sub.notification.metadataFlags, sub.attrsFormat,
+                           tenant, servicePathV, xauthToken, fiwareCorrelator, &b, &notificationDone);
   if (notificationDone)
   {
     long long lastNotification = (long long) getCurrentTime();

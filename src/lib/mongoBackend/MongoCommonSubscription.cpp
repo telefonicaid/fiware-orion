@@ -280,7 +280,9 @@ void setCondsAndInitialNotify
   const Subscription&              sub,
   const std::string&               subId,
   const std::string&               status,
+  const std::vector<std::string>&  notifAttributesV,
   const HttpInfo&                  httpInfo,
+  bool                             blacklist,
   bool                             metadataFlags,
   RenderFormat                     attrsFormat,
   const std::string&               tenant,
@@ -299,7 +301,7 @@ void setCondsAndInitialNotify
   *notificationDone = false;
   BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             sub.subject.entities,
-                                            sub.notification.attributes,
+                                            notifAttributesV,
                                             subId,
                                             httpInfo,
                                             notificationDone,
@@ -310,8 +312,8 @@ void setCondsAndInitialNotify
                                             &(sub.restriction),
                                             status,
                                             fiwareCorrelator,
-                                            sub.notification.attributes,
-                                            sub.notification.blacklist,
+                                            notifAttributesV,
+                                            blacklist,
                                             metadataFlags);
 
   b->append(CSUB_CONDITIONS, conds);
