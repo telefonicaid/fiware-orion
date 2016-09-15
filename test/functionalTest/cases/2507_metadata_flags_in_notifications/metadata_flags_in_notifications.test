@@ -658,7 +658,7 @@ Date: REGEX(.*)
 15. Dump and reset: see notification with 2 entities with ngsi:onSubscriptionChange for A, B and C
 ==================================================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 944
+Content-Length: 733
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -699,16 +699,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                 "type": "Number",
                 "value": 30
             },
-            "D": {
-                "metadata": {
-                    "ngsi:onSubscriptionChange": {
-                        "type": "Boolean",
-                        "value": true
-                    }
-                },
-                "type": "Number",
-                "value": 41
-            },
             "id": "E1",
             "type": "T"
         },
@@ -742,16 +732,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                 },
                 "type": "Text",
                 "value": "z"
-            },
-            "D": {
-                "metadata": {
-                    "ngsi:onSubscriptionChange": {
-                        "type": "Boolean",
-                        "value": true
-                    }
-                },
-                "type": "Text",
-                "value": "u"
             },
             "id": "E2",
             "type": "T"
