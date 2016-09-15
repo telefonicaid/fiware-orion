@@ -707,6 +707,7 @@ Let's examine in detail the different elements included in the payload:
     described [in this document](duration.md#extending-duration).
     We are using a date far enough away in time (year 2040) hoping the subscription
     will not expire while you run this tutorial :).
+-   You can also have permanent subscriptions. Just omit the `expires` field.
 -   The `conditions` element defines the "trigger" for the subscription. The
     `attrs` field contains a list of attribute names. These names define the
     "triggering attributes", i.e. attributes that upon creation/change
@@ -724,6 +725,9 @@ Let's examine in detail the different elements included in the payload:
     way only to show the enormous flexibility of subscriptions.
 -   You can leave `conditions.attrs` empty to make a notification
     trigger on any entity attribute change (regardless of the name of the attribute).
+-   You can also set "notify all attributes except some ones" subscriptions (a kind of
+    "blacklist" functionality). In this case, use `exceptAttrs` instead of `attrs`
+    within `notifications`.
 -   You can include filtering expressions in `conditions`. For example, to get notified
     not only if pressure changes, but if it changes within the range 700-800. This
     is an advanced topic, see the "Subscriptions" section in the
