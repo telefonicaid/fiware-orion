@@ -409,16 +409,16 @@ attributes using ID metadata:
 
 ## Notification metadata marks
 
-For those subscription created using `metadataFlags` to `true` (using NGSIv2 operations) some
+For subscriptions created with `metadataFlags` set to `true` (using NGSIv2 operations) some
 metadata may appear in notifications sent by Orion (no matter if the notification format is NGSIv2
 or NGSIv1, using `attrsFormat` to `legacy` in the second case). In particular:
 
-* For these attributes included in the update triggering the notification, no matter if the actually
-  changed or not, `ngsi:onArrival` with boolean value `true` and type `"Boolean"` is inserted.
+* For attributes included in the update, that triggered the notification, no matter whether they actually
+  changed, `ngsi:onArrival` with boolean value `true` and type `"Boolean"` is included.
 
-* For these attributes included in the update triggering the notification that actually changed their
-  values, `ngsi:onChange` with boolean value `true` and type `"Boolean"` is inserted.
+* For attributes included in the update, that triggered the notification and that actually changed their
+  values, `ngsi:onChange` with boolean value `true` and type `"Boolean"` is included.
 
-* For these attributes notififed as a consecuence of an initial creation or update of the
+* For attributes notified as a consequence of an initial creation or update of the
   subscription, `ngsi:onSubscriptionChange` with boolean value `true` and type `"Boolean"`
-  is inserted.
+  is included.
