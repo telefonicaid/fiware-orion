@@ -23,20 +23,30 @@
 # Author: Ivan Arias Leon
 
 # variables
-HOST="localhost"
-PORT="1026"
-NGSI_VERSION="v1"
+HOST=localhost
+PORT=1026
+NGSI_VERSION=v1
 UPDATE_TOTAL=100
 SUBSC=false
 SUBSC_REFERENCE="http://localhost:1028/notify"
 
-function random_string(){
-    # a random string is generated with a given size
-    cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${1:-32} | head -n 1
+
+# ========================================================
+# 
+# random_string - generate a random string with a given size
+# 
+function random_string()
+{
+  size=$1
+  cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${size:-32} | head -n 1
 }
 
-function usage(){
-     # show the script usage
+# ========================================================
+# 
+# usage - show the script usage
+# 
+function usage()
+{
      echo " "
      echo "Usage: "$(basename $0) 
      echo "   -u (usage)"
@@ -67,16 +77,16 @@ do
   else
       echo $0: bad parameter/option: "'"${1}"'";
       usage
-      exit
+      exit 0
   fi
   shift
 done
 
 if [ "$SUBSC" == "true" ]; then
    curl "http://$HOST:$PORT/v2/subscriptions" -H "Fiware-service: test" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" -d '{"subject": {"entities": [{"type": "Room","idPattern": ".*"}], "condition": {"attrs": ["temperature"]}}, "notification": {"http": {"url": "'$SUBSC_REFERENCE'"}, "attrs": ["temperature"]}}' &> /dev/null
-   echo "...a subscription has been created..."
+   echo "A subscription has been created and Update Requests are not sent. "
 else
-    echo "...Executing "$UPDATE_TOTAL "updates using NGSI "$NGSI_VERSION "in the host "$HOST "..."
+    echo -n "Executing "$UPDATE_TOTAL "updates using NGSI "$NGSI_VERSION "in the host "$HOST"..."
     INIT_DATE=$(date +%s)
     for (( c=1; c<=$UPDATE_TOTAL; c++ ))
        do
@@ -88,5 +98,5 @@ else
            fi
         done
     END_DATE=$(date +%s)
-    echo "the test using NGSI "$NGSI_VERSION " has taken" $(( END_DATE - INIT_DATE )) "secs..."
+    echo " The test using NGSI "$NGSI_VERSION" has taken" $(( END_DATE - INIT_DATE )) "seconds."
 fi
