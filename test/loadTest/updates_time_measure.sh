@@ -63,6 +63,7 @@ function usage()
      echo "     - if the subscription is created, the entities are not updated and viceversa..."
      echo "     - if \"--subsc_reference\" parameter is used is not necessary the \"-subsc\" parameter ..."
      echo " "
+     exit 0
 }
 
 # BEGIN 
@@ -77,7 +78,6 @@ do
   else
       echo $0: bad parameter/option: "'"${1}"'";
       usage
-      exit 0
   fi
   shift
 done
