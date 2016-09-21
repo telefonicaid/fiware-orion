@@ -1,6 +1,6 @@
 ﻿#!/bin/bash
 # -*- coding: latin-1 -*-
-# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -27,7 +27,6 @@ HOST="localhost"
 PORT="1026"
 NGSI_VERSION="v1"
 UPDATE_TOTAL=100
-INIT_DATE=$(date +%s)
 SUBSC=false
 SUBSC_REFERENCE="http://localhost:1028/notify"
 
@@ -78,6 +77,7 @@ if [ "$SUBSC" == "true" ]; then
    echo "...a subscription has been created..."
 else
     echo "...Executing "$UPDATE_TOTAL "updates using NGSI "$NGSI_VERSION "in the host "$HOST "..."
+    INIT_DATE=$(date +%s)
     for (( c=1; c<=$UPDATE_TOTAL; c++ ))
        do
            VALUE=$(random_string 8)
@@ -87,7 +87,6 @@ else
               curl "http://$HOST:$PORT/v2/op/update" -H "Fiware-service: test" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" -d '{"entities": [{"type": "Room", "id": "Room1", "temperature": {"value": "'$VALUE'"}}], "actionType": "APPEND"}' &> /dev/null
            fi
         done
-
-    END_DATE=$(date + %s)
-    echo "the test using NGSI "$NGSI_VERSION " has delayed" $(( END_DATE - INIT_DATE )) "secs..."
+    END_DATE=$(date +%s)
+    echo "the test using NGSI "$NGSI_VERSION " has taken" $(( END_DATE - INIT_DATE )) "secs..."
 fi
