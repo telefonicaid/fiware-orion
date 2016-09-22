@@ -366,8 +366,7 @@ int mongoSubCacheItemInsert
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
   cSubP->next                  = NULL;
-  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
-  cSubP->metadataFlags         = sub.hasField(CSUB_METADATA_FLAGS)? getBoolFieldF(sub, CSUB_METADATA_FLAGS) : false;
+  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;  
 
   //
   // httpInfo
@@ -406,6 +405,7 @@ int mongoSubCacheItemInsert
 
   //
   // 06. Push attribute names to Attribute Vector (cSubP->attributes)
+  // FIXME: use setStringVector
   //
   for (unsigned int ix = 0; ix < attrVec.size(); ++ix)
   {
@@ -414,9 +414,16 @@ int mongoSubCacheItemInsert
   }
 
 
+  //
+  // 07. Push metadata names to Metadata Vector (cSubP->metadatas)
+  // FIXME: use setStringVector
+  //
+  setStringVectorF(sub, CSUB_METADATA,&(cSubP->metadata));
+
 
   //
-  // 07. Fill in cSubP->notifyConditionV from condVec
+  // 08. Fill in cSubP->notifyConditionV from condVec
+  // FIXME: use setStringVector
   //
   for (unsigned int ix = 0; ix < condVec.size(); ++ix)
   {

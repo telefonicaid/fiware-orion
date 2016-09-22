@@ -85,6 +85,7 @@
 #define CSUB_THROTTLING            "throttling"
 #define CSUB_ENTITIES              "entities"
 #define CSUB_ATTRS                 "attrs"
+#define CSUB_METADATA              "metadata"
 #define CSUB_ENTITY_ID             "id"
 #define CSUB_ENTITY_TYPE           "type"
 #define CSUB_ENTITY_ISPATTERN      "isPattern"
@@ -99,7 +100,6 @@
 #define CSUB_QS                    "qs"
 #define CSUB_PAYLOAD               "payload"
 #define CSUB_BLACKLIST             "blacklist"
-#define CSUB_METADATA_FLAGS        "mdFlags"
 
 #define CASUB_EXPIRATION        "expiration"
 #define CASUB_REFERENCE         "reference"

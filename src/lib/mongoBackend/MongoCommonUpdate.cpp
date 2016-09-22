@@ -1171,8 +1171,8 @@ static bool addTriggeredSubscriptions_withCache
                                                            aList,
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant);
-    subP->blacklist     = cSubP->blacklist;
-    subP->metadataFlags = cSubP->metadataFlags;
+    subP->blacklist = cSubP->blacklist;
+    subP->metadata  = cSubP->metadata;
 
     subP->fillExpression(cSubP->expression.georel, cSubP->expression.geometry, cSubP->expression.coords);
 
@@ -1541,7 +1541,8 @@ static bool addTriggeredSubscriptions_noCache
           subToAttributeList(sub), "", "");
 
       trigs->blacklist     = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
-      trigs->metadataFlags = sub.hasField(CSUB_METADATA_FLAGS)? getBoolFieldF(sub, CSUB_METADATA_FLAGS) : false;
+
+      setStringVectorF(sub, CSUB_METADATA, &(trigs->metadata));
 
       if (sub.hasField(CSUB_EXPR))
       {
@@ -1739,7 +1740,7 @@ static bool processOnChangeConditionForUpdateContext
 }
 
 
-
+# if 0
 /* ****************************************************************************
 *
 * setMetadataForFlags -
@@ -1763,7 +1764,7 @@ static void setMetadataForFlags(ContextElementResponse* notifyCerP)
     }
   }
 }
-
+#endif
 
 
 /* ****************************************************************************
@@ -1876,10 +1877,10 @@ static bool processSubscriptions
     }
 
     /* Set metadata corresponding to notification flags */
-    if (tSubP->metadataFlags)
+    /*if (tSubP->metadataFlags)
     {
       setMetadataForFlags(notifyCerP);
-    }
+    }*/
 
     /* Send notification */
     LM_T(LmtSubCache, ("NOT ignored: %s", tSubP->cacheSubId.c_str()));

@@ -122,7 +122,6 @@ extern void setCondsAndInitialNotify
   const std::string&               subId,
   const std::string&               status,
   const ngsiv2::HttpInfo&          httpInfo,
-  bool                             metadataFlags,
   RenderFormat                     attrsFormat,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,
@@ -181,10 +180,10 @@ extern void setBlacklist(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder*
 
 /* ****************************************************************************
 *
-* setMdFlags -
+* setMetadata -
 *
 */
-extern void setMetadataFlags(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
+extern void setMetadata(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
 
 
 

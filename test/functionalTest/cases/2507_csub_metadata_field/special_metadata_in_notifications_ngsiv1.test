@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Metadata flags in NGSIv1 notifications
+Special metadata in NGSIv1 notifications
 
 --SHELL-INIT--
 dbInit CB

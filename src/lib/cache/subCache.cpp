@@ -746,6 +746,7 @@ void subCacheItemInsert
   const ngsiv2::HttpInfo&            httpInfo,
   const std::vector<ngsiv2::EntID>&  entIdVector,
   const std::vector<std::string>&    attributes,
+  const std::vector<std::string>&    metadata,
   const std::vector<std::string>&    conditionAttrs,
   const char*                        subscriptionId,
   int64_t                            expirationTime,
@@ -760,8 +761,7 @@ void subCacheItemInsert
   const std::string&                 geometry,
   const std::string&                 coords,
   const std::string&                 georel,
-  bool                               blacklist,
-  bool                               metadataFlags
+  bool                               blacklist
 )
 {
   //
@@ -790,10 +790,10 @@ void subCacheItemInsert
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
   cSubP->blacklist             = blacklist;
-  cSubP->metadataFlags         = metadataFlags;
   cSubP->httpInfo              = httpInfo;
   cSubP->notifyConditionV      = conditionAttrs;
   cSubP->attributes            = attributes;
+  cSubP->metadata              = metadata;
 
 
   //
