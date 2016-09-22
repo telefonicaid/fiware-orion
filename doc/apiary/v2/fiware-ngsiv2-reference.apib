@@ -403,11 +403,11 @@ The following strings must not be used as attribute names:
 
 The following strings must not be used as metadata names:
 
-* `ngsi:onArrival`, as it has an special use (see "Notification metadata marks" section).
+* `previousValue`, as it is a reserved metadata (see "Special metadata in notifications" section).
 
-* `ngsi:onChange`, as it has an special use (see "Notification metadata marks" section).
+* `actionType`, as it is a reserved metadata (see "Special metadata in notifications" section).
 
-* `ngsi:onSubscriptionChange`, as it has an special use (see "Notification metadata marks" section).
+* `*`, as it has an special meaning as "all the custom (user) metadata".
 
 ## Ordering Results
 
@@ -923,20 +923,21 @@ Note that if a custom payload is used for the notification (the field `payload` 
 corresponding subscription), then a value of `custom` is used for the `Ngsiv2-AttrsFormat` header
 in the notification.
 
-## Notification metadata marks
+## Special metadata in notifications
 
-In the case of using `metadataFlags` to `true` in the subscription, the following metadata
-are automatically inserted in the notification messages:
+The following metadata are not included in notifications by default, the `metadata` field (within
+`notification` field) in subscription is used to do so.
 
-* For these attributes included in the update triggering the notification, no matter if the actually
-  changed or not, `ngsi:onArrival` with boolean value `true` and type `"Boolean"` is inserted.
+* `previousValue`: the value and type of this metadata is the one of the attribute to which it
+  is attached previous to the processing of the request that triggered the notification. If the
+  type/value of `previousValue` is the same type/value than in the attribute in which it has been
+  included, then the attribute has not actually changed its value.
 
-* For these attributes included in the update triggering the notification that actually changed their
-  values, `ngsi:onChange` with boolean value `true` and type `"Boolean"` is inserted.
-
-* For these attributes notififed as a consecuence of an initial creation or update of the
-  subscription, `ngsi:onSubscriptionChange` with boolean value `true` and type `"Boolean"`
-  is inserted.
+* `actionType`: it is included if the attribute to which it is attached was included in the request
+  that triggered the notification. Its value depend on the request operation type: `update`
+  for updates, `append` for creation and `delete` for deletion. Its type is always `Text`.
+  (NOTE: currently Orion, reference implementation of NGSIv2 API, doesn't implement the append
+  and delete cases).
 
 ## Group API Entry Point
 
@@ -1695,9 +1696,9 @@ A `notification` object contains the following subfields:
   Accepted values are `normalized` (default), `keyValues` or `values`.
   If `attrsFormat` takes any value different
   than those, an error is raised. See detail in "Notification Messages" section.
-+ `metadataFlags` (optional): a boolean field that specifies if notification metadata marks has to be
-  included in notifications (if set to `true`) or not (if set to `false` or omitted). See "Notification
-  metadata marks" section. Only shown in subscription retrieve operations when its value is `true`.
++ `metadata` (optional): List of metadata to be included in notification messages. By default all
+  metadata are included except the special ones described at "Special metadata in notifications"
+  section. The string `*` can be used as member of this list to mean "all the custom (user) metadata".
 + `timesSent` (not editable, only present in GET operations): Number of notifications sent due to
    this subscription.
 + `lastNotification` (not editable, only present in GET operations): Last notification date in ISO8601 format.

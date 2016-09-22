@@ -407,18 +407,32 @@ attributes using ID metadata:
     section](append_and_delete.md#adding-and-removing-attributes-with-append-and-delete-in-updatecontext)).
 
 
-## Notification metadata marks
+## Metadata in notifications
 
-For subscriptions created with `metadataFlags` set to `true` (using NGSIv2 operations) some
-metadata may appear in notifications sent by Orion (no matter if the notification format is NGSIv2
-or NGSIv1, using `attrsFormat` to `legacy` in the second case). In particular:
+By default, all custom (user) metadata are included in notifications. However, the field `metadata`
+can be used to filter the list. In addition, it can used to specify that the following special
+metadata (not included by default) has to be included.
 
-* For attributes included in the update, that triggered the notification, no matter whether they actually
-  changed, `ngsi:onArrival` with boolean value `true` and type `"Boolean"` is included.
+* previousValue
+* actionType
 
-* For attributes included in the update, that triggered the notification and that actually changed their
-  values, `ngsi:onChange` with boolean value `true` and type `"Boolean"` is included.
+Details about their meaning can be found in "Special metadata in notifications" section in
+the NGSIv2 specification).
 
-* For attributes notified as a consequence of an initial creation or update of the
-  subscription, `ngsi:onSubscriptionChange` with boolean value `true` and type `"Boolean"`
-  is included.
+Note that using the following
+
+```
+"metadata": [ "previousValue" ]
+```
+
+will cause to include `previousValue` but will remove any other metadata that
+attributes in the notification may potentially have. If you want to get `previousValue`
+*and* any other "regular" metadata then use:
+
+```
+"metadata": [ "previousValue", "*" ]
+```
+
+Note that you can also use `"metadata": [ "*" ]` although it doesn't have too much sense, as
+you will get the same result that not including `metadata` at all (remember that default
+behaviour is to include all custom metadata).
