@@ -493,7 +493,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   //
   std::string apiVersion = "v1";
 
-  if (strcasecmp(compV[0].c_str(), "v2") == 0)
+  if ((compV.size() != 0) && strcasecmp(compV[0].c_str(), "v2") == 0)
   {
     apiVersion = "v2";
   }
