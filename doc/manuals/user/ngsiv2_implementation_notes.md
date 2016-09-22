@@ -97,9 +97,19 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
     * **method**: optional (but if present it must be a valid HTTP method)
     * **payload**: optional (empty string is allowed)
   * **attrs**: optional (but if present it must be a list; empty list is allowed)
+  * **metadata**: optional (but if present it must be a list; empty list is allowed)
   * **exceptAttrs**: optional (but it cannot be present if `attrs` is also used; if present it must be a non-empty list)
   * **attrsFormat**: optional (but if present it must be a valid attrs format keyword)
 * **throttling**: optional (must be an integer)
 * **expires**: optional (must be a date or empty string "")
 * **status**: optional (must be a valid status keyword)
 
+# actionType metadata
+
+From NGSIv2 specification section "Special metadata in notifications", regarding `actionType` metadata:
+
+> Its value depend on the request operation type: `update` for updates,
+> `append` for creation and `delete` for deletion. Its type is always `Text`.
+
+Current Orion implementation only supports the "update" case. Other cases will be
+supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).

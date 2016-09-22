@@ -724,12 +724,10 @@ Let's examine in detail the different elements included in the payload:
     way only to show the enormous flexibility of subscriptions.
 -   You can leave `conditions.attrs` empty to make a notification
     trigger on any entity attribute change (regardless of the name of the attribute).
--   You can make Orion mark the attributes in the notification that at the same
-    time were part of the triggering update. In addition, Orion can mark the attributes
-    that actually changed as a consequence of that update. These marks are based on
-    metadata, described in [the following piece of documentation](metadata.md). Have
-    a look at the "Notification metadata marks" section in the
-    [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
+-   Notifications include the attribute values *after* processing the update operation
+    triggering the notification. However, you can make Orion to include also the
+    *previous* value. This is achieved using metadata. Have a look to
+    [the following piece of documentation](metadata.md#metadata-in-notifications).
 -   You can include filtering expressions in `conditions`. For example, to get notified
     not only if pressure changes, but if it changes within the range 700-800. This
     is an advanced topic, see the "Subscriptions" section in the

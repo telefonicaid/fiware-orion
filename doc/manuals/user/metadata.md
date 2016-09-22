@@ -11,9 +11,7 @@ for special metadata that are interpreted by Orion:
 
 -   [ID](#metadata-id-for-attributes)
 -   location, which is currently [deprecated](../deprecated.md), but still supported
--   ngsi:onArrival, used by the "Notification metadata marks" functionality in NGSIv2
--   ngsi:onChange, used by the "Notification metadata marks" functionality in NGSIv2
--   ngsi:onSubscription, used by the "Notification metadata marks" functionality in NGSIv2
+-   The ones defined in "Special metadata in notifications" section in the NGSIv2 spec
 
 Its management is slightly different in NGSIv1 and NGSIv2, so it is
 described in different sections.
