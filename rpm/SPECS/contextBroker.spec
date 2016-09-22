@@ -164,8 +164,11 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Thu Sep 22 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.2.3-1
+- Fix: missing expression sub-fields (q, etc.) in csubs makes Orion to crash
+
 * Wed Sep 14 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.2.2-1
--Hotfix: remove attribute detail in get types operations (only NGSIv2 API) (hardwired solution for #2073)
+- Hotfix: remove attribute detail in get types operations (only NGSIv2 API) (hardwired solution for #2073)
 
 * Thu Jun 16 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.2.1-1
 - Fix: UTC as time in log file (#2232)
