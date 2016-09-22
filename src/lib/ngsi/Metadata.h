@@ -48,7 +48,11 @@
 #define NGSI_MD_MODDATE            "modDate"    // FIXME P5: to be used for modDate (currenly only in DB)
 #define NGSI_MD_NOTIF_ONUPDATE     "ngsi:onArrival"
 #define NGSI_MD_NOTIF_ONCHANGE     "ngsi:onChange"
+
+#if 0
+// FIXME #910: disabled by the moment, maybe removed at the end
 #define NGSI_MD_NOTIF_ONSUBCHANGE  "ngsi:onSubscriptionChange"
+#endif
 
 
 

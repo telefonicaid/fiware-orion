@@ -1816,9 +1816,12 @@ AttributeList subToAttributeList(const BSONObj& sub)
 }
 
 
+#if 0
 /* ****************************************************************************
 *
 * setOnSubscriptionMetadata -
+*
+* FIXME #910: disabled by the moment, maybe removed at the end
 */
 static void setOnSubscriptionMetadata(ContextElementResponseVector* cerVP)
 {
@@ -1834,7 +1837,7 @@ static void setOnSubscriptionMetadata(ContextElementResponseVector* cerVP)
     }
   }
 }
-
+#endif
 
 
 /* ****************************************************************************
@@ -1898,11 +1901,14 @@ static bool processOnChangeConditionForSubscription
   pruneContextElements(rawCerV, &ncr.contextElementResponseVector);
   rawCerV.release();
 
+#if 0
+  // FIXME #910: disabled by the moment, maybe removed at the end
   /* Append notification metadata */
   if (metadataFlags)
   {
     setOnSubscriptionMetadata(&ncr.contextElementResponseVector);
   }
+#endif
 
   if (ncr.contextElementResponseVector.size() > 0)
   {
