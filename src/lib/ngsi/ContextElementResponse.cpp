@@ -227,12 +227,17 @@ ContextElementResponse::ContextElementResponse
       case Object:
         caP = new ContextAttribute(ca.name, ca.type, "");
         caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
+        caP->valueType = orion::ValueTypeObject;
         compoundObjectResponse(caP->compoundValueP, getFieldF(attr, ENT_ATTRS_VALUE));
         break;
 
       case Array:
         caP = new ContextAttribute(ca.name, ca.type, "");
         caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
+        // FIXME P7: next line is counterintuitive. If the object is a vector, why
+        // we need to use ValueTypeObject here? Because otherwise Metadata::toJson()
+        // method doesn't work. A littely crazy... it should be fixed.
+        caP->valueType = orion::ValueTypeObject;
         compoundVectorResponse(caP->compoundValueP, getFieldF(attr, ENT_ATTRS_VALUE));
         break;
 

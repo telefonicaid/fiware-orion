@@ -1810,6 +1810,7 @@ static void setPreviousValueMetadata(ContextElementResponse* notifyCerP)
     {
       mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, "");
       mdP->valueType = previousValueP->valueType;
+
       // Steal the compound
       mdP->compoundValueP = previousValueP->compoundValueP;
       previousValueP->compoundValueP = NULL;
@@ -2150,7 +2151,7 @@ static void updateAttrInNotifyCer
 
         if (targetAttr->type != "")
         {
-          caP->previousValue->type = targetAttr->type;
+          caP->previousValue->type = caP->type;
         }
 
         /* Set values from target attribute */
