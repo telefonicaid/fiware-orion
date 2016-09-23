@@ -87,7 +87,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that "<returned>" entities are returned
     And verify headers in response
       | parameter          | value      |
-      | fiware-total-count | <entities> |
+      | Fiware-Total-Count | <entities> |
     Examples:
       | entities | returned |
       | 1        | 1        |
@@ -130,7 +130,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that "<returned>" entities are returned
     And verify headers in response
       | parameter          | value      |
-      | fiware-total-count | <entities> |
+      | Fiware-Total-Count | <entities> |
     Examples:
       | entities | returned |
       | 1        | 1        |
@@ -174,7 +174,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that "<returned>" entities are returned
     And verify headers in response
       | parameter          | value      |
-      | fiware-total-count | <entities> |
+      | Fiware-Total-Count | <entities> |
     Examples:
       | entities | offset | limit | returned |
       | 1        | 1      | 1     | 0        |

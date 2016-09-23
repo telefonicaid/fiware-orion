@@ -117,7 +117,7 @@ Feature: verify fields in log traces with list entities request using NGSI v2.
     And verify that "1" entities are returned
     And verify headers in response
       | parameter          | value |
-      | fiware-total-count | 1     |
+      | Fiware-Total-Count | 1     |
     And check in log, label "INFO" and message "Starting transaction from"
       | trace  | value              |
       | time   | ignored            |
