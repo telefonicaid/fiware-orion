@@ -281,7 +281,6 @@ void setCondsAndInitialNotify
   const std::string&               subId,
   const std::string&               status,
   const HttpInfo&                  httpInfo,
-  //bool                             metadataFlags,
   RenderFormat                     attrsFormat,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,
@@ -312,8 +311,7 @@ void setCondsAndInitialNotify
                                             status,
                                             fiwareCorrelator,
                                             sub.notification.attributes,
-                                            sub.notification.blacklist/*,
-                                            metadataFlags*/);
+                                            sub.notification.blacklist);
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));

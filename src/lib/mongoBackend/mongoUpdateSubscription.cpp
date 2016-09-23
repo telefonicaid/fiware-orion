@@ -355,7 +355,7 @@ static void setCondsAndInitialNotify
     HttpInfo httpInfo;
     if (subUp.notificationProvided)
     {
-      httpInfo      = subUp.notification.httpInfo;     
+      httpInfo = subUp.notification.httpInfo;
     }
     else
     {
@@ -386,7 +386,7 @@ static void setCondsAndInitialNotify
     }
     else
     {
-      setCondsAndInitialNotify(subUp, subUp.id, status, httpInfo, /*metadataFlags,*/ attrsFormat,
+      setCondsAndInitialNotify(subUp, subUp.id, status, httpInfo, attrsFormat,
                                tenant, servicePathV, xauthToken, fiwareCorrelator,
                                b, notificationDone);
     }

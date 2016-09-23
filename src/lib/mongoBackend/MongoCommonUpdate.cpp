@@ -1541,7 +1541,7 @@ static bool addTriggeredSubscriptions_noCache
           httpInfo,
           subToAttributeList(sub), "", "");
 
-      trigs->blacklist     = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+      trigs->blacklist = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
 
       setStringVectorF(sub, CSUB_METADATA, &(trigs->metadata));
 

@@ -413,8 +413,6 @@ void Metadata::fill(const struct Metadata& md)
 */
 std::string Metadata::toStringValue(void) const
 {
-  char buffer[64];
-
   switch (valueType)
   {
   case orion::ValueTypeString:
@@ -428,8 +426,7 @@ std::string Metadata::toStringValue(void) const
     }
     else // regular number
     {
-      snprintf(buffer, sizeof(buffer), "%f", numberValue);
-      return std::string(buffer);
+      return toString(numberValue);
     }    
     break;
 
