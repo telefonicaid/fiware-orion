@@ -925,15 +925,16 @@ in the notification.
 
 ## Special metadata in notifications
 
-The following metadata are not included in notifications by default, the `metadata` field (within
-`notification` field) in subscription is used to do so.
+The `metadata` field (within the `notification` field) can be used to select a set of special
+attribute metadata included by notifications and aimed at providing more information about the
+nature of the event that triggered the notification. These metadata are:
 
-* `previousValue`: the value and type of this metadata is the one of the attribute to which it
-  is attached previous to the processing of the request that triggered the notification. If the
-  type/value of `previousValue` is the same type/value than in the attribute in which it has been
-  included, then the attribute has not actually changed its value.
+* `previousValue`. The value of this metadata must be the previous value of the associated attribute.
+  The type of this metadata must be the previous type of the associated attribute. If the
+  type/value of `previousValue` is the same type/value than in the associated attribute, then the
+  attribute has not actually changed its value.
 
-* `actionType`: it is included if the attribute to which it is attached was included in the request
+* `actionType`. It is included if the attribute to which it is attached was included in the request
   that triggered the notification. Its value depend on the request operation type: `update`
   for updates, `append` for creation and `delete` for deletion. Its type is always `Text`.
 

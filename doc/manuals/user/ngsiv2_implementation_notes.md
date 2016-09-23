@@ -111,5 +111,5 @@ From NGSIv2 specification section "Special metadata in notifications", regarding
 > Its value depend on the request operation type: `update` for updates,
 > `append` for creation and `delete` for deletion. Its type is always `Text`.
 
-Current Orion implementation only supports the "update" case. Other cases will be
+Current Orion implementation supports "update" and "append". The "delete" case will be
 supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).
