@@ -66,8 +66,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
 
   # ------------ subject - condition - attributes ---------------------
@@ -114,8 +114,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
 
   @condition_attrs
@@ -137,8 +137,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
     Examples:
       | attributes |
@@ -179,8 +179,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
     Examples:
       | number |
@@ -378,8 +378,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
 
   @condition_expression_empty @ISSUE_1946
@@ -427,8 +427,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
     Examples:
       | q                                                         |
@@ -484,8 +484,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
 
   @condition_expression_q_parse_error @BUG_1989 @BUG_2106
   Scenario Outline:  try to create a new subscription using NGSI v2 with "q" condition expression but with parse errors
@@ -699,8 +699,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
     Examples:
       | georel                | geometry | coords                                                      |
@@ -1009,8 +1009,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
     Examples:
       | georel                | geometry | coords                                                      |

@@ -72,8 +72,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
 
   @maximum_size
@@ -125,10 +125,10 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | error       | ContentLengthRequired                            |
       | description | Zero/No Content-Length in PUT/POST/PATCH request |
 
-  # ---------- content-type header --------------------------------
+  # ---------- Content-Type header --------------------------------
 
   @content_type_without
-  Scenario:  try to create a new subscription using NGSI v2 without content-type header
+  Scenario:  try to create a new subscription using NGSI v2 without Content-Type header
     Given  a definition of headers
       | parameter          | value             |
       | Fiware-Service     | test_content_type |
@@ -150,7 +150,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | description | Content-Type header not used, default application/octet-stream is not supported |
 
   @content_type_error
-  Scenario Outline:  try to create a new subscription using NGSI v2 with wrong content-type header
+  Scenario Outline:  try to create a new subscription using NGSI v2 with wrong Content-Type header
     Given  a definition of headers
       | parameter          | value             |
       | Fiware-Service     | test_content_type |
@@ -203,8 +203,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
 
   @service
@@ -227,8 +227,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
     Examples:
       | service            |
@@ -318,8 +318,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
     Examples:
       | service_path                                                  |
@@ -352,8 +352,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
 
   @service_path_without @BUG_2024
@@ -375,8 +375,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
 
   @service_path_error
