@@ -31,7 +31,7 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# Same script than metadata_flags_in_notifications_ngsiv1.test but using "legacy" as attrsFormat
+# Same script as special_metadata_in_notifications_ngsiv1.test but using "legacy" as attrsFormat
 #
 # 01. Create E1 with attributes A:1, B:2, C:3, D:4
 # 02. Subscribe to E.* for A, B and C; triggered by B, C or D

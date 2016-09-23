@@ -72,7 +72,7 @@ struct Notification
   std::vector<std::string> metadata;
   bool                     blacklist;
   long long                timesSent;
-  long long                lastNotification;  
+  long long                lastNotification;
   HttpInfo                 httpInfo;
   std::string              toJson(const std::string& attrsFormat);
   Notification():

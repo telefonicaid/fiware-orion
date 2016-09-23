@@ -67,8 +67,10 @@ public:
   orion::CompoundValueNode*  compoundValueP;
   bool                       typeGiven;               // Was 'type' part of the incoming payload?
 
-  bool                       onUpdate;                // Used by the metadata flags on notifications functionality
-  bool                       onChange;                // Used by the metadata flags on notifications functionality
+  std::string                actionType;              // Used by special metadata in notifications functionality
+  ContextAttribute*          previousValue;           // Used by special metadata in notifications functionality
+                                                      // (Note we are forced to use a pointer for this, as we are using
+                                                      // ContextAttribute field in the ContextAttribute type declaration)
 
   ~ContextAttribute();
   ContextAttribute();
