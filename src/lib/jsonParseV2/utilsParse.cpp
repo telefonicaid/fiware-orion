@@ -70,7 +70,7 @@ extern Opt<bool> getBoolMust(const rapidjson::Value& parent, const char* field, 
 
 /* ****************************************************************************
 *
-* getBoolOpt - get a optional bool from the rapidjson node
+* getBoolOpt - get an optional bool from the rapidjson node
 */
 extern Opt<bool> getBoolOpt(const rapidjson::Value& parent, const char* field, const std::string& description)
 {
@@ -117,7 +117,7 @@ extern Opt<string> getStringMust(const rapidjson::Value& parent, const char* fie
 
 /* ****************************************************************************
 *
-* getStringOpt - get a optional string from the rapidjson node
+* getStringOpt - get an optional string from the rapidjson node
 */
 extern Opt<string> getStringOpt(const rapidjson::Value& parent, const char* field, const std::string& description)
 {
@@ -164,7 +164,7 @@ extern Opt<int64_t> getInt64Must(const rapidjson::Value& parent, const char* fie
 
 /* ****************************************************************************
 *
-* getInt64Opt - get a optional int64_t from the rapidjson node
+* getInt64Opt - get an optional int64_t from the rapidjson node
 */
 extern Opt<int64_t> getInt64Opt(const rapidjson::Value& parent, const char* field, const std::string& description)
 {
