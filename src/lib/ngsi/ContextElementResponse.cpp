@@ -344,11 +344,17 @@ std::string ContextElementResponse::render
 *
 * ContextElementResponse::toJson - 
 */
-std::string ContextElementResponse::toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist)
+std::string ContextElementResponse::toJson
+(
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter,
+  const std::vector<std::string>&  metadataFilter,
+  bool                             blacklist
+)
 {
   std::string out;
 
-  out = contextElement.toJson(renderFormat, attrsFilter, blacklist);
+  out = contextElement.toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
 
   return out;
 }

@@ -87,6 +87,25 @@ std::string MetadataVector::render(const std::string& indent, bool comma)
 
 /* ****************************************************************************
 *
+* MetadataVector::matchFilter -
+*
+*/
+bool MetadataVector::matchFilter(const std::string& mdName, const std::vector<std::string>& metadataFilter)
+{
+
+  /* Metadata filtering only in the case of actual metadata vector not conatining "*" */
+  if ((metadataFilter.size() == 0) || (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_ALL) != metadataFilter.end()))
+  {
+    return true;
+  }
+
+  return std::find(metadataFilter.begin(), metadataFilter.end(), mdName) != metadataFilter.end();
+}
+
+
+
+/* ****************************************************************************
+*
 * MetadataVector::toJson -
 *
 * Metadatas named 'value' or 'type' are not rendered in API version 2, due to the 
@@ -96,7 +115,7 @@ std::string MetadataVector::render(const std::string& indent, bool comma)
 * If anybody needs a metadata named 'value' or 'type', then API v1
 * will have to be used to retreive that information.
 */
-std::string MetadataVector::toJson(bool isLastElement)
+std::string MetadataVector::toJson(bool isLastElement, const std::vector<std::string>& metadataFilter)
 {
   if (vec.size() == 0)
   {
@@ -119,7 +138,7 @@ std::string MetadataVector::toJson(bool isLastElement)
   int validMetadatas = 0;
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    if ((vec[ix]->name == "value") || (vec[ix]->name == "type"))
+    if ((vec[ix]->name == "value") || (vec[ix]->name == "type") || !(matchFilter(vec[ix]->name, metadataFilter)))
     {
       continue;
     }
@@ -135,7 +154,7 @@ std::string MetadataVector::toJson(bool isLastElement)
   int          renderedMetadatas = 0;
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    if ((vec[ix]->name == "value") || (vec[ix]->name == "type"))
+    if ((vec[ix]->name == "value") || (vec[ix]->name == "type") || !(matchFilter(vec[ix]->name, metadataFilter)))
     {
       continue;
     }

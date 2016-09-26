@@ -1662,6 +1662,8 @@ static bool addTriggeredSubscriptions
   }
 }
 
+
+
 /* ****************************************************************************
 *
 * processOnChangeConditionForUpdateContext -
@@ -1674,6 +1676,7 @@ static bool processOnChangeConditionForUpdateContext
 (
   ContextElementResponse*          notifyCerP,
   const AttributeList&             attrL,
+  const std::vector<std::string>&  metadataV,
   std::string                      subId,
   RenderFormat                     renderFormat,
   std::string                      tenant,
@@ -1736,6 +1739,7 @@ static bool processOnChangeConditionForUpdateContext
                                           fiwareCorrelator,
                                           renderFormat,
                                           attrsOrder,
+                                          metadataV,
                                           blacklist);
   return true;
 }
@@ -1949,6 +1953,7 @@ static bool processSubscriptions
 
     notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
                                                                 tSubP->attrL,
+                                                                tSubP->metadata,
                                                                 mapSubId,
                                                                 tSubP->renderFormat,
                                                                 tenant,

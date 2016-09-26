@@ -685,7 +685,13 @@ std::string ContextAttribute::render
 *        the code paths of the rendering process
 *
 */
-std::string ContextAttribute::toJson(bool isLastElement, RenderFormat renderFormat, RequestType requestType)
+std::string ContextAttribute::toJson
+(
+  bool                             isLastElement,
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  metadataFilter,
+  RequestType                      requestType
+)
 {
   std::string  out;
 
@@ -797,7 +803,7 @@ std::string ContextAttribute::toJson(bool isLastElement, RenderFormat renderForm
     //
     // metadata
     //
-    out += JSON_STR("metadata") + ":" + "{" + metadataVector.toJson(true) + "}";
+    out += JSON_STR("metadata") + ":" + "{" + metadataVector.toJson(true, metadataFilter) + "}";
 
     if (requestType != EntityAttributeResponse)
     {

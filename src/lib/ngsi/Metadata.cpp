@@ -259,16 +259,17 @@ std::string Metadata::render(const std::string& indent, bool comma)
 
     if (compoundValueP->isObject())
     {
-      //part = compoundValueP->toJson(true, false);
-      part = "{" + compoundValueP->toJson(true, false) + "}";
+      // Note in this case we don't add the "value" key, the toJson()
+      // method does it for toplevel compound (a bit crazy... this deserves a FIXME mark)
+      compoundValueP->renderName = true;
+      part = compoundValueP->toJson(true, false);
     }
     else if (compoundValueP->isVector())
     {
-      part = "[" + compoundValueP->toJson(true, false) + "]";
+      part = JSON_STR("value") + ": [" + compoundValueP->toJson(true, false) + "]";
     }    
 
-    //out += part;
-    out += indent + "  " + JSON_STR("value") + ": " + part;
+    out += part;
   }
   else
   {

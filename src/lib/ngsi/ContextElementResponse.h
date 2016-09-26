@@ -72,7 +72,10 @@ typedef struct ContextElementResponse
                       const std::string&  indent,
                       bool                comma               = false,
                       bool                omitAttributeValues = false);
-  std::string  toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist = false);
+  std::string  toJson(RenderFormat                     renderFormat,
+                      const std::vector<std::string>&  attrsFilter,
+                      const std::vector<std::string>&  metadataFilter,
+                      bool blacklist = false);
   void         present(const std::string& indent, int ix);
   void         release(void);
 

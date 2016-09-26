@@ -58,7 +58,10 @@ typedef struct ContextElement
   ContextElement(EntityId* eP);
 
   std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues = false);
-  std::string  toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist = false) const;
+  std::string  toJson(RenderFormat                     renderFormat,
+                      const std::vector<std::string>&  attrsFilter,
+                      const std::vector<std::string>&  metadataFilter,
+                      bool                             blacklist = false) const;
   void         present(const std::string& indent, int ix);
   void         release(void);
   void         fill(const struct ContextElement& ce);

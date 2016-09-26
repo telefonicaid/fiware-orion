@@ -1939,7 +1939,7 @@ static bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
-        getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, blacklist);
+        getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataV, blacklist);
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
@@ -1950,7 +1950,7 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
-      getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, blacklist);
+      getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataV, blacklist);
       ncr.contextElementResponseVector.release();
 
       return true;
