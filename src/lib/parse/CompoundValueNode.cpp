@@ -661,10 +661,8 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, const std::string& in
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
   std::string  key       = (container->valueType == orion::ValueTypeVector)? "item" : name;
 
-  LM_W(("KZ: In CompoundValueNode::render"));
   if (ciP->apiVersion == "v2")
   {
-    LM_W(("KZ: CompoundValueNode::render redirecting to CompoundValueNode::toJson"));
     return toJson(true); // FIXME P8: The info on comma-after-or-not is not available here ...
   }
 
@@ -688,38 +686,37 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, const std::string& in
     LM_T(LmtCompoundValueRender, ("I am NULL (%s)", name.c_str()));
     out = valueTag1(indent, key, "null", jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
+
+#if 0
+  //
+  // FIXME P5: code to be used when refactoring rendering of compounds
+  //   Three cases:
+  //   01. Toplevel      (only content of the vector to be included)
+  //   02. Inside vector (the name of the vector is omitted - doesn't even exist)
+  //   03. Inside object (the name of the vector is rendered)
+  //
+  // Similar change for Objects and also in CompoundValueNode::toJson()
+  //
   else if (valueType == orion::ValueTypeVector)
   {
     out = "";
 
-    //
-    // Three cases:
-    // 1. Toplevel      (only content of the vector to be included)
-    // 2. Inside vector (the name of the vector is omitted - doesn't even exist)
-    // 3. Inside object (the name of the vector is rendered)
-    //
-
-    LM_W(("KZ: valueType is a Vector"));
-    if (container == this)
+    if (container == this)  // 01. Toplevel
     {
-      LM_W(("KZ: Toplevel"));
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
       {
-        out += childV[ix]->render(ciP, indent + "  ");
+        out += childV[ix]->render(ciP, indent);
       }
     }
-    else
+    else   // 02/03. Not toplevel
     {
-      LM_W(("KZ: Not Toplevel"));
-      if (container->valueType == orion::ValueTypeObject)
+      if (container->valueType == orion::ValueTypeObject)  // 03. Inside object
       {
-        LM_W(("KZ: Inside Object"));
-        out = indent + "\"" + name + "\": [\n";
+        out = indent + "\"" + name + "\" : [\n";
       }
-      else  // Array
+      else  // 02. Inside vector
       {
-        LM_W(("KZ: Inside Array"));
-        out += indent + "[\n";
+        out += indent + "  " + "[\n";
       }
 
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
@@ -727,10 +724,12 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, const std::string& in
         out += childV[ix]->render(ciP, indent + "  ");
       }
 
-      out += indent + "]\n";
+      out += indent + "  ]\n";
     }
     
   }
+#endif  // FIXME P5: code to be used when refactoring rendering of compounds
+
   else if ((valueType == orion::ValueTypeVector) && (container != this))
   {
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));
@@ -802,8 +801,6 @@ std::string CompoundValueNode::toJson(bool isLastElement, bool comma)
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
   std::string  key       = (container->valueType == orion::ValueTypeVector)? "item" : name;
 
-  LM_W(("KZ: In CompoundValueNode::toJson"));
-
   // No "comma after" if toplevel
   if ((container == this) || (comma == false))
   {
@@ -862,7 +859,6 @@ std::string CompoundValueNode::toJson(bool isLastElement, bool comma)
   }
   else if ((valueType == orion::ValueTypeVector) && (renderName == true))
   {
-    LM_W(("KZ: Vector[1], renderName == true: rendering 'name: [ content ]'"));
     out += JSON_STR(name) + ":[";
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
@@ -873,7 +869,6 @@ std::string CompoundValueNode::toJson(bool isLastElement, bool comma)
   }
   else if ((valueType == orion::ValueTypeVector) && (container == this))
   {
-    LM_W(("KZ: Vector[2], toplevel: rendering 'content'"));
     //
     // NOTE: Here, the '[]' are already added in the calling function
     //
@@ -885,7 +880,6 @@ std::string CompoundValueNode::toJson(bool isLastElement, bool comma)
   }
   else if ((valueType == orion::ValueTypeVector) && (container->valueType == orion::ValueTypeVector))
   {
-    LM_W(("KZ: Vector[3], Inside Vector, not toplevel (%s): rendering '[ content ]'", name.c_str()));
     out += "[";
 
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
@@ -897,10 +891,6 @@ std::string CompoundValueNode::toJson(bool isLastElement, bool comma)
   }
   else if (valueType == orion::ValueTypeVector)
   {
-    LM_W(("KZ: Vector[4], Inside Object (%s): rendering 'name: [ content ]'", name.c_str()));
-    LM_W(("KZ: Container: %p", container));
-    LM_W(("KZ: This:      %p", this));
-
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));
     out += JSON_STR(name) + ":[";
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
