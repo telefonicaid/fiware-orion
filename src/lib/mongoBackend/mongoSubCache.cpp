@@ -96,9 +96,6 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   // 04. Extract data from subP
   //
   std::string               renderFormatString = sub.hasField(CSUB_FORMAT)? getFieldF(sub, CSUB_FORMAT).String() : "legacy";  // NGSIv1 JSON is 'default' (for old db-content)
-  std::vector<BSONElement>  eVec               = getFieldF(sub, CSUB_ENTITIES).Array();
-  std::vector<BSONElement>  attrVec            = getFieldF(sub, CSUB_ATTRS).Array();
-  std::vector<BSONElement>  condVec            = getFieldF(sub, CSUB_CONDITIONS).Array();
   RenderFormat              renderFormat       = stringToRenderFormat(renderFormatString);
 
   cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);
@@ -183,6 +180,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // 05. Push Entity-data names to EntityInfo Vector (cSubP->entityInfos)
   //
+  std::vector<BSONElement>  eVec = getFieldF(sub, CSUB_ENTITIES).Array();
   for (unsigned int ix = 0; ix < eVec.size(); ++ix)
   {
     BSONObj entity = eVec[ix].embeddedObject();
@@ -214,22 +212,14 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // 06. Push attribute names to Attribute Vector (cSubP->attributes)
   //
-  for (unsigned int ix = 0; ix < attrVec.size(); ++ix)
-  {
-    std::string s = attrVec[ix].String();
-    cSubP->attributes.push_back(s);
-  }
-
+  setStringVectorF(sub, CSUB_ATTRS, &(cSubP->attributes));
 
 
   //
   // 07. Fill in cSubP->notifyConditionV from condVec
   //
-  for (unsigned int ix = 0; ix < condVec.size(); ++ix)
-  {
-    std::string attr = condVec[ix].String();
-    cSubP->notifyConditionV.push_back(attr);
-  }
+  setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
+
 
   subCacheItemInsert(cSubP);
 
@@ -338,9 +328,6 @@ int mongoSubCacheItemInsert
   //
   // 04. Extract data from mongo sub
   //
-  std::vector<BSONElement>  attrVec       = getFieldF(sub, CSUB_ATTRS).Array();
-  std::vector<BSONElement>  condVec       = getFieldF(sub, CSUB_CONDITIONS).Array();
-
   if ((lastNotificationTime == -1) && (sub.hasField(CSUB_LASTNOTIFICATION)))
   {
     //
@@ -405,30 +392,18 @@ int mongoSubCacheItemInsert
 
   //
   // 06. Push attribute names to Attribute Vector (cSubP->attributes)
-  // FIXME: use setStringVector
   //
-  for (unsigned int ix = 0; ix < attrVec.size(); ++ix)
-  {
-    std::string s = attrVec[ix].String();
-    cSubP->attributes.push_back(s);
-  }
-
+  setStringVectorF(sub, CSUB_ATTRS, &(cSubP->attributes));
 
   //
   // 07. Push metadata names to Metadata Vector (cSubP->metadatas)
-  // FIXME: use setStringVector
   //
   setStringVectorF(sub, CSUB_METADATA,&(cSubP->metadata));
 
-
   //
   // 08. Fill in cSubP->notifyConditionV from condVec
-  // FIXME: use setStringVector
   //
-  for (unsigned int ix = 0; ix < condVec.size(); ++ix)
-  {
-    cSubP->notifyConditionV.push_back(condVec[ix].String());
-  }
+  setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
 
   if (cSubP->notifyConditionV.size() == 0)
   {
