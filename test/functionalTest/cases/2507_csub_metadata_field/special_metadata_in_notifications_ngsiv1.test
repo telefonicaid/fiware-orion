@@ -717,11 +717,7 @@ Date: REGEX(.*)
 15. Dump and reset: see notification with 2 entities with A, B and C
 ====================================================================
 POST http://localhost:REGEX(\d+)/notify
-<<<<<<< HEAD:test/functionalTest/cases/2507_metadata_flags_in_notifications/metadata_flags_in_notifications_ngsiv1.test
-Content-Length: 2398
-=======
-Content-Length: 1447
->>>>>>> develop:test/functionalTest/cases/2507_csub_metadata_field/special_metadata_in_notifications_ngsiv1.test
+Content-Length: 1234
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -747,14 +743,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                         "name": "C",
                         "type": "Number",
                         "value": 30
-<<<<<<< HEAD:test/functionalTest/cases/2507_metadata_flags_in_notifications/metadata_flags_in_notifications_ngsiv1.test
-=======
-                    },
-                    {
-                        "name": "D",
-                        "type": "Number",
-                        "value": 41
->>>>>>> develop:test/functionalTest/cases/2507_csub_metadata_field/special_metadata_in_notifications_ngsiv1.test
                     }
                 ],
                 "id": "E1",
@@ -783,14 +771,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                         "name": "C",
                         "type": "Text",
                         "value": "z"
-<<<<<<< HEAD:test/functionalTest/cases/2507_metadata_flags_in_notifications/metadata_flags_in_notifications_ngsiv1.test
-=======
-                    },
-                    {
-                        "name": "D",
-                        "type": "Text",
-                        "value": "u"
->>>>>>> develop:test/functionalTest/cases/2507_csub_metadata_field/special_metadata_in_notifications_ngsiv1.test
                     }
                 ],
                 "id": "E2",
