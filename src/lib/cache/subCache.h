@@ -96,6 +96,7 @@ struct CachedSubscription
 {
   std::vector<EntityInfo*>    entityIdInfos;
   std::vector<std::string>    attributes;
+  std::vector<std::string>    metadata;
   std::vector<std::string>    notifyConditionV;
   char*                       tenant;
   char*                       servicePath;
@@ -194,6 +195,7 @@ extern void subCacheItemInsert
   const ngsiv2::HttpInfo&            httpInfo,
   const std::vector<ngsiv2::EntID>&  entities,
   const std::vector<std::string>&    attributes,
+  const std::vector<std::string>&    metadata,
   const std::vector<std::string>&    conditionAttrs,
   const char*                        subscriptionId,
   int64_t                            expiration,

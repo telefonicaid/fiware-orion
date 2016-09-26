@@ -66,7 +66,13 @@ std::string NotifyContextRequest::render(ConnectionInfo* ciP, RequestType reques
 *
 * NotifyContextRequest::toJson -
 */
-std::string NotifyContextRequest::toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist)
+std::string NotifyContextRequest::toJson
+(
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter,
+  const std::vector<std::string>&  metadataFilter,
+  bool                             blacklist
+)
 {
   if ((renderFormat != NGSI_V2_NORMALIZED) && (renderFormat != NGSI_V2_KEYVALUES) && (renderFormat != NGSI_V2_VALUES))
   {
@@ -84,7 +90,7 @@ std::string NotifyContextRequest::toJson(RenderFormat renderFormat, const std::v
   out += ",";
   out += JSON_STR("data") + ":[";
 
-  out += contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist);
+  out += contextElementResponseVector.toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
   out += "]";
   out += "}";
 

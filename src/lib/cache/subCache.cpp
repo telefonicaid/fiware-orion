@@ -746,6 +746,7 @@ void subCacheItemInsert
   const ngsiv2::HttpInfo&            httpInfo,
   const std::vector<ngsiv2::EntID>&  entIdVector,
   const std::vector<std::string>&    attributes,
+  const std::vector<std::string>&    metadata,
   const std::vector<std::string>&    conditionAttrs,
   const char*                        subscriptionId,
   int64_t                            expirationTime,
@@ -792,6 +793,7 @@ void subCacheItemInsert
   cSubP->httpInfo              = httpInfo;
   cSubP->notifyConditionV      = conditionAttrs;
   cSubP->attributes            = attributes;
+  cSubP->metadata              = metadata;
 
 
   //

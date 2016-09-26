@@ -299,6 +299,7 @@ void setCondsAndInitialNotify
   BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             sub.subject.entities,
                                             sub.notification.attributes,
+                                            sub.notification.metadata,
                                             subId,
                                             httpInfo,
                                             notificationDone,
@@ -375,6 +376,8 @@ void setFormat(const Subscription& sub, BSONObjBuilder* b)
   LM_T(LmtMongo, ("Subscription format: %s", format.c_str()));
 }
 
+
+
 /* ****************************************************************************
 *
 * setBlacklist -
@@ -385,4 +388,23 @@ void setBlacklist(const Subscription& sub, BSONObjBuilder* b)
   bool bl = sub.notification.blacklist;
   b->append(CSUB_BLACKLIST, bl);
   LM_T(LmtMongo, ("Subscription blacklist: %s", bl ? "true" : "false"));
+}
+
+
+
+/* ****************************************************************************
+*
+* setMetadata -
+*
+*/
+void setMetadata(const Subscription& sub, BSONObjBuilder* b)
+{
+  BSONArrayBuilder metadata;
+  for (unsigned int ix = 0; ix < sub.notification.metadata.size(); ++ix)
+  {
+    metadata.append(sub.notification.metadata[ix]);
+  }
+  BSONArray metadataArr = metadata.arr();
+  b->append(CSUB_METADATA, metadataArr);
+  LM_T(LmtMongo, ("Subscription metadata: %s", metadataArr.toString().c_str()));
 }

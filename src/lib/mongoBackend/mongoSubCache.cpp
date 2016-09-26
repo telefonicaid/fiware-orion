@@ -405,6 +405,7 @@ int mongoSubCacheItemInsert
 
   //
   // 06. Push attribute names to Attribute Vector (cSubP->attributes)
+  // FIXME: use setStringVector
   //
   for (unsigned int ix = 0; ix < attrVec.size(); ++ix)
   {
@@ -413,9 +414,16 @@ int mongoSubCacheItemInsert
   }
 
 
+  //
+  // 07. Push metadata names to Metadata Vector (cSubP->metadatas)
+  // FIXME: use setStringVector
+  //
+  setStringVectorF(sub, CSUB_METADATA,&(cSubP->metadata));
+
 
   //
-  // 07. Fill in cSubP->notifyConditionV from condVec
+  // 08. Fill in cSubP->notifyConditionV from condVec
+  // FIXME: use setStringVector
   //
   for (unsigned int ix = 0; ix < condVec.size(); ++ix)
   {

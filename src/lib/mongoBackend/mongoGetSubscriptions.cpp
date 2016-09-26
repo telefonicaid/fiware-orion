@@ -139,6 +139,7 @@ static void setSubject(Subscription* s, const BSONObj& r)
 static void setNotification(Subscription* subP, const BSONObj& r, const std::string& tenant)
 {
   // Attributes
+  // FIXME: use setStringVectorF
   std::vector<BSONElement> attrs = getFieldF(r, CSUB_ATTRS).Array();
   for (unsigned int ix = 0; ix < attrs.size(); ++ix)
   {
@@ -146,6 +147,8 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
 
     subP->notification.attributes.push_back(attr);
   }
+
+  setStringVectorF(r, CSUB_METADATA, &(subP->notification.metadata));
 
   subP->notification.httpInfo.fill(r);
 

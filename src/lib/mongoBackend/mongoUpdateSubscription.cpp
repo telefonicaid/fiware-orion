@@ -285,6 +285,7 @@ static void setCondsAndInitialNotifyNgsiv1
     entities.push_back(en);
   }
 
+  // FIXME: use setStrintVectorF
   std::vector<std::string> attributes;
   std::vector<BSONElement> attrs = getFieldF(subOrig, CSUB_ATTRS).Array();
   for (unsigned int ix = 0; ix < attrs.size(); ++ix)
@@ -292,12 +293,15 @@ static void setCondsAndInitialNotifyNgsiv1
     attributes.push_back(attrs[ix].String());
   }
 
+  std::vector<std::string> metadata;
+  setStringVectorF(subOrig, CSUB_METADATA, &metadata);
 
   /* Conds vector (and maybe an initial notification) */
   *notificationDone = false;
   BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             entities,
                                             attributes,
+                                            metadata,
                                             subId,
                                             url,
                                             notificationDone,
@@ -373,7 +377,7 @@ static void setCondsAndInitialNotify
       // In NGSIv1 is legal updating conditions without updating entities, which is not possible
       // in NGSIv2 (as both entities and coditions are part of 'subject' and they are updated as
       // a whole). In addition, NGSIv1 doesn't allow to update notification attributes. Both
-      // (entities and notification attributes) are pased in subOrig
+      // (entities and notification attributes) are passed in subOrig.
       //
       // See: https://fiware-orion.readthedocs.io/en/develop/user/updating_regs_and_subs/index.html
       setCondsAndInitialNotifyNgsiv1(subUp, subOrig, subUp.id, status, httpInfo.url, attrsFormat,
@@ -505,6 +509,28 @@ static void setBlacklist(const SubscriptionUpdate& subUp, const BSONObj& subOrig
     LM_T(LmtMongo, ("Subscription blacklist: %s", bl? "true" : "false"));
   }
 }
+
+
+
+/* ****************************************************************************
+*
+* setMetadata -
+*/
+static void setMetadata(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
+{
+  if (subUp.notificationProvided)
+  {
+    setMetadata(subUp, b);
+  }
+  else
+  {
+    BSONArray metadata = getArrayFieldF(subOrig, CSUB_METADATA);
+    b->append(CSUB_METADATA, metadata);
+    LM_T(LmtMongo, ("Subscription metadata: %s", metadata.toString().c_str()));
+  }
+}
+
+
 
 /* ****************************************************************************
 *
@@ -691,7 +717,8 @@ std::string mongoUpdateSubscription
   setStatus(subUp, subOrig, &b);
   setEntities(subUp, subOrig, &b);
   setAttrs(subUp, subOrig, &b);
-  setBlacklist(subUp, subOrig, &b);
+  setMetadata(subUp, subOrig, &b);
+  setBlacklist(subUp, subOrig, &b);  
   setCondsAndInitialNotify(subUp, subOrig, tenant, servicePathV, xauthToken, fiwareCorrelator,
                            &b, &notificationDone);
 
