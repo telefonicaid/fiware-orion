@@ -418,8 +418,7 @@ int mongoSubCacheItemInsert
   // 07. Push metadata names to Metadata Vector (cSubP->metadatas)
   // FIXME: use setStringVector
   //
-  setStringVectorF(sub, CSUB_METADATA,&(cSubP->metadata));
-
+  setStringVectorF(sub, CSUB_METADATA, &(cSubP->metadata));
 
   //
   // 08. Fill in cSubP->notifyConditionV from condVec
@@ -430,12 +429,14 @@ int mongoSubCacheItemInsert
     cSubP->notifyConditionV.push_back(condVec[ix].String());
   }
 
+#if 0
   if (cSubP->notifyConditionV.size() == 0)
   {
     subCacheItemDestroy(cSubP);
     delete cSubP;
     return -5;
   }
+#endif
 
   subCacheItemInsert(cSubP);
 
