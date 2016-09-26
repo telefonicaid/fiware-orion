@@ -261,11 +261,15 @@ std::string Metadata::render(const std::string& indent, bool comma)
     {
       // Note in this case we don't add the "value" key, the toJson()
       // method does it for toplevel compound (a bit crazy... this deserves a FIXME mark)
+      LM_W(("KZ: Rendering compound metadata object"));
       compoundValueP->renderName = true;
+      compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
       part = compoundValueP->toJson(true, false);
     }
     else if (compoundValueP->isVector())
     {
+      LM_W(("KZ: Rendering compound metadata vector (name: [] already given)"));
+      compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
       part = JSON_STR("value") + ": [" + compoundValueP->toJson(true, false) + "]";
     }    
 
