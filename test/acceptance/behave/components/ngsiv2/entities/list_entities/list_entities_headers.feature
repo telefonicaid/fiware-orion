@@ -121,7 +121,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that "1" entities are returned
     And verify headers in response
       | parameter          | value |
-      | fiware-total-count | 1     |
+      | Fiware-Total-Count | 1     |
 
   @id_multiples @BUG_1720
   Scenario:  try to list all entities using NGSI v2 (3 entity groups with 15 entities in total) but with id query parameter used as regexp

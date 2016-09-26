@@ -50,7 +50,7 @@ Feature: create an entity with geospatial properties of entities using NGSIv2. "
 
   # -------------------- Simple Location Format ---------------
   @simple_location_wo_metadata
-  Scenario Outline:  create an entity with Simple Location Format to define location and to geo-query using NGSIv2 without metadata
+  Scenario Outline:  create an entity with Simple Location Format to define Location and to geo-query using NGSIv2 without metadata
     Given  a definition of headers
       | parameter          | value                |
       | Fiware-Service     | test_simple_location |

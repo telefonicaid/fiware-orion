@@ -152,7 +152,7 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
     Then verify that receive an "OK" http code
     And verify headers in response
       | parameter         | value      |
-      | fiware-correlator | [a-f0-9-]* |
+      | Fiware-Correlator | [a-f0-9-]* |
     And verify that attributes types by entity type are returned in response based on the info in the recorder
 
 
@@ -404,7 +404,7 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
       | entities_id       | room1       |
       | attributes_number | 2           |
       | attributes_name   | temperature |
-      | attributes_value  | 34          |
+      | attributes_value  | high        |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -435,7 +435,7 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
     Then verify that receive an "OK" http code
     And verify headers in response
       | parameter         | value      |
-      | fiware-correlator | [a-f0-9-]* |
+      | Fiware-Correlator | [a-f0-9-]* |
     And verify that attributes types by entity type are returned in response based on the info in the recorder
     Examples:
       | service            |
@@ -461,6 +461,7 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
       | attributes_number | 2           |
       | attributes_name   | temperature |
       | attributes_value  | 34          |
+      | attributes_type   | celsius     |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -490,7 +491,7 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
     Then verify that receive an "OK" http code
     And verify headers in response
       | parameter         | value      |
-      | fiware-correlator | [a-f0-9-]* |
+      | Fiware-Correlator | [a-f0-9-]* |
     And verify that attributes types by entity type are returned in response based on the info in the recorder
 
   @service_error
@@ -546,7 +547,7 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
       | entities_id       | room1       |
       | attributes_number | 2           |
       | attributes_name   | temperature |
-      | attributes_value  | 34          |
+      | attributes_value  | high        |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -577,7 +578,7 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
     Then verify that receive an "OK" http code
     And verify headers in response
       | parameter         | value      |
-      | fiware-correlator | [a-f0-9-]* |
+      | Fiware-Correlator | [a-f0-9-]* |
     And verify that attributes types by entity type are returned in response based on the info in the recorder
     Examples:
       | service_path                                                  |
@@ -606,6 +607,7 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
       | attributes_number | 2           |
       | attributes_name   | temperature |
       | attributes_value  | 34          |
+      | attributes_type   | celsius     |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -635,7 +637,7 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
     Then verify that receive an "OK" http code
     And verify headers in response
       | parameter         | value      |
-      | fiware-correlator | [a-f0-9-]* |
+      | Fiware-Correlator | [a-f0-9-]* |
     And verify that attributes types by entity type are returned in response based on the info in the recorder
 
   @service_path_error
@@ -737,7 +739,7 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
     Then verify that receive an "OK" http code
     And verify headers in response
       | parameter         | value      |
-      | fiware-correlator | [a-f0-9-]* |
+      | Fiware-Correlator | [a-f0-9-]* |
     And verify that attributes types by entity type are returned in response based on the info in the recorder
     Examples:
       | types      |
@@ -821,7 +823,7 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
     Then verify that receive an "OK" http code
     And verify headers in response
       | parameter         | value      |
-      | fiware-correlator | [a-f0-9-]* |
+      | Fiware-Correlator | [a-f0-9-]* |
     And verify that attributes types are returned in response based on the info in the recorder
 
   @type_forbidden
