@@ -132,7 +132,7 @@ Feature: verify notifications from subscriptions with different conditions value
     And verify that receive a "Created" http code
     And properties to entities
       | parameter         | value        |
-      | entities_type     | random=3     |
+      | entities_type     | house        |
       | entities_id       | room2        |
       | attributes_number | 3            |
       | attributes_name   | <attributes> |
@@ -247,7 +247,7 @@ Feature: verify notifications from subscriptions with different conditions value
     And verify that receive a "Created" http code
     And properties to entities
       | parameter        | value                                                                    |
-      | entities_type    | "random=4"                                                               |
+      | entities_type    | "house"                                                                  |
       | entities_id      | "room_2"                                                                 |
       | attributes_name  | "temperature"&"pressure"&"humidity"&"timestamp"&"value_str"&"value_bool" |
       | attributes_value | 34&"high"&"air,density"&"2017-06-15T07:21:24.00Z"&"true"&true            |
@@ -355,7 +355,7 @@ Feature: verify notifications from subscriptions with different conditions value
     Then get notification sent to listener
     And verify that no notification is received
 
-  @condition_q_structured_content @BUG_2442 @skip
+  @condition_q_structured_content
   Scenario Outline:  send a notification using NGSI v2 with "q" condition field and structured content in attributes
     Given  a definition of headers
       | parameter          | value                |
@@ -385,27 +385,57 @@ Feature: verify notifications from subscriptions with different conditions value
     Then get notification sent to listener
     And verify the notification in "normalized" format
     Examples:
-      | attr_value_compound     | q_expression              |
-      | {"B":{"C":45}}          | temperature               |
-      | {"B":{"C":45}}          | temperature.B.C==45       |
-      | {"B":{"C":{"D":55}}}    | temperature.B.C.D>=54     |
-      | {"B":{"C":{"D":55}}}    | temperature.B.C.D>=55     |
-      | {"B":{"C":{"D":55}}}    | temperature.B.C.D!=33     |
-      | {"B":{"C":{"D":55}}}    | temperature.B.C.D>54      |
-      | {"B":{"C":{"D":55}}}    | temperature.B.C.D<=55     |
-      | {"B":{"C":{"D":55}}}    | temperature.B.C.D<=56     |
-      | {"B":{"C":{"D":55}}}    | temperature.B.C.D<56      |
-      | {"B":{"C":{"D":55}}}    | temperature.B.C.D==54..55 |
-      | {"B":{"C":{"D":55}}}    | temperature.B.C.D==55..56 |
-      | {"B":{"C":{"D":55}}}    | temperature.B.C.D!=33..54 |
-      | {"B":{"C":{"D":55}}}    | temperature.B.C.D!=56..94 |
-      | {"B":{"C":{"D":"hot"}}} | temperature.B.C.D==hot    |
-      | {"B":{"C":{"D":"hot"}}} | temperature.B.C.D=='hot'  |
-      | {"B":{"C":{"D":"hot"}}} | temperature.B.C.D!='cold' |
-      | [34,56,78,90]           | temperature!=64           |
-      | ["one","two","three"]   | temperature!='five'       |
-    Examples:  # @BUG_2442
+      | attr_value_compound        | q_expression              |
+      | {"B": {"C": 45}}           | temperature               |
+      | {"B": {"C": 45}}           | temperature.B.C==45       |
+      | {"B": {"C": {"D": 55}}}    | temperature.B.C.D>=54     |
+      | {"B": {"C": {"D": 55}}}    | temperature.B.C.D>=55     |
+      | {"B": {"C": {"D": 55}}}    | temperature.B.C.D!=33     |
+      | {"B": {"C": {"D": 55}}}    | temperature.B.C.D>54      |
+      | {"B": {"C": {"D": 55}}}    | temperature.B.C.D<=55     |
+      | {"B": {"C": {"D": 55}}}    | temperature.B.C.D<=56     |
+      | {"B": {"C": {"D": 55}}}    | temperature.B.C.D<56      |
+      | {"B": {"C": {"D": 55}}}    | temperature.B.C.D==54..55 |
+      | {"B": {"C": {"D": 55}}}    | temperature.B.C.D==55..56 |
+      | {"B": {"C": {"D": 55}}}    | temperature.B.C.D!=33..54 |
+      | {"B": {"C": {"D": 55}}}    | temperature.B.C.D!=56..94 |
+      | {"B": {"C": {"D": "hot"}}} | temperature.B.C.D==hot    |
+      | {"B": {"C": {"D": "hot"}}} | temperature.B.C.D=='hot'  |
+      | {"B": {"C": {"D": "hot"}}} | temperature.B.C.D!='cold' |
+
+  @condition_q_vector_content @ISSUE_2442 @skip
+  Scenario Outline:  send a notification using NGSI v2 with "q" condition field and a vector in attributes
+    Given  a definition of headers
+      | parameter          | value                |
+      | Fiware-Service     | test_notif_condition |
+      | Fiware-ServicePath | /test                |
+      | Content-Type       | application/json     |
+    # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter             | value                           |
+      | subject_idPattern     | .*                              |
+      | condition_expression  | q>>><q_expression>              |
+      | notification_http_url | http://replace_host:1045/notify |
+    And create a new subscription
+    And verify that receive a "Created" http code
+    And properties to entities
+      | parameter        | value                 |
+      | entities_type    | "random=4"            |
+      | entities_id      | "room1"               |
+      | attributes_name  | "temperature"         |
+      | attributes_value | <attr_value_compound> |
+      | attributes_type  | "celsius"             |
+      | metadatas_name   | "very_cold"           |
+      | metadatas_type   | "alarm"               |
+      | metadatas_value  | "cold"                |
+    When create an entity in raw and "normalized" modes
+    And verify that receive a "Created" http code
+    Then get notification sent to listener
+    And verify the notification in "normalized" format
+    Examples:  # @ISSUE_2442
       | attr_value_compound   | q_expression          |
+      | [34,56,78,90]         | temperature!=64       |
+      | ["one","two","three"] | temperature!='five'   |
       | [34,56,78,90]         | temperature==34       |
       | [34,56,78,90]         | temperature==30..99   |
       | [34,56,78,90]         | temperature==30,56,99 |
@@ -413,7 +443,7 @@ Feature: verify notifications from subscriptions with different conditions value
       | ["one","two","three"] | temperature==one      |
 
    # ----------------------- condition - mq  ---------------------------
-  @condition_mq @BUG_2445
+  @condition_mq @BUG_2445 @BUG_2522
   Scenario Outline:  send a notification using NGSI v2 with "mq" condition field
     Given  a definition of headers
       | parameter          | value                |
@@ -475,13 +505,16 @@ Feature: verify notifications from subscriptions with different conditions value
       | timestamp.meta_timestamp<=2017-06-15T07:21:24.00Z                                          |
       | timestamp.meta_timestamp<=2026-06-15T07:21:24.00Z                                          |
       | timestamp.meta_timestamp!=2006-06-15T07:21:24.00Z..2015-06-15T07:21:24.00Z                 |
-      | timestamp.meta_timestamp!=2017-06-15T07:21:24.00Z..2026-06-15T07:21:24.00Z                 |
     Examples: # @BUG_2445
       | mq_expression                                                              |
       | timestamp.meta_timestamp==2017-06-15T07:21:24.00Z                          |
       | timestamp.meta_timestamp>2016-06-15T07:21:24.00Z                           |
       | timestamp.meta_timestamp<2026-06-15T07:21:24.00Z                           |
       | timestamp.meta_timestamp==2016-06-15T07:21:24.00Z..2026-06-15T07:21:24.00Z |
+    Examples: # @BUG_2522
+      | mq_expression                                                              |
+      | timestamp.meta_timestamp!=2018-06-15T07:21:24.00Z..2026-06-15T07:21:24.00Z |
+
 
   @condition_mq_eval_not_match
   Scenario:  not send a notification using NGSI v2 with "mq" condition field, but eval does not match
@@ -543,7 +576,7 @@ Feature: verify notifications from subscriptions with different conditions value
     Then get notification sent to listener
     And verify that no notification is received
 
-  @condition_mq_structured_content  @BUG_2442 @skip
+  @condition_mq_structured_content
   Scenario Outline:  send a notification using NGSI v2 with "mq" condition field and structured content in attributes metadata
     Given  a definition of headers
       | parameter          | value                    |
@@ -573,33 +606,63 @@ Feature: verify notifications from subscriptions with different conditions value
     Then get notification sent to listener
     And verify the notification in "normalized" format
     Examples:
-      | meta_value_compound     | mq_expression                       |
-      | {"B":{"C":45}}          | temperature.very_cold               |
-      | {"B":{"C":45}}          | temperature.very_cold.B.C==45       |
-      | {"B":{"C":{"D":55}}}    | temperature.very_cold.B.C.D>=45     |
-      | {"B":{"C":{"D":55}}}    | temperature.very_cold.B.C.D!=33     |
-      | {"B":{"C":{"D":55}}}    | temperature.very_cold.B.C.D>54      |
-      | {"B":{"C":{"D":55}}}    | temperature.very_cold.B.C.D<=55     |
-      | {"B":{"C":{"D":55}}}    | temperature.very_cold.B.C.D<56      |
-      | {"B":{"C":{"D":55}}}    | temperature.very_cold.B.C.D==54..55 |
-      | {"B":{"C":{"D":55}}}    | temperature.very_cold.B.C.D==55..56 |
-      | {"B":{"C":{"D":55}}}    | temperature.very_cold.B.C.D!=33..54 |
-      | {"B":{"C":{"D":55}}}    | temperature.very_cold.B.C.D!=56..94 |
-      | {"B":{"C":{"D":"hot"}}} | temperature.very_cold.B.C.D==hot    |
-      | {"B":{"C":{"D":"hot"}}} | temperature.very_cold.B.C.D=='hot'  |
-      | {"B":{"C":{"D":"hot"}}} | temperature.very_cold.B.C.D!='cold' |
-      | [34,56,78,90]           | temperature.very_cold!=64           |
-      | ["one","two","three"]   | temperature.very_cold!='five'       |
-    Examples:  # @BUG_2442
+      | meta_value_compound        | mq_expression                       |
+      | {"B": {"C": 45}}           | temperature.very_cold               |
+      | {"B": {"C": 45}}           | temperature.very_cold.B.C==45       |
+      | {"B": {"C": {"D": 55}}}    | temperature.very_cold.B.C.D>=45     |
+      | {"B": {"C": {"D": 55}}}    | temperature.very_cold.B.C.D!=33     |
+      | {"B": {"C": {"D": 55}}}    | temperature.very_cold.B.C.D>54      |
+      | {"B": {"C": {"D": 55}}}    | temperature.very_cold.B.C.D<=55     |
+      | {"B": {"C": {"D": 55}}}    | temperature.very_cold.B.C.D<56      |
+      | {"B": {"C": {"D": 55}}}    | temperature.very_cold.B.C.D==54..55 |
+      | {"B": {"C": {"D": 55}}}    | temperature.very_cold.B.C.D==55..56 |
+      | {"B": {"C": {"D": 55}}}    | temperature.very_cold.B.C.D!=33..54 |
+      | {"B": {"C": {"D": 55}}}    | temperature.very_cold.B.C.D!=56..94 |
+      | {"B": {"C": {"D": "hot"}}} | temperature.very_cold.B.C.D==hot    |
+      | {"B": {"C": {"D": "hot"}}} | temperature.very_cold.B.C.D=='hot'  |
+      | {"B": {"C": {"D": "hot"}}} | temperature.very_cold.B.C.D!='cold' |
+
+  @condition_mq_vector_content  @ISSUE_2442 @skip
+  Scenario Outline:  send a notification using NGSI v2 with "mq" condition field and a vector in attributes metadata
+    Given  a definition of headers
+      | parameter          | value                    |
+      | Fiware-Service     | test_notif_condition_not |
+      | Fiware-ServicePath | /test                    |
+      | Content-Type       | application/json         |
+    # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter             | value                           |
+      | subject_idPattern     | .*                              |
+      | condition_expression  | mq>>><mq_expression>            |
+      | notification_http_url | http://replace_host:1045/notify |
+    And create a new subscription
+    And verify that receive a "Created" http code
+    And properties to entities
+      | parameter        | value                 |
+      | entities_type    | "random=4"            |
+      | entities_id      | "room1"               |
+      | attributes_name  | "temperature"         |
+      | attributes_value | 56                    |
+      | attributes_type  | "celsius"             |
+      | metadatas_name   | "very_cold"           |
+      | metadatas_type   | "alarm"               |
+      | metadatas_value  | <meta_value_compound> |
+    When create an entity in raw and "normalized" modes
+    And verify that receive a "Created" http code
+    Then get notification sent to listener
+    And verify the notification in "normalized" format
+    Examples:  # @ISSUE_2442
       | meta_value_compound   | mq_expression                 |
+      | [34,56,78,90]         | temperature.very_cold!=64     |
+      | ["one","two","three"] | temperature.very_cold!='five' |
       | [34,56,78,90]         | temperature.very_cold==34     |
       | [34,56,78,90]         | temperature.very_cold==30..99 |
       | ["one","two","three"] | temperature.very_cold=='one'  |
       | ["one","two","three"] | temperature.very_cold==one    |
 
-   # ----------------------- condition - geo-location ---------------------------
-  @condition_geo_location_geo_json @BUG_2499 @skip
-  Scenario Outline:  send a notification using NGSI v2 with geo-location condition fields and GeoJSON attribute
+   # ----------------------- condition - geo-Location ---------------------------
+  @condition_geo_Location_geo_json @BUG_2499 @skip
+  Scenario Outline:  send a notification using NGSI v2 with geo-Location condition fields and GeoJSON attribute
     Given  a definition of headers
       | parameter          | value                |
       | Fiware-Service     | test_notif_condition |
@@ -617,7 +680,7 @@ Feature: verify notifications from subscriptions with different conditions value
       | parameter        | value                                                           |
       | entities_type    | "random=4"                                                      |
       | entities_id      | "room1"                                                         |
-      | attributes_name  | "location"&"temperature"                                        |
+      | attributes_name  | "Location"&"temperature"                                        |
       | attributes_value | {"type": "<geojson_type>","coordinates": [<geojson_coords>]}&45 |
       | attributes_type  | "geo:json"                                                      |
     When create an entity in raw and "normalized" modes
@@ -644,8 +707,8 @@ Feature: verify notifications from subscriptions with different conditions value
       | geojson_type | geojson_coords                                                                        | georel   | geometry | coords                                                                              |
       | Polygon      | [[-75.690,35.742],[-75.59,35.742],[-75.541,35.585],[-75.941,35.485],[-75.690,35.742]] | disjoint | polygon  | 115.742,-165.690;135.742,-125.59;135.585,-175.541;135.485,-175.941;115.742,-165.690 |
 
-  @condition_geo_location_simple_location_format @BUG_2499 @skip
-  Scenario Outline:  send a notification using NGSI v2 with geo-location condition fields and Simple Location Format in attributes
+  @condition_geo_Location_simple_Location_format @BUG_2499 @skip
+  Scenario Outline:  send a notification using NGSI v2 with geo-Location condition fields and Simple Location Format in attributes
     Given  a definition of headers
       | parameter          | value                |
       | Fiware-Service     | test_notif_condition |
@@ -663,7 +726,7 @@ Feature: verify notifications from subscriptions with different conditions value
       | parameter        | value                    |
       | entities_type    | "random=4"               |
       | entities_id      | "room1"                  |
-      | attributes_name  | "location"&"temperature" |
+      | attributes_name  | "Location"&"temperature" |
       | attributes_value | <geojson_coords>&45      |
       | attributes_type  | "<geojson_type>"         |
     When create an entity in raw and "normalized" modes
