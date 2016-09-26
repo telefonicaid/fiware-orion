@@ -423,7 +423,7 @@ Note that using the following
 "metadata": [ "previousValue" ]
 ```
 
-will cause to include `previousValue` but will remove any other metadata that
+will cause to include `previousValue` but will exclude user metadata that
 attributes in the notification may have. If you want to get `previousValue`
 *and* any other "regular" metadata then use:
 
@@ -433,4 +433,4 @@ attributes in the notification may have. If you want to get `previousValue`
 
 Note that you can also use `"metadata": [ "*" ]` although it doesn't make much sense, as
 it gives the same result as not including `metadata` at all (remember that the default
-behaviour is to include all custom metadata).
+behaviour is to include all user metadata).
