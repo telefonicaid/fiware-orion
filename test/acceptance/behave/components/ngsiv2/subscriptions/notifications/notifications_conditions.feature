@@ -661,7 +661,7 @@ Feature: verify notifications from subscriptions with different conditions value
       | ["one","two","three"] | temperature.very_cold==one    |
 
    # ----------------------- condition - geo-Location ---------------------------
-  @condition_geo_Location_geo_json @BUG_2499 @skip
+  @condition_geo_location_geo_json @BUG_2499 @skip
   Scenario Outline:  send a notification using NGSI v2 with geo-Location condition fields and GeoJSON attribute
     Given  a definition of headers
       | parameter          | value                |
@@ -680,7 +680,7 @@ Feature: verify notifications from subscriptions with different conditions value
       | parameter        | value                                                           |
       | entities_type    | "random=4"                                                      |
       | entities_id      | "room1"                                                         |
-      | attributes_name  | "Location"&"temperature"                                        |
+      | attributes_name  | "location"&"temperature"                                        |
       | attributes_value | {"type": "<geojson_type>","coordinates": [<geojson_coords>]}&45 |
       | attributes_type  | "geo:json"                                                      |
     When create an entity in raw and "normalized" modes
@@ -707,7 +707,7 @@ Feature: verify notifications from subscriptions with different conditions value
       | geojson_type | geojson_coords                                                                        | georel   | geometry | coords                                                                              |
       | Polygon      | [[-75.690,35.742],[-75.59,35.742],[-75.541,35.585],[-75.941,35.485],[-75.690,35.742]] | disjoint | polygon  | 115.742,-165.690;135.742,-125.59;135.585,-175.541;135.485,-175.941;115.742,-165.690 |
 
-  @condition_geo_Location_simple_Location_format @BUG_2499 @skip
+  @condition_geo_location_simple_format @BUG_2499 @skip
   Scenario Outline:  send a notification using NGSI v2 with geo-Location condition fields and Simple Location Format in attributes
     Given  a definition of headers
       | parameter          | value                |
@@ -726,7 +726,7 @@ Feature: verify notifications from subscriptions with different conditions value
       | parameter        | value                    |
       | entities_type    | "random=4"               |
       | entities_id      | "room1"                  |
-      | attributes_name  | "Location"&"temperature" |
+      | attributes_name  | "location"&"temperature" |
       | attributes_value | <geojson_coords>&45      |
       | attributes_type  | "<geojson_type>"         |
     When create an entity in raw and "normalized" modes
