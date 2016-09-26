@@ -281,9 +281,9 @@ void setCondsAndInitialNotify
   const std::string&               subId,
   const std::string&               status,
   const std::vector<std::string>&  notifAttributesV,
+  const std::vector<std::string>&  metadataV,
   const HttpInfo&                  httpInfo,
   bool                             blacklist,
-  bool                             metadataFlags,
   RenderFormat                     attrsFormat,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,
@@ -302,6 +302,7 @@ void setCondsAndInitialNotify
   BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             sub.subject.entities,
                                             notifAttributesV,
+                                            metadataV,
                                             subId,
                                             httpInfo,
                                             notificationDone,
@@ -313,8 +314,7 @@ void setCondsAndInitialNotify
                                             status,
                                             fiwareCorrelator,
                                             notifAttributesV,
-                                            blacklist,
-                                            metadataFlags);
+                                            blacklist);
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
@@ -397,12 +397,17 @@ void setBlacklist(const Subscription& sub, BSONObjBuilder* b)
 
 /* ****************************************************************************
 *
-* setMetadataFlags -
+* setMetadata -
 *
 */
-void setMetadataFlags(const Subscription& sub, BSONObjBuilder* b)
+void setMetadata(const Subscription& sub, BSONObjBuilder* b)
 {
-  bool metadataFlags = sub.notification.metadataFlags;
-  b->append(CSUB_METADATA_FLAGS, metadataFlags);
-  LM_T(LmtMongo, ("Subscription metadataFlags: %s", metadataFlags ? "true" : "false"));
+  BSONArrayBuilder metadata;
+  for (unsigned int ix = 0; ix < sub.notification.metadata.size(); ++ix)
+  {
+    metadata.append(sub.notification.metadata[ix]);
+  }
+  BSONArray metadataArr = metadata.arr();
+  b->append(CSUB_METADATA, metadataArr);
+  LM_T(LmtMongo, ("Subscription metadata: %s", metadataArr.toString().c_str()));
 }

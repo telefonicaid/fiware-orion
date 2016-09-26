@@ -11,9 +11,7 @@ for special metadata that are interpreted by Orion:
 
 -   [ID](#metadata-id-for-attributes)
 -   location, which is currently [deprecated](../deprecated.md), but still supported
--   ngsi:onArrival, used by the "Notification metadata marks" functionality in NGSIv2
--   ngsi:onChange, used by the "Notification metadata marks" functionality in NGSIv2
--   ngsi:onSubscription, used by the "Notification metadata marks" functionality in NGSIv2
+-   The ones defined in "Special metadata in notifications" section in the NGSIv2 spec
 
 Its management is slightly different in NGSIv1 and NGSIv2, so it is
 described in different sections.
@@ -407,18 +405,32 @@ attributes using ID metadata:
     section](append_and_delete.md#adding-and-removing-attributes-with-append-and-delete-in-updatecontext)).
 
 
-## Notification metadata marks
+## Metadata in notifications
 
-For those subscription created using `metadataFlags` to `true` (using NGSIv2 operations) some
-metadata may appear in notifications sent by Orion (no matter if the notification format is NGSIv2
-or NGSIv1, using `attrsFormat` to `legacy` in the second case). In particular:
+By default, all custom (user) metadata are included in notifications. However, the field `metadata`
+can be used to filter the list. In addition, it can be used to specify that the following special
+metadata (not included by default) must be included.
 
-* For these attributes included in the update triggering the notification, no matter if the actually
-  changed or not, `ngsi:onArrival` with boolean value `true` and type `"Boolean"` is inserted.
+* previousValue
+* actionType
 
-* For these attributes included in the update triggering the notification that actually changed their
-  values, `ngsi:onChange` with boolean value `true` and type `"Boolean"` is inserted.
+Details about their meaning can be found in the "Special metadata in notifications" section in
+the NGSIv2 specification).
 
-* For these attributes notififed as a consecuence of an initial creation or update of the
-  subscription, `ngsi:onSubscriptionChange` with boolean value `true` and type `"Boolean"`
-  is inserted.
+Note that using the following
+
+```
+"metadata": [ "previousValue" ]
+```
+
+will cause to include `previousValue` but will exclude user metadata that
+attributes in the notification may have. If you want to get `previousValue`
+*and* any other "regular" metadata then use:
+
+```
+"metadata": [ "previousValue", "*" ]
+```
+
+Note that you can also use `"metadata": [ "*" ]` although it doesn't make much sense, as
+it gives the same result as not including `metadata` at all (remember that the default
+behaviour is to include all user metadata).

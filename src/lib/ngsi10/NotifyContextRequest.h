@@ -47,7 +47,10 @@ typedef struct NotifyContextRequest
   ContextElementResponseVector  contextElementResponseVector;  // Optional
 
   std::string   render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
-  std::string   toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist = false);
+  std::string   toJson(RenderFormat                     renderFormat,
+                       const std::vector<std::string>&  attrsFilter,
+                       const std::vector<std::string>&  metadataFilter,
+                       bool                             blacklist = false);
   std::string   check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
   void          present(const std::string& indent);
   void          release(void);

@@ -1816,9 +1816,12 @@ AttributeList subToAttributeList(const BSONObj& sub)
 }
 
 
+#if 0
 /* ****************************************************************************
 *
 * setOnSubscriptionMetadata -
+*
+* FIXME #910: disabled by the moment, maybe removed at the end
 */
 static void setOnSubscriptionMetadata(ContextElementResponseVector* cerVP)
 {
@@ -1834,7 +1837,7 @@ static void setOnSubscriptionMetadata(ContextElementResponseVector* cerVP)
     }
   }
 }
-
+#endif
 
 
 /* ****************************************************************************
@@ -1860,6 +1863,7 @@ static bool processOnChangeConditionForSubscription
 (
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
+  const std::vector<std::string>   metadataV,
   ConditionValueList*              condValues,
   const std::string&               subId,
   const HttpInfo&                  notifyHttpInfo,
@@ -1870,8 +1874,7 @@ static bool processOnChangeConditionForSubscription
   const Restriction*               resP,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist,
-  bool                             metadataFlags
+  bool                             blacklist
 )
 {
   std::string                   err;
@@ -1898,11 +1901,14 @@ static bool processOnChangeConditionForSubscription
   pruneContextElements(rawCerV, &ncr.contextElementResponseVector);
   rawCerV.release();
 
+#if 0
+  // FIXME #910: disabled by the moment, maybe removed at the end
   /* Append notification metadata */
   if (metadataFlags)
   {
     setOnSubscriptionMetadata(&ncr.contextElementResponseVector);
   }
+#endif
 
   if (ncr.contextElementResponseVector.size() > 0)
   {
@@ -1933,7 +1939,7 @@ static bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
-        getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, blacklist);
+        getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataV, blacklist);
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
@@ -1944,7 +1950,7 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
-      getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, blacklist);
+      getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataV, blacklist);
       ncr.contextElementResponseVector.release();
 
       return true;
@@ -1967,6 +1973,7 @@ BSONArray processConditionVector
   NotifyConditionVector*           ncvP,
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
+  const std::vector<std::string>   metadataV,
   const std::string&               subId,
   const HttpInfo&                  httpInfo,
   bool*                            notificationDone,
@@ -1978,8 +1985,7 @@ BSONArray processConditionVector
   const std::string&               status,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist,
-  bool                             metadataFlags
+  bool                             blacklist
 )
 {
   BSONArrayBuilder conds;
@@ -2001,6 +2007,7 @@ BSONArray processConditionVector
       if ((status == STATUS_ACTIVE) &&
           (processOnChangeConditionForSubscription(enV,
                                                    attrL,
+                                                   metadataV,
                                                    &(nc->condValueList),
                                                    subId,
                                                    httpInfo,
@@ -2011,8 +2018,7 @@ BSONArray processConditionVector
                                                    resP,
                                                    fiwareCorrelator,
                                                    attrsOrder,
-                                                   blacklist,
-                                                   metadataFlags)))
+                                                   blacklist)))
       {
         *notificationDone = true;
       }
@@ -2042,6 +2048,7 @@ BSONArray processConditionVector
   const std::vector<std::string>&  condAttributesV,
   const std::vector<EntID>&        entitiesV,
   const std::vector<std::string>&  notifAttributesV,
+  const std::vector<std::string>&  metadataV,
   const std::string&               subId,
   const HttpInfo&                  httpInfo,
   bool*                            notificationDone,
@@ -2053,8 +2060,7 @@ BSONArray processConditionVector
   const std::string&               status,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist,
-  bool                             metadataFlags
+  bool                             blacklist
 )
 {
   NotifyConditionVector ncV;
@@ -2068,6 +2074,7 @@ BSONArray processConditionVector
   BSONArray arr = processConditionVector(&ncV,
                                          enV,
                                          attrL,
+                                         metadataV,
                                          subId,
                                          httpInfo,
                                          notificationDone,
@@ -2079,8 +2086,7 @@ BSONArray processConditionVector
                                          status,
                                          fiwareCorrelator,
                                          attrsOrder,
-                                         blacklist,
-                                         metadataFlags);
+                                         blacklist);
 
   enV.release();
   ncV.release();

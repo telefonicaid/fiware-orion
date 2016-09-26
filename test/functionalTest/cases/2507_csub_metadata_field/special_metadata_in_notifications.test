@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Metadata flags in notifications
+Special metadata in notifications
 
 --SHELL-INIT--
 dbInit CB
@@ -33,19 +33,19 @@ accumulatorStart --pretty-print
 #
 # 01. Create E1 with attributes A:1, B:2, C:3, D:4
 # 02. Subscribe to E.* for A, B and C; triggered by B, C or D
-# 03. Dump and reset: see initial notification with ngsi:onSubscriptionChange for A, B and C
+# 03. Dump and reset: see initial notification with A, B and C
 # 04. Update B:20
-# 05. Dump and reset: see notification with ngsi:onArrival and ngsi:onChange for B
+# 05. Dump and reset: see notification with actionType=update and previousValue=2 for B
 # 06. Update B:20, C:30
-# 07. Dump and reset: see notification with ngsi:onArrival for B and C and ngsi:onChange for C
+# 07. Dump and reset: see notification with actionType=update for B and C, previousValue=20 for B, previousValue=3 for C
 # 08. Update A:1, D:40
-# 09. Dump and reset: see notification with ngsi:onArrival for A
+# 09. Dump and reset: see notification with actionType=update and previousValue=1 for A
 # 10. Update A:10, D:41
-# 11. Dump and reset: see notification with ngsi:onArrival and ngsi:OnChange for A
+# 11. Dump and reset: see notification with actionType=update and previousValue=10 for A
 # 12. Create E2 with attributes A:x, B:y, C:z, D:u
-# 13. Dump and reset: see notification with ngsi:onArrival and ngsi:onChange for A, B, C
+# 13. Dump and reset: see notification with actionType=append for A, B, C
 # 14. Update subscription conditions (to re-trigger initial notification)
-# 15. Dump and reset: see notification with 2 entities with ngsi:onSubscriptionChange for A, B and C
+# 15. Dump and reset: see notification with 2 entities with A, B and C
 #
 
 echo "01. Create E1 with attributes A:1, B:2, C:3, D:4"
@@ -94,7 +94,7 @@ payload='{
       "url": "http://localhost:'$LISTENER_PORT'/notify"
     },
     "attrs": [ "A", "B", "C" ],
-    "metadataFlags": true
+    "metadata": [ "previousValue", "actionType" ]
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -104,8 +104,8 @@ echo
 SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 
-echo "03. Dump and reset: see initial notification with ngsi:onSubscriptionChange for A, B and C"
-echo "=========================================================================================="
+echo "03. Dump and reset: see initial notification with A, B and C"
+echo "============================================================"
 accumulatorDump
 accumulatorReset
 echo
@@ -125,8 +125,8 @@ echo
 echo
 
 
-echo "05. Dump and reset: see notification with ngsi:onArrival and ngsi:onChange for B"
-echo "================================================================================"
+echo "05. Dump and reset: see notification with actionType=update and previousValue=2 for B"
+echo "====================================================================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -150,8 +150,8 @@ echo
 echo
 
 
-echo "07. Dump and reset: see notification with ngsi:onArrival for B and C and ngsi:onChange for C"
-echo "============================================================================================"
+echo "07. Dump and reset: see notification with actionType=update for B and C, previousValue=20 for B, previousValue=3 for C"
+echo "======================================================================================================================"
 accumulatorDump
 accumulatorReset
 echo
@@ -174,8 +174,8 @@ echo
 echo
 
 
-echo "09. Dump and reset: see notification with ngsi:onArrival for A"
-echo "=============================================================="
+echo "09. Dump and reset: see notification with actionType=update and previousValue=1 for A"
+echo "====================================================================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -199,8 +199,8 @@ echo
 echo
 
 
-echo "11. Dump and reset: see notification with ngsi:onArrival and ngsi:OnChange for A"
-echo "================================================================================"
+echo "11. Dump and reset: see notification with actionType=update and previousValue=10 for A"
+echo "======================================================================================"
 accumulatorDump
 accumulatorReset
 echo
@@ -234,8 +234,8 @@ echo
 echo
 
 
-echo "13. Dump and reset: see notification with ngsi:onArrival and ngsi:onChange for A, B, C"
-echo "====================================================================================="
+echo "13. Dump and reset: see notification with actionType=append for A, B, C"
+echo "======================================================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -263,8 +263,8 @@ echo
 echo
 
 
-echo "15. Dump and reset: see notification with 2 entities with ngsi:onSubscriptionChange for A, B and C"
-echo "=================================================================================================="
+echo "15. Dump and reset: see notification with 2 entities with A, B and C"
+echo "===================================================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -292,10 +292,10 @@ Date: REGEX(.*)
 
 
 
-03. Dump and reset: see initial notification with ngsi:onSubscriptionChange for A, B and C
-==========================================================================================
+03. Dump and reset: see initial notification with A, B and C
+============================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 392
+Content-Length: 215
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -307,32 +307,17 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A": {
-                "metadata": {
-                    "ngsi:onSubscriptionChange": {
-                        "type": "Boolean",
-                        "value": true
-                    }
-                },
+                "metadata": {},
                 "type": "Number",
                 "value": 1
             },
             "B": {
-                "metadata": {
-                    "ngsi:onSubscriptionChange": {
-                        "type": "Boolean",
-                        "value": true
-                    }
-                },
+                "metadata": {},
                 "type": "Number",
                 "value": 2
             },
             "C": {
-                "metadata": {
-                    "ngsi:onSubscriptionChange": {
-                        "type": "Boolean",
-                        "value": true
-                    }
-                },
+                "metadata": {},
                 "type": "Number",
                 "value": 3
             },
@@ -354,10 +339,10 @@ Date: REGEX(.*)
 
 
 
-05. Dump and reset: see notification with ngsi:onArrival and ngsi:onChange for B
-================================================================================
+05. Dump and reset: see notification with actionType=update and previousValue=2 for B
+=====================================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 312
+Content-Length: 305
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -375,13 +360,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             },
             "B": {
                 "metadata": {
-                    "ngsi:onArrival": {
-                        "type": "Boolean",
-                        "value": true
+                    "actionType": {
+                        "type": "Text",
+                        "value": "update"
                     },
-                    "ngsi:onChange": {
-                        "type": "Boolean",
-                        "value": true
+                    "previousValue": {
+                        "type": "Number",
+                        "value": 2
                     }
                 },
                 "type": "Number",
@@ -410,10 +395,10 @@ Date: REGEX(.*)
 
 
 
-07. Dump and reset: see notification with ngsi:onArrival for B and C and ngsi:onChange for C
-============================================================================================
+07. Dump and reset: see notification with actionType=update for B and C, previousValue=20 for B, previousValue=3 for C
+======================================================================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 361
+Content-Length: 396
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -431,9 +416,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             },
             "B": {
                 "metadata": {
-                    "ngsi:onArrival": {
-                        "type": "Boolean",
-                        "value": true
+                    "actionType": {
+                        "type": "Text",
+                        "value": "update"
+                    },
+                    "previousValue": {
+                        "type": "Number",
+                        "value": 20
                     }
                 },
                 "type": "Number",
@@ -441,13 +430,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             },
             "C": {
                 "metadata": {
-                    "ngsi:onArrival": {
-                        "type": "Boolean",
-                        "value": true
+                    "actionType": {
+                        "type": "Text",
+                        "value": "update"
                     },
-                    "ngsi:onChange": {
-                        "type": "Boolean",
-                        "value": true
+                    "previousValue": {
+                        "type": "Number",
+                        "value": 3
                     }
                 },
                 "type": "Number",
@@ -471,10 +460,10 @@ Date: REGEX(.*)
 
 
 
-09. Dump and reset: see notification with ngsi:onArrival for A
-==============================================================
+09. Dump and reset: see notification with actionType=update and previousValue=1 for A
+=====================================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 265
+Content-Length: 306
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -487,9 +476,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A": {
                 "metadata": {
-                    "ngsi:onArrival": {
-                        "type": "Boolean",
-                        "value": true
+                    "actionType": {
+                        "type": "Text",
+                        "value": "update"
+                    },
+                    "previousValue": {
+                        "type": "Number",
+                        "value": 1
                     }
                 },
                 "type": "Number",
@@ -523,10 +516,10 @@ Date: REGEX(.*)
 
 
 
-11. Dump and reset: see notification with ngsi:onArrival and ngsi:OnChange for A
-================================================================================
+11. Dump and reset: see notification with actionType=update and previousValue=10 for A
+======================================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 314
+Content-Length: 307
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -539,13 +532,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A": {
                 "metadata": {
-                    "ngsi:onArrival": {
-                        "type": "Boolean",
-                        "value": true
+                    "actionType": {
+                        "type": "Text",
+                        "value": "update"
                     },
-                    "ngsi:onChange": {
-                        "type": "Boolean",
-                        "value": true
+                    "previousValue": {
+                        "type": "Number",
+                        "value": 1
                     }
                 },
                 "type": "Number",
@@ -580,10 +573,10 @@ Date: REGEX(.*)
 
 
 
-13. Dump and reset: see notification with ngsi:onArrival and ngsi:onChange for A, B, C
-=====================================================================================
+13. Dump and reset: see notification with actionType=append for A, B, C
+=======================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 503
+Content-Length: 350
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -596,13 +589,9 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A": {
                 "metadata": {
-                    "ngsi:onArrival": {
-                        "type": "Boolean",
-                        "value": true
-                    },
-                    "ngsi:onChange": {
-                        "type": "Boolean",
-                        "value": true
+                    "actionType": {
+                        "type": "Text",
+                        "value": "append"
                     }
                 },
                 "type": "Text",
@@ -610,13 +599,9 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             },
             "B": {
                 "metadata": {
-                    "ngsi:onArrival": {
-                        "type": "Boolean",
-                        "value": true
-                    },
-                    "ngsi:onChange": {
-                        "type": "Boolean",
-                        "value": true
+                    "actionType": {
+                        "type": "Text",
+                        "value": "append"
                     }
                 },
                 "type": "Text",
@@ -624,13 +609,9 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             },
             "C": {
                 "metadata": {
-                    "ngsi:onArrival": {
-                        "type": "Boolean",
-                        "value": true
-                    },
-                    "ngsi:onChange": {
-                        "type": "Boolean",
-                        "value": true
+                    "actionType": {
+                        "type": "Text",
+                        "value": "append"
                     }
                 },
                 "type": "Text",
@@ -655,10 +636,14 @@ Date: REGEX(.*)
 
 
 
-15. Dump and reset: see notification with 2 entities with ngsi:onSubscriptionChange for A, B and C
-==================================================================================================
+15. Dump and reset: see notification with 2 entities with A, B and C
+====================================================================
 POST http://localhost:REGEX(\d+)/notify
+<<<<<<< HEAD:test/functionalTest/cases/2507_metadata_flags_in_notifications/metadata_flags_in_notifications.test
 Content-Length: 733
+=======
+Content-Length: 472
+>>>>>>> develop:test/functionalTest/cases/2507_csub_metadata_field/special_metadata_in_notifications.test
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -670,69 +655,55 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A": {
-                "metadata": {
-                    "ngsi:onSubscriptionChange": {
-                        "type": "Boolean",
-                        "value": true
-                    }
-                },
+                "metadata": {},
                 "type": "Number",
                 "value": 10
             },
             "B": {
-                "metadata": {
-                    "ngsi:onSubscriptionChange": {
-                        "type": "Boolean",
-                        "value": true
-                    }
-                },
+                "metadata": {},
                 "type": "Number",
                 "value": 20
             },
             "C": {
-                "metadata": {
-                    "ngsi:onSubscriptionChange": {
-                        "type": "Boolean",
-                        "value": true
-                    }
-                },
+                "metadata": {},
                 "type": "Number",
                 "value": 30
             },
+<<<<<<< HEAD:test/functionalTest/cases/2507_metadata_flags_in_notifications/metadata_flags_in_notifications.test
+=======
+            "D": {
+                "metadata": {},
+                "type": "Number",
+                "value": 41
+            },
+>>>>>>> develop:test/functionalTest/cases/2507_csub_metadata_field/special_metadata_in_notifications.test
             "id": "E1",
             "type": "T"
         },
         {
             "A": {
-                "metadata": {
-                    "ngsi:onSubscriptionChange": {
-                        "type": "Boolean",
-                        "value": true
-                    }
-                },
+                "metadata": {},
                 "type": "Text",
                 "value": "x"
             },
             "B": {
-                "metadata": {
-                    "ngsi:onSubscriptionChange": {
-                        "type": "Boolean",
-                        "value": true
-                    }
-                },
+                "metadata": {},
                 "type": "Text",
                 "value": "y"
             },
             "C": {
-                "metadata": {
-                    "ngsi:onSubscriptionChange": {
-                        "type": "Boolean",
-                        "value": true
-                    }
-                },
+                "metadata": {},
                 "type": "Text",
                 "value": "z"
             },
+<<<<<<< HEAD:test/functionalTest/cases/2507_metadata_flags_in_notifications/metadata_flags_in_notifications.test
+=======
+            "D": {
+                "metadata": {},
+                "type": "Text",
+                "value": "u"
+            },
+>>>>>>> develop:test/functionalTest/cases/2507_csub_metadata_field/special_metadata_in_notifications.test
             "id": "E2",
             "type": "T"
         }

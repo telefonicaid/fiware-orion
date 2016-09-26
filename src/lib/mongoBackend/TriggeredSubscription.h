@@ -52,17 +52,17 @@
 class TriggeredSubscription
 {
  public:
-  long long           throttling;
-  long long           lastNotification;
-  RenderFormat        renderFormat;
-  ngsiv2::HttpInfo    httpInfo;
-  AttributeList       attrL;
-  std::string         cacheSubId;
-  std::string         tenant;
-  StringFilter*       stringFilterP;
-  StringFilter*       mdStringFilterP;
-  bool                blacklist;
-  bool                metadataFlags;
+  long long                 throttling;
+  long long                 lastNotification;
+  RenderFormat              renderFormat;
+  ngsiv2::HttpInfo          httpInfo;
+  AttributeList             attrL;
+  std::string               cacheSubId;
+  std::string               tenant;
+  StringFilter*             stringFilterP;
+  StringFilter*             mdStringFilterP;
+  bool                      blacklist;
+  std::vector<std::string>  metadata;
 
   // FIXME P5: This entire struct will be removed once geo-stuff is implemented the same way StringFilter was implemented (for Issue #1705)
   struct {

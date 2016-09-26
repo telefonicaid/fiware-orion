@@ -96,6 +96,7 @@ struct CachedSubscription
 {
   std::vector<EntityInfo*>    entityIdInfos;
   std::vector<std::string>    attributes;
+  std::vector<std::string>    metadata;
   std::vector<std::string>    notifyConditionV;
   char*                       tenant;
   char*                       servicePath;
@@ -108,7 +109,6 @@ struct CachedSubscription
   RenderFormat                renderFormat;
   SubscriptionExpression      expression;
   bool                        blacklist;
-  bool                        metadataFlags;
   ngsiv2::HttpInfo            httpInfo;
 
   struct CachedSubscription*  next;
@@ -195,6 +195,7 @@ extern void subCacheItemInsert
   const ngsiv2::HttpInfo&            httpInfo,
   const std::vector<ngsiv2::EntID>&  entities,
   const std::vector<std::string>&    attributes,
+  const std::vector<std::string>&    metadata,
   const std::vector<std::string>&    conditionAttrs,
   const char*                        subscriptionId,
   int64_t                            expiration,
@@ -209,8 +210,7 @@ extern void subCacheItemInsert
   const std::string&                 geometry,
   const std::string&                 coords,
   const std::string&                 georel,
-  bool                               blacklist,
-  bool                               metadataFlags
+  bool                               blacklist
 );
 
 

@@ -635,6 +635,17 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     subsP->notification.blacklist = true;
   }
 
+  // metadata
+  if (notification.HasMember("metadata"))
+  {
+    std::string r = parseAttributeList(ciP, &subsP->notification.metadata, notification["metadata"]);
+
+    if (r != "")
+    {
+      return r;
+    }
+  }
+
   // attrsFormat field
   Opt<std::string>  attrsFormatOpt = getStringOpt(notification, "attrsFormat");
   if (!attrsFormatOpt.ok())
@@ -657,21 +668,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   {
     subsP->attrsFormatProvided = true;
     subsP->attrsFormat = DEFAULT_RENDER_FORMAT;  // Default format for NGSIv2: normalized
-  }
-
-  // metadataFlags field
-  Opt<bool>  metadataFlagsOpt = getBoolOpt(notification, "metadataFlags");
-  if (!metadataFlagsOpt.ok())
-  {
-    return badInput(ciP, metadataFlagsOpt.error);
-  }
-  else if (metadataFlagsOpt.given)
-  {
-    subsP->notification.metadataFlags = metadataFlagsOpt.value;
-  }
-  else // Default value for creation
-  {
-    subsP->notification.metadataFlags = false;
   }
 
   return "";

@@ -163,13 +163,20 @@ public:
          * actually created/sent */
     }
 
-    MOCK_METHOD8(sendNotifyContextRequest, void(NotifyContextRequest* ncr, const ngsiv2::HttpInfo& httpInfo, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, RenderFormat renderFormat, const std::vector<std::string>&  attrsFilter, bool blacklist));
+    MOCK_METHOD9(sendNotifyContextRequest, void(NotifyContextRequest* ncr, const ngsiv2::HttpInfo& httpInfo, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, RenderFormat renderFormat, const std::vector<std::string>&  attrsFilter, const std::vector<std::string>&  metadataFilter, bool blacklist));
     MOCK_METHOD5(sendNotifyContextAvailabilityRequest, void(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, const std::string& fiwareCorrelator, RenderFormat renderFormat));
 
     /* Wrappers for parent methods (used in ON_CALL() defaults set in the constructor) */
-    void parent_sendNotifyContextRequest(NotifyContextRequest* ncr, const ngsiv2::HttpInfo& httpInfo, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, RenderFormat renderFormat, const std::vector<std::string>&  attrsFilter)
+    void parent_sendNotifyContextRequest(NotifyContextRequest*            ncr,
+                                         const ngsiv2::HttpInfo&          httpInfo,
+                                         const std::string&               tenant,
+                                         const std::string&               xauthToken,
+                                         const std::string&               fiwareCorrelator,
+                                         RenderFormat                     renderFormat,
+                                         const std::vector<std::string>&  attrsFilter,
+                                         const std::vector<std::string>&  metadataFilter)
     {
-      Notifier::sendNotifyContextRequest(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsFilter);
+      Notifier::sendNotifyContextRequest(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsFilter, metadataFilter);
     }
     void parent_sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, const std::string& fiwareCorrelator, RenderFormat renderFormat)
     {

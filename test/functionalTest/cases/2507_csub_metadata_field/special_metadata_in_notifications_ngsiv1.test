@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Metadata flags in NGSIv1 notifications
+Special metadata in NGSIv1 notifications
 
 --SHELL-INIT--
 dbInit CB
@@ -31,23 +31,23 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# Same script than metadata_flags_in_notifications_ngsiv1.test but using "legacy" as attrsFormat
+# Same script as special_metadata_in_notifications_ngsiv1.test but using "legacy" as attrsFormat
 #
 # 01. Create E1 with attributes A:1, B:2, C:3, D:4
 # 02. Subscribe to E.* for A, B and C; triggered by B, C or D
-# 03. Dump and reset: see initial notification with ngsi:onSubscriptionChange for A, B and C
+# 03. Dump and reset: see initial notification with A, B and C
 # 04. Update B:20
-# 05. Dump and reset: see notification with ngsi:onArrival and ngsi:onChange for B
+# 05. Dump and reset: see notification with actionType=update and previousValue=2 for B
 # 06. Update B:20, C:30
-# 07. Dump and reset: see notification with ngsi:onArrival for B and C and ngsi:onChange for C
+# 07. Dump and reset: see notification with actionType=update for B and C, previousValue=20 for B, previousValue=3 for C
 # 08. Update A:1, D:40
-# 09. Dump and reset: see notification with ngsi:onArrival for A
+# 09. Dump and reset: see notification with actionType=update and previousValue=1 for A
 # 10. Update A:10, D:41
-# 11. Dump and reset: see notification with ngsi:onArrival and ngsi:OnChange for A
+# 11. Dump and reset: see notification with actionType=update and previousValue=10 for A
 # 12. Create E2 with attributes A:x, B:y, C:z, D:u
-# 13. Dump and reset: see notification with ngsi:onArrival and ngsi:onChange for A, B, C
+# 13. Dump and reset: see notification with actionType=append for A, B, C
 # 14. Update subscription conditions (to re-trigger initial notification)
-# 15. Dump and reset: see notification with 2 entities with ngsi:onSubscriptionChange for A, B and C
+# 15. Dump and reset: see notification with 2 entities with A, B and C
 #
 
 echo "01. Create E1 with attributes A:1, B:2, C:3, D:4"
@@ -97,7 +97,7 @@ payload='{
     },
     "attrs": [ "A", "B", "C" ],
     "attrsFormat": "legacy",
-    "metadataFlags": true
+    "metadata": [ "previousValue", "actionType" ]
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -107,8 +107,8 @@ echo
 SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 
-echo "03. Dump and reset: see initial notification with ngsi:onSubscriptionChange for A, B and C"
-echo "=========================================================================================="
+echo "03. Dump and reset: see initial notification with A, B and C"
+echo "============================================================"
 accumulatorDump
 accumulatorReset
 echo
@@ -128,8 +128,8 @@ echo
 echo
 
 
-echo "05. Dump and reset: see notification with ngsi:onArrival and ngsi:onChange for B"
-echo "================================================================================"
+echo "05. Dump and reset: see notification with actionType=update and previousValue=2 for B"
+echo "====================================================================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -153,8 +153,8 @@ echo
 echo
 
 
-echo "07. Dump and reset: see notification with ngsi:onArrival for B and C and ngsi:onChange for C"
-echo "============================================================================================"
+echo "07. Dump and reset: see notification with actionType=update for B and C, previousValue=20 for B, previousValue=3 for C"
+echo "======================================================================================================================"
 accumulatorDump
 accumulatorReset
 echo
@@ -177,8 +177,8 @@ echo
 echo
 
 
-echo "09. Dump and reset: see notification with ngsi:onArrival for A"
-echo "=============================================================="
+echo "09. Dump and reset: see notification with actionType=update and previousValue=1 for A"
+echo "====================================================================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -202,8 +202,8 @@ echo
 echo
 
 
-echo "11. Dump and reset: see notification with ngsi:onArrival and ngsi:OnChange for A"
-echo "================================================================================"
+echo "11. Dump and reset: see notification with actionType=update and previousValue=10 for A"
+echo "======================================================================================"
 accumulatorDump
 accumulatorReset
 echo
@@ -237,8 +237,8 @@ echo
 echo
 
 
-echo "13. Dump and reset: see notification with ngsi:onArrival and ngsi:onChange for A, B, C"
-echo "====================================================================================="
+echo "13. Dump and reset: see notification with actionType=append for A, B, C"
+echo "======================================================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -266,8 +266,8 @@ echo
 echo
 
 
-echo "15. Dump and reset: see notification with 2 entities with ngsi:onSubscriptionChange for A, B and C"
-echo "=================================================================================================="
+echo "15. Dump and reset: see notification with 2 entities with A, B and C"
+echo "===================================================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -295,10 +295,10 @@ Date: REGEX(.*)
 
 
 
-03. Dump and reset: see initial notification with ngsi:onSubscriptionChange for A, B and C
-==========================================================================================
+03. Dump and reset: see initial notification with A, B and C
+============================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 1253
+Content-Length: 671
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -311,37 +311,16 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "ngsi:onSubscriptionChange",
-                                "type": "Boolean",
-                                "value": true
-                            }
-                        ],
                         "name": "A",
                         "type": "Number",
                         "value": 1
                     },
                     {
-                        "metadatas": [
-                            {
-                                "name": "ngsi:onSubscriptionChange",
-                                "type": "Boolean",
-                                "value": true
-                            }
-                        ],
                         "name": "B",
                         "type": "Number",
                         "value": 2
                     },
                     {
-                        "metadatas": [
-                            {
-                                "name": "ngsi:onSubscriptionChange",
-                                "type": "Boolean",
-                                "value": true
-                            }
-                        ],
                         "name": "C",
                         "type": "Number",
                         "value": 3
@@ -372,10 +351,10 @@ Date: REGEX(.*)
 
 
 
-05. Dump and reset: see notification with ngsi:onArrival and ngsi:onChange for B
-================================================================================
+05. Dump and reset: see notification with actionType=update and previousValue=2 for B
+=====================================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 995
+Content-Length: 990
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -395,14 +374,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "ngsi:onArrival",
-                                "type": "Boolean",
-                                "value": true
+                                "name": "actionType",
+                                "type": "Text",
+                                "value": "update"
                             },
                             {
-                                "name": "ngsi:onChange",
-                                "type": "Boolean",
-                                "value": true
+                                "name": "previousValue",
+                                "type": "Number",
+                                "value": 2
                             }
                         ],
                         "name": "B",
@@ -440,10 +419,10 @@ Date: REGEX(.*)
 
 
 
-07. Dump and reset: see notification with ngsi:onArrival for B and C and ngsi:onChange for C
-============================================================================================
+07. Dump and reset: see notification with actionType=update for B and C, previousValue=20 for B, previousValue=3 for C
+======================================================================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 1179
+Content-Length: 1310
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -463,9 +442,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "ngsi:onArrival",
-                                "type": "Boolean",
-                                "value": true
+                                "name": "actionType",
+                                "type": "Text",
+                                "value": "update"
+                            },
+                            {
+                                "name": "previousValue",
+                                "type": "Number",
+                                "value": 20
                             }
                         ],
                         "name": "B",
@@ -475,14 +459,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "ngsi:onArrival",
-                                "type": "Boolean",
-                                "value": true
+                                "name": "actionType",
+                                "type": "Text",
+                                "value": "update"
                             },
                             {
-                                "name": "ngsi:onChange",
-                                "type": "Boolean",
-                                "value": true
+                                "name": "previousValue",
+                                "type": "Number",
+                                "value": 3
                             }
                         ],
                         "name": "C",
@@ -515,10 +499,10 @@ Date: REGEX(.*)
 
 
 
-09. Dump and reset: see notification with ngsi:onArrival for A
-==============================================================
+09. Dump and reset: see notification with actionType=update and previousValue=1 for A
+=====================================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 856
+Content-Length: 991
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -533,9 +517,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "ngsi:onArrival",
-                                "type": "Boolean",
-                                "value": true
+                                "name": "actionType",
+                                "type": "Text",
+                                "value": "update"
+                            },
+                            {
+                                "name": "previousValue",
+                                "type": "Number",
+                                "value": 1
                             }
                         ],
                         "name": "A",
@@ -578,10 +567,10 @@ Date: REGEX(.*)
 
 
 
-11. Dump and reset: see notification with ngsi:onArrival and ngsi:OnChange for A
-================================================================================
+11. Dump and reset: see notification with actionType=update and previousValue=10 for A
+======================================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 997
+Content-Length: 992
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -596,14 +585,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "ngsi:onArrival",
-                                "type": "Boolean",
-                                "value": true
+                                "name": "actionType",
+                                "type": "Text",
+                                "value": "update"
                             },
                             {
-                                "name": "ngsi:onChange",
-                                "type": "Boolean",
-                                "value": true
+                                "name": "previousValue",
+                                "type": "Number",
+                                "value": 1
                             }
                         ],
                         "name": "A",
@@ -647,10 +636,10 @@ Date: REGEX(.*)
 
 
 
-13. Dump and reset: see notification with ngsi:onArrival and ngsi:onChange for A, B, C
-=====================================================================================
+13. Dump and reset: see notification with actionType=append for A, B, C
+=======================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 1640
+Content-Length: 1217
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -665,14 +654,9 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "ngsi:onArrival",
-                                "type": "Boolean",
-                                "value": true
-                            },
-                            {
-                                "name": "ngsi:onChange",
-                                "type": "Boolean",
-                                "value": true
+                                "name": "actionType",
+                                "type": "Text",
+                                "value": "append"
                             }
                         ],
                         "name": "A",
@@ -682,14 +666,9 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "ngsi:onArrival",
-                                "type": "Boolean",
-                                "value": true
-                            },
-                            {
-                                "name": "ngsi:onChange",
-                                "type": "Boolean",
-                                "value": true
+                                "name": "actionType",
+                                "type": "Text",
+                                "value": "append"
                             }
                         ],
                         "name": "B",
@@ -699,14 +678,9 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                     {
                         "metadatas": [
                             {
-                                "name": "ngsi:onArrival",
-                                "type": "Boolean",
-                                "value": true
-                            },
-                            {
-                                "name": "ngsi:onChange",
-                                "type": "Boolean",
-                                "value": true
+                                "name": "actionType",
+                                "type": "Text",
+                                "value": "append"
                             }
                         ],
                         "name": "C",
@@ -740,10 +714,14 @@ Date: REGEX(.*)
 
 
 
-15. Dump and reset: see notification with 2 entities with ngsi:onSubscriptionChange for A, B and C
-==================================================================================================
+15. Dump and reset: see notification with 2 entities with A, B and C
+====================================================================
 POST http://localhost:REGEX(\d+)/notify
+<<<<<<< HEAD:test/functionalTest/cases/2507_metadata_flags_in_notifications/metadata_flags_in_notifications_ngsiv1.test
 Content-Length: 2398
+=======
+Content-Length: 1447
+>>>>>>> develop:test/functionalTest/cases/2507_csub_metadata_field/special_metadata_in_notifications_ngsiv1.test
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -756,40 +734,27 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "ngsi:onSubscriptionChange",
-                                "type": "Boolean",
-                                "value": true
-                            }
-                        ],
                         "name": "A",
                         "type": "Number",
                         "value": 10
                     },
                     {
-                        "metadatas": [
-                            {
-                                "name": "ngsi:onSubscriptionChange",
-                                "type": "Boolean",
-                                "value": true
-                            }
-                        ],
                         "name": "B",
                         "type": "Number",
                         "value": 20
                     },
                     {
-                        "metadatas": [
-                            {
-                                "name": "ngsi:onSubscriptionChange",
-                                "type": "Boolean",
-                                "value": true
-                            }
-                        ],
                         "name": "C",
                         "type": "Number",
                         "value": 30
+<<<<<<< HEAD:test/functionalTest/cases/2507_metadata_flags_in_notifications/metadata_flags_in_notifications_ngsiv1.test
+=======
+                    },
+                    {
+                        "name": "D",
+                        "type": "Number",
+                        "value": 41
+>>>>>>> develop:test/functionalTest/cases/2507_csub_metadata_field/special_metadata_in_notifications_ngsiv1.test
                     }
                 ],
                 "id": "E1",
@@ -805,40 +770,27 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "contextElement": {
                 "attributes": [
                     {
-                        "metadatas": [
-                            {
-                                "name": "ngsi:onSubscriptionChange",
-                                "type": "Boolean",
-                                "value": true
-                            }
-                        ],
                         "name": "A",
                         "type": "Text",
                         "value": "x"
                     },
                     {
-                        "metadatas": [
-                            {
-                                "name": "ngsi:onSubscriptionChange",
-                                "type": "Boolean",
-                                "value": true
-                            }
-                        ],
                         "name": "B",
                         "type": "Text",
                         "value": "y"
                     },
                     {
-                        "metadatas": [
-                            {
-                                "name": "ngsi:onSubscriptionChange",
-                                "type": "Boolean",
-                                "value": true
-                            }
-                        ],
                         "name": "C",
                         "type": "Text",
                         "value": "z"
+<<<<<<< HEAD:test/functionalTest/cases/2507_metadata_flags_in_notifications/metadata_flags_in_notifications_ngsiv1.test
+=======
+                    },
+                    {
+                        "name": "D",
+                        "type": "Text",
+                        "value": "u"
+>>>>>>> develop:test/functionalTest/cases/2507_csub_metadata_field/special_metadata_in_notifications_ngsiv1.test
                     }
                 ],
                 "id": "E2",

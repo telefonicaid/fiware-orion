@@ -116,11 +116,11 @@ static void setSubject(Subscription* s, const BSONObj& r)
   if (r.hasField(CSUB_EXPR))
   {
     mongo::BSONObj expression = getFieldF(r, CSUB_EXPR).Obj();
-    std::string    q          = getFieldF(expression, CSUB_EXPR_Q).String();
-    std::string    mq         = getFieldF(expression, CSUB_EXPR_MQ).String();
-    std::string    geo        = getFieldF(expression, CSUB_EXPR_GEOM).String();
-    std::string    coords     = getFieldF(expression, CSUB_EXPR_COORDS).String();
-    std::string    georel     = getFieldF(expression, CSUB_EXPR_GEOREL).String();
+    std::string    q          = getStringFieldF(expression, CSUB_EXPR_Q);
+    std::string    mq         = getStringFieldF(expression, CSUB_EXPR_MQ);
+    std::string    geo        = getStringFieldF(expression, CSUB_EXPR_GEOM);
+    std::string    coords     = getStringFieldF(expression, CSUB_EXPR_COORDS);
+    std::string    georel     = getStringFieldF(expression, CSUB_EXPR_GEOREL);
 
     s->subject.condition.expression.q        = q;
     s->subject.condition.expression.mq       = mq;
@@ -139,6 +139,7 @@ static void setSubject(Subscription* s, const BSONObj& r)
 static void setNotification(Subscription* subP, const BSONObj& r, const std::string& tenant)
 {
   // Attributes
+  // FIXME: use setStringVectorF
   std::vector<BSONElement> attrs = getFieldF(r, CSUB_ATTRS).Array();
   for (unsigned int ix = 0; ix < attrs.size(); ++ix)
   {
@@ -147,13 +148,14 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
     subP->notification.attributes.push_back(attr);
   }
 
+  setStringVectorF(r, CSUB_METADATA, &(subP->notification.metadata));
+
   subP->notification.httpInfo.fill(r);
 
   subP->throttling                    = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(r, CSUB_THROTTLING)       : -1;
   subP->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(r, CSUB_LASTNOTIFICATION) : -1;
   subP->notification.timesSent        = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : -1;
   subP->notification.blacklist        = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(r, CSUB_BLACKLIST)                   : false;
-  subP->notification.metadataFlags    = r.hasField(CSUB_METADATA_FLAGS)?   getBoolFieldF(r, CSUB_METADATA_FLAGS)              : false;
 
   // Attributes format
   subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(r, CSUB_FORMAT)) : NGSI_V1_LEGACY;

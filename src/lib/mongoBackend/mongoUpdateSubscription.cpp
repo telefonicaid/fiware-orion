@@ -285,6 +285,7 @@ static void setCondsAndInitialNotifyNgsiv1
     entities.push_back(en);
   }
 
+  // FIXME: use setStrintVectorF
   std::vector<std::string> attributes;
   std::vector<BSONElement> attrs = getFieldF(subOrig, CSUB_ATTRS).Array();
   for (unsigned int ix = 0; ix < attrs.size(); ++ix)
@@ -292,12 +293,15 @@ static void setCondsAndInitialNotifyNgsiv1
     attributes.push_back(attrs[ix].String());
   }
 
+  std::vector<std::string> metadata;
+  setStringVectorF(subOrig, CSUB_METADATA, &metadata);
 
   /* Conds vector (and maybe an initial notification) */
   *notificationDone = false;
   BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             entities,
                                             attributes,
+                                            metadata,
                                             subId,
                                             url,
                                             notificationDone,
@@ -309,8 +313,7 @@ static void setCondsAndInitialNotifyNgsiv1
                                             status,
                                             fiwareCorrelator,
                                             sub.notification.attributes,
-                                            sub.notification.blacklist,
-                                            sub.notification.metadataFlags);
+                                            sub.notification.blacklist);
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
@@ -350,26 +353,22 @@ static void setCondsAndInitialNotify
     }
 
     HttpInfo                  httpInfo;
-    bool                      metadataFlags;
     bool                      blacklist;
     std::vector<std::string>  notifAttributesV;
+    std::vector<std::string>  metadataV;
     if (subUp.notificationProvided)
     {
       httpInfo         = subUp.notification.httpInfo;
       blacklist        = subUp.notification.blacklist;
-      metadataFlags    = subUp.notification.metadataFlags;
+      metadataV        = subUp.notification.metadata;
       notifAttributesV = subUp.notification.attributes;
     }
     else
     {
       httpInfo.fill(subOrig);
-      blacklist     = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(subOrig, CSUB_BLACKLIST) : false;
-      metadataFlags = subOrig.hasField(CSUB_METADATA_FLAGS)? getBoolFieldF(subOrig, CSUB_METADATA_FLAGS) : false;
-      std::vector<BSONElement> attrs = getFieldF(subOrig, CSUB_ATTRS).Array();
-      for (unsigned int ix = 0; ix < attrs.size(); ++ix)
-      {
-        notifAttributesV.push_back(attrs[ix].String());
-      }
+      blacklist = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(subOrig, CSUB_BLACKLIST) : false;
+      setStringVectorF(subOrig, CSUB_METADATA, &metadataV);
+      setStringVectorF(subOrig, CSUB_ATTRS, &notifAttributesV);
     }
 
     RenderFormat attrsFormat;
@@ -396,9 +395,8 @@ static void setCondsAndInitialNotify
     }
     else
     {
-      setCondsAndInitialNotify(subUp, subUp.id, status, notifAttributesV, httpInfo, blacklist,
-                               metadataFlags, attrsFormat, tenant, servicePathV, xauthToken,
-                               fiwareCorrelator, b, notificationDone);
+      setCondsAndInitialNotify(subUp, subUp.id, status, notifAttributesV, metadataV, httpInfo, blacklist,
+                               attrsFormat, tenant, servicePathV, xauthToken, fiwareCorrelator, b, notificationDone);
     }
   }
   else
@@ -524,19 +522,19 @@ static void setBlacklist(const SubscriptionUpdate& subUp, const BSONObj& subOrig
 
 /* ****************************************************************************
 *
-* setMetadataFlags -
+* setMetadata -
 */
-static void setMetadataFlags(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
+static void setMetadata(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
 {
   if (subUp.notificationProvided)
   {
-    setMetadataFlags(subUp, b);
+    setMetadata(subUp, b);
   }
   else
   {
-    bool metadataFlags = subOrig.hasField(CSUB_METADATA_FLAGS)? getBoolFieldF(subOrig, CSUB_METADATA_FLAGS) : false;
-    b->append(CSUB_METADATA_FLAGS, metadataFlags);
-    LM_T(LmtMongo, ("Subscription metadataFlags: %s", metadataFlags? "true" : "false"));
+    BSONArray metadata = getArrayFieldF(subOrig, CSUB_METADATA);
+    b->append(CSUB_METADATA, metadata);
+    LM_T(LmtMongo, ("Subscription metadata: %s", metadata.toString().c_str()));
   }
 }
 
@@ -727,8 +725,8 @@ std::string mongoUpdateSubscription
   setStatus(subUp, subOrig, &b);
   setEntities(subUp, subOrig, &b);
   setAttrs(subUp, subOrig, &b);
-  setBlacklist(subUp, subOrig, &b);
-  setMetadataFlags(subUp, subOrig, &b);
+  setMetadata(subUp, subOrig, &b);
+  setBlacklist(subUp, subOrig, &b);  
   setCondsAndInitialNotify(subUp, subOrig, tenant, servicePathV, xauthToken, fiwareCorrelator,
                            &b, &notificationDone);
 

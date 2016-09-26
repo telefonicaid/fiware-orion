@@ -90,6 +90,7 @@ static void insertInCache
                      sub.notification.httpInfo,
                      sub.subject.entities,
                      sub.notification.attributes,
+                     sub.notification.metadata,
                      sub.subject.condition.attributes,
                      subId.c_str(),
                      sub.expires,
@@ -104,8 +105,7 @@ static void insertInCache
                      sub.subject.condition.expression.geometry,
                      sub.subject.condition.expression.coords,
                      sub.subject.condition.expression.georel,
-                     sub.notification.blacklist,
-                     sub.notification.metadataFlags);
+                     sub.notification.blacklist);
 
   cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
 }
@@ -149,12 +149,12 @@ std::string mongoCreateSubscription
   setStatus(sub, &b);
   setEntities(sub, &b);
   setAttrs(sub, &b);
+  setMetadata(sub, &b);
   setBlacklist(sub, &b);
-  setMetadataFlags(sub, &b);
 
   std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
-  setCondsAndInitialNotify(sub, subId, status, sub.notification.attributes, sub.notification.httpInfo,
-                           sub.notification.blacklist, sub.notification.metadataFlags, sub.attrsFormat,
+  setCondsAndInitialNotify(sub, subId, status, sub.notification.attributes, sub.notification.metadata,
+                           sub.notification.httpInfo, sub.notification.blacklist, sub.attrsFormat,
                            tenant, servicePathV, xauthToken, fiwareCorrelator, &b, &notificationDone);
   if (notificationDone)
   {

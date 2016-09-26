@@ -155,7 +155,7 @@ Date: REGEX(.*)
 02. GET the entity using /v1/queryContext
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 3569
+Content-Length: 3558
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -286,7 +286,7 @@ Date: REGEX(.*)
                             {
                                 "name": "Integer",
                                 "type": "Number",
-                                "value": 3.0
+                                "value": 3
                             },
                             {
                                 "name": "Null",
@@ -336,7 +336,7 @@ Date: REGEX(.*)
 04. Dump accumulator
 ====================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 3648
+Content-Length: 3637
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
@@ -469,7 +469,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                             {
                                 "name": "Integer",
                                 "type": "Number",
-                                "value": 3.0
+                                "value": 3
                             },
                             {
                                 "name": "Null", 

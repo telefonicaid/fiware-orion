@@ -130,9 +130,9 @@ namespace ngsiv2
       jh.addRaw("http", this->httpInfo.toJson());
     }
 
-    if (this->metadataFlags)
+    if (this->metadata.size() > 0)
     {
-      jh.addRaw("metadataFlags", "true");
+      jh.addRaw("metadata", vectorToJson(this->metadata));
     }
 
     return jh.str();

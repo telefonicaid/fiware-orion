@@ -259,11 +259,14 @@ std::string Metadata::render(const std::string& indent, bool comma)
 
     if (compoundValueP->isObject())
     {
+      // Note in this case we don't add the "value" key, the toJson()
+      // method does it for toplevel compound (a bit crazy... this deserves a FIXME mark)
+      compoundValueP->renderName = true;
       part = compoundValueP->toJson(true, false);
     }
     else if (compoundValueP->isVector())
     {
-      part = "[" + compoundValueP->toJson(true, false) + "]";
+      part = JSON_STR("value") + ": [" + compoundValueP->toJson(true, false) + "]";
     }    
 
     out += part;
@@ -413,8 +416,6 @@ void Metadata::fill(const struct Metadata& md)
 */
 std::string Metadata::toStringValue(void) const
 {
-  char buffer[64];
-
   switch (valueType)
   {
   case orion::ValueTypeString:
@@ -428,8 +429,7 @@ std::string Metadata::toStringValue(void) const
     }
     else // regular number
     {
-      snprintf(buffer, sizeof(buffer), "%f", numberValue);
-      return std::string(buffer);
+      return toString(numberValue);
     }    
     break;
 
