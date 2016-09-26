@@ -247,8 +247,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 *  -1: Empty subscriptionId
 *  -2: Empty servicePath
 *  -3: Out of memory (either this or EXIT)
-*  -4: Subscription not valid for sub-cache (no patterns)
-*  -5: Subscription not valid for sub-cache (empty notify-condition vector)
+*  -4: Subscription not valid for sub-cache (no entity ids)
 *
 *
 * Note that the 'count' of the inserted subscription is set to ZERO.
