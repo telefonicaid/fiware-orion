@@ -129,8 +129,8 @@ def __add_chars(text, before, after, char_to_add=" "):
     """
     append chars before or/and after in a text
     :param text: text to modify
-    :param before: number of blanks added to the beginning of the text
-    :param after: number of blanks added to the end of the text
+    :param before: number of chars added to the beginning of the text
+    :param after: number of chars added to the end of the text
     :param char_to_add: char used to append (blank space by default)
     :return: String (text)
     """
