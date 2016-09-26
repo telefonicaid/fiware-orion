@@ -25,7 +25,6 @@ __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
 import copy
 import re
-
 from bson.objectid import ObjectId
 
 from iotqatools.helpers_utils import *
@@ -380,6 +379,53 @@ class NGSI:
                     break
         return result
 
+    def __mq_binary_unary_statements(mq):
+        """
+        get binary and unary statements with mq condition
+
+        :param mq: mq string
+        :return: list of dicts.
+             Example of an internal dict:
+              {'operator': '==',
+               'attribute': 'picture',
+               'metadata': 'color',
+               'compound': 'secondary_color',  [OPTIONAL] [only in compound metadata]
+               'value': 'red'}                 [OPTIONAL] [only in binaries cases]
+        """
+        mq_split = mq.split(";")
+
+        mq_list = []
+        operator = ["==", "!=", ">=", ">", "<=", "<",  "!"]
+        for item in mq_split:
+            op_exist = False
+            item_list = []
+            for op in operator:
+                if item.find(op) >= 0:
+                    item_list = item.split(op)
+                    item_list.append(op)
+                    if op == "!":
+                        item_list.pop(0)
+                    op_exist = True
+                    break
+            if not op_exist:   # unary positive case
+                item_list.append(item)
+                item_list.append("+")
+
+            mq_dict = {}
+            name_split = item_list[0].split(".")
+            mq_dict["attribute"] = name_split[0]
+            mq_dict["metadata"] = name_split[1]
+            if len(name_split) > 2:
+                compound = u''
+                for i in range(2, len(name_split)):
+                    compound = compound + name_split[i]
+                mq_dict["compound"] = compound
+            mq_dict["operator"] = item_list[-1]
+            if len(item_list) > 2:
+                mq_dict["value"] = item_list[1]
+            mq_list.append(mq_dict)
+        return mq_list
+
     def __get_entities_context_group(self, accumulate, elements):
         """
         get entities context groups
@@ -579,8 +625,8 @@ class NGSI:
         verify headers in response, it is possible to use regular expressions
         Ex:
           | parameter          | value                |
-          | fiware-total-count | 5                    |
-          | location           | /v2/subscriptions/.* |
+          | Fiware-Total-Count | 5                    |
+          | Location           | /v2/subscriptions/.* |
         :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
         """
         headers= {}                                # headers to verify
@@ -631,8 +677,10 @@ class NGSI:
         assert remove_quote(entities_context["attributes_name"]) in entity,   \
             'ERROR - attribute name "%s" does not exist in raw mode' % entities_context["attributes_name"]
         attribute = entity[remove_quote(entities_context["attributes_name"])]
+        entities_context["attributes_type"] = self.__change_attribute_type(entities_context["attributes_value"], entities_context["attributes_type"])
+
         assert remove_quote(entities_context["attributes_type"]) == attribute["type"],\
-            'ERROR - in attribute type "%s" in raw mode' % remove_quote(entities_context["attributes_type"])
+            'ERROR - in attribute type "%s" in raw mode' % entities_context["attributes_type"]
 
         if str(type(attribute["value"])) == "<type 'float'>":
             if attribute["value"] % 1 == 0:
@@ -870,8 +918,8 @@ class NGSI:
         type_list = types.split(",")
         items_list = convert_str_to_dict(resp.content, JSON)
         for item in items_list:
-            __logger__.debug("checking: %s include in %s" % (item, types))
-            assert item["type"] in type_list, " ERROR - \"%s\" type does not match with types to verify" % item
+            __logger__.debug("checking: %s include in %s" % (item["type"], types))
+            assert item["type"] in type_list, " ERROR - \"%s\" type does not match with types to verify" % item["type"]
 
     def verify_attributes_types_with_entity_types(self, queries_parameters, accumulate_entities_context, prefixes, resp):
         """
@@ -942,10 +990,12 @@ class NGSI:
             for attr in attr_list:
                 for entities_group in accumulate_entities_context:
                     attr_exists = False
-                    if (item["type"].find(entities_group["entities_type"]) >= 0) and (attr.find(entities_group["attributes_name"]) >= 0):
-                        if entities_group["attributes_type"] in item["attrs"][attr]["types"]:
-                            attr_exists = True
-                            break
+                    entities_group["attributes_type"] = self.__change_attribute_type(entities_group["attributes_value"], entities_group["attributes_type"])
+                    if (str(item["type"]).find(str(entities_group["entities_type"])) >= 0):
+                        if (attr.find(entities_group["attributes_name"]) >= 0):
+                            if entities_group["attributes_type"] in item["attrs"][attr]["types"]:
+                                attr_exists = True
+                                break
                 assert attr_exists, ' ERROR - the attribute: "%s" with type: "%s" does not exist...' % (attr, str(item["attrs"][attr]["types"]))
             __logger__.info(u'"%s" attribute and its types are verified successfully' % attr)
             # count field
@@ -972,6 +1022,7 @@ class NGSI:
             for entities_group in accumulate_entities_context:
                 attr_exists = False
                 if (attr.find(entities_group["attributes_name"]) >= 0):
+                    entities_group["attributes_type"] = self.__change_attribute_type(entities_group["attributes_value"], entities_group["attributes_type"])
                     if entities_group["attributes_type"] in attrs_dict["attrs"][attr]["types"]:
                         attr_exists = True
                         break
@@ -1196,5 +1247,304 @@ class NGSI:
         assert error == resp_dict["error"], 'ERROR -  error: "%s" is not the expected: "%s"' % \
                                                      (str(resp_dict["error"]), error)
 
+    def __get_attribute_fields(self, entity_context, subsc_context):
+        """
+        get attribute names, values and types from entities and subscriptions to be used with notifications
+        :param entity_context: entity context used
+        :param subsc_context: subscription context used
+        :returns lists (attribute names list, attribute values list, attribute types list)
+        """
+        # attribute field lists
+        attrs_to_notif = []
+        attr_values_list = []
+        attr_types_list = []
+        if entity_context["attributes_number"] > 1:
+            for i in range(int(entity_context["attributes_number"])):
+                attrs_to_notif.append("%s_%s" % (entity_context["attributes_name"], str(i)))
+                attr_values_list.append(entity_context["attributes_value"])
+                attr_types_list.append(self.__change_attribute_type(entity_context["attributes_value"], entity_context["attributes_type"]))
+        else:
+            if entity_context["attributes_name"].find("&")<0:
+                attrs_to_notif.append(entity_context["attributes_name"])
+                attr_values_list.append(entity_context["attributes_value"])
+                attr_types_list.append(self.__change_attribute_type(entity_context["attributes_value"], entity_context["attributes_type"]))
+            else:
+                attrs_to_notif = entity_context["attributes_name"].split ("&")
+                attr_values_list = entity_context["attributes_value"].split ("&")
+                while entity_context["attributes_type"].find("&&") >= 0:
+                    entity_context["attributes_type"] = entity_context["attributes_type"].replace("&&", "&none&")
+                attr_types_list = entity_context["attributes_type"].split ("&")
+                if len(attr_types_list) != len(attrs_to_notif):
+                    diff = len(attrs_to_notif) - len(attr_types_list)
+                    for i in range(diff):
+                        attr_types_list.append(u'none')
+                for i in range(len(attr_types_list)):
+                    attr_types_list[i] = self.__change_attribute_type(attr_values_list[i], attr_types_list[i])
+                    if attr_types_list[i] == "Boolean":
+                        attr_values_list[i] = "%s%s" % (attr_values_list[i][0].upper(),attr_values_list[i][1:] )
 
+                for e in range(len(attrs_to_notif)):  # remove quote from raw request
+                    attrs_to_notif[e] = remove_quote(attrs_to_notif[e])
+                    attr_values_list[e] = remove_quote(attr_values_list[e])
+                    attr_types_list[e] = remove_quote(attr_types_list[e])
+        if subsc_context["notification_attrs"] is not None:
+            i = 0
+            while i < len(attrs_to_notif):
+                if attrs_to_notif[i] not in subsc_context["notification_attrs"]:
+                    attrs_to_notif.pop(i)
+                    attr_values_list.pop(i)
+                    attr_types_list.pop(i)
+                else:
+                    i += 1
+        elif subsc_context["notification_except_attrs"] is not None:
+            except_attrs = []
+            if subsc_context["notification_attrs_number"] == 1:
+                except_attrs.append(subsc_context["notification_except_attrs"])
+            else:
+                for i in range(int(subsc_context["notification_attrs_number"])):
+                    except_attrs.append("%s_%s" % (subsc_context["notification_except_attrs"], str(i)))
 
+            for e_a in range(len(except_attrs)):
+                if except_attrs[e_a] in attrs_to_notif:
+                    p = attrs_to_notif.index(except_attrs[e_a])
+                    attrs_to_notif.pop(p)
+                    attr_values_list.pop(p)
+                    attr_types_list.pop(p)
+        return attrs_to_notif, attr_values_list, attr_types_list
+
+    def __change_attribute_type(self, attributes_value, attributes_type):
+        """
+        change the attribute type if it is not defined depending to the value type
+        types by default (Text, Number, Boolean, None or StruturedValue)
+        :param attributes_value: attribute value
+        :param attributes_type: attribute type (changed if it is "none")
+        :return: string (attributes_type)
+        """
+        attributes_type = remove_quote(attributes_type)
+        if attributes_type == "none":
+            if (attributes_value.find(u'{') >= 0) or (attributes_value.find(u'[') >= 0):
+                attributes_type = '"StructuredValue'
+            elif (attributes_value == "true") or (attributes_value == "false"):
+                attributes_type = 'Boolean'
+            elif (attributes_value == "null"):
+                attributes_type = 'None'
+            else:
+                try:
+                    numeric = True
+                    float(attributes_value)
+                except Exception, e:
+                    numeric = False
+                if numeric:
+                    attributes_type = u'Number'
+                else:
+                    attributes_type = u'Text'
+        return attributes_type
+
+    def verify_notification(self, notif_format, payload, headers, entity_context, subsc_context):
+        """
+        verify the notification in a given format
+        :param notif_format: format expected (normalized | keyValues | values | legacy)
+        :param payload: payload received
+        :param headers: headers received
+        :param entity_context: entity context used
+        :param subsc_context: subscription context used
+        """
+        payload_dict = convert_str_to_dict(payload, JSON)
+
+        # no notification is received
+        assert "msg" not in payload_dict, " ERROR - no notification is received: \n   - %s" % payload_dict["msg"]
+
+        # subscriptionId field
+        assert len(payload_dict["subscriptionId"]) == 24, " ERROR - subscriptionId does not has 24 chars"
+        try:
+            int(payload_dict["subscriptionId"], 16)  # validate if it is hexadecimal
+        except Exception, e:
+            __logger__.error(" ERROR: the subcriptionId is not an hexadecimal: %s \n  - %s" % (payload_dict["subscriptionId"], str(e)))
+            raise Exception(" ERROR: the subcriptionId is not an hexadecimal: %s" % payload_dict["subscriptionId"])
+        __logger__.info("  - subcriptionId field does has 24 chars and it is an hexadecimal")
+
+        # get attribute fields lists (attribute names list, attribute values list, attribute types list)
+        attrs_to_notif, attr_values_list, attr_types_list = self.__get_attribute_fields(entity_context, subsc_context)
+
+        #legacy format
+        if notif_format == "legacy":
+            statusCode = payload_dict["contextResponses"][0]["statusCode"]
+            # status code fields
+            assert statusCode["code"] == "200", " ERROR - the status code is not the expected: %s" % statusCode["code"]
+            assert statusCode["reasonPhrase"] == "OK", " ERROR - the reason phrase is not the expected: %s" % statusCode["reasonPhrase"]
+            __logger__.info("  - The status code and the reason phrase is the expected correctly")
+
+            #context Element fields
+            contextElement = payload_dict["contextResponses"][0]["contextElement"]
+            # id, type and idPattern fields
+            assert contextElement["id"] == entity_context["entities_id"], " ERROR - the id is not the expected: %s" % entity_context["entities_id"]
+            __logger__.info("  - id matches succesfully")
+            assert contextElement["isPattern"] == "false", " ERROR - the isPattern is not the expected" % contextElement["isPattern"]
+            __logger__.info("  - isPattern matches succesfully")
+            assert contextElement["type"] == entity_context["entities_type"], " ERROR - the type is not the expected: %s" % entity_context["entities_type"]
+            __logger__.info("  - type matches succesfully")
+
+            # Attributes fields
+            attributes = contextElement["attributes"]
+            for i in range(len(attributes)):
+                assert attributes[i]["name"] in attrs_to_notif, " ERROR - the attribute name is not the expected: %s" % attributes[i]["name"]
+                __logger__.info("  - attribute name: %s  matches succesfully" % attributes[i]["name"])
+                assert attributes[i]["type"] in attr_types_list, " ERROR - the attribute type is not the expected: %s" % attributes[i]["type"]
+                __logger__.info("  - attribute type: %s  matches succesfully" % attributes[i]["type"])
+                assert attributes[i]["value"] in attr_values_list, " ERROR - the attribute type is not the expected: %s" % attributes[i]["value"]
+                __logger__.info("  - attribute value: %s  matches succesfully" % attributes[i]["value"])
+
+        # another formats: normalized, keyValues, values
+        else:
+            data = payload_dict["data"][0]
+            # "id" and "type" fields only are sent in normalized or keyValues formats (not in values format)
+            if notif_format == "normalized" or notif_format == "keyValues":
+                # entity id field
+                entity_id = []
+                entity_type = []
+                if ("id" in entity_context["entities_prefix"]) and (entity_context["entities_prefix"]["id"] == "true"):
+                    for i in range(int(entity_context["entities_number"])):
+                        entity_id.append("%s_%s" % (entity_context["entities_id"], str(i)))
+                else:
+                    entity_id.append(entity_context["entities_id"])
+                for e in range(len(entity_id)):  # remove quote from raw request
+                    entity_id[e] = remove_quote(entity_id[e])
+                assert data["id"] in entity_id, " ERROR - id %s does not include into %s" % (data["id"], str(entity_id))
+                __logger__.info("  - id matches succesfully")
+
+                # entity type field
+                if entity_context["entities_type"] is not None:
+                    if ("type" in entity_context["entities_prefix"]) and (entity_context["entities_prefix"]["type"] == "true"):
+                        for i in range(int(entity_context["entities_number"])):
+                            entity_type.append("%s_%s" % (entity_context["entities_type"], str(i)))
+                    else:
+                        entity_type.append(entity_context["entities_type"])
+                    for e in range(len(entity_type)):  # remove quote from raw request
+                        entity_type[e] = remove_quote(entity_type[e])
+                    assert data["type"] in entity_type, " ERROR - type does not match %s != %s" % \
+                                                                            (data["type"], str(entity_type))
+                    __logger__.info("  - type matches succesfully")
+
+            # attributes fields
+            if notif_format == "normalized" or notif_format == "keyValues":  # attribute names notified only in or
+                __logger__.info("attributes to notify:")
+                for a in attrs_to_notif:
+                    __logger__.info("  - %s" % a)
+            for i in range(len(attrs_to_notif)):
+                # attribute names only are sent in normalized or keyValues formats (not in values format)
+                attrs_to_notif[i] = remove_quote(attrs_to_notif[i])
+                if notif_format == "normalized" or notif_format == "keyValues":
+                    assert remove_quote(attrs_to_notif[i]) in data, " ERROR - the attribute: %s does not exist in the notification" % attrs_to_notif[i]
+                    __logger__.info("the attribute \"%s\" is sent in the notification in \"%s\" format with:" % (attrs_to_notif[i], notif_format))
+                if notif_format == "normalized":
+                    if isinstance(data[attrs_to_notif[i]]["value"], dict):
+                        data[attrs_to_notif[i]]["value"] = convert_dict_to_str(data[attrs_to_notif[i]]["value"], JSON)
+                    assert str(attr_values_list[i]) == str(data[attrs_to_notif[i]]["value"]), " ERROR - the attribute value does not match in normalized format: \n   %s != %s" \
+                                                                                      % (attr_values_list[i] , data[attrs_to_notif[i]]["value"])
+                    __logger__.info("  - the attribute value sent is correct: %s" % attr_values_list[i] )
+                    assert attr_types_list[i] == data[attrs_to_notif[i]]["type"], " ERROR - the attribute type does not match in normalized format: \n   %s != %s" \
+                                                                                      % (attr_types_list[i], data[attrs_to_notif[i]]["type"])
+                    __logger__.info("  - the attribute type sent is correct: %s" % attr_types_list[i])
+                elif notif_format == "keyValues":
+                    assert unicode(attr_values_list[i]) == data[attrs_to_notif[i]], " ERROR - the attribute value does not match in keyValues format: \n   %s != %s" \
+                                                                                      % (attr_values_list[i], data[attrs_to_notif[i]])
+                    __logger__.info("  - the attribute value sent is correct: %s" % entity_context["attributes_value"])
+                elif notif_format == "values":
+                    assert attr_values_list[i] == data[i], " ERROR - the attribute value does not match in values format: \n   %s != %s" \
+                                                                                      % (attr_values_list[i], data[i])
+                    __logger__.info("  - the attribute value sent is correct: %s" % attr_values_list[i])
+
+    def __replacing_values(self, str_to_replace, **kwargs):
+        """
+        replacing values from subscription request
+        :param str_to_replace: string to replace values
+        :param id: entity_id
+        :param type: entity_type
+        :param attr_names_list: list of attr names
+        :param attr_values_list: list of attr values
+        :return: string
+        """
+        entity_id = kwargs.get("id", "")
+        entity_type = kwargs.get("type", "")
+        attr_names_list = kwargs.get("names", [])
+        attr_values_list = kwargs.get("values", [])
+        str_to_replace = str_to_replace.replace("${id}", remove_quote(entity_id))
+        str_to_replace = str_to_replace.replace("${type}", remove_quote(entity_type))
+        for a in range(len(attr_names_list)):
+            str_to_replace = str_to_replace.replace("${%s}" % attr_names_list[a], remove_quote(attr_values_list[a]))
+        # if some attribute does not exist, it is replace to empty string
+        str_to_replace_split = str_to_replace.split("${")
+        str_to_replace = str_to_replace_split[0]
+        for i in range(1, len(str_to_replace_split)):
+            pos = str_to_replace_split[i].find("}") + 1
+            str_to_replace = "%s%s" % (str_to_replace, str_to_replace_split[i][pos:])
+        return str_to_replace
+
+    def verify_custom_notification(self, payload, headers, entity_context, subsc_context):
+        """
+        verify the custom notification (templates)
+        :param payload: payload received
+        :param headers: headers received
+        :param entity_context: entity context used
+        :param subsc_context: subscription context used
+        """
+
+        # get attribute fields lists (attribute names list, attribute values list, attribute types list)
+        attrs_to_notif, attr_values_list, attr_types_list = self.__get_attribute_fields(entity_context, subsc_context)
+
+        # custom notification
+        payload_type = headers["last-content-type"]
+        __logger__.debug("payload type: %s" % payload_type)
+        if payload_type == "application/json":  # to review this if
+            payload = payload
+        else:
+            payload = payload
+        url = headers["last-url"]
+
+        # replacing values in payload, url, qs and headers in request fields (id, type and attributes)
+        # payload
+        expected_payload = remove_quote(subsc_context["notification_http_custom_payload"]).replace("%22", "\"")
+        expected_payload = self.__replacing_values(expected_payload,
+                                                   id=entity_context["entities_id"],
+                                                   type=entity_context["entities_type"],
+                                                   names=attrs_to_notif,
+                                                   values=attr_values_list)
+
+        assert expected_payload == payload, " ERROR - the payload \"%s\" is not the expected: \"%s\"" % (
+        payload, expected_payload)
+        __logger__.debug("the payload is the expected: (%s)" % payload)
+
+        # url
+        expected_url = remove_quote(subsc_context["notification_http_custom_url"])
+        expected_method = remove_quote(subsc_context["notification_http_custom_method"])
+        expected_url = "%s - %s" % (expected_method, expected_url)
+        expected_qs = convert_str_to_dict(subsc_context["notification_http_custom_qs"], "json")
+
+        if expected_qs != {}:
+            for item in expected_qs:
+                expected_url = "%s&%s=%s" % (expected_url, item, expected_qs[item])
+            expected_url = expected_url.replace("&", "?", 1)
+        __logger__.debug("url expected: %s" % expected_url)
+        expected_url = self.__replacing_values(expected_url,
+                                          id=entity_context["entities_id"],
+                                          type=entity_context["entities_type"],
+                                          names=attrs_to_notif,
+                                          values=attr_values_list)
+
+        assert expected_url == url, " ERROR - the url \"%s\" is not the expected: \"%s\"" % (url, expected_url)
+        __logger__.debug("the url is the expected: (%s)" % url)
+
+        # headers
+        expected_headers_dict = convert_str_to_dict(subsc_context["notification_http_custom_headers"], "json")
+        for item in expected_headers_dict:
+            expected_headers_dict[item] = self.__replacing_values(expected_headers_dict[item],
+                                                             id=entity_context["entities_id"],
+                                                             type=entity_context["entities_type"],
+                                                             names=attrs_to_notif,
+                                                             values=attr_values_list)
+            assert "last-%s" % item in headers, " ERROR - the \"%s\" header does not sent" % item
+            __logger__.debug("the \"%s\" header has been sent" % item)
+            assert expected_headers_dict[item] == headers["last-%s" % item], \
+                ' ERROR - the header value "%s" does not match with the expected "%s"' % (
+                headers["last-%s" % item], expected_headers_dict[item])
+            __logger__.debug("the header value does match: %s" % expected_headers_dict[item])
