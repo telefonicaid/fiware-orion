@@ -428,15 +428,6 @@ int mongoSubCacheItemInsert
     cSubP->notifyConditionV.push_back(condVec[ix].String());
   }
 
-#if 0
-  if (cSubP->notifyConditionV.size() == 0)
-  {
-    subCacheItemDestroy(cSubP);
-    delete cSubP;
-    return -5;
-  }
-#endif
-
   subCacheItemInsert(cSubP);
 
   return 0;
