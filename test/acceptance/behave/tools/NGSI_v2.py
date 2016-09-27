@@ -46,7 +46,8 @@ class NGSI:
     """
     manage Context broker operations
     """
-    def __init__(self,  **kwargs):
+
+    def __init__(self, **kwargs):
         """
         constructor
         """
@@ -76,7 +77,7 @@ class NGSI:
 
         if subs_id != EMPTY:
             collection = u'csubs'
-            query = {'_id': ObjectId(subs_id)} # use "from bson.objectid import ObjectId"
+            query = {'_id': ObjectId(subs_id)}  # use "from bson.objectid import ObjectId"
         else:
             collection = u'entities'
             if FIWARE_SERVICE_PATH_HEADER in headers:
@@ -111,7 +112,7 @@ class NGSI:
         verify attributes from mongo
         """
         # verify attributes
-        for a in range(int(entities_contexts["attributes_number"])):    # manages N attributes
+        for a in range(int(entities_contexts["attributes_number"])):  # manages N attributes
             if int(entities_contexts["attributes_number"]) == 1:
                 attr_name = entities_contexts["attributes_name"]
             else:
@@ -135,11 +136,11 @@ class NGSI:
                     " ERROR -- attribute value: %s is not stored successful in mongo" % str(entities_contexts["attributes_value"])
                 if entities_contexts["attributes_type"] != "none":
                     assert entities_contexts["attributes_type"] == entity[u'attrs'][attr_name][u'type'], \
-                    " ERROR -- attribute type: %s is not stored successful in mongo" % entities_contexts["attributes_type"]
+                        " ERROR -- attribute type: %s is not stored successful in mongo" % entities_contexts["attributes_type"]
                 # verify metadatas
                 if entities_contexts["metadatas_number"] > 0:
                     md = entity[u'attrs'][attr_name][u'md']
-                    for m in range(int(entities_contexts["metadatas_number"])):    # manages N metadatas
+                    for m in range(int(entities_contexts["metadatas_number"])):  # manages N metadatas
                         if int(entities_contexts["metadatas_number"]) == 1:
                             meta_name = entities_contexts["metadatas_name"]
                         else:
@@ -153,17 +154,16 @@ class NGSI:
                         assert entities_contexts["metadatas_value"] == md[meta_name][u'value'], \
                             " ERROR -- metadata value: %s is not stored successful in mongo" % entities_contexts["metadatas_value"]
                         if entities_contexts["metadatas_type"] != "none":
-
                             assert entities_contexts["metadatas_type"] == md[meta_name][u'type'], \
                                 " ERROR -- metadata type: %s is not stored successful in mongo" % entities_contexts["metadatas_type"]
-                assert u'creDate' in entity[u'attrs'][attr_name],\
+                assert u'creDate' in entity[u'attrs'][attr_name], \
                     " ERROR -- creDate field into attribute does not exists in document"
-                assert u'modDate' in entity[u'attrs'][attr_name],\
+                assert u'modDate' in entity[u'attrs'][attr_name], \
                     " ERROR -- modDate field into attribute does not exists in document"
 
-            assert u'creDate' in entity,\
+            assert u'creDate' in entity, \
                 " ERROR -- creDate field does not exists in document"
-            assert u'modDate' in entity,\
+            assert u'modDate' in entity, \
                 " ERROR -- modDate field does not exists in document"
         __logger__.debug(" Entity id prefix: \"%s\" is successful stored in mongo" % entities_contexts["entities_id"])
         __logger__.debug(" Entity type prefix: \"%s\" is successful stored in mongo" % entities_contexts["entities_type"])
@@ -213,7 +213,7 @@ class NGSI:
         for i in range(int(entities_contexts["entities_number"])):
             # verify if the entity is stored in mongo
             if stored:
-                __logger__.debug("Number of doc read from mongo: %s" % str(i+1))
+                __logger__.debug("Number of doc read from mongo: %s" % str(i + 1))
                 assert i < len(curs_list), " ERROR - the entity \"%s\" is not stored" % str(i)
                 entity = curs_list[i]  # manages N entities
                 # verify attributes
@@ -290,11 +290,11 @@ class NGSI:
                 posi = posi + quote + 1
                 if posi >= 0:
                     posf = value[posi:].find("'")
-                    comma = value[posi:posf+posi].find(",")
+                    comma = value[posi:posf + posi].find(",")
                     if comma >= 0:
                         comma += posi
-                        value = "%s%s%s" % (value[:comma], text_to_comma_replace, value[comma+1:])
-                posi = posi+posf + len(text_to_comma_replace) + 1
+                        value = "%s%s%s" % (value[:comma], text_to_comma_replace, value[comma + 1:])
+                posi = posi + posf + len(text_to_comma_replace) + 1
         l = value.split(",")
         for e in l:
             e = e.replace("'", "")  # remove the simpl quote
@@ -348,17 +348,17 @@ class NGSI:
                         items.append(min_max)
 
                         assert len(min_max) == 2, " WARN - It is necessary two values in range (minimum and maximum)"
-                    else:   # The value is a single element
+                    else:  # The value is a single element
                         items = self.__get_simple_quote_values(value[1])
 
                     if items[0] == "range":
                         try:
                             if op == "==" and ((float(entity_context["attributes_value"]) >= float(items[1][0])) and
-                                              (float(entity_context["attributes_value"]) <= float(items[1][1]))):
-                                    result = "this statement does match"  # range q=attr==x..y
+                                                   (float(entity_context["attributes_value"]) <= float(items[1][1]))):
+                                result = "this statement does match"  # range q=attr==x..y
                             elif op == "!=" and ((float(entity_context["attributes_value"]) <= float(items[1][0])) or
-                                                 (float(entity_context["attributes_value"]) >= float(items[1][1]))):
-                                    result = "this statement does match"  # range q=attr!=x..y
+                                                     (float(entity_context["attributes_value"]) >= float(items[1][1]))):
+                                result = "this statement does match"  # range q=attr!=x..y
                         except Exception, e:
                             __logger__.warn("some value is not numeric format, %s" % str(e))
                     else:
@@ -370,16 +370,16 @@ class NGSI:
                                 else:
                                     result = None
                                 break
-                            else:     # OR operation
+                            else:  # OR operation
                                 if eval:
                                     result = "this statement does match"
                                     break
 
             if result is None:
-                    break
+                break
         return result
 
-    def __mq_binary_unary_statements(mq):
+    def __mq_binary_unary_statements(self, mq):
         """
         get binary and unary statements with mq condition
 
@@ -395,7 +395,7 @@ class NGSI:
         mq_split = mq.split(";")
 
         mq_list = []
-        operator = ["==", "!=", ">=", ">", "<=", "<",  "!"]
+        operator = ["==", "!=", ">=", ">", "<=", "<", "!"]
         for item in mq_split:
             op_exist = False
             item_list = []
@@ -407,7 +407,7 @@ class NGSI:
                         item_list.pop(0)
                     op_exist = True
                     break
-            if not op_exist:   # unary positive case
+            if not op_exist:  # unary positive case
                 item_list.append(item)
                 item_list.append("+")
 
@@ -514,8 +514,8 @@ class NGSI:
         if offset >= total:
             items = 0
             position = 0
-        elif limit+offset > total:
-            items = total-offset
+        elif limit + offset > total:
+            items = total - offset
             position = offset
         else:
             items = limit
@@ -535,7 +535,7 @@ class NGSI:
         items_list = convert_str_to_dict(resp.content, JSON)
 
         assert len(items_list) == int(entities_returned), "ERROR - in number of items in response\n  received: %s \n  expected: %s" % \
-                                         (str(len(items_list)), entities_returned)
+                                                          (str(len(items_list)), entities_returned)
         __logger__.debug("items returned: %d " % len(items_list))
         __logger__.debug("items expected to return: %s" % int(entities_returned))
 
@@ -543,7 +543,7 @@ class NGSI:
             sub_elements = {}
             for i in range(int(entities_returned)):
                 sub_elements.clear()
-                 # verify entity id and entity type
+                # verify entity id and entity type
                 id_exists = False
                 type_exists = False
                 for id in ids:
@@ -610,7 +610,7 @@ class NGSI:
                                     else:
                                         meta_name = sub_group["metadatas_name"]
 
-                                    assert meta_name in attribute["metadata"],  \
+                                    assert meta_name in attribute["metadata"], \
                                         'ERROR - attribute metadata name "%s" does not exist' % meta_name
                                     metadata = attribute["metadata"][meta_name]
                                     if sub_group["metadatas_type"] != "none":
@@ -629,7 +629,7 @@ class NGSI:
           | Location           | /v2/subscriptions/.* |
         :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
         """
-        headers= {}                                # headers to verify
+        headers = {}  # headers to verify
         for row in context.table:
             headers[row[PARAMETER]] = row[VALUE]
         headers_list = dict(context.resp.headers)  # headers returned in response
@@ -639,7 +639,7 @@ class NGSI:
             prog = re.compile(headers[h])
             result = prog.match(headers_list[h])
             assert result is not None, " ERROR - the \"%s\" header value expected (%s) not matches with headers response value: \"%s\"" % \
-                                                  (h, headers[h], headers_list[h])
+                                       (h, headers[h], headers_list[h])
             __logger__.info("\"%s\" header expected does match with \"%s\" in headers response " % (h, result.group(0)))
 
     @staticmethod
@@ -667,19 +667,20 @@ class NGSI:
         assert resp.text != "[]", "ERROR - It has not returned any entity"
         entity = convert_str_to_dict(resp.text, JSON)
         if type(entity) is not dict:
-            entity = entity[0]   # in raw mode is used only one entity
-        assert remove_quote(entities_context["entities_id"]) == entity["id"],  \
+            entity = entity[0]  # in raw mode is used only one entity
+        assert remove_quote(entities_context["entities_id"]) == entity["id"], \
             'ERROR - in id "%s" in raw mode' % (entity["id"])
-        assert remove_quote(entities_context["entities_type"]) == entity["type"],  \
+        assert remove_quote(entities_context["entities_type"]) == entity["type"], \
             'ERROR - in type "%s" in raw mode' % (entity["type"])
 
         # verify attribute fields
-        assert remove_quote(entities_context["attributes_name"]) in entity,   \
+        assert remove_quote(entities_context["attributes_name"]) in entity, \
             'ERROR - attribute name "%s" does not exist in raw mode' % entities_context["attributes_name"]
         attribute = entity[remove_quote(entities_context["attributes_name"])]
-        entities_context["attributes_type"] = self.__change_attribute_type(entities_context["attributes_value"], entities_context["attributes_type"])
+        entities_context["attributes_type"] = self.__change_attribute_type(entities_context["attributes_value"],
+                                                                           entities_context["attributes_type"])
 
-        assert remove_quote(entities_context["attributes_type"]) == attribute["type"],\
+        assert remove_quote(entities_context["attributes_type"]) == attribute["type"], \
             'ERROR - in attribute type "%s" in raw mode' % entities_context["attributes_type"]
 
         if str(type(attribute["value"])) == "<type 'float'>":
@@ -688,7 +689,7 @@ class NGSI:
         if str(type(attribute["value"])) == "<type 'unicode'>":
             attribute["value"] = str(attribute["value"])
 
-        assert str(type(attribute["value"])) == "<type '%s'>" % field_type,  \
+        assert str(type(attribute["value"])) == "<type '%s'>" % field_type, \
             'ERROR - in attribute value "%s" with type "%s" does not match' % (str(attribute["value"]), field_type)
 
     def verify_an_entity_by_id(self, queries_parameters, entities_context, resp, entity_id_to_test, **kwargs):
@@ -717,11 +718,11 @@ class NGSI:
         resp_json = convert_str_to_dict(resp.content, JSON)
         __logger__.debug("query parameter: %s" % str(queries_parameters))
         if not attrs_request:
-            assert resp_json["id"] == entity_id_to_test,  'ERROR - in id "%s"' % resp_json["id"]
+            assert resp_json["id"] == entity_id_to_test, 'ERROR - in id "%s"' % resp_json["id"]
             if entities_context["entities_type"] != "none":
-                assert resp_json["type"] == entities_context["entities_type"],  'ERROR - in type "%s" ' % resp_json["type"]
+                assert resp_json["type"] == entities_context["entities_type"], 'ERROR - in type "%s" ' % resp_json["type"]
 
-        #  attr query parameter
+        # attr query parameter
         if "attrs" in queries_parameters:
             attrs_list = queries_parameters["attrs"].split(",")
         else:
@@ -731,8 +732,8 @@ class NGSI:
                 for e in range(int(entities_context["attributes_number"])):
                     attrs_list.append("%s_%s" % (entities_context["attributes_name"], str(e)))
 
-        #  options query parameter
-        if  "options" in queries_parameters:
+        # options query parameter
+        if "options" in queries_parameters:
             __logger__.debug("options query parameter: %s" % str(queries_parameters["options"]))
             # options = keyValues
             if queries_parameters["options"].find("keyValues") >= 0:
@@ -753,7 +754,7 @@ class NGSI:
                     if entities_context["attributes_value"] != "none":
                         assert entities_context["attributes_value"] == resp_json[c], \
                             'ERROR - in attribute value "%s" with values option' % entities_context["attributes_value"]
-                    c=+1
+                    c = +1
             # options = unique
             elif queries_parameters["options"].find("unique") >= 0:
                 # verify attributes value
@@ -784,7 +785,7 @@ class NGSI:
                                 meta_name = entities_context["metadatas_name"]
                             else:
                                 meta_name = "%s_%s" % (entities_context["metadatas_name"], str(m))
-                            assert meta_name in attribute["metadata"],\
+                            assert meta_name in attribute["metadata"], \
                                 'ERROR - attribute metadata name "%s" does not exist with normalized option' \
                                 % meta_name
                             metadata = attribute["metadata"][meta_name]
@@ -817,13 +818,13 @@ class NGSI:
         """
         attribute = convert_str_to_dict(resp.content, JSON)
         if entities_context["attributes_type"] != "none":
-            assert entities_context["attributes_type"] == attribute["type"],\
+            assert entities_context["attributes_type"] == attribute["type"], \
                 'ERROR - in attribute type "%s"' % (entities_context["attributes_type"])
         if entities_context["attributes_value"] is not None:
-            assert entities_context["attributes_value"] == attribute["value"],\
+            assert entities_context["attributes_value"] == attribute["value"], \
                 'ERROR - in attribute value "%s"' % (entities_context["attributes_value"])
 
-       # verify attribute metadatas
+            # verify attribute metadatas
         if entities_context["metadatas_number"] > 0:
             for m in range(int(entities_context["metadatas_number"])):
                 if int(entities_context["metadatas_number"]) > 1:
@@ -849,7 +850,7 @@ class NGSI:
         :param field_type:
         """
         assert resp.text != "[]", "ERROR - It has not returned any entity"
-        attribute = convert_str_to_dict(resp.text, JSON)   # in raw mode is used only one entity
+        attribute = convert_str_to_dict(resp.text, JSON)  # in raw mode is used only one entity
         __logger__.debug("attribute: %s" % str(attribute))
 
         if entities_context["attributes_type"] != "none":
@@ -873,15 +874,17 @@ class NGSI:
         json_object = False
         json_chars = ["{", "["]
         __logger__.debug("Content-Type in response:  %s" % resp.headers["content-type"])
-        for o in json_chars:    # determine if the response is an json object or not
+        for o in json_chars:  # determine if the response is an json object or not
             if resp.content.find(o) >= 0:
                 json_object = True
         try:
             if json_object:
                 resp_json = convert_str_to_dict(resp.content, JSON)
-                assert cmp(resp_json, entities_context["attributes_value"]) == 0, "ERROR - the value %s is not the expected: %s" % (str(resp_json), str(entities_context["attributes_value"]))
+                assert cmp(resp_json, entities_context["attributes_value"]) == 0, "ERROR - the value %s is not the expected: %s" % (
+                str(resp_json), str(entities_context["attributes_value"]))
             else:
-                assert str(resp.content) == str(entities_context["attributes_value"]), "ERROR - the value %s is not the expected: %s" % (str(resp.content), str(entities_context["attributes_value"]))
+                assert str(resp.content) == str(entities_context["attributes_value"]), "ERROR - the value %s is not the expected: %s" % (
+                str(resp.content), str(entities_context["attributes_value"]))
         except Exception, e:
             __logger__.error(e)
 
@@ -893,20 +896,20 @@ class NGSI:
         """
         __logger__.debug("parameters: %s" % str(parameters))
         __logger__.debug("headers: %s" % str(headers))
-        __logger__.debug("properties: %s" % str(entities_contexts))       
+        __logger__.debug("properties: %s" % str(entities_contexts))
         if "type" in parameters:
             entities_type = parameters["type"]
         else:
             entities_type = entities_contexts["entities_type"]
         curs_list = self.__get_mongo_cursor(mongo_driver, headers, type=entities_type, id=entities_contexts["entities_id"])
-      
+
         # verify attribute in entity
         __logger__.debug("Number of docs read from mongo: %s" % str(len(curs_list)))
         __logger__.debug("attribute name to verify: %s" % entities_contexts["attributes_name"])
         assert len(curs_list) == 1, " ERROR - should be returned only one entity"
         entity = curs_list[0]
         assert entities_contexts["attributes_name"] not in entity["attrNames"], \
-            " ERROR - the attribute: %s exists in the entity " %  entities_contexts["attributes_name"]
+            " ERROR - the attribute: %s exists in the entity " % entities_contexts["attributes_name"]
 
     def verify_entity_types(self, types, resp):
         """
@@ -941,8 +944,8 @@ class NGSI:
                         types_count["%s_%s" % (entities_group["entities_type"], str(i))] = 1
                         total += 1
                 else:
-                     types_count[temp] = int(entities_group["entities_number"])
-                     total += 1
+                    types_count[temp] = int(entities_group["entities_number"])
+                    total += 1
             else:
                 types_count[temp] += int(entities_group["entities_number"])  # entities counter
 
@@ -958,14 +961,14 @@ class NGSI:
         if offset >= total:
             items = 0
             position = 0
-        elif limit+offset > total:
-            items = total-offset
+        elif limit + offset > total:
+            items = total - offset
             position = offset
         else:
             items = limit
             position = offset
 
-        #  info in log
+        # info in log
         __logger__.debug("total:  %s" % str(total))
         __logger__.debug("limit:  %s" % str(limit))
         __logger__.debug("offset: %s" % str(offset))
@@ -990,18 +993,21 @@ class NGSI:
             for attr in attr_list:
                 for entities_group in accumulate_entities_context:
                     attr_exists = False
-                    entities_group["attributes_type"] = self.__change_attribute_type(entities_group["attributes_value"], entities_group["attributes_type"])
-                    if (str(item["type"]).find(str(entities_group["entities_type"])) >= 0):
-                        if (attr.find(entities_group["attributes_name"]) >= 0):
+                    entities_group["attributes_type"] = self.__change_attribute_type(entities_group["attributes_value"],
+                                                                                     entities_group["attributes_type"])
+                    if str(item["type"]).find(str(entities_group["entities_type"])) >= 0:
+                        if attr.find(entities_group["attributes_name"]) >= 0:
                             if entities_group["attributes_type"] in item["attrs"][attr]["types"]:
                                 attr_exists = True
                                 break
-                assert attr_exists, ' ERROR - the attribute: "%s" with type: "%s" does not exist...' % (attr, str(item["attrs"][attr]["types"]))
+                assert attr_exists, ' ERROR - the attribute: "%s" with type: "%s" does not exist...' % (
+                attr, str(item["attrs"][attr]["types"]))
             __logger__.info(u'"%s" attribute and its types are verified successfully' % attr)
             # count field
             assert "count" in item, "ERROR - the count field does not exist in response"
-            assert item["count"] == types_count[item["type"]], u' ERROR - "count" field in response (%s) does not match with the expected (%s)' \
-                                                                                  % (str(item["count"]), types_count[item["type"]])
+            assert item["count"] == types_count[
+                item["type"]], u' ERROR - "count" field in response (%s) does not match with the expected (%s)' \
+                               % (str(item["count"]), types_count[item["type"]])
             __logger__.info(u'"count" field is verified successfully')
 
     def verify_attributes_types_by_entity_types(self, entity_type, accumulate_entities_context, resp):
@@ -1022,16 +1028,18 @@ class NGSI:
             for entities_group in accumulate_entities_context:
                 attr_exists = False
                 if (attr.find(entities_group["attributes_name"]) >= 0):
-                    entities_group["attributes_type"] = self.__change_attribute_type(entities_group["attributes_value"], entities_group["attributes_type"])
+                    entities_group["attributes_type"] = self.__change_attribute_type(entities_group["attributes_value"],
+                                                                                     entities_group["attributes_type"])
                     if entities_group["attributes_type"] in attrs_dict["attrs"][attr]["types"]:
                         attr_exists = True
                         break
-            assert attr_exists, ' ERROR - the attribute: "%s" with type: "%s" does not exist...' % (attr, str(attrs_dict["attrs"][attr]["types"]))
+            assert attr_exists, ' ERROR - the attribute: "%s" with type: "%s" does not exist...' % (
+            attr, str(attrs_dict["attrs"][attr]["types"]))
             __logger__.info(u'"%s" attribute and its types are verified successfully' % attr)
             # count field
             assert "count" in attrs_dict, "ERROR - the count field does not exist in response"
             assert attrs_dict["count"] == entities_counter, u' ERROR - "count" field in response (%s) does not match with the expected (%s)' \
-                                                                                  % (str(attrs_dict["count"]), entities_counter)
+                                                            % (str(attrs_dict["count"]), entities_counter)
             __logger__.info(u'"count" field is verified successfully')
 
     def verify_log(self, context, line):
@@ -1045,7 +1053,7 @@ class NGSI:
             trace[row[TRACE]] = row[VALUE]
 
         for key, value in trace.items():
-            assert line.find(key) >= 0,u'ERROR - the "%s" trace does not exist in the line: \n   %s' % (key, line)
+            assert line.find(key) >= 0, u'ERROR - the "%s" trace does not exist in the line: \n   %s' % (key, line)
             __logger__.info(u' the "%s" trace does exist in log line' % key)
             if trace[key] != "ignored":
                 remote_log = Remote_Log()
@@ -1099,7 +1107,7 @@ class NGSI:
         assert len(curs_list) == 1, " ERROR - the subscription docs number in mongo is not the expected: %s" % str(len(curs_list))
         curs = curs_list[0]
         __logger__.debug("subscription to verify: %s" % str(curs))
-        for item in subscription_context:   # used to remove quotes when are using raw mode
+        for item in subscription_context:  # used to remove quotes when are using raw mode
             if item != "condition_expression":
                 subscription_context[item] = remove_quote(subscription_context[item])
 
@@ -1135,30 +1143,30 @@ class NGSI:
             # conditions - attributes
             for a in range(int(subscription_context["condition_attrs_number"])):
                 if int(subscription_context["condition_attrs_number"]) > 1:
-                    condition_attr =  "%s_%s" % (subscription_context["condition_attrs"], str(a))
+                    condition_attr = "%s_%s" % (subscription_context["condition_attrs"], str(a))
                 else:
                     condition_attr = subscription_context["condition_attrs"]
                 if subscription_context["condition_attrs"] == "without condition field":
                     assert len(curs["conditions"]) == 0, \
-                    u' ERROR - the condition attrs "%s" are not empty into DB' % str(curs["conditions"])
+                        u' ERROR - the condition attrs "%s" are not empty into DB' % str(curs["conditions"])
                 else:
                     assert condition_attr in curs["conditions"], \
-                    u' ERROR - the condition attr "%s" does not exist in conditions values into DB' % condition_attr
+                        u' ERROR - the condition attr "%s" does not exist in conditions values into DB' % condition_attr
             __logger__.info("attributes in the \"conditions\" field are verified successfully")
 
         # expression field
-        if subscription_context["condition_expression"] is not None and  subscription_context["condition_expression"] != "object is empty":
+        if subscription_context["condition_expression"] is not None and subscription_context["condition_expression"] != "object is empty":
             exp_op = subscription_context["condition_expression"].split("&")
             for op in exp_op:
                 exp_split = op.split(">>>")
-                for i in range(len(exp_split)):   # used to remove quotes when are using raw mode
+                for i in range(len(exp_split)):  # used to remove quotes when are using raw mode
                     exp_split[i] = remove_quote(exp_split[i])
                 assert exp_split[1] == curs["expression"][exp_split[0]], \
                     u' ERROR - the "%s" key does not match with the expected value: %s' % (exp_split[0], exp_split[1])
         else:
             keys = ["q", "geometry", "georel", "coords"]
             for k in keys:
-              assert curs["expression"][k] == "", u' ERROR - the "%s" key in expression is not empty or not exists' % k
+                assert curs["expression"][k] == "", u' ERROR - the "%s" key in expression is not empty or not exists' % k
         __logger__.info("expressions in the \"conditions\" field are verified successfully")
 
         # reference field
@@ -1173,12 +1181,13 @@ class NGSI:
             assert curs["custom"] == True, " ERROR - custom field \"%s\" in DB is not activated" % curs["custom"]
             __logger__.info("notification httpCustom url field is verified successfully")
         else:
-           assert EMPTY == curs["reference"], u' ERROR - the reference "%s" is not the expected' % curs["reference"]
+            assert EMPTY == curs["reference"], u' ERROR - the reference "%s" is not the expected' % curs["reference"]
 
         # throttling field
         if subscription_context["throttling"] is None:
             subscription_context["throttling"] = 0
-        assert curs["throttling"] == int(subscription_context["throttling"]), u' ERROR - the throttling "%s" is not the expected' % curs["throttling"]
+        assert curs["throttling"] == int(subscription_context["throttling"]), u' ERROR - the throttling "%s" is not the expected' % curs[
+            "throttling"]
         __logger__.info("throttling in the \"notification\" field is verified successfully")
 
         # expiration field
@@ -1199,7 +1208,8 @@ class NGSI:
                 service_path = headers[FIWARE_SERVICE_PATH_HEADER]
         else:
             service_path = ALL_SERVICE_PATHS
-        assert curs["servicePath"] == service_path, u' ERROR the servicePath field "%s" is not the expected "%s"' % (curs["servicePath"], service_path)
+        assert curs["servicePath"] == service_path, u' ERROR the servicePath field "%s" is not the expected "%s"' % (
+        curs["servicePath"], service_path)
         __logger__.info("servicePath field is verified successfully")
 
         # attrs and exceptAttrs fields
@@ -1245,7 +1255,7 @@ class NGSI:
         resp_dict = convert_str_to_dict(context.resp.text, JSON)
         assert "error" in resp_dict, "ERROR - error field does not exists"
         assert error == resp_dict["error"], 'ERROR -  error: "%s" is not the expected: "%s"' % \
-                                                     (str(resp_dict["error"]), error)
+                                            (str(resp_dict["error"]), error)
 
     def __get_attribute_fields(self, entity_context, subsc_context):
         """
@@ -1264,16 +1274,16 @@ class NGSI:
                 attr_values_list.append(entity_context["attributes_value"])
                 attr_types_list.append(self.__change_attribute_type(entity_context["attributes_value"], entity_context["attributes_type"]))
         else:
-            if entity_context["attributes_name"].find("&")<0:
+            if entity_context["attributes_name"].find("&") < 0:
                 attrs_to_notif.append(entity_context["attributes_name"])
                 attr_values_list.append(entity_context["attributes_value"])
                 attr_types_list.append(self.__change_attribute_type(entity_context["attributes_value"], entity_context["attributes_type"]))
             else:
-                attrs_to_notif = entity_context["attributes_name"].split ("&")
-                attr_values_list = entity_context["attributes_value"].split ("&")
+                attrs_to_notif = entity_context["attributes_name"].split("&")
+                attr_values_list = entity_context["attributes_value"].split("&")
                 while entity_context["attributes_type"].find("&&") >= 0:
                     entity_context["attributes_type"] = entity_context["attributes_type"].replace("&&", "&none&")
-                attr_types_list = entity_context["attributes_type"].split ("&")
+                attr_types_list = entity_context["attributes_type"].split("&")
                 if len(attr_types_list) != len(attrs_to_notif):
                     diff = len(attrs_to_notif) - len(attr_types_list)
                     for i in range(diff):
@@ -1281,7 +1291,7 @@ class NGSI:
                 for i in range(len(attr_types_list)):
                     attr_types_list[i] = self.__change_attribute_type(attr_values_list[i], attr_types_list[i])
                     if attr_types_list[i] == "Boolean":
-                        attr_values_list[i] = "%s%s" % (attr_values_list[i][0].upper(),attr_values_list[i][1:] )
+                        attr_values_list[i] = "%s%s" % (attr_values_list[i][0].upper(), attr_values_list[i][1:])
 
                 for e in range(len(attrs_to_notif)):  # remove quote from raw request
                     attrs_to_notif[e] = remove_quote(attrs_to_notif[e])
@@ -1366,7 +1376,7 @@ class NGSI:
         # get attribute fields lists (attribute names list, attribute values list, attribute types list)
         attrs_to_notif, attr_values_list, attr_types_list = self.__get_attribute_fields(entity_context, subsc_context)
 
-        #legacy format
+        # legacy format
         if notif_format == "legacy":
             statusCode = payload_dict["contextResponses"][0]["statusCode"]
             # status code fields
@@ -1374,24 +1384,29 @@ class NGSI:
             assert statusCode["reasonPhrase"] == "OK", " ERROR - the reason phrase is not the expected: %s" % statusCode["reasonPhrase"]
             __logger__.info("  - The status code and the reason phrase is the expected correctly")
 
-            #context Element fields
+            # context Element fields
             contextElement = payload_dict["contextResponses"][0]["contextElement"]
             # id, type and idPattern fields
-            assert contextElement["id"] == entity_context["entities_id"], " ERROR - the id is not the expected: %s" % entity_context["entities_id"]
+            assert contextElement["id"] == entity_context["entities_id"], " ERROR - the id is not the expected: %s" % entity_context[
+                "entities_id"]
             __logger__.info("  - id matches succesfully")
             assert contextElement["isPattern"] == "false", " ERROR - the isPattern is not the expected" % contextElement["isPattern"]
             __logger__.info("  - isPattern matches succesfully")
-            assert contextElement["type"] == entity_context["entities_type"], " ERROR - the type is not the expected: %s" % entity_context["entities_type"]
+            assert contextElement["type"] == entity_context["entities_type"], " ERROR - the type is not the expected: %s" % entity_context[
+                "entities_type"]
             __logger__.info("  - type matches succesfully")
 
             # Attributes fields
             attributes = contextElement["attributes"]
             for i in range(len(attributes)):
-                assert attributes[i]["name"] in attrs_to_notif, " ERROR - the attribute name is not the expected: %s" % attributes[i]["name"]
+                assert attributes[i]["name"] in attrs_to_notif, " ERROR - the attribute name is not the expected: %s" % attributes[i][
+                    "name"]
                 __logger__.info("  - attribute name: %s  matches succesfully" % attributes[i]["name"])
-                assert attributes[i]["type"] in attr_types_list, " ERROR - the attribute type is not the expected: %s" % attributes[i]["type"]
+                assert attributes[i]["type"] in attr_types_list, " ERROR - the attribute type is not the expected: %s" % attributes[i][
+                    "type"]
                 __logger__.info("  - attribute type: %s  matches succesfully" % attributes[i]["type"])
-                assert attributes[i]["value"] in attr_values_list, " ERROR - the attribute type is not the expected: %s" % attributes[i]["value"]
+                assert attributes[i]["value"] in attr_values_list, " ERROR - the attribute type is not the expected: %s" % attributes[i][
+                    "value"]
                 __logger__.info("  - attribute value: %s  matches succesfully" % attributes[i]["value"])
 
         # another formats: normalized, keyValues, values
@@ -1422,7 +1437,7 @@ class NGSI:
                     for e in range(len(entity_type)):  # remove quote from raw request
                         entity_type[e] = remove_quote(entity_type[e])
                     assert data["type"] in entity_type, " ERROR - type does not match %s != %s" % \
-                                                                            (data["type"], str(entity_type))
+                                                        (data["type"], str(entity_type))
                     __logger__.info("  - type matches succesfully")
 
             # attributes fields
@@ -1434,24 +1449,29 @@ class NGSI:
                 # attribute names only are sent in normalized or keyValues formats (not in values format)
                 attrs_to_notif[i] = remove_quote(attrs_to_notif[i])
                 if notif_format == "normalized" or notif_format == "keyValues":
-                    assert remove_quote(attrs_to_notif[i]) in data, " ERROR - the attribute: %s does not exist in the notification" % attrs_to_notif[i]
-                    __logger__.info("the attribute \"%s\" is sent in the notification in \"%s\" format with:" % (attrs_to_notif[i], notif_format))
+                    assert remove_quote(attrs_to_notif[i]) in data, " ERROR - the attribute: %s does not exist in the notification" % \
+                                                                    attrs_to_notif[i]
+                    __logger__.info(
+                        "the attribute \"%s\" is sent in the notification in \"%s\" format with:" % (attrs_to_notif[i], notif_format))
                 if notif_format == "normalized":
                     if isinstance(data[attrs_to_notif[i]]["value"], dict):
                         data[attrs_to_notif[i]]["value"] = convert_dict_to_str(data[attrs_to_notif[i]]["value"], JSON)
-                    assert str(attr_values_list[i]) == str(data[attrs_to_notif[i]]["value"]), " ERROR - the attribute value does not match in normalized format: \n   %s != %s" \
-                                                                                      % (attr_values_list[i] , data[attrs_to_notif[i]]["value"])
-                    __logger__.info("  - the attribute value sent is correct: %s" % attr_values_list[i] )
-                    assert attr_types_list[i] == data[attrs_to_notif[i]]["type"], " ERROR - the attribute type does not match in normalized format: \n   %s != %s" \
-                                                                                      % (attr_types_list[i], data[attrs_to_notif[i]]["type"])
+                    assert str(attr_values_list[i]) == str(
+                        data[attrs_to_notif[i]]["value"]), " ERROR - the attribute value does not match in normalized format: \n   %s != %s" \
+                                                           % (attr_values_list[i], data[attrs_to_notif[i]]["value"])
+                    __logger__.info("  - the attribute value sent is correct: %s" % attr_values_list[i])
+                    assert attr_types_list[i] == data[attrs_to_notif[i]][
+                        "type"], " ERROR - the attribute type does not match in normalized format: \n   %s != %s" \
+                                 % (attr_types_list[i], data[attrs_to_notif[i]]["type"])
                     __logger__.info("  - the attribute type sent is correct: %s" % attr_types_list[i])
                 elif notif_format == "keyValues":
-                    assert unicode(attr_values_list[i]) == data[attrs_to_notif[i]], " ERROR - the attribute value does not match in keyValues format: \n   %s != %s" \
-                                                                                      % (attr_values_list[i], data[attrs_to_notif[i]])
+                    assert unicode(attr_values_list[i]) == data[
+                        attrs_to_notif[i]], " ERROR - the attribute value does not match in keyValues format: \n   %s != %s" \
+                                            % (attr_values_list[i], data[attrs_to_notif[i]])
                     __logger__.info("  - the attribute value sent is correct: %s" % entity_context["attributes_value"])
                 elif notif_format == "values":
                     assert attr_values_list[i] == data[i], " ERROR - the attribute value does not match in values format: \n   %s != %s" \
-                                                                                      % (attr_values_list[i], data[i])
+                                                           % (attr_values_list[i], data[i])
                     __logger__.info("  - the attribute value sent is correct: %s" % attr_values_list[i])
 
     def __replacing_values(self, str_to_replace, **kwargs):
@@ -1511,7 +1531,7 @@ class NGSI:
                                                    values=attr_values_list)
 
         assert expected_payload == payload, " ERROR - the payload \"%s\" is not the expected: \"%s\"" % (
-        payload, expected_payload)
+            payload, expected_payload)
         __logger__.debug("the payload is the expected: (%s)" % payload)
 
         # url
@@ -1526,10 +1546,10 @@ class NGSI:
             expected_url = expected_url.replace("&", "?", 1)
         __logger__.debug("url expected: %s" % expected_url)
         expected_url = self.__replacing_values(expected_url,
-                                          id=entity_context["entities_id"],
-                                          type=entity_context["entities_type"],
-                                          names=attrs_to_notif,
-                                          values=attr_values_list)
+                                               id=entity_context["entities_id"],
+                                               type=entity_context["entities_type"],
+                                               names=attrs_to_notif,
+                                               values=attr_values_list)
 
         assert expected_url == url, " ERROR - the url \"%s\" is not the expected: \"%s\"" % (url, expected_url)
         __logger__.debug("the url is the expected: (%s)" % url)
@@ -1538,13 +1558,153 @@ class NGSI:
         expected_headers_dict = convert_str_to_dict(subsc_context["notification_http_custom_headers"], "json")
         for item in expected_headers_dict:
             expected_headers_dict[item] = self.__replacing_values(expected_headers_dict[item],
-                                                             id=entity_context["entities_id"],
-                                                             type=entity_context["entities_type"],
-                                                             names=attrs_to_notif,
-                                                             values=attr_values_list)
+                                                                  id=entity_context["entities_id"],
+                                                                  type=entity_context["entities_type"],
+                                                                  names=attrs_to_notif,
+                                                                  values=attr_values_list)
             assert "last-%s" % item in headers, " ERROR - the \"%s\" header does not sent" % item
             __logger__.debug("the \"%s\" header has been sent" % item)
             assert expected_headers_dict[item] == headers["last-%s" % item], \
                 ' ERROR - the header value "%s" does not match with the expected "%s"' % (
-                headers["last-%s" % item], expected_headers_dict[item])
+                    headers["last-%s" % item], expected_headers_dict[item])
             __logger__.debug("the header value does match: %s" % expected_headers_dict[item])
+
+    def __get_order_by(self, values):
+        """
+        get attribute without prefix and the order
+        :param value: attribute (with/without "!" prefix)
+        :return: attribute and order
+        """
+        if values[:1] == "!":
+            order_by = "DESC"
+            values = values[1:]
+        else:
+            order_by = "ASC"
+        return values, order_by
+
+    def __sort_attrs(self, entities, attrs_to_sort_list):
+        """
+        sort a entities list by attributes
+        :param entities: entities list
+        :param attrs_to_sort_list: attributes list to sort
+        :return: list sorted
+        """
+        pos_attr = 0
+        attrs_to_sort, order_by = self.__get_order_by(attrs_to_sort_list[pos_attr])
+        for pos_entity in range(len(entities) - 1):
+            for pos_entity_adv in range(pos_entity + 1, len(entities)):
+                swap_items = False
+                if attrs_to_sort in entities[pos_entity]["attrs"]:
+                    if entities[pos_entity]["attrs"][attrs_to_sort] < entities[pos_entity_adv]["attrs"][attrs_to_sort]:
+                        if order_by == "DESC":
+                            swap_items = True
+                    elif entities[pos_entity]["attrs"][attrs_to_sort] > entities[pos_entity_adv]["attrs"][attrs_to_sort]:
+                        if order_by == "ASC":
+                            swap_items = True
+                    else:
+                        while pos_attr < len(attrs_to_sort_list) and swap_items is not True:
+                            pos_attr = pos_attr + 1
+                            if pos_attr < len(attrs_to_sort_list):
+                                attrs_to_sort_temp, order_by_temp = self.__get_order_by(attrs_to_sort_list[pos_attr])
+                                if entities[pos_entity]["attrs"][attrs_to_sort_temp] < entities[pos_entity_adv]["attrs"][
+                                    attrs_to_sort_temp]:
+                                    if order_by_temp == "DESC":
+                                        swap_items = True
+                                elif entities[pos_entity]["attrs"][attrs_to_sort_temp] > entities[pos_entity_adv]["attrs"][
+                                    attrs_to_sort_temp]:
+                                    if order_by_temp == "ASC":
+                                        swap_items = True
+                    if swap_items:
+                        entities = list_swap(entities, pos_entity_adv, pos_entity)
+        return entities
+
+    def __get_entities_sorted_by_attributes(self, queries_parameters, accumulate_entities_context, sort):
+        """
+        get an entitie dict sorted by attributes
+        :param queries_parameters: queries params dictionary
+        :param accumulate_entities_context: accumulate of all entities context. See "entity_context" dict in cb_v2_utils.py
+        :param sort: determine if the attributes are sorted or not (by default is True)
+        :return: attributes to sort list and entities dict sorted
+        """
+        entities = []
+        if "orderBy" in queries_parameters:
+            attrs_to_sort_list = queries_parameters["orderBy"].split(",")
+        __logger__.debug("Attrs used to sort: %s" % (attrs_to_sort_list))
+        for ent in accumulate_entities_context:
+            attrs_name_temp = ent["attributes_name"].split("&")
+            attrs_value_temp = ent["attributes_value"].split("&")
+            attrs = {}
+            for i in range(len(attrs_name_temp)):
+                name = remove_quote(attrs_name_temp[i])
+                value = attrs_value_temp[i]
+                if value.find("true") == 0 or value.find("false") == 0:
+                    attrs[name] = bool(convert_str_to_bool(value))
+                elif (attrs_value_temp[i].find(u'{') >= 0) or (value.find(u'[') >= 0):
+                    attrs[name] = convert_str_to_dict(value, JSON)
+                else:
+                    try:
+                        temp = float(value)
+                        numeric = True
+                    except Exception:
+                        numeric = False
+                    if numeric:
+                        if temp.is_integer():
+                            attrs[name] = int(temp)
+                        else:
+                            attrs[name] = temp
+                    else:
+                        attrs[name] = remove_quote(value)
+            entities.append({"id": remove_quote(ent["entities_id"]),
+                             "type": remove_quote(ent["entities_type"]),
+                             "attrs": attrs})
+        __logger__.debug("attributes to sort: %s" % str(attrs_to_sort_list))
+        __logger__.debug("entities unsorted: %s" % str(entities))
+        # Sorting
+        if sort:
+            entities = self.__sort_attrs(entities, attrs_to_sort_list)
+            __logger__.debug("entities sorted: %s" % str(entities))
+
+        if "attrs" in queries_parameters:
+            attrs_to_show_list = queries_parameters["attrs"].split(",")
+            for attr in attrs_to_sort_list:
+                if attr not in attrs_to_show_list:
+                    attrs_to_sort_list.remove(attr)
+
+        return attrs_to_sort_list, entities
+
+    def verify_that_entities_are_sorted_by_some_attributes(self, queries_parameters, accumulate_entities_context, resp, sort=True):
+        """
+        verify that entities are sorted by some attributes
+        :param queries_parameters: queries params dictionary
+        :param accumulate_entities_context: accumulate of all entities context. See "entity_context" dict in cb_v2_utils.py
+        :param resp: http response
+        :param sort: determine if the attributes are sorted or not (by default is True)
+        """
+        attrs_to_sort_list, entities = self.__get_entities_sorted_by_attributes(queries_parameters, accumulate_entities_context, sort)
+        resp_dict = convert_str_to_dict(resp.content, "json")
+
+        # verifying id and type
+        for pos in range(len(resp_dict)):
+            assert resp_dict[pos]["id"] == entities[pos]["id"], ' ERROR - the id "%s" does not match with "%s"' % (resp_dict[pos]["id"],
+                                                                                                                   entities[pos]["id"])
+            __logger__.info('the id "%s" is sorted correctly' % resp_dict[pos]["id"])
+            assert resp_dict[pos]["type"] == entities[pos]["type"], ' ERROR - the type "%s" does not match with "%s"' % (resp_dict[pos]["type"],
+                                                                                                                         entities[pos]["type"])
+            __logger__.info('the type "%s" is sorted correctly' % resp_dict[pos]["type"])
+
+        # verifying attributes
+        for pos_attr in range(len(attrs_to_sort_list)):
+            for pos_ent in range(len(resp_dict)):
+                attrs_to_sort, order_by = self.__get_order_by(attrs_to_sort_list[pos_attr])
+                assert attrs_to_sort in resp_dict[pos_ent], " ERROR - the attribute \"%s\" does not exist..." % attrs_to_sort
+                entity = entities[pos_ent]
+                if order_by == "DESC":
+                    assert entity["attrs"][attrs_to_sort] == resp_dict[pos_ent][attrs_to_sort]["value"], \
+                    " ERROR - the attribute \"%s\" is lower than the value \"%s\" with \"%s\"" % (
+                    attrs_to_sort, resp_dict[pos_ent][attrs_to_sort]["value"], entity["attrs"][attrs_to_sort])
+                else:
+                    assert entity["attrs"][attrs_to_sort] == resp_dict[pos_ent][attrs_to_sort]["value"], \
+                    " ERROR - the attribute \"%s\" is greater than the value \"%s\" with \"%s\"" % (
+                    attrs_to_sort, resp_dict[pos_ent][attrs_to_sort]["value"], entity["attrs"][attrs_to_sort])
+                __logger__.info('the attribute "%s" has it value "%s" and it is sorted correctly' %
+                            (attrs_to_sort, str(resp_dict[pos_ent][attrs_to_sort]["value"])))
