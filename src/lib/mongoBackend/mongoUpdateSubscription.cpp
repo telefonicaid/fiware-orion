@@ -626,15 +626,14 @@ void updateInCache
                                           mdStringFilterP,
                                           doc.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(doc, CSUB_FORMAT)) : NGSI_V2_NORMALIZED);
 
-  if (subCacheP != NULL)
-  {
-    LM_T(LmtSubCache, ("Calling subCacheItemRemove"));
-    subCacheItemRemove(subCacheP);
-  }
-
   if (mscInsert == 0)  // 0: Insertion was really made
   {
     subCacheUpdateStatisticsIncrement();
+    if (subCacheP != NULL)
+    {
+      LM_T(LmtSubCache, ("Calling subCacheItemRemove"));
+      subCacheItemRemove(subCacheP);
+    }
   }
 
   cacheSemGive(__FUNCTION__, "Updating cached subscription");
