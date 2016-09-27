@@ -2,6 +2,7 @@
 - Add: filtering metadata in notifications (#2507)
 - Fix: removed spurious decimals in metadata numbers in NGSIv1 rendering (a follow up of #2176)
 - Fix: crash when creating entity with metadata when subscription is in place with "mq" on a different metadata (#2496)
+- Fix: correct rendering of metadata compound values when a vector
 - Fix: crash with request with empty URI PATH (Issue #2527)
 - Fix: supporting DateTime filters for metadata (#2443, #2445)
 - Fix: wrong matching in metadata existence and not existence filters with compounds
