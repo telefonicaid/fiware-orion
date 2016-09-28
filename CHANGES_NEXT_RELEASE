@@ -9,3 +9,4 @@
 - Fix: supporting DateTime filters for metadata (#2443, #2445)
 - Fix: wrong matching in metadata existence and not existence filters with compounds
 - Fix: missing expression sub-fields (q, etc.) in csubs makes Orion to crash
+- Hardening: ensure to use type oriented functions when getting data from DB (safer, but more verbose in error log if DB is not perfectly aligned with what Orion is expecting)

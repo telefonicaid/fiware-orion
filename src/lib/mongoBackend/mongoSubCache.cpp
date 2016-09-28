@@ -95,17 +95,17 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // 04. Extract data from subP
   //
-  std::string               renderFormatString = sub.hasField(CSUB_FORMAT)? getFieldF(sub, CSUB_FORMAT).String() : "legacy";  // NGSIv1 JSON is 'default' (for old db-content)
+  std::string               renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";  // NGSIv1 JSON is 'default' (for old db-content)
   RenderFormat              renderFormat       = stringToRenderFormat(renderFormatString);
 
   cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);
   cSubP->subscriptionId        = strdup(idField.OID().toString().c_str());
-  cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getFieldF(sub, CSUB_SERVICE_PATH).String().c_str() : "/");
+  cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(sub, CSUB_SERVICE_PATH).c_str() : "/");
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       : 0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
-  cSubP->status                = sub.hasField(CSUB_STATUS)?           getFieldF(sub, CSUB_STATUS).String().c_str()         : "active";
+  cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS).c_str()         : "active";
   cSubP->count                 = 0;
   cSubP->next                  = NULL;
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
@@ -124,13 +124,13 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   if (sub.hasField(CSUB_EXPR))
   {
-    mongo::BSONObj expression = getFieldF(sub, CSUB_EXPR).Obj();
+    mongo::BSONObj expression = getObjectFieldF(sub, CSUB_EXPR);
 
     if (expression.hasField(CSUB_EXPR_Q))
     {
       std::string errorString;
 
-      cSubP->expression.q = getFieldF(expression, CSUB_EXPR_Q).String();
+      cSubP->expression.q = getStringFieldF(expression, CSUB_EXPR_Q);
       if (cSubP->expression.q != "")
       {
         if (!cSubP->expression.stringFilter.parse(cSubP->expression.q.c_str(), &errorString))
@@ -147,7 +147,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
     {
       std::string errorString;
 
-      cSubP->expression.mq = getFieldF(expression, CSUB_EXPR_MQ).String();
+      cSubP->expression.mq = getStringFieldF(expression, CSUB_EXPR_MQ);
       if (cSubP->expression.mq != "")
       {
         if (!cSubP->expression.mdStringFilter.parse(cSubP->expression.mq.c_str(), &errorString))
@@ -162,17 +162,17 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
     if (expression.hasField(CSUB_EXPR_GEOM))
     {
-      cSubP->expression.geometry = getFieldF(expression, CSUB_EXPR_GEOM).String();
+      cSubP->expression.geometry = getStringFieldF(expression, CSUB_EXPR_GEOM);
     }
 
     if (expression.hasField(CSUB_EXPR_COORDS))
     {
-      cSubP->expression.coords = getFieldF(expression, CSUB_EXPR_COORDS).String();
+      cSubP->expression.coords = getStringFieldF(expression, CSUB_EXPR_COORDS);
     }
 
     if (expression.hasField(CSUB_EXPR_GEOREL))
     {
-      cSubP->expression.georel = getFieldF(expression, CSUB_EXPR_GEOREL).String();
+      cSubP->expression.georel = getStringFieldF(expression, CSUB_EXPR_GEOREL);
     }
   }
 

@@ -167,7 +167,7 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
       */
 
     case NumberDouble:
-      if (getFieldF(md1, ENT_ATTRS_MD_TYPE).Number() != getFieldF(md2, ENT_ATTRS_MD_TYPE).Number())
+      if (getNumberFieldF(md1, ENT_ATTRS_MD_TYPE) != getNumberFieldF(md2, ENT_ATTRS_MD_TYPE))
       {
         return false;
       }
@@ -220,7 +220,7 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
     */
 
     case NumberDouble:
-      return getFieldF(md1, ENT_ATTRS_MD_VALUE).Number() == getFieldF(md2, ENT_ATTRS_MD_VALUE).Number();
+      return getNumberFieldF(md1, ENT_ATTRS_MD_VALUE) == getNumberFieldF(md2, ENT_ATTRS_MD_VALUE);
 
     case Bool:
       return getBoolFieldF(md1, ENT_ATTRS_MD_VALUE) == getBoolFieldF(md2, ENT_ATTRS_MD_VALUE);
@@ -263,8 +263,8 @@ static bool equalMetadata(BSONObj& md1, BSONObj& md2)
       return false;
     }
 
-    BSONObj md1Item = getFieldF(md1, currentMd).embeddedObject();
-    BSONObj md2Item = getFieldF(md2, currentMd).embeddedObject();
+    BSONObj md1Item = getObjectFieldF(md1, currentMd);
+    BSONObj md2Item = getObjectFieldF(md2, currentMd);
 
     if (!equalMetadataValues(md1Item, md2Item))
     {
@@ -333,7 +333,7 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP, std::string apiVersi
       return true;
 
     case NumberDouble:
-      return caP->valueType != ValueTypeNumber || caP->numberValue != getFieldF(attr, ENT_ATTRS_VALUE).Number();
+      return caP->valueType != ValueTypeNumber || caP->numberValue != getNumberFieldF(attr, ENT_ATTRS_VALUE);
 
     case Bool:
       return caP->valueType != ValueTypeBoolean || caP->boolValue != getBoolFieldF(attr, ENT_ATTRS_VALUE);
@@ -485,15 +485,15 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
     switch (getFieldF(attr, ENT_ATTRS_VALUE).type())
     {
       case Object:
-        ab.append(ENT_ATTRS_VALUE, getFieldF(attr, ENT_ATTRS_VALUE).embeddedObject());
+        ab.append(ENT_ATTRS_VALUE, getObjectFieldF(attr, ENT_ATTRS_VALUE));
         break;
 
       case Array:
-        ab.appendArray(ENT_ATTRS_VALUE, getFieldF(attr, ENT_ATTRS_VALUE).embeddedObject());
+        ab.appendArray(ENT_ATTRS_VALUE, getArrayFieldF(attr, ENT_ATTRS_VALUE));
         break;
 
       case NumberDouble:
-        ab.append(ENT_ATTRS_VALUE, getFieldF(attr, ENT_ATTRS_VALUE).Number());
+        ab.append(ENT_ATTRS_VALUE, getNumberFieldF(attr, ENT_ATTRS_VALUE));
         break;
 
       case Bool:
@@ -763,7 +763,7 @@ static bool updateAttribute
     }
 
     BSONObj newAttr;
-    BSONObj attr = getFieldF(attrs, effectiveName).embeddedObject();
+    BSONObj attr = getObjectFieldF(attrs, effectiveName);
     actualUpdate = mergeAttrInfo(attr, caP, &newAttr, apiVersion);
     if (actualUpdate)
     {
@@ -1527,7 +1527,7 @@ static bool addTriggeredSubscriptions_noCache
 
       long long           throttling         = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
       long long           lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
-      std::string         renderFormatString = sub.hasField(CSUB_FORMAT)? getFieldF(sub, CSUB_FORMAT).String() : "legacy";  // NGSIv1 JSON is 'default' (for old db-content)
+      std::string         renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";  // NGSIv1 JSON is 'default' (for old db-content)
       RenderFormat        renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo    httpInfo;
 
@@ -2991,7 +2991,7 @@ static void updateEntity
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
   const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
 
-  BSONObj            idField           = getFieldF(r, "_id").embeddedObject();
+  BSONObj            idField           = getObjectFieldF(r, "_id");
 
   std::string        entityId          = getStringFieldF(idField, ENT_ENTITY_ID);
   std::string        entityType        = idField.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(idField, ENT_ENTITY_TYPE) : "";
@@ -3016,7 +3016,7 @@ static void updateEntity
    * BSON object for $set (updates and appends) and a BSON object for $unset (deletes). Note that depending
    * the request one of the BSON objects could be empty (it use to be the $unset one). In addition, for
    * APPEND and DELETE updates we use two arrays to push/pull attributes in the attrsNames vector */
-  BSONObj           attrs     = getFieldF(r, ENT_ATTRS).embeddedObject();
+  BSONObj           attrs     = getObjectFieldF(r, ENT_ATTRS);
   BSONObjBuilder    toSet;
   BSONObjBuilder    toUnset;
   BSONArrayBuilder  toPush;
