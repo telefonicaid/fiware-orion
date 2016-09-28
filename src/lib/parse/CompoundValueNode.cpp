@@ -686,6 +686,50 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, const std::string& in
     LM_T(LmtCompoundValueRender, ("I am NULL (%s)", name.c_str()));
     out = valueTag1(indent, key, "null", jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
+
+#if 0
+  //
+  // FIXME P5: code to be used when refactoring rendering of compounds
+  //   Three cases:
+  //   01. Toplevel      (only content of the vector to be included)
+  //   02. Inside vector (the name of the vector is omitted - doesn't even exist)
+  //   03. Inside object (the name of the vector is rendered)
+  //
+  // Similar change for Objects and also in CompoundValueNode::toJson()
+  //
+  else if (valueType == orion::ValueTypeVector)
+  {
+    out = "";
+
+    if (container == this)  // 01. Toplevel
+    {
+      for (uint64_t ix = 0; ix < childV.size(); ++ix)
+      {
+        out += childV[ix]->render(ciP, indent);
+      }
+    }
+    else   // 02/03. Not toplevel
+    {
+      if (container->valueType == orion::ValueTypeObject)  // 03. Inside object
+      {
+        out = indent + "\"" + name + "\" : [\n";
+      }
+      else  // 02. Inside vector
+      {
+        out += indent + "  " + "[\n";
+      }
+
+      for (uint64_t ix = 0; ix < childV.size(); ++ix)
+      {
+        out += childV[ix]->render(ciP, indent + "  ");
+      }
+
+      out += indent + "  ]\n";
+    }
+    
+  }
+#endif  // FIXME P5: code to be used when refactoring rendering of compounds
+
   else if ((valueType == orion::ValueTypeVector) && (container != this))
   {
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));

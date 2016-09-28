@@ -259,13 +259,18 @@ std::string Metadata::render(const std::string& indent, bool comma)
 
     if (compoundValueP->isObject())
     {
+      //
       // Note in this case we don't add the "value" key, the toJson()
       // method does it for toplevel compound (a bit crazy... this deserves a FIXME mark)
+      // FIXME P4: modify/simplify the rendering of compound values. Too many if/else ...
+      //
       compoundValueP->renderName = true;
+      compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
       part = compoundValueP->toJson(true, false);
     }
     else if (compoundValueP->isVector())
     {
+      compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
       part = JSON_STR("value") + ": [" + compoundValueP->toJson(true, false) + "]";
     }    
 
