@@ -178,6 +178,14 @@ extern int subCacheItems(void);
 
 /* ****************************************************************************
 *
+* subCacheEntryPresent -
+*/
+extern void subCacheEntryPresent(CachedSubscription* cSubP);
+
+
+
+/* ****************************************************************************
+*
 * subCachePresent - 
 */
 extern void subCachePresent(const char* title);

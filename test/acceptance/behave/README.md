@@ -290,7 +290,7 @@ The Context Broker must start with "DEBUG" level in "CB_EXTRA_OPS" field into pr
 | retrieve_api_resource                       |     19       | GET     | /version  /statistics  cache/statistics    /v2       | No        | No             |
 |                                                                                                                                                          |
 |**entities folder**                                                                                                                                       |
-| list_entities                               |    556       | GET     | /v2/entities/                                        | No        | Yes            |
+| list_entities                               |    570       | GET     | /v2/entities/                                        | No        | Yes            |
 | create_entity                               |    785       | POST    | /v2/entities/                                        | Yes       | Yes            |    
 |                                                                                                                                                          |
 | retrieve_entity                             |    231       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |
