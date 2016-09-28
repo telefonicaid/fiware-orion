@@ -163,14 +163,14 @@ ContextElementResponse::ContextElementResponse
   // Attribute vector
   // FIXME P5: constructor for BSONObj could be added to ContextAttributeVector/ContextAttribute classes, to make building more modular
   //
-  BSONObj                attrs = getFieldF(entityDoc, ENT_ATTRS).embeddedObject();
+  BSONObj                attrs = getObjectFieldF(entityDoc, ENT_ATTRS);
   std::set<std::string>  attrNames;
 
   attrs.getFieldNames(attrNames);
   for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
     std::string        attrName = *i;
-    BSONObj            attr     = getFieldF(attrs, attrName).embeddedObject();
+    BSONObj            attr     = getObjectFieldF(attrs, attrName);
     ContextAttribute*  caP      = NULL;
     ContextAttribute   ca;
 
@@ -205,7 +205,7 @@ ContextElementResponse::ContextElementResponse
         break;
 
       case NumberDouble:
-        ca.numberValue = getFieldF(attr, ENT_ATTRS_VALUE).Number();
+        ca.numberValue = getNumberFieldF(attr, ENT_ATTRS_VALUE);
         caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
         break;
 
@@ -269,14 +269,14 @@ ContextElementResponse::ContextElementResponse
     if (attr.hasField(ENT_ATTRS_MD))
     {
 
-      BSONObj                mds = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
+      BSONObj                mds = getObjectFieldF(attr, ENT_ATTRS_MD);
       std::set<std::string>  mdsSet;
 
       mds.getFieldNames(mdsSet);
       for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
       {
         std::string currentMd = *i;
-        Metadata*   md = new Metadata(dbDotDecode(currentMd), getFieldF(mds, currentMd).embeddedObject());
+        Metadata*   md = new Metadata(dbDotDecode(currentMd), getObjectFieldF(mds, currentMd));
         caP->metadataVector.push_back(md);
       }
     }

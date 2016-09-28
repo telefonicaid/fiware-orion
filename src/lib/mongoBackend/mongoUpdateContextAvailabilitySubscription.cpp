@@ -130,7 +130,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   /* Duration (optional) */
   if (requestP->duration.isEmpty())
   {
-    newSub.append(CASUB_EXPIRATION, getFieldF(sub, CASUB_EXPIRATION).numberLong());
+    newSub.append(CASUB_EXPIRATION, getLongFieldF(sub, CASUB_EXPIRATION));
   }
   else {
       long long expiration = getCurrentTime() + requestP->duration.parse();
