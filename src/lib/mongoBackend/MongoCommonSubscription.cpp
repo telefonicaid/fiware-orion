@@ -280,7 +280,10 @@ void setCondsAndInitialNotify
   const Subscription&              sub,
   const std::string&               subId,
   const std::string&               status,
+  const std::vector<std::string>&  notifAttributesV,
+  const std::vector<std::string>&  metadataV,
   const HttpInfo&                  httpInfo,
+  bool                             blacklist,
   RenderFormat                     attrsFormat,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,
@@ -298,8 +301,8 @@ void setCondsAndInitialNotify
   *notificationDone = false;
   BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             sub.subject.entities,
-                                            sub.notification.attributes,
-                                            sub.notification.metadata,
+                                            notifAttributesV,
+                                            metadataV,
                                             subId,
                                             httpInfo,
                                             notificationDone,
@@ -310,8 +313,8 @@ void setCondsAndInitialNotify
                                             &(sub.restriction),
                                             status,
                                             fiwareCorrelator,
-                                            sub.notification.attributes,
-                                            sub.notification.blacklist);
+                                            notifAttributesV,
+                                            blacklist);
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));

@@ -247,8 +247,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 *  -1: Empty subscriptionId
 *  -2: Empty servicePath
 *  -3: Out of memory (either this or EXIT)
-*  -4: Subscription not valid for sub-cache (no patterns)
-*  -5: Subscription not valid for sub-cache (empty notify-condition vector)
+*  -4: Subscription not valid for sub-cache (no entity ids)
 *
 *
 * Note that the 'count' of the inserted subscription is set to ZERO.
@@ -418,8 +417,7 @@ int mongoSubCacheItemInsert
   // 07. Push metadata names to Metadata Vector (cSubP->metadatas)
   // FIXME: use setStringVector
   //
-  setStringVectorF(sub, CSUB_METADATA,&(cSubP->metadata));
-
+  setStringVectorF(sub, CSUB_METADATA, &(cSubP->metadata));
 
   //
   // 08. Fill in cSubP->notifyConditionV from condVec
@@ -428,13 +426,6 @@ int mongoSubCacheItemInsert
   for (unsigned int ix = 0; ix < condVec.size(); ++ix)
   {
     cSubP->notifyConditionV.push_back(condVec[ix].String());
-  }
-
-  if (cSubP->notifyConditionV.size() == 0)
-  {
-    subCacheItemDestroy(cSubP);
-    delete cSubP;
-    return -5;
   }
 
   subCacheItemInsert(cSubP);
