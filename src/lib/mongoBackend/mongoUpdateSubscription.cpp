@@ -285,13 +285,8 @@ static void setCondsAndInitialNotifyNgsiv1
     entities.push_back(en);
   }
 
-  // FIXME: use setStrintVectorF
   std::vector<std::string> attributes;
-  std::vector<BSONElement> attrs = getFieldF(subOrig, CSUB_ATTRS).Array();
-  for (unsigned int ix = 0; ix < attrs.size(); ++ix)
-  {
-    attributes.push_back(attrs[ix].String());
-  }
+  setStringVectorF(subOrig, CSUB_ATTRS, &attributes);
 
   std::vector<std::string> metadata;
   setStringVectorF(subOrig, CSUB_METADATA, &metadata);
@@ -352,14 +347,23 @@ static void setCondsAndInitialNotify
       status = subOrig.hasField(CSUB_STATUS)? getStringFieldF(subOrig, CSUB_STATUS) : STATUS_ACTIVE;
     }
 
-    HttpInfo httpInfo;
+    HttpInfo                  httpInfo;
+    bool                      blacklist;
+    std::vector<std::string>  notifAttributesV;
+    std::vector<std::string>  metadataV;
     if (subUp.notificationProvided)
     {
-      httpInfo = subUp.notification.httpInfo;
+      httpInfo         = subUp.notification.httpInfo;
+      blacklist        = subUp.notification.blacklist;
+      metadataV        = subUp.notification.metadata;
+      notifAttributesV = subUp.notification.attributes;
     }
     else
     {
       httpInfo.fill(subOrig);
+      blacklist = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(subOrig, CSUB_BLACKLIST) : false;
+      setStringVectorF(subOrig, CSUB_METADATA, &metadataV);
+      setStringVectorF(subOrig, CSUB_ATTRS, &notifAttributesV);
     }
 
     RenderFormat attrsFormat;
@@ -386,9 +390,8 @@ static void setCondsAndInitialNotify
     }
     else
     {
-      setCondsAndInitialNotify(subUp, subUp.id, status, httpInfo, attrsFormat,
-                               tenant, servicePathV, xauthToken, fiwareCorrelator,
-                               b, notificationDone);
+      setCondsAndInitialNotify(subUp, subUp.id, status, notifAttributesV, metadataV, httpInfo, blacklist,
+                               attrsFormat, tenant, servicePathV, xauthToken, fiwareCorrelator, b, notificationDone);
     }
   }
   else
@@ -618,15 +621,14 @@ void updateInCache
                                           mdStringFilterP,
                                           doc.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(doc, CSUB_FORMAT)) : NGSI_V2_NORMALIZED);
 
-  if (subCacheP != NULL)
-  {
-    LM_T(LmtSubCache, ("Calling subCacheItemRemove"));
-    subCacheItemRemove(subCacheP);
-  }
-
   if (mscInsert == 0)  // 0: Insertion was really made
   {
     subCacheUpdateStatisticsIncrement();
+    if (subCacheP != NULL)
+    {
+      LM_T(LmtSubCache, ("Calling subCacheItemRemove"));
+      subCacheItemRemove(subCacheP);
+    }
   }
 
   cacheSemGive(__FUNCTION__, "Updating cached subscription");

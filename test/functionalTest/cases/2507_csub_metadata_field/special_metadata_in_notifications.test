@@ -639,7 +639,7 @@ Date: REGEX(.*)
 15. Dump and reset: see notification with 2 entities with A, B and C
 ====================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 472
+Content-Length: 379
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -665,11 +665,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                 "type": "Number",
                 "value": 30
             },
-            "D": {
-                "metadata": {},
-                "type": "Number",
-                "value": 41
-            },
             "id": "E1",
             "type": "T"
         },
@@ -688,11 +683,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                 "metadata": {},
                 "type": "Text",
                 "value": "z"
-            },
-            "D": {
-                "metadata": {},
-                "type": "Text",
-                "value": "u"
             },
             "id": "E2",
             "type": "T"
