@@ -285,13 +285,8 @@ static void setCondsAndInitialNotifyNgsiv1
     entities.push_back(en);
   }
 
-  // FIXME: use setStrintVectorF
   std::vector<std::string> attributes;
-  std::vector<BSONElement> attrs = getFieldF(subOrig, CSUB_ATTRS).Array();
-  for (unsigned int ix = 0; ix < attrs.size(); ++ix)
-  {
-    attributes.push_back(attrs[ix].String());
-  }
+  setStringVectorF(subOrig, CSUB_ATTRS, &attributes);
 
   std::vector<std::string> metadata;
   setStringVectorF(subOrig, CSUB_METADATA, &metadata);

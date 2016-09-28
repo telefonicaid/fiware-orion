@@ -232,8 +232,6 @@ BSONElement getField(const BSONObj& b, const std::string& field, const std::stri
 *
 * setStringVector -
 *
-* FIXME P5: probably we have a lot of old places doing BSONArray -> std::vector<std::string> where
-* this function could be used.
 */
 void setStringVector
 (
