@@ -48,6 +48,7 @@
 * URI parameters:
 *   - attributesFormat=object
 *   - collapse=true
+*   - options=noAttrDetail
 */
 std::string getEntityTypes
 (
@@ -58,18 +59,19 @@ std::string getEntityTypes
 )
 {
   EntityTypeVectorResponse  response;
-  unsigned int              totalTypes = 0;
+  unsigned int              totalTypes   = 0;
+  unsigned int*             totalTypesP  = NULL;
+  bool                      noAttrDetail = ciP->uriParamOptions[OPT_NO_ATTR_DETAIL];
 
   response.statusCode.fill(SccOk);
 
   // NGSIv1 uses details=on to request count
-  unsigned int* totalTypesP = NULL;
   if (ciP->uriParam["details"] == "on")
   {
     totalTypesP = &totalTypes;
   }
 
-  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP));
+  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP, noAttrDetail));
 
   std::string rendered;
   TIMED_RENDER(rendered = response.render(ciP, ""));

@@ -25,24 +25,27 @@
 *
 * Author: Fermin Galan Marquez
 */
-
 #include <string>
 #include <map>
 
 #include "orionTypes/EntityTypeVectorResponse.h"
 #include "orionTypes/EntityTypeResponse.h"
-
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/dbConstants.h"
 
 
-/* Some string tokens used for aggregation commands */
+
+/* ****************************************************************************
+*
+* Some string tokens used for aggregation commands
+*/
 const std::string C_ID_ENTITY      = std::string("_id.") + "type";
 const std::string C_ID_SERVICEPATH = std::string("_id.") + "servicePath";
 const std::string CS_ID_ENTITY     = std::string("$_id.") + "type";
 const std::string C_ID_NAME        = std::string("_id.") + "name";
 const std::string C_ID_TYPE        = std::string("_id.") + "type";
 const std::string S_ATTRNAMES      = std::string("$") + ENT_ATTRNAMES;
+
 
 
 /* ****************************************************************************
@@ -56,7 +59,8 @@ extern HttpStatusCode mongoEntityTypes
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
   const std::string&                   apiVersion,
-  unsigned int*                        totalTypesP
+  unsigned int*                        totalTypesP,
+  bool                                 noAttrDetail = false
 );
 
 
@@ -87,7 +91,8 @@ extern HttpStatusCode mongoAttributesForEntityType
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
-  const std::string&                   apiVersion = "v1"
+  bool                                 noAttrDetail = false,
+  const std::string&                   apiVersion   = "v1"
 );
 
 #endif

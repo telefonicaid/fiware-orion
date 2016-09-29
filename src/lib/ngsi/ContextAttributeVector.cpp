@@ -74,9 +74,8 @@ static std::string addedLookup(const std::vector<std::string>& added, std::strin
 /* ****************************************************************************
 *
 * ContextAttributeVector::toJsonTypes -
-*
 */
-std::string ContextAttributeVector::toJsonTypes()
+std::string ContextAttributeVector::toJsonTypes(bool noAttrDetail)
 {
   // Pass 1 - get per-attribute types
   std::map<std::string, std::map<std::string, int> > perAttrTypes;
@@ -99,16 +98,20 @@ std::string ContextAttributeVector::toJsonTypes()
 
     out += JSON_STR(attrName) + ":{" + JSON_STR("types") + ":[";
 
-    std::map<std::string, int>::iterator jt;
-    unsigned int                         jx;
-    for (jt = attrTypes.begin(), jx = 0; jt != attrTypes.end(); ++jt, ++jx)
+    if (noAttrDetail == false)
     {
-      std::string type = jt->first;
-      out += JSON_STR(type);
+      std::map<std::string, int>::iterator jt;
+      unsigned int                         jx;
 
-      if (jx != attrTypes.size() - 1)
+      for (jt = attrTypes.begin(), jx = 0; jt != attrTypes.end(); ++jt, ++jx)
       {
-        out += ",";
+        std::string type = jt->first;
+        out += JSON_STR(type);
+
+        if (jx != attrTypes.size() - 1)
+        {
+          out += ",";
+        }
       }
     }
 

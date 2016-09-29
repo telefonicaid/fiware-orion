@@ -139,7 +139,7 @@ std::string EntityTypeVectorResponse::toJson(ConnectionInfo* ciP)
     }
     else  // default
     {
-      out += entityTypeVector.vec[ix]->toJson(ciP, true);
+      out += entityTypeVector.vec[ix]->toJson(ciP, true, ciP->uriParamOptions[OPT_NO_ATTR_DETAIL]);
     }
 
     if (ix != entityTypeVector.vec.size() - 1)
