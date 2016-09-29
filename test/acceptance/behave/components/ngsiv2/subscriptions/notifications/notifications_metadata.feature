@@ -83,7 +83,7 @@ Feature: verify notifications with specials metadata from subscriptions using NG
     When create entity group with "1" entities in "normalized" mode
     And verify that receive several "Created" http code
     Then get notification sent to listener
-    And verify metadata in notification with "*"
+    And verify metadata in notification without special metadata
 
   @metadata_create_entity  @metadata_create_entity.row<row.id>
   Scenario Outline:  send a notification using NGSI v2 with special metadata when an entity is created
