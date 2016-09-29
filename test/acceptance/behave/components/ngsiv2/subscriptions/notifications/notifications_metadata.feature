@@ -85,7 +85,7 @@ Feature: verify notifications with specials metadata from subscriptions using NG
     Then get notification sent to listener
     And verify metadata in notification without special metadata
 
-  @metadata_create_entity  @metadata_create_entity.row<row.id>
+  @metadata_create_entity
   Scenario Outline:  send a notification using NGSI v2 with special metadata when an entity is created
     Given  a definition of headers
       | parameter          | value                       |
