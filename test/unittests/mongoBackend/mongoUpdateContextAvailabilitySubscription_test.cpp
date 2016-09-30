@@ -193,31 +193,31 @@ static void prepareDatabase(void) {
 
     BSONObj reg2 = BSON(
                 "_id" << OID("51307b66f481db11bf860002") <<
-                "expiration" << (long long) 1879048191 <<
+                "expiration" << 1879048191 <<
                 "contextRegistration" << BSON_ARRAY(cr3)
                 );
 
     BSONObj reg3 = BSON(
                 "_id" << OID("51307b66f481db11bf860003") <<
-                "expiration" << (long long) 1879048191 <<
+                "expiration" << 1879048191 <<
                 "contextRegistration" << BSON_ARRAY(cr4)
                 );
 
     BSONObj reg4 = BSON(
                 "_id" << OID("51307b66f481db11bf860004") <<
-                "expiration" << (long long) 1879048191 <<
+                "expiration" << 1879048191 <<
                 "contextRegistration" << BSON_ARRAY(cr5)
                 );
 
     BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860010") <<
-                        "expiration" << (long long) 1879048191 <<
+                        "expiration" << 1879048191 <<
                         "reference" << "http://notify1.me" <<
                         "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E7" << "type" << "T7" << "isPattern" << "false")) <<
                         "attrs" << BSONArray());
 
     BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860020") <<
-                        "expiration" << (long long) 1879048191 <<
+                        "expiration" << 1879048191 <<
                         "reference" << "http://notify2.me" <<
                         "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E8" << "type" << "T8" << "isPattern" << "false")) <<
@@ -314,41 +314,41 @@ static void prepareDatabasePatternTrue(void) {
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
   BSONObj reg1 = BSON(
               "_id" << "ff37" <<
-              "expiration" << (long long) 1879048191 <<
+              "expiration" << 1879048191 <<
               "subscriptions" << BSONArray() <<
               "contextRegistration" << BSON_ARRAY(cr1 << cr2)
               );
 
   BSONObj reg2 = BSON(
               "_id" << "ee48" <<
-              "expiration" << (long long) 1879048191 <<
+              "expiration" << 1879048191 <<
               "subscriptions" << BSONArray() <<
               "contextRegistration" << BSON_ARRAY(cr3)
               );
 
   BSONObj reg3 = BSON(
               "_id" << "ee00" <<
-              "expiration" << (long long) 1879048191 <<
+              "expiration" << 1879048191 <<
               "subscriptions" << BSONArray() <<
               "contextRegistration" << BSON_ARRAY(cr4)
               );
 
   BSONObj reg4 = BSON(
               "_id" << "ff00" <<
-              "expiration" << (long long) 1879048191 <<
+              "expiration" << 1879048191 <<
               "subscriptions" << BSONArray() <<
               "contextRegistration" << BSON_ARRAY(cr5)
               );
 
   BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860010") <<
-                      "expiration" << (long long) 1879048191 <<
+                      "expiration" << 1879048191 <<
                       "reference" << "http://notify1.me" <<
                       "format" << "JSON" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E7" << "type" << "T7" << "isPattern" << "false")) <<
                       "attrs" << BSONArray());
 
   BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860020") <<
-                      "expiration" << (long long) 1879048191 <<
+                      "expiration" << 1879048191 <<
                       "reference" << "http://notify2.me" <<
                       "format" << "JSON" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E8" << "type" << "T8" << "isPattern" << "false")) <<
