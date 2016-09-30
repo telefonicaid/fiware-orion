@@ -35,7 +35,6 @@ brokerStart CB
 # 03. GET /v2/entities?metadata=M1,M2
 # 04. GET /v2/entities/E1?metadata=M1,M2
 # 05. GET /v2/entities/E1/attrs/A1?metadata=M1,M2
-# 06. POST /v2/op/query?metadata=M1,M2 to see E1/A1/M1+M2, but not M3
 #
 
 echo "01. Create entity E1 with attr A1 with md M1, M2 and M3"
@@ -65,6 +64,27 @@ echo
 echo "02. GET /v2/entities/E1/attrs?metadata=M1,M2"
 echo "============================================"
 orionCurl --url '/v2/entities/E1/attrs?metadata=M1,M2'
+echo
+echo
+
+
+echo "03. GET /v2/entities?metadata=M1,M2"
+echo "==================================="
+orionCurl --url '/v2/entities?metadata=M1,M2'
+echo
+echo
+
+
+echo "04. GET /v2/entities/E1?metadata=M1,M2"
+echo "======================================"
+orionCurl --url '/v2/entities/E1?metadata=M1,M2'
+echo
+echo
+
+
+echo "05. GET /v2/entities/E1/attrs/A1?metadata=M1,M2"
+echo "==============================================="
+orionCurl --url '/v2/entities/E1/attrs/A1?metadata=M1,M2'
 echo
 echo
 
@@ -103,6 +123,88 @@ Date: REGEX(.*)
         "type": "Number",
         "value": 1
     }
+}
+
+
+03. GET /v2/entities?metadata=M1,M2
+===================================
+HTTP/1.1 200 OK
+Content-Length: 142
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "Text",
+                    "value": "m1"
+                },
+                "M2": {
+                    "type": "Text",
+                    "value": "m2"
+                }
+            },
+            "type": "Number",
+            "value": 1
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+04. GET /v2/entities/E1?metadata=M1,M2
+======================================
+HTTP/1.1 200 OK
+Content-Length: 140
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {
+            "M1": {
+                "type": "Text",
+                "value": "m1"
+            },
+            "M2": {
+                "type": "Text",
+                "value": "m2"
+            }
+        },
+        "type": "Number",
+        "value": 1
+    },
+    "id": "E1",
+    "type": "Thing"
+}
+
+
+05. GET /v2/entities/E1/attrs/A1?metadata=M1,M2
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 108
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "metadata": {
+        "M1": {
+            "type": "Text",
+            "value": "m1"
+        },
+        "M2": {
+            "type": "Text",
+            "value": "m2"
+        }
+    },
+    "type": "Number",
+    "value": 1
 }
 
 
