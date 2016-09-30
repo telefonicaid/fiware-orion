@@ -33,6 +33,54 @@ using std::string;
 
 /* ****************************************************************************
 *
+* getBoolAux -
+*/
+static Opt<bool> getBoolAux(const Value& parent, const char* field, const string& description, bool optional)
+{
+  if (parent.HasMember(field))
+  {
+    const Value& value = parent[field];
+    if (!value.IsBool())
+    {
+      return Opt<bool>((!description.empty() ? description : field) + " is not a bool");
+    }
+
+    return Opt<bool>(value.GetBool(), true);
+  }
+  else if (!optional)
+  {
+     return Opt<bool>((!description.empty() ? description : field) + " is missing");
+  }
+
+  return Opt<bool>("", false);
+}
+
+
+
+/* ****************************************************************************
+*
+* getBoolMust - get a mandatory bool from the rapidjson node
+*/
+extern Opt<bool> getBoolMust(const rapidjson::Value& parent, const char* field, const std::string& description)
+{
+  return getBoolAux(parent, field, description, false);
+}
+
+
+
+/* ****************************************************************************
+*
+* getBoolOpt - get an optional bool from the rapidjson node
+*/
+extern Opt<bool> getBoolOpt(const rapidjson::Value& parent, const char* field, const std::string& description)
+{
+  return getBoolAux(parent, field, description, true);
+}
+
+
+
+/* ****************************************************************************
+*
 * getStringAux - 
 */
 static Opt<string> getStringAux(const Value& parent, const char* field, const string& description, bool optional)
@@ -69,7 +117,7 @@ extern Opt<string> getStringMust(const rapidjson::Value& parent, const char* fie
 
 /* ****************************************************************************
 *
-* getStringOpt - get a optional string from the rapidjson node
+* getStringOpt - get an optional string from the rapidjson node
 */
 extern Opt<string> getStringOpt(const rapidjson::Value& parent, const char* field, const std::string& description)
 {
@@ -116,7 +164,7 @@ extern Opt<int64_t> getInt64Must(const rapidjson::Value& parent, const char* fie
 
 /* ****************************************************************************
 *
-* getInt64Opt - get a optional int64_t from the rapidjson node
+* getInt64Opt - get an optional int64_t from the rapidjson node
 */
 extern Opt<int64_t> getInt64Opt(const rapidjson::Value& parent, const char* field, const std::string& description)
 {

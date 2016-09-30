@@ -192,7 +192,7 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 
   case NumberDouble:
     valueType   = orion::ValueTypeNumber;
-    numberValue = getFieldF(mdB, ENT_ATTRS_MD_VALUE).Number();
+    numberValue = getNumberFieldF(mdB, ENT_ATTRS_MD_VALUE);
     break;
 
   case Bool:
@@ -259,11 +259,19 @@ std::string Metadata::render(const std::string& indent, bool comma)
 
     if (compoundValueP->isObject())
     {
+      //
+      // Note in this case we don't add the "value" key, the toJson()
+      // method does it for toplevel compound (a bit crazy... this deserves a FIXME mark)
+      // FIXME P4: modify/simplify the rendering of compound values. Too many if/else ...
+      //
+      compoundValueP->renderName = true;
+      compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
       part = compoundValueP->toJson(true, false);
     }
     else if (compoundValueP->isVector())
     {
-      part = "[" + compoundValueP->toJson(true, false) + "]";
+      compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
+      part = JSON_STR("value") + ": [" + compoundValueP->toJson(true, false) + "]";
     }    
 
     out += part;
@@ -413,8 +421,6 @@ void Metadata::fill(const struct Metadata& md)
 */
 std::string Metadata::toStringValue(void) const
 {
-  char buffer[64];
-
   switch (valueType)
   {
   case orion::ValueTypeString:
@@ -422,8 +428,14 @@ std::string Metadata::toStringValue(void) const
     break;
 
   case orion::ValueTypeNumber:
-    snprintf(buffer, sizeof(buffer), "%f", numberValue);
-    return std::string(buffer);
+    if (type == DATE_TYPE)
+    {
+      return JSON_STR(isodate2str(numberValue));
+    }
+    else // regular number
+    {
+      return toString(numberValue);
+    }    
     break;
 
   case orion::ValueTypeBoolean:
@@ -472,7 +484,16 @@ std::string Metadata::toJson(bool isLastElement)
   }
   else if (valueType == orion::ValueTypeNumber)
   {
-    out += JSON_VALUE_NUMBER("value", toString(numberValue));
+    std::string effectiveValue;
+    if (type == DATE_TYPE)
+    {
+      effectiveValue = JSON_STR(isodate2str(numberValue));
+    }
+    else // regular number
+    {
+      effectiveValue = toString(numberValue);
+    }
+    out += JSON_VALUE_NUMBER("value", effectiveValue);
   }
   else if (valueType == orion::ValueTypeBoolean)
   {

@@ -69,6 +69,7 @@ inline bool operator!=(const EntID& lhs, const EntID& rhs){ return !(lhs == rhs)
 struct Notification
 {
   std::vector<std::string> attributes;
+  std::vector<std::string> metadata;
   bool                     blacklist;
   long long                timesSent;
   long long                lastNotification;

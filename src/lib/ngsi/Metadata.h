@@ -42,10 +42,21 @@
 *
 * Metadata interpreted by Orion Context Broker, i.e. not custom metadata
 */
-#define NGSI_MD_ID       "ID"
-#define NGSI_MD_LOCATION "location"
-#define NGSI_MD_CREDATE  "creDate"    // FIXME P5: to be used for creDate (currenly only in DB)
-#define NGSI_MD_MODDATE  "modDate"    // FIXME P5: to be used for modDate (currenly only in DB)
+#define NGSI_MD_ID                 "ID"
+#define NGSI_MD_LOCATION           "location"
+#define NGSI_MD_CREDATE            "creDate"    // FIXME P5: to be used for creDate (currenly only in DB)
+#define NGSI_MD_MODDATE            "modDate"    // FIXME P5: to be used for modDate (currenly only in DB)
+#define NGSI_MD_PREVIOUSVALUE      "previousValue"   // Special metadata
+#define NGSI_MD_ACTIONTYPE         "actionType"      // Special metadata
+#define NGSI_MD_ALL                "*"               // Special metadata (alias meaning "all metadata")
+#define NGSI_MD_ACTIONTYPE_UPDATE  "update"
+#define NGSI_MD_ACTIONTYPE_APPEND  "append"
+#define NGSI_MD_ACTIONTYPE_DELETE  "delete"          // FIXME #1494: reserved for future use
+
+#if 0
+// FIXME #910: disabled by the moment, maybe removed at the end
+#define NGSI_MD_NOTIF_ONSUBCHANGE  "ngsi:onSubscriptionChange"
+#endif
 
 
 

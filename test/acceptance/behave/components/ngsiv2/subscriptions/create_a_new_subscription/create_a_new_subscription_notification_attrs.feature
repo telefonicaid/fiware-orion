@@ -64,8 +64,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
 
   @notification_attrs_array_empty
@@ -87,8 +87,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
 
   @notification_attrs
@@ -110,8 +110,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
     Examples:
       | attributes |
@@ -174,8 +174,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
     Examples:
       | number |
@@ -327,8 +327,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
 
   @notification_except_attrs
@@ -350,8 +350,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
     Examples:
       | attributes |
@@ -436,8 +436,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
     Examples:
       | number |

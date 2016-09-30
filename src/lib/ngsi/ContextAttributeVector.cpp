@@ -136,7 +136,14 @@ std::string ContextAttributeVector::toJsonTypes()
 * If anybody needs an attribute named 'id' or 'type', then API v1
 * will have to be used to retrieve that information.
 */
-std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist) const
+std::string ContextAttributeVector::toJson
+(
+  bool                             isLastElement,
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter,
+  const std::vector<std::string>&  metadataFilter,
+  bool                             blacklist
+) const
 {
   if (vec.size() == 0)
   {
@@ -231,7 +238,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat rend
         }
       }
 
-      out += vec[ix]->toJson(renderedAttributes == validAttributes, renderFormat);
+      out += vec[ix]->toJson(renderedAttributes == validAttributes, renderFormat, metadataFilter);
 
       if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
@@ -247,7 +254,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat rend
       if (caP != NULL)
       {
         ++renderedAttributes;
-        out += caP->toJson(renderedAttributes == validAttributes, renderFormat);
+        out += caP->toJson(renderedAttributes == validAttributes, renderFormat, metadataFilter);
       }
     }
   }
@@ -258,7 +265,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat rend
       if (std::find(attrsFilter.begin(), attrsFilter.end(), vec[ix]->name) == attrsFilter.end())
       {
         ++renderedAttributes;
-        out += vec[ix]->toJson(renderedAttributes == validAttributes, renderFormat);
+        out += vec[ix]->toJson(renderedAttributes == validAttributes, renderFormat, metadataFilter);
       }
     }
   }

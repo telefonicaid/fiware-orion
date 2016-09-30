@@ -152,7 +152,7 @@ Feature: verify fields in log traces with retrieve an entity type request using 
     Then verify that receive an "OK" http code
     And verify headers in response
       | parameter         | value      |
-      | fiware-correlator | [a-f0-9-]* |
+      | Fiware-Correlator | [a-f0-9-]* |
     And verify that attributes types by entity type are returned in response based on the info in the recorder
     And check in log, label "INFO" and message "Starting transaction from"
       | trace  | value              |

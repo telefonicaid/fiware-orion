@@ -106,21 +106,16 @@ static void setSubject(Subscription* s, const BSONObj& r)
   }
 
   // Condition
-  std::vector<BSONElement> conds = getFieldF(r, CSUB_CONDITIONS).Array();
-  for (unsigned int ix = 0; ix < conds.size(); ++ix)
-  {
-    std::string attr = conds[ix].String();
-    s->subject.condition.attributes.push_back(attr);
-  }
+  setStringVectorF(r, CSUB_CONDITIONS, &(s->subject.condition.attributes));
 
   if (r.hasField(CSUB_EXPR))
   {
-    mongo::BSONObj expression = getFieldF(r, CSUB_EXPR).Obj();
-    std::string    q          = getFieldF(expression, CSUB_EXPR_Q).String();
-    std::string    mq         = getFieldF(expression, CSUB_EXPR_MQ).String();
-    std::string    geo        = getFieldF(expression, CSUB_EXPR_GEOM).String();
-    std::string    coords     = getFieldF(expression, CSUB_EXPR_COORDS).String();
-    std::string    georel     = getFieldF(expression, CSUB_EXPR_GEOREL).String();
+    mongo::BSONObj expression = getObjectFieldF(r, CSUB_EXPR);
+    std::string    q          = getStringFieldF(expression, CSUB_EXPR_Q);
+    std::string    mq         = getStringFieldF(expression, CSUB_EXPR_MQ);
+    std::string    geo        = getStringFieldF(expression, CSUB_EXPR_GEOM);
+    std::string    coords     = getStringFieldF(expression, CSUB_EXPR_COORDS);
+    std::string    georel     = getStringFieldF(expression, CSUB_EXPR_GEOREL);
 
     s->subject.condition.expression.q        = q;
     s->subject.condition.expression.mq       = mq;
@@ -139,13 +134,10 @@ static void setSubject(Subscription* s, const BSONObj& r)
 static void setNotification(Subscription* subP, const BSONObj& r, const std::string& tenant)
 {
   // Attributes
-  std::vector<BSONElement> attrs = getFieldF(r, CSUB_ATTRS).Array();
-  for (unsigned int ix = 0; ix < attrs.size(); ++ix)
-  {
-    std::string attr = attrs[ix].String();
+  setStringVectorF(r, CSUB_ATTRS, &(subP->notification.attributes));
 
-    subP->notification.attributes.push_back(attr);
-  }
+  // Metadata
+  setStringVectorF(r, CSUB_METADATA, &(subP->notification.metadata));
 
   subP->notification.httpInfo.fill(r);
 

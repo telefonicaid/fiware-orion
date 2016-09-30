@@ -61,7 +61,7 @@ Feature: verify fields in log traces with retrieve entity types request using NG
       | entities_id       | room1       |
       | attributes_number | 2           |
       | attributes_name   | temperature |
-      | attributes_value  | 34          |
+      | attributes_value  | high        |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -139,7 +139,7 @@ Feature: verify fields in log traces with retrieve entity types request using NG
       | limit     | 2     |
       | offset    | 1     |
     Then verify that receive an "OK" http code
-    And verify that entity types returned in response are: "house,home"
+    And verify that entity types returned in response are: "car,home"
     And verify that attributes types are returned in response based on the info in the recorder
     And check in log, label "INFO" and message "Starting transaction from"
       | trace  | value              |

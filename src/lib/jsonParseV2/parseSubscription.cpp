@@ -635,6 +635,17 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     subsP->notification.blacklist = true;
   }
 
+  // metadata
+  if (notification.HasMember("metadata"))
+  {
+    std::string r = parseAttributeList(ciP, &subsP->notification.metadata, notification["metadata"]);
+
+    if (r != "")
+    {
+      return r;
+    }
+  }
+
   // attrsFormat field
   Opt<std::string>  attrsFormatOpt = getStringOpt(notification, "attrsFormat");
   if (!attrsFormatOpt.ok())

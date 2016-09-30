@@ -145,10 +145,7 @@ def get_entity_types(context, entity_type):
     __logger__.info("...returned an entity type")
 
 
-
-
 # ------------------------------------- validations ----------------------------------------------
-
 
 @step(u'verify that "([^"]*)" entities are returned')
 def verify_get_all_entities(context, entities_returned):
@@ -286,3 +283,29 @@ def verify_that_attributes_types_by_entity_type_are_returned_in_response_based_o
     ngsi = NGSI()
     ngsi.verify_attributes_types_by_entity_types(entity_type, context.entities_accumulate, context.resp)
     __logger__.info("...Verified that attribute types by entity type are returned in response...")
+
+
+@step(u'verify that entities are sorted by some attributes')
+def verify_that_entities_are_sorted_by_some_attributes(context):
+    """
+    verify that entities are sorted by some attributes
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.debug("Verifying that entities are sorted by some attributes...")
+    queries_parameters = context.cb.get_entities_parameters()
+    ngsi = NGSI()
+    ngsi.verify_that_entities_are_sorted_by_some_attributes(queries_parameters, context.entities_accumulate, context.resp)
+    __logger__.debug("Verified that entities are sorted by some attributes...")
+
+
+@step(u'verify that entities are not sorted by attributes')
+def verify_that_entities_are_not_sorted_by_attributes(context):
+    """
+    verify that entities are not sorted by attributes
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.debug("Verifying that entities are  not sorted by attributes...")
+    queries_parameters = context.cb.get_entities_parameters()
+    ngsi = NGSI()
+    ngsi.verify_that_entities_are_sorted_by_some_attributes(queries_parameters, context.entities_accumulate, context.resp, False)
+    __logger__.debug("Verified that entities are not sorted by attributes...")

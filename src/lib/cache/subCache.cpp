@@ -746,6 +746,7 @@ void subCacheItemInsert
   const ngsiv2::HttpInfo&            httpInfo,
   const std::vector<ngsiv2::EntID>&  entIdVector,
   const std::vector<std::string>&    attributes,
+  const std::vector<std::string>&    metadata,
   const std::vector<std::string>&    conditionAttrs,
   const char*                        subscriptionId,
   int64_t                            expirationTime,
@@ -792,6 +793,7 @@ void subCacheItemInsert
   cSubP->httpInfo              = httpInfo;
   cSubP->notifyConditionV      = conditionAttrs;
   cSubP->attributes            = attributes;
+  cSubP->metadata              = metadata;
 
 
   //
@@ -943,6 +945,71 @@ void subCacheStatisticsReset(const char* by)
 }
 
 
+/* ****************************************************************************
+*
+* subCacheEntryPresent -
+*/
+void subCacheEntryPresent(CachedSubscription* cSubP)
+{
+  // FIXME P4: complete with the rest of fields in CachedSubscription
+
+  std::string entityIdInfo;
+  std::string attributes;
+  std::string metadata;
+  std::string notifyCondition;
+
+  for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
+  {
+    entityIdInfo +=  cSubP->entityIdInfos[ix]->entityId + "-" + cSubP->entityIdInfos[ix]->entityType;
+    if (ix != cSubP->entityIdInfos.size() -1)
+    {
+      entityIdInfo += ",";
+    }
+  }
+
+  for (unsigned int ix = 0; ix < cSubP->attributes.size(); ++ix)
+  {
+    attributes += cSubP->attributes[ix];
+    if (ix != cSubP->attributes.size() -1)
+    {
+      attributes += ",";
+    }
+  }
+
+  for (unsigned int ix = 0; ix < cSubP->metadata.size(); ++ix)
+  {
+    metadata += cSubP->metadata[ix];
+    if (ix != cSubP->metadata.size() -1)
+    {
+      metadata += ",";
+    }
+  }
+
+  for (unsigned int ix = 0; ix < cSubP->notifyConditionV.size(); ++ix)
+  {
+    notifyCondition += cSubP->notifyConditionV[ix];
+    if (ix != cSubP->notifyConditionV.size() -1)
+    {
+      notifyCondition += ",";
+    }
+  }
+
+  LM_T(LmtSubCache, ("o %s (tenant: %s, subservice: %s, entities: <%s>, attributes: <%s>, metadata: <%s>, "
+                     "notifyCondition: <%s>, LNT: %lu, count: %lu, status: %s, expiration: %lu, THR: %d)",
+                     cSubP->subscriptionId,
+                     cSubP->tenant,
+                     cSubP->servicePath,
+                     entityIdInfo.c_str(),
+                     attributes.c_str(),
+                     metadata.c_str(),
+                     notifyCondition.c_str(),
+                     cSubP->lastNotificationTime,
+                     cSubP->count,
+                     cSubP->status.c_str(),
+                     cSubP->expirationTime,
+                     cSubP->throttling));
+}
+
 
 /* ****************************************************************************
 *
@@ -956,12 +1023,7 @@ void subCachePresent(const char* title)
 
   while (cSubP != NULL)
   {
-    LM_T(LmtSubCache, ("o %s (tenant: %s, LNT: %lu, THR: %d)",
-                       cSubP->subscriptionId,
-                       cSubP->tenant,
-                       cSubP->lastNotificationTime,
-                       cSubP->throttling));
-
+    subCacheEntryPresent(cSubP);
     cSubP = cSubP->next;
   }
 

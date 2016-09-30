@@ -74,7 +74,8 @@ static bool templateNotify
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsOrder
+  const std::vector<std::string>&  attrsOrder,
+  const std::vector<std::string>&  metadataFilter
 )
 {
   Verb                                verb = httpInfo.verb;
@@ -114,7 +115,7 @@ static bool templateNotify
     cer.contextElement = ce;
     ncr.subscriptionId = subscriptionId;
     ncr.contextElementResponseVector.push_back(&cer);
-    payload  = ncr.toJson(renderFormat, attrsOrder);
+    payload  = ncr.toJson(renderFormat, attrsOrder, metadataFilter);
     mimeType = "application/json";
   }
   else
@@ -258,6 +259,7 @@ typedef struct NotificationAsTemplateParams
   std::string                      fiwareCorrelator;
   RenderFormat                     renderFormat;
   std::vector<std::string>         attrsOrder;
+  std::vector<std::string>         metadataFilter;
 } NotificationAsTemplateParams;
 
 
@@ -290,7 +292,8 @@ void* sendNotifyContextRequestAsPerTemplate(void* p)
                    paramP->xauthToken,
                    paramP->fiwareCorrelator,
                    paramP->renderFormat,
-                   paramP->attrsOrder);
+                   paramP->attrsOrder,
+                   paramP->metadataFilter);
   }
 
   paramP->ncrP->release();
@@ -315,6 +318,7 @@ void Notifier::sendNotifyContextRequest
   const std::string&               fiwareCorrelator,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsOrder,
+  const std::vector<std::string>&  metadataFilter,
   bool                             blackList
 )
 {
@@ -356,6 +360,7 @@ void Notifier::sendNotifyContextRequest
       paramP->fiwareCorrelator = fiwareCorrelator;
       paramP->renderFormat     = renderFormat;
       paramP->attrsOrder       = attrsOrder;
+      paramP->metadataFilter   = metadataFilter;
 
       pthread_t  tid;
       int        r = pthread_create(&tid, NULL, sendNotifyContextRequestAsPerTemplate, (void*) paramP);
@@ -414,7 +419,7 @@ void Notifier::sendNotifyContextRequest
     }
     else
     {
-      payloadString = ncrP->toJson(renderFormat, attrsOrder, blackList);
+      payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
     }
 
     /* Parse URL */

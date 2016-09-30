@@ -67,6 +67,11 @@ public:
   orion::CompoundValueNode*  compoundValueP;
   bool                       typeGiven;               // Was 'type' part of the incoming payload?
 
+  std::string                actionType;              // Used by special metadata in notifications functionality
+  ContextAttribute*          previousValue;           // Used by special metadata in notifications functionality
+                                                      // (Note we are forced to use a pointer for this, as we are using
+                                                      // ContextAttribute field in the ContextAttribute type declaration)
+
   ~ContextAttribute();
   ContextAttribute();
   ContextAttribute(ContextAttribute* caP, bool useDefaultType = false);
@@ -83,7 +88,10 @@ public:
   std::string  render(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false, bool omitValue = false);
   std::string  renderAsJsonObject(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma, bool omitValue = false);
   std::string  renderAsNameString(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false);
-  std::string  toJson(bool isLastElement, RenderFormat renderFormat, RequestType requestType = NoRequest);
+  std::string  toJson(bool                             isLastElement,
+                      RenderFormat                     renderFormat,
+                      const std::vector<std::string>&  metadataFilter,
+                      RequestType                      requestType = NoRequest);
   std::string  toJsonAsValue(ConnectionInfo* ciP);
   void         present(const std::string& indent, int ix);
   void         release(void);

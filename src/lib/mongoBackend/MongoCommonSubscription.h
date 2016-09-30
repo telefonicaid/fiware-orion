@@ -121,7 +121,10 @@ extern void setCondsAndInitialNotify
   const ngsiv2::Subscription&      sub,
   const std::string&               subId,
   const std::string&               status,
+  const std::vector<std::string>&  notifAttributesV,
+  const std::vector<std::string>&  metadataV,
   const ngsiv2::HttpInfo&          httpInfo,
+  bool                             blacklist, 
   RenderFormat                     attrsFormat,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,
@@ -175,6 +178,16 @@ extern void setFormat(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b)
 *
 */
 extern void setBlacklist(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
+
+
+
+/* ****************************************************************************
+*
+* setMetadata -
+*
+*/
+extern void setMetadata(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
+
 
 
 #endif // SRC_LIB_MONGO_BACKEND_MONGOCOMMONSUBSCRIPTION_H
