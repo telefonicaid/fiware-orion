@@ -164,6 +164,7 @@ ContextAttribute::ContextAttribute()
   found                 = false;
   skip                  = false;
   typeGiven             = false;
+  previousValue         = NULL;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -198,6 +199,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
   found                 = caP->found;
   skip                  = false;
   typeGiven             = caP->typeGiven;
+  previousValue         = NULL;
 
   providingApplication.set(caP->providingApplication.get());
   providingApplication.setMimeType(caP->providingApplication.getMimeType());
@@ -261,6 +263,7 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  previousValue         = NULL;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -293,6 +296,7 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  previousValue         = NULL;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -325,6 +329,7 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  previousValue         = NULL;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -357,6 +362,7 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  previousValue         = NULL;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -385,6 +391,7 @@ ContextAttribute::ContextAttribute
   valueType             = orion::ValueTypeObject;  // FIXME P6: Could be ValueTypeVector ...
   skip                  = false;
   typeGiven             = false;
+  previousValue         = NULL;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -678,7 +685,13 @@ std::string ContextAttribute::render
 *        the code paths of the rendering process
 *
 */
-std::string ContextAttribute::toJson(bool isLastElement, RenderFormat renderFormat, RequestType requestType)
+std::string ContextAttribute::toJson
+(
+  bool                             isLastElement,
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  metadataFilter,
+  RequestType                      requestType
+)
 {
   std::string  out;
 
@@ -790,7 +803,7 @@ std::string ContextAttribute::toJson(bool isLastElement, RenderFormat renderForm
     //
     // metadata
     //
-    out += JSON_STR("metadata") + ":" + "{" + metadataVector.toJson(true) + "}";
+    out += JSON_STR("metadata") + ":" + "{" + metadataVector.toJson(true, metadataFilter) + "}";
 
     if (requestType != EntityAttributeResponse)
     {
@@ -1055,6 +1068,12 @@ void ContextAttribute::release(void)
   }
 
   metadataVector.release();
+  if (previousValue != NULL)
+  {
+    previousValue->release();
+    delete previousValue;
+    previousValue = NULL;
+  }
 }
 
 

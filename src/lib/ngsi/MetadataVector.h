@@ -38,6 +38,7 @@
 */
 typedef struct MetadataVector
 {
+public:
   std::vector<Metadata*>  vec;
 
   std::string             keyName;        // Help variable for the 'render' method
@@ -46,7 +47,8 @@ typedef struct MetadataVector
 
   void            keyNameSet(const std::string& key);
   std::string     render(const std::string& indent, bool comma = false);
-  std::string     toJson(bool isLastElement);
+  std::string     toJson(bool                             isLastElement,
+                         const std::vector<std::string>&  metadataFilter);
   std::string     check(ConnectionInfo* ciP,
                       RequestType requestType,
                       const std::string& indent,
@@ -63,6 +65,8 @@ typedef struct MetadataVector
   
   Metadata* operator[](unsigned int ix) const;
 
+private:
+  bool matchFilter(const std::string& mdName, const std::vector<std::string>& metadataFilter);
   
 } MetadataVector;
 

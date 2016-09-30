@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <algorithm>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -166,7 +167,7 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
       */
 
     case NumberDouble:
-      if (getFieldF(md1, ENT_ATTRS_MD_TYPE).Number() != getFieldF(md2, ENT_ATTRS_MD_TYPE).Number())
+      if (getNumberFieldF(md1, ENT_ATTRS_MD_TYPE) != getNumberFieldF(md2, ENT_ATTRS_MD_TYPE))
       {
         return false;
       }
@@ -219,7 +220,7 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
     */
 
     case NumberDouble:
-      return getFieldF(md1, ENT_ATTRS_MD_VALUE).Number() == getFieldF(md2, ENT_ATTRS_MD_VALUE).Number();
+      return getNumberFieldF(md1, ENT_ATTRS_MD_VALUE) == getNumberFieldF(md2, ENT_ATTRS_MD_VALUE);
 
     case Bool:
       return getBoolFieldF(md1, ENT_ATTRS_MD_VALUE) == getBoolFieldF(md2, ENT_ATTRS_MD_VALUE);
@@ -262,8 +263,8 @@ static bool equalMetadata(BSONObj& md1, BSONObj& md2)
       return false;
     }
 
-    BSONObj md1Item = getFieldF(md1, currentMd).embeddedObject();
-    BSONObj md2Item = getFieldF(md2, currentMd).embeddedObject();
+    BSONObj md1Item = getObjectFieldF(md1, currentMd);
+    BSONObj md2Item = getObjectFieldF(md2, currentMd);
 
     if (!equalMetadataValues(md1Item, md2Item))
     {
@@ -332,7 +333,7 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP, std::string apiVersi
       return true;
 
     case NumberDouble:
-      return caP->valueType != ValueTypeNumber || caP->numberValue != getFieldF(attr, ENT_ATTRS_VALUE).Number();
+      return caP->valueType != ValueTypeNumber || caP->numberValue != getNumberFieldF(attr, ENT_ATTRS_VALUE);
 
     case Bool:
       return caP->valueType != ValueTypeBoolean || caP->boolValue != getBoolFieldF(attr, ENT_ATTRS_VALUE);
@@ -484,15 +485,15 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
     switch (getFieldF(attr, ENT_ATTRS_VALUE).type())
     {
       case Object:
-        ab.append(ENT_ATTRS_VALUE, getFieldF(attr, ENT_ATTRS_VALUE).embeddedObject());
+        ab.append(ENT_ATTRS_VALUE, getObjectFieldF(attr, ENT_ATTRS_VALUE));
         break;
 
       case Array:
-        ab.appendArray(ENT_ATTRS_VALUE, getFieldF(attr, ENT_ATTRS_VALUE).embeddedObject());
+        ab.appendArray(ENT_ATTRS_VALUE, getArrayFieldF(attr, ENT_ATTRS_VALUE));
         break;
 
       case NumberDouble:
-        ab.append(ENT_ATTRS_VALUE, getFieldF(attr, ENT_ATTRS_VALUE).Number());
+        ab.append(ENT_ATTRS_VALUE, getNumberFieldF(attr, ENT_ATTRS_VALUE));
         break;
 
       case Bool:
@@ -762,7 +763,7 @@ static bool updateAttribute
     }
 
     BSONObj newAttr;
-    BSONObj attr = getFieldF(attrs, effectiveName).embeddedObject();
+    BSONObj attr = getObjectFieldF(attrs, effectiveName);
     actualUpdate = mergeAttrInfo(attr, caP, &newAttr, apiVersion);
     if (actualUpdate)
     {
@@ -1172,6 +1173,7 @@ static bool addTriggeredSubscriptions_withCache
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant);
     subP->blacklist = cSubP->blacklist;
+    subP->metadata  = cSubP->metadata;
 
     subP->fillExpression(cSubP->expression.georel, cSubP->expression.geometry, cSubP->expression.coords);
 
@@ -1525,7 +1527,7 @@ static bool addTriggeredSubscriptions_noCache
 
       long long           throttling         = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
       long long           lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
-      std::string         renderFormatString = sub.hasField(CSUB_FORMAT)? getFieldF(sub, CSUB_FORMAT).String() : "legacy";  // NGSIv1 JSON is 'default' (for old db-content)
+      std::string         renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";  // NGSIv1 JSON is 'default' (for old db-content)
       RenderFormat        renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo    httpInfo;
 
@@ -1540,6 +1542,8 @@ static bool addTriggeredSubscriptions_noCache
           subToAttributeList(sub), "", "");
 
       trigs->blacklist = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+
+      setStringVectorF(sub, CSUB_METADATA, &(trigs->metadata));
 
       if (sub.hasField(CSUB_EXPR))
       {
@@ -1658,6 +1662,8 @@ static bool addTriggeredSubscriptions
   }
 }
 
+
+
 /* ****************************************************************************
 *
 * processOnChangeConditionForUpdateContext -
@@ -1670,6 +1676,7 @@ static bool processOnChangeConditionForUpdateContext
 (
   ContextElementResponse*          notifyCerP,
   const AttributeList&             attrL,
+  const std::vector<std::string>&  metadataV,
   std::string                      subId,
   RenderFormat                     renderFormat,
   std::string                      tenant,
@@ -1732,8 +1739,89 @@ static bool processOnChangeConditionForUpdateContext
                                           fiwareCorrelator,
                                           renderFormat,
                                           attrsOrder,
+                                          metadataV,
                                           blacklist);
   return true;
+}
+
+
+/* ****************************************************************************
+*
+* setActionTypeMetadata -
+*/
+static void setActionTypeMetadata(ContextElementResponse* notifyCerP)
+{
+  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
+    /* ActionType "" means that the attribute was not touched by the update triggering the
+     * notification, so no metadata must be added */
+    if (caP->actionType != "")
+    {
+      Metadata* mdP = new Metadata(NGSI_MD_ACTIONTYPE, DEFAULT_ATTR_STRING_TYPE, caP->actionType);
+      caP->metadataVector.push_back(mdP);
+    }
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* setPreviousValueMetadata -
+*/
+static void setPreviousValueMetadata(ContextElementResponse* notifyCerP)
+{
+  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
+    ContextAttribute* previousValueP = caP->previousValue;
+
+    if (previousValueP == NULL)
+    {
+      // This CA doesn't have a previousValue. It may has been just created or not being
+      // touched by the update causing the notification. Thus, returning without adding metadata
+      continue;
+    }
+
+    Metadata* mdP;
+    if (previousValueP->compoundValueP == NULL)
+    {
+      switch (previousValueP->valueType)
+      {
+      case ValueTypeString:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->stringValue);
+        break;
+
+      case ValueTypeBoolean:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->boolValue);
+        break;
+
+      case ValueTypeNumber:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->numberValue);
+        break;
+
+      case ValueTypeNone:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, "");
+        mdP->valueType = ValueTypeNone;
+        break;
+
+      default:
+        LM_E(("Runtime Error (unknown value type: %d)", previousValueP->valueType));
+      }
+    }
+    else
+    {
+      mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, "");
+      mdP->valueType = previousValueP->valueType;
+
+      // Steal the compound
+      mdP->compoundValueP = previousValueP->compoundValueP;
+      previousValueP->compoundValueP = NULL;
+    }
+
+    caP->metadataVector.push_back(mdP);
+  }
 }
 
 
@@ -1847,6 +1935,17 @@ static bool processSubscriptions
       }
     }
 
+    /* Set special metadatas */
+    if (std::find(tSubP->metadata.begin(), tSubP->metadata.end(), NGSI_MD_ACTIONTYPE) != tSubP->metadata.end())
+    {
+      setActionTypeMetadata(notifyCerP);
+    }
+
+    if (std::find(tSubP->metadata.begin(), tSubP->metadata.end(), NGSI_MD_PREVIOUSVALUE) != tSubP->metadata.end())
+    {
+      setPreviousValueMetadata(notifyCerP);
+    }
+
     /* Send notification */
     LM_T(LmtSubCache, ("NOT ignored: %s", tSubP->cacheSubId.c_str()));
 
@@ -1854,6 +1953,7 @@ static bool processSubscriptions
 
     notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
                                                                 tSubP->attrL,
+                                                                tSubP->metadata,
                                                                 mapSubId,
                                                                 tSubP->renderFormat,
                                                                 tenant,
@@ -2021,7 +2121,8 @@ static void updateAttrInNotifyCer
 (
   ContextElementResponse* notifyCerP,
   ContextAttribute*       targetAttr,
-  bool                    useDefaultType
+  bool                    useDefaultType,
+  std::string             actionType
 )
 {
   /* Try to find the attribute in the notification CER */
@@ -2033,6 +2134,32 @@ static void updateAttrInNotifyCer
     {
       if (targetAttr->valueType != ValueTypeNone)
       {
+        /* Store previous value (it may be necessary to render previousValue metadata) */
+        if (caP->previousValue == NULL)
+        {
+          caP->previousValue = new ContextAttribute();
+        }
+
+        caP->previousValue->valueType   = caP->valueType;
+        caP->previousValue->stringValue = caP->stringValue;
+        caP->previousValue->boolValue   = caP->boolValue;
+        caP->previousValue->numberValue = caP->numberValue;
+
+        if (caP->compoundValueP != NULL)
+        {
+          // We cannot steal this time, as we are going to steal in a next place (see below)
+          caP->previousValue->compoundValueP = caP->compoundValueP->clone();
+        }
+        else {
+          caP->previousValue->compoundValueP = NULL;
+        }
+
+        if (targetAttr->type != "")
+        {
+          caP->previousValue->type = caP->type;
+        }
+
+        /* Set values from target attribute */
         caP->valueType      = targetAttr->valueType;
         caP->stringValue    = targetAttr->stringValue;
         caP->boolValue      = targetAttr->boolValue;
@@ -2053,6 +2180,9 @@ static void updateAttrInNotifyCer
       {
         caP->type = targetAttr->type;
       }
+
+      /* Set actionType */
+      caP->actionType = actionType;
 
       /* Metadata */
       for (unsigned int jx = 0; jx < targetAttr->metadataVector.size(); jx++)
@@ -2113,6 +2243,9 @@ static void updateAttrInNotifyCer
     // The ContextAttribute constructor steals the compound, but in this case, it must be cloned
     targetAttr->compoundValueP = caP->compoundValueP->clone();
   }
+
+  /* Set actionType */
+  caP->actionType = actionType;
 
   notifyCerP->contextElement.contextAttributeVector.push_back(caP);
 }
@@ -2207,7 +2340,7 @@ static bool updateContextAttributeItem
     return false;
   }
 
-  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2");
+  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2", NGSI_MD_ACTIONTYPE_UPDATE);
 
   return true;
 }
@@ -2275,7 +2408,7 @@ static bool appendContextAttributeItem
   // Note that updateAttrInNotifyCer() may "ruin" targetAttr, as compoundValueP is moved
   // (not copied) to the structure in the notifyCerP and null-ified in targetAttr. Thus, it has
   // to be called after the location processing logic (as this logic may need the compoundValueP
-  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2");
+  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2", NGSI_MD_ACTIONTYPE_APPEND);
 
   return true;
 }
@@ -2858,7 +2991,7 @@ static void updateEntity
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
   const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
 
-  BSONObj            idField           = getFieldF(r, "_id").embeddedObject();
+  BSONObj            idField           = getObjectFieldF(r, "_id");
 
   std::string        entityId          = getStringFieldF(idField, ENT_ENTITY_ID);
   std::string        entityType        = idField.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(idField, ENT_ENTITY_TYPE) : "";
@@ -2883,7 +3016,7 @@ static void updateEntity
    * BSON object for $set (updates and appends) and a BSON object for $unset (deletes). Note that depending
    * the request one of the BSON objects could be empty (it use to be the $unset one). In addition, for
    * APPEND and DELETE updates we use two arrays to push/pull attributes in the attrsNames vector */
-  BSONObj           attrs     = getFieldF(r, ENT_ATTRS).embeddedObject();
+  BSONObj           attrs     = getObjectFieldF(r, ENT_ATTRS);
   BSONObjBuilder    toSet;
   BSONObjBuilder    toUnset;
   BSONArrayBuilder  toPush;
@@ -3205,6 +3338,23 @@ static bool contextElementPreconditionsCheck
 
 }
 
+
+
+/* ****************************************************************************
+*
+* setActionType -
+*/
+static void setActionType(ContextElementResponse* notifyCerP, std::string actionType)
+{
+  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
+    caP->actionType = actionType;
+  }
+}
+
+
+
 /* ****************************************************************************
 *
 * processContextElement -
@@ -3495,6 +3645,9 @@ void processContextElement
         // one item, so it should be safe to get item 0
         //
         ContextElementResponse* notifyCerP = new ContextElementResponse(ceP, apiVersion == "v2");
+
+        // Set action type
+        setActionType(notifyCerP, NGSI_MD_ACTIONTYPE_APPEND);
 
         notifyCerP->contextElement.creDate = now;
         notifyCerP->contextElement.modDate = now;

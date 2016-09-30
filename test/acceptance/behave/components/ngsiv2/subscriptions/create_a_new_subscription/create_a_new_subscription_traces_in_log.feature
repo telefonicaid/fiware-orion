@@ -74,8 +74,8 @@ Feature: verify fields in log traces with update or append entity attributes req
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
     And check in log, label "INFO" and message "Starting transaction from"
       | trace  | value              |

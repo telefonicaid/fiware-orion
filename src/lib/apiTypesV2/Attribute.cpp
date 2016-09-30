@@ -52,8 +52,10 @@ std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool
     }
     else
     {
+      std::vector<std::string> metadataFilter;
+
       out = "{";
-      out += pcontextAttribute->toJson(true, renderFormat, requestType);  // param 1 'true' as it is the last and only element
+      out += pcontextAttribute->toJson(true, renderFormat, metadataFilter, requestType);  // param 1 'true' as it is the last and only element
       out += "}";
     }
 

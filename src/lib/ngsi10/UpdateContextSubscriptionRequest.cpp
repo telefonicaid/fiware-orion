@@ -136,7 +136,7 @@ void UpdateContextSubscriptionRequest::toNgsiv2Subscription(SubscriptionUpdate* 
   subUp->subjectProvided      = (notifyConditionVector.size() > 0);
   subUp->expiresProvided      = !duration.isEmpty();
   subUp->statusProvided       = false;  // not supported in NGSIv1
-  subUp->notificationProvided = false;  // NGSIv1 doesn's allow changes in that parte
+  subUp->notificationProvided = false;  // NGSIv1 doesn's allow changes in that part
   subUp->attrsFormatProvided  = true;   // updating in NGSIv1 involves and implicit change to NGSIv1 legacy format
   subUp->throttlingProvided   = !throttling.isEmpty();
 

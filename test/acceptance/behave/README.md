@@ -290,15 +290,15 @@ The Context Broker must start with "DEBUG" level in "CB_EXTRA_OPS" field into pr
 | retrieve_api_resource                       |     19       | GET     | /version  /statistics  cache/statistics    /v2       | No        | No             |
 |                                                                                                                                                          |
 |**entities folder**                                                                                                                                       |
-| list_entities                               |    556       | GET     | /v2/entities/                                        | No        | Yes            |
+| list_entities                               |    570       | GET     | /v2/entities/                                        | No        | Yes            |
 | create_entity                               |    785       | POST    | /v2/entities/                                        | Yes       | Yes            |    
 |                                                                                                                                                          |
 | retrieve_entity                             |    231       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |
 | retrieve_entity_attributes                  |    250       | GET     | /v2/entities/`<entity_id>`/attrs                     | No        | Yes            |
-| update_or_append_entity_attributes          |    823       | POST    | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
+| update_or_append_entity_attributes          |    834       | POST    | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
 | update_existing_entity_attributes           |    642       | PATCH   | /v2/entities/`<entity_id>`                           | Yes       | Yes            |
-| replace_all_entity_attributes               |    586       | PUT     | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
-| remove_entity                               |    101       | DELETE  | /v2/entities/`<entity_id>`                           | No        | Yes            |
+| replace_all_entity_attributes               |    598       | PUT     | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
+| remove_entity                               |    103       | DELETE  | /v2/entities/`<entity_id>`                           | No        | Yes            |
 |                                                                                                                                                          |
 |**attributes folder**                                                                                                                                     |
 | get_attribute_data                          |    254       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | Yes            |   
@@ -321,7 +321,7 @@ The Context Broker must start with "DEBUG" level in "CB_EXTRA_OPS" field into pr
 | update_subscription                         |  (pending)   | PATCH   | /v2/subscriptions/`<subscription_id>`                | Yes       | No             |   
 | delete_subscription                         |  (pending)   | DELETE  | /v2/subscriptions/`<subscription_id>`                | No        | No             |   
 |                                                                                                                                                          |
-| notifications                               |     75       |                                                                                             |   
+| notifications                               |    255       |                                                                                             |   
 |                                                                                                                                                          |
 |**registration folder**                                                                                                                                   |
 | retrieve_registrations                      |  (pending)   | GET     | /v2/registrations                                    | No        | Yes            |   

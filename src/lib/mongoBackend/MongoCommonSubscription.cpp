@@ -280,7 +280,10 @@ void setCondsAndInitialNotify
   const Subscription&              sub,
   const std::string&               subId,
   const std::string&               status,
+  const std::vector<std::string>&  notifAttributesV,
+  const std::vector<std::string>&  metadataV,
   const HttpInfo&                  httpInfo,
+  bool                             blacklist,
   RenderFormat                     attrsFormat,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,
@@ -298,7 +301,8 @@ void setCondsAndInitialNotify
   *notificationDone = false;
   BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             sub.subject.entities,
-                                            sub.notification.attributes,
+                                            notifAttributesV,
+                                            metadataV,
                                             subId,
                                             httpInfo,
                                             notificationDone,
@@ -309,8 +313,8 @@ void setCondsAndInitialNotify
                                             &(sub.restriction),
                                             status,
                                             fiwareCorrelator,
-                                            sub.notification.attributes,
-                                            sub.notification.blacklist);
+                                            notifAttributesV,
+                                            blacklist);
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
@@ -375,6 +379,8 @@ void setFormat(const Subscription& sub, BSONObjBuilder* b)
   LM_T(LmtMongo, ("Subscription format: %s", format.c_str()));
 }
 
+
+
 /* ****************************************************************************
 *
 * setBlacklist -
@@ -385,4 +391,23 @@ void setBlacklist(const Subscription& sub, BSONObjBuilder* b)
   bool bl = sub.notification.blacklist;
   b->append(CSUB_BLACKLIST, bl);
   LM_T(LmtMongo, ("Subscription blacklist: %s", bl ? "true" : "false"));
+}
+
+
+
+/* ****************************************************************************
+*
+* setMetadata -
+*
+*/
+void setMetadata(const Subscription& sub, BSONObjBuilder* b)
+{
+  BSONArrayBuilder metadata;
+  for (unsigned int ix = 0; ix < sub.notification.metadata.size(); ++ix)
+  {
+    metadata.append(sub.notification.metadata[ix]);
+  }
+  BSONArray metadataArr = metadata.arr();
+  b->append(CSUB_METADATA, metadataArr);
+  LM_T(LmtMongo, ("Subscription metadata: %s", metadataArr.toString().c_str()));
 }

@@ -96,15 +96,15 @@ static void getAttributeTypes
 
     /* Previous versions of this function used a simpler approach:
      *
-     *   BSONObj attrs = getFieldF(r, ENT_ATTRS).embeddedObject();
-     *   BSONObj attr  = getFieldF(attrs, attrName).embeddedObject();
+     *   BSONObj attrs = getObjectFieldF(r, ENT_ATTRS);
+     *   BSONObj attr  = getObjectFieldF(attrs, attrName);
      *   attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
      *
      * However, it doesn't work when the attribute used metadata ID
      *
      */
 
-    BSONObj                attrs = getFieldF(r, ENT_ATTRS).embeddedObject();
+    BSONObj                attrs = getObjectFieldF(r, ENT_ATTRS);
     std::set<std::string>  attrsSet;
 
     attrs.getFieldNames(attrsSet);
@@ -113,7 +113,7 @@ static void getAttributeTypes
       std::string currentAttr = *i;
       if (basePart(currentAttr) == attrName)
       {
-        BSONObj attr = getFieldF(attrs, currentAttr).embeddedObject();
+        BSONObj attr = getObjectFieldF(attrs, currentAttr);
         attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
       }
     }

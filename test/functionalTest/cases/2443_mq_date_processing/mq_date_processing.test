@@ -1,0 +1,201 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+MQ with DateTime
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity
+# 02. Get entity matching DateTime
+#
+
+echo '01. Create entity'
+echo '================='
+payload='{
+  "type": "hy6K",
+  "id": "room4",
+  "temperature": {
+    "type": "celsius",
+    "metadata": {
+      "meta_temperature": {
+        "value": 34,
+        "type":
+        "alarm"
+      }
+    },
+    "value": 34
+  },
+  "pressure": {
+    "metadata": {
+      "meta_pressure": {
+        "value": "high"
+      }
+    },
+    "value": 35
+  },
+  "humidity": {
+    "type": "porcent",
+    "metadata": {
+      "meta_humidity": {
+        "value": "air,density"
+      }
+    },
+    "value": 36
+  },
+  "timestamp": {
+    "type": "nothing",
+    "metadata": {
+      "meta_timestamp": {
+        "value": "2017-06-15T07:21:24.00Z",
+        "type": "DateTime"
+      }
+    },
+    "value": 37
+  },
+  "value_str": {
+    "metadata": {
+      "meta_value_str": {
+        "value": "true"
+      }
+    },
+    "value": 38
+  },
+  "value_bool": {
+    "metadata": {
+      "meta_value_bool": {
+        "value": true,
+        "type": "alarm"
+      }
+    },
+    "value": 39
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+
+echo "02. Get entity matching DateTime"
+echo "================================"
+orionCurl --url '/v2/entities?mq=timestamp.meta_timestamp>=2017-06-15T07:21:24.00Z'
+echo
+echo
+
+
+
+--REGEXPECT--
+01. Create entity
+=================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/room4?type=hy6K
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Get entity matching DateTime
+================================
+HTTP/1.1 200 OK
+Content-Length: 673
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "humidity": {
+            "metadata": {
+                "meta_humidity": {
+                    "type": "Text",
+                    "value": "air,density"
+                }
+            },
+            "type": "porcent",
+            "value": 36
+        },
+        "id": "room4",
+        "pressure": {
+            "metadata": {
+                "meta_pressure": {
+                    "type": "Text",
+                    "value": "high"
+                }
+            },
+            "type": "Number",
+            "value": 35
+        },
+        "temperature": {
+            "metadata": {
+                "meta_temperature": {
+                    "type": "alarm",
+                    "value": 34
+                }
+            },
+            "type": "celsius",
+            "value": 34
+        },
+        "timestamp": {
+            "metadata": {
+                "meta_timestamp": {
+                    "type": "DateTime",
+                    "value": "2017-06-15T07:21:24.00Z"
+                }
+            },
+            "type": "nothing",
+            "value": 37
+        },
+        "type": "hy6K",
+        "value_bool": {
+            "metadata": {
+                "meta_value_bool": {
+                    "type": "alarm",
+                    "value": true
+                }
+            },
+            "type": "Number",
+            "value": 39
+        },
+        "value_str": {
+            "metadata": {
+                "meta_value_str": {
+                    "type": "Text",
+                    "value": "true"
+                }
+            },
+            "type": "Number",
+            "value": 38
+        }
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -79,7 +79,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         POST request
         """
         global last_headers, last_payload, last_url, get_last_data, show_last_data
-        __logger__.info("entro un POST")
+        __logger__.info("a POST request is received")
         self.send_response(200)
         get_last_data(self)
         headers_prefix = u'last'
@@ -92,12 +92,66 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(last_payload)
 
+    def do_PUT(self):
+        """
+        PUT request
+        """
+        global last_headers, last_payload, last_url, get_last_data, show_last_data
+        __logger__.info("a PUT request is received")
+        self.send_response(200)
+        get_last_data(self)
+        headers_prefix = u'last'
+        for item in last_headers:
+            self.send_header("%s-%s" % (headers_prefix, item), last_headers[item])
+        self.send_header("%s-url" % headers_prefix, "%s" % (last_url))
+
+        show_last_data()   # verify VERBOSE global variable
+
+        self.end_headers()
+        self.wfile.write(last_payload)
+
+    def do_DELETE(self):
+        """
+        DELETE request
+        """
+        global last_headers, last_payload, last_url, get_last_data, show_last_data
+        __logger__.info("a DELETE request is received")
+        self.send_response(200)
+        get_last_data(self)
+        headers_prefix = u'last'
+        for item in last_headers:
+            self.send_header("%s-%s" % (headers_prefix, item), last_headers[item])
+        self.send_header("%s-url" % headers_prefix, "%s" % (last_url))
+
+        show_last_data()   # verify VERBOSE global variable
+
+        self.end_headers()
+        self.wfile.write(last_payload)
+
+    def do_PATCH(self):
+        """
+        PATCH request
+        """
+        global last_headers, last_payload, last_url, get_last_data, show_last_data
+        __logger__.info("a PATCH request is received")
+        self.send_response(200)
+        get_last_data(self)
+        headers_prefix = u'last'
+        for item in last_headers:
+            self.send_header("%s-%s" % (headers_prefix, item), last_headers[item])
+        self.send_header("%s-url" % headers_prefix, "%s" % (last_url))
+
+        show_last_data()   # verify VERBOSE global variable
+
+        self.end_headers()
+        self.wfile.write(last_payload)
+
     def do_GET(self):
         """
         GET request
         """
         global last_headers, last_payload, unknown_path, last_url
-        __logger__.info("entro un GET")
+        __logger__.info("a GET request is received")
         self.send_response(200)
         if self.path == "/last_notification":
             headers_prefix = u'last'

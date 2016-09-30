@@ -90,6 +90,7 @@ static void insertInCache
                      sub.notification.httpInfo,
                      sub.subject.entities,
                      sub.notification.attributes,
+                     sub.notification.metadata,
                      sub.subject.condition.attributes,
                      subId.c_str(),
                      sub.expires,
@@ -148,12 +149,13 @@ std::string mongoCreateSubscription
   setStatus(sub, &b);
   setEntities(sub, &b);
   setAttrs(sub, &b);
+  setMetadata(sub, &b);
   setBlacklist(sub, &b);
 
   std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
-  setCondsAndInitialNotify(sub, subId, status, sub.notification.httpInfo, sub.attrsFormat,
-                           tenant, servicePathV, xauthToken, fiwareCorrelator,
-                           &b, &notificationDone);
+  setCondsAndInitialNotify(sub, subId, status, sub.notification.attributes, sub.notification.metadata,
+                           sub.notification.httpInfo, sub.notification.blacklist, sub.attrsFormat,
+                           tenant, servicePathV, xauthToken, fiwareCorrelator, &b, &notificationDone);
   if (notificationDone)
   {
     long long lastNotification = (long long) getCurrentTime();

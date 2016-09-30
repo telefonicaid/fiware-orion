@@ -31,8 +31,8 @@
 
 Feature: list all entities with get request and queries parameters using NGSI v2. "GET" - /v2/entities/
   Queries parameters
-  tested : limit, offset, id, idPattern, type, q and option=count,keyValues
-  pending: georel, geometry, coords and option=values,unique
+  tested : options=count,keyValues
+  pending: options=values,unique
   As a context broker user
   I would like to list all entities with get request and queries parameter using NGSI v2
   So that I can manage and use them in my scripts
@@ -87,7 +87,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that "<returned>" entities are returned
     And verify headers in response
       | parameter          | value      |
-      | fiware-total-count | <entities> |
+      | Fiware-Total-Count | <entities> |
     Examples:
       | entities | returned |
       | 1        | 1        |
@@ -130,7 +130,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that "<returned>" entities are returned
     And verify headers in response
       | parameter          | value      |
-      | fiware-total-count | <entities> |
+      | Fiware-Total-Count | <entities> |
     Examples:
       | entities | returned |
       | 1        | 1        |
@@ -174,7 +174,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that "<returned>" entities are returned
     And verify headers in response
       | parameter          | value      |
-      | fiware-total-count | <entities> |
+      | Fiware-Total-Count | <entities> |
     Examples:
       | entities | offset | limit | returned |
       | 1        | 1      | 1     | 0        |
@@ -252,110 +252,3 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | options   | keyValues |
     Then verify that receive an "OK" http code
     And verify that "3" entities are returned
-
-  # --- attrs ---
-  @qp_attrs_only
-  Scenario:  list entities using NGSI v2 with attrs query parameter only
-    Given  a definition of headers
-      | parameter          | value                  |
-      | Fiware-Service     | test_list_only_options |
-      | Fiware-ServicePath | /test                  |
-      | Content-Type       | application/json       |
-    And initialize entity groups recorder
-    And properties to entities
-      | parameter         | value       |
-      | entities_type     | home        |
-      | entities_id       | room1       |
-      | attributes_number | 5           |
-      | attributes_name   | temperature |
-      | attributes_value  | high        |
-      | attributes_type   | celsius     |
-      | metadatas_number  | 2           |
-      | metadatas_name    | very_hot    |
-      | metadatas_type    | alarm       |
-      | metadatas_value   | random=10   |
-    And create entity group with "3" entities in "normalized" mode
-      | entity | prefix |
-      | id     | true   |
-    And verify that receive several "Created" http code
-    And record entity group
-    And modify headers and keep previous values "false"
-      | parameter          | value                  |
-      | Fiware-Service     | test_list_only_options |
-      | Fiware-ServicePath | /test                  |
-    When get all entities
-      | parameter | value                       |
-      | attrs     | temperature_3,temperature_4 |
-    Then verify that receive an "OK" http code
-    And verify that "3" entities are returned
-
-  @qp_attrs_unknown @BUG_2245
-  Scenario:  list entities using NGSI v2 with unknown value in attrs query parameter
-    Given  a definition of headers
-      | parameter          | value                  |
-      | Fiware-Service     | test_list_only_options |
-      | Fiware-ServicePath | /test                  |
-      | Content-Type       | application/json       |
-    And initialize entity groups recorder
-    And properties to entities
-      | parameter         | value       |
-      | entities_type     | home        |
-      | entities_id       | room1       |
-      | attributes_number | 5           |
-      | attributes_name   | temperature |
-      | attributes_value  | high        |
-      | attributes_type   | celsius     |
-      | metadatas_number  | 2           |
-      | metadatas_name    | very_hot    |
-      | metadatas_type    | alarm       |
-      | metadatas_value   | random=10   |
-    And create entity group with "3" entities in "normalized" mode
-      | entity | prefix |
-      | id     | true   |
-    And verify that receive several "Created" http code
-    And record entity group
-    And modify headers and keep previous values "false"
-      | parameter          | value                  |
-      | Fiware-Service     | test_list_only_options |
-      | Fiware-ServicePath | /test                  |
-    When get all entities
-      | parameter | value    |
-      | attrs     | fdgdfgdf |
-    Then verify that receive an "OK" http code
-    And verify that "3" entities are returned
-
-  @qp_attrs_and_id
-  Scenario:  list entities using NGSI v2 with attrs and id queries parameters
-    Given  a definition of headers
-      | parameter          | value                  |
-      | Fiware-Service     | test_list_only_options |
-      | Fiware-ServicePath | /test                  |
-      | Content-Type       | application/json       |
-    And initialize entity groups recorder
-    And properties to entities
-      | parameter         | value       |
-      | entities_type     | home        |
-      | entities_id       | room1       |
-      | attributes_number | 5           |
-      | attributes_name   | temperature |
-      | attributes_value  | high        |
-      | attributes_type   | celsius     |
-      | metadatas_number  | 2           |
-      | metadatas_name    | very_hot    |
-      | metadatas_type    | alarm       |
-      | metadatas_value   | random=10   |
-    And create entity group with "3" entities in "normalized" mode
-      | entity | prefix |
-      | id     | true   |
-    And verify that receive several "Created" http code
-    And record entity group
-    And modify headers and keep previous values "false"
-      | parameter          | value                  |
-      | Fiware-Service     | test_list_only_options |
-      | Fiware-ServicePath | /test                  |
-    When get all entities
-      | parameter | value                       |
-      | attrs     | temperature_3,temperature_4 |
-      | id        | room1_2                     |
-    Then verify that receive an "OK" http code
-    And verify that "1" entities are returned

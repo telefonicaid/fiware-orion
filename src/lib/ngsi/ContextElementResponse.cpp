@@ -163,14 +163,14 @@ ContextElementResponse::ContextElementResponse
   // Attribute vector
   // FIXME P5: constructor for BSONObj could be added to ContextAttributeVector/ContextAttribute classes, to make building more modular
   //
-  BSONObj                attrs = getFieldF(entityDoc, ENT_ATTRS).embeddedObject();
+  BSONObj                attrs = getObjectFieldF(entityDoc, ENT_ATTRS);
   std::set<std::string>  attrNames;
 
   attrs.getFieldNames(attrNames);
   for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
     std::string        attrName = *i;
-    BSONObj            attr     = getFieldF(attrs, attrName).embeddedObject();
+    BSONObj            attr     = getObjectFieldF(attrs, attrName);
     ContextAttribute*  caP      = NULL;
     ContextAttribute   ca;
 
@@ -205,7 +205,7 @@ ContextElementResponse::ContextElementResponse
         break;
 
       case NumberDouble:
-        ca.numberValue = getFieldF(attr, ENT_ATTRS_VALUE).Number();
+        ca.numberValue = getNumberFieldF(attr, ENT_ATTRS_VALUE);
         caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
         break;
 
@@ -227,12 +227,17 @@ ContextElementResponse::ContextElementResponse
       case Object:
         caP = new ContextAttribute(ca.name, ca.type, "");
         caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
+        caP->valueType = orion::ValueTypeObject;
         compoundObjectResponse(caP->compoundValueP, getFieldF(attr, ENT_ATTRS_VALUE));
         break;
 
       case Array:
         caP = new ContextAttribute(ca.name, ca.type, "");
         caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
+        // FIXME P7: next line is counterintuitive. If the object is a vector, why
+        // we need to use ValueTypeObject here? Because otherwise Metadata::toJson()
+        // method doesn't work. A littely crazy... it should be fixed.
+        caP->valueType = orion::ValueTypeObject;
         compoundVectorResponse(caP->compoundValueP, getFieldF(attr, ENT_ATTRS_VALUE));
         break;
 
@@ -264,14 +269,14 @@ ContextElementResponse::ContextElementResponse
     if (attr.hasField(ENT_ATTRS_MD))
     {
 
-      BSONObj                mds = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
+      BSONObj                mds = getObjectFieldF(attr, ENT_ATTRS_MD);
       std::set<std::string>  mdsSet;
 
       mds.getFieldNames(mdsSet);
       for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
       {
         std::string currentMd = *i;
-        Metadata*   md = new Metadata(dbDotDecode(currentMd), getFieldF(mds, currentMd).embeddedObject());
+        Metadata*   md = new Metadata(dbDotDecode(currentMd), getObjectFieldF(mds, currentMd));
         caP->metadataVector.push_back(md);
       }
     }
@@ -339,11 +344,17 @@ std::string ContextElementResponse::render
 *
 * ContextElementResponse::toJson - 
 */
-std::string ContextElementResponse::toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist)
+std::string ContextElementResponse::toJson
+(
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter,
+  const std::vector<std::string>&  metadataFilter,
+  bool                             blacklist
+)
 {
   std::string out;
 
-  out = contextElement.toJson(renderFormat, attrsFilter, blacklist);
+  out = contextElement.toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
 
   return out;
 }

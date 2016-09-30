@@ -350,7 +350,7 @@ Feature: verify notifications from subscriptions with different subject entities
       | room2(_3)     |
       | room2(.*)     |
 
-  # ----------------------- type and typePattern (no developed yet) ---------------------------
+  # ----------------------- type and typePattern ---------------------------
   @type
   Scenario Outline:  send a notification using NGSI v2 with subject-type field
     Given  a definition of headers
@@ -477,7 +477,7 @@ Feature: verify notifications from subscriptions with different subject entities
     Then get notification sent to listener
     And verify the notification in "normalized" format
 
-  @type_pattern @ISSUE_1853 @skip
+  @type_pattern @ISSUE_1853
   Scenario Outline:  send a notification using NGSI v2 with subject-typePattern field
     Given  a definition of headers
       | parameter          | value               |

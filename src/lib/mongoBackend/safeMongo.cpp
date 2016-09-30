@@ -106,6 +106,34 @@ std::string getStringField(const BSONObj& b, const std::string& field, const std
   return "";
 }
 
+
+
+/* ****************************************************************************
+*
+* getNumberField -
+*/
+double getNumberField(const BSONObj& b, const std::string& field, const std::string& caller, int line)
+{
+  if (b.hasField(field) && b.getField(field).type() == NumberDouble)
+  {
+    return b.getField(field).Number();
+  }
+
+  // Detect error
+  if (!b.hasField(field))
+  {
+    LM_E(("Runtime Error (double field '%s' is missing in BSONObj <%s> from caller %s:%d)", field.c_str(), b.toString().c_str(), caller.c_str(), line));
+  }
+  else
+  {
+    LM_E(("Runtime Error (field '%s' was supposed to be an double but type=%d in BSONObj <%s> from caller %s:%d)",
+          field.c_str(), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
+  }
+  return -1;
+}
+
+
+
 /* ****************************************************************************
 *
 * getIntField -
@@ -225,6 +253,57 @@ BSONElement getField(const BSONObj& b, const std::string& field, const std::stri
   LM_E(("Runtime Error (field '%s' is missing in BSONObj <%s> from caller %s:%d)", field.c_str(), b.toString().c_str(), caller.c_str(), line));
   return BSONElement();
 }
+
+
+
+/* ****************************************************************************
+*
+* setStringVector -
+*
+*/
+void setStringVector
+(
+  const BSONObj&             b,
+  const std::string&         field,
+  std::vector<std::string>*  v,
+  const std::string&         caller,
+  int                        line
+)
+{
+  if (b.hasField(field) && b.getField(field).type() == Array)
+  {
+    // See http://stackoverflow.com/questions/36307126/getting-bsonarray-from-bsonelement-in-an-direct-way
+    std::vector<BSONElement> ba = b.getField(field).Array();
+    v->clear();
+    for (unsigned int ix = 0; ix < ba.size(); ++ix)
+    {
+      if (ba[ix].type() == String)
+      {
+        v->push_back(ba[ix].String());
+      }
+      else
+      {
+        LM_E(("Runtime Error (element %d in array was supposed to be an string but type=%d from caller %s:%d)",
+              ix, ba[ix].type(), caller.c_str(), line));
+        v->clear();
+        return;
+      }
+    }
+  }
+
+  // Detect error
+  if (!b.hasField(field))
+  {
+    LM_E(("Runtime Error (object field '%s' is missing in BSONObj <%s> from caller %s:%d)", field.c_str(), b.toString().c_str(), caller.c_str(), line));
+  }
+  else
+  {
+    LM_E(("Runtime Error (field '%s' was supposed to be an array but type=%d in BSONObj <%s> from caller %s:%d)",
+          field.c_str(), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
+  }
+}
+
+
 
 /* ****************************************************************************
 *

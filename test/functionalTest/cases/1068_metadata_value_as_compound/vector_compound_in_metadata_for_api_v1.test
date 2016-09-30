@@ -1,0 +1,164 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Check rendering of metadata compound vector in APIv1
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity with attribute with metadata M1 that has a compound vector as value
+# 02. See the entity using POST /v1/queryContext and make sure the metadata value-vector is correctly rendered
+# 03. See the entity using GET /v2/entities make sure the metadata value-vector is correctly rendered
+#
+
+echo "01. Create entity with attribute with metadata M1 that has a compound vector as value"
+echo "====================================================================================="
+payload='{
+  "id": "E1",
+  "A1": {
+    "value": 1,
+    "metadata": {
+      "M1": {
+        "value": [ 1,2,3 ]
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. See the entity using POST /v1/queryContext and make sure the metadata value-vector is correctly rendered"
+echo "============================================================================================================"
+payload='{
+    "entities": [
+        {
+            "isPattern": "false",
+            "id": "E1"
+        }
+    ]
+}'
+orionCurl --url /v1/queryContext --payload "$payload"
+echo
+echo
+
+
+echo "03. See the entity using GET /v2/entities make sure the metadata value-vector is correctly rendered"
+echo "==================================================================================================="
+orionCurl --url /v2/entities
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity with attribute with metadata M1 that has a compound vector as value
+=====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. See the entity using POST /v1/queryContext and make sure the metadata value-vector is correctly rendered
+============================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 551
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "M1",
+                                "type": "StructuredValue",
+                                "value": [
+                                    1,
+                                    2,
+                                    3
+                                ]
+                            }
+                        ],
+                        "name": "A1",
+                        "type": "Number",
+                        "value": 1
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "Thing"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+03. See the entity using GET /v2/entities make sure the metadata value-vector is correctly rendered
+===================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 122
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": [
+                        1,
+                        2,
+                        3
+                    ]
+                }
+            },
+            "type": "Number",
+            "value": 1
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

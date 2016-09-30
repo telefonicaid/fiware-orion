@@ -86,8 +86,9 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
       if (attributeVector.size() != 0)
       {
         std::vector<std::string> attrsFilter;
+        std::vector<std::string> metadataFilter;
         stringSplit(ciP->uriParam["attrs"], ',', attrsFilter);
-        out += attributeVector.toJson(true, renderFormat, attrsFilter);
+        out += attributeVector.toJson(true, renderFormat, attrsFilter, metadataFilter);
       }
       out += "]";        
     }
@@ -108,9 +109,10 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
       if (attributeVector.size() != 0)
       {
         std::vector<std::string> attrsFilter;
+        std::vector<std::string> metadataFilter;
         stringSplit(ciP->uriParam["attrs"], ',', attrsFilter);
 
-        attrsOut += attributeVector.toJson(true, renderFormat, attrsFilter);
+        attrsOut += attributeVector.toJson(true, renderFormat, attrsFilter, metadataFilter);
       }
 
       // Note that just attributeVector.size() != 0 (used in previous versions) cannot be used
