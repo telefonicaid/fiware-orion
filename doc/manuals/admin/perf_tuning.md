@@ -46,11 +46,11 @@ to decide what to prioritize.
 However, in order to help administrators in this task, the following indexes are recommended:
 
 * Collection [entities](database_model.md#entities-collection)
-  * `_id.id`
-  * `_id.type`
-  * `_id.servicePath`
-  * `attrNames`
-  * `creDate`
+    * `_id.id`
+    * `_id.type`
+    * `_id.servicePath`
+    * `attrNames`
+    * `creDate`
 
 The only index that Orion Context Broker actually ensures is the "2dsphere" in the `location.coords`
 field in the entities collection, due to functional needs [geo-location functionality](../user/geolocation.md).
