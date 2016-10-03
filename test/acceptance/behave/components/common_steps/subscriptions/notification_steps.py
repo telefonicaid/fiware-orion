@@ -145,3 +145,21 @@ def verify_the_custom_notification(context):
     ngsi = NGSI()
     ngsi.verify_custom_notification(payload, headers, entity_context, subsc_context)
     __logger__.info("...verified the notification received with custom template")
+
+@step(u'verify metadata in notification without special metadata')
+@step(u'verify metadata in notification with "([^"]*)"')
+def verify_metadata_in_notification(context, metadata_flags="*"):
+    """
+    verify metadata in notification
+    :param metadata_flags: metadata notified
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.debug("verifying metadata in the notification (custom user or special)...")
+    entity_context = context.cb.get_entity_context()
+    subsc_context = context.cb.get_subscription_context()
+    action_type = context.cb.get_action_type()
+    previous_value = context.cb.get_previous_value()
+    payload = context.resp.text
+    ngsi = NGSI()
+    ngsi.verify_metadata_notification(metadata_flags, payload, entity_context, subsc_context, action_type, previous_value)
+    __logger__.info("...verified metadata in the notification")
