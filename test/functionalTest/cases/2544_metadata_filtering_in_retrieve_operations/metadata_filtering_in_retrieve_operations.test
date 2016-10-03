@@ -36,6 +36,8 @@ brokerStart CB
 # 04. GET /v2/entities/E1?metadata=M1,M2
 # 05. GET /v2/entities/E1/attrs/A1?metadata=M1,M2
 # 06. POST /v2/op/query with attributes=A1 and metadata=M1,M2 in payload
+# 07. GET /v2/entities/E1/attrs?metadata=* - see M1, M2 and M3
+# 08. POST /v2/op/query with attributes=A1 and metadata=* in payload - see M1, M2 and M3
 #
 
 echo "01. Create entity E1 with attr A1 with md M1, M2 and M3"
@@ -95,6 +97,24 @@ echo "======================================================================"
 payload='{
   "attributes": [ "A1" ],
   "metadata":   [ "M1", "M2" ]
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "07. GET /v2/entities/E1/attrs?metadata=* - see M1, M2 and M3"
+echo "============================================================"
+orionCurl --url '/v2/entities/E1/attrs?metadata=*'
+echo
+echo
+
+
+echo "08. POST /v2/op/query with attributes=A1 and metadata=* in payload - see M1, M2 and M3"
+echo "======================================================================================"
+payload='{
+  "attributes": [ "A1" ],
+  "metadata":   [ "*" ]
 }'
 orionCurl --url /v2/op/query --payload "$payload"
 echo
@@ -239,6 +259,70 @@ Date: REGEX(.*)
                 "M2": {
                     "type": "Text",
                     "value": "m2"
+                }
+            },
+            "type": "Number",
+            "value": 1
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+07. GET /v2/entities/E1/attrs?metadata=* - see M1, M2 and M3
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 149
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {
+            "M1": {
+                "type": "Text",
+                "value": "m1"
+            },
+            "M2": {
+                "type": "Text",
+                "value": "m2"
+            },
+            "M3": {
+                "type": "Text",
+                "value": "m3"
+            }
+        },
+        "type": "Number",
+        "value": 1
+    }
+}
+
+
+08. POST /v2/op/query with attributes=A1 and metadata=* in payload - see M1, M2 and M3
+======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 176
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "Text",
+                    "value": "m1"
+                },
+                "M2": {
+                    "type": "Text",
+                    "value": "m2"
+                },
+                "M3": {
+                    "type": "Text",
+                    "value": "m3"
                 }
             },
             "type": "Number",
