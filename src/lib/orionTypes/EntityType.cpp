@@ -159,7 +159,7 @@ void EntityType::release(void)
 *
 * EntityType::toJson -
 */
-std::string EntityType::toJson(ConnectionInfo* ciP, bool includeType, bool noAttrDetail)
+std::string EntityType::toJson(ConnectionInfo* ciP, bool includeType)
 {
   std::string  out = "{";
   char         countV[STRING_SIZE_FOR_INT];
@@ -174,7 +174,7 @@ std::string EntityType::toJson(ConnectionInfo* ciP, bool includeType, bool noAtt
   out += JSON_STR("attrs") + ":";
 
   out += "{";
-  out += contextAttributeVector.toJsonTypes(noAttrDetail);
+  out += contextAttributeVector.toJsonTypes();
   out += "}";
 
   out += "," + JSON_STR("count") + ":" + countV;

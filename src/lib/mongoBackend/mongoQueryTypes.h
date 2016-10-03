@@ -60,7 +60,7 @@ extern HttpStatusCode mongoEntityTypes
   std::map<std::string, std::string>&  uriParams,
   const std::string&                   apiVersion,
   unsigned int*                        totalTypesP,
-  bool                                 noAttrDetail = false
+  bool                                 noAttrDetail
 );
 
 
@@ -91,8 +91,8 @@ extern HttpStatusCode mongoAttributesForEntityType
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
-  bool                                 noAttrDetail = false,
-  const std::string&                   apiVersion   = "v1"
+  bool                                 noAttrDetail,
+  const std::string&                   apiVersion
 );
 
 #endif

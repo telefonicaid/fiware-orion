@@ -50,7 +50,7 @@ class EntityType
   std::string   render(ConnectionInfo* ciP, const std::string& indent, bool comma = false, bool typeNameBefore = false);  
   void          present(const std::string& indent);
   void          release(void);
-  std::string   toJson(ConnectionInfo* ciP, bool includeType = false, bool noAttrDetail = false);
+  std::string   toJson(ConnectionInfo* ciP, bool includeType = false);
 };
 
 #endif  // SRC_LIB_UTILITY_ENTITYTYPE_H_

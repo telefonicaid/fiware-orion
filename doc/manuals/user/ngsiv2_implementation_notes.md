@@ -113,3 +113,9 @@ From NGSIv2 specification section "Special metadata in notifications", regarding
 
 Current Orion implementation supports "update" and "append". The "delete" case will be
 supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).
+
+# URI parameters
+
+A special value of the URI param `options` (options=noAttrDetail) has been invented, for users of the
+broker to be able to avoid the CPU-intense query of the list of attribute types. `noAttrDetails` exists not
+for NGSIv2 but to improve performance in some operations.
