@@ -1,1 +1,2 @@
 Add: Added URI parameter metadata=metadata-name-list for NGSIv2 retrieve requests (Issue #2544)
+Add: Added 'metadata' as part of the payload for POST /v2/op/query (Issue #2544)

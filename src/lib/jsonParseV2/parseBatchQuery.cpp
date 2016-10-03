@@ -92,7 +92,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       std::string r = parseEntityVector(ciP, iter, &bqrP->entities, false);  // param 4: attributes are NOT allowed in payload
 
       if (r != "OK")
-      {        
+      {
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
@@ -114,6 +114,18 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
     else if (name == "scopes")
     {
       std::string r = parseScopeVector(ciP, iter, &bqrP->scopeV);
+
+      if (r != "OK")
+      {        
+        alarmMgr.badInput(clientIp, r);
+        oe.fill(SccBadRequest, r, "BadRequest");
+        ciP->httpStatusCode = SccBadRequest;
+        return oe.toJson();
+      }
+    }
+    else if (name == "metadata")
+    {
+      std::string r = parseAttributeList(ciP, iter, &bqrP->metadataV);
 
       if (r != "OK")
       {        

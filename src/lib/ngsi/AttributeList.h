@@ -43,6 +43,7 @@ typedef struct AttributeList
 
   void         fill(const std::vector<std::string>& aVec);
   std::string  render(const std::string& indent, bool comma = false);
+  std::string  toString(void);
   void         present(const std::string& indent);
   void         release(void);
   bool         lookup(const std::string& attributeName);
@@ -58,9 +59,9 @@ typedef struct AttributeList
 
   std::string  operator[](unsigned int ix)  const
   {
-  return attributeV[ix];
+    return attributeV[ix];
   }
-  
+
 } AttributeList;
 
 #endif  // SRC_LIB_NGSI_ATTRIBUTELIST_H_

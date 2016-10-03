@@ -2162,7 +2162,7 @@ Response:
 + Response 204
 
 
-### Query [POST /v2/op/query{?limit,offset,options,metadata}]
+### Query [POST /v2/op/query{?limit,offset,options}]
 
 The response payload is an Array containing one object per matching entity, or an empty array `[]` if 
 no entities are found. The entities follow the JSON entity representation format
@@ -2181,6 +2181,7 @@ The payload may contain the following elements (all of them optional):
    JSON object with a `type` (a JSON string) and `value` (whose type depends on the `type`
    property).
    The different available scopes are described elsewhere.
++ `metadata`: a list of metadata names to include in the response. If omitted, it means "all metadata".
 
 Response code:
 
@@ -2227,6 +2228,10 @@ Response code:
               "type": "FIWARE::...",
               "value": "..."
             }
+          ],
+          "metadata": [
+            "accuracy",
+            "timestamp"
           ]
         }
 
