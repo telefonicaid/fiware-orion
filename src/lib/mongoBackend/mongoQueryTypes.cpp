@@ -455,6 +455,10 @@ HttpStatusCode mongoEntityTypes
         }
         else
         {
+          //
+          // NOTE: here we add a ContextAttribute with empty type, as a marker for
+          //       this special condition of 'No Attribute Detail'
+          //
           ContextAttribute* caP = new ContextAttribute(attrsArray[jx].str(), "", "");
           entityType->contextAttributeVector.push_back(caP);
         }
@@ -635,6 +639,10 @@ HttpStatusCode mongoAttributesForEntityType
     }
     else
     {
+      //
+      // NOTE: here we add a ContextAttribute with empty type, as a marker for
+      //       this special condition of 'No Attribute Detail'
+      //
       ContextAttribute* caP = new ContextAttribute(idField.str(), "", "");
       responseP->entityType.contextAttributeVector.push_back(caP);      
     }
