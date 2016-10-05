@@ -46,6 +46,10 @@
 *
 * Payload In:  None
 * Payload Out: EntityTypeResponse
+*
+* URI parameters:
+*   - options=noAttrDetail
+*
 */
 std::string getEntityType
 (
@@ -58,6 +62,7 @@ std::string getEntityType
   EntityTypeResponse  response;
   std::string         entityTypeName = compV[2];
   std::string         answer;
+  bool                noAttrDetail   = ciP->uriParamOptions[OPT_NO_ATTR_DETAIL];
 
   if (entityTypeName == "")
   {
@@ -66,7 +71,7 @@ std::string getEntityType
     return oe.toJson();
   }
 
-  TIMED_MONGO(mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion));
+  TIMED_MONGO(mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam, noAttrDetail, ciP->apiVersion));
 
   if (response.entityType.count == 0)
   {
