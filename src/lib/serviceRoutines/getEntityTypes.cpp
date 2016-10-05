@@ -48,7 +48,6 @@
 * URI parameters:
 *   - attributesFormat=object
 *   - collapse=true
-*   - options=noAttrDetail
 */
 std::string getEntityTypes
 (
@@ -61,7 +60,6 @@ std::string getEntityTypes
   EntityTypeVectorResponse  response;
   unsigned int              totalTypes   = 0;
   unsigned int*             totalTypesP  = NULL;
-  bool                      noAttrDetail = ciP->uriParamOptions[OPT_NO_ATTR_DETAIL];
 
   response.statusCode.fill(SccOk);
 
@@ -71,7 +69,7 @@ std::string getEntityTypes
     totalTypesP = &totalTypes;
   }
 
-  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP, noAttrDetail));
+  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP, false));
 
   std::string rendered;
   TIMED_RENDER(rendered = response.render(ciP, ""));

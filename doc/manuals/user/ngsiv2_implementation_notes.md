@@ -114,8 +114,12 @@ From NGSIv2 specification section "Special metadata in notifications", regarding
 Current Orion implementation supports "update" and "append". The "delete" case will be
 supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).
 
-# URI parameters
+# `noAttrDetail` option
 
-A special value of the URI param `options` (options=noAttrDetail) has been invented, for users of the
-broker to be able to avoid the CPU-intense query of the list of attribute types. `noAttrDetails` exists not
-for NGSIv2 but to improve performance in some operations.
+The value `noAttrDetail` of the URI param `options` may be used in order to avoid NGSIv2 type browsing queries
+(`GET /v2/types` and `GET /v2/types/<type>`) to provide attribute type details.
+When used, the `types` list associated to each attribute name is set to `[]`.
+
+Using this option, Orion solves these queries much faster, especially in the case of a large number of attributes, each one with a different type.
+This can be very useful if your use case doesn't need the attribute type detail.
+In some cases savings from 30 seconds to 0.5 seconds with the `noAttrDetails` option have been detected.

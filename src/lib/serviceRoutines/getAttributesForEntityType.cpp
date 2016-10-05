@@ -49,7 +49,6 @@
 *
 * URI parameters:
 *   - attributesFormat=object
-*   - options=noAttrDetail
 *
 */
 std::string getAttributesForEntityType
@@ -62,11 +61,10 @@ std::string getAttributesForEntityType
 {
   EntityTypeResponse  response;
   std::string         entityTypeName = compV[2];
-  bool                noAttrDetail   = ciP->uriParamOptions[OPT_NO_ATTR_DETAIL];
 
   response.statusCode.fill(SccOk);
 
-  TIMED_MONGO(mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam, noAttrDetail, ciP->apiVersion));
+  TIMED_MONGO(mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam, false, ciP->apiVersion));
 
   std::string rendered;
   TIMED_RENDER(rendered = response.render(ciP, ""));
