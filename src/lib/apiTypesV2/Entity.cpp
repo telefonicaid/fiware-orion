@@ -30,6 +30,7 @@
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/errorMessages.h"
+#include "rest/uriParamNames.h"
 #include "alarmMgr/alarmMgr.h"
 #include "parse/forbiddenChars.h"
 #include "apiTypesV2/Entity.h"
@@ -79,6 +80,12 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
   if ((oe.details == "") && ((oe.reasonPhrase == "OK") || (oe.reasonPhrase == "")))
   {
     std::string out;
+    std::vector<std::string> metadataFilter;
+
+    if (ciP->uriParam[URI_PARAM_METADATA] != "")
+    {
+      stringSplit(ciP->uriParam[URI_PARAM_METADATA], ',', metadataFilter);
+    }
 
     if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
     {
@@ -86,8 +93,8 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
       if (attributeVector.size() != 0)
       {
         std::vector<std::string> attrsFilter;
-        std::vector<std::string> metadataFilter;
-        stringSplit(ciP->uriParam["attrs"], ',', attrsFilter);
+
+        stringSplit(ciP->uriParam[URI_PARAM_ATTRIBUTES], ',', attrsFilter);
         out += attributeVector.toJson(true, renderFormat, attrsFilter, metadataFilter);
       }
       out += "]";        
@@ -109,14 +116,16 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
       if (attributeVector.size() != 0)
       {
         std::vector<std::string> attrsFilter;
-        std::vector<std::string> metadataFilter;
-        stringSplit(ciP->uriParam["attrs"], ',', attrsFilter);
+
+        stringSplit(ciP->uriParam[URI_PARAM_ATTRIBUTES], ',', attrsFilter);
 
         attrsOut += attributeVector.toJson(true, renderFormat, attrsFilter, metadataFilter);
       }
 
+      //
       // Note that just attributeVector.size() != 0 (used in previous versions) cannot be used
       // as ciP->uriParam["attrs"] filter could remove all the attributes
+      //
       if (attrsOut != "")
       {
         if (renderId)

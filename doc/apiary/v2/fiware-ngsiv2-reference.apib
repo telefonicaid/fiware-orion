@@ -963,7 +963,7 @@ to keep your client decoupled from implementation details.
 
 # Group Entities
 
-### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,orderBy}]
+### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]
 
 Retrieves a list of entities that match different criteria by id, type, pattern matching (either id or type)
 and/or those which match a query or geographical query. A given entity has to match all the criteria to be retrieved
@@ -1020,6 +1020,9 @@ Response code:
       are to be included in the response.
       The attributes are retrieved in the order specified by this parameter. If this parameter is
       not included, the attributes are retrieved in arbitrary order.
+
+    + `metadata`: a list of metadata names to include in the response. If omitted, it means "all metadata".
+      The string `*` can be used as member of this list to mean "all the custom (user) metadata".
 
     + orderBy: temperature,!speed (optional, string) - Criteria for ordering results.
       See "Ordering Results" section for details.
@@ -1127,7 +1130,7 @@ Response:
 
 ## Entity by ID [/v2/entities/{entityId}{?type,attrs,options}]
 
-### Retrieve entity [GET /v2/entities/{entityId}{?type,attrs,options}]
+### Retrieve entity [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]
 
 The response is an object representing the entity identified by the ID. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section).
@@ -1150,6 +1153,8 @@ Response:
       this parameter.
       If this parameter is not included, the attributes are retrieved in arbitrary order, and all
       the attributes of the entity are included in the response.
+    + `metadata`: a list of metadata names to include in the response. If omitted, it means "all metadata".
+      The string `*` can be used as member of this list to mean "all the custom (user) metadata".
     + options (optional, string) - Options dictionary
       + Members
           + keyValues - when used, the response payload uses the `keyValues` simplified entity
@@ -1185,7 +1190,7 @@ Response:
           }
         }
 
-### Retrieve entity attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,options}]
+### Retrieve entity attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]
 
 This request is similar to retreiving the whole entity, however this one omits the `id` and `type`
 fields.
@@ -1210,6 +1215,8 @@ Response:
       by this parameter.
       If this parameter is not included, the attributes are retrieved in arbitrary order, and all
       the attributes of the entity are included in the response.
+    + `metadata`: a list of metadata names to include in the response. If omitted, it means "all metadata".
+      The string `*` can be used as member of this list to mean "all the custom (user) metadata".
     + options (optional, string) - Options dictionary
       + Members
           + keyValues - when used, the response payload uses the `keyValues` simplified entity
@@ -1382,7 +1389,7 @@ Response:
 
 ## Attribute by Entity ID [/v2/entities/{entityId}/attrs/{attrName}{?type}]
 
-### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}{?type}]
+### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}{?type,metadata}]
 
 Returns a JSON object with the attribute data of the attribute. The object follows the JSON
 representation for attributes (described in "JSON Attribute Representation" section).
@@ -1398,6 +1405,8 @@ Response:
     + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
       entities with the same entity id.
     + attrName: temperature (required, string) - Name of the attribute to be retrieved.
+    + `metadata`: a list of metadata names to include in the response. If omitted, it means "all metadata".
+      The string `*` can be used as member of this list to mean "all the custom (user) metadata".
 
 + Response 200 (application/json)
 
@@ -2181,6 +2190,8 @@ The payload may contain the following elements (all of them optional):
    JSON object with a `type` (a JSON string) and `value` (whose type depends on the `type`
    property).
    The different available scopes are described elsewhere.
++ `metadata`: a list of metadata names to include in the response. If omitted, it means "all metadata".
+   The string `*` can be used as member of this list to mean "all the custom (user) metadata".
 
 Response code:
 
@@ -2227,6 +2238,10 @@ Response code:
               "type": "FIWARE::...",
               "value": "..."
             }
+          ],
+          "metadata": [
+            "accuracy",
+            "timestamp"
           ]
         }
 
