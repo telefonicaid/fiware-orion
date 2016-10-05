@@ -69,7 +69,13 @@ std::string getEntityTypes
     totalTypesP = &totalTypes;
   }
 
-  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP, false));
+  //
+  // NOTE
+  //   The last parameter for mongoEntityTypes 'bool noAttrDetail' is always
+  //   set to true (meaning to skip the attribute detail) for NGSIv1 requests.
+  //   The parameter is only used for NGSIv2
+  //
+  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP, true));
 
   std::string rendered;
   TIMED_RENDER(rendered = response.render(ciP, ""));
