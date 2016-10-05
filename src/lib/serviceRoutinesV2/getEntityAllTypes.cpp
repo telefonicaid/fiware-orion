@@ -44,6 +44,10 @@
 *
 * Payload In:  None
 * Payload Out: EntityTypeVectorResponse
+*
+* URI parameters:
+*   - options=noAttrDetail
+*
 */
 std::string getEntityAllTypes
 (
@@ -55,28 +59,30 @@ std::string getEntityAllTypes
 {
   EntityTypeVectorResponse  response;
   std::string               answer;
-  unsigned int              totalTypes = 0;
+  unsigned int              totalTypes   = 0;
+  bool                      noAttrDetail = ciP->uriParamOptions[OPT_NO_ATTR_DETAIL];
+  unsigned int*             totalTypesP  = NULL;
 
   // NGSIv2 uses options=count to request count
-  unsigned int* totalTypesP = NULL;
-  if (ciP->uriParamOptions["count"])
+  if (ciP->uriParamOptions[OPT_COUNT])
   {
     totalTypesP = &totalTypes;
   }
 
-  if (ciP->uriParamOptions["values"])
+  if (ciP->uriParamOptions[OPT_VALUES])
   {
     TIMED_MONGO(mongoEntityTypesValues(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, totalTypesP));
   }
   else  // default
   {
-    TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP));
+    TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP, noAttrDetail));
   }
   TIMED_RENDER(answer = response.toJson(ciP));
 
-  if (ciP->uriParamOptions["count"])
+  if (ciP->uriParamOptions[OPT_COUNT])
   {
     char cVec[64];
+
     snprintf(cVec, sizeof(cVec), "%d", totalTypes);
     ciP->httpHeader.push_back("Fiware-Total-Count");
     ciP->httpHeaderValue.push_back(cVec);

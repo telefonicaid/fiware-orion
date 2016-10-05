@@ -74,9 +74,8 @@ static std::string addedLookup(const std::vector<std::string>& added, std::strin
 /* ****************************************************************************
 *
 * ContextAttributeVector::toJsonTypes -
-*
 */
-std::string ContextAttributeVector::toJsonTypes()
+std::string ContextAttributeVector::toJsonTypes(void)
 {
   // Pass 1 - get per-attribute types
   std::map<std::string, std::map<std::string, int> > perAttrTypes;
@@ -101,10 +100,23 @@ std::string ContextAttributeVector::toJsonTypes()
 
     std::map<std::string, int>::iterator jt;
     unsigned int                         jx;
+
     for (jt = attrTypes.begin(), jx = 0; jt != attrTypes.end(); ++jt, ++jx)
     {
       std::string type = jt->first;
-      out += JSON_STR(type);
+      
+      //
+      // Special condition for 'options=noAttrDetail':
+      //   When the 'options' URI parameter contains 'noAttrDetail',
+      //   mongoBackend fills the attribute type vector with *just one item* (that is an empty string).
+      //   This special condition is checked for here, to produce a [] for the vector for the response.
+      //
+      // See the origin of this in mongoQueryTypes.cpp. Look for "NOTE: here we add", in two locations.
+      //
+      if ((type != "") || (attrTypes.size() != 1))
+      {
+        out += JSON_STR(type);
+      }
 
       if (jx != attrTypes.size() - 1)
       {
