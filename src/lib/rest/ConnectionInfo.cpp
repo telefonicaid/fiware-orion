@@ -46,7 +46,8 @@ static const char* validOptions[] =
   OPT_APPEND,
   OPT_UNIQUE_VALUES,
   OPT_DATE_CREATED,
-  OPT_DATE_MODIFIED
+  OPT_DATE_MODIFIED,
+  OPT_NO_ATTR_DETAIL
 };
 
 

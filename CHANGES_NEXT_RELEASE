@@ -1,2 +1,4 @@
-Add: Added URI parameter metadata=metadata-name-list for NGSIv2 retrieve requests (Issue #2544)
-Add: Added 'metadata' as part of the payload for POST /v2/op/query (Issue #2544)
+- Add: Added URI parameter metadata=metadata-name-list for NGSIv2 retrieve requests (Issue #2544)
+- Add: Added 'metadata' as part of the payload for POST /v2/op/query (Issue #2544)
+- Add: new value for URI param 'options' (options=noAttrDetail) for NGSIv2 queries to exclude attribute detail, making the query faster (#2073) 
+- Fix: avoid unused attribute type detail in NGSIv1 queries (which was making the queries slower) (#2073)
