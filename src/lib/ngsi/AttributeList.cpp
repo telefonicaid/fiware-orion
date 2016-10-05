@@ -197,3 +197,24 @@ void AttributeList::clone(const AttributeList& aList)
     push_back(aList[ix]);
   }
 }
+
+
+/* ****************************************************************************
+*
+* AttributeList::toString - 
+*/
+std::string AttributeList::toString(void)
+{
+  std::string out;
+
+  for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
+  {
+    out += attributeV[ix];
+    if (ix < attributeV.size() - 1)
+    {
+      out += ",";
+    }
+  }
+
+  return out;
+}

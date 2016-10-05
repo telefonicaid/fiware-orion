@@ -315,7 +315,7 @@ The Context Broker must start with "DEBUG" level in "CB_EXTRA_OPS" field into pr
 |                                                                                                                                                          |
 |**subscriptions folder**                                                                                                                                  |
 | retrieve_subscriptions                      |  (pending)   | GET     | /v2/subscriptions                                    | No        | Yes            |   
-| create_a_new_subscription                   |    788       | POST    | /v2/subscriptions                                    | Yes       | No             |   
+| create_a_new_subscription                   |    811       | POST    | /v2/subscriptions                                    | Yes       | No             |   
 |                                                                                                                                                          |
 | retrieve_subscription                       |  (pending)   | GET     | /v2/subscriptions/`<subscription_id>`                | No        | No             |   
 | update_subscription                         |  (pending)   | PATCH   | /v2/subscriptions/`<subscription_id>`                | Yes       | No             |   

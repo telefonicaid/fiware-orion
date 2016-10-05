@@ -1235,6 +1235,14 @@ class NGSI:
                                                                  % (curs["status"], subscription_context["status"])
         __logger__.info("the subscription status is the expected: %s" % subscription_context["status"])
 
+        # metadata field
+        if subscription_context["notification_metadata"] is not None and subscription_context["notification_metadata"] != "array is empty":
+            metadata = subscription_context["notification_metadata"].split(",")
+            for item in metadata:
+                assert item in curs["metadata"], \
+                    " ERROR - the metadata \"%s\" does not exist in mongo metadata: %s" % (item, curs["metadata"])
+            __logger__.info("metadata \"%s\" stored succesfully in mongo" % metadata)
+
     def verify_log_level(self, context, level):
         """
         verify if the log level is the expected
@@ -1257,7 +1265,7 @@ class NGSI:
         assert error == resp_dict["error"], 'ERROR -  error: "%s" is not the expected: "%s"' % \
                                             (str(resp_dict["error"]), error)
 
-    def __get_attribute_fields(self, entity_context, subsc_context):
+    def __get_attribute_fields_to_notifications(self, entity_context, subsc_context):
         """
         get attribute names, values and types from entities and subscriptions to be used with notifications
         :param entity_context: entity context used
@@ -1293,10 +1301,6 @@ class NGSI:
                     if attr_types_list[i] == "Boolean":
                         attr_values_list[i] = "%s%s" % (attr_values_list[i][0].upper(), attr_values_list[i][1:])
 
-                for e in range(len(attrs_to_notif)):  # remove quote from raw request
-                    attrs_to_notif[e] = remove_quote(attrs_to_notif[e])
-                    attr_values_list[e] = remove_quote(attr_values_list[e])
-                    attr_types_list[e] = remove_quote(attr_types_list[e])
         if subsc_context["notification_attrs"] is not None:
             i = 0
             while i < len(attrs_to_notif):
@@ -1320,7 +1324,51 @@ class NGSI:
                     attrs_to_notif.pop(p)
                     attr_values_list.pop(p)
                     attr_types_list.pop(p)
+        for e in range(len(attrs_to_notif)):  # remove quote from raw request
+            attrs_to_notif[e] = remove_quote(attrs_to_notif[e])
+            attr_values_list[e] = remove_quote(attr_values_list[e])
+            attr_types_list[e] = remove_quote(attr_types_list[e])
         return attrs_to_notif, attr_values_list, attr_types_list
+
+    def __get_metadata_attribute_fields_to_notifications(self, entity_context):
+        """
+        get metadata attribute names, metadata values and metadata types from entities to be used with notifications
+        :param entity_context: entity context used
+        :returns lists (metadata attribute names list, metadata attribute values list, metadata attribute types list)
+        """
+        meta_names_list = []
+        meta_values_list = []
+        meta_types_list = []
+
+        if entity_context["metadatas_number"] > 1:
+            for i in range(int(entity_context["metadatas_number"])):
+                meta_names_list.append("%s_%s" % (entity_context["metadatas_name"], str(i)))
+                meta_values_list.append(entity_context["metadatas_value"])
+                meta_types_list.append(self.__change_attribute_type(entity_context["metadatas_value"], entity_context["metadatas_type"]))
+        else:
+            if entity_context["metadatas_name"].find("&") < 0:
+                meta_names_list.append(entity_context["metadatas_name"])
+                meta_values_list.append(entity_context["metadatas_value"])
+                meta_types_list.append(self.__change_attribute_type(entity_context["metadatas_value"], entity_context["metadatas_type"]))
+            else:
+                meta_names_list = entity_context["metadatas_name"].split("&")
+                meta_values_list = entity_context["metadatas_value"].split("&")
+                while entity_context["metadatas_type"].find("&&") >= 0:
+                    entity_context["metadatas_type"] = entity_context["metadatas_type"].replace("&&", "&none&")
+                meta_types_list = entity_context["metadatas_type"].split("&")
+                if len(meta_types_list) != len(meta_names_list):
+                    diff = len(meta_names_list) - len(meta_types_list)
+                    for i in range(diff):
+                        meta_types_list.append(u'Thing')
+                for i in range(len(meta_types_list)):
+                    meta_types_list[i] = self.__change_attribute_type(meta_values_list[i], meta_types_list[i])
+                    if meta_types_list[i] == "Boolean":
+                        meta_values_list[i] = "%s%s" % (meta_values_list[i][0].upper(), meta_values_list[i][1:])
+        for e in range(len(meta_names_list)):  # remove quote from raw request
+            meta_names_list[e] = remove_quote(meta_names_list[e])
+            meta_values_list[e] = remove_quote(meta_values_list[e])
+            meta_types_list[e] = remove_quote(meta_types_list[e])
+        return meta_names_list, meta_values_list, meta_types_list
 
     def __change_attribute_type(self, attributes_value, attributes_type):
         """
@@ -1374,7 +1422,7 @@ class NGSI:
         __logger__.info("  - subcriptionId field does has 24 chars and it is an hexadecimal")
 
         # get attribute fields lists (attribute names list, attribute values list, attribute types list)
-        attrs_to_notif, attr_values_list, attr_types_list = self.__get_attribute_fields(entity_context, subsc_context)
+        attrs_to_notif, attr_values_list, attr_types_list = self.__get_attribute_fields_to_notifications(entity_context, subsc_context)
 
         # legacy format
         if notif_format == "legacy":
@@ -1390,7 +1438,7 @@ class NGSI:
             assert contextElement["id"] == entity_context["entities_id"], " ERROR - the id is not the expected: %s" % entity_context[
                 "entities_id"]
             __logger__.info("  - id matches succesfully")
-            assert contextElement["isPattern"] == "false", " ERROR - the isPattern is not the expected" % contextElement["isPattern"]
+            assert contextElement["isPattern"] == "false", " ERROR - the isPattern is not the expected: %s" % contextElement["isPattern"]
             __logger__.info("  - isPattern matches succesfully")
             assert contextElement["type"] == entity_context["entities_type"], " ERROR - the type is not the expected: %s" % entity_context[
                 "entities_type"]
@@ -1510,7 +1558,7 @@ class NGSI:
         """
 
         # get attribute fields lists (attribute names list, attribute values list, attribute types list)
-        attrs_to_notif, attr_values_list, attr_types_list = self.__get_attribute_fields(entity_context, subsc_context)
+        attrs_to_notif, attr_values_list, attr_types_list = self.__get_attribute_fields_to_notifications(entity_context, subsc_context)
 
         # custom notification
         payload_type = headers["last-content-type"]
@@ -1708,3 +1756,52 @@ class NGSI:
                     attrs_to_sort, resp_dict[pos_ent][attrs_to_sort]["value"], entity["attrs"][attrs_to_sort])
                 __logger__.info('the attribute "%s" has it value "%s" and it is sorted correctly' %
                             (attrs_to_sort, str(resp_dict[pos_ent][attrs_to_sort]["value"])))
+
+    def verify_metadata_notification(self, metadata_flags, payload, entity_context, subsc_context, action_type, previous_value):
+        """
+        verify metadata in the notification (custom user or/and specials)
+        :param metadata_flags: metadata notified
+        :param payload: notification payload
+        :param entity_context: entity properties
+        :param subsc_context: subscription properties
+        :param action_type: action in entity (append | update |delete)
+        :param previous_value: previous value before update (previous values and type)
+        """
+        __logger__.debug("action type: %s" % action_type)
+        __logger__.debug("previous value: %s" % str(previous_value))
+        special_meta = metadata_flags.split(",")
+        payload_dict = convert_str_to_dict(payload, JSON)
+        __logger__.debug("special metadata: %s" % str(special_meta))
+
+        attrs_to_notif, attr_values_list, attr_types_list = self.__get_attribute_fields_to_notifications(entity_context, subsc_context)
+        __logger__.debug("attributes_notified: %s " % str(attrs_to_notif))
+        for attrs_name in attrs_to_notif:    # number of attributes notified
+            metadata = payload_dict["data"][0][attrs_name]["metadata"]
+            meta_names_list, meta_values_list, meta_types_list = self.__get_metadata_attribute_fields_to_notifications(entity_context)
+            for i in range (len(meta_names_list)):  # number of ametadata attribute notified
+                for meta_flag in special_meta:      # number of metadata flags
+                    # previousValue metadata verification
+                    if meta_flag == "previousValue" and previous_value["value"] is not None:
+                        assert "previousValue" in metadata, " ERROR - the previousValue does not exist im metadata: %s" % str (metadata)
+                        assert metadata["previousValue"]["type"] == previous_value["type"], \
+                            " ERROR - the previousValue type is not Text: %s" % previous_value["type"]
+                        assert metadata["previousValue"]["value"] == previous_value["value"],\
+                            " ERROR - the previousValue value is not the expected: %s" % previous_value["value"]
+                        __logger__.info(" the previousValue metadata is the expected with type: %s and value:%s" % (previous_value["type"], previous_value["value"]))
+                    # actionType metadata verification
+                    if meta_flag == "actionType":
+                        assert "actionType" in metadata, " ERROR - the actionType does not exist im metadata"
+                        assert metadata["actionType"]["type"] == "Text", " ERROR - the actionType type is not Text: %s" % metadata["actionType"]["type"]
+                        assert metadata["actionType"]["value"] == action_type, " ERROR - the actionType value is not the expected: %s" % action_type
+                        __logger__.info(" the actionType metadata is the expected: %s" % action_type)
+                    # custom user metadata verification
+                    if meta_flag == "*":
+                        meta_name = meta_names_list[i]
+                        assert meta_name in metadata, " ERROR - the metadata \"%s\" does not exist" % meta_name
+                        assert metadata[meta_name]["type"] == meta_types_list[i], \
+                            " ERROR - the type in metadata \"%s\" does not match: \n %s != %s" % \
+                            (meta_name, metadata[meta_name]["type"], meta_types_list[i])
+                        assert metadata[meta_name]["value"] == meta_values_list[i], \
+                            " ERROR - the value in metadata \"%s\" does not match: \n %s != %s" % \
+                            (meta_name, metadata[meta_name]["value"], meta_values_list[i])
+                        __logger__.info("In Attribute \"%s\", the metadata \"%s\" exists and the value and the type match successfully..." % (attrs_name, meta_name))

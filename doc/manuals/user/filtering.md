@@ -2,15 +2,15 @@
 
 * [Introduction](#introduction)
 * [NGSIv2 filtering](#ngsiv2-filtering)
-  * [Simple Query Language](#simple-query-language)
-  * [Geographical Queries](#geographical-queries)
+    * [Simple Query Language](#simple-query-language)
+    * [Geographical Queries](#geographical-queries)
 * [NGSIv1 filtering](#ngsiv1-filtering)
-  * [Existence type filter](#existence-type-filter)
-  * [No-Existence type filter](#no-existence-type-filter)
-  * [Entity type filter](#entity-type-filter)
-  * [Geo-location filter](#geo-location-filter)
-  * [Geo-location filter NGSIv2](#geo-location-filter-ngsiv2)
-  * [String query filter](#string-filters)
+    * [Existence type filter](#existence-type-filter)
+    * [No-Existence type filter](#no-existence-type-filter)
+    * [Entity type filter](#entity-type-filter)
+    * [Geo-location filter](#geo-location-filter)
+    * [Geo-location filter NGSIv2](#geo-location-filter-ngsiv2)
+    * [String query filter](#string-filters)
     
 ## Introduction
 

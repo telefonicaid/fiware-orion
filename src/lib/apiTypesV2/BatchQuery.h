@@ -46,6 +46,7 @@ public:
   Entities       entities;
   AttributeList  attributeV;
   ScopeVector    scopeV;
+  AttributeList  metadataV;  // FIXME P2: Change name of AttributeList to StringVector/StringList
 
   BatchQuery();
   ~BatchQuery();
