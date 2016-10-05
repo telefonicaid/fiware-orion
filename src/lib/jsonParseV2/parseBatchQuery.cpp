@@ -125,6 +125,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
     }
     else if (name == "metadata")
     {
+      // FIXME P2: parseAttributeList to change name to parseStringList
       std::string r = parseAttributeList(ciP, iter, &bqrP->metadataV);
 
       if (r != "OK")
