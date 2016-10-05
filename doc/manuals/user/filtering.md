@@ -2,15 +2,15 @@
 
 * [Introduction](#introduction)
 * [NGSIv2 filtering](#ngsiv2-filtering)
-  * [Simple Query Language](#simple-query-language)
-  * [Geographical Queries](#geographical-queries)
+    * [Simple Query Language](#simple-query-language)
+    * [Geographical Queries](#geographical-queries)
 * [NGSIv1 filtering](#ngsiv1-filtering)
-  * [Existence type filter](#existence-type-filter)
-  * [No-Existence type filter](#no-existence-type-filter)
-  * [Entity type filter](#entity-type-filter)
-  * [Geo-location filter](#geo-location-filter)
-  * [Geo-location filter NGSIv2](#geo-location-filter-ngsiv2)
-  * [String query filter](#string-filter)
+    * [Existence type filter](#existence-type-filter)
+    * [No-Existence type filter](#no-existence-type-filter)
+    * [Entity type filter](#entity-type-filter)
+    * [Geo-location filter](#geo-location-filter)
+    * [Geo-location filter NGSIv2](#geo-location-filter-ngsiv2)
+    * [String query filter](#string-filters)
     
 ## Introduction
 
@@ -188,7 +188,27 @@ described in detail in [the following section](geolocation.md#geo-located-querie
 
 [Top](#top)
 
-### String filter
+### String filters
+
+Two different types of string filters are supported:
+* filtering over attributes (scope type: "FIWARE::StringQuery") and
+* filtering over the metadatas of attributes (scope type: "FIWARE::StringQuery::Metadata").
+
+These scopes allow to express filtering conditions such as equality, unequality,
+greater/less than, in-array, range or existence (of attributes and metadata of attributes).
+
+There isn't any URL parameter corresponding to these filters in NGSIv1.
+In NGSIv2 they correspond to the `q` and `mq` URI parameters.
+
+For a detailed syntax description of the value of the string filters or ofthe `q` and `mq`
+parameters, see
+[NGSIv2 specification document](http://telefonicaid.github.io/fiware-orion/api/v2/stable).
+
+You can use these scopes in NGSIv1, but take into account that in order to set attribute
+values to numbers, you need to use NGSIv2 (NGSIv1 always uses strings for values).
+
+
+#### Filtering over attributes
 
 The scope corresponding to this type is "FIWARE::StringQuery".
 
@@ -207,18 +227,31 @@ The scope corresponding to this type is "FIWARE::StringQuery".
 ...
 ```
 
-This scope allows to express filtering conditions such as equality, unequality,
-greater/less than, range or existence.
-
-There isn't any URL parameter correspondence for this filter in NGSI v1. In NGSI v2
-it corresponds to the `q` parameter:
+In NGSIv2, the URI parameter `q` can be used in queries to express this scope:
 
     curl 'localhost:1026/v2/entities?q=temperature<24;humidity==75..90;status==running'
 
-For a detailed syntax description of the `value` or `q` parameter, see [NGSIv2 specification
-document](http://telefonicaid.github.io/fiware-orion/api/v2/stable).
+#### Filtering over metadata
 
-You can use this scope in NGSI v1, but take into account that in order to set attribute
-values to numbers, you need to use NGSI v2 (NGSI v1 always uses strings for values).
+The scope corresponding to this type is "FIWARE::StringQuery::Metadata".
+
+```
+...
+    {
+        "restriction": {
+            "scopes": [
+                {
+                    "type": "FIWARE::StringQuery::Metadata",
+                    "value": "temperature.accuracy<1;humidity.accuracy==1..2"
+                }
+            ]
+        }
+    }
+...
+```
+
+In NGSIv2, the URI parameter `mq` can be used in queries to express this scope:
+
+    curl 'localhost:1026/v2/entities?mq=temperature.accuracy<1;humidity.accuracy==1..2'
 
 [Top](#top)

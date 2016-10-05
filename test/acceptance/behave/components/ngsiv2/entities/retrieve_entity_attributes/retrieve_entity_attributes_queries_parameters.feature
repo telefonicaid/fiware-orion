@@ -73,11 +73,15 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                   |
+      | Fiware-Service     | test_id_q_param_without |
+      | Fiware-ServicePath | /test                   |
     When get attributes in an entity by ID "room"
     Then verify that receive an "OK" http code
     And verify headers in response
       | parameter         | value      |
-      | fiware-correlator | [a-f0-9-]* |
+      | Fiware-Correlator | [a-f0-9-]* |
     And verify that attributes in an entity by ID are returned
 
   # --- attrs query parameter ---
@@ -99,6 +103,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                             |
+      | Fiware-Service     | test_id_q_param_without_attr_type |
+      | Fiware-ServicePath | /test                             |
     When get attributes in an entity by ID "room"
       | parameter | value         |
       | attrs     | temperature_0 |
@@ -106,12 +114,12 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
     And verify that attributes in an entity by ID are returned
 
   @query_parameter_with_metadatas
-  Scenario:  get attributes in an entity by ID using NGSI v2 with attrs query parameter and metadatas
+  Scenario:  get attributes in an entity by ID using NGSI v2 with attrs query parameter and metadata
     Given  a definition of headers
-      | parameter          | value                          |
-      | Fiware-Service     | test_id_q_param_with_metadatas |
-      | Fiware-ServicePath | /test                          |
-      | Content-Type       | application/json               |
+      | parameter          | value                         |
+      | Fiware-Service     | test_id_q_param_with_metadata |
+      | Fiware-ServicePath | /test                         |
+      | Content-Type       | application/json              |
     And properties to entities
       | parameter         | value       |
       | entities_type     | house       |
@@ -127,6 +135,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                         |
+      | Fiware-Service     | test_id_q_param_with_metadata |
+      | Fiware-ServicePath | /test                         |
     When get attributes in an entity by ID "room"
       | parameter | value         |
       | attrs     | temperature_0 |
@@ -136,10 +148,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
   @query_parameter_without_metadata_type
   Scenario:  get attributes in an entity by ID using NGSI v2 with attrs query parameter and without metadata type
     Given  a definition of headers
-      | parameter          | value                          |
-      | Fiware-Service     | test_id_q_param_with_metadatas |
-      | Fiware-ServicePath | /test                          |
-      | Content-Type       | application/json               |
+      | parameter          | value                         |
+      | Fiware-Service     | test_id_q_param_with_metadata |
+      | Fiware-ServicePath | /test                         |
+      | Content-Type       | application/json              |
     And properties to entities
       | parameter         | value       |
       | entities_type     | house       |
@@ -154,6 +166,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                         |
+      | Fiware-Service     | test_id_q_param_with_metadata |
+      | Fiware-ServicePath | /test                         |
     When get attributes in an entity by ID "room"
       | parameter | value         |
       | attrs     | temperature_0 |
@@ -163,10 +179,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
   @query_parameter_multiples_attributes
   Scenario Outline:  get attributes in an entity by ID using NGSI v2 with attrs query parameter and multiples attributes
     Given  a definition of headers
-      | parameter          | value                          |
-      | Fiware-Service     | test_id_q_param_with_metadatas |
-      | Fiware-ServicePath | /test                          |
-      | Content-Type       | application/json               |
+      | parameter          | value                         |
+      | Fiware-Service     | test_id_q_param_with_metadata |
+      | Fiware-ServicePath | /test                         |
+      | Content-Type       | application/json              |
     And properties to entities
       | parameter         | value       |
       | entities_type     | house       |
@@ -178,6 +194,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                         |
+      | Fiware-Service     | test_id_q_param_with_metadata |
+      | Fiware-ServicePath | /test                         |
     When get attributes in an entity by ID "room"
       | parameter | value            |
       | attrs     | <attribute_name> |
@@ -212,6 +232,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value           |
+      | Fiware-Service     | test_id_attr_qp |
+      | Fiware-ServicePath | /test           |
     When get attributes in an entity by ID "room_0"
       | parameter | value    |
       | attrs     | humidity |
@@ -224,10 +248,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
   @query_parameter_invalid
   Scenario Outline:  try to get attributes in an entity by ID using NGSI v2 with invalid attr query parameter
     Given  a definition of headers
-      | parameter          | value                          |
-      | Fiware-Service     | test_id_q_param_with_metadatas |
-      | Fiware-ServicePath | /test                          |
-      | Content-Type       | application/json               |
+      | parameter          | value                   |
+      | Fiware-Service     | test_id_q_param_invalid |
+      | Fiware-ServicePath | /test                   |
+      | Content-Type       | application/json        |
     And properties to entities
       | parameter         | value       |
       | entities_type     | house       |
@@ -239,6 +263,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                   |
+      | Fiware-Service     | test_id_q_param_invalid |
+      | Fiware-ServicePath | /test                   |
     When get attributes in an entity by ID "room_0"
       | parameter | value            |
       | attrs     | <attribute_name> |
@@ -262,10 +290,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
   @query_parameter_type
   Scenario:  get attributes in an entity by ID using NGSI v2 with type query parameter
     Given  a definition of headers
-      | parameter          | value                   |
-      | Fiware-Service     | test_id_q_param_without |
-      | Fiware-ServicePath | /test                   |
-      | Content-Type       | application/json        |
+      | parameter          | value                |
+      | Fiware-Service     | test_id_q_param_type |
+      | Fiware-ServicePath | /test                |
+      | Content-Type       | application/json     |
     And properties to entities
       | parameter         | value       |
       | entities_type     | house       |
@@ -282,6 +310,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                |
+      | Fiware-Service     | test_id_q_param_type |
+      | Fiware-ServicePath | /test                |
     When get attributes in an entity by ID "room"
       | parameter | value |
       | type      | house |
@@ -291,10 +323,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
   @query_parameter_type_unknown
   Scenario:  get attributes in an entity by ID using NGSI v2 with type query parameter amd unknown type value
     Given  a definition of headers
-      | parameter          | value                   |
-      | Fiware-Service     | test_id_q_param_without |
-      | Fiware-ServicePath | /test                   |
-      | Content-Type       | application/json        |
+      | parameter          | value                |
+      | Fiware-Service     | test_id_q_param_type |
+      | Fiware-ServicePath | /test                |
+      | Content-Type       | application/json     |
     And properties to entities
       | parameter         | value       |
       | entities_type     | house       |
@@ -311,6 +343,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                |
+      | Fiware-Service     | test_id_q_param_type |
+      | Fiware-ServicePath | /test                |
     When get attributes in an entity by ID "room"
       | parameter | value    |
       | type      | sdfsdfsd |
@@ -323,10 +359,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
   @query_parameter_type_invalid
   Scenario Outline:  get attributes in an entity by ID using NGSI v2 with type query parameter amd invalid type value
     Given  a definition of headers
-      | parameter          | value                   |
-      | Fiware-Service     | test_id_q_param_without |
-      | Fiware-ServicePath | /test                   |
-      | Content-Type       | application/json        |
+      | parameter          | value                |
+      | Fiware-Service     | test_id_q_param_type |
+      | Fiware-ServicePath | /test                |
+      | Content-Type       | application/json     |
     And properties to entities
       | parameter         | value       |
       | entities_type     | house       |
@@ -343,6 +379,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                |
+      | Fiware-Service     | test_id_q_param_type |
+      | Fiware-ServicePath | /test                |
     When get attributes in an entity by ID "room"
       | parameter | value  |
       | type      | <type> |
@@ -363,10 +403,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
   @query_parameter_type_and_attrs
   Scenario:  get attributes in an entity by ID using NGSI v2 with type and attrs queries parameters
     Given  a definition of headers
-      | parameter          | value                   |
-      | Fiware-Service     | test_id_q_param_without |
-      | Fiware-ServicePath | /test                   |
-      | Content-Type       | application/json        |
+      | parameter          | value                |
+      | Fiware-Service     | test_id_q_param_type |
+      | Fiware-ServicePath | /test                |
+      | Content-Type       | application/json     |
     And properties to entities
       | parameter         | value       |
       | entities_type     | house       |
@@ -383,6 +423,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                |
+      | Fiware-Service     | test_id_q_param_type |
+      | Fiware-ServicePath | /test                |
     When get attributes in an entity by ID "room"
       | parameter | value                       |
       | type      | house                       |
@@ -409,6 +453,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                   |
+      | Fiware-Service     | test_id_options_q_param |
+      | Fiware-ServicePath | /test                   |
     When get attributes in an entity by ID "room"
       | parameter | value   |
       | options   | unknown |
@@ -438,6 +486,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                           |
+      | Fiware-Service     | test_id_q_param_with_key_values |
+      | Fiware-ServicePath | /test                           |
     When get attributes in an entity by ID "room"
       | parameter | value     |
       | options   | keyValues |
@@ -466,6 +518,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                              |
+      | Fiware-Service     | test_id_q_param_without_key_values |
+      | Fiware-ServicePath | /test                              |
     When get attributes in an entity by ID "room"
       | parameter | value     |
       | options   | keyValues |
@@ -492,6 +548,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                           |
+      | Fiware-Service     | test_id_q_param_with_key_values |
+      | Fiware-ServicePath | /test                           |
     When get attributes in an entity by ID "room"
       | parameter | value                       |
       | attrs     | temperature_0,temperature_1 |
@@ -521,6 +581,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                              |
+      | Fiware-Service     | test_id_q_param_without_key_values |
+      | Fiware-ServicePath | /test                              |
     When get attributes in an entity by ID "room"
       | parameter | value                       |
       | attrs     | temperature_0,temperature_1 |
@@ -533,10 +597,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
   @qp_options_values
   Scenario Outline:  get attributes in an entity by ID using NGSI v2 with options=values query parameter with keyValues query parameter in create request
     Given  a definition of headers
-      | parameter          | value                           |
-      | Fiware-Service     | test_id_q_param_with_key_values |
-      | Fiware-ServicePath | /test                           |
-      | Content-Type       | application/json                |
+      | parameter          | value                          |
+      | Fiware-Service     | test_id_q_param_options_values |
+      | Fiware-ServicePath | /test                          |
+      | Content-Type       | application/json               |
     And properties to entities
       | parameter         | value       |
       | entities_type     | house       |
@@ -550,6 +614,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                          |
+      | Fiware-Service     | test_id_q_param_options_values |
+      | Fiware-ServicePath | /test                          |
     When get attributes in an entity by ID "room"
       | parameter | value  |
       | options   | values |
@@ -563,10 +631,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
   @qp_options_values
   Scenario:  get attributes in an entity by ID using NGSI v2 with options=values query parameter without keyValues query parameter in create request
     Given  a definition of headers
-      | parameter          | value                              |
-      | Fiware-Service     | test_id_q_param_without_key_values |
-      | Fiware-ServicePath | /test                              |
-      | Content-Type       | application/json                   |
+      | parameter          | value                          |
+      | Fiware-Service     | test_id_q_param_options_values |
+      | Fiware-ServicePath | /test                          |
+      | Content-Type       | application/json               |
     And properties to entities
       | parameter         | value       |
       | entities_type     | house       |
@@ -578,6 +646,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                          |
+      | Fiware-Service     | test_id_q_param_options_values |
+      | Fiware-ServicePath | /test                          |
     When get attributes in an entity by ID "room"
       | parameter | value  |
       | options   | values |
@@ -587,10 +659,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
   @qp_attrs_and_options_values
   Scenario Outline:  get attributes in an entity by ID using NGSI v2 with attrs and options=values query parameters with keyValues query parameter in create request
     Given  a definition of headers
-      | parameter          | value                           |
-      | Fiware-Service     | test_id_q_param_with_key_values |
-      | Fiware-ServicePath | /test                           |
-      | Content-Type       | application/json                |
+      | parameter          | value                          |
+      | Fiware-Service     | test_id_q_param_options_values |
+      | Fiware-ServicePath | /test                          |
+      | Content-Type       | application/json               |
     And properties to entities
       | parameter         | value       |
       | entities_type     | house       |
@@ -604,6 +676,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                          |
+      | Fiware-Service     | test_id_q_param_options_values |
+      | Fiware-ServicePath | /test                          |
     When get attributes in an entity by ID "room"
       | parameter | value                       |
       | attrs     | temperature_0,temperature_1 |
@@ -618,10 +694,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
   @qp_attrs_and_options_values
   Scenario:  get attributes in an entity by ID using NGSI v2 with attrs, type and options=values query parameter without keyValues query parameter in create request
     Given  a definition of headers
-      | parameter          | value                              |
-      | Fiware-Service     | test_id_q_param_without_key_values |
-      | Fiware-ServicePath | /test                              |
-      | Content-Type       | application/json                   |
+      | parameter          | value                          |
+      | Fiware-Service     | test_id_q_param_options_values |
+      | Fiware-ServicePath | /test                          |
+      | Content-Type       | application/json               |
     And properties to entities
       | parameter         | value       |
       | entities_type     | house       |
@@ -633,6 +709,10 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                          |
+      | Fiware-Service     | test_id_q_param_options_values |
+      | Fiware-ServicePath | /test                          |
     When get attributes in an entity by ID "room"
       | parameter | value                       |
       | attrs     | temperature_0,temperature_1 |

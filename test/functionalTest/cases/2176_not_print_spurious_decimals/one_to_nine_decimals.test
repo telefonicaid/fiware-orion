@@ -1,0 +1,162 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Round number test from one to nine decimals
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create E1 with 10 attributes, from 1 to 10 decimal digits (0.9999... pattern)
+# 02. Create E2 with 10 attributes, from 1 to 10 decimal digits (0.0..01 pattern)
+# 03. Get E1 (A10 get rounded to next integer)
+# 04. Get E2 (A10 get rounded to previous integer)
+#
+
+echo "01. Create E1 with 10 attributes, from 1 to 10 decimal digits (0.9999... pattern)"
+echo "================================================================================="
+payload='{
+    "id": "E1",
+    "type": "T",
+    "A1":  42.9,
+    "A2":  42.99,
+    "A3":  42.999,
+    "A4":  42.9999,
+    "A5":  42.99999,
+    "A6":  42.999999,
+    "A7":  42.9999999,
+    "A8":  42.99999999,
+    "A9":  42.999999999,
+    "A10": 42.9999999999
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E2 with 10 attributes, from 1 to 10 decimal digits (0.0..01 pattern)"
+echo "==============================================================================="
+payload='{
+    "id": "E2",
+    "type": "T",
+    "A1":  42.1,
+    "A2":  42.01,
+    "A3":  42.001,
+    "A4":  42.0001,
+    "A5":  42.00001,
+    "A6":  42.000001,
+    "A7":  42.0000001,
+    "A8":  42.00000001,
+    "A9":  42.000000001,
+    "A10": 42.0000000001
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "03. Get E1 (A10 get rounded to next integer)"
+echo "============================================"
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues'
+echo
+echo
+
+
+echo "04. Get E2 (A10 get rounded to previous integer)"
+echo "================================================"
+orionCurl --url '/v2/entities/E2/attrs?options=keyValues'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 with 10 attributes, from 1 to 10 decimal digits (0.9999... pattern)
+=================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create E2 with 10 attributes, from 1 to 10 decimal digits (0.0..01 pattern)
+===============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Get E1 (A10 get rounded to next integer)
+============================================
+HTTP/1.1 200 OK
+Content-Length: 152
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A1": 42.9,
+    "A10": 43.0,
+    "A2": 42.99,
+    "A3": 42.999,
+    "A4": 42.9999,
+    "A5": 42.99999,
+    "A6": 42.999999,
+    "A7": 42.9999999,
+    "A8": 42.99999999,
+    "A9": 42.999999999
+}
+
+
+04. Get E2 (A10 get rounded to previous integer)
+================================================
+HTTP/1.1 200 OK
+Content-Length: 132
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A1": 42.1,
+    "A10": 42,
+    "A2": 42.01,
+    "A3": 42.001,
+    "A4": 42.0001,
+    "A5": 42.00001,
+    "A6": 42.000001,
+    "A7": 42.0000001,
+    "A8": 42.00000001,
+    "A9": 42
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

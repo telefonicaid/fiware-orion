@@ -1,10 +1,10 @@
 FORMAT: 1A
 HOST: http://orion.lab.fiware.org
-TITLE: FIWARE-NGSI v2 Specification
-DATE: 30 September 2015
-VERSION: 2.0-latest
-PREVIOUS_VERSION: <placeholder>
-APIARY_PROJECT: fiware-ngsi-v2
+TITLE: FIWARE-NGSI v2 Specification (WIP)
+DATE: to be fixed upon next RC production
+VERSION: latest
+PREVIOUS_VERSION: stable
+APIARY_PROJECT: orioncontextbroker
 SPEC_URL: https://telefonicaid.github.io/fiware-orion/api/v2/
 GITHUB_SOURCE: http://github.com/telefonicaid/fiware-orion.git
 
@@ -45,9 +45,12 @@ In addition, note that a list of currently open discussions is available at
 
 ## Copyright
 
+Copyright (c) 2011-2016 Telecom Italia, Telefónica I+D and NEC. 
+
+## License
+
 This specification is licensed under the
-[FIWARE Open Specification License (implicit patent license)]
-(http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_Open_Specification_Legal_Notice_(implicit_patents_license)).
+[FIWARE Open Specification License (implicit patent license)](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Implicit_Patents_License).
 
 ## Conformance
 
@@ -298,7 +301,7 @@ Some operations use partial representation of entities:
 * `id` and `type` are not allowed in update operations, as they are immutable properties.
 
 * In requests where entity `type` is allowed, it may be omitted. When omitted in entity
-  creation operations, the default string value `none` is used for the type.
+  creation operations, the default string value `Thing` is used for the type.
 
 * In some cases, not all the attributes of the entity are shown, e.g. a query selecting a subset
   of the entity attributes.
@@ -307,7 +310,12 @@ Some operations use partial representation of entities:
   `null` value. In responses, the value is always present.
 
 * Attribute/metadata `type` may be omitted in requests. When omitted in attribute/metadata creation
-  or in update operations, the default string value `none` is used for the type.
+  or in update operations, a default is used for the type depending on the value:
+  * If value is a string, then type `Text` is used
+  * If value is a number, then type `Number` is used.
+  * If value is a boolean, then type `Boolean` is used.
+  * If value is an object or array, then `StructuredValue` is used.
+  * If value is null, then `None` is used.
 
 * Attribute `metadata` may be omitted in requests, meaning that there are no metadata elements
   associated to the attribute. In responses, this property is set to
@@ -332,6 +340,9 @@ meaning:
   }
 }
 ```
+
+* `geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`. They have special semantics
+  related with entity location. See "Geospatial properties of entities" section.
 
 ## Virtual Attributes
 
@@ -388,6 +399,16 @@ The following strings must not be used as attribute names:
 
 * Virtual attribute names (see specific section on "Virtual Attributes")
 
+## Metadata names restrictions
+
+The following strings must not be used as metadata names:
+
+* `previousValue`, as it is a reserved metadata (see "Special metadata in notifications" section).
+
+* `actionType`, as it is a reserved metadata (see "Special metadata in notifications" section).
+
+* `*`, as it has an special meaning as "all the custom (user) metadata".
+
 ## Ordering Results
 
 Operations that retrieve lists of entities permit the `orderBy` URI parameter to specify the
@@ -423,7 +444,8 @@ Error list (HTTP response code in parenthesis):
   identification
   used in the request.
 * ContentLengthRequired (`411`). Zero/No Content-Length in PUT/POST/PATCH request.
-* RequestEntityTooLarge (`413`). Payload is too large.
+* RequestEntityTooLarge (`413`). Payload is too large. The specific limit to consider a payload too large depends
+                                 on the particular implementation.
 * UnsupportedMediaType  (`415`). Request content type is not supported.
 * InvalidModification   (`422`). Some piece of information is missing in payload.
 * NotSupportedQuery     (`422`). The implementation does not support the query issued.
@@ -566,68 +588,95 @@ The query returns all the entities that match all the matching conditions (AND l
 
 There are two kinds of statements: *unary statements* and *binary statements*.
 
-Binary statements are composed by an attribute name (e.g. "temperature"), an operator and a value
-(whose format depends on the operator), e.g.:
+Binary statements are composed by an attribute path (e.g. `temperature` or `brand.name`), an operator
+and a value (whose format depends on the operator), e.g.:
 
 ```
 temperature==50
 temperature<=20
 ```
 
+The syntax of an attribute path consists of a list of tokens separated by the `.` character. This list of tokens
+addresses a JSON property name, in accordance with the following rules:
+
+* The first token is the name of an NGSI attribute (*target NGSI attribute*) of an entity.
+* If filtering by attribute value (i.e. the expression is used in a `q` query), the rest of tokens (if present)
+  represent the path to a sub-property of the *target NGSI attribute value* (which should be a JSON object).
+  Such sub-property is defined as the *target property*.
+* If filtering by metadata (i.e. the expression is used in a `mq` query), the second token represents a metadata
+  name associated to the target NGSI attribute, *target metadata*, and the rest of tokens
+  (if present) represent the path to a sub-property of the *target metadata value* (which should be a
+  JSON object). Such sub-property is defined as the *target property*.
+
+The *target property value* is defined as the value of the JSON property addressed by the list of tokens described
+above i.e. the value of the *target property*.
+
+In case only one token is provided (two in case of filtering by metadata), then the *target property* will
+be the *target NGSI attribute* itself (or the *target metadata* in case of filtering by metadata) and the
+*target property value* will be the *target NGSI attribute* value (or the *target metadata* value in case
+of filtering by metadata). The value of the *target NGSI attribute* (or the *target metadata*
+in case of filtering by metadata) should not be a JSON object in this case.
+
+In case some of the tokens include `.`, you can use single quote (`'`) as separator. For example, the following
+attribute path `'a.b'.w.'x.y'` is composed by three tokens: the first token is `a.b`, the second token is `w` and
+the third token is `x.y`.
+
 The list of operators (and the format of the values they use) is as follows:
 
 + **Equal**: `==`. This operator accepts the following types of right-hand side:
-    + Single element, e.g. `temperature==40`. For an entity to match, it must contain an attribute
-      with that exact name (temperature) and value (40).
+    + Single element, e.g. `temperature==40`. For an entity to match, it must contain the *target
+      property* (temperature) and the *target property value* must be the query value (40)
+      (or include the value, in case the *target property value* is an array).
     + A list of comma-separated values, e.g. `color==black,red`. For an entity to match, it must
-      contain an attribute with that name and the value of the attribute must be **any** of the
-      values in the list (OR clause).
+      contain the *target property* and the *target property value* must be **any** of the values
+      in the list (OR clause) (or include **any** of the values in the list in case the *target
+      property value* is an array).
       E.g. entities with an attribute named `color`, whose value is `black` are a match, while
       entities with an attribute named `color` but whose value is `white` do not match.
     + A range, specified as a minimum and a maximum, separated by `..`, e.g. `temperature==10..20`.
-      For an entity to match, it must contain an attribute with that name (temperature), and its
-      value must be in the interval between the minimum and maximum of the range (both included).
-      Ranges can only be used with attributes that represent dates (in ISO8601 format), numbers or
-      strings.
+      For an entity to match, it must contain the *target property* (temperature),
+      and the *target property value* must be in the interval between the minimum and maximum
+      of the range (both included). Ranges can only be used with *target properties* that represent
+      dates (in ISO8601 format), numbers or strings.
 + **Unequal**: `!=`. This operator accepts the following types of right-hand side:
-    + Single element, e.g. `temperature!=41`. For an entity to match, it must contain an attribute
-      with that exact name (temperature) and whose value is **not** that exact value (41).
+    + Single element, e.g. `temperature!=41`. For an entity to match, it must contain the *target
+      property* (temperature) and the *target property value* must **not** be the query value (41).
     + A list of comma-separated values, e.g. `color!=black,red`. For an entity to match, it must
-      contain an attribute with that name, and whose value is **not** any of the values in the list
-      (AND clause).
+      contain the *target property* and the *target property value* must **not** be any of the values
+      in the list (AND clause) (or not include **any** of the values in the list in case the *target
+      property value* is an array).
       Eg. entities whose attribute `color` is set to `black` will not match, while entities whose
       attribute `color` is set to `white` will match.
     + A range, specified as a minimum and maximum separated by `..`, e.g. `temperature!=10..20`.
-      For an entity to match, it must contain an attribute with that exact name (temperature) and
-      whose value is **not** in the interval between the minimum and the maximum (both included).
-      Ranges can only be used with attributes that represent dates (in ISO8601 format), numbers or
-      strings.
+      For an entity to match, it must contain the *target property* (temperature) and the
+      *target property value* must **not** be in the interval between the minimum and the maximum
+      (both included). Ranges can only be used with elements *target properties* that represent dates
+      (in ISO8601 format), numbers or strings.
 + **Greater than**: `>`. The right-hand side must be a single element, e.g. `temperature>42`.
-    For an entity to match, it must contain an attribute with that exact name (temperature) and
-    whose value is strictly greater than that value (42).
-    This operation is only valid for attributes of type date, numbers or strings (used with
-    attributes of other types may lead to unpredictable results).
+    For an entity to match, it must contain the *target property* (temperature)
+    and the *target property value* must be strictly greater than the query value (42).
+    This operation is only valid for *target properties* of type date, number or string (used with
+    *target properties* of other types may lead to unpredictable results).
 + **Less than**: `<`. The right-hand side must be a single element, e.g. `temperature<43`.
-    For an entity to match, it must contain an attribute with that exact name (temperature) and
-    whose value is strictly less than that value (43).
-    This operation is only valid for attributes of type date, numbers or strings (used with
-    attributes of other types may lead to unpredictable results).
+    For an entity to match, it must contain the *target property* (temperature)
+    and the *target property value* must be strictly less than the value (43).
+    This operation is only valid for *target properties* of type date, number or string (used with
+    *target properties* of other types may lead to unpredictable results).
 + **Greater or equal than**: `>=`. The right-hand side must be a single element, e.g. `temperature>=44`.
-    For an entity to match, it must contain an attribute with that exact name (temperature) and
-    whose value is greater than or equal to that value (44).
-    This operation is only valid for attributes of type date, numbers or strings (used with
-    attributes of other types may lead to unpredictable results).
+    For an entity to match, it must contain the *target property* (temperature)
+    and the *target property value* must be greater than or equal to that value (44).
+    This operation is only valid for *target properties* of type date, number or string (used with
+    *target properties* of other types may lead to unpredictable results).
 + **Less or equal than**: `<=`. The right-hand side must be a single element, e.g. `temperature<=45`.
-    For an entity to match, it must contain an attribute with that exact name (temperature) and
-    whose value is less than or equal to that value (45).
-    This operation is only valid for attributes of type date, numbers or strings (used with
-    attributes of other types may lead to unpredictable results).
+    For an entity to match, it must contain the *target property* (temperature)
+    and the *target property value* must be less than or equal to that value (45).
+    This operation is only valid for *target properties* of type date, number or string (used with
+    *target properties* of other types may lead to unpredictable results).
 + **Match pattern**: `~=`. The value matches a given pattern, expressed as a regular expression, e.g.
-    `color~=ow`.
-    For an entity to match, it must contain an attribute with that exact name (color), and
-    whose value matches the string in the right-hand side, 'ow' in this example (`brown` and `yellow`
-    would match, `black` and `white` would not).
-    This operation is only valid for attributes of type string.
+    `color~=ow`. For an entity to match, it must contain the *target property* (color)
+    and the *target property value* must match the string in the right-hand side,
+    'ow' in this example (`brown` and `yellow` would match, `black` and `white` would not).
+    This operation is only valid for *target properties* of type string.
 
 The symbol `:` can be used instead of `==`.
 
@@ -637,7 +686,7 @@ The first example would match a color with the exact value 'light,green' OR 'dee
 
 Unary negatory statements use the unary operator `!`, while affirmative unary statements use no
 operator at all.
-The unary statements are used to check for the existence of attribute.
+The unary statements are used to check for the existence of the *target property*.
 E.g. `temperature` matches entities that have an attribute called 'temperature' (no matter its
 value), while `!temperature` matches entities that do not have a temperature called 'attribute'.
  
@@ -747,7 +796,7 @@ is used:
       "type": "Room",
       "temperature": {
         "value": 23,
-        "type": "none",
+        "type": "Number",
         "metadata": {}
       },
       "humidity": {
@@ -761,7 +810,7 @@ is used:
       "type": "Room",
       "temperature": {
         "value": 24,
-        "type": "none",
+        "type": "Number",
         "metadata": {}
       }
     }
@@ -874,6 +923,21 @@ Note that if a custom payload is used for the notification (the field `payload` 
 corresponding subscription), then a value of `custom` is used for the `Ngsiv2-AttrsFormat` header
 in the notification.
 
+## Special metadata in notifications
+
+The `metadata` field (within the `notification` field) can be used to select a set of special
+attribute metadata included by notifications and aimed at providing more information about the
+nature of the event that triggered the notification. These metadata are:
+
+* `previousValue`. The value of this metadata must be the previous value of the associated attribute.
+  The type of this metadata must be the previous type of the associated attribute. If the
+  type/value of `previousValue` is the same type/value than in the associated attribute, then the
+  attribute has not actually changed its value.
+
+* `actionType`. It is included if the attribute to which it is attached was included in the request
+  that triggered the notification. Its value depend on the request operation type: `update`
+  for updates, `append` for creation and `delete` for deletion. Its type is always `Text`.
+
 ## Group API Entry Point
 
 ### Retrieve API Resources [GET /v2]
@@ -899,13 +963,13 @@ to keep your client decoupled from implementation details.
 
 # Group Entities
 
-### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,q,georel,geometry,coords,attrs,orderBy}]
+### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]
 
-Retrieves a list of entities that match different criteria (by id, idPattern, type or those which
-match a query or geographical query). A given entity has to match all the criteria to be retrieved
-(i.e., the criteria is combined in a logical AND way). Note that the id and idPattern parameters are
-incompatible - cannot be used together.
-See [Simple Query Language](#simple_query_language) and [Geographical Queries](#geographical_queries).
+Retrieves a list of entities that match different criteria by id, type, pattern matching (either id or type)
+and/or those which match a query or geographical query. A given entity has to match all the criteria to be retrieved
+(i.e., the criteria is combined in a logical AND way). Note that pattern matching query parameters are incompatible
+(i.e. mutually exclusive) with their corresponding exact matching parameters, i.e. `idPattern` with `id` and
+`typePattern` with `type`.
 
 The response payload is an array containing one object per matching entity. Each entity follows
 the JSON entity representation format (described in "JSON Entity Representation" section).
@@ -923,13 +987,21 @@ Response code:
     
     + type: Room (optional, string) -  comma-separated list of elements.
       Retrieve entities whose type matches one of the elements in the list.
+      Incompatible with `typePattern`.
 
     + idPattern: Bode_.* (optional, string) - A correctly formated regular expression.
       Retrieve entities whose ID matches the regular expression. Incompatible with id.
+
+    + typePattern: Room_.* (optional, string) - A correctly formated regular expression.
+      Retrieve entities whose type matches the regular expression. Incompatible with `type`.
     
     + q: temperature>40 (optional, string) - A query expression, composed of a list of statements
       separated by `;`, i.e., q=statement;statements;statement.
       See [Simple Query Language specification](#simple_query_language). 
+
+    + mq: temperature.accuracy<0.9 (optional, string) - A query expression for attribute metadata,
+      composed of a list of statements separated by `;`, i.e., mq=statement1;statement2;statement3.
+      See [Simple Query Language specification](#simple_query_language).
     
     + georel: near (optional, string) - Spatial relationship between matching entities and a
       reference shape. See [Geographical Queries](#geographical_queries).
@@ -949,6 +1021,9 @@ Response code:
       The attributes are retrieved in the order specified by this parameter. If this parameter is
       not included, the attributes are retrieved in arbitrary order.
 
+    + `metadata`: a list of metadata names to include in the response. If omitted, it means "all metadata".
+      The string `*` can be used as member of this list to mean "all the custom (user) metadata".
+
     + orderBy: temperature,!speed (optional, string) - Criteria for ordering results.
       See "Ordering Results" section for details.
     
@@ -967,13 +1042,13 @@ Response code:
 
 + Response 200 (application/json)
 
-       [
+        [
          {
            "type": "Room",
            "id": "DC_S1-D41",
            "temperature": {
              "value": 35.6,
-             "type": "none",
+             "type": "Number",
              "metadata": {}
            }
          },
@@ -982,7 +1057,7 @@ Response code:
            "id": "Boe-Idearium",
            "temperature": {
              "value": 22.5,
-             "type": "none",
+             "type": "Number",
              "metadata": {}
            }
          },
@@ -995,7 +1070,7 @@ Response code:
              "metadata": {
                "accuracy": {
                  "value": 2,
-                 "type": "none"
+                 "type": "Number"
                },
                "timestamp": {
                  "value": "2015-06-04T07:20:27.378Z",
@@ -1004,7 +1079,7 @@ Response code:
              }
            }
          }
-       ]
+        ]
 
 ### Create entity [POST /v2/entities{?options}]
 
@@ -1055,7 +1130,7 @@ Response:
 
 ## Entity by ID [/v2/entities/{entityId}{?type,attrs,options}]
 
-### Retrieve entity [GET /v2/entities/{entityId}{?type,attrs,options}]
+### Retrieve entity [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]
 
 The response is an object representing the entity identified by the ID. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section).
@@ -1078,6 +1153,8 @@ Response:
       this parameter.
       If this parameter is not included, the attributes are retrieved in arbitrary order, and all
       the attributes of the entity are included in the response.
+    + `metadata`: a list of metadata names to include in the response. If omitted, it means "all metadata".
+      The string `*` can be used as member of this list to mean "all the custom (user) metadata".
     + options (optional, string) - Options dictionary
       + Members
           + keyValues - when used, the response payload uses the `keyValues` simplified entity
@@ -1095,11 +1172,11 @@ Response:
           "id": "Bcn_Welt",
           "temperature": {
             "value": 21.7,
-            "type": "none"
+            "type": "Number"
           },
           "humidity": {
             "value": 60,
-            "type": "none"
+            "type": "Number"
           },
           "location": {
             "value": "41.3763726, 2.1864475",
@@ -1107,13 +1184,13 @@ Response:
             "metadata": {
               "crs": {
                 "value": "WGS84",
-                "type": "none"
+                "type": "Text"
               }
             }
           }
         }
 
-### Retrieve entity attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,options}]
+### Retrieve entity attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]
 
 This request is similar to retreiving the whole entity, however this one omits the `id` and `type`
 fields.
@@ -1138,6 +1215,8 @@ Response:
       by this parameter.
       If this parameter is not included, the attributes are retrieved in arbitrary order, and all
       the attributes of the entity are included in the response.
+    + `metadata`: a list of metadata names to include in the response. If omitted, it means "all metadata".
+      The string `*` can be used as member of this list to mean "all the custom (user) metadata".
     + options (optional, string) - Options dictionary
       + Members
           + keyValues - when used, the response payload uses the `keyValues` simplified entity
@@ -1153,11 +1232,11 @@ Response:
         {
           "temperature": {
             "value": 21.7,
-            "type": "none"
+            "type": "Number"
           },
           "humidity": {
             "value": 60,
-            "type": "none"
+            "type": "Number"
           },
           "location": {
             "value": "41.3763726, 2.1864475",
@@ -1165,7 +1244,7 @@ Response:
             "metadata": {
               "crs": {
                 "value": "WGS84",
-                "type": "none"
+                "type": "String"
               }
             }
           }
@@ -1310,7 +1389,7 @@ Response:
 
 ## Attribute by Entity ID [/v2/entities/{entityId}/attrs/{attrName}{?type}]
 
-### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}{?type}]
+### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}{?type,metadata}]
 
 Returns a JSON object with the attribute data of the attribute. The object follows the JSON
 representation for attributes (described in "JSON Attribute Representation" section).
@@ -1326,12 +1405,14 @@ Response:
     + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
       entities with the same entity id.
     + attrName: temperature (required, string) - Name of the attribute to be retrieved.
+    + `metadata`: a list of metadata names to include in the response. If omitted, it means "all metadata".
+      The string `*` can be used as member of this list to mean "all the custom (user) metadata".
 
 + Response 200 (application/json)
 
         {
           "value": 21.7,
-          "type": "none",
+          "type": "Number",
           "metadata": {}
         }
 
@@ -1414,7 +1495,7 @@ Response:
     + entityId: Bcn_Welt (required, string) - Id of the entity in question
     + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
       entities with the same entity id.
-    + attrName: temperature (required, string) - Name of the attribute to be retrieved.
+    + attrName: address (required, string) - Name of the attribute to be retrieved.
 
 + Response 200 (application/json)
 
@@ -1453,7 +1534,7 @@ Response:
     + entityId: Bcn_Welt (required, string) - Id of the entity to be updated.
     + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
       entities with the same entity id.
-    + attrName: temperature (required, string) - Attribute name.
+    + attrName: address (required, string) - Attribute name.
 
 + Request (application/json)
 
@@ -1509,7 +1590,7 @@ Response code:
             "type": "Car",
             "attrs": {
               "speed": {
-                "types": [ "none" ]
+                "types": [ "Number" ]
               },
               "fuel": {
                 "types": [ "gasoline", "diesel" ]
@@ -1524,7 +1605,7 @@ Response code:
             "type": "Room",
             "attrs": {
               "pressure": {
-                "types": [ "none" ]
+                "types": [ "Number" ]
               },
               "humidity": {
                 "types": [ "percentage" ]
@@ -1563,7 +1644,7 @@ Response code:
           {
             "attrs": {
               "pressure": {
-                "types": [ "none" ]
+                "types": [ "Number" ]
               },
               "humidity": {
                 "types": [ "percentage" ]
@@ -1595,14 +1676,15 @@ A subscription is represented by a JSON object with the following fields:
 
 A `subject` contains the following subfields:
 
-+ `entities`: A list of objects, each one composed of the following subfields (`id`/`idPattern` or
-  `type` must be present):
-    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
-      time, but at least one of them must be present.
-    + `type`: Type of the affected entities (optional).
-+ `condition`: Condition to trigger notifications. It has two optional properties:
++ `entities`: A list of objects, each one composed of the following subfields:
+  + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
+     time, but at least one of them must be present.
+  + `type` or `typePattern`: Type or type pattern of the affected entities. Both cannot be used at
+     the same time. If omitted, it means "any entity type".
++ `condition`: Condition to trigger notifications. This field is optional and it may contain two
+  properties, both optional:
     + `attrs`: array of attribute names
-    + `expression`: an expression composed of `q`, `georel`, `geometry` and `coords` (see "List
+    + `expression`: an expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see "List
        entities" operation above about this field).
 
 A `notification` object contains the following subfields:
@@ -1622,6 +1704,9 @@ A `notification` object contains the following subfields:
   Accepted values are `normalized` (default), `keyValues` or `values`.
   If `attrsFormat` takes any value different
   than those, an error is raised. See detail in "Notification Messages" section.
++ `metadata` (optional): List of metadata to be included in notification messages. By default all
+  metadata are included except the special ones described at "Special metadata in notifications"
+  section. The string `*` can be used as member of this list to mean "all the custom (user) metadata".
 + `timesSent` (not editable, only present in GET operations): Number of notifications sent due to
    this subscription.
 + `lastNotification` (not editable, only present in GET operations): Last notification date in ISO8601 format.
@@ -1657,7 +1742,7 @@ Notification rules are as follow:
 
 ## Subscription List [/v2/subscriptions]
 
-### Retrieve subscriptions [GET /v2/subscriptions]
+### Retrieve subscriptions [GET /v2/subscriptions{?limit,offset,options}]
 
 Returns a list of all the subscriptions present in the system.
 
@@ -1874,11 +1959,11 @@ A context registration is represented by a JSON object with the following fields
 
 A `subject` contains the following subfields:
 
-+ `entities`: A list of objects, each one composed of the following subfields (`id`/`idPattern` or
-  type must be present):
-    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be set at the same
-      time, but one of them must be set.
-    + `type`: Type of the affected entities (optional).
++ `entities`: A list of objects, each one composed of the following subfields:
+    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
+      time, but at least one of them must be present.
+    + `type` or `typePattern`: Type or pattern of the affected entities. Both cannot be used at
+      the same time. If omitted, it means "any entity type".
 + `attributes`: List of attributes to be provided (if not specified, all attributes).
 
 ## Registration list [/v2/registrations]
@@ -1913,11 +1998,11 @@ Response:
             "metadata": {
               "providingService": {
                  "value": "weather.example.com",
-                 "type": "none"
+                 "type": "Text"
                },
               "providingAuthority": {
                  "value": "AEMET - Spain",
-                 "type": "none"
+                 "type": "Text"
                }
             },
             "duration": "PT1M"
@@ -2100,17 +2185,19 @@ no entities are found. The entities follow the JSON entity representation format
 
 The payload may contain the following elements (all of them optional):
 
-+ `entities`: a list of entites to search for. Each entity is represented by a JSON object with the
++ `entities`: a list of entites to search for. Each element is represented by a JSON object with the
   following elements:
-    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be present at the
-      same time, but one of them must be.
-    + `type`: specifies the type of the entities to search for. If omitted, it means
-      "any entity type".
+    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
+      time, but at least one of them must be present.
+    + `type` or `typePattern`: Type or type pattern of the entities to search for. Both cannot be used at
+      the same time. If omitted, it means "any entity type".
 + `attributes`: a list of attribute names to search for. If omitted, it means "all attributes".
 + `scopes`: a list of scopes to restrict the result of the query. Each scope is represented by a
    JSON object with a `type` (a JSON string) and `value` (whose type depends on the `type`
    property).
    The different available scopes are described elsewhere.
++ `metadata`: a list of metadata names to include in the response. If omitted, it means "all metadata".
+   The string `*` can be used as member of this list to mean "all the custom (user) metadata".
 
 Response code:
 
@@ -2157,6 +2244,10 @@ Response code:
               "type": "FIWARE::...",
               "value": "..."
             }
+          ],
+          "metadata": [
+            "accuracy",
+            "timestamp"
           ]
         }
 
@@ -2168,7 +2259,7 @@ Response code:
             "id": "DC_S1-D41",
             "temperature": {
               "value": 35.6,
-              "type": "none"
+              "type": "Number"
             }
           },
           {
@@ -2176,7 +2267,7 @@ Response code:
             "id": "Boe-Idearium",
             "temperature": {
               "value": 22.5,
-              "type": "none"
+              "type": "Number"
             }
           },
           {
@@ -2266,10 +2357,10 @@ The payload may contain the following elements (all of them optional):
 
 + `entities`: a list of entites to search for. Each entity is represented by a JSON object with the
   following elements:
-    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be present at the
-      same time, but one of them must be.
-    + `type`: specifies the type of the entities to search for. If omitted, it means
-      "any entity type".
+    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
+      time, but at least one of them must be present.
+    + `type` or `typePattern`: Type or type pattern of the entities to search for. Both cannot be used at
+      the same time. If omitted, it means "any entity type".
 + `attributes`: a list of attribute names to search for. If omitted, it means "all attributes".
 + `scopes`: a list of scopes to restrict the results of the query. Each scope is represented by a
   JSON object with a `type` (a JSON string) and a `value` (whose type depends on the `type`

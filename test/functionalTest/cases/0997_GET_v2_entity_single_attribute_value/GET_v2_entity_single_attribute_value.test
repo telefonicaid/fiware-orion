@@ -36,6 +36,8 @@ brokerStart CB
 # 04. GET /v2/entities/8787GHY/speed/value
 # 05. GET /v2/entities/8787GHY/A3/value
 #
+# Note (step 04) that the attribute speed is a string, as it is created using NGSIv1
+#
 
 echo "01. POST /v1/updateContext"
 echo "=========================="
@@ -181,45 +183,45 @@ Date: REGEX(.*)
 02. GET /v2/entities/8787GHY/attrs/brand/value
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 13
+Content-Length: 15
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-Mercedes Benz
+"Mercedes Benz"
 
 
 03. GET /v2/entities/8787GHY/attrs/model/value
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 8
+Content-Length: 10
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-Klasse C
+"Klasse C"
 
 
 04. GET /v2/entities/8787GHY/attrs/speed/value
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 3
+Content-Length: 5
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-150
+"150"
 
 
 05. GET /v2/entities/8787GHY/attrs/A3/value
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 11
+Content-Length: 13
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-E1/T1/A3/M1
+"E1/T1/A3/M1"
 
 
 --TEARDOWN--

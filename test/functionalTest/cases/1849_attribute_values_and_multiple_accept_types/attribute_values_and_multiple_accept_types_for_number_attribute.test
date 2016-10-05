@@ -1,0 +1,220 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Attribute Values And Multiple Accept Types For Number Attribute
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create E1 with an attribute of each type (S: string, I: number, B: bool, N: null, O: json object, A: json array)
+# 02. GET I with Accept header text/plain - see plain text
+# 03. GET I with Accept header */* - see plain text
+# 04. GET I with Accept header text/* - see plain text
+# 05. GET I with Accept header text/plain, application/json - see plain text
+# 06. GET I with Accept header application/json, text/plain - see plain text
+# 07. GET I with Accept header text/*, application/json - see plain text
+# 08. GET I with Accept header text/*;q=0.3,application/json;q=0.8 - see plain text (q is overridden)
+# 09. GET I with Accept header application/json - see error
+#
+
+echo "01. Create E1 with an attribute of each type (S: string, I: number, B: bool, N: null, O: json object, A: json array)"
+echo "===================================================================================================================="
+payload='{
+  "id": "E1",
+  "S": "S",
+  "I": 3.14,
+  "B": true,
+  "N": null,
+  "O": { "o1": 1, "o2": "2" },
+  "A": [ 1,2,3 ]
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "02. GET I with Accept header text/plain - see plain text"
+echo "========================================================"
+orionCurl --url /v2/entities/E1/attrs/I/value --out 'text/plain' --noPayloadCheck
+echo
+echo
+
+
+echo "03. GET I with Accept header */* - see plain text"
+echo "================================================="
+orionCurl --url /v2/entities/E1/attrs/I/value --out 'any' --noPayloadCheck
+echo
+echo
+
+
+echo "04. GET I with Accept header text/* - see plain text"
+echo "===================================================="
+orionCurl --url /v2/entities/E1/attrs/I/value --out 'text/*' --noPayloadCheck
+echo
+echo
+
+
+echo "05. GET I with Accept header text/plain, application/json - see plain text"
+echo "=========================================================================="
+orionCurl --url /v2/entities/E1/attrs/I/value --out 'text/plain, application/json' --noPayloadCheck
+echo
+echo
+
+
+echo "06. GET I with Accept header application/json, text/plain - see plain text"
+echo "=========================================================================="
+orionCurl --url /v2/entities/E1/attrs/I/value --out 'application/json, text/plain' --noPayloadCheck
+echo
+echo
+
+
+echo "07. GET I with Accept header text/*, application/json - see plain text"
+echo "======================================================================"
+orionCurl --url /v2/entities/E1/attrs/I/value --out 'text/*, application/json' --noPayloadCheck
+echo
+echo
+
+
+echo "08. GET I with Accept header text/*;q=0.3,application/json;q=0.8 - see plain text (q is overridden)"
+echo "==================================================================================================="
+orionCurl --url /v2/entities/E1/attrs/I/value --out 'text/*;q=0.3,application/json;q=0.8' --noPayloadCheck
+echo
+echo
+
+
+echo "09. GET I with Accept header application/json - see error"
+echo "========================================================="
+orionCurl --url /v2/entities/E1/attrs/I/value --out 'application/json'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 with an attribute of each type (S: string, I: number, B: bool, N: null, O: json object, A: json array)
+====================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. GET I with Accept header text/plain - see plain text
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 4
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+3.14
+
+
+03. GET I with Accept header */* - see plain text
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 4
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+3.14
+
+
+04. GET I with Accept header text/* - see plain text
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 4
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+3.14
+
+
+05. GET I with Accept header text/plain, application/json - see plain text
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 4
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+3.14
+
+
+06. GET I with Accept header application/json, text/plain - see plain text
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 4
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+3.14
+
+
+07. GET I with Accept header text/*, application/json - see plain text
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 4
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+3.14
+
+
+08. GET I with Accept header text/*;q=0.3,application/json;q=0.8 - see plain text (q is overridden)
+===================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 4
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+3.14
+
+
+09. GET I with Accept header application/json - see error
+=========================================================
+HTTP/1.1 406 Not Acceptable
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "accepted MIME types: text/plain",
+    "error": "NotAcceptable"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

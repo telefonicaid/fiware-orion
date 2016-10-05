@@ -57,8 +57,8 @@ TEST(mongoCreateSubscriptions, createSubscriptionNotCustomOK)
   sub.throttling  = 5;
   sub.attrsFormat = NGSI_V2_NORMALIZED;
 
-  EntID en1("E1", "", "T1");
-  EntID en2("", "E.*", "T2");
+  EntID en1("E1", "", "T1", "");
+  EntID en2("", "E.*", "T2", "");
   sub.subject.entities.push_back(en1);
   sub.subject.entities.push_back(en2);
   sub.subject.condition.attributes.push_back("A");
@@ -121,13 +121,9 @@ TEST(mongoCreateSubscriptions, createSubscriptionNotCustomOK)
   EXPECT_EQ("D", attrs[1].String());
 
   std::vector<BSONElement> conds = doc.getField("conditions").Array();
-  ASSERT_EQ(1, conds.size());
-  BSONObj cond0 = conds[0].embeddedObject();
-  EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-  std::vector<BSONElement> condValues = cond0.getField("value").Array();
-  ASSERT_EQ(2, condValues.size());
-  EXPECT_EQ("A", condValues[0].String());
-  EXPECT_EQ("B", condValues[1].String());
+  ASSERT_EQ(2, conds.size());
+  EXPECT_EQ("A", conds[0].String());
+  EXPECT_EQ("B", conds[1].String());
 
   utExit();
 }
@@ -152,8 +148,8 @@ TEST(mongoCreateSubscriptions, createSubscriptionCustomOK)
   sub.throttling  = 5;
   sub.attrsFormat = NGSI_V2_NORMALIZED;
 
-  EntID en1("E1", "", "T1");
-  EntID en2("", "E.*", "T2");
+  EntID en1("E1", "", "T1", "");
+  EntID en2("", "E.*", "T2", "");
   sub.subject.entities.push_back(en1);
   sub.subject.entities.push_back(en2);
   sub.subject.condition.attributes.push_back("A");
@@ -237,13 +233,9 @@ TEST(mongoCreateSubscriptions, createSubscriptionCustomOK)
   EXPECT_EQ("D", attrs[1].String());
 
   std::vector<BSONElement> conds = doc.getField("conditions").Array();
-  ASSERT_EQ(1, conds.size());
-  BSONObj cond0 = conds[0].embeddedObject();
-  EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-  std::vector<BSONElement> condValues = cond0.getField("value").Array();
-  ASSERT_EQ(2, condValues.size());
-  EXPECT_EQ("A", condValues[0].String());
-  EXPECT_EQ("B", condValues[1].String());
+  ASSERT_EQ(2, conds.size());
+  EXPECT_EQ("A", conds[0].String());
+  EXPECT_EQ("B", conds[1].String());
 
   utExit();
 }

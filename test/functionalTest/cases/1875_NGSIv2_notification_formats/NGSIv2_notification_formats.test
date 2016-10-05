@@ -66,7 +66,7 @@ echo "================================================="
 payload='{
   "entities": [
     {  
-    "id": "E1",
+      "id": "E1",
       "type": "none"
     }
   ],
@@ -325,7 +325,7 @@ Date: REGEX(.*)
 07. Dump accumulator to see 5 notifications
 ===========================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 566
+Content-Length: 570
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -339,12 +339,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                 "attributes": [
                     {
                         "name": "A1", 
-                        "type": "none", 
+                        "type": "Number", 
                         "value": 1
                     }, 
                     {
                         "name": "A2", 
-                        "type": "none", 
+                        "type": "Number", 
                         "value": 2
                     }
                 ], 
@@ -363,7 +363,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 170
+Content-Length: 174
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -376,12 +376,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A1": {
                 "metadata": {}, 
-                "type": "none", 
+                "type": "Number", 
                 "value": 1
             }, 
             "A3": {
                 "metadata": {}, 
-                "type": "none", 
+                "type": "Number", 
                 "value": 3
             }, 
             "id": "E1", 
@@ -392,7 +392,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 170
+Content-Length: 174
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -405,12 +405,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A1": {
                 "metadata": {}, 
-                "type": "none", 
+                "type": "Number", 
                 "value": 1
             }, 
             "A4": {
                 "metadata": {}, 
-                "type": "none", 
+                "type": "Number", 
                 "value": 4
             }, 
             "id": "E1", 

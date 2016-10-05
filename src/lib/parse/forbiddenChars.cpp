@@ -74,7 +74,7 @@ bool forbiddenChars(const char* s, const char* exceptions)
       continue;
     }
 
-    if(commonForbidden(*s))
+    if (commonForbidden(*s))
     {
       return true;
     }
@@ -97,6 +97,7 @@ bool forbiddenIdChars(const std::string& api, const char* s, const char* excepti
   {
     return forbiddenChars(s, exceptions);  // old behavior
   }
+
   return forbiddenIdCharsV2(s, exceptions);
 }
 
@@ -120,10 +121,12 @@ bool forbiddenIdCharsV2(const char* s, const char* exceptions)
       ++s;
       continue;
     }
+
     if (*s >= 127 || *s <= 32)
     {
       return true;
     }
+
     switch (*s)
     {
     case '?':

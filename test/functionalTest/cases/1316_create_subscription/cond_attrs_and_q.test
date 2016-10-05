@@ -259,7 +259,7 @@ Date: REGEX(.*)
 ==========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Room?type=none
+Location: /v2/entities/Room?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -295,7 +295,7 @@ Date: REGEX(.*)
 08. Dump accumulator: see four
 ==============================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 130
+Content-Length: 133
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -309,17 +309,17 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "id": "Room",
             "temp": {
                 "metadata": {},
-                "type": "none",
+                "type": "Number",
                 "value": 10
             },
-            "type": "none"
+            "type": "Thing"
         }
     ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 130
+Content-Length: 133
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -333,17 +333,17 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "id": "Room",
             "temp": {
                 "metadata": {},
-                "type": "none",
+                "type": "Number",
                 "value": 15
             },
-            "type": "none"
+            "type": "Thing"
         }
     ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 129
+Content-Length: 132
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -357,17 +357,17 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "id": "Room",
             "temp": {
                 "metadata": {},
-                "type": "none",
+                "type": "Number",
                 "value": 5
             },
-            "type": "none"
+            "type": "Thing"
         }
     ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 130
+Content-Length: 133
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -381,10 +381,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "id": "Room",
             "temp": {
                 "metadata": {},
-                "type": "none",
+                "type": "Number",
                 "value": 10
             },
-            "type": "none"
+            "type": "Thing"
         }
     ],
     "subscriptionId": "REGEX([0-9a-f]{24})"

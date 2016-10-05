@@ -48,7 +48,7 @@ status_codes = {'OK': 200,
                 'Bad Request': 400,
                 'unauthorized': 401,
                 'Not Found': 404,
-                'Method not allowed': 405,
+                'Method Not Allowed': 405,
                 'Not Acceptable': 406,
                 'Conflict': 409,
                 'Content Length Required': 411,
@@ -62,6 +62,7 @@ behave.use_step_matcher("re")
 __logger__ = logging.getLogger("steps")
 
 # --------------- general_operations ----------------------
+
 
 @step(u'send a API entry point request')
 def send_a_base_request(context):
@@ -89,6 +90,7 @@ def send_a_version_request(context):
     __logger__.info("..Sent a version request correctly")
 send_a_version_request = step(u'send a version request')(send_a_version_request)
 
+
 @step(u'send a statistics request')
 def send_a_statistics_request(context):
     """
@@ -114,6 +116,7 @@ def send_a_cache_statistics_request(context):
     context.resp = context.cb.get_cache_statistics_request()
     __logger__.info("..Sent a statistics request correctly")
 
+
 @step(u'delete database in mongo')
 def delete_database_in_mongo(context):
     """
@@ -125,16 +128,16 @@ def delete_database_in_mongo(context):
     database_name = orion_prefix
     props_mongo = properties_class.read_properties()[MONGO_ENV]  # mongo properties dict
     mongo = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
-              password=props_mongo["MONGO_PASS"])
+                  password=props_mongo["MONGO_PASS"])
     headers = context.cb.get_headers()
 
     if fiware_service_header in headers:
         if headers[fiware_service_header] != EMPTY:
-           if headers[fiware_service_header].find(".") < 0:
-               database_name = "%s-%s" % (database_name, headers[fiware_service_header].lower())
-           else:
-               postfix = headers[fiware_service_header].lower()[0:headers[fiware_service_header].find(".")]
-               database_name = "%s-%s" % (database_name, postfix)
+            if headers[fiware_service_header].find(".") < 0:
+                database_name = "%s-%s" % (database_name, headers[fiware_service_header].lower())
+            else:
+                postfix = headers[fiware_service_header].lower()[0:headers[fiware_service_header].find(".")]
+                database_name = "%s-%s" % (database_name, postfix)
 
     __logger__.debug("Deleting database \"%s\" in mongo..." % database_name)
     mongo.connect(database_name)
@@ -147,23 +150,66 @@ def delete_database_in_mongo(context):
 def check_in_log_label_and_text(context, label, text):
     """
     Verify in log file if a label with a message exists
-    :param step:
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param label: label to find
     :param text: text to find (begin since the end)
     """
     __logger__.debug("Looking for in log the \"%s\" label and the \"%s\" text..." % (label, text))
     props_cb_env = properties_class.read_properties()[CONTEXT_BROKER_ENV]
     remote_log = Remote_Log(file="%s/contextBroker.log" % props_cb_env["CB_LOG_FILE"], fabric=context.my_fab)
-    line = remote_log.find_line(label,text)
-    assert line != None, " ERROR - the \"%s\" label and the \"%s\" text do not exist in the log" % (label, text)
-    __logger__.info("log line: \n%s" %line)
+    line = remote_log.find_line(label, text)
+    assert line is not None, " ERROR - the \"%s\" label and the \"%s\" text do not exist in the log" % (label, text)
+    __logger__.info("log line: \n%s" % line)
     ngsi = NGSI()
     ngsi.verify_log(context, line)
     __logger__.info("...confirmed traces in log")
 
 
+@step(u'delay for "([^"]*)" seconds')
+def delay_for_seconds(context, seconds):
+    """
+    delay for N seconds
+
+    :param seconds: seconds to delay
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.info("delay for \"%s\" seconds" % seconds)
+    time.sleep(int(seconds))
+
+
+@step(u'retrieve the log level')
+def retrieve_the_log_level(context):
+    """
+    retrieve the log level in Context Broker
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.info("retrieving the log level in Context Broker")
+    context.props_cb_env = properties_class.read_properties()[CONTEXT_BROKER_ENV]
+    context.cb = CB(protocol=context.props_cb_env["CB_PROTOCOL"], host=context.props_cb_env["CB_HOST"], port=context.props_cb_env["CB_PORT"])
+    context.resp = context.cb.retrieve_the_log_level()
+    __logger__.info("..retrieved the log level in Context Broker")
+
+
+@step(u'change the log level')
+def change_the_log_level(context):
+    """
+    change the log level
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.info("changing the log level in Context Broker")
+    query_param = {}
+    if context.table is not None:
+        for row in context.table:
+            query_param[row["parameter"]] = row["value"]
+            __logger__.info("query param: %s = %s" % (row["parameter"], row["value"]))
+
+    context.props_cb_env = properties_class.read_properties()[CONTEXT_BROKER_ENV]
+    context.cb = CB(protocol=context.props_cb_env["CB_PROTOCOL"], host=context.props_cb_env["CB_HOST"], port=context.props_cb_env["CB_PORT"])
+    context.resp = context.cb.change_the_log_level(query_param)
+    __logger__.info("..changed the log level in Context Broker")
 
 # ------------------------------------- validations ----------------------------------------------
+
 
 @step(u'verify that receive a.? "([^"]*)" http code')
 def verify_that_receive_an_http_code(context, http_code):
@@ -174,10 +220,10 @@ def verify_that_receive_an_http_code(context, http_code):
     """
     __logger__.debug("context: %s" % repr(context.resp.text))
     __logger__.debug("Verifying that return an http codes...")
-    assert context.resp.status_code == status_codes[http_code], " ERROR - http code is wrong\n" \
-                                                        " expected: %s \n" \
-                                                        " received: %s" % (
-                                                        str(status_codes[http_code]), str(context.resp.status_code))
+    assert context.resp.status_code == status_codes[http_code], \
+        " ERROR - http code is wrong\n" \
+        " expected: %s \n" \
+        " received: %s" % (str(status_codes[http_code]), str(context.resp.status_code))
     __logger__.info('...Verified that http code returned is "%s"' % http_code)
 
 
@@ -279,11 +325,10 @@ def verify_that_receive_several_http_codes(context, http_code):
     __logger__.debug("Verifying that return an http code in several entities...")
     entities_context = context.cb.get_entity_context()
     for i in range(int(entities_context["entities_number"])):
-        assert context.resp_list[i].status_code == status_codes[http_code], " ERROR - http code is wrong in position: %s \n" \
-                                                                    " expected: %s \n" \
-                                                                    " received: %s" % (
-                                                                    str(i), str(status_codes[http_code]),
-                                                                    str(context.resp_list[i].status_code))
+        assert context.resp_list[i].status_code == status_codes[http_code], \
+            " ERROR - http code is wrong in position: %s \n" \
+            "expected: %s \n" \
+            " received: %s" % (str(i), str(status_codes[http_code]), str(context.resp_list[i].status_code))
         __logger__.debug(" -- status code \"%s\" is the expected in position: %s" % (http_code, str(i)))
     __logger__.info("...Verified that http code returned in all entities are %s" % http_code)
 
@@ -320,11 +365,38 @@ def verify_headers_in_response(context):
     verify headers in response
     Ex:
           | parameter          | value                |
-          | fiware-total-count | 5                    |
-          | location           | /v2/subscriptions/.* |
+          | Fiware-Total-Count | 5                    |
+          | Location           | /v2/subscriptions/.* |
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
     __logger__.debug("Verifying headers in response...")
     ngsi = NGSI()
     ngsi.verify_headers_response(context)
     __logger__.info("...Verified headers in response")
+
+
+@step(u'verify if the log level "([^"]*)" is the expected')
+def verify_if_the_log_level_is_the_expected(context, level):
+    """
+    verify if the log level is the expected
+
+    :param level: log level expected
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.debug("Verifying if the log level \"%s\" is the expected in response..." % level)
+    ngsi = NGSI()
+    ngsi.verify_log_level(context, level)
+    __logger__.info("...Verified log level in response")
+
+
+@step(u'verify admin error "([^"]*)"')
+def verify_admin_error(context, error):
+    """
+    verify admin error message
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    :param error: error message expected
+    """
+    __logger__.debug("Verifying the admin error message: %s..." % error)
+    ngsi = NGSI()
+    ngsi.verify_admin_error(context, error)
+    __logger__.info("...Verified that the admin error message is the expected")

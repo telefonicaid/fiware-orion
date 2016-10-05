@@ -318,7 +318,7 @@ Date: REGEX(.*)
 04. GET /v2/entities to see that all four entities have the attribute A1
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 412
+Content-Length: 426
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -327,7 +327,7 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 1
         },
         "id": "E1",
@@ -336,12 +336,12 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 1
         },
         "A2": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 2
         },
         "id": "E2",
@@ -350,12 +350,12 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 1
         },
         "A3": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 3
         },
         "id": "E3",
@@ -364,12 +364,12 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 1
         },
         "A4": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 4
         },
         "id": "E4",

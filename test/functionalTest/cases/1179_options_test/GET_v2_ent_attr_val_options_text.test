@@ -107,12 +107,12 @@ Date: REGEX(.*)
 02. GET /v2/entities/E!/attrs/a_string/value
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 10
+Content-Length: 12
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-some value
+"some value"
 
 
 03. GET /v2/entities/E1/attrs/a_bool/value
@@ -129,12 +129,12 @@ true
 04. GET /v2/entities/E1/attrs/a_number/value
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 8
+Content-Length: 1
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-0.000000
+0
 
 
 05. GET /v2/entities/E1/attrs/a_compound/value

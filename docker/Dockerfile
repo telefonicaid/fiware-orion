@@ -6,18 +6,16 @@ ENV ORION_USER orion
 ENV GIT_REV_ORION develop
 ENV CLEAN_DEV_TOOLS 1
 
-RUN adduser --comment "${ORION_USER}" ${ORION_USER}
-
 WORKDIR /opt
 
 RUN \
+    adduser --comment "${ORION_USER}" ${ORION_USER} && \
     # Install dependencies
     yum -y install epel-release && \
     yum -y install \
       boost-devel \
       bzip2 \
       cmake \
-      epel-release \
       gnutls-devel \
       libgcrypt-devel \
       libcurl-devel \
@@ -29,7 +27,6 @@ RUN \
       scons \
       tar \
       which && \
-    cd /opt && \
     # Install libmicrohttpd from source
     curl -kOL http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz && \
     tar xvf libmicrohttpd-0.9.48.tar.gz && \
@@ -47,15 +44,6 @@ RUN \
     curl -kOL https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz && \
     tar xfz v1.0.2.tar.gz && \
     mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include && \
-    # Install Google Test/Mock from source
-    curl -kOL http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 && \
-    tar xfj gmock-1.5.0.tar.bz2 && \
-    cd gmock-1.5.0 && \
-    ./configure && \
-    make && \
-    make install && \
-    ldconfig && \
-    cd /opt && \
     # Install orion from source
     git clone https://github.com/telefonicaid/fiware-orion && \
     cd fiware-orion && \
@@ -83,18 +71,16 @@ RUN \
            /opt/rapidjson-1.0.2 \
            /opt/v1.0.2.tar.gz \
            /usr/local/include/rapidjson \
-           /opt/gmock-1.5.0.tar.bz2 \
-           /opt/gmock-1.5.0 \
-           /usr/local/bin/gmock* \
-           /usr/local/bin/gtest* \
-           /usr/local/include/gmock \
-           /usr/local/include/gtest \
-           /usr/local/lib/libgmock* \
-           /usr/local/lib/libgtest* \
-           /usr/local/share/aclocal/gtest* \
            /opt/fiware-orion \
+           # We don't need to manage Linux account passwords requisites: lenght, mays/mins, etc.
+           # This cannot be removed using yum as yum uses hard dependencies and doing so will 
+           # uninstall essential packages
+           /usr/share/cracklib \
+           # We don't need glibc locale data. This cannot be removed using yum as yum uses hard 
+           # dependencies and doing so will uninstall essential packages
+           /usr/share/i18n /usr/{lib,lib64}/gconv \
            && \
-    yum -y erase git perl rsync \
+    yum -y erase git perl* rsync \
         cmake libarchive \
         gcc-c++ cloog-ppl cpp gcc glibc-devel glibc-headers \
         kernel-headers libgomp libstdc++-devel mpfr ppl \
@@ -106,14 +92,26 @@ RUN \
         boost-iostreams boost boost-date-time \
         boost-test boost-graph boost-signals \
         boost-program-options boost-math \
-        openssh openssh-clients libedit \
+        openssh openssh-clients libedit hwdata dbus-glib fipscheck* *devel sysvinit-tools \
         && \
-    yum clean all && \
-    bash -c 'find /usr/share/locale -maxdepth 1 -mindepth 1 -type d | grep -v -e "en_US" | xargs rm -rfv' && \
+    # Erase without dependencies of the document formatting system (man). This cannot be removed using yum 
+    # as yum uses hard dependencies and doing so will uninstall essential packages
+    rpm -qa groff | xargs -r rpm -e --nodeps && \
+    # Clean yum data
+    yum clean all && rm -rf /var/lib/yum/yumdb && rm -rf /var/lib/yum/history && \
+    # Rebuild rpm data files
+    rpm -vv --rebuilddb && \
+    # Delete unused locales. Only preserve en_US and the locale aliases
+    find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en_US' ! -name 'locale.alias' | xargs -r rm -r && \
     bash -c 'localedef --list-archive | grep -v -e "en_US" | xargs localedef --delete-from-archive' && \
-    mv -f /usr/lib/locale/locale-archive /usr/lib/locale/locale-archive.tmpl && \
-    build-locale-archive
+    # We use cp instead of mv as to refresh locale changes for ssh connections. We use /bin/cp instead of 
+    # cp to avoid any alias substitution, which in some cases has been problematic
+    /bin/cp -f /usr/lib/locale/locale-archive /usr/lib/locale/locale-archive.tmpl && \
+    build-locale-archive && \
+    # Don't need old log files inside docker images
+    rm -f /var/log/*log
 
 WORKDIR /
 ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice"]
 EXPOSE 1026
+

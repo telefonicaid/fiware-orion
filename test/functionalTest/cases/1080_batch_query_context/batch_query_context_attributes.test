@@ -180,7 +180,7 @@ Date: REGEX(.*)
 04. POST /v2/op/query, with only A5 in payload, see 3 entities
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 207
+Content-Length: 213
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -189,7 +189,7 @@ Date: REGEX(.*)
     {
         "A5": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 15
         },
         "id": "E",
@@ -198,7 +198,7 @@ Date: REGEX(.*)
     {
         "A5": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 25
         },
         "id": "E",
@@ -207,7 +207,7 @@ Date: REGEX(.*)
     {
         "A5": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 35
         },
         "id": "E3",
@@ -219,7 +219,7 @@ Date: REGEX(.*)
 05. POST /v2/op/query, with E.* and A1 in payload, see 1 entity
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 69
+Content-Length: 71
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -228,7 +228,7 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 11
         },
         "id": "E",
@@ -240,7 +240,7 @@ Date: REGEX(.*)
 06. POST /v2/op/query, with E.* and A5 in payload, see 3 entities
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 207
+Content-Length: 213
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -249,7 +249,7 @@ Date: REGEX(.*)
     {
         "A5": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 15
         },
         "id": "E",
@@ -258,7 +258,7 @@ Date: REGEX(.*)
     {
         "A5": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 25
         },
         "id": "E",
@@ -267,7 +267,7 @@ Date: REGEX(.*)
     {
         "A5": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 35
         },
         "id": "E3",
@@ -279,7 +279,7 @@ Date: REGEX(.*)
 07. POST /v2/op/query, with E.* and A1,A2 in payload, see 2 entities
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 138
+Content-Length: 142
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -288,7 +288,7 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 11
         },
         "id": "E",
@@ -297,7 +297,7 @@ Date: REGEX(.*)
     {
         "A2": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 22
         },
         "id": "E",

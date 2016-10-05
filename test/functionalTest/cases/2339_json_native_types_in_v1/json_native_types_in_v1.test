@@ -1,0 +1,509 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Native JSON types in NGSIv1
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create an entity, using NGSIv2, with all possible attribute types
+# 02. GET the entity using /v1/queryContext
+# 03. Subscribe to E1, using V1
+# 04. Dump accumulator
+#
+
+echo "01. Create an entity, using NGSIv2, with all possible attribute types"
+echo "====================================================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "String":  { "value": "string" },
+  "Integer": { "value": 3 },
+  "Float":   { "value": 3.14 },
+  "Bool":    { "value": true },
+  "Null":    { "value": null },
+  "NumVec":  { "value": [ 1,2,3 ] },
+  "BoolVec": { "value": [ true, false, true ] },
+  "NullVec": { "value": [ null, null, null ] },
+  "Object":  {
+    "value": {
+      "String": "string",
+      "Integer":  3,
+      "Float": 3.14,
+      "Bool": true,
+      "Null": null,
+      "NumVec": [ 1,2,3 ],
+      "BoolVec": [ true, false, true ],
+      "NullVec": [ null, null, null  ],
+      "Object": {
+        "String": "string",
+        "Integer":  3,
+        "Float": 3.14,
+        "Bool": true,
+        "Null": null,
+        "NumVec": [ 1,2,3 ],
+        "BoolVec": [ true, false, true ],
+        "NullVec": [ null, null, null  ],
+        "Object": {
+          "a": "1",
+          "b": null,
+          "c": true,
+          "d": 3.14
+        }
+      }
+    }
+  },
+  "attrWithMetadata": {
+    "value": 14,
+    "type": "mixed",
+    "metadata": {
+      "String":  { "value": "string" },
+      "Integer": { "value": 3        },
+      "Float":   { "value": 3.14     },
+      "Bool":    { "value": true     },
+      "Null":    { "value": null     }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. GET the entity using /v1/queryContext"
+echo "========================================="
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "id": "E1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "$payload"
+echo
+echo
+
+
+echo "03. Subscribe to E1, using V1"
+echo "============================="
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "id": "E1"
+    }
+  ],
+  "attributes": [],
+  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+  "duration": "PT1H",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [ "String" ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload"
+echo
+echo
+
+
+echo "04. Dump accumulator"
+echo "===================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity, using NGSIv2, with all possible attribute types
+=====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. GET the entity using /v1/queryContext
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 3558
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "Bool",
+                        "type": "Boolean",
+                        "value": true
+                    },
+                    {
+                        "name": "BoolVec",
+                        "type": "StructuredValue",
+                        "value": [
+                            true,
+                            false,
+                            true
+                        ]
+                    },
+                    {
+                        "name": "Float",
+                        "type": "Number",
+                        "value": 3.14
+                    },
+                    {
+                        "name": "Integer",
+                        "type": "Number",
+                        "value": 3
+                    },
+                    {
+                        "name": "Null",
+                        "type": "None",
+                        "value": null
+                    },
+                    {
+                        "name": "NullVec",
+                        "type": "StructuredValue",
+                        "value": [
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    {
+                        "name": "NumVec",
+                        "type": "StructuredValue",
+                        "value": [
+                            1,
+                            2,
+                            3
+                        ]
+                    },
+                    {
+                        "name": "Object",
+                        "type": "StructuredValue",
+                        "value": {
+                            "Bool": true,
+                            "BoolVec": [
+                                true,
+                                false,
+                                true
+                            ],
+                            "Float": 3.14,
+                            "Integer": 3,
+                            "Null": null,
+                            "NullVec": [
+                                null,
+                                null,
+                                null
+                            ],
+                            "NumVec": [
+                                1,
+                                2,
+                                3
+                            ],
+                            "Object": {
+                                "Bool": true,
+                                "BoolVec": [
+                                    true,
+                                    false,
+                                    true
+                                ],
+                                "Float": 3.14,
+                                "Integer": 3,
+                                "Null": null,
+                                "NullVec": [
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "NumVec": [
+                                    1,
+                                    2,
+                                    3
+                                ],
+                                "Object": {
+                                    "a": "1",
+                                    "b": null,
+                                    "c": true,
+                                    "d": 3.14
+                                },
+                                "String": "string"
+                            },
+                            "String": "string"
+                        }
+                    },
+                    {
+                        "name": "String",
+                        "type": "Text",
+                        "value": "string"
+                    },
+                    {
+                        "metadatas": [
+                            {
+                                "name": "Bool",
+                                "type": "Boolean",
+                                "value": true
+                            },
+                            {
+                                "name": "Float",
+                                "type": "Number",
+                                "value": 3.14
+                            },
+                            {
+                                "name": "Integer",
+                                "type": "Number",
+                                "value": 3
+                            },
+                            {
+                                "name": "Null",
+                                "type": "None",
+                                "value": null
+                            },
+                            {
+                                "name": "String",
+                                "type": "Text",
+                                "value": "string"
+                            }
+                        ],
+                        "name": "attrWithMetadata",
+                        "type": "mixed",
+                        "value": 14
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+03. Subscribe to E1, using V1
+=============================
+HTTP/1.1 200 OK
+Content-Length: 109
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "PT1H",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+04. Dump accumulator
+====================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 3637
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "Bool", 
+                        "type": "Boolean", 
+                        "value": true
+                    }, 
+                    {
+                        "name": "BoolVec", 
+                        "type": "StructuredValue", 
+                        "value": [
+                            true, 
+                            false, 
+                            true
+                        ]
+                    }, 
+                    {
+                        "name": "Float", 
+                        "type": "Number", 
+                        "value": 3.14REGEX([01]*)
+                    }, 
+                    {
+                        "name": "Integer", 
+                        "type": "Number", 
+                        "value": 3
+                    }, 
+                    {
+                        "name": "Null", 
+                        "type": "None", 
+                        "value": null
+                    }, 
+                    {
+                        "name": "NullVec", 
+                        "type": "StructuredValue", 
+                        "value": [
+                            null, 
+                            null, 
+                            null
+                        ]
+                    }, 
+                    {
+                        "name": "NumVec", 
+                        "type": "StructuredValue", 
+                        "value": [
+                            1, 
+                            2, 
+                            3
+                        ]
+                    }, 
+                    {
+                        "name": "Object", 
+                        "type": "StructuredValue", 
+                        "value": {
+                            "Bool": true, 
+                            "BoolVec": [
+                                true, 
+                                false, 
+                                true
+                            ], 
+                            "Float": 3.14REGEX([01]*),
+                            "Integer": 3, 
+                            "Null": null, 
+                            "NullVec": [
+                                null, 
+                                null, 
+                                null
+                            ], 
+                            "NumVec": [
+                                1, 
+                                2, 
+                                3
+                            ], 
+                            "Object": {
+                                "Bool": true, 
+                                "BoolVec": [
+                                    true, 
+                                    false, 
+                                    true
+                                ], 
+                                "Float": 3.14REGEX([01]*), 
+                                "Integer": 3, 
+                                "Null": null, 
+                                "NullVec": [
+                                    null, 
+                                    null, 
+                                    null
+                                ], 
+                                "NumVec": [
+                                    1, 
+                                    2, 
+                                    3
+                                ], 
+                                "Object": {
+                                    "a": "1", 
+                                    "b": null, 
+                                    "c": true, 
+                                    "d": 3.14REGEX([01]*)
+                                }, 
+                                "String": "string"
+                            }, 
+                            "String": "string"
+                        }
+                    }, 
+                    {
+                        "name": "String", 
+                        "type": "Text", 
+                        "value": "string"
+                    }, 
+                    {
+                        "metadatas": [
+                            {
+                                "name": "Bool",
+                                "type": "Boolean",
+                                "value": true
+                            },
+                            {
+                                "name": "Float", 
+                                "type": "Number", 
+                                "value": 3.14REGEX([01]*)
+                            }, 
+                            {
+                                "name": "Integer",
+                                "type": "Number",
+                                "value": 3
+                            },
+                            {
+                                "name": "Null", 
+                                "type": "None", 
+                                "value": null
+                            },
+                            {
+                                "name": "String",
+                                "type": "Text",
+                                "value": "string"
+                            }
+                        ], 
+                        "name": "attrWithMetadata", 
+                        "type": "mixed", 
+                        "value": 14
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ], 
+    "originator": "localhost", 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

@@ -67,7 +67,7 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 87
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -75,7 +75,7 @@ Date: REGEX(.*)
 {
     "cvec": {
         "metadata": {},
-        "type": "none",
+        "type": "StructuredValue",
         "value": [
             1,
             2,

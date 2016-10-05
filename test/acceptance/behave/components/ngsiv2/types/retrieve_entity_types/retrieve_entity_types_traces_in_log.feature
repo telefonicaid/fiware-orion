@@ -61,7 +61,7 @@ Feature: verify fields in log traces with retrieve entity types request using NG
       | entities_id       | room1       |
       | attributes_number | 2           |
       | attributes_name   | temperature |
-      | attributes_value  | 34          |
+      | attributes_value  | high        |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -129,39 +129,43 @@ Feature: verify fields in log traces with retrieve entity types request using NG
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value           |
+      | Fiware-Service     | test_log_traces |
+      | Fiware-ServicePath | /test           |
     When get entity types
       | parameter | value |
       | options   | count |
       | limit     | 2     |
       | offset    | 1     |
     Then verify that receive an "OK" http code
-    And verify that entity types returned in response are: "house,home"
+    And verify that entity types returned in response are: "car,home"
     And verify that attributes types are returned in response based on the info in the recorder
     And check in log, label "INFO" and message "Starting transaction from"
-      | trace    | value              |
-      | time     | ignored            |
-      | trans    | ignored            |
-      | srv      | pending            |
-      | subsrv   | pending            |
-      | from     | pending            |
-      | function | lmTransactionStart |
-      | comp     | Orion              |
+      | trace  | value              |
+      | time   | ignored            |
+      | trans  | ignored            |
+      | srv    | pending            |
+      | subsrv | pending            |
+      | from   | pending            |
+      | op     | lmTransactionStart |
+      | comp   | Orion              |
     And check in log, label "DEBUG" and message "--------------------- Serving request GET /v2/types -----------------"
-      | trace    | value           |
-      | time     | ignored         |
-      | corr     | N/A             |
-      | trans    | N/A             |
-      | srv      | N/A             |
-      | subsrv   | N/A             |
-      | from     | N/A             |
-      | function | connectionTreat |
-      | comp     | Orion           |
+      | trace  | value           |
+      | time   | ignored         |
+      | corr   | N/A             |
+      | trans  | N/A             |
+      | srv    | N/A             |
+      | subsrv | N/A             |
+      | from   | N/A             |
+      | op     | connectionTreat |
+      | comp   | Orion           |
     And check in log, label "INFO" and message "Transaction ended"
-      | trace    | value            |
-      | time     | ignored          |
-      | trans    | ignored          |
-      | srv      | test_log_traces  |
-      | subsrv   | /test            |
-      | from     | ignored          |
-      | function | lmTransactionEnd |
-      | comp     | Orion            |
+      | trace  | value            |
+      | time   | ignored          |
+      | trans  | ignored          |
+      | srv    | test_log_traces  |
+      | subsrv | /test            |
+      | from   | ignored          |
+      | op     | lmTransactionEnd |
+      | comp   | Orion            |

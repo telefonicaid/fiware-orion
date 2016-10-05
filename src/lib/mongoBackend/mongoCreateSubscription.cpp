@@ -68,13 +68,19 @@ static void insertInCache
   // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY sub.restriction.scopeVector?
   // If so, set it as string filter to the sub-cache item
   //
-  StringFilter*  stringFilterP = NULL;
+  StringFilter*  stringFilterP   = NULL;
+  StringFilter*  mdStringFilterP = NULL;
 
   for (unsigned int ix = 0; ix < sub.restriction.scopeVector.size(); ++ix)
   {
     if (sub.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
       stringFilterP = sub.restriction.scopeVector[ix]->stringFilterP;
+    }
+
+    if (sub.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY_MD)
+    {
+      mdStringFilterP = sub.restriction.scopeVector[ix]->mdStringFilterP;
     }
   }
 
@@ -84,6 +90,7 @@ static void insertInCache
                      sub.notification.httpInfo,
                      sub.subject.entities,
                      sub.notification.attributes,
+                     sub.notification.metadata,
                      sub.subject.condition.attributes,
                      subId.c_str(),
                      sub.expires,
@@ -92,6 +99,7 @@ static void insertInCache
                      notificationDone,
                      lastNotification,
                      stringFilterP,
+                     mdStringFilterP,
                      sub.status,
                      sub.subject.condition.expression.q,
                      sub.subject.condition.expression.geometry,
@@ -141,12 +149,13 @@ std::string mongoCreateSubscription
   setStatus(sub, &b);
   setEntities(sub, &b);
   setAttrs(sub, &b);
+  setMetadata(sub, &b);
   setBlacklist(sub, &b);
 
   std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
-  setCondsAndInitialNotify(sub, subId, status, sub.notification.httpInfo, sub.attrsFormat,
-                           tenant, servicePathV, xauthToken, fiwareCorrelator,
-                           &b, &notificationDone);
+  setCondsAndInitialNotify(sub, subId, status, sub.notification.attributes, sub.notification.metadata,
+                           sub.notification.httpInfo, sub.notification.blacklist, sub.attrsFormat,
+                           tenant, servicePathV, xauthToken, fiwareCorrelator, &b, &notificationDone);
   if (notificationDone)
   {
     long long lastNotification = (long long) getCurrentTime();
@@ -170,7 +179,7 @@ std::string mongoCreateSubscription
 
   if (!noCache)
   {
-    insertInCache(sub, subId, tenant, servicePath, notificationDone, lastNotification);
+    insertInCache(sub, subId, tenant, servicePath, false, lastNotification);
   }
 
   reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);

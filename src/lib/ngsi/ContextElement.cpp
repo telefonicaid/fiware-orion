@@ -113,7 +113,13 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
 *
 * ContextElement::toJson - 
 */
-std::string ContextElement::toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist) const
+std::string ContextElement::toJson
+(
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter,
+  const std::vector<std::string>&  metadataFilter,
+  bool                             blacklist
+) const
 {
   std::string out;
 
@@ -128,7 +134,7 @@ std::string ContextElement::toJson(RenderFormat renderFormat, const std::vector<
 
   if (contextAttributeVector.size() != 0)
   {
-    out += contextAttributeVector.toJson(true, renderFormat, attrsFilter, blacklist);
+    out += contextAttributeVector.toJson(true, renderFormat, attrsFilter, metadataFilter, blacklist);
   }
 
   return out;
@@ -140,16 +146,18 @@ std::string ContextElement::toJson(RenderFormat renderFormat, const std::vector<
 *
 * ContextElement::getAttribute
 */
-ContextAttribute* ContextElement::getAttribute(std::string attrName)
+ContextAttribute* ContextElement::getAttribute(const std::string& attrName)
 {
   for (unsigned int ix = 0; ix < contextAttributeVector.size(); ++ix)
   {
     ContextAttribute* ca = contextAttributeVector[ix];
+
     if (ca->name == attrName)
     {
       return ca;
     }
   }
+
   return NULL;
 }
 

@@ -31,7 +31,7 @@ brokerStart CB
 
 #
 # 01. Create entity with metadata without type
-# 02. Check metadata has type none
+# 02. Check metadata has type Text
 # 03. Create entity with metadata with type empty string
 #
 
@@ -50,7 +50,7 @@ orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
-echo "02. Check metadata has type none"
+echo "02. Check metadata has type Text"
 echo "================================"
 orionCurl --url /v2/entities/E
 echo
@@ -82,7 +82,7 @@ Date: REGEX(.*)
 
 
 
-02. Check metadata has type none
+02. Check metadata has type Text
 ================================
 HTTP/1.1 200 OK
 Content-Length: 101
@@ -94,7 +94,7 @@ Date: REGEX(.*)
     "A1": {
         "metadata": {
             "MD1": {
-                "type": "none",
+                "type": "Text",
                 "value": "MDV1"
             }
         },

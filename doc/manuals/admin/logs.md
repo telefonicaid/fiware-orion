@@ -18,15 +18,16 @@ When starting the Orion context broker, if a previous log file exists:
 The `-logLevel` option allows to choose which error messages are printed in the log:
 
 - NONE: no log at all
+- FATAL: only FATAL ERROR messages are logged
 - ERROR: only ERROR messages are logged
-- WARNING (default): WARNING and ERROR messages are logged
-- INFO: INFO, WARNING and ERROR messages are logged
-- DEBUG: DEBUG, INFO, WARNING and ERROR messages are logged
+- WARN (default): WARN and ERROR messages are logged
+- INFO: INFO, WARN and ERROR messages are logged
+- DEBUG: DEBUG, INFO, WARN and ERROR messages are logged
 
 When Orion runs in foreground (i.e. with the `-fg` [CLI argument](cli.md)), it also prints the same log traces
 (but in a simplified way) on the standard output.
 
-The log level can be changed in run-time, using the [admin API](management_api.md) exposed by Orion.
+The log level can be changed (and retrieved) in run-time, using the [admin API](management_api.md) exposed by Orion.
 
 [Top](#top)
 
@@ -38,37 +39,37 @@ The log format is designed to be processed by tools like
 Each line in the log file is composed by several key-value fields,
 separed by the pipe character (`|`). Example:
 
-    time=2014-07-18T16:39:06.265Z | lvl=INFO | corr=N/A | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=main | comp=Orion | msg=contextBroker.cpp[1217]: Orion Context Broker is running
-    time=2014-07-18T16:39:06.266Z | lvl=INFO | corr=N/A | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=mongoConnect | comp=Orion | msg=MongoGlobal.cpp[122]: Successful connection to database
-    time=2014-07-18T16:39:06.266Z | lvl=INFO | corr=N/A | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=mongoInit | comp=Orion | msg=contextBroker.cpp[1055]: Connected to mongo at localhost:orion
-    time=2014-07-18T16:39:06.452Z | lvl=INFO | corr=N/A | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=main | comp=Orion | msg=contextBroker.cpp[1290]: Startup completed
+    time=2014-07-18T16:39:06.265Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1217]:main | msg=Orion Context Broker is running
+    time=2014-07-18T16:39:06.266Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=MongoGlobal.cpp[122]:mongoConnect | msg=Successful connection to database
+    time=2014-07-18T16:39:06.266Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1055]:mongoInit | msg=Connected to mongo at localhost:orion
+    time=2014-07-18T16:39:06.452Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1290]:main | msg=Startup completed
     ...
-    time=2014-07-18T16:39:22.920Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=pending | subsrv=pending | from=pending | function=connectionTreat | comp=Orion | msg=rest.cpp[615]: Starting transaction from 10.0.0.1:v1/v1/updateContext
-    time=2014-07-18T16:39:22.922Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=processContextElement | comp=Orion | msg=MongoCommonUpdate.cpp[1499]: Database Operation Successful (...)
-    time=2014-07-18T16:39:22.922Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=createEntity | comp=Orion | msg=MongoCommonUpdate.cpp[1318]: Database Operation Successful (...)
-    time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=addTriggeredSubscriptions | comp=Orion | msg=MongoCommonUpdate.cpp[811]: Database Operation Successful (...)
-    time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=addTriggeredSubscriptions | comp=Orion | msg=MongoCommonUpdate.cpp[811]: Database Operation Successful (...)
-    time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=connectionTreat | comp=Orion | msg=rest.cpp[745]: Transaction ended
+    time=2014-07-18T16:39:22.920Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=pending | srv=pending | subsrv=pending | comp=Orion | op=rest.cpp[615]:connectionTreat | msg=Starting transaction from 10.0.0.1:v1/v1/updateContext
+    time=2014-07-18T16:39:22.922Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[1499]:processContextElement | msg=Database Operation Successful (...)
+    time=2014-07-18T16:39:22.922Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[1318]:createEntity | msg=Database Operation Successful (...)
+    time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[811]:addTriggeredSubscriptions | msg=Database Operation Successful (...)
+    time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[811]:addTriggeredSubscriptions | msg=Database Operation Successful (...)
+    time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=rest.cpp[745]:connectionTreat | msg=Transaction ended
     ...
-    time=2014-07-18T16:39:35.415Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | srv=pending | subsrv=pending | from=pending | function=connectionTreat | comp=Orion | msg=rest.cpp[615]: Starting transaction from 10.0.0.2:48373/v1/queryContext
-    time=2014-07-18T16:39:35.416Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | srv=s1 | subsrv=/A | from=10.0.0.2 | function=entitiesQuery | comp=Orion | msg=MongoGlobal.cpp[877]: Database Operation Successful (...)
-    time=2014-07-18T16:39:35.416Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | srv=s1 | subsrv=/A | from=10.0.0.2 | function=connectionTreat | comp=Orion | msg=rest.cpp[745]: Transaction ended
+    time=2014-07-18T16:39:35.415Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | from=pending | srv=pending | subsrv=pending | comp=Orion | op=rest.cpp[615]:connectionTreat | msg=Starting transaction from 10.0.0.2:48373/v1/queryContext
+    time=2014-07-18T16:39:35.416Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | from=10.0.0.2 | srv=s1 | subsrv=/A | comp=Orion | op=MongoGlobal.cpp[877]:entitiesQuery | msg=Database Operation Successful (...)
+    time=2014-07-18T16:39:35.416Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | from=10.0.0.2 | srv=s1 | subsrv=/A | comp=Orion | op=rest.cpp[745]:connectionTreat | msg=Transaction ended
     ...
-    time=2014-07-18T16:44:53.541Z | lvl=INFO | corr=N/A | trans=N/A | corr=N/A | srv=N/A | subsrv=N/A | from=N/A | function=sigHandler | comp=Orion | msg=contextBroker.cpp[968]: Signal Handler (caught signal 2)
-    time=2014-07-18T16:44:53.541Z | lvl=INFO | corr=N/A | trans=N/A | corr=N/A | srv=N/A | subsrv=N/A | from=N/A | function=sigHandler | comp=Orion | msg=contextBroker.cpp[974]: Orion context broker exiting due to receiving a signal
+    time=2014-07-18T16:44:53.541Z | lvl=INFO | corr=N/A | trans=N/A | corr=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[968]:sigHandler | msg=Signal Handler (caught signal 2)
+    time=2014-07-18T16:44:53.541Z | lvl=INFO | corr=N/A | trans=N/A | corr=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[974]:sigHandler | msg=Orion context broker exiting due to receiving a signal
 
 The different fields in each line are as follows:
 
 -   **time**. A timestamp corresponding to the moment in which the log
     line was generated in [ISO8601](https://es.wikipedia.org/wiki/ISO_8601) format.
     Orion prints timestamps in UTC format.
--   **lvl (level)**. There are five levels:
-    -   ERROR: This level designates error events. There is a severe
-        problem that should be fixed. A subclass of ERROR is FATAL,
-        which designates very severe error events that will
-        presumably lead the application to abort. The process can no
-        longer work.
-    -   WARNING: This level designates potentially harmful situations.
+-   **lvl (level)**. There are six levels:
+    -   FATAL: This level designates severe error events
+        that lead the application to exit.
+        The process can no longer work.
+    -   ERROR: This level designates error events.
+        There is a severe problem that must be fixed.
+    -   WARN: This level designates potentially harmful situations.
         There is a minor problem that should be fixed.
     -   INFO: This level designates informational messages that
         highlight the progress of Orion.
@@ -112,16 +113,17 @@ The different fields in each line are as follows:
         reference element of the subscription, i.e. the URL of the
         callback to send the notification. The last message of both
         transaction types is "Transaction ended".
+-   **from**. Source IP of the HTTP request associated to the transaction, except
+    if the request includes `X-Forwarded-For` header (which overrides the former)
+    or `X-Real-IP` (which overrides `X-Forwarded-For` and source IP).
 -   **srv**. Service associated to the transaction, or "pending" if the
     transaction has started but the service has not been yet obtained.
 -   **subsrv**. Subservice associated to the transaction, or "pending" if the
     transaction has started but the subservice has not been yet obtained.
--   **from**. Source IP of the HTTP request associated to the transaction, except
-    if the request includes `X-Forwarded-For` header (which overrides the former).
--   **function**. The function in the source code that generated the
-    log message. This information is useful for developers only.
 -   **comp (component)**. Current version always uses "Orion" in
     this field.
+-   **op**. The function in the source code that generated the
+    log message. This information is useful for developers only.
 -   **msg (message)**. The actual log message. The text of the message
     include the name of the file and line number generating the trace
     (this information is useful mainly for Orion developers).
@@ -132,13 +134,13 @@ The different fields in each line are as follows:
 
 Alarm conditions:
 
-| Alarm ID   | Severity   |   Detection strategy                                                                                              | Stop condition                                                                                                                                                                                                                            | Description                                                                                                  | Action
-|:---------- |:----------:|:----------------------------------------------------------------------------------------------------------------- |:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |:------------------------------------------------------------------------------------------------------------ |:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Alarm ID   | Severity   |   Detection strategy                                                                                              | Stop condition                                                                                                                                                                                                                            | Description                                                                                                   | Action
+|:---------- |:----------:|:----------------------------------------------------------------------------------------------------------------- |:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |:------------------------------------------------------------------------------------------------------------- |:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | 1          | CRITICAL   | A FATAL trace is found                                                                                            | N/A                                                                                                                                                                                                                                       | A problem has occurred at Orion Context Broker startup. The FATAL 'msg' field details the particular problem. | Solving the issue that is precluding Orion Context Broker startup, e.g. if the problem was due to the listening port is being used, the solution would be either changing Orion listening port or ending the process that is already using the port.
-| 2          | CRITICAL   | The following ERROR text appears in the 'msg' field: "Runtime Error (`<detail>`)"                                 | N/A                                                                                                                                                                                                                                       | Runtime Error. The `<detail>` text containts the detailed information.          | Restart Orion Context Broker. If it persists (e.g. new Runtime Errors appear within the next hour), scale up the problem to development team.
-| 3          | CRITICAL   | The following ERROR text appears in the 'msg' field: "Raising alarm DatabaseError: `<detail>`"                    | The following ERROR text appears in the 'msg' field: "Releasing alarm DatabaseError". Orion prints this trace when it detects that DB is ok again."                                                                                       | Database Error. The `<detail>` text contains the detailed information.         | Orion is unable to access MongoDB database and/or MongoDB database is not working properly. Check database connection and database status. Once the database is repaired and/or its connection to Orion, the problem should disappear (Orion service restart is not needed). No specific action has to be performed at Orion Context Broker service.
-| 4          | WARNING    | The following WARNING text appear in the 'msg' field: "Raising alarm BadInput `<ip>`: `<detail>`".                | The following WARNING text appears in the 'msg' field: "Releasing alarm BadInput `<ip>`", where <uip> is the same one that triggered the alarm. Orion prints this trace when it receives a correct request from that client.              | Bad Input. The `<detail>` text contains the detailed information.               | The client has sent a request to Orion that doesn't conform to the API specification, e.g. bad URL, bad payload, syntax/semantic error in the request, etc. Depending on the IP, it could correspond to a platform client or to an external third-party client. In any case, the client owner should be reported in order to know and fix the issue. No specific action has to be performed at Orion Context Broker service.
-| 5          | WARNING    | The following WARNING text appears in the 'msg' field: "Raising alarm NotificationError `<url>`: `<detail>`".     | The following WARNING text appears in the 'msg' field: "Releasing alarm NotificationError <url>", where <url> is the same one that triggered the alarm. Orion prints this trace when it successfully sent a notification to that URL.     | Notification Failure. The `<detail>`text contains the detailed information.     | Orion is trying to send the notification to a given receiver and some problem has occurred. It could be due to a problem with the network connectivity or on the receiver, e.g. the receiver is down. In the second case, the owner of the receiver of the notification should be reported. No specific action has to be performed at Orion Context Broker service.
+| 2          | CRITICAL   | The following ERROR text appears in the 'msg' field: "Runtime Error (`<detail>`)"                                 | N/A                                                                                                                                                                                                                                       | Runtime Error. The `<detail>` text containts the detailed information.                                        | Restart Orion Context Broker. If it persists (e.g. new Runtime Errors appear within the next hour), scale up the problem to development team.
+| 3          | CRITICAL   | The following ERROR text appears in the 'msg' field: "Raising alarm DatabaseError: `<detail>`"                    | The following ERROR text appears in the 'msg' field: "Releasing alarm DatabaseError". Orion prints this trace when it detects that DB is ok again."                                                                                       | Database Error. The `<detail>` text contains the detailed information.                                        | Orion is unable to access MongoDB database and/or MongoDB database is not working properly. Check database connection and database status. Once the database is repaired and/or its connection to Orion, the problem should disappear (Orion service restart is not needed). No specific action has to be performed at Orion Context Broker service.
+| 4          | WARNING    | The following WARN text appear in the 'msg' field: "Raising alarm BadInput `<ip>`: `<detail>`".                   | The following WARN text appears in the 'msg' field: "Releasing alarm BadInput `<ip>`", where <uip> is the same one that triggered the alarm. Orion prints this trace when it receives a correct request from that client.                 | Bad Input. The `<detail>` text contains the detailed information.                                             | The client has sent a request to Orion that doesn't conform to the API specification, e.g. bad URL, bad payload, syntax/semantic error in the request, etc. Depending on the IP, it could correspond to a platform client or to an external third-party client. In any case, the client owner should be reported in order to know and fix the issue. No specific action has to be performed at Orion Context Broker service.
+| 5          | WARNING    | The following WARN text appears in the 'msg' field: "Raising alarm NotificationError `<url>`: `<detail>`".        | The following WARN text appears in the 'msg' field: "Releasing alarm NotificationError <url>", where <url> is the same one that triggered the alarm. Orion prints this trace when it successfully sent a notification to that URL.        | Notification Failure. The `<detail>`text contains the detailed information.                                   | Orion is trying to send the notification to a given receiver and some problem has occurred. It could be due to a problem with the network connectivity or on the receiver, e.g. the receiver is down. In the second case, the owner of the receiver of the notification should be reported. No specific action has to be performed at Orion Context Broker service.
 
 By default, Orion only traces the origin (i.e. raising) and end (i.e. releasing) of an alarm, e.g:
 
@@ -147,12 +149,12 @@ By default, Orion only traces the origin (i.e. raising) and end (i.e. releasing)
 time=... | lvl=ERROR | ... Raising alarm DatabaseError: collection: orion.entities - query(): { ... } - exception: ....
 time=... | lvl=ERROR | ... Releasing alarm DatabaseError
 ...
-time=... | lvl=WARNING | ... Raising alarm BadInput 10.0.0.1: JSON Parse Error: <unspecified file>(1): expected object or array
-time=... | lvl=WARNING | ... Releasing alarm BadInput 10.0.0.1
+time=... | lvl=WARN  | ... Raising alarm BadInput 10.0.0.1: JSON Parse Error: <unspecified file>(1): expected object or array
+time=... | lvl=WARN  | ... Releasing alarm BadInput 10.0.0.1
 ...
 
-time=... | lvl=WARNING | ... Raising alarm NotificationError localhost:1028/accumulate: (curl_easy_perform failed: Couldn't connect to server)
-time=... | lvl=WARNING | ... Releasing alarm NotificationError localhost:1028/accumulate
+time=... | lvl=WARN  | ... Raising alarm NotificationError localhost:1028/accumulate: (curl_easy_perform failed: Couldn't connect to server)
+time=... | lvl=WARN  | ... Releasing alarm NotificationError localhost:1028/accumulate
 ```
 
 This means that if the condition that triggered the alarm (e.g. a new invalid request from the 10.0.0.1 client) occurs again between the raising
@@ -160,11 +162,11 @@ and releasing alarm messages, it wouldn't be traced again. However, this behavio
 `-relogAlarms` is used, a log trace is printed every time a triggering conditions happens, e.g:
 
 ```
-time=... | lvl=WARNING | Raising alarm BadInput 10.0.0.1: JSON parse error
-time=... | lvl=WARNING | Repeated BadInput 10.0.0.1: JSON parse error
-time=... | lvl=WARNING | Repeated BadInput 10.0.0.1: JSON parse error
-time=... | lvl=WARNING | Repeated BadInput 10.0.0.1: service '/v2/entitiesxx' not found
-time=... | lvl=WARNING | Releasing alarm BadInput 0.0.0.0
+time=... | lvl=WARN | ... Raising alarm BadInput 10.0.0.1: JSON parse error
+time=... | lvl=WARN | ... Repeated BadInput 10.0.0.1: JSON parse error
+time=... | lvl=WARN | ... Repeated BadInput 10.0.0.1: JSON parse error
+time=... | lvl=WARN | ... Repeated BadInput 10.0.0.1: service '/v2/entitiesxx' not found
+time=... | lvl=WARN | ... Releasing alarm BadInput 0.0.0.0
 ```
 
 Log traces between "Raising" and "Releasing" messages use "Repeated" in the message text. Note that the details part of the message is not necesarily the same

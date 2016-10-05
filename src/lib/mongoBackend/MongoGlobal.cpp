@@ -667,7 +667,14 @@ static void fillQueryEntity(BSONArrayBuilder& ba, const EntityId* enP)
 
   if (enP->type != "")
   {
-    ent.append(typeString, enP->type);
+    if (enP->isTypePattern)
+    {
+      ent.appendRegex(typeString, enP->type);
+    }
+    else
+    {
+      ent.append(typeString, enP->type);
+    }
   }
 
   BSONObj entObj = ent.obj();
@@ -835,6 +842,60 @@ static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
 }
 
 
+
+
+/* *****************************************************************************
+*
+* addFilterScope -
+*/
+static void addFilterScope(const Scope* scoP, std::vector<BSONObj> &filters)
+{
+  std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
+
+  if (scoP->type == SCOPE_FILTER_EXISTENCE)
+  {
+    if (scoP->value == SCOPE_VALUE_ENTITY_TYPE)
+    {
+      BSONObj b = scoP->oper == SCOPE_OPERATOR_NOT ?
+            BSON(entityTypeString << BSON("$exists" << false)) :
+            BSON(entityTypeString << BSON("$exists" << true));
+      filters.push_back(b);
+    }
+    else
+    {
+      std::string details = std::string("unknown value for '") + SCOPE_FILTER_EXISTENCE + "' filter: '" + scoP->value + "'";
+      alarmMgr.badInput(clientIp, details);
+    }
+  }
+  else
+  {
+    std::string details = std::string("unknown filter type '") + scoP->type + "'";
+    alarmMgr.badInput(clientIp, details);
+  }
+}
+
+/* ****************************************************************************
+*
+* sortCriteria -
+*
+*/
+static std::string sortCriteria(const std::string& sortToken)
+{
+  if (sortToken == DATE_CREATED)
+  {
+    return ENT_CREATION_DATE;
+  }
+
+  if (sortToken == DATE_MODIFIED)
+  {
+    return ENT_MODIFICATION_DATE;
+  }
+
+  return std::string(ENT_ATTRS) + "." + sortToken + "." + ENT_ATTRS_VALUE;
+}
+
+
+
 /* *****************************************************************************
 *
 * processAreaScopeV2 -
@@ -842,7 +903,7 @@ static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
 * Returns true if areaQuery was filled, false otherwise
 *
 */
-static bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
+bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
 {
   if (!mongoLocationCapable())
   {
@@ -934,57 +995,6 @@ static bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
   }
 
   return true;
-}
-
-
-/* *****************************************************************************
-*
-* addFilterScope -
-*/
-static void addFilterScope(const Scope* scoP, std::vector<BSONObj> &filters)
-{
-  std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
-
-  if (scoP->type == SCOPE_FILTER_EXISTENCE)
-  {
-    if (scoP->value == SCOPE_VALUE_ENTITY_TYPE)
-    {
-      BSONObj b = scoP->oper == SCOPE_OPERATOR_NOT ?
-            BSON(entityTypeString << BSON("$exists" << false)) :
-            BSON(entityTypeString << BSON("$exists" << true));
-      filters.push_back(b);
-    }
-    else
-    {
-      std::string details = std::string("unknown value for '") + SCOPE_FILTER_EXISTENCE + "' filter: '" + scoP->value + "'";
-      alarmMgr.badInput(clientIp, details);
-    }
-  }
-  else
-  {
-    std::string details = std::string("unknown filter type '") + scoP->type + "'";
-    alarmMgr.badInput(clientIp, details);
-  }
-}
-
-/* ****************************************************************************
-*
-* sortCriteria -
-*
-*/
-static std::string sortCriteria(const std::string& sortToken)
-{
-  if (sortToken == DATE_CREATED)
-  {
-    return ENT_CREATION_DATE;
-  }
-
-  if (sortToken == DATE_MODIFIED)
-  {
-    return ENT_MODIFICATION_DATE;
-  }
-
-  return std::string(ENT_ATTRS) + "." + sortToken + "." + ENT_ATTRS_VALUE;
 }
 
 
@@ -1117,6 +1127,16 @@ bool entitiesQuery
         for (unsigned int ix = 0; ix < scopeP->stringFilterP->mongoFilters.size(); ++ix)
         {
           finalQuery.appendElements(scopeP->stringFilterP->mongoFilters[ix]);
+        }
+      }
+    }
+    else if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY_MD)
+    {
+      if (scopeP->mdStringFilterP)
+      {
+        for (unsigned int ix = 0; ix < scopeP->mdStringFilterP->mongoFilters.size(); ++ix)
+        {
+          finalQuery.appendElements(scopeP->mdStringFilterP->mongoFilters[ix]);
         }
       }
     }
@@ -1715,51 +1735,27 @@ bool isCondValueInContextElementResponse(ConditionValueList* condValues, Context
 
 /* ****************************************************************************
 *
-* someEmptyCondValue -
-*
-* This logic would be MUCH simpler in the case conditions was a single field instead of a vector.
-*/
-bool someEmptyCondValue(const BSONObj& sub)
-{
-  std::vector<BSONElement>  conds = getFieldF(sub, CSUB_CONDITIONS).Array();
-
-  for (unsigned int ix = 0; ix < conds.size() ; ++ix)
-  {
-    BSONObj cond = conds[ix].embeddedObject();
-    if (getFieldF(cond, CSUB_CONDITIONS_VALUE).Array().size() == 0)
-    {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
 * condValueAttrMatch -
 *
-* This logic would be MUCH simpler in the case conditions was a single field instead of a vector.
 */
 bool condValueAttrMatch(const BSONObj& sub, const std::vector<std::string>& modifiedAttrs)
 {
   std::vector<BSONElement>  conds = getFieldF(sub, CSUB_CONDITIONS).Array();
 
+  if (conds.size() == 0)
+  {
+    // ONANYCHANGE case: always match
+    return true;
+  }
+
   for (unsigned int ix = 0; ix < conds.size() ; ++ix)
   {
-    BSONObj cond = conds[ix].embeddedObject();
-    std::vector<BSONElement>  condValues = getFieldF(cond, CSUB_CONDITIONS_VALUE).Array();
-    for (unsigned int jx = 0; jx < condValues.size() ; ++jx)
+    std::string condAttr = conds[ix].String();
+    for (unsigned int jx = 0; jx < modifiedAttrs.size(); ++jx)
     {
-      std::string condValue = condValues[jx].String();
-      for (unsigned int kx = 0; kx < modifiedAttrs.size(); ++kx)
+      if (condAttr == modifiedAttrs[jx])
       {
-        if (condValue == modifiedAttrs[kx])
-        {
-          return true;
-        }
+        return true;
       }
     }
   }
@@ -1820,6 +1816,30 @@ AttributeList subToAttributeList(const BSONObj& sub)
 }
 
 
+#if 0
+/* ****************************************************************************
+*
+* setOnSubscriptionMetadata -
+*
+* FIXME #910: disabled by the moment, maybe removed at the end
+*/
+static void setOnSubscriptionMetadata(ContextElementResponseVector* cerVP)
+{
+  for (unsigned int ix = 0; ix < cerVP->size(); ix++)
+  {
+    ContextElementResponse* cerP = (*cerVP)[ix];
+
+    for (unsigned int jx = 0; jx < cerP->contextElement.contextAttributeVector.size(); jx++)
+    {
+      ContextAttribute* caP = cerP->contextElement.contextAttributeVector[jx];
+      Metadata* newMdP = new Metadata(NGSI_MD_NOTIF_ONSUBCHANGE, DEFAULT_ATTR_BOOL_TYPE, true);
+      caP->metadataVector.push_back(newMdP);
+    }
+  }
+}
+#endif
+
+
 /* ****************************************************************************
 *
 * processOnChangeConditionForSubscription -
@@ -1843,6 +1863,7 @@ static bool processOnChangeConditionForSubscription
 (
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
+  const std::vector<std::string>   metadataV,
   ConditionValueList*              condValues,
   const std::string&               subId,
   const HttpInfo&                  notifyHttpInfo,
@@ -1853,7 +1874,7 @@ static bool processOnChangeConditionForSubscription
   const Restriction*               resP,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist = false
+  bool                             blacklist
 )
 {
   std::string                   err;
@@ -1879,6 +1900,15 @@ static bool processOnChangeConditionForSubscription
   /* Prune "not found" CERs */
   pruneContextElements(rawCerV, &ncr.contextElementResponseVector);
   rawCerV.release();
+
+#if 0
+  // FIXME #910: disabled by the moment, maybe removed at the end
+  /* Append notification metadata */
+  if (metadataFlags)
+  {
+    setOnSubscriptionMetadata(&ncr.contextElementResponseVector);
+  }
+#endif
 
   if (ncr.contextElementResponseVector.size() > 0)
   {
@@ -1909,7 +1939,7 @@ static bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
-        getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, blacklist);
+        getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataV, blacklist);
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
@@ -1920,7 +1950,7 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
-      getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, blacklist);
+      getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataV, blacklist);
       ncr.contextElementResponseVector.release();
 
       return true;
@@ -1943,6 +1973,7 @@ BSONArray processConditionVector
   NotifyConditionVector*           ncvP,
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
+  const std::vector<std::string>   metadataV,
   const std::string&               subId,
   const HttpInfo&                  httpInfo,
   bool*                            notificationDone,
@@ -1967,21 +1998,16 @@ BSONArray processConditionVector
 
     if (nc->type == ON_CHANGE_CONDITION)
     {
-      /* Create an array holding the list of condValues */
-      BSONArrayBuilder condValues;
 
       for (unsigned int jx = 0; jx < nc->condValueList.size(); ++jx)
       {
-        condValues.append(nc->condValueList[jx]);
+        conds.append(nc->condValueList[jx]);
       }
-
-      conds.append(BSON(CSUB_CONDITIONS_TYPE << ON_CHANGE_CONDITION <<
-                        CSUB_CONDITIONS_VALUE << condValues.arr()
-                        ));
 
       if ((status == STATUS_ACTIVE) &&
           (processOnChangeConditionForSubscription(enV,
                                                    attrL,
+                                                   metadataV,
                                                    &(nc->condValueList),
                                                    subId,
                                                    httpInfo,
@@ -2022,6 +2048,7 @@ BSONArray processConditionVector
   const std::vector<std::string>&  condAttributesV,
   const std::vector<EntID>&        entitiesV,
   const std::vector<std::string>&  notifAttributesV,
+  const std::vector<std::string>&  metadataV,
   const std::string&               subId,
   const HttpInfo&                  httpInfo,
   bool*                            notificationDone,
@@ -2047,6 +2074,7 @@ BSONArray processConditionVector
   BSONArray arr = processConditionVector(&ncV,
                                          enV,
                                          attrL,
+                                         metadataV,
                                          subId,
                                          httpInfo,
                                          notificationDone,

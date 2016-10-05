@@ -130,6 +130,11 @@ namespace ngsiv2
       jh.addRaw("http", this->httpInfo.toJson());
     }
 
+    if (this->metadata.size() > 0)
+    {
+      jh.addRaw("metadata", vectorToJson(this->metadata));
+    }
+
     return jh.str();
   }
 
@@ -163,10 +168,11 @@ namespace ngsiv2
 
     JsonHelper jhe;
 
-    if (this->expression.q != "")         jhe.addString("q", this->expression.q);
+    if (this->expression.q        != "")  jhe.addString("q",        this->expression.q);
+    if (this->expression.mq       != "")  jhe.addString("mq",       this->expression.mq);
     if (this->expression.geometry != "")  jhe.addString("geometry", this->expression.geometry);
-    if (this->expression.coords != "")    jhe.addString("coords", this->expression.coords);
-    if (this->expression.georel != "")    jhe.addString("georel", this->expression.georel);
+    if (this->expression.coords   != "")  jhe.addString("coords",   this->expression.coords);
+    if (this->expression.georel   != "")  jhe.addString("georel",   this->expression.georel);
 
     std::string expressionString = jhe.str();
 
@@ -185,9 +191,22 @@ namespace ngsiv2
   {
     JsonHelper jh;
 
-    jh.addString("id", this->id);
-    jh.addString("idPattern", this->idPattern);
-    jh.addString("type", this->type);
+    if (!this->id.empty())
+    {
+        jh.addString("id", this->id);
+    }
+    if (!this->idPattern.empty())
+    {
+      jh.addString("idPattern", this->idPattern);
+    }
+    if (!this->type.empty())
+    {
+      jh.addString("type", this->type);
+    }
+    if (!this->typePattern.empty())
+    {
+      jh.addString("typePattern", this->typePattern);
+    }
 
     return jh.str();
   }

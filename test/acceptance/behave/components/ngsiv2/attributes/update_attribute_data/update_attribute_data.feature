@@ -556,11 +556,11 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
     When update an attribute by ID "sdfsdfs" and attribute name "temperature_0" if it exists
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
+      | parameter   | value                                                      |
+      | error       | NotFound                                                   |
+      | description | The requested entity has not been found. Check type and id |
 
-  @more_entities_update @BUG_1387 @skip
+  @more_entities_update @BUG_1387
   Scenario:  try to update an attribute by entity ID and attribute name using NGSI v2 with more than one entity id  with the same id
     Given  a definition of headers
       | parameter          | value                     |
@@ -585,9 +585,9 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
     When update an attribute by ID "room" and attribute name "temperature_0" if it exists
     Then verify that receive an "Conflict" http code
     And verify an error response
-      | parameter   | value                                                                          |
-      | error       | TooManyResults                                                                 |
-      | description | There is more than one entity that match the update. Please refine your query. |
+      | parameter   | value                                                   |
+      | error       | TooManyResults                                          |
+      | description | More than one matching entity. Please refine your query |
 
   @entity_id_update_invalid @BUG_1351
   Scenario Outline:  try to update an attribute by entity ID and attribute name using NGSI v2 with invalid entity id values
@@ -654,7 +654,7 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
       | error       | BadRequest        |
       | description | service not found |
 
-  @entity_id_update_invalid @BUG_1351 @ISSUE_2080 @skip
+  @entity_id_update_invalid @BUG_1351 @ISSUE_2080
   Scenario:  try to update an attribute by entity ID and attribute name using NGSI v2 with invalid entity id values
     Given  a definition of headers
       | parameter          | value                 |
@@ -666,13 +666,13 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
       | parameter        | value |
       | attributes_value | 80    |
     When update an attribute by ID "house_#" and attribute name "temperature_0" if it exists
-    Then verify that receive an "Bad Request" http code
+    Then verify that receive an "Method Not Allowed" http code
     And verify an error response
-      | parameter   | value                                                            |
-      | error       | BadRequest                                                       |
-      | description | attribute must be a JSON object, unless keyValues option is used |
+      | parameter   | value              |
+      | error       | MethodNotAllowed   |
+      | description | method not allowed |
 
-  @entity_id_empty @ISSUE_1426 @skip
+  @entity_id_empty @ISSUE_1426
   Scenario:  try to update an attribute by entity ID and attribute name using NGSI v2 API with empty entity_id
     Given  a definition of headers
       | parameter          | value                            |
@@ -686,9 +686,9 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
     When update an attribute by ID "" and attribute name "temperature_0" if it exists
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value             |
-      | error       | BadRequest        |
-      | description | service not found |
+      | parameter   | value                                        |
+      | error       | BadRequest                                   |
+      | description | entity id length: 0, min length supported: 1 |
 
  # --------------------- attribute name  ------------------------------------
 
@@ -788,11 +788,10 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
     When update an attribute by ID "room_1" and attribute name "ewrewrwrw" if it exists
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
+      | parameter   | value                                      |
+      | error       | NotFound                                   |
+      | description | The entity does not have such an attribute |
 
-  @attribute_name_invalid.row<row.id>
   @attribute_name_invalid @BUG_1351
   Scenario Outline:  try to update an attribute by entity id and attribute name using NGSI v2 API with invalid attribute names
     Given  a definition of headers
@@ -934,11 +933,11 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
       | parameter        | value |
       | attributes_value | 25    |
     When update an attribute by ID "room_1" and attribute name "house_/" if it exists
-    Then verify that receive an "Not Found" http code
+    Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
+      | parameter   | value             |
+      | error       | BadRequest        |
+      | description | service not found |
 
   @attribute_name_invalid @BUG_1360
   Scenario:  try to update an attribute by entity id and attribute name using NGSI v2 API with invalid attribute names
@@ -970,9 +969,9 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
     When update an attribute by ID "room_1" and attribute name "house_#" if it exists
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
+      | parameter   | value                                      |
+      | error       | NotFound                                   |
+      | description | The entity does not have such an attribute |
 
   @attribute_name_empty
   Scenario:  try to update an attribute by entity ID and attribute name using NGSI v2 API with empty attribute name
@@ -1005,9 +1004,9 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
     When update an attribute by ID "room" and attribute name "" if it exists
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                            |
-      | error       | BadRequest                                                       |
-      | description | attribute must be a JSON object, unless keyValues option is used |
+      | parameter   | value                                             |
+      | error       | BadRequest                                        |
+      | description | attribute name length: 0, min length supported: 1 |
 
  # --------------------- attribute type  ------------------------------------
 

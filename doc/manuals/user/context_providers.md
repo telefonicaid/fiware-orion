@@ -17,7 +17,7 @@ element locally (i.e. in its internal database) *but* a Context Provider
 is registered for that context element, then Orion will forward the
 query/update request to the Context Provider. In this case, Orion acts
 as a pure "NGSI proxy" (i.e. doesn't cache the result of the query
-internally) and, from the poinf of view of the client issuing the
+internally) and, from the point of view of the client issuing the
 original request, the process is mostly transparent. The Context
 Provider is meant to implement the NGSI10 API (at least partially) to
 support the query/update operation.
@@ -30,7 +30,7 @@ Let's illustrate this with an example.
 -     First (message number 1), the application (maybe on behalf of a
       Context Provider) registers the Context Provider at Orion for the
       Street4 temperature. Let's assume that the Context Provider exposes
-      its API on <http://sensor48.mycity.com/ngsi10>
+      its API on <http://sensor48.mycity.com/v1>
       
 ```
 (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \
@@ -109,7 +109,7 @@ EOF
 ``` 
 
 
--     The Context Provider at <http://sensor48.mycity.com/ngsi10> responds
+-     The Context Provider at <http://sensor48.mycity.com/v1> responds
       with the data (message number 4).
 
 ``` 
@@ -163,7 +163,7 @@ EOF
             },
             "statusCode": {
                 "code": "200",
-                "details": "Redirected to context provider http://sensor48.mycity.com/ngsi10",
+                "details": "Redirected to context provider http://sensor48.mycity.com/v1",
                 "reasonPhrase": "OK"
             }
         }
@@ -201,3 +201,7 @@ Some additional comments:
 -   You can use the `-cprForwardLimit` [CLI parameter](admin/cli.md) to limit
     the maximum number of forwarded requests to Context Providers for a single client request.
     You can use 0 to disable Context Providers forwarding at all.
+-   In NGSIv1 registrations, `isPattern` cannot be set to `"true"`.
+    If so, the registration fails and an error is returned.
+    The OMA specification allows for regular expressions in entity id in registrations but as of now,
+    the Context Broker doesn't support this feature.

@@ -1,0 +1,8 @@
+{
+  "registrationId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "isPattern set to true for registrations is currently not supported"
+  }
+}

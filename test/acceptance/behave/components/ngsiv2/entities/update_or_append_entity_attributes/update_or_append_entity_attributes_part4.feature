@@ -127,10 +127,10 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       # query parameter
       | qp_options       | append        |
     When update or append attributes by ID "room_1" and with "normalized" mode
-    Then verify that receive an "Bad Request" http code
+    Then verify that receive an "Unprocessable Entity" http code
     And verify an error response
       | parameter   | value                                                                         |
-      | error       | BadRequest                                                                    |
+      | error       | Unprocessable                                                                 |
       | description | one or more of the attributes in the request already exist: [ temperature_0 ] |
 
   @qp_options_append_in_blank
@@ -492,8 +492,8 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       # query parameter
       | qp_options        | keyValues,append |
     When update or append attributes by ID "room_1" and with "keyValues" mode
-    Then verify that receive an "Bad Request" http code
+    Then verify that receive an "Unprocessable Entity" http code
     And verify an error response
       | parameter   | value                                                                                        |
-      | error       | BadRequest                                                                                   |
+      | error       | Unprocessable                                                                                |
       | description | one or more of the attributes in the request already exist: [ temperature_0, temperature_1 ] |

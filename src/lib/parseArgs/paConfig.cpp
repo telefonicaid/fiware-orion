@@ -277,7 +277,7 @@ void paConfigCleanup(void)
 
   if (paManExitStatus)
   {
-    //LM_T(LmtParse,("Freeing paManExitStatus"));
+    // LM_T(LmtParse,("Freeing paManExitStatus"));
     PA_M(("Freeing paManExitStatus"));
     free(paManExitStatus);
     paManExitStatus = NULL;
@@ -285,7 +285,7 @@ void paConfigCleanup(void)
 
   if (paManAuthor)
   {
-    //LM_T(LmtParse,("Freeing paManAuthor"));
+    // LM_T(LmtParse,("Freeing paManAuthor"));
     PA_M(("Freeing paManAuthor"));
     free(paManAuthor);
     paManAuthor = NULL;
@@ -969,7 +969,7 @@ int paConfigActions(bool preTreat)
       {
         ok = validLogLevelCheck(paValidLogLevels, paLogLevel);
       }
-      
+
       if (ok == true)
       {
         lmLevelMaskSetString(paLogLevel);

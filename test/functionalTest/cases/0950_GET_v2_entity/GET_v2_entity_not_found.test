@@ -138,7 +138,7 @@ Date: REGEX(.*)
     },
     "A1": {
         "metadata": {},
-        "type": "none",
+        "type": "Text",
         "value": "E1/T1/A1"
     },
     "A2": {
@@ -149,7 +149,7 @@ Date: REGEX(.*)
     "A3": {
         "metadata": {
             "m1": {
-                "type": "none",
+                "type": "Text",
                 "value": "M1"
             }
         },
@@ -159,7 +159,7 @@ Date: REGEX(.*)
     "A4": {
         "metadata": {
             "m1": {
-                "type": "none",
+                "type": "Text",
                 "value": "M1"
             },
             "m2": {

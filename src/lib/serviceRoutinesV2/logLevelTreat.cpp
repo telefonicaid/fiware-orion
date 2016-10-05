@@ -42,9 +42,9 @@
 
 /* ****************************************************************************
 *
-* logLevelTreat -
+* changeLogLevel -
 */
-std::string logLevelTreat
+std::string changeLogLevel
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -76,13 +76,9 @@ std::string logLevelTreat
       (strcasecmp(levelP, "info")    == 0) ||
       (strcasecmp(levelP, "debug")   == 0))
   {
-    if (strcasecmp(levelP, "fatal") == 0)
+    if (strcasecmp(levelP, "warning") == 0)
     {
-      level = "None";
-    }
-    else if (strcasecmp(levelP, "warn") == 0)
-    {
-      level = "Warning";
+      level = "WARN";
     }
 
     lmLevelMaskSetString((char*) level.c_str());
@@ -95,4 +91,23 @@ std::string logLevelTreat
   }
 
   return "";
+}
+
+
+
+/* ****************************************************************************
+*
+* getLogLevel -
+*/
+std::string getLogLevel
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
+{
+  std::string  level = lmLevelMaskStringGet();
+
+  return "{\"level\":\"" + level + "\"}";
 }

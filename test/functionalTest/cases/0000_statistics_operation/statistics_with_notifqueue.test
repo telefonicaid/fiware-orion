@@ -44,14 +44,14 @@ Date: REGEX(.*)
 {
     "measuring_interval_in_secs": REGEX(\d+),
     "notifQueue": {
-        "avgTimeInQueue": 0.0,
+        "avgTimeInQueue": 0,
         "in": 0,
         "out": 0,
         "reject": 0,
         "sentError": 0,
         "sentOk": 0,
         "size": 0,
-        "timeInQueue": 0.0
+        "timeInQueue": 0
     },
     "uptime_in_secs": REGEX(\d+)
 }

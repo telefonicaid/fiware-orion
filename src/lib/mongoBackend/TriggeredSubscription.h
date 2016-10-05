@@ -52,15 +52,17 @@
 class TriggeredSubscription
 {
  public:
-  long long           throttling;
-  long long           lastNotification;
-  RenderFormat        renderFormat;
-  ngsiv2::HttpInfo    httpInfo;
-  AttributeList       attrL;
-  std::string         cacheSubId;
-  std::string         tenant;
-  StringFilter*       stringFilterP;
-  bool                blacklist;
+  long long                 throttling;
+  long long                 lastNotification;
+  RenderFormat              renderFormat;
+  ngsiv2::HttpInfo          httpInfo;
+  AttributeList             attrL;
+  std::string               cacheSubId;
+  std::string               tenant;
+  StringFilter*             stringFilterP;
+  StringFilter*             mdStringFilterP;
+  bool                      blacklist;
+  std::vector<std::string>  metadata;
 
   // FIXME P5: This entire struct will be removed once geo-stuff is implemented the same way StringFilter was implemented (for Issue #1705)
   struct {
@@ -86,6 +88,7 @@ class TriggeredSubscription
   // FIXME P5: This method will cease to exist once geo-stuff is implemented the same way StringFilter was implemented (for Issue #1705)
   void         fillExpression(const std::string& georel, const std::string& geometry, const std::string& coords);
   bool         stringFilterSet(StringFilter* _stringFilterP, std::string* errorStringP);
+  bool         mdStringFilterSet(StringFilter* _stringFilterP, std::string* errorStringP);
   std::string  toString(const std::string& delimiter);
 };
 

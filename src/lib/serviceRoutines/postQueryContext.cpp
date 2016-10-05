@@ -183,7 +183,15 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   ciP->verb   = POST;
   ciP->method = "POST";
 
+  // Note that jsonTreat() is thought for client-to-CB interactions, thus it modifies ciP->httpStatusCode
+  // Thus, we need to preserve it before (and recover after) in order a fail in the CB-to-CPr interaction doesn't
+  // "corrupt" the status code in the client-to-CB interaction.
+  // FIXME P5: not sure if I like this approach... very "hacking-style". Probably it would be better
+  // to make JSON parsing logic (internal to jsonTreat()) independent of ciP (in fact, parsing process
+  // hasn't anything to do with connection).
+  HttpStatusCode sc = ciP->httpStatusCode;
   s = jsonTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, "queryContextResponse", NULL);
+  ciP->httpStatusCode = sc;
 
   if (s != "OK")
   {

@@ -75,10 +75,12 @@ static void setSubject(Subscription* s, const BSONObj& r)
   std::vector<BSONElement> ents = getFieldF(r, CSUB_ENTITIES).Array();
   for (unsigned int ix = 0; ix < ents.size(); ++ix)
   {
-    BSONObj ent           = ents[ix].embeddedObject();
-    std::string id        = getStringFieldF(ent, CSUB_ENTITY_ID);
-    std::string type      = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
-    std::string isPattern = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
+    BSONObj ent               = ents[ix].embeddedObject();
+    std::string id            = getStringFieldF(ent, CSUB_ENTITY_ID);
+    std::string type          = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
+    std::string isPattern     = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
+    bool        isTypePattern = ent.hasField(CSUB_ENTITY_ISTYPEPATTERN)?
+                                  getBoolFieldF(ent, CSUB_ENTITY_ISTYPEPATTERN) : false;
 
     EntID en;
     if (isFalse(isPattern))
@@ -89,38 +91,37 @@ static void setSubject(Subscription* s, const BSONObj& r)
     {
       en.idPattern = id;
     }
-    en.type = type;
+
+    if (!isTypePattern)
+    {
+      en.type = type;
+    }
+    else // isTypePattern
+    {
+      en.typePattern = type;
+    }
+
 
     s->subject.entities.push_back(en);
   }
 
   // Condition
-  std::vector<BSONElement> conds = getFieldF(r, CSUB_CONDITIONS).Array();
-  for (unsigned int ix = 0; ix < conds.size(); ++ix)
-  {
-    BSONObj cond = conds[ix].embeddedObject();
-    // The ONCHANGE check is needed, as a subscription could mix different conditions types in DB
-    if (std::string(getStringFieldF(cond, CSUB_CONDITIONS_TYPE)) == ON_CHANGE_CONDITION)
-    {
-      std::vector<BSONElement> condValues = getFieldF(cond, CSUB_CONDITIONS_VALUE).Array();
-      for (unsigned int jx = 0; jx < condValues.size(); ++jx)
-      {
-        std::string attr = condValues[jx].String();
-        s->subject.condition.attributes.push_back(attr);
-      }
-    }
-  }
-  if (r.hasField(CSUB_EXPR)) {
-    mongo::BSONObj expression = getFieldF(r, CSUB_EXPR).Obj();
-    std::string    q          = getFieldF(expression, CSUB_EXPR_Q).String();
-    std::string    geo        = getFieldF(expression, CSUB_EXPR_GEOM).String();
-    std::string    coords     = getFieldF(expression, CSUB_EXPR_COORDS).String();
-    std::string    georel     = getFieldF(expression, CSUB_EXPR_GEOREL).String();
+  setStringVectorF(r, CSUB_CONDITIONS, &(s->subject.condition.attributes));
 
-    s->subject.condition.expression.q = q;
+  if (r.hasField(CSUB_EXPR))
+  {
+    mongo::BSONObj expression = getObjectFieldF(r, CSUB_EXPR);
+    std::string    q          = getStringFieldF(expression, CSUB_EXPR_Q);
+    std::string    mq         = getStringFieldF(expression, CSUB_EXPR_MQ);
+    std::string    geo        = getStringFieldF(expression, CSUB_EXPR_GEOM);
+    std::string    coords     = getStringFieldF(expression, CSUB_EXPR_COORDS);
+    std::string    georel     = getStringFieldF(expression, CSUB_EXPR_GEOREL);
+
+    s->subject.condition.expression.q        = q;
+    s->subject.condition.expression.mq       = mq;
     s->subject.condition.expression.geometry = geo;
-    s->subject.condition.expression.coords = coords;
-    s->subject.condition.expression.georel = georel;
+    s->subject.condition.expression.coords   = coords;
+    s->subject.condition.expression.georel   = georel;
   }
 
 }
@@ -133,13 +134,10 @@ static void setSubject(Subscription* s, const BSONObj& r)
 static void setNotification(Subscription* subP, const BSONObj& r, const std::string& tenant)
 {
   // Attributes
-  std::vector<BSONElement> attrs = getFieldF(r, CSUB_ATTRS).Array();
-  for (unsigned int ix = 0; ix < attrs.size(); ++ix)
-  {
-    std::string attr = attrs[ix].String();
+  setStringVectorF(r, CSUB_ATTRS, &(subP->notification.attributes));
 
-    subP->notification.attributes.push_back(attr);
-  }
+  // Metadata
+  setStringVectorF(r, CSUB_METADATA, &(subP->notification.metadata));
 
   subP->notification.httpInfo.fill(r);
 
@@ -238,17 +236,16 @@ void mongoListSubscriptions
    * Note that expiration is not taken into account (in the future, a q= query
    * could be added to the operation in order to filter results) */
   std::auto_ptr<DBClientCursor>  cursor;
-  std::string                    err;
-  std::string                    conds = std::string(CSUB_CONDITIONS) + "." + CSUB_CONDITIONS_TYPE;
+  std::string                    err; 
   Query                          q;
 
   if (!servicePath.empty() && servicePath != "/#")
   {
-    q = Query(BSON(CSUB_SERVICE_PATH << servicePath << conds << ON_CHANGE_CONDITION));
+    q = Query(BSON(CSUB_SERVICE_PATH << servicePath));
   }
   else
   {
-    q = Query(BSON(conds << ON_CHANGE_CONDITION));
+    q = Query();
   }
 
   q.sort(BSON("_id" << 1));

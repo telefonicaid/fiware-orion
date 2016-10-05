@@ -26,6 +26,37 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
+
+#include "common/MimeType.h"
+
+
+
+// -----------------------------------------------------------------------------
+//
+// HttpAcceptHeader -
+//
+// The incoming data is a comma-separated list of media-range, accept-params, and accept-extension.
+// The three components are separated by semicolon, and so are multiple accept-extensions.
+// There is only one media-range and only one instance of accept-params (or zero)
+//
+// See https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
+//
+// Accept = "Accept" ":" <media-range> [;<accept-params>[;accept-extension]*]
+//
+//   media-range:      < */* | type/* | type/subtype >
+//   accept-params:    [ q=<qvalue> ]
+//   accept-extension: [ token=<token|quoted-string> ]*
+//
+// The qvalue is a parameter for indicating a relative quality factor. It goes from 1 to 0, 1 being max-priority.
+// The default value of q is 1.
+//
+typedef struct HttpAcceptHeader
+{
+  std::string               mediaRange;
+  double                    qvalue;
+  std::vector<std::string>  acceptExtensions;
+} HttpAcceptHeader;
 
 
 
@@ -35,12 +66,13 @@
 */
 typedef struct HttpHeaders
 {
-  HttpHeaders()
-  {
-    gotHeaders          = false;
-    servicePathReceived = false;
-    contentLength       = 0;
-  }
+  HttpHeaders();
+
+  void      release(void);
+  bool      accepted(const std::string& mime);
+  MimeType  outformatSelect(void);
+
+  std::vector<HttpAcceptHeader*> acceptHeaderV;
 
   bool          gotHeaders;
   std::string   userAgent;
@@ -52,6 +84,7 @@ typedef struct HttpHeaders
   std::string   tenant;
   std::string   servicePath;
   std::string   xauthToken;
+  std::string   xrealIp;
   std::string   xforwardedFor;
   std::string   correlator;
 

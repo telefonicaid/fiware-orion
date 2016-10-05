@@ -64,8 +64,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
 
   @notification_attrs_array_empty
@@ -87,8 +87,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
 
   @notification_attrs
@@ -110,8 +110,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
     Examples:
       | attributes |
@@ -174,8 +174,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
     Examples:
       | number |
@@ -327,8 +327,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
 
   @notification_except_attrs
@@ -350,8 +350,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
     Examples:
       | attributes |
@@ -436,8 +436,8 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     Then verify that receive a "Created" http code
     And verify headers in response
       | parameter      | value                |
-      | location       | /v2/subscriptions/.* |
-      | content-length | 0                    |
+      | Location       | /v2/subscriptions/.* |
+      | Content-Length | 0                    |
     And verify that the subscription is stored in mongo
     Examples:
       | number |
@@ -504,7 +504,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | españa     |
       | barça      |
 
-  @notification_except_attrs_length_exceed @BUG_2100 @skip
+  @notification_except_attrs_length_exceed @BUG_2100
   Scenario:  try to create a new subscription using NGSI v2 with length max exceed (256) in notification exceptAttrs field
     Given  a definition of headers
       | parameter          | value                         |
@@ -522,9 +522,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                              |
-      | error       | BadRequest                                                         |
-      | description | notification attribute name length: 257, max length supported: 256 |
+      | parameter   | value                         |
+      | error       | BadRequest                    |
+      | description | max attribute length exceeded |
 
   @notification_except_attrs_two_equals @BUG_2101 @skip
   Scenario:  try to create a new subscription using NGSI v2 with attributes name equals in notification exceptAttrs field

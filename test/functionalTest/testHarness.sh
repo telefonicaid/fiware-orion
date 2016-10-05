@@ -28,7 +28,6 @@ MAX_TRIES=${CB_MAX_TRIES:-3}
 echo $testStartTime > /tmp/brokerStartCounter
 
 
-
 # ------------------------------------------------------------------------------
 #
 # Find out in which directory this script resides
@@ -97,6 +96,8 @@ function usage()
   echo "$empty [--ixList <list of test indexes>]"
   echo "$empty [--stopOnError (stop at first error encountered)]"
   echo "$empty [--no-duration (removes duration mark on successful tests)]"
+  echo "$empty [--noCache (force broker to be started with the option --noCache)]"
+  echo "$empty [--cache (force broker to be started without the option --noCache)]"
   echo "$empty [ <directory or file> ]*"
   echo
   echo "* Please note that if a directory is passed as parameter, its entire path must be given, not only the directory-name"
@@ -194,6 +195,7 @@ filterGiven=no
 showDuration=on
 fromIx=0
 ixList=""
+noCache=""
 
 vMsg "parsing options"
 while [ "$#" != 0 ]
@@ -209,6 +211,8 @@ do
   elif [ "$1" == "--fromIx" ];      then fromIx=$2; shift;
   elif [ "$1" == "--ixList" ];      then ixList=$2; shift;
   elif [ "$1" == "--no-duration" ]; then showDuration=off;
+  elif [ "$1" == "--noCache" ];     then noCache=ON;
+  elif [ "$1" == "--cache" ];       then noCache=OFF;
   else
     if [ "$dirOrFile" == "" ]
     then
@@ -223,6 +227,18 @@ do
 done
 
 vMsg "options parsed"
+
+
+
+# -----------------------------------------------------------------------------
+#
+# The function brokerStart looks at the env var CB_NO_CACHE to decide
+# whether to start the broker with the --noCache option or not
+#
+if [ "$noCache" != "" ]
+then
+  export CB_NO_CACHE=$noCache
+fi
 
 
 # ------------------------------------------------------------------------------

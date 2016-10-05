@@ -71,36 +71,40 @@ Feature: verify fields in log traces with retrieve entity attributes request usi
       | id     | true   |
     And verify that receive several "Created" http code
     When get an entity by ID "room_0"
+    And modify headers and keep previous values "false"
+      | parameter          | value           |
+      | Fiware-Service     | test_log_traces |
+      | Fiware-ServicePath | /test           |
     When get attributes in an entity by ID "room_0"
     Then verify that receive an "OK" http code
     And verify that attributes in an entity by ID are returned
     And check in log, label "INFO" and message "Starting transaction from"
-      | trace    | value              |
-      | time     | ignored            |
-      | corr     | ignored            |
-      | trans    | ignored            |
-      | srv      | pending            |
-      | subsrv   | pending            |
-      | from     | pending            |
-      | function | lmTransactionStart |
-      | comp     | Orion              |
+      | trace  | value              |
+      | time   | ignored            |
+      | corr   | ignored            |
+      | trans  | ignored            |
+      | srv    | pending            |
+      | subsrv | pending            |
+      | from   | pending            |
+      | op     | lmTransactionStart |
+      | comp   | Orion              |
     And check in log, label "DEBUG" and message "--------------------- Serving request GET /v2/entities/room_0/attrs -----------------"
-      | trace    | value           |
-      | time     | ignored         |
-      | corr     | N/A             |
-      | trans    | N/A             |
-      | srv      | N/A             |
-      | subsrv   | N/A             |
-      | from     | N/A             |
-      | function | connectionTreat |
-      | comp     | Orion           |
+      | trace  | value           |
+      | time   | ignored         |
+      | corr   | N/A             |
+      | trans  | N/A             |
+      | srv    | N/A             |
+      | subsrv | N/A             |
+      | from   | N/A             |
+      | op     | connectionTreat |
+      | comp   | Orion           |
     And check in log, label "INFO" and message "Transaction ended"
-      | trace    | value            |
-      | time     | ignored          |
-      | corr     | ignored          |
-      | trans    | ignored          |
-      | srv      | test_log_traces  |
-      | subsrv   | /test            |
-      | from     | ignored          |
-      | function | lmTransactionEnd |
-      | comp     | Orion            |
+      | trace  | value            |
+      | time   | ignored          |
+      | corr   | ignored          |
+      | trans  | ignored          |
+      | srv    | test_log_traces  |
+      | subsrv | /test            |
+      | from   | ignored          |
+      | op     | lmTransactionEnd |
+      | comp   | Orion            |

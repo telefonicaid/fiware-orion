@@ -93,6 +93,7 @@ class CompoundValueNode
 
   // Needed for JSON rendering
   int                                siblingNo;
+  bool                               renderName;
 
   // Fields that may not be necessary
   // FIXME P4: when finally sure, remove the unnecessary fields
@@ -160,7 +161,7 @@ class CompoundValueNode
   std::string         check(void);
   std::string         finish(void);
   std::string         render(ConnectionInfo* ciP, const std::string& indent);
-  std::string         toJson(bool isLastElement);
+  std::string         toJson(bool isLastElement, bool comma = true);
 
   void                shortShow(const std::string& indent);
   void                show(const std::string& indent);

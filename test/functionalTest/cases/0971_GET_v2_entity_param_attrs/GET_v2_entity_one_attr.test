@@ -172,7 +172,7 @@ Date: REGEX(.*)
     "id": "8787GHY",
     "plateCountry": {
         "metadata": {},
-        "type": "none",
+        "type": "Text",
         "value": "ES"
     },
     "speed": {

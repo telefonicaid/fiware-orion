@@ -35,9 +35,22 @@
 
 /* ****************************************************************************
 *
-* logLevelTreat - 
+* changeLogLevel -
 */
-extern std::string logLevelTreat
+extern std::string changeLogLevel
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
+
+
+/* ****************************************************************************
+*
+* getLogLevel -
+*/
+extern std::string getLogLevel
 (
   ConnectionInfo*            ciP,
   int                        components,

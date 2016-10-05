@@ -274,7 +274,7 @@ TEST(mongoQueryContextRequest_filters, equalToOne_s)
     std::string  errorString;
     bool         b;
 
-    sc.stringFilterP = new StringFilter();
+    sc.stringFilterP = new StringFilter(SftQ);
     b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
     EXPECT_EQ("", errorString);
     EXPECT_EQ(true, b);
@@ -321,7 +321,7 @@ TEST(mongoQueryContextRequest_filters, equalToOne_n)
   std::string  errorString;
   bool         b;
 
-  sc.stringFilterP = new StringFilter();
+  sc.stringFilterP = new StringFilter(SftQ);
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -379,7 +379,7 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_s)
   std::string  errorString;
   bool         b;
 
-  sc.stringFilterP = new StringFilter();
+  sc.stringFilterP = new StringFilter(SftQ);
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -428,7 +428,7 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_n)
   std::string  errorString;
   bool         b;
 
-  sc.stringFilterP = new StringFilter();
+  sc.stringFilterP = new StringFilter(SftQ);
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -487,7 +487,7 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_s)
   std::string  errorString;
   bool         b;
 
-  sc.stringFilterP = new StringFilter();
+  sc.stringFilterP = new StringFilter(SftQ);
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -536,7 +536,7 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_n)
   std::string  errorString;
   bool         b;
 
-  sc.stringFilterP = new StringFilter();
+  sc.stringFilterP = new StringFilter(SftQ);
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -597,7 +597,7 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_s)
   std::string  errorString;
   bool         b;
 
-  sc.stringFilterP = new StringFilter();
+  sc.stringFilterP = new StringFilter(SftQ);
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -645,7 +645,7 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_n)
   std::string  errorString;
   bool         b;
 
-  sc.stringFilterP = new StringFilter();
+  sc.stringFilterP = new StringFilter(SftQ);
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -705,7 +705,7 @@ TEST(mongoQueryContextRequest_filters, greaterThan_n)
   std::string  errorString;
   bool         b;
 
-  sc.stringFilterP = new StringFilter();
+  sc.stringFilterP = new StringFilter(SftQ);
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -765,7 +765,7 @@ TEST(mongoQueryContextRequest_filters, greaterThanOrEqual_n)
   std::string  errorString;
   bool         b;
 
-  sc.stringFilterP = new StringFilter();
+  sc.stringFilterP = new StringFilter(SftQ);
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -824,7 +824,7 @@ TEST(mongoQueryContextRequest_filters, lessThan_n)
   std::string  errorString;
   bool         b;
 
-  sc.stringFilterP = new StringFilter();
+  sc.stringFilterP = new StringFilter(SftQ);
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -884,7 +884,7 @@ TEST(mongoQueryContextRequest_filters, lessThanOrEqual_n)
   std::string  errorString;
   bool         b;
 
-  sc.stringFilterP = new StringFilter();
+  sc.stringFilterP = new StringFilter(SftQ);
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -943,7 +943,7 @@ TEST(mongoQueryContextRequest_filters, insideRange_n)
   std::string  errorString;
   bool         b;
 
-  sc.stringFilterP = new StringFilter();
+  sc.stringFilterP = new StringFilter(SftQ);
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -1002,7 +1002,7 @@ TEST(mongoQueryContextRequest_filters, outsideRange_n)
   std::string  errorString;
   bool         b;
 
-  sc.stringFilterP = new StringFilter();
+  sc.stringFilterP = new StringFilter(SftQ);
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -1049,6 +1049,8 @@ TEST(mongoQueryContextRequest_filters, DISABLED_outsideRange_d)
 */
 TEST(mongoQueryContextRequest_filters, withAttribute)
 {
+  utInit();
+  
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
@@ -1062,7 +1064,7 @@ TEST(mongoQueryContextRequest_filters, withAttribute)
   std::string  errorString;
   bool         b;
 
-  sc.stringFilterP = new StringFilter();
+  sc.stringFilterP = new StringFilter(SftQ);
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -1071,7 +1073,6 @@ TEST(mongoQueryContextRequest_filters, withAttribute)
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
-  servicePathVector.clear();
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
@@ -1081,7 +1082,7 @@ TEST(mongoQueryContextRequest_filters, withAttribute)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself */
   ASSERT_EQ(5, res.contextElementResponseVector.size());
   EXPECT_EQ("E1", RES_CER(0).entityId.id);
   EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -1091,6 +1092,8 @@ TEST(mongoQueryContextRequest_filters, withAttribute)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -1100,6 +1103,8 @@ TEST(mongoQueryContextRequest_filters, withAttribute)
 */
 TEST(mongoQueryContextRequest_filters, withoutAttribute)
 {
+  utInit();
+
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
@@ -1113,7 +1118,7 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
   std::string  errorString;
   bool         b;
 
-  sc.stringFilterP = new StringFilter();
+  sc.stringFilterP = new StringFilter(SftQ);
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -1122,7 +1127,6 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
-  servicePathVector.clear();
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
@@ -1132,7 +1136,7 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself */
   ASSERT_EQ(6, res.contextElementResponseVector.size());
   EXPECT_EQ("C1", RES_CER(0).entityId.id);
   EXPECT_EQ("C2", RES_CER(1).entityId.id);
@@ -1143,6 +1147,8 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 
@@ -1150,10 +1156,11 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
 /* ****************************************************************************
 *
 * stringsWithCommas -
-*
 */
 TEST(mongoQueryContextRequest_filters, stringsWithCommas)
 {
+  utInit();
+
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
@@ -1167,7 +1174,7 @@ TEST(mongoQueryContextRequest_filters, stringsWithCommas)
   std::string  errorString;
   bool         b;
 
-  sc.stringFilterP = new StringFilter();
+  sc.stringFilterP = new StringFilter(SftQ);
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -1176,7 +1183,6 @@ TEST(mongoQueryContextRequest_filters, stringsWithCommas)
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
-  servicePathVector.clear();
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
@@ -1193,15 +1199,21 @@ TEST(mongoQueryContextRequest_filters, stringsWithCommas)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
+
+
 
 /* ****************************************************************************
 *
-* cobingingSeveralFilters -
+* combiningSeveralFilters -
 *
 */
-TEST(mongoQueryContextRequest_filters, cobingingSeveralFilters)
+TEST(mongoQueryContextRequest_filters, combiningSeveralFilters)
 {
+  utInit();
+
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
@@ -1215,7 +1227,7 @@ TEST(mongoQueryContextRequest_filters, cobingingSeveralFilters)
   std::string  errorString;
   bool         b;
 
-  sc.stringFilterP = new StringFilter();
+  sc.stringFilterP = new StringFilter(SftQ);
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -1224,7 +1236,6 @@ TEST(mongoQueryContextRequest_filters, cobingingSeveralFilters)
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
-  servicePathVector.clear();
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
@@ -1240,6 +1251,8 @@ TEST(mongoQueryContextRequest_filters, cobingingSeveralFilters)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -1249,6 +1262,8 @@ TEST(mongoQueryContextRequest_filters, cobingingSeveralFilters)
 */
 TEST(mongoQueryContextRequest_filters, repeatSameFilter)
 {
+  utInit();
+
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
@@ -1262,7 +1277,7 @@ TEST(mongoQueryContextRequest_filters, repeatSameFilter)
   std::string  errorString;
   bool         b;
 
-  sc.stringFilterP = new StringFilter();
+  sc.stringFilterP = new StringFilter(SftQ);
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -1271,7 +1286,6 @@ TEST(mongoQueryContextRequest_filters, repeatSameFilter)
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
-  servicePathVector.clear();
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
@@ -1288,6 +1302,8 @@ TEST(mongoQueryContextRequest_filters, repeatSameFilter)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -1297,6 +1313,8 @@ TEST(mongoQueryContextRequest_filters, repeatSameFilter)
 */
 TEST(mongoQueryContextRequest_filters, rangeWithDecimals)
 {
+  utInit();
+
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
@@ -1310,7 +1328,7 @@ TEST(mongoQueryContextRequest_filters, rangeWithDecimals)
   std::string  errorString;
   bool         b;
 
-  sc.stringFilterP = new StringFilter();
+  sc.stringFilterP = new StringFilter(SftQ);
   b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
   EXPECT_EQ("", errorString);
   EXPECT_EQ(true, b);
@@ -1319,7 +1337,6 @@ TEST(mongoQueryContextRequest_filters, rangeWithDecimals)
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
-  servicePathVector.clear();
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
@@ -1336,5 +1353,7 @@ TEST(mongoQueryContextRequest_filters, rangeWithDecimals)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 

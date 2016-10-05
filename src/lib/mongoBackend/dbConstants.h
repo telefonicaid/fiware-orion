@@ -61,7 +61,7 @@
 #define ENT_ATTRS_CREATION_DATE      "creDate"
 #define ENT_ATTRS_MODIFICATION_DATE  "modDate"
 #define ENT_ATTRS_MD                 "md"
-#define ENT_ATTRS_MD_NAME            "name"
+#define ENT_ATTRS_MDNAMES            "mdNames"
 #define ENT_ATTRS_MD_TYPE            "type"
 #define ENT_ATTRS_MD_VALUE           "value"
 #define ENT_CREATION_DATE            "creDate"
@@ -75,30 +75,31 @@
 #define CSUB_LASTNOTIFICATION   "lastNotification"
 #define CSUB_REFERENCE          "reference"
 #define CSUB_CONDITIONS         "conditions"
-#define CSUB_CONDITIONS_TYPE    "type"
-#define CSUB_CONDITIONS_VALUE   "value"
 #define CSUB_EXPR               "expression"
 #define CSUB_EXPR_Q             "q"
+#define CSUB_EXPR_MQ            "mq"
 #define CSUB_EXPR_GEOM          "geometry"
 #define CSUB_EXPR_COORDS        "coords"
 #define CSUB_EXPR_GEOREL        "georel"
 
-#define CSUB_THROTTLING         "throttling"
-#define CSUB_ENTITIES           "entities"
-#define CSUB_ATTRS              "attrs"
-#define CSUB_ENTITY_ID          "id"
-#define CSUB_ENTITY_TYPE        "type"
-#define CSUB_ENTITY_ISPATTERN   "isPattern"
-#define CSUB_COUNT              "count"
-#define CSUB_FORMAT             "format"
-#define CSUB_STATUS             "status"
-#define CSUB_SERVICE_PATH       "servicePath"
-#define CSUB_CUSTOM             "custom"
-#define CSUB_METHOD             "method"
-#define CSUB_HEADERS            "headers"
-#define CSUB_QS                 "qs"
-#define CSUB_PAYLOAD            "payload"
-#define CSUB_BLACKLIST          "blacklist"
+#define CSUB_THROTTLING            "throttling"
+#define CSUB_ENTITIES              "entities"
+#define CSUB_ATTRS                 "attrs"
+#define CSUB_METADATA              "metadata"
+#define CSUB_ENTITY_ID             "id"
+#define CSUB_ENTITY_TYPE           "type"
+#define CSUB_ENTITY_ISPATTERN      "isPattern"
+#define CSUB_ENTITY_ISTYPEPATTERN  "isTypePattern"
+#define CSUB_COUNT                 "count"
+#define CSUB_FORMAT                "format"
+#define CSUB_STATUS                "status"
+#define CSUB_SERVICE_PATH          "servicePath"
+#define CSUB_CUSTOM                "custom"
+#define CSUB_METHOD                "method"
+#define CSUB_HEADERS               "headers"
+#define CSUB_QS                    "qs"
+#define CSUB_PAYLOAD               "payload"
+#define CSUB_BLACKLIST             "blacklist"
 
 #define CASUB_EXPIRATION        "expiration"
 #define CASUB_REFERENCE         "reference"
@@ -113,9 +114,10 @@
 
 
 
-/*****************************************************************************
-* Constant string for field values acting as keywods */
-
+/* ****************************************************************************
+*
+* Constant strings for field values acting as keywords
+*/
 #define STATUS_ACTIVE        "active"
 #define STATUS_INACTIVE      "inactive"
 

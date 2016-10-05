@@ -107,9 +107,20 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 
   if (val == NULL || *val == 0)
   {
-    OrionError error(SccBadRequest, std::string("Empty right-hand-side for URI param /") + ckey + "/");
-    ciP->httpStatusCode = error.code;
-    ciP->answer         = error.smartRender(ciP->apiVersion);
+    std::string  errorString = std::string("Empty right-hand-side for URI param /") + ckey + "/";
+
+    if (ciP->apiVersion == "v2")
+    {
+      OrionError error(SccBadRequest, errorString);
+      ciP->httpStatusCode = error.code;
+      ciP->answer         = error.smartRender(ciP->apiVersion);
+    }
+    else if (ciP->apiVersion == "admin")
+    {
+      ciP->httpStatusCode = SccBadRequest;
+      ciP->answer         = "{" + JSON_STR("error") + ":" + JSON_STR(errorString) + "}";
+    }
+
     return MHD_YES;
   }
 
@@ -207,7 +218,9 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       ciP->uriParamTypes.push_back(val);
     }
   }
-  else if (key != URI_PARAM_Q)  // FIXME P1: possible more known options here ...
+  else if ((key != URI_PARAM_Q)       &&
+           (key != URI_PARAM_MQ)      &&
+           (key != URI_PARAM_LEVEL))  // FIXME P1: possible more known options here ...
   {
     LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
   }
@@ -240,7 +253,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     containsForbiddenChars = forbiddenChars(val, ";");
   }
-  else if ((key != "q") && (key != "idPattern"))
+  else if ((key != URI_PARAM_Q) && (key != URI_PARAM_MQ) && (key != "idPattern"))
   {
     containsForbiddenChars = forbiddenChars(ckey) || forbiddenChars(val);
   }
@@ -262,18 +275,236 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 
 /* ****************************************************************************
 *
+* mimeTypeSelect - 
+*/
+static MimeType mimeTypeSelect(ConnectionInfo* ciP, const std::string& what)
+{
+  if ((what == "Error") ||   // JSON Error to be returned
+      (what == "Normal"))    // Normal handling - same as Error
+  {
+    if (ciP->httpHeaders.accepted("application/json"))
+    {
+      return JSON;
+    }
+    if (ciP->httpHeaders.accepted("text/plain"))
+    {
+      return TEXT;
+    }
+
+    return JSON;
+  }
+
+  return JSON;
+}
+
+
+
+/* ****************************************************************************
+*
+* acceptItemParse - 
+*/
+static bool acceptItemParse(ConnectionInfo* ciP, char* value)
+{
+  HttpHeaders*       headerP        = &ciP->httpHeaders;
+  char*              rest           = NULL;
+  char*              cP             = (char*) value;
+  HttpAcceptHeader*  acceptHeaderP;
+  char*              delimiter;
+
+  if (value[0] == 0)
+  {
+    ciP->httpStatusCode    = SccBadRequest;
+    ciP->acceptHeaderError = "empty item in accept header";
+    ciP->outMimeType       = mimeTypeSelect(ciP, "Error");
+    return false;
+  }
+
+  if ((delimiter = strchr(cP, ';')) != NULL)
+  {
+    *delimiter = 0;
+    rest = &delimiter[1];
+  }
+
+  //
+  // Now we have the 'media-range'.
+  // The broker accepts only the following two media types:
+  //   - application/json
+  //   - text/plain
+  // So, if the media-range is anything else, it is rejected immediately and not put in the list
+  //
+  if ((strcmp(cP, "*/*")              != 0) &&
+      (strcmp(cP, "application/*")    != 0) && 
+      (strcmp(cP, "application/json") != 0) && 
+      (strcmp(cP, "text/*")           != 0) &&
+      (strcmp(cP, "text/plain")       != 0))
+  {
+    return true;  // No error, just a media type that the broker doesn't recognize
+  }
+
+
+  acceptHeaderP = new HttpAcceptHeader();
+  acceptHeaderP->mediaRange = cP;
+  acceptHeaderP->qvalue     = 1;  // default value of 'q' - may be modified later
+
+  // If nothing after the media-range, we are done
+  if (rest == NULL)
+  {
+    headerP->acceptHeaderV.push_back(acceptHeaderP);
+    return true;
+  }
+
+  // If we get here, next in line must be a 'q', perhaps preceded by whitespace
+  while ((*rest == ' ') || (*rest == '\t'))
+  {
+    ++rest;
+  }
+
+  if (*rest == 0)
+  {
+    headerP->acceptHeaderV.push_back(acceptHeaderP);
+    return true;
+  }
+
+
+  //
+  // Next item is q=qvalue
+  //
+
+  if (*rest != 'q')
+  {
+    ciP->acceptHeaderError = "q missing in accept header";
+    ciP->httpStatusCode    = SccBadRequest;
+    delete acceptHeaderP;
+    return false;
+  }
+
+  // Pass 'q' and check for '='
+  ++rest;
+  if (*rest != '=')
+  {
+    ciP->acceptHeaderError = "missing equal-sign after q in accept header";
+    ciP->httpStatusCode    = SccBadRequest;
+    delete acceptHeaderP;
+    return false;
+  }
+  
+  // Pass '=' and check for Number
+  ++rest;
+  // Zero-out ';' if present
+  if ((cP = strchr(rest, ';')) != NULL)
+  {
+    *cP = 0;
+  }
+
+  // qvalue there?
+  if (*rest == 0)
+  {
+    ciP->acceptHeaderError = "qvalue in accept header is missing";
+    ciP->httpStatusCode    = SccBadRequest;
+    delete acceptHeaderP;
+    return false;
+  }
+
+  // qvalue a number?
+  if (str2double(rest, &acceptHeaderP->qvalue) == false)
+  {
+    ciP->acceptHeaderError = "qvalue in accept header is not a number";
+    ciP->httpStatusCode    = SccBadRequest;
+    ciP->outMimeType       = mimeTypeSelect(ciP, "Error");
+    delete acceptHeaderP;
+    return false;
+  }
+
+
+  //
+  // And now the accept-extensions  (which is ignored for now)
+  // FIXME P4: Implement treatment of accept-extensions
+  //
+
+  // push the accept header and return true
+  headerP->acceptHeaderV.push_back(acceptHeaderP);
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* acceptParse - 
+*/
+static void acceptParse(ConnectionInfo* ciP, const char* value)
+{
+  char*         itemStart  = (char*) value;
+  char*         cP         = (char*) value;
+
+  if (value[0] == 0)
+  {
+    ciP->acceptHeaderError = "empty accept header";
+    ciP->httpStatusCode    = SccBadRequest;
+    return;
+  }
+
+  while (*cP != 0)
+  {
+    if (*cP != ',')
+    {
+      ++cP;
+    }
+    else
+    {
+      *cP = 0;
+
+      // step over the comma
+      ++cP;
+
+      // step over initial whitespace
+      while ((*cP == ' ') || (*cP == '\t'))
+      {
+        ++cP;
+      }
+
+      acceptItemParse(ciP, itemStart);
+      itemStart = cP;
+    }
+  }
+
+  acceptItemParse(ciP, itemStart);
+
+  if ((ciP->httpHeaders.acceptHeaderV.size() == 0) && (ciP->acceptHeaderError == ""))
+  {
+    ciP->httpStatusCode    = SccNotAcceptable;
+    ciP->acceptHeaderError = "no acceptable mime-type in accept header";
+  }
+
+  if ((ciP->httpStatusCode == SccNotAcceptable) || (ciP->httpStatusCode == SccBadRequest))
+  {
+    OrionError oe(ciP->httpStatusCode, ciP->acceptHeaderError);
+
+    ciP->answer = oe.smartRender(ciP->apiVersion);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * httpHeaderGet - 
 */
 static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* value)
 {
-  HttpHeaders*  headerP = (HttpHeaders*) cbDataP;
-  std::string   key     = ckey;
+  ConnectionInfo*  ciP     = (ConnectionInfo*) cbDataP;
+  HttpHeaders*     headerP = &ciP->httpHeaders;
+  std::string      key     = ckey;
 
   LM_T(LmtHttpHeaders, ("HTTP Header:   %s: %s", key.c_str(), value));
 
   if      (strcasecmp(key.c_str(), "User-Agent") == 0)        headerP->userAgent      = value;
   else if (strcasecmp(key.c_str(), "Host") == 0)              headerP->host           = value;
-  else if (strcasecmp(key.c_str(), "Accept") == 0)            headerP->accept         = value;
+  else if (strcasecmp(key.c_str(), "Accept") == 0)
+  {
+    headerP->accept = value;
+    acceptParse(ciP, value);  // Any errors are flagged in ciP->acceptHeaderError and taken care of later
+  }
   else if (strcasecmp(key.c_str(), "Expect") == 0)            headerP->expect         = value;
   else if (strcasecmp(key.c_str(), "Connection") == 0)        headerP->connection     = value;
   else if (strcasecmp(key.c_str(), "Content-Type") == 0)      headerP->contentType    = value;
@@ -281,6 +512,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "Origin") == 0)            headerP->origin         = value;
   else if (strcasecmp(key.c_str(), "Fiware-Service") == 0)    headerP->tenant         = value;
   else if (strcasecmp(key.c_str(), "X-Auth-Token") == 0)      headerP->xauthToken     = value;
+  else if (strcasecmp(key.c_str(), "X-Real-IP") == 0)         headerP->xrealIp        = value;
   else if (strcasecmp(key.c_str(), "X-Forwarded-For") == 0)   headerP->xforwardedFor  = value;
   else if (strcasecmp(key.c_str(), "Fiware-Correlator") == 0) headerP->correlator     = value;
   else if (strcasecmp(key.c_str(), "Fiware-Servicepath") == 0)
@@ -312,122 +544,6 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 
   return MHD_YES;
 }
-
-
-
-/* ****************************************************************************
-*
-* wantedOutputSupported - 
-*/
-static MimeType wantedOutputSupported(const std::string& apiVersion, const std::string& acceptList, std::string* charsetP)
-{
-  std::vector<std::string>  vec;
-  char*                     copy;
-
-  if (acceptList.length() == 0) 
-  {
-    /* HTTP RFC states that a missing Accept header must be interpreted as if the client is accepting any type */
-    copy = strdup("*/*");
-  }
-  else 
-  {
-    copy = strdup((char*) acceptList.c_str());
-  }
-  char*  cP   = copy;
-
-  do
-  {
-     char* comma;
-
-     comma = strstr(cP, ",");
-     if (comma != NULL)
-     {
-        *comma = 0;
-        
-        cP = wsStrip(cP);
-        vec.push_back(cP);
-        cP = comma;
-        ++cP;
-     }
-     else
-     {
-        cP = wsStrip(cP);
-        if (*cP != 0)
-        {
-           vec.push_back(cP);
-        }
-        *cP = 0;
-     }
-
-  } while (*cP != 0);
-
-  free(copy);
-
-  bool json = false;
-  bool text = true;
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-     char* s;
-
-     //
-     // charset embedded in 'Accept' header?
-     // We read it but we don't do anything with it ...
-     //
-     if ((s = strstr((char*) vec[ix].c_str(), ";")) != NULL)
-     {
-        *s = 0;
-        ++s;
-        s = wsStrip(s);
-        if (strncmp(s, "charset=", 8) == 0)
-        {
-           s = &s[8];
-           s = wsStrip(s);
-
-           if (charsetP != NULL)
-              *charsetP = s;
-        }
-     }
-
-     std::string mimeType = vec[ix].c_str();
-     if (mimeType == "*/*")              { json = true; text=true;}
-     if (mimeType == "application/*")    { json = true; }
-     if (mimeType == "application/json") { json = true; }
-     if (mimeType == "*/json")           { json = true; }
-     if (mimeType == "text/plain")       { text = true; }
-
-     //
-     // Resetting charset
-     //
-     if (charsetP != NULL)
-     {
-       *charsetP = "";
-     }
-  }
-
-  if (apiVersion == "v2")
-  {
-    if (json == true)
-    {
-      return JSON;
-    }
-    else if (text)
-    {
-      return TEXT;
-    }
-  }
-  else
-  {
-    if (json == true)
-    {
-      return JSON;
-    }
-  }
-
-  alarmMgr.badInput(clientIp, "no valid 'Accept-format' found");
-  return NOMIMETYPE;
-}
-
 
 
 /* ****************************************************************************
@@ -504,34 +620,6 @@ static void requestCompleted
 
     timeStatSemGive(__FUNCTION__, "updating statistics");
   }
-}
-
-
-
-/* ****************************************************************************
-*
-* outMimeTypeCheck - 
-*/
-static int outMimeTypeCheck(ConnectionInfo* ciP)
-{
-  ciP->outMimeType  = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
-  if (ciP->outMimeType == NOMIMETYPE)
-  {
-    /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
-    ciP->httpStatusCode = SccNotAcceptable;
-    ciP->answer = restErrorReplyGet(ciP,
-                                    "",
-                                    "OrionError",
-                                    SccNotAcceptable,
-                                    std::string("acceptable MIME types: application/json. Accept header in request: ") + ciP->httpHeaders.accept);
-
-    ciP->outMimeType    = JSON; // We use JSON as default mimeType
-    ciP->httpStatusCode = SccNotAcceptable;
-
-    return 1;
-  }
-
-  return 0;
 }
 
 
@@ -798,10 +886,10 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
   }
 
   //
-  // Remove '/' at end of URL path
+  // Remove ONE '/' at end of URL path
   //
   char* s = (char*) url.c_str();
-  while (s[strlen(s) - 1] == '/')
+  if (s[strlen(s) - 1] == '/')
   {
     s[strlen(s) - 1] = 0;
   }
@@ -839,10 +927,80 @@ static std::string apiVersionGet(const char* path)
 
   if (strcmp(path, "/admin/log") == 0)
   {
-    return "v2";
+    return "admin";
   }
 
   return "v1";
+}
+
+
+
+/* ****************************************************************************
+*
+* acceptHeadersAcceptable - 
+*
+* URI paths ending with '/value' accept both text/plain and application/json.
+* All other requests accept only application/json.
+*
+* This function just checks that the media types flagged as accepted by the client
+* are OK to work with for the broker.
+* The media type to be used is selected later, depending on the request.
+* Actually, all requests except those ending in '/value' will use application/json.
+* 
+*/
+static bool acceptHeadersAcceptable(ConnectionInfo* ciP, bool* textAcceptedP)
+{
+  char* eopath = (char*) ciP->url.c_str();
+  int   urllen = strlen(eopath);
+
+  if (urllen > 6)
+  {
+    eopath = &eopath[urllen - 6];  // to point to '/value' if present
+  }
+
+  if (strcmp(eopath, "/value") == 0)
+  {
+    *textAcceptedP = true;
+  }
+
+
+  //
+  // Go over vector with accepted mime types
+  //
+  for (unsigned int ix = 0; ix < ciP->httpHeaders.acceptHeaderV.size(); ++ix)
+  {
+    HttpAcceptHeader* haP = ciP->httpHeaders.acceptHeaderV[ix];
+
+    if (haP->mediaRange == "*/*")
+    {
+      return true;
+    }
+
+    if (haP->mediaRange == "application/*")
+    {
+      return true;
+    }
+
+    if (haP->mediaRange == "application/json")
+    {
+      return true;
+    }
+
+    if (*textAcceptedP == true)
+    {
+      if (haP->mediaRange == "text/*")
+      {
+        return true;
+      }
+
+      if (haP->mediaRange == "text/plain")
+      {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 
@@ -950,6 +1108,8 @@ static int connectionTreat
       clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);
     }
 
+    ciP->apiVersion = apiVersionGet(ciP->url.c_str());
+
     LM_T(LmtRequest, (""));
     // WARNING: This log message below is crucial for the correct function of the Behave tests - CANNOT BE REMOVED
     LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", method, url));
@@ -971,7 +1131,12 @@ static int connectionTreat
     ciP->uriParam[URI_PARAM_PAGINATION_LIMIT]   = DEFAULT_PAGINATION_LIMIT;
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
     
-    MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
+    MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
+    if (ciP->httpHeaders.accept == "")  // No Accept: given, treated as */*
+    {
+      ciP->httpHeaders.accept = "*/*";
+      acceptParse(ciP, "*/*");
+    }
 
     char correlator[CORRELATOR_ID_SIZE + 1];
     if (ciP->httpHeaders.correlator == "")
@@ -990,27 +1155,25 @@ static int connectionTreat
     //
     lmTransactionStart("from", ip, port, url);  // Incoming REST request starts
 
-
-    /* X-Forwared-For (used by a potential proxy on top of Orion) overrides ip */
-    if (ciP->httpHeaders.xforwardedFor == "")
+    /* X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides ip.
+       X-Real-IP takes preference over X-Forwarded-For, if both appear */
+    if (ciP->httpHeaders.xrealIp != "")
     {
-      lmTransactionSetFrom(ip);
+      lmTransactionSetFrom(ciP->httpHeaders.xrealIp.c_str());
     }
-    else
+    else if (ciP->httpHeaders.xforwardedFor != "")
     {
       lmTransactionSetFrom(ciP->httpHeaders.xforwardedFor.c_str());
     }
-
-    ciP->apiVersion = apiVersionGet(ciP->url.c_str());
+    else
+    {
+      lmTransactionSetFrom(ip);
+    }
 
     char tenant[SERVICE_NAME_MAX_LEN + 1];
     ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
-    ciP->outMimeType          = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
-    if (ciP->outMimeType == NOMIMETYPE)
-    {
-      ciP->outMimeType = JSON; // JSON is default output mimeType
-    }
 
+    ciP->outMimeType = mimeTypeSelect(ciP, "Normal");
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
 
     return MHD_YES;
@@ -1096,11 +1259,6 @@ static int connectionTreat
     alarmMgr.badInput(clientIp, "invalid mime-type in Content-Type http-header");
     restReply(ciP, ciP->answer);
   }
-  else if (outMimeTypeCheck(ciP) != 0)
-  {
-    alarmMgr.badInput(clientIp, "invalid mime-type in Accept http-header");
-    restReply(ciP, ciP->answer);
-  }
   else
   {
     ciP->inMimeType = mimeTypeParse(ciP->httpHeaders.contentType, NULL);
@@ -1126,6 +1284,86 @@ static int connectionTreat
     ciP->answer         = restErrorReplyGet(ciP, "", ciP->url, SccRequestEntityTooLarge, details);
     ciP->httpStatusCode = SccRequestEntityTooLarge;
   }
+
+
+  //
+  // Check for error during Accept Header parsing
+  //
+  if (ciP->acceptHeaderError != "")
+  {
+    OrionError   oe(SccBadRequest, ciP->acceptHeaderError);
+
+    ciP->httpStatusCode = oe.code;
+    alarmMgr.badInput(clientIp, ciP->acceptHeaderError);
+    restReply(ciP, oe.smartRender(ciP->apiVersion));
+    return MHD_YES;
+  }
+
+
+  //
+  // Check that Accept Header values are acceptable
+  //
+  bool textAccepted = false;
+  if (!acceptHeadersAcceptable(ciP, &textAccepted))
+  {
+    OrionError oe(SccNotAcceptable, "");
+
+    if (textAccepted)
+    {
+      oe.details = "acceptable MIME types: application/json, text/plain";
+    }
+    else
+    {
+      oe.details = "acceptable MIME types: application/json";
+    }
+
+    ciP->httpStatusCode = oe.code;
+    alarmMgr.badInput(clientIp, oe.details);
+    restReply(ciP, oe.smartRender(ciP->apiVersion));
+    return MHD_YES;
+  }
+
+
+  // Note that ciP->outMimeType is not set here.
+  // Why?
+  // If text/plain is asked for and accepted ('*/value' operations) but something goes wrong,
+  // then application/json is used for the error
+  // If all goes well, the proper service routine will set ciP->outMimeType to text/plain
+  //
+  if (ciP->httpHeaders.outformatSelect() == NOMIMETYPE)
+  {
+    OrionError oe(SccNotAcceptable, "");
+
+    if (textAccepted)
+    {
+      oe.details = "acceptable MIME types: application/json, text/plain";
+    }
+    else
+    {
+      oe.details = "acceptable MIME types: application/json";
+    }
+
+    ciP->httpStatusCode = oe.code;
+    alarmMgr.badInput(clientIp, oe.details);
+    restReply(ciP, oe.smartRender(ciP->apiVersion));
+    return MHD_YES;
+  }
+
+
+  //
+  // Check Content-Type and Content-Length for GET/DELETE requests
+  //
+  if ((ciP->httpHeaders.contentType != "") && (ciP->httpHeaders.contentLength == 0) && ((ciP->verb == GET) || (ciP->verb == DELETE)))
+  {
+    const char*  details = "Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden";
+    OrionError   oe(SccBadRequest, details);
+
+    ciP->httpStatusCode = oe.code;
+    alarmMgr.badInput(clientIp, details);
+    restReply(ciP, oe.smartRender(ciP->apiVersion));
+    return MHD_YES;
+  }
+
 
   //
   // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with two exceptions.

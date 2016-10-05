@@ -164,6 +164,91 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Fri Sep 30 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.4.0-1
+- Add: notification metadata previousValue and actionType (except 'delete') (#2507)
+- Add: filtering metadata in notifications (#2507)
+- Fix: removed spurious decimals in metadata numbers in NGSIv1 rendering (a follow up of #2176)
+- Fix: wrong attributes included in notifications at subscription update time in some cases (both in blacklist and not blacklist cases)
+- Fix: csub cache wrong deletion of subscription at subscription update time when new subscription has empty condition attributes list
+- Fix: crash when creating entity with metadata when subscription is in place with "mq" on a different metadata (#2496)
+- Fix: correct rendering of metadata compound values when a vector (bugfix for issue #1068)
+- Fix: crash with request with empty URI PATH (#2527)
+- Fix: supporting DateTime filters for metadata (#2443, #2445)
+- Fix: wrong matching in metadata existence and not existence filters with compounds
+- Fix: missing expression sub-fields (q, etc.) in csubs makes Orion to crash
+- Hardening: ensure to use type oriented functions when getting data from DB (safer, but more verbose in error log if DB is not perfectly aligned with what Orion is expecting)
+
+* Fri Sep 02 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.3.0-1
+- Add: support for geometry, coords and georel in NGSIv2 subscriptions (AKA geo-subscriptions) (#1678)
+- Add: Type pattern for subscriptions (#1853)
+- Add: New param 'mq' (both in URI param for list all entities operation and expression sub-field in subscriptions) for matching in metadata (#1156)
+- Add: FIWARE::StringQuery::Metadata scope (#1156)
+- Add: q-string filters for compound values of attributes, both for queries and subscriptions (#1156)
+- Add: mq-string filters for compound values of metadata, both for queries and subscriptions (#1156)
+- Add: accepting compound values for metadatas (#1068)
+- Add: GET /admin/log operation to retrieve log level (#2352)
+- Add: new operation: GET /admin/sem, to see list of the brokers semaphores (#2145)
+- Fix: NGSIv2 subscriptions payload validation (#1946, #1964, #1965, #1967, #1973, #1974, #1975, #1979, #1980, #1981, #1983, #1984, #1986, #1988, #1999, #2000, #2006, #2007, #2018, #2093, #2095, #2099, #2100)
+- Fix: Return error on NGSIv1 register requests with entity isPattern set to "true" (#2332)
+- Fix: UTC as time in log file (#2232)
+- Fix: Removed capping in NGSIv2 update forwarding (#2193)
+- Fix: In some cases, compound attribute values were forwarded as empty strings (#2237)
+- Fix: attribute overwritten when JSON value used in PUT /v2/entities/<eId>/attrs/<attrName>/values (#2246 and #2248)
+- Fix: error returned if a NGSIv2 subscription contains no id nor idPattern (#1939)
+- Fix: subscription equal filter evaluation on update context logic (#2222)
+- Fix: capturing invalid id patterns at json parse time for v2 subscriptions - this bug made the broker crash when receiving invalid id-patterns (#2257)
+- Fix: out-of-NGSI service not found error now using 400 Bad Request HTTP response code (instead of 200 OK). Error message has been unified to "service not found" in all cases (#1887).
+- Fix: using 404 Not Found - PartialUpdate error when  NGSIv2 forwarded update is partially done (previously 204 No Content was used, without providing actual informaton about the partial update)
+- Fix: CPrs responding with not NGSIv1-compliant messages was progressed to clients as 204 Not Content in NGSIv2 update forward scenarios (now responding with 404 Not Found)
+- Fix: NGSIv2 "attribute already exists" error case was wrongly using 400 Bad Request, now it uses 422 Unprocessable Entity (according to rules defined in #1286)
+- Fix: NGSIv2 "duplicated attribute (in request)" error case was wronly using 422 Unprocessable Entity, now it uses 400 Bad Request (according to rules defined in #1286)
+- Fix: NGSIv2 "entity does not have such attribute" error case was wrongly using "requested entity has not been found" descriptions (#1890)
+- Fix: missing error payload for NotFound error in 'PUT /v2/entities/<eId>/attrs/<attrName>' and 'PUT /v2/entities/<eId>/attrs/<attrName>/value' operations (#1909)
+- Fix: missing error payload for TooManyResults error in 'DELETE /v2/entities/<eId>' operation (#1346)
+- Fix: correctly rending as JSON error responses that were being rendered as plain text (#1989, #1991) 
+- Fix: NGSIv2 "InvalidModification" errors changed to "Unprocessable" (according to rules defined in #1286)
+- Fix: Using default values for types of Entities, Attributes, and Metadata aligned with the type names used by schema.org (#2223)
+- Fix: Allowing trailing semicolon in a string filter, but only one (#2086)
+- Fix: NGSIv2 geoquery syntax errors using 400 Bad Request instead of 422 Unprocessable Entity (according to rules defined in #1286)
+- Fix: NGSIv2 URI PATH must be all in lowercase, otherwise "service not found" (#2057)
+- Fix: A bug fixed in URI param 'q', avoiding false matches when using string match operator (~=) that matches AND some operator that does not match.
+- Fix: no longer accepting 'keyValues-style' values for metadatas (e.g. "metadata": { "m1": 6 } )
+- Fix: GET /v2/subscriptions/subId error for non existing subscriptions (now using 404 Not Found, previously using 400 Bad Request)
+- Fix: 472 Unknown returned as HTTP status code by POST /v2/op/update in some cases (now using 404 Not Found).
+- Fix: Correctly returning error on present but empty attribute types in PATCH v2/entites/{id} operation (#1785)
+- Fix: Error returned on encountering non-existing attributes in PATCH /v2/entities/<id>/attrs (#1784)
+- Fix: Fixed a bug about string lists in URI parameter 'q' (strings treated as numbers, if possible. E.g. '123' => 123)
+- Fix: use X-Real-IP header as preferred option for from= field in log traces (#2353)
+- Fix: use op= instead of function= in log traces (along with moving the file/line identification from msg= to op=) (#2353)
+- Fix: reorder field in log traces lo align with IoTP Operations requirements (#2353)
+- Fix: using WARN log level instead of WARNING log level to align with IoTP Operations requirements (#2353)
+- Fix: Fixed metadata rendering in NGSIv1, so that the JSON data type is taken into account and not empty string is returned for non-string values (#1068, just a part of it)
+- Fix: Fixed a bug about lists in URI parameter 'q' (last list item was skipped)
+- Fix: render float values with 9 digits precision in all cases, avoding spurious decimals (#2207, #2176, #2383)
+- Fix: Error payload returned on encountering non-existing entity/attribute in PUT /v2/entities/<entity-id>/attrs/<attr-name> (#1360)
+- Fix: Added citation marks surrounding strings as response in text/plain.
+- Fix: Return NGSIv2 error if citation-mark is missing in PUT /v2/entities/{id}/attrs/{attrName}/value payload for plain text (previously it was NGSIv1 error format) (#2386)
+- Fix: invalid regex patterns detection (#968)
+- Fix: Better error returned on invalid geoquery (#2174)
+- Fix: Better error returned on attribute not found in GET /v2/entities/<entity-id>/attrs/<attr-name>/value (#2220)
+- Fix: Metadata identification based on just name instead of name+type (metadata representation at DB changed from vector to object)  (#1112)
+- Fix: Bug in log level configuration via REST fixed, and log levels in broker modified (#2419)
+- Fix: Distinguish between strings and numbers in q string filter (#1129)
+- Fix: proper response for 'GET /v2/entities/<id>?attrs=<attrName>' and 'GET /v2/entities/<id>/attrs?attrs=<attrName>' when <attrName> doesn't exist (#2241)
+- Fix: Rendering problems in metadata vector (#2446)
+- Fix: correct error response for missing value in URI param in /admin/ requests (#2420)
+- Fix: In error responses for ngsi9 registrations, the duration is no longer rendered.
+- Fix: Do not allow forbidden chars in description for subscription (#2308)
+- Fix: Correct error returned when trying to replace a non-existing attribute in PUT /v2/entities/<entity-id>/attrs/<attr-name> (#2221)
+- Fix: Empty string detection for entity id, entity type and attribute name in NGSIv2 request URLs (#1426, #1487)
+- Fix: Trailing slashes in URI path no longer silently removed, but considered and giving adequate error responses
+- Fix: Initial notifications were counted twice when running with subscription cache (which gave erroneous timesSent in GET /v2/subscriptions/<subId>)
+- Fix: Avoid rendering at the same time id and idPattern fields in NGSIv2 subscriptions
+- Fix: Error returned on GET/DELETE requests specifying Content-Type (#2128)
+- Fix: Error responses with '405 Method Not Allowed' now return payload to describe the error, for v2 requests only (#2075, #2078 and #2083)
+- Fix: Implemented more sofisticated HTTP Accept Header handling (Issues #1037, #1849, #1886, #2175, and #2208)
+- Hardening: csubs data model simplification, using a list of attributes for "conditions" instead of a complex structure (#1851)
+
 * Thu Jun 02 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.2.0-1
 - Add: notification attributes blacklist for NGSIv2 notifications (#2064)
 - Add: NGSIv2 custom notifications (#2015)
@@ -187,6 +272,7 @@ fi
 - Fix: Expression lost after refreshing subscription cache (#2202)
 - Fix: Avoided a possible infinite loop in sub-cache synchronization function (subscriptions stopped working due to this bug)
 - Deprecated: /ngsi10 and /ngsi9 as URL path prefixes
+- Fix: throttling set to zero (#2030)
 
 * Tue May 03 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.1.0-1
 - Add: NGSIv2 notifications (#1875)

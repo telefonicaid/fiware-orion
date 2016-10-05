@@ -31,9 +31,10 @@
 
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
+#include "rest/uriParamNames.h"
+#include "rest/EntityTypeInfo.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
-#include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "alarmMgr/alarmMgr.h"
@@ -56,6 +57,7 @@
 *   - id
 *   - idPattern
 *   - q
+*   - mq
 *   - geometry
 *   - coords
 *   - georel
@@ -78,13 +80,16 @@ std::string getEntities
 {
   Entities     entities;
   std::string  answer;
-  std::string  pattern    = ".*"; // all entities, default value
-  std::string  id         = ciP->uriParam["id"];
-  std::string  idPattern  = ciP->uriParam["idPattern"];
-  std::string  q          = ciP->uriParam["q"];
-  std::string  geometry   = ciP->uriParam["geometry"];
-  std::string  coords     = ciP->uriParam["coords"];
-  std::string  georel     = ciP->uriParam["georel"];
+  std::string  pattern     = ".*"; // all entities, default value
+  std::string  id          = ciP->uriParam["id"];
+  std::string  idPattern   = ciP->uriParam["idPattern"];
+  std::string  type        = ciP->uriParam["type"];
+  std::string  typePattern = ciP->uriParam["typePattern"];
+  std::string  q           = ciP->uriParam[URI_PARAM_Q];
+  std::string  mq          = ciP->uriParam[URI_PARAM_MQ];
+  std::string  geometry    = ciP->uriParam["geometry"];
+  std::string  coords      = ciP->uriParam["coords"];
+  std::string  georel      = ciP->uriParam["georel"];
   std::string  out;
 
   if ((idPattern != "") && (id != ""))
@@ -124,6 +129,14 @@ std::string getEntities
     pattern   = idPattern;
   }
 
+  if ((typePattern != "") && (type != ""))
+  {
+    OrionError oe(SccBadRequest, "Incompatible parameters: type, typePattern", "BadRequest");
+
+    TIMED_RENDER(answer = oe.toJson());
+    ciP->httpStatusCode = oe.code;
+    return answer;
+  }
 
   //
   // Making sure geometry, georel and coords are not used individually
@@ -188,7 +201,7 @@ std::string getEntities
   //
   // String filter in URI param 'q' ?
   // If so, put it in a new Scope and parse the q-string.
-  // The plain q-string is saved uin Scope::value, just in case.
+  // The plain q-string is saved in Scope::value, just in case.
   // Might be useful for debugging, if nothing else.
   //
   if (q != "")
@@ -196,7 +209,7 @@ std::string getEntities
     Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, q);
     std::string  errorString;
 
-    scopeP->stringFilterP = new StringFilter();
+    scopeP->stringFilterP = new StringFilter(SftQ);
     if (scopeP->stringFilterP->parse(q.c_str(), &errorString) == false)
     {
       OrionError oe(SccBadRequest, errorString, "BadRequest");
@@ -214,6 +227,34 @@ std::string getEntities
   }
 
 
+  //
+  // Metadata string filter in URI param 'mq' ?
+  // If so, put it in a new Scope and parse the mq-string.
+  // The plain mq-string is saved in Scope::value, just in case.
+  // Might be useful for debugging, if nothing else.
+  //
+  if (mq != "")
+  {
+    Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY_MD, mq);
+    std::string  errorString;
+
+    scopeP->mdStringFilterP = new StringFilter(SftMq);
+    if (scopeP->mdStringFilterP->parse(mq.c_str(), &errorString) == false)
+    {
+      OrionError oe(SccBadRequest, errorString, "BadRequest");
+
+      alarmMgr.badInput(clientIp, errorString);
+      scopeP->release();
+      delete scopeP;
+
+      TIMED_RENDER(out = oe.toJson());
+      ciP->httpStatusCode = oe.code;
+      return out;
+    }
+
+    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
+  }
+
 
   //
   // 01. Fill in QueryContextRequest - type "" is valid for all types
@@ -225,13 +266,25 @@ std::string getEntities
   // 2. Used with a single type name, so add it to the fill
   // 3. Used and with more than ONE typename
 
-  if (ciP->uriParamTypes.size() == 0)
+  if (!typePattern.empty())
+  {
+
+    bool      isIdPattern = (idPattern != "" || pattern == ".*");
+    EntityId* entityId    = new EntityId(pattern, typePattern, isIdPattern ? "true" : "false", true);
+
+    parseDataP->qcr.res.entityIdVector.push_back(entityId);
+  }
+  else if (ciP->uriParamTypes.size() == 0)
   {
     parseDataP->qcr.res.fill(pattern, "", "true", EntityTypeEmptyOrNotEmpty, "");
   }
   else if (ciP->uriParamTypes.size() == 1)
   {
-    parseDataP->qcr.res.fill(pattern, ciP->uriParam["type"], "true", EntityTypeNotEmpty, "");
+    parseDataP->qcr.res.fill(pattern, type, "true", EntityTypeNotEmpty, "");
+  }
+  else if (ciP->uriParamTypes.size() == 1)
+  {
+    parseDataP->qcr.res.fill(pattern, type, "true", EntityTypeNotEmpty, "");
   }
   else
   {

@@ -72,11 +72,99 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value              |
+      | Fiware-Service     | test_id_happy_path |
+      | Fiware-ServicePath | /test              |
     When get an attribute "temperature_0" by ID "room_1"
     Then verify that receive an "OK" http code
     And verify that the attribute by ID is returned
 
-   # ------------------------ Service ----------------------------------------------
+  # ------------------------ Content-Type header ----------------------------------------------
+  @with_content_type @BUG_2128
+  Scenario Outline:  try to get an attribute by entity ID using NGSI v2 with Content-Type header
+    Given  a definition of headers
+      | parameter          | value              |
+      | Fiware-Service     | test_id_happy_path |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | house       |
+      | entities_id       | room        |
+      | attributes_number | 3           |
+      | attributes_name   | temperature |
+      | attributes_value  | 34          |
+      | attributes_type   | celsius     |
+      | metadatas_number  | 2           |
+      | metadatas_name    | very_hot    |
+      | metadatas_type    | alarm       |
+      | metadatas_value   | hot         |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value              |
+      | Fiware-Service     | test_id_happy_path |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | <content_type>     |
+    When get an attribute "temperature_0" by ID "room_1"
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                                                        |
+      | error       | BadRequest                                                                                   |
+      | description | Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden |
+    Examples:
+      | content_type                      |
+      | application/json                  |
+      | application/xml                   |
+      | application/x-www-form-urlencoded |
+      | multipart/form-data               |
+      | text/plain                        |
+      | text/html                         |
+      | dsfsdfsdf                         |
+      | <sdsd>                            |
+      | (eeqweqwe)                        |
+
+  @with_empty_content_type @BUG_2364 @skip
+  Scenario:  try to get an attribute by entity ID using NGSI v2 with Content-Type header and empty value
+    Given  a definition of headers
+      | parameter          | value              |
+      | Fiware-Service     | test_id_happy_path |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | house       |
+      | entities_id       | room        |
+      | attributes_number | 3           |
+      | attributes_name   | temperature |
+      | attributes_value  | 34          |
+      | attributes_type   | celsius     |
+      | metadatas_number  | 2           |
+      | metadatas_name    | very_hot    |
+      | metadatas_type    | alarm       |
+      | metadatas_value   | hot         |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value              |
+      | Fiware-Service     | test_id_happy_path |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       |                    |
+    When get an attribute "temperature_0" by ID "room_1"
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                                                        |
+      | error       | BadRequest                                                                                   |
+      | description | Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden |
+
+   # ------------------------ Service header ----------------------------------------------
   @service
   Scenario Outline:  get an attribute by entity ID using NGSI v2 with several services
     Given  a definition of headers
@@ -95,6 +183,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                                  |
+      | Fiware-Service     | the same value of the previous request |
+      | Fiware-ServicePath | /test                                  |
     When get an attribute "temperature" by ID "room_0"
     Then verify that receive an "OK" http code
     And verify that the attribute by ID is returned
@@ -124,6 +216,9 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value |
+      | Fiware-ServicePath | /test |
     When get an attribute "temperature" by ID "room_0"
     Then verify that receive an "OK" http code
     And verify that the attribute by ID is returned
@@ -131,10 +226,9 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
   @service_error @BUG_1873
   Scenario Outline:  try to get an attribute by entity ID using NGSI v2 with wrong several services
     Given  a definition of headers
-      | parameter          | value            |
-      | Fiware-Service     | <service>        |
-      | Fiware-ServicePath | /test            |
-      | Content-Type       | application/json |
+      | parameter          | value     |
+      | Fiware-Service     | <service> |
+      | Fiware-ServicePath | /test     |
     When get an attribute "temperature_0" by ID "room_0"
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -159,7 +253,6 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | parameter          | value                           |
       | Fiware-Service     | greater than max length allowed |
       | Fiware-ServicePath | /test                           |
-      | Content-Type       | application/json                |
     When get an attribute "temperature_0" by ID "room_0"
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -187,6 +280,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                                  |
+      | Fiware-Service     | test_attr_service_path                 |
+      | Fiware-ServicePath | the same value of the previous request |
     When get an attribute "temperature" by ID "room_0"
     Then verify that receive an "OK" http code
     And verify that the attribute by ID is returned
@@ -219,6 +316,9 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter      | value                          |
+      | Fiware-Service | test_attr_service_path_without |
     When get an attribute "temperature" by ID "room_0"
     Then verify that receive an "OK" http code
     And verify that the attribute by ID is returned
@@ -229,7 +329,6 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | parameter          | value                        |
       | Fiware-Service     | test_attr_service_path_error |
       | Fiware-ServicePath | <service_path>               |
-      | Content-Type       | application/json             |
     When get an attribute "temperature_0" by ID "room_0"
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -251,7 +350,6 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | parameter          | value                        |
       | Fiware-Service     | test_attr_service_path_error |
       | Fiware-ServicePath | <service_path>               |
-      | Content-Type       | application/json             |
     When get an attribute "temperature_0" by ID "room_0"
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -269,7 +367,6 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | parameter          | value                        |
       | Fiware-Service     | test_attr_service_path_error |
       | Fiware-ServicePath | <service_path>               |
-      | Content-Type       | application/json             |
     When get an attribute "temperature_0" by ID "room_0"
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -287,7 +384,6 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | parameter          | value                                |
       | Fiware-Service     | test_attr_service_path_error         |
       | Fiware-ServicePath | max length allowed and eleven levels |
-      | Content-Type       | application/json                     |
     When get an attribute "temperature_0" by ID "room_0"
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -320,6 +416,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value               |
+      | Fiware-Service     | test_attr_entity_id |
+      | Fiware-ServicePath | /test               |
     When get an attribute "temperature_0" by ID "<entity_id>"
     Then verify that receive an "OK" http code
     And verify that the attribute by ID is returned
@@ -330,7 +430,6 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | room_4    |
       | room_2    |
 
-  @entity_id_one_entity.row<row.id>
   @entity_id_one_entity
   Scenario Outline:  get an attribute by entity ID using NGSI v2 with several entity id values with one entity
     Given  a definition of headers
@@ -353,6 +452,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | metadatas_value   | hot           |
     And create entity group with "1" entities in "normalized" mode
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value               |
+      | Fiware-Service     | test_attr_entity_id |
+      | Fiware-ServicePath | /test               |
     When get an attribute "temperature_1" by ID "the same value of the previous request"
     Then verify that receive an "OK" http code
     And verify that the attribute by ID is returned
@@ -381,7 +484,6 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | parameter          | value               |
       | Fiware-Service     | test_attr_entity_id |
       | Fiware-ServicePath | /test               |
-      | Content-Type       | application/json    |
     When get an attribute "temperature_0" by ID "<entity_id>"
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -413,6 +515,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                     |
+      | Fiware-Service     | test_attr_entity_unkwnown |
+      | Fiware-ServicePath | /test                     |
     When get an attribute "temperature_1" by ID "retretert"
     Then verify that receive an "Not Found" http code
     And verify an error response
@@ -426,7 +532,6 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | parameter          | value                  |
       | Fiware-Service     | test_id_entity_invalid |
       | Fiware-ServicePath | /test                  |
-      | Content-Type       | application/json       |
     When get an attribute "temperature_1" by ID "<entity_id>"
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -452,7 +557,6 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | parameter          | value                  |
       | Fiware-Service     | test_id_entity_invalid |
       | Fiware-ServicePath | /test                  |
-      | Content-Type       | application/json       |
     When get an attribute "temperature_1" by ID "house_?"
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -466,7 +570,6 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | parameter          | value                  |
       | Fiware-Service     | test_id_entity_invalid |
       | Fiware-ServicePath | /test                  |
-      | Content-Type       | application/json       |
     When get an attribute "temperature_1" by ID "house_/"
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -480,7 +583,6 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | parameter          | value                  |
       | Fiware-Service     | test_id_entity_invalid |
       | Fiware-ServicePath | /test                  |
-      | Content-Type       | application/json       |
     When get an attribute "temperature_1" by ID "house_#"
     Then verify that receive an "Not Found" http code
     And verify an error response
@@ -514,6 +616,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                       |
+      | Fiware-Service     | test_id_attr_attribute_name |
+      | Fiware-ServicePath | /test                       |
     When get an attribute "<attribute_name>" by ID "room_1"
     Then verify that receive an "OK" http code
     And verify that the attribute by ID is returned
@@ -542,6 +648,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                                 |
+      | Fiware-Service     | test_attr_attribute_name_without_type |
+      | Fiware-ServicePath | /test                                 |
     When get an attribute "the same value of the previous request" by ID "room_1"
     Then verify that receive an "OK" http code
     And verify that the attribute by ID is returned
@@ -581,6 +691,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                                 |
+      | Fiware-Service     | test_attr_attribute_name_without_type |
+      | Fiware-ServicePath | /test                                 |
     When get an attribute "<attribute_name>" by ID "room_1"
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -612,6 +726,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                              |
+      | Fiware-Service     | test_attr_attribute_name_with_type |
+      | Fiware-ServicePath | /test                              |
     When get an attribute "the same value of the previous request" by ID "room_1"
     Then verify that receive an "OK" http code
     And verify that the attribute by ID is returned
@@ -656,6 +774,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                                   |
+      | Fiware-Service     | test_attr_attribute_name_with_metadatas |
+      | Fiware-ServicePath | /test                                   |
     When get an attribute "the same value of the previous request" by ID "room_1"
     Then verify that receive an "OK" http code
     And verify that the attribute by ID is returned
@@ -695,6 +817,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                            |
+      | Fiware-Service     | test_attr_attribute_name_unknown |
+      | Fiware-ServicePath | /test                            |
     When get an attribute "dfdsfsdfds" by ID "room_1"
     Then verify that receive an "Not Found" http code
     And verify an error response
@@ -708,13 +834,6 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | parameter          | value                 |
       | Fiware-Service     | test_update_entity_id |
       | Fiware-ServicePath | /test                 |
-      | Content-Type       | application/json      |
-    # These properties below are used in update request
-    And properties to entities
-      | parameter         | value       |
-      | attributes_number | 2           |
-      | attributes_name   | temperature |
-      | attributes_value  | 80          |
     When get an attribute "<entity_id>" by ID "room_1"
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -735,28 +854,30 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | my house            |
 
   @attribute_name_invalid @BUG_1280
-  Scenario Outline:  try to get an attribute by entity ID using NGSI v2 with invalid attribute_name
+  Scenario:  try to get an attribute by entity ID using NGSI v2 with invalid attribute_name
     Given  a definition of headers
       | parameter          | value                 |
       | Fiware-Service     | test_update_entity_id |
       | Fiware-ServicePath | /test                 |
-      | Content-Type       | application/json      |
-  # These properties below are used in update request
-    And properties to entities
-      | parameter         | value       |
-      | attributes_number | 2           |
-      | attributes_name   | temperature |
-      | attributes_value  | 80          |
-    When get an attribute "<entity_id>" by ID "room_1"
+    When get an attribute "house_/" by ID "room_1"
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value             |
+      | error       | BadRequest          |
+      | description | service not found |
+
+  @attribute_name_invalid @BUG_1280
+  Scenario:  try to get an attribute by entity ID using NGSI v2 with invalid attribute_name
+    Given  a definition of headers
+      | parameter          | value                 |
+      | Fiware-Service     | test_update_entity_id |
+      | Fiware-ServicePath | /test                 |
+    When get an attribute "house_#" by ID "room_1"
     Then verify that receive an "Not Found" http code
     And verify an error response
       | parameter   | value                                                      |
       | error       | NotFound                                                   |
       | description | The requested entity has not been found. Check type and id |
-    Examples:
-      | entity_id |
-      | house_/   |
-      | house_#   |
 
   @attribute_name_wrong
   Scenario:  try to get an attribute by entity ID using NGSI v2 with wrong attribute_name
@@ -764,7 +885,6 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | parameter          | value                  |
       | Fiware-Service     | test_id_entity_invalid |
       | Fiware-ServicePath | /test                  |
-      | Content-Type       | application/json       |
     When get an attribute "house_?" by ID "rooom_1"
     Then verify that receive an "Bad Request" http code
     And verify an error response
@@ -773,8 +893,6 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | description | Empty right-hand-side for URI param /// |
 
   #   -------------- attribute value ------------------------------------------
-
-  @compound_value_without_attr_type.row<row.id>
   @compound_value_without_attr_type @BUG_1106
   Scenario Outline: get an attribute by entity ID using NGSI v2 with special attribute values and without attr type (compound, vector, boolean, etc)
     Given  a definition of headers
@@ -791,6 +909,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | attributes_value | <attributes_value> |
     And create an entity in raw and "normalized" modes
     And verify that receive an "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                    |
+      | Fiware-Service     | test_attr_with_metadatas |
+      | Fiware-ServicePath | /test                    |
     When get an attribute "temperature" by ID "<entity_id>"
     Then verify that receive an "OK" http code
     And verify an attribute by ID in raw mode with type "<type>" in attribute value from http response
@@ -832,6 +954,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | attributes_type  | "celsius"          |
     And create an entity in raw and "normalized" modes
     And verify that receive an "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                    |
+      | Fiware-Service     | test_attr_with_metadatas |
+      | Fiware-ServicePath | /test                    |
     When get an attribute "temperature" by ID "<entity_id>"
     Then verify that receive an "OK" http code
     And verify an attribute by ID in raw mode with type "<type>" in attribute value from http response
@@ -875,6 +1001,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | metadatas_value  | "hot"              |
     And create an entity in raw and "normalized" modes
     And verify that receive an "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                    |
+      | Fiware-Service     | test_attr_with_metadatas |
+      | Fiware-ServicePath | /test                    |
     When get an attribute "temperature" by ID "<entity_id>"
     Then verify that receive an "OK" http code
     And verify an attribute by ID in raw mode with type "<type>" in attribute value from http response
@@ -924,6 +1054,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                                           |
+      | Fiware-Service     | test_attr_attribute_name_without_metadatas_type |
+      | Fiware-ServicePath | /test                                           |
     When get an attribute "temperature_0" by ID "room_1"
     Then verify that receive an "OK" http code
     And verify that the attribute by ID is returned
@@ -969,6 +1103,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                                           |
+      | Fiware-Service     | test_attr_attribute_name_without_metadatas_type |
+      | Fiware-ServicePath | /test                                           |
     When get an attribute "temperature_0" by ID "room_1"
     Then verify that receive an "OK" http code
     And verify that the attribute by ID is returned
@@ -1011,6 +1149,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | type   | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value                   |
+      | Fiware-Service     | test_attr_more_entities |
+      | Fiware-ServicePath | /test                   |
     When get an attribute "temperature" by ID "room"
     Then verify that receive an "Conflict" http code
     And verify an error response
@@ -1036,6 +1178,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | type   | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value             |
+      | Fiware-Service     | test_attr_type_qp |
+      | Fiware-ServicePath | /test             |
     When get an attribute "temperature" by ID "room"
       | parameter | value   |
       | type      | house_1 |
@@ -1060,6 +1206,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | type   | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value             |
+      | Fiware-Service     | test_attr_type_qp |
+      | Fiware-ServicePath | /test             |
     When get an attribute "temperature" by ID "room"
       | parameter | value |
       | type      |       |
@@ -1087,6 +1237,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | type   | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value             |
+      | Fiware-Service     | test_attr_type_qp |
+      | Fiware-ServicePath | /test             |
     When get an attribute "temperature" by ID "room"
       | parameter   | value   |
       | <parameter> | house_1 |
@@ -1122,6 +1276,10 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | type   | true   |
     And verify that receive several "Created" http code
+    And modify headers and keep previous values "false"
+      | parameter          | value             |
+      | Fiware-Service     | test_attr_type_qp |
+      | Fiware-ServicePath | /test             |
     When get an attribute "temperature" by ID "room"
       | parameter   | value   |
       | <parameter> | house_1 |
@@ -1141,5 +1299,3 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | p(flat)             |
       | {\'a\':34}          |
       | [\'34\', \'a\', 45] |
-
-

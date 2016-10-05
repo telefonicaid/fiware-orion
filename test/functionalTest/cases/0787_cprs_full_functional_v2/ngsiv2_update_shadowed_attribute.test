@@ -296,7 +296,7 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "A1",
-                        "type": "none",
+                        "type": "Text",
                         "value": "A1 modified by 04"
                     }
                 ],

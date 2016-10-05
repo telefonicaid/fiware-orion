@@ -304,14 +304,14 @@ Date: REGEX(.*)
 11. GET /v2/entities/E1/attrs/A1
 =================================
 HTTP/1.1 200 OK
-Content-Length: 39
+Content-Length: 41
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "Number",
     "value": 0
 }
 
@@ -335,7 +335,7 @@ Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "None",
     "value": null
 }
 
@@ -357,11 +357,16 @@ Date: REGEX(.*)
 15. PATCH /v2/entities/E1/attrs/A1 (empty payload)
 ==================================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
+Content-Length: 63
+Content-Type: application/json
 Allow: GET, PUT, DELETE
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
 
 
 --TEARDOWN--

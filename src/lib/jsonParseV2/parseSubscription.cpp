@@ -110,6 +110,10 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     {
       return badInput(ciP, "max description length exceeded");
     }
+    if (forbiddenChars(descriptionString.c_str()))
+    {
+      return badInput(ciP, "forbidden characters in description");
+    }
 
     subsP->descriptionProvided = true;
     subsP->description = descriptionString;
@@ -303,9 +307,16 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
       return badInput(ciP, "subject entities element has id and idPattern");
     }
 
+    if (iter->HasMember("type") && iter->HasMember("typePattern"))
+    {
+      return badInput(ciP, "subject entities element has type and typePattern");
+    }
+
+
     std::string  id;
     std::string  idPattern;
     std::string  type;
+    std::string  typePattern;
 
     {
       Opt<std::string> idOpt = getStringOpt(*iter, "id", "subject entities element id");
@@ -356,25 +367,53 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
       }
     }
 
-    Opt<std::string> typeOpt = getStringOpt(*iter, "type", "subject entities element type");
-    if (!typeOpt.ok())
     {
-      return badInput(ciP, typeOpt.error);
-    }
-    else if (typeOpt.given)
-    {
-      if (forbiddenIdCharsV2(typeOpt.value.c_str()))
+      Opt<std::string> typeOpt = getStringOpt(*iter, "type", "subject entities element type");
+      if (!typeOpt.ok())
       {
-        return badInput(ciP, "forbidden characters in subject entities element type");
+        return badInput(ciP, typeOpt.error);
       }
-      if (typeOpt.value.length() > MAX_ID_LEN)
+      else if (typeOpt.given)
       {
-        return badInput(ciP, "max type length exceeded");
+        if (forbiddenIdCharsV2(typeOpt.value.c_str()))
+        {
+          return badInput(ciP, "forbidden characters in subject entities element type");
+        }
+        if (typeOpt.value.length() > MAX_ID_LEN)
+        {
+          return badInput(ciP, "max type length exceeded");
+        }
+        type = typeOpt.value;
       }
-      type = typeOpt.value;
     }
 
-    EntID  eid(id, idPattern, type);
+    {
+      Opt<std::string> typePatOpt = getStringOpt(*iter, "typePattern", "subject entities element typePattern");
+      if (!typePatOpt.ok())
+      {
+        return badInput(ciP, typePatOpt.error);
+      }
+      else if (typePatOpt.given)
+      {
+        if (typePatOpt.value.empty())
+        {
+          return badInput(ciP, "subject entities element typePattern is empty");
+        }
+
+        typePattern = typePatOpt.value;
+
+        // FIXME P5: Keep the regex and propagate to sub-cache
+        regex_t re;
+        if (regcomp(&re, typePattern.c_str(), REG_EXTENDED) != 0)
+        {
+          return badInput(ciP, "Invalid regex for entity id pattern");
+        }
+        regfree(&re);  // As the regex is not yet propagated ...
+      }
+    }
+
+
+    EntID  eid(id, idPattern, type, typePattern);
 
     if (std::find(eivP->begin(), eivP->end(), eid) == eivP->end()) // if not already included
     {
@@ -596,6 +635,17 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     subsP->notification.blacklist = true;
   }
 
+  // metadata
+  if (notification.HasMember("metadata"))
+  {
+    std::string r = parseAttributeList(ciP, &subsP->notification.metadata, notification["metadata"]);
+
+    if (r != "")
+    {
+      return r;
+    }
+  }
+
   // attrsFormat field
   Opt<std::string>  attrsFormatOpt = getStringOpt(notification, "attrsFormat");
   if (!attrsFormatOpt.ok())
@@ -684,7 +734,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
       std::string  errorString;
       Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, qString);
 
-      scopeP->stringFilterP = new StringFilter();
+      scopeP->stringFilterP = new StringFilter(SftQ);
       if (scopeP->stringFilterP->parse(scopeP->value.c_str(), &errorString) == false)
       {
         delete scopeP->stringFilterP;
@@ -696,7 +746,41 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
       subsP->restriction.scopeVector.push_back(scopeP);
     }
 
+    if (expression.HasMember("mq"))
+    {
+      const Value& mq = expression["mq"];
+      std::string  mqString;
+
+      if (!mq.IsString())
+      {
+        return badInput(ciP, "mq is not a string");
+      }
+
+      mqString = mq.GetString();
+      if (mqString.empty())
+      {
+        return badInput(ciP, "mq is empty");
+      }
+
+      subsP->subject.condition.expression.mq = mqString;
+
+      std::string  errorString;
+      Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY_MD, mqString);
+
+      scopeP->mdStringFilterP = new StringFilter(SftMq);
+      if (scopeP->mdStringFilterP->parse(scopeP->value.c_str(), &errorString) == false)
+      {
+        delete scopeP->mdStringFilterP;
+        delete scopeP;
+
+        return badInput(ciP, errorString);
+      }
+
+      subsP->restriction.scopeVector.push_back(scopeP);
+    }
+
     // geometry
+    int nGeoItems = 0;
     {
       Opt<std::string> geometryOpt = getStringOpt(expression, "geometry");
 
@@ -711,6 +795,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
           return badInput(ciP, "geometry is empty");
         }
         subsP->subject.condition.expression.geometry = geometryOpt.value;
+        nGeoItems++;
       }
     }
 
@@ -729,6 +814,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
           return badInput(ciP, "coords is empty");
         }
         subsP->subject.condition.expression.coords = coordsOpt.value;
+        nGeoItems++;
       }
     }
 
@@ -746,7 +832,28 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
           return badInput(ciP, "georel is empty");
         }
         subsP->subject.condition.expression.georel = georelOpt.value;
+        nGeoItems++;
       }
+    }
+
+    if ((nGeoItems > 0) && (nGeoItems != 3))
+    {
+      return badInput(ciP, "partial geo expression; geometry, georel and coords have to be provided together");
+    }
+
+    // If geometry, coords and georel are filled, then attempt to create a filter scope
+    // with them
+    SubscriptionExpression subExpr = subsP->subject.condition.expression;
+    if ((subExpr.georel != "") && (subExpr.geometry != "") && (subExpr.coords != ""))
+    {
+      Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
+      std::string  err;
+      if (scopeP->fill("v2", subExpr.geometry, subExpr.coords, subExpr.georel, &err) != 0)
+      {
+        delete scopeP;
+        return badInput(ciP, "error parsing geo-query fields: " + err);
+      }
+      subsP->restriction.scopeVector.push_back(scopeP);
     }
   }
 

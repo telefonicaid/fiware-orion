@@ -155,7 +155,7 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
       | error       | BadRequest                                           |
       | description | metadata name length: 257, max length supported: 256 |
 
-  @attribute_metadata_name_update_without_attr_value @BUG_1868 @skip
+  @attribute_metadata_name_update_without_attr_value @BUG_1868
   Scenario:  try to update an attribute by entity ID and attribute name using NGSI v2 with attribute metadata and  without attribute value
     Given  a definition of headers
       | parameter          | value                                 |
@@ -177,13 +177,9 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
       | metadatas_name  | my_meta |
       | metadatas_value | 5678    |
     When update an attribute by ID "room" and attribute name "temperature" if it exists
-    Then verify that receive an "Bad Request" http code
-    And verify an error response
-      | parameter   | value                                             |
-      | error       | BadRequest                                        |
-      | description | no 'value' for ContextAttribute without keyValues |
+    Then verify that receive an "No Content" http code
+    And verify that an entity is updated in mongo
 
-  @attribute_metadata_name_update_2.row<row.id>
   @attribute_metadata_name_update_2 @BUG_1217
   Scenario Outline:  update an attribute by entity ID and attribute name using NGSI v2 with several attribute metadata name with attribute type previously in attribute
     Given  a definition of headers
@@ -648,8 +644,7 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
       | room_18   | random=100000         |
       | room_19   | random=1000000        |
 
-  @attributes_metadata_compound_value @ISSUE_1712 @skip
-  # The json values still are not allowed.
+  @attributes_metadata_compound_value_object @ISSUE_1712 @ISSUE_1068
   Scenario Outline:  update an attribute by entity ID and attribute name using NGSI v2 with compound attribute metadata values without attribute metadata type
     Given  a definition of headers
       | parameter          | value                       |
@@ -672,7 +667,6 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
   # These properties below are used in update request
     And properties to entities
       | parameter        | value            |
-      | attributes_name  | "temperature"    |
       | attributes_value | 78               |
       | metadatas_name   | "alarm"          |
       | metadatas_value  | <metadata_value> |
@@ -680,17 +674,16 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
     Then verify that receive an "No Content" http code
     Examples:
       | entity_id | metadata_value                                                                |
-      | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
-      | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
-      | "room9"   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
-      | "room10"  | {"x": "x1","x2": "b"}                                                         |
-      | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  |
-      | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
-      | "room13"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
-      | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
+      | room7     | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
+      | room8     | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
+      | room9     | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
+      | room10    | {"x": "x1","x2": "b"}                                                         |
+      | room11    | {"x": {"x1": "a","x2": "b"}}                                                  |
+      | room12    | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
+      | room13    | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
+      | room14    | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
 
-  @attributes_metadata_compound_value @ISSUE_1712 @skip
-  # The json values still are not allowed.
+  @attributes_metadata_compound_value_object @ISSUE_1712 @ISSUE_1068
   Scenario Outline:  update an attribute by entity ID and attribute name using NGSI v2 with compound attribute metadata values with attribute metadata type
     Given  a definition of headers
       | parameter          | value                       |
@@ -721,14 +714,14 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
     Then verify that receive an "No Content" http code
     Examples:
       | entity_id | metadata_value                                                                |
-      | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
-      | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
-      | "room9"   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
-      | "room10"  | {"x": "x1","x2": "b"}                                                         |
-      | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  |
-      | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
-      | "room13"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
-      | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
+      | room7     | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
+      | room8     | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
+      | room9     | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
+      | room10    | {"x": "x1","x2": "b"}                                                         |
+      | room11    | {"x": {"x1": "a","x2": "b"}}                                                  |
+      | room12    | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
+      | room13    | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
+      | room14    | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
 
   @attribute_metadata_value_update_special_without_meta_type @BUG_1220
   Scenario Outline:  update an attribute by entity ID and attribute name using NGSI v2 with special metadata attribute values (compound, vector, boolean, etc) and without attribute metadata type

@@ -73,7 +73,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     And verify that entities are stored in mongo
     Examples:
       | metadata_name |
-      | temperature   |
+      | thing         |
       | 34            |
       | false         |
       | true          |
@@ -118,6 +118,39 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | habitación    |
       | españa        |
       | barça         |
+
+  @attributes_metadata_exists @BUG_1112
+  Scenario:  try to create entities using NGSI v2 if attributes metadata exists but without metadata type but the new one has metadata type
+    Given  a definition of headers
+      | parameter          | value              |
+      | Fiware-Service     | test_metadata_name |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 56          |
+      | metadatas_name   | very_hot    |
+      | metadatas_value  | true        |
+    When create entity group with "1" entities in "normalized" mode
+    Then verify that receive several "Created" http code
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 56          |
+      | metadatas_name   | very_hot    |
+      | metadatas_value  | true        |
+      | metadatas_type   | alarm       |
+    When create entity group with "1" entities in "normalized" mode
+    Then verify that receive several "Unprocessable Entity" http code
+    And verify several error responses
+      | parameter   | value          |
+      | error       | Unprocessable  |
+      | description | Already Exists |
 
   @attributes_metadata_name_with_type
   Scenario Outline:  create entities using NGSI v2 with several attributes metadata name with metadata type
@@ -472,7 +505,6 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | error       | BadRequest             |
       | description | missing metadata value |
 
-  @attributes_metadata_value_special.row<row.id>
   @attributes_metadata_value_special @BUG_1106 @BUG_1713
   Scenario Outline:  create an entity using NGSI v2 with several attributes metadata special values without metadata type (null, boolean, etc)
     Given  a definition of headers
@@ -502,8 +534,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | "room8"   | "2017-06-17T07:21:24.238Z" |
       | "room9"   | null                       |
 
-  @attributes_metadata_value_special_3 @ISSUE_1712 @skip
-  # The json values still are not allowed.
+  @attributes_metadata_value_special_object @ISSUE_1712 @ISSUE_1068
   Scenario Outline:  create an entity using NGSI v2 with several attributes metadata json values without metadata type (null, boolean, etc)
     Given  a definition of headers
       | parameter          | value                       |
@@ -561,8 +592,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | "room16"  | "2017-06-17T07:21:24.238Z" |
       | "room17"  | null                       |
 
-  @attributes_metadata_value_special_6 @ISSUE_1712 @skip
-  # The json values still are not allowed.
+  @attributes_metadata_value_special_object @ISSUE_1712 @ISSUE_1068
   Scenario Outline:  create an entity using NGSI v2 with several attributes metadata json values with metadata type (null, boolean, etc)
     Given  a definition of headers
       | parameter          | value                       |
@@ -572,7 +602,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     And properties to entities
       | parameter        | value            |
       | entities_type    | "room"           |
-      | entities_id      | <entity_id>      |
+      | entities_id      | "<entity_id>"    |
       | attributes_name  | "temperature"    |
       | attributes_value | "34"             |
       | metadatas_name   | "alarm"          |
@@ -582,14 +612,14 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     Then verify that receive an "Created" http code
     Examples:
       | entity_id | metadata_value                                                                |
-      | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
-      | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
-      | "room9"   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
-      | "room10"  | {"x": "x1","x2": "b"}                                                         |
-      | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  |
-      | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
-      | "room13"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
-      | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
+      | room7     | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
+      | room8     | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
+      | room9     | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
+      | room10    | {"x": "x1","x2": "b"}                                                         |
+      | room11    | {"x": {"x1": "a","x2": "b"}}                                                  |
+      | room12    | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
+      | room13    | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
+      | room14    | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
 
   @attributes_metadata_value_error @BUG_1093 @BUG_1200
   Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes metadata value without metadata type
@@ -692,7 +722,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | "room_13" | {"a" "b"}      |
       | "room_14" | "a": "b"}      |
 
-  @attributes_metadata_value_special_not_allowed @BUG_1110
+  @attributes_metadata_value_special_object @BUG_1110
   Scenario Outline:  try to create an entity using NGSI v2 with several compound special attributes metadata values without metadata type
     Given  a definition of headers
       | parameter          | value                             |
@@ -702,27 +732,23 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     And properties to entities
       | parameter        | value            |
       | entities_type    | "room"           |
-      | entities_id      | <entity_id>      |
+      | entities_id      | "<entity_id>"    |
       | attributes_name  | "temperature"    |
       | attributes_value | "34"             |
       | metadatas_name   | "alarm"          |
       | metadatas_value  | <metadata_value> |
     When create an entity in raw and "normalized" modes
-    Then verify that receive an "Bad Request" http code
-    And verify an error response
-      | parameter   | value                                          |
-      | error       | BadRequest                                     |
-      | description | invalid JSON type for attribute metadata value |
+    Then verify that receive an "Created" http code
     Examples:
       | entity_id | metadata_value                                                                |
-      | "room15"  | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
-      | "room16"  | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
-      | "room17"  | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
-      | "room18"  | {"x": "x1","x2": "b"}                                                         |
-      | "room19"  | {"x": {"x1": "a","x2": "b"}}                                                  |
-      | "room20"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
-      | "room21"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
-      | "room22"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
+      | room15    | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
+      | room16    | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
+      | room17    | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
+      | room18    | {"x": "x1","x2": "b"}                                                         |
+      | room19    | {"x": {"x1": "a","x2": "b"}}                                                  |
+      | room20    | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
+      | room21    | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
+      | room22    | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
 
   @attributes_metadata_value_special_wrong @BUG_1110
   Scenario Outline:  try to create an entity using NGSI v2 with several wrong special attributes metadata values with metadata type
@@ -763,7 +789,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | "room_13" | {"a" "b"}      |
       | "room_14" | "a": "b"}      |
 
-  @attributes_metadata_value_special_not_allowed @BUG_1110
+  @attributes_metadata_value_special_object @BUG_1110
   Scenario Outline:  try to create an entity using NGSI v2 with several compound special attributes metadata values with metadata type
     Given  a definition of headers
       | parameter          | value                             |
@@ -773,28 +799,24 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     And properties to entities
       | parameter        | value            |
       | entities_type    | "room"           |
-      | entities_id      | <entity_id>      |
+      | entities_id      | "<entity_id>"    |
       | attributes_name  | "temperature"    |
       | attributes_value | "34"             |
       | metadatas_name   | "alarm"          |
       | metadatas_value  | <metadata_value> |
       | metadatas_type   | "nothing"        |
     When create an entity in raw and "normalized" modes
-    Then verify that receive an "Bad Request" http code
-    And verify an error response
-      | parameter   | value                                          |
-      | error       | BadRequest                                     |
-      | description | invalid JSON type for attribute metadata value |
+    Then verify that receive an "Created" http code
     Examples:
       | entity_id | metadata_value                                                                |
-      | "room15"  | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
-      | "room16"  | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
-      | "room17"  | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
-      | "room18"  | {"x": "x1","x2": "b"}                                                         |
-      | "room19"  | {"x": {"x1": "a","x2": "b"}}                                                  |
-      | "room20"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
-      | "room21"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
-      | "room22"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
+      | room15    | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
+      | room16    | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
+      | room17    | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
+      | room18    | {"x": "x1","x2": "b"}                                                         |
+      | room19    | {"x": {"x1": "a","x2": "b"}}                                                  |
+      | room20    | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
+      | room21    | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
+      | room22    | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
 
   # ---------- attribute metadata type --------------------------------
 
@@ -1088,7 +1110,6 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | house(flat) | normalized |
       | house(flat) | keyValues  |
 
-  @qp_key_values_off_only_value.row<row.id>
   @qp_key_values_off_only_value @BUG_1716 @BUG_1789
   Scenario Outline:  try to create an entity using NGSI v2 without keyValues mode activated, but in only values format
     Given  a definition of headers

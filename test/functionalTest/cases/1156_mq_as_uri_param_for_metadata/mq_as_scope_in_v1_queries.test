@@ -1,0 +1,224 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+mq as scope for v1 queries
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E1, with attr A1=1, having metadata M1=1
+# 02. Create entity E2, with attr A1=1, having metadata M1=2
+# 03. Create entity E3, with attr A1=1, having metadata M2=3
+# 04. Create entity E4, with attr A1=2, having metadata M1=2 and M2=3 (never to be found)
+# 05. GET entities matching q=A1==1 AND mq=A1.M1==2, see E2, using /v1/queryContext
+#
+
+echo "01. Create entity E1, with attr A1=1, having metadata M1=1"
+echo "=========================================================="
+payload='{
+  "id": "E1",
+  "A1": {
+    "value": 1,
+    "metadata": {
+      "M1": {
+        "value": 1
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E2, with attr A1=1, having metadata M1=2"
+echo "=========================================================="
+payload='{
+  "id": "E2",
+  "A1": {
+    "value": 1,
+    "metadata": {
+      "M1": {
+        "value": 2
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity E3, with attr A1=1, having metadata M2=3"
+echo "=========================================================="
+payload='{
+  "id": "E3",
+  "A1": {
+    "value": 1,
+    "metadata": {
+      "M2": {
+        "value": 3
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Create entity E4, with attr A1=2, having metadata M1=2 and M2=3 (never to be found)"
+echo "======================================================================================="
+payload='{
+  "id": "E4",
+  "A1": {
+    "value": 2,
+    "metadata": {
+      "M1": {
+        "value": 2
+      },
+      "M2": {
+        "value": 3
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. GET entities matching q=A1==1 AND mq=A1.M1==2, see E2, using /v1/queryContext"
+echo "================================================================================="
+payload='{
+  "entities": [
+    {
+      "isPattern": "true",
+      "id": ".*"
+    }
+  ],
+  "restriction": {
+      "scopes": [
+          {
+              "type": "FIWARE::StringQuery::Metadata",
+              "value": "A1.M1==2"
+          },
+          {
+              "type": "FIWARE::StringQuery",
+              "value": "A1==1"
+          }
+      ]
+    }
+}'
+orionCurl --url /v1/queryContext --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1, with attr A1=1, having metadata M1=1
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity E2, with attr A1=1, having metadata M1=2
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create entity E3, with attr A1=1, having metadata M2=3
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create entity E4, with attr A1=2, having metadata M1=2 and M2=3 (never to be found)
+=======================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. GET entities matching q=A1==1 AND mq=A1.M1==2, see E2, using /v1/queryContext
+=================================================================================
+HTTP/1.1 200 OK
+Content-Length: 552
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "M1",
+                                "type": "Number",
+                                "value": 2
+                            }
+                        ],
+                        "name": "A1",
+                        "type": "Number",
+                        "value": 1
+                    }
+                ],
+                "id": "E2",
+                "isPattern": "false",
+                "type": "Thing"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

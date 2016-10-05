@@ -42,7 +42,7 @@ payload='{
   "id": "E1",
   "temp": {
     "value": "1",
-    "metadata": { "m1": 1 }
+    "metadata": { "m1": { "value": 1 } }
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -55,7 +55,7 @@ echo "====================================================="
 payload='{
   "temp": {
     "value": "1",
-    "metadata": { "m1": 2 }
+    "metadata": { "m1": { "value": 2 } }
   }
 }'
 orionCurl --url /v2/entities/E1/attrs --payload "$payload"
@@ -93,7 +93,7 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 102
+Content-Length: 104
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -103,11 +103,11 @@ Date: REGEX(.*)
     "temp": {
         "metadata": {
             "m1": {
-                "type": "none",
+                "type": "Number",
                 "value": 2
             }
         },
-        "type": "none",
+        "type": "Text",
         "value": "1"
     },
     "type": "T1"

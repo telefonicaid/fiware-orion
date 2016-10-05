@@ -108,7 +108,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext --payload "${payload}" --out "text/plain, application/json; charset=UTF-8"
+orionCurl --url /v1/queryContext --payload "${payload}" --out "text/plain, application/json;q=0.9;charset=UTF-8"
 echo
 echo
 
@@ -246,7 +246,7 @@ Date: REGEX(.*)
 06. 'Accept-list' with no valid mime-type and invalid JSON payload
 ==================================================================
 HTTP/1.1 406 Not Acceptable
-Content-Length: 194
+Content-Length: 145
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -254,7 +254,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "406",
-        "details": "acceptable MIME types: application/json. Accept header in request: text/plane, image/jpeg",
+        "details": "no acceptable mime-type in accept header",
         "reasonPhrase": "Not Acceptable"
     }
 }
@@ -263,7 +263,7 @@ Date: REGEX(.*)
 07. 'Accept-list' with no valid mime-type, invalid JSON payload, and extra encoding after ';'
 =============================================================================================
 HTTP/1.1 406 Not Acceptable
-Content-Length: 217
+Content-Length: 145
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -271,7 +271,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "406",
-        "details": "acceptable MIME types: application/json. Accept header in request: text/plane, image/jpeg&#59; charset&#61;UTF-8",
+        "details": "no acceptable mime-type in accept header",
         "reasonPhrase": "Not Acceptable"
     }
 }

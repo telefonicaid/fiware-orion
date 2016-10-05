@@ -627,9 +627,9 @@ Feature: update an attribute value by entity ID and attribute name if it exists 
     When update an attribute value by ID "dfgfdg" and attribute name "temperature_0" if it exists
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
+      | parameter   | value                                                      |
+      | error       | NotFound                                                   |
+      | description | The requested entity has not been found. Check type and id |
 
   @more_entities_update @BUG_1387
   Scenario:  try to update an attribute value by entity ID and attribute name using NGSI v2 with more than one entity id with the same id
@@ -695,7 +695,7 @@ Feature: update an attribute value by entity ID and attribute name if it exists 
       | house_&             |
       | my house            |
 
-  @entity_id_update_invalid_2 @BUG_1351 @ISSUE_2083 @skip
+  @entity_id_update_invalid @BUG_1351 @ISSUE_2083
   Scenario:  try to update an attribute value by entity ID and attribute name using NGSI v2 with invalid entity id values
     Given  a definition of headers
       | parameter          | value                 |
@@ -707,11 +707,11 @@ Feature: update an attribute value by entity ID and attribute name if it exists 
       | parameter        | value |
       | attributes_value | 80    |
     When update an attribute value by ID "house_#" and attribute name "temperature_0" if it exists
-    Then verify that receive an "Method not allowed" http code
+    Then verify that receive an "Method Not Allowed" http code
     And verify an error response
-      | parameter   | value            |
-      | error       | MethodNotAllowed |
-      | description | No defined yet   |
+      | parameter   | value              |
+      | error       | MethodNotAllowed   |
+      | description | method not allowed |
 
   @entity_id_update_invalid @BUG_1351
   Scenario:  try to update an attribute value by entity ID and attribute name using NGSI v2 with invalid entity id values
@@ -745,11 +745,11 @@ Feature: update an attribute value by entity ID and attribute name if it exists 
     When update an attribute value by ID "house_/" and attribute name "temperature_0" if it exists
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                |
-      | error       | BadRequest           |
-      | description | unrecognized request |
+      | parameter   | value             |
+      | error       | BadRequest        |
+      | description | service not found |
 
-  @entity_id_empty @ISSUE_1487 @skip
+  @entity_id_empty @ISSUE_1487
   Scenario:  try to update an attribute value by entity ID and attribute name using NGSI v2 API with empty entity_id
     Given  a definition of headers
       | parameter          | value                            |
@@ -763,9 +763,9 @@ Feature: update an attribute value by entity ID and attribute name if it exists 
     When update an attribute value by ID "" and attribute name "temperature_0" if it exists
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value             |
-      | error       | BadRequest        |
-      | description | service not found |
+      | parameter   | value                                        |
+      | error       | BadRequest                                   |
+      | description | entity id length: 0, min length supported: 1 |
 
  # --------------------- attribute name  ------------------------------------
 
@@ -874,9 +874,9 @@ Feature: update an attribute value by entity ID and attribute name if it exists 
     When update an attribute value by ID "room_1" and attribute name "fdgdfgdfg" if it exists
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
+      | parameter   | value                                      |
+      | error       | NotFound                                   |
+      | description | The entity does not have such an attribute |
 
   @attribute_name_invalid @BUG_1351
   Scenario Outline:  try to update an attribute value by entity id and attribute name using NGSI v2 API with invalid attribute names
@@ -986,9 +986,9 @@ Feature: update an attribute value by entity ID and attribute name if it exists 
     When update an attribute value by ID "room_1" and attribute name "house_/" if it exists
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                |
-      | error       | BadRequest           |
-      | description | unrecognized request |
+      | parameter   | value             |
+      | error       | BadRequest        |
+      | description | service not found |
 
   @attribute_name_invalid @BUG_1351
   Scenario:  try to update an attribute value by entity id and attribute name using NGSI v2 API with invalid attribute names
@@ -1023,7 +1023,7 @@ Feature: update an attribute value by entity ID and attribute name if it exists 
       | error       | UnsupportedMediaType                   |
       | description | not supported content type: text/plain |
 
-  @attribute_name_empty @ISSUE_1487 @skip
+  @attribute_name_empty @ISSUE_1487
   Scenario:  try to update an attribute value by entity ID and attribute name using NGSI v2 API with empty attribute name
     Given  a definition of headers
       | parameter          | value                            |
@@ -1052,6 +1052,6 @@ Feature: update an attribute value by entity ID and attribute name if it exists 
     When update an attribute value by ID "room_1" and attribute name "" if it exists
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value             |
-      | error       | BadRequest        |
-      | description | service not found |
+      | parameter   | value                                             |
+      | error       | BadRequest                                        |
+      | description | attribute name length: 0, min length supported: 1 |

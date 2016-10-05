@@ -1,0 +1,223 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Metadata value as complex compound
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity with three attrs having complicated compound values in metadatas
+# 02. GET /v2/entities, to see the entity
+# 03. POST /v1/queryContext, to see all entities using NSGIv1
+#
+
+echo '01. Create an entity with three attrs having complicated compound values in metadatas'
+echo '====================================================================================='
+payload='{
+  "id": "E1",
+  "objCompound": {
+    "value": "02",
+    "metadata": {
+      "M1": {
+        "value": {
+          "x": {
+            "x1": "a",
+            "x2": "b"
+          },
+          "y": [ "y1", "y2" ]
+        }
+      }
+    }
+  },
+  "mixCompound": {
+    "value": "02",
+    "metadata": {
+      "M1": {
+        "value": {
+          "a": "1",
+          "b": 2,
+          "c": true,
+          "d": false,
+          "e": {
+            "f": 5,
+            "g": "6",
+            "h": true,
+            "obj": { "oa": 1, "ob": false },
+            "ivec": [ 1, 2, 3, 4, 5 ],
+            "bvec": [ true, false, true, false, false ],
+            "svec": [ "s0", "s1", "s2", "s3", "s4" ]
+          }
+        }
+      }
+    }
+  },
+  "objCompound2": {
+    "value": "01",
+    "metadata": {
+      "M1": {
+        "value": {
+           "22": 22,
+           "o": {
+              "x" : [ "x1", "x2" ],
+              "y" : 3
+           },
+           "v": [ "z1", "z2" ]
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+
+echo "02. GET /v2/entities, to see the entity"
+echo "======================================="
+orionCurl --url /v2/entities
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with three attrs having complicated compound values in metadatas
+=====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. GET /v2/entities, to see the entity
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 593
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "mixCompound": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "a": "1",
+                        "b": 2,
+                        "c": true,
+                        "d": false,
+                        "e": {
+                            "bvec": [
+                                true,
+                                false,
+                                true,
+                                false,
+                                false
+                            ],
+                            "f": 5,
+                            "g": "6",
+                            "h": true,
+                            "ivec": [
+                                1,
+                                2,
+                                3,
+                                4,
+                                5
+                            ],
+                            "obj": {
+                                "oa": 1,
+                                "ob": false
+                            },
+                            "svec": [
+                                "s0",
+                                "s1",
+                                "s2",
+                                "s3",
+                                "s4"
+                            ]
+                        }
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "02"
+        },
+        "objCompound": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "x": {
+                            "x1": "a",
+                            "x2": "b"
+                        },
+                        "y": [
+                            "y1",
+                            "y2"
+                        ]
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "02"
+        },
+        "objCompound2": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "22": 22,
+                        "o": {
+                            "x": [
+                                "x1",
+                                "x2"
+                            ],
+                            "y": 3
+                        },
+                        "v": [
+                            "z1",
+                            "z2"
+                        ]
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "01"
+        },
+        "type": "Thing"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

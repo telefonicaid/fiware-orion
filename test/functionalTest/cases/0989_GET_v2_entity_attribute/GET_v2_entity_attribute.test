@@ -170,7 +170,7 @@ Date: REGEX(.*)
 {
     "metadata": {
         "m1": {
-            "type": "none",
+            "type": "Text",
             "value": "M1"
         }
     },

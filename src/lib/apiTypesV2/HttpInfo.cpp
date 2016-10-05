@@ -112,13 +112,13 @@ void HttpInfo::fill(const BSONObj& bo)
 
     if (bo.hasField(CSUB_METHOD))
     {
-      this->verb = str2Verb(getFieldF(bo, CSUB_METHOD).String());
+      this->verb = str2Verb(getStringFieldF(bo, CSUB_METHOD));
     }
 
     // qs
     if (bo.hasField(CSUB_QS))
     {
-      BSONObj qs = getFieldF(bo, CSUB_QS).Obj();
+      BSONObj qs = getObjectFieldF(bo, CSUB_QS);
 
       for (BSONObj::iterator i = qs.begin(); i.more();)
       {
@@ -131,7 +131,7 @@ void HttpInfo::fill(const BSONObj& bo)
     // headers
     if (bo.hasField(CSUB_HEADERS))
     {
-      BSONObj headers = getFieldF(bo, CSUB_HEADERS).Obj();
+      BSONObj headers = getObjectFieldF(bo, CSUB_HEADERS);
 
       for (BSONObj::iterator i = headers.begin(); i.more();)
       {

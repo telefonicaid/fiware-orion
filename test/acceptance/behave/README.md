@@ -228,6 +228,13 @@ Feature: feature name...
 ```
 
 
+## Notification listener
+
+The notification listener is executed automatically (a HTTP server as a daemon) in local IP where test are executed. 
+If you wish use the local IP in the url to notification, put in `notification_http_url` field the `replace_host` value, ex: 
+    `http://replace_host:1234/notify` -->  it string is replaced internally by the local IP (used to notifications).
+
+
 ## Summary of Features and Scenarios
 
 Finally, after each execution is displayed a summary (Optional) with all features executed and its scenarios status. See `environment.py` in root path.
@@ -259,45 +266,62 @@ Took 5m52.659s
 
 The log is stored in `logs` folder (if this folder does not exist it is created) and is called `behave.log` see `logging.ini`.
 
+The Context Broker must start with "DEBUG" level in "CB_EXTRA_OPS" field into properties.json file, otherwise some test expecting that setup will fail. Ex:
+```
+    "CB_EXTRA_OPS": "\"-multiservice -t 0-255 -logLevel DEBUG\"",
+```
+
 
 ## Tests Suites Coverage (features):
 
 |       FEATURE/REFERENCE                     |  TEST CASES  | METHOD  |            URL                                       |  PAYLOAD  | QUERIES PARAMS |
 |:--------------------------------------------|:------------:|--------:|:-----------------------------------------------------|:---------:|:--------------:|      
-|**api_entry_point**                                                                                                                                       |
-|  retrieve_api_resource                      |     19       | GET     | /version  /statistics  cache/statistics    /v2       | No        | No             |
+|**admin folder**                                                                                                                                          |
+| retrieve_log_level                          |      1       | GET     | /admin/log                                           | No        | No             |
+| change_log_level                            |     15       | PUT     | /admin/log                                           | No        | Yes            |
+|                                                                                                                                                          |
+| retrieve_trace_level                        |  (pending)   | GET     | /log/trace                                           | No        | No             |
+| change_trace_level                          |  (pending)   | PUT     | /log/trace/`<trace_levels>`                          | No        | No             |
+| delete_trace_level                          |  (pending)   | DELETE  | /log/trace/`<trace_levels>`                          | No        | No             |
+|                                                                                                                                                          |
+| semaphore_list                              |  (pending)   | GET     | /admin/sem                                           | No        | No             |
+|                                                                                                                                                          |
+|**api_entry_point folder**                                                                                                                                |
+| retrieve_api_resource                       |     19       | GET     | /version  /statistics  cache/statistics    /v2       | No        | No             |
 |                                                                                                                                                          |
 |**entities folder**                                                                                                                                       |
-| list_entities                               |    510       | GET     | /v2/entities/                                        | No        | Yes            |
-| create_entity                               |    693       | POST    | /v2/entities/                                        | Yes       | Yes            |    
+| list_entities                               |    570       | GET     | /v2/entities/                                        | No        | Yes            |
+| create_entity                               |    785       | POST    | /v2/entities/                                        | Yes       | Yes            |    
 |                                                                                                                                                          |
-| retrieve_entity                             |    220       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |
-| retrieve_entity_attributes                  |    201       | GET     | /v2/entities/`<entity_id>`/attrs                     | No        | Yes            |
-| update_or_append_entity_attributes          |    823       | POST    | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
+| retrieve_entity                             |    231       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |
+| retrieve_entity_attributes                  |    250       | GET     | /v2/entities/`<entity_id>`/attrs                     | No        | Yes            |
+| update_or_append_entity_attributes          |    834       | POST    | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
 | update_existing_entity_attributes           |    642       | PATCH   | /v2/entities/`<entity_id>`                           | Yes       | Yes            |
-| replace_all_entity_attributes               |    586       | PUT     | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
-| remove_entity                               |     92       | DELETE  | /v2/entities/`<entity_id>`                           | No        | Yes            |
+| replace_all_entity_attributes               |    598       | PUT     | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
+| remove_entity                               |    103       | DELETE  | /v2/entities/`<entity_id>`                           | No        | Yes            |
 |                                                                                                                                                          |
 |**attributes folder**                                                                                                                                     |
-| get_attribute_data                          |    244       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | Yes            |   
-| update_attribute_data                       |    610       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | Yes       | Yes            |
-| remove_a_single_attribute                   |    121       | DELETE  | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | Yes            |
+| get_attribute_data                          |    254       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | Yes            |   
+| update_attribute_data                       |    651       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | Yes       | Yes            |
+| remove_a_single_attribute                   |    132       | DELETE  | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | Yes            |
 |                                                                                                                                                          |
 |**attributes_value folder**                                                                                                                               |
-| get_attribute_value                         |    190       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | No        | Yes            |  
-| update_attribute_value                      |    337       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes       | Yes            |
+| get_attribute_value                         |    201       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | No        | Yes            |  
+| update_attribute_value                      |    338       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes       | Yes            |
 |                                                                                                                                                          |
 |**types folder**                                                                                                                                          |
-| retrieve_entity_types                       |     76       | GET     | /v2/types/                                           | No        | Yes            |   
-| retrieve_an_entity_type                     |     66       | GET     | /v2/types/`<entity_type>`                            | No        | No             |   
+| retrieve_entity_types                       |     85       | GET     | /v2/types/                                           | No        | Yes            |   
+| retrieve_an_entity_type                     |     76       | GET     | /v2/types/`<entity_type>`                            | No        | No             |   
 |                                                                                                                                                          |
 |**subscriptions folder**                                                                                                                                  |
 | retrieve_subscriptions                      |  (pending)   | GET     | /v2/subscriptions                                    | No        | Yes            |   
-| create_a_new_subscription                   |    585       | POST    | /v2/subscriptions                                    | Yes       | No             |   
+| create_a_new_subscription                   |    811       | POST    | /v2/subscriptions                                    | Yes       | No             |   
 |                                                                                                                                                          |
 | retrieve_subscription                       |  (pending)   | GET     | /v2/subscriptions/`<subscription_id>`                | No        | No             |   
 | update_subscription                         |  (pending)   | PATCH   | /v2/subscriptions/`<subscription_id>`                | Yes       | No             |   
 | delete_subscription                         |  (pending)   | DELETE  | /v2/subscriptions/`<subscription_id>`                | No        | No             |   
+|                                                                                                                                                          |
+| notifications                               |    304       |                                                                                             |   
 |                                                                                                                                                          |
 |**registration folder**                                                                                                                                   |
 | retrieve_registrations                      |  (pending)   | GET     | /v2/registrations                                    | No        | Yes            |   
@@ -394,6 +418,9 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
   - In expression value have multiples expressions uses `&` as separator, and in each operation use `>>>` as separator between the key and the value,
      ex:
          `| condition_expression | q>>>temperature>40&georel>>>near&geometry>>>point&coords>>>40.6391 |`
+  - If `notification_http_url` has `replace_host` value, ex: http://replace_host:1234/notify, it string is replaced internally by the hostname (used to notifications).
+  - If you do like to use the subscriptionId of the subscription created previously, use `previous subs` value
+ 
 
 ## Tags
 

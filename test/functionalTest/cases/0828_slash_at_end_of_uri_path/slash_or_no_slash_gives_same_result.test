@@ -62,7 +62,7 @@ echo
 
 echo "02. GET /v1/contextEntityTypes/ and see error 'service not found'"
 echo "================================================================="
-orionCurl --url /v1/contextEntityTypes//////////
+orionCurl --url /v1/contextEntityTypes/
 echo
 echo
 

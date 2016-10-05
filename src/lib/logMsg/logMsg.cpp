@@ -438,8 +438,8 @@ const char* lmSemGet(void)
   {
     return "taken";
   }
-  
-  return "free";  
+
+  return "free";
 }
 
 
@@ -557,12 +557,16 @@ void lmLevelMaskSetString(char* level)
   {
     lmLevelMask = 0;
   }
+  else if (strcasecmp(level, "FATAL") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+  }
   else if (strcasecmp(level, "ERROR") == 0)
   {
     lmLevelMask  = LogLevelExit;
     lmLevelMask |= LogLevelError;
   }
-  else if (strcasecmp(level, "WARNING") == 0)
+  else if (strcasecmp(level, "WARN") == 0)
   {
     lmLevelMask  = LogLevelExit;
     lmLevelMask |= LogLevelError;
@@ -617,6 +621,47 @@ void lmLevelMaskSetString(char* level)
 int lmLevelMaskGet(void)
 {
   return lmLevelMask;
+}
+
+
+
+/* ****************************************************************************
+*
+* lmLevelMaskStringGet -
+*/
+std::string lmLevelMaskStringGet(void)
+{
+  /* Check masks, in incresing severity order */
+
+  if (lmLevelMask == 0)
+  {
+    return "NONE";
+  }
+  else if (lmLevelMask & LogLevelDebug)
+  {
+    return "DEBUG";
+  }
+  else if (lmLevelMask & LogLevelInfo)
+  {
+    return "INFO";
+  }
+  else if (lmLevelMask & LogLevelWarning)
+  {
+    return "WARN";
+  }
+  else if (lmLevelMask & LogLevelError)
+  {
+    return "ERROR";
+  }
+  else if (lmLevelMask & LogLevelExit)
+  {
+    return "FATAL";
+  }
+  else
+  {
+    // Reaching would be an error in the log level management logic...
+    return "UNKNOWN";
+  }
 }
 
 
@@ -1025,7 +1070,7 @@ const char* longTypeName(char type)
 {
   switch (type)
   {
-  case 'W':  return "WARNING";
+  case 'W':  return "WARN";
   case 'E':  return "ERROR";
   case 'P':  return "ERROR";
   case 'X':  return "FATAL";

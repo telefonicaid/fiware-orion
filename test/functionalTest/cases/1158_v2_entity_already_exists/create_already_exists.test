@@ -119,7 +119,7 @@ Date: REGEX(.*)
     "id": "Room1",
     "temp": {
         "metadata": {},
-        "type": "none",
+        "type": "Text",
         "value": "29"
     },
     "type": "Room"

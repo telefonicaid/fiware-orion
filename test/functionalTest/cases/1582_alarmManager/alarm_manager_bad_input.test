@@ -84,7 +84,7 @@ echo
 
 echo "07. grep in log-file"
 echo "===================="
-egrep 'Raising alarm|Releasing alarm' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F']:' '{ print $2 }'
+egrep 'Raising alarm|Releasing alarm' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
 echo
 echo
 
@@ -121,11 +121,16 @@ Date: REGEX(.*)
 03. GETT /v2/entities - bad verb
 ================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
+Content-Length: 63
+Content-Type: application/json
 Allow: POST, GET
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
 
 
 04. POST /v2/entities without payload
@@ -156,18 +161,23 @@ Date: REGEX(.*)
 06. One more error, just to show how it looks in the log file ...
 =================================================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
+Content-Length: 63
+Content-Type: application/json
 Allow: POST, GET
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
 
 
 07. grep in log-file
 ====================
- Raising alarm BadInput 0.0.0.0: service '/v2/noService' not found
- Releasing alarm BadInput 0.0.0.0
- Raising alarm BadInput 0.0.0.0: bad verb for url '/v2/entities', method 'PROUST'
+Raising alarm BadInput 0.0.0.0: service '/v2/noService' not found
+Releasing alarm BadInput 0.0.0.0
+Raising alarm BadInput 0.0.0.0: bad verb for url '/v2/entities', method 'PROUST'
 
 
 --TEARDOWN--

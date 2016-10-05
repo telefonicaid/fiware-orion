@@ -87,13 +87,13 @@ echo
 01. Modify non-existing entity E1
 =================================
 HTTP/1.1 404 Not Found
-Content-Length: 61
+Content-Length: 95
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "No context element found",
+    "description": "The requested entity has not been found. Check type and id",
     "error": "NotFound"
 }
 
@@ -116,7 +116,7 @@ Date: REGEX(.*)
 =============
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -125,7 +125,7 @@ Date: REGEX(.*)
 04. Make sure E1 is as created
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 73
+Content-Length: 76
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -133,11 +133,11 @@ Date: REGEX(.*)
 {
     "attr1": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 3
     },
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 
@@ -153,7 +153,7 @@ Date: REGEX(.*)
 06. Make sure E1 is as modified
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 73
+Content-Length: 76
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -161,11 +161,11 @@ Date: REGEX(.*)
 {
     "attr1": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 5
     },
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 

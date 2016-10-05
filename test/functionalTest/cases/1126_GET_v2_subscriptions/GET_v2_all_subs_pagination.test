@@ -153,7 +153,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions?limit=1&options=count
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 417
+Content-Length: 387
 Content-Type: application/json
 Fiware-Total-Count: 2
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -185,12 +185,10 @@ Date: REGEX(.*)
             "entities": [
                 {
                     "id": "ConferenceRoom",
-                    "idPattern": "",
                     "type": "Room"
                 },
                 {
                     "id": "OfficeRoom",
-                    "idPattern": "",
                     "type": "Room"
                 }
             ]
@@ -203,7 +201,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions?limit=1&offset=1&options=count
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 351
+Content-Length: 321
 Content-Type: application/json
 Fiware-Total-Count: 2
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -233,12 +231,10 @@ Date: REGEX(.*)
             "entities": [
                 {
                     "id": "MyCar",
-                    "idPattern": "",
                     "type": "Car"
                 },
                 {
                     "id": "OtherCar",
-                    "idPattern": "",
                     "type": "Room"
                 }
             ]

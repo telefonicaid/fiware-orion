@@ -61,14 +61,14 @@ echo
 
 echo "03. grep SUMMARY in log-file (4 transactions, 1 bad input)"
 echo "=========================================================="
-egrep 'SUMMARY' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F']:' '{ print $2 }' | sed 's/(/_/g' | sed 's/)/_/g'
+egrep 'SUMMARY' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }' | sed 's/(/_/g' | sed 's/)/_/g'
 echo
 echo
 
 
 echo "04. grep BadInput in log-file (4 lines found)"
 echo "============================================="
-grep BadInput /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F']:' '{ print $2 }'
+grep BadInput /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
 echo
 echo
 
@@ -97,11 +97,16 @@ Date: REGEX(.*)
     "error": "ParseError"
 }
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
+Content-Length: 63
+Content-Type: application/json
 Allow: POST, GET
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
 HTTP/1.1 411 Length Required
 Content-Length: 98
 Content-Type: application/json
@@ -120,18 +125,18 @@ Date: REGEX(.*)
 
 03. grep SUMMARY in log-file (4 transactions, 1 bad input)
 ==========================================================
- Transactions: REGEX((4 _new: 4_|5 _new: 5_))
- DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
- Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
- Bad input active alarms: 1, raised: _total: 1, new: 1_, released: _total: 0, new: 0_
+Transactions: REGEX((4 _new: 4_|5 _new: 5_))
+DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Bad input active alarms: 1, raised: _total: 1, new: 1_, released: _total: 0, new: 0_
 
 
 04. grep BadInput in log-file (4 lines found)
 =============================================
- Raising alarm BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): service '/v2/noService' not found
- Repeated BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): JSON parse error
- Repeated BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): bad verb for url '/v2/entities', method 'GETT'
- Repeated BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): {"error":"ContentLengthRequired","description":"Zero/No Content-Length in PUT/POST/PATCH request"}
+Raising alarm BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): service '/v2/noService' not found
+Repeated BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): JSON parse error
+Repeated BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): bad verb for url '/v2/entities', method 'GETT'
+Repeated BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): {"error":"ContentLengthRequired","description":"Zero/No Content-Length in PUT/POST/PATCH request"}
  
 
 --TEARDOWN--

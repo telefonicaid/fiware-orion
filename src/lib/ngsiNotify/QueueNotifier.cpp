@@ -69,6 +69,7 @@ void QueueNotifier::sendNotifyContextRequest
   const std::string&               fiwareCorrelator,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsOrder,
+  const std::vector<std::string>&  metadataFilter,
   bool                             blacklist
 )
 {
@@ -120,7 +121,7 @@ void QueueNotifier::sendNotifyContextRequest
   }
   else
   {
-    payload = ncr->toJson(renderFormat, attrsOrder, blacklist);
+    payload = ncr->toJson(renderFormat, attrsOrder, metadataFilter, blacklist);
   }
 
   /* Parse URL */

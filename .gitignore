@@ -2,6 +2,7 @@
 *~
 *.bak
 .*
+*.autosave
 BUILD_*
 ToDo
 coverage

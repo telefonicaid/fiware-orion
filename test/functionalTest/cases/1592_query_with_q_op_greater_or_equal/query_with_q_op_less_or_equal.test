@@ -147,7 +147,7 @@ echo
 ============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -157,7 +157,7 @@ Date: REGEX(.*)
 ============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2?type=none
+Location: /v2/entities/E2?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -167,7 +167,7 @@ Date: REGEX(.*)
 ============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E3?type=none
+Location: /v2/entities/E3?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -176,7 +176,7 @@ Date: REGEX(.*)
 04. GET all entities (3 entities)
 =================================
 HTTP/1.1 200 OK
-Content-Length: 217
+Content-Length: 226
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -185,29 +185,29 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 10
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 20
         },
         "id": "E2",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 30
         },
         "id": "E3",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -240,7 +240,7 @@ Date: REGEX(.*)
 07. GET all entities with attribute A1<=10 (1 hit)
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 73
+Content-Length: 76
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -249,11 +249,11 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 10
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -261,7 +261,7 @@ Date: REGEX(.*)
 08. GET all entities with attribute A1<=11 (1 hit)
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 73
+Content-Length: 76
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -270,11 +270,11 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 10
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -282,7 +282,7 @@ Date: REGEX(.*)
 09. GET all entities with attribute A1<=20 (2 hits)
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 145
+Content-Length: 151
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -291,20 +291,20 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 10
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 20
         },
         "id": "E2",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -312,7 +312,7 @@ Date: REGEX(.*)
 10. GET all entities with attribute A1<=21 (2 hits)
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 145
+Content-Length: 151
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -321,20 +321,20 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 10
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 20
         },
         "id": "E2",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -342,7 +342,7 @@ Date: REGEX(.*)
 11. GET all entities with attribute A1<=30 (3 hits)
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 217
+Content-Length: 226
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -351,29 +351,29 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 10
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 20
         },
         "id": "E2",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 30
         },
         "id": "E3",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -381,7 +381,7 @@ Date: REGEX(.*)
 12. GET all entities with attribute A1<=31 (3 hits)
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 217
+Content-Length: 226
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -390,29 +390,29 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 10
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 20
         },
         "id": "E2",
-        "type": "none"
+        "type": "Thing"
     },
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 30
         },
         "id": "E3",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 

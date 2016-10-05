@@ -25,7 +25,7 @@ notifyFormat_ngsi10
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 38,101,102 IPv4 -subCacheIval 8
+brokerStart CB 38,101,102 IPv4 -subCacheIval 8 --cache
 accumulatorStart
 
 --SHELL--
@@ -202,7 +202,7 @@ echo
 ===================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E10?type=none
+Location: /v2/entities/E10?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -351,7 +351,7 @@ Date: REGEX(.*)
 13. Dump accumulator - see four notifications
 =============================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 475
+Content-Length: 476
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -364,13 +364,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "none",
+        "type" : "Thing",
         "isPattern" : "false",
         "id" : "E10",
         "attributes" : [
           {
             "name" : "A1",
-            "type" : "none",
+            "type" : "Text",
             "value" : "01. Creation"
           }
         ]
@@ -384,7 +384,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 474
+Content-Length: 475
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -397,13 +397,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "none",
+        "type" : "Thing",
         "isPattern" : "false",
         "id" : "E10",
         "attributes" : [
           {
             "name" : "A1",
-            "type" : "none",
+            "type" : "Text",
             "value" : "09. Updated"
           }
         ]
@@ -417,7 +417,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 474
+Content-Length: 475
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -430,13 +430,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "none",
+        "type" : "Thing",
         "isPattern" : "false",
         "id" : "E10",
         "attributes" : [
           {
             "name" : "A1",
-            "type" : "none",
+            "type" : "Text",
             "value" : "10. Updated"
           }
         ]
@@ -450,7 +450,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 474
+Content-Length: 475
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -463,13 +463,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "none",
+        "type" : "Thing",
         "isPattern" : "false",
         "id" : "E10",
         "attributes" : [
           {
             "name" : "A1",
-            "type" : "none",
+            "type" : "Text",
             "value" : "11. Updated"
           }
         ]

@@ -28,6 +28,8 @@
 #include "common/tag.h"
 #include "common/errorMessages.h"
 #include "common/RenderFormat.h"
+#include "common/string.h"
+#include "rest/uriParamNames.h"
 #include "apiTypesV2/Attribute.h"
 #include "ngsi10/QueryContextResponse.h"
 
@@ -52,8 +54,15 @@ std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool
     }
     else
     {
+      std::vector<std::string> metadataFilter;
+
+      if (ciP->uriParam[URI_PARAM_METADATA] != "")
+      {
+        stringSplit(ciP->uriParam[URI_PARAM_METADATA], ',', metadataFilter);
+      }
+
       out = "{";
-      out += pcontextAttribute->toJson(true, renderFormat, requestType);  // param 1 'true' as it is the last and only element
+      out += pcontextAttribute->toJson(true, renderFormat, metadataFilter, requestType);  // param 1 'true' as it is the last and only element
       out += "}";
     }
 

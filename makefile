@@ -68,6 +68,17 @@ all: prepare_release release
 
 di: install_debug
 
+#
+# The 'dix' build target must only be used when fiddling with style_check.
+# It is necessary to be able to check that style_check modifications don't 
+# break the compilation.
+#
+# FIXME: As soon as all the source code is incorporated into style_check, this
+#        build target (dix) must be removed.
+#
+dix: prepare_debug
+	cd BUILD_DEBUG && make -j$(CPU_COUNT)
+
 compile_info:
 	./scripts/build/compileInfo.sh
 
@@ -93,10 +104,14 @@ prepare_unit_test: compile_info
 	@echo '------------------------------- prepare_unit_test ended ---------------------------------'
 
 
+style_check_included_in_make_steps:
+	./scripts/style_check_in_makefile.sh
+
+
 release: prepare_release
 	cd BUILD_RELEASE && make -j$(CPU_COUNT)
 
-debug: prepare_debug
+debug: style_check_included_in_make_steps prepare_debug
 	cd BUILD_DEBUG && make -j$(CPU_COUNT)
 
 # Requires root access, i.e. use 'sudo make install' to install
@@ -404,8 +419,6 @@ cppcheck:
 sonar_metrics: coverage
 	scripts/build/sonarProperties.sh $(BROKER_VERSION) > sonar-project.properties 
 	cd BUILD_COVERAGE/src && gcovr --gcov-exclude='.*parseArgs.*' --gcov-exclude='.*logMsg.*' -x -o ../../coverage.xml && cd ../../
-	# The JOB_NAME var will be injected automatically by Jenkins at the job execution
-	#sed 's#filename="/var/develenv/jenkins/jobs/ContextBroker-Build-UnitTests/workspace#filename="/var/develenv/jenkins/jobs/metrics-queue-consumer/workspace/workspace#g' coverage.xml > coverage_sonar.xml
 	cppcheck --xml -j 8 --enable=all -I src/lib/ -i src/lib/parseArgs -i src/lib/logMsg src/ 2>cppcheck-result.xml
 
 .PHONY: rpm mock mock32 mock64 valgrind

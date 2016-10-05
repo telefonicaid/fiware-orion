@@ -51,7 +51,7 @@ payload='
                "q": "temperature>40",
                "geometry": "point",
                "coords": "-40.4,-3.5",
-               "georel": "near;minDistance=5000"
+               "georel": "near;minDistance:5000"
             }
          }
     },
@@ -90,7 +90,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 410
+Content-Length: 402
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -114,13 +114,12 @@ Date: REGEX(.*)
             "expression": {
                 "coords": "-40.4,-3.5",
                 "geometry": "point",
-                "georel": "near;minDistance=5000",
+                "georel": "near;minDistance:5000",
                 "q": "temperature>40"
             }
         },
         "entities": [
             {
-                "id": "",
                 "idPattern": ".*",
                 "type": "Room"
             }

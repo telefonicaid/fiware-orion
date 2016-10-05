@@ -98,7 +98,7 @@ Date: REGEX(.*)
 ==============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -108,7 +108,7 @@ Date: REGEX(.*)
 =====================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 65
+Content-Length: 58
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
@@ -116,7 +116,7 @@ Accept: application/json
 Content-Type: application/xml
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
-<attributes><a1>a1</a1><a2>a2</a2><a3>13.000000</a3></attributes>=======================================
+<attributes><a1>a1</a1><a2>a2</a2><a3>13</a3></attributes>=======================================
 
 
 --TEARDOWN--

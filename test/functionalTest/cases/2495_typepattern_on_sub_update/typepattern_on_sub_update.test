@@ -1,0 +1,202 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+typePattern on subscription update
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create subscription without typePattern
+# 02. Get subscription and do not see typePattern
+# 03. Update subscription with typePattern
+# 04. Get subscription and see typePattern
+#
+
+echo "01. Create subscription without typePattern"
+echo "==========================================="
+payload='{
+  "description": "One subscription to rule them all",
+  "expires": "2027-04-05T14:00:00.00Z",
+  "status": "active",
+  "subject": {
+    "entities": [
+      {
+        "id": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [],
+      "expression": {
+        "q": "temperature>40"
+      }
+    }
+  },
+  "notification": {
+    "attrs": [  "temperature",  "humidity"  ],
+    "attrsFormat": "normalized",
+    "http": { "url": "http://localhost:1234"  }
+  },
+  "throttling": 5
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+echo '02. Get subscription and do not see typePattern'
+echo '==============================================='
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+
+echo "03. Update subscription with typePattern"
+echo "========================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "room2",
+        "typePattern": ".*"
+      }
+    ]
+  }
+}'
+orionCurl -X PATCH --url /v2/subscriptions/$SUB_ID --payload "$payload"
+echo
+echo
+
+echo "04. Get subscription and see typePattern"
+echo "========================================"
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription without typePattern
+===========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Get subscription and do not see typePattern
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 370
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "One subscription to rule them all",
+    "expires": "2027-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [
+            "temperature",
+            "humidity"
+        ],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:1234"
+        }
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "expression": {
+                "q": "temperature>40"
+            }
+        },
+        "entities": [
+            {
+                "id": "Room"
+            }
+        ]
+    },
+    "throttling": 5
+}
+
+
+03. Update subscription with typePattern
+========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Get subscription and see typePattern
+========================================
+HTTP/1.1 200 OK
+Content-Length: 354
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "One subscription to rule them all",
+    "expires": "2027-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [
+            "temperature",
+            "humidity"
+        ],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:1234"
+        }
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": []
+        },
+        "entities": [
+            {
+                "id": "room2",
+                "typePattern": ".*"
+            }
+        ]
+    },
+    "throttling": 5
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -43,6 +43,7 @@ public:
   std::string             id;               // Mandatory
   std::string             type;             // Optional
   std::string             isPattern;        // Optional
+  bool                    isTypePattern;
   ContextAttributeVector  attributeVector;  // Optional
   OrionError              oe;               // Optional - mandatory if not 200-OK
 

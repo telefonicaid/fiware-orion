@@ -33,14 +33,12 @@ brokerStart CB
 # 01. Create an entity E of type T, with attributes A1=11,A4=14,A5=15
 # 02. Create an entity E of type T2, with attributes A2=22,A5=25
 # 03. Create an entity E3 of type T, with attributes A3=33,A4=34,A5=35
-#
 # 04. POST /v2/op/query, with E.* and in a scope q:A1==11, see E/T
 # 05. Create an entity E5 without type, with attribute A5=45
 # 06. Create an entity E5 of type T4, with attribute A5=45 and attribute B
-# 07. POST /v2/op/query, with E.*, and with scopes q:B and q=A5==45, see E5/T4 and E5/none
+# 07. POST /v2/op/query, with E.*, and with scopes q:B and q=A5==45, see E5/T4 and E5/Thing
 # 08. POST /v2/op/query, with E.* with scopes q:!B and q=A5==45, see NO entities
 #
-
 
 echo "01. Create an entity E of type T, with attributes A1=11,A4=14,A5=15"
 echo "==================================================================="
@@ -146,8 +144,8 @@ echo
 echo
 
 
-echo "08. POST /v2/op/query, with E.* with scopes q:!type and q=A5==45, see E5/none"
-echo "============================================================================="
+echo "08. POST /v2/op/query, with E.* with scopes q:!B and q=A5==45, see E5/Thing"
+echo "==========================================================================="
 payload='{
   "entities": [
     {
@@ -168,7 +166,6 @@ payload='{
 orionCurl --url /v2/op/query --payload "$payload"
 echo
 echo
-
 
 
 --REGEXPECT--
@@ -205,7 +202,7 @@ Date: REGEX(.*)
 04. POST /v2/op/query, with E.* and in a scope q:A1==11, see E/T
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 161
+Content-Length: 167
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -214,17 +211,17 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 11
         },
         "A4": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 14
         },
         "A5": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 15
         },
         "id": "E",
@@ -237,7 +234,7 @@ Date: REGEX(.*)
 ==========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E5?type=none
+Location: /v2/entities/E5?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -256,7 +253,7 @@ Date: REGEX(.*)
 07. POST /v2/op/query, with E.*, and with scopes q:B and q=A5==45, see E5/T4
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 127
+Content-Length: 129
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -265,12 +262,12 @@ Date: REGEX(.*)
     {
         "A5": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 45
         },
         "B": {
             "metadata": {},
-            "type": "none",
+            "type": "Text",
             "value": "just a mark"
         },
         "id": "E5",
@@ -279,10 +276,10 @@ Date: REGEX(.*)
 ]
 
 
-08. POST /v2/op/query, with E.* with scopes q:!type and q=A5==45, see E5/none
-=============================================================================
+08. POST /v2/op/query, with E.* with scopes q:!B and q=A5==45, see E5/Thing
+===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 73
+Content-Length: 76
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -291,11 +288,11 @@ Date: REGEX(.*)
     {
         "A5": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 45
         },
         "id": "E5",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 

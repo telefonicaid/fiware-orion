@@ -31,9 +31,32 @@
 
 #include "mongo/client/dbclient.h"
 
-struct ContextAttribute;
+#include "parse/CompoundValueNode.h"
+
+
 
 using namespace mongo;
+
+
+
+/* ****************************************************************************
+*
+* Declaring structs for pointer-usage, to avoid include the headers
+*/
+struct ContextAttribute;
+struct Metadata;
+
+
+
+/* ****************************************************************************
+*
+* StringFilterType - 
+*/
+typedef enum StringFilterType
+{
+  SftQ,
+  SftMq
+} StringFilterType;
 
 
 
@@ -94,7 +117,8 @@ typedef enum StringFilterValueType
 *   numberRangeTo        upper limit for numeric ranges
 *   stringRangeFrom      lower limit for string ranges
 *   stringRangeTo        upper limit for string ranges
-*   attributeName        The name of the attribute, used for unary operators only
+*   attributeName        The name of the attribute, used for unary operators and for mq filters
+*   metadataName         The name of the metadata, used for mqfilters
 *
 * METHODS
 *   parse                parse a string, like 'a>14' into a StringFilterItem
@@ -105,11 +129,11 @@ typedef enum StringFilterValueType
 *   rangeParse           parse a range 'xxx..yyy' and check its validity
 *   listParse            parse a list 'a,b,c,d' and check its validity
 *   listItemAdd          add an item to a list - used by listParse
-*   matchEquals          returns true if '== comparison' with ContextAttribute gives a match
-*   matchPattern         returns true if '~= comparison' with ContextAttribute gives a match
-*   matchGreaterThan     returns true if '> comparison' with ContextAttribute gives a match
+*   matchEquals          returns true if '== comparison' gives a match
+*   matchPattern         returns true if '~= comparison' gives a match
+*   matchGreaterThan     returns true if '> comparison' gives a match
 *                        Note that '<= comparisons' use !matchGreaterThan()
-*   matchLessThan        returns true if '< comparison' with ContextAttribute gives a match
+*   matchLessThan        returns true if '< comparison' gives a match
 *                        Note that '>= comparisons' use !matchLessThan()
 */
 class StringFilterItem
@@ -128,14 +152,17 @@ public:
   double                    numberRangeTo;
   std::string               stringRangeFrom;
   std::string               stringRangeTo;
-  std::string               attributeName;  // Used for unary operators only
-
+  std::string               attributeName;  // Used for unary operators and for metadata filters
+  std::string               metadataName;   // Used for metadata filters
+  std::string               compoundPath;
   bool                      compiledPattern;
+  StringFilterType          type;
 
   StringFilterItem();
   ~StringFilterItem();
 
-  bool                      parse(char* qItem, std::string* errorStringP);
+  bool                      parse(char* qItem, std::string* errorStringP, StringFilterType _type);
+  void                      lhsParse(void);
   const char*               opName(void);
   const char*               valueTypeName(void);
 
@@ -151,13 +178,23 @@ public:
   bool                      listParse(char* s, std::string* errorStringP);
   bool                      listItemAdd(char* s, std::string* errorStringP);
   bool                      matchEquals(ContextAttribute* caP);
+  bool                      matchEquals(Metadata* mdP);
+  bool                      matchEquals(orion::CompoundValueNode* cvP);
   bool                      matchPattern(ContextAttribute* caP);
+  bool                      matchPattern(Metadata* mdP);
+  bool                      matchPattern(orion::CompoundValueNode* cvP);
   bool                      matchGreaterThan(ContextAttribute* caP);
+  bool                      matchGreaterThan(Metadata* mdP);
+  bool                      matchGreaterThan(orion::CompoundValueNode* cvP);
   bool                      matchLessThan(ContextAttribute* caP);
+  bool                      matchLessThan(Metadata* mdP);
+  bool                      matchLessThan(orion::CompoundValueNode* cvP);
   bool                      fill(StringFilterItem* sfiP, std::string* errorStringP);
 
 private:
   bool                      compatibleType(ContextAttribute* caP);
+  bool                      compatibleType(Metadata* mdP);
+  bool                      compatibleType(orion::CompoundValueNode* cvP);
 };
 
 
@@ -192,13 +229,16 @@ class StringFilter
 public:
   std::vector<StringFilterItem*>  filters;
   std::vector<BSONObj>            mongoFilters;
+  StringFilterType                type;
 
-  StringFilter();
+  StringFilter(StringFilterType _type);
   ~StringFilter();
 
   bool  parse(const char* q, std::string* errorStringP);
   bool  mongoFilterPopulate(std::string* errorStringP);
   bool  match(ContextElementResponse* cerP);
+  bool  qMatch(ContextElementResponse* cerP);
+  bool  mqMatch(ContextElementResponse* cerP);
 
   StringFilter*  clone(std::string* errorStringP);
   bool           fill(StringFilter* sfP, std::string* errorStringP);

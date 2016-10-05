@@ -40,118 +40,17 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
 #include "rest/OrionError.h"
+#include "parse/CompoundValueNode.h"
 
 #include "mongo/client/dbclient.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"
+#include "mongoBackend/compoundValueBson.h"
 
 using namespace mongo;
 using namespace orion;
 
-/* ****************************************************************************
-*
-* Forward declarations
-*/
-static void compoundValueBson(std::vector<CompoundValueNode*> children, BSONObjBuilder& b);
 
-
-
-/* ****************************************************************************
-*
-* compoundValueBson (for arrays) -
-*/
-static void compoundValueBson(std::vector<CompoundValueNode*> children, BSONArrayBuilder& b)
-{
-  for (unsigned int ix = 0; ix < children.size(); ++ix)
-  {
-    CompoundValueNode* child = children[ix];
-
-    if (child->valueType == ValueTypeString)
-    {
-      b.append(child->stringValue);
-    }
-    else if (child->valueType == ValueTypeNumber)
-    {
-      b.append(child->numberValue);
-    }
-    else if (child->valueType == ValueTypeBoolean)
-    {
-      b.append(child->boolValue);
-    }
-    else if (child->valueType == ValueTypeNone)
-    {
-      b.appendNull();
-    }
-    else if (child->valueType == ValueTypeVector)
-    {
-      BSONArrayBuilder ba;
-
-      compoundValueBson(child->childV, ba);
-      b.append(ba.arr());
-    }
-    else if (child->valueType == ValueTypeObject)
-    {
-      BSONObjBuilder bo;
-
-      compoundValueBson(child->childV, bo);
-      b.append(bo.obj());
-    }
-    else
-    {
-      LM_E(("Runtime Error (Unknown type in compound value)"));
-    }
-  }
-}
-
-
-/* ****************************************************************************
-*
-* compoundValueBson -
-*/
-static void compoundValueBson(std::vector<CompoundValueNode*> children, BSONObjBuilder& b)
-{
-  for (unsigned int ix = 0; ix < children.size(); ++ix)
-  {
-    CompoundValueNode* child = children[ix];
-
-    std::string effectiveName = dbDotEncode(child->name);
-
-    if (child->valueType == ValueTypeString)
-    {
-      b.append(effectiveName, child->stringValue);
-    }
-    else if (child->valueType == ValueTypeNumber)
-    {
-      b.append(effectiveName, child->numberValue);
-    }
-    else if (child->valueType == ValueTypeBoolean)
-    {
-      b.append(effectiveName, child->boolValue);
-    }
-    else if (child->valueType == ValueTypeNone)
-    {
-      b.appendNull(effectiveName);
-    }
-    else if (child->valueType == ValueTypeVector)
-    {
-      BSONArrayBuilder ba;
-
-      compoundValueBson(child->childV, ba);
-      b.append(effectiveName, ba.arr());
-    }
-    else if (child->valueType == ValueTypeObject)
-    {
-      BSONObjBuilder bo;
-
-      compoundValueBson(child->childV, bo);
-      b.append(effectiveName, bo.obj());
-    }
-    else
-    {
-      LM_E(("Runtime Error (Unknown type in compound value)"));
-    }
-  }
-}
 
 /* ****************************************************************************
 *
@@ -160,7 +59,7 @@ static void compoundValueBson(std::vector<CompoundValueNode*> children, BSONObjB
 */
 void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr) const
 {
-  switch(valueType)
+  switch (valueType)
   {
     case ValueTypeString:
       bsonAttr.append(ENT_ATTRS_VALUE, stringValue);
@@ -265,6 +164,7 @@ ContextAttribute::ContextAttribute()
   found                 = false;
   skip                  = false;
   typeGiven             = false;
+  previousValue         = NULL;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -299,6 +199,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
   found                 = caP->found;
   skip                  = false;
   typeGiven             = caP->typeGiven;
+  previousValue         = NULL;
 
   providingApplication.set(caP->providingApplication.get());
   providingApplication.setMimeType(caP->providingApplication.getMimeType());
@@ -318,7 +219,20 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
 
   if (useDefaultType && !typeGiven)
   {
-    type = DEFAULT_TYPE;
+    //
+    // NOTE:
+    //   Compound values all have attribute type == orion::ValueTypeObject.
+    //   So, if compound, we need to step down into the compound to see whether it is 
+    //   an object or a vector.
+    //
+    if ((valueType != orion::ValueTypeObject) || (compoundValueP == NULL) || (compoundValueP->valueType != orion::ValueTypeVector))
+    {
+      type = defaultType(valueType);
+    }
+    else
+    {
+      type = defaultType(orion::ValueTypeVector);
+    }
   }
 }
 
@@ -349,6 +263,7 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  previousValue         = NULL;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -381,6 +296,7 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  previousValue         = NULL;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -413,6 +329,7 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  previousValue         = NULL;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -445,6 +362,7 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  previousValue         = NULL;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -473,6 +391,7 @@ ContextAttribute::ContextAttribute
   valueType             = orion::ValueTypeObject;  // FIXME P6: Could be ValueTypeVector ...
   skip                  = false;
   typeGiven             = false;
+  previousValue         = NULL;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -766,7 +685,13 @@ std::string ContextAttribute::render
 *        the code paths of the rendering process
 *
 */
-std::string ContextAttribute::toJson(bool isLastElement, RenderFormat renderFormat, RequestType requestType)
+std::string ContextAttribute::toJson
+(
+  bool                             isLastElement,
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  metadataFilter,
+  RequestType                      requestType
+)
 {
   std::string  out;
 
@@ -819,8 +744,16 @@ std::string ContextAttribute::toJson(bool isLastElement, RenderFormat renderForm
     //
     // type
     //
-    /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
-    out += (type != "")? JSON_VALUE("type", type) : JSON_VALUE("type", DEFAULT_TYPE);
+    // This is needed for entities coming from NGSIv1 (which allows empty or missing types)
+    //
+    std::string defType = defaultType(valueType);
+
+    if (compoundValueP && compoundValueP->isVector())
+    {
+      defType = defaultType(orion::ValueTypeVector);
+    }
+
+    out += (type != "")? JSON_VALUE("type", type) : JSON_VALUE("type", defType);
     out += ",";
 
 
@@ -870,7 +803,7 @@ std::string ContextAttribute::toJson(bool isLastElement, RenderFormat renderForm
     //
     // metadata
     //
-    out += JSON_STR("metadata") + ":" + "{" + metadataVector.toJson(true) + "}";
+    out += JSON_STR("metadata") + ":" + "{" + metadataVector.toJson(true, metadataFilter) + "}";
 
     if (requestType != EntityAttributeResponse)
     {
@@ -896,17 +829,51 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
 {
   std::string  out;
 
-  if (ciP->outMimeType == JSON)
+  if (compoundValueP == NULL)  // Not a compound - text/plain must be accepted
   {
-    if (compoundValueP != NULL)
+    if (ciP->httpHeaders.accepted("text/plain"))
     {
-      if (compoundValueP->isVector())
+      char buf[64];
+
+      ciP->outMimeType = TEXT;
+
+      switch (valueType)
       {
-        out = "[" + compoundValueP->toJson(true) + "]";
-      }
-      else  // Object
-      {
-        out = "{" + compoundValueP->toJson(false) + "}";
+      case orion::ValueTypeString:
+        if (ciP->apiVersion == "v2")
+        { 
+          out = '"' + stringValue + '"';
+        }
+        else
+        { 
+          out = stringValue;
+        }
+        break;
+
+      case orion::ValueTypeNumber:
+        if (type == DATE_TYPE)
+        {
+          out = isodate2str(numberValue);
+        }
+        else // regular number
+        {          
+          out = toString(numberValue);
+        }
+        break;
+
+      case orion::ValueTypeBoolean:
+        snprintf(buf, sizeof(buf), "%s", boolValue? "true" : "false");
+        out = buf;
+        break;
+
+      case orion::ValueTypeNone:
+        snprintf(buf, sizeof(buf), "%s", "null");
+        out = buf;
+        break;
+
+      default:
+        out = "ERROR";
+        break;
       }
     }
     else
@@ -917,49 +884,26 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
       out = oe.toJson();
     }
   }
-  else  // TEXT
+  else if (compoundValueP != NULL)  /// Compound: application/json OR text/plain must be accepted
   {
-    if (compoundValueP != NULL)
+    if (!ciP->httpHeaders.accepted("application/json") && !ciP->httpHeaders.accepted("text/plain"))
     {
+      OrionError oe(SccNotAcceptable, "accepted MIME types: application/json, text/plain", "NotAcceptable");
+      ciP->httpStatusCode = SccNotAcceptable;
+
+      out = oe.toJson();
+    }
+    else
+    {
+      ciP->outMimeType = ciP->httpHeaders.outformatSelect();
+
       if (compoundValueP->isVector())
       {
-        out = "[" + compoundValueP->toJson(false) + "]";
+        out = "[" + compoundValueP->toJson(true) + "]";
       }
       else  // Object
       {
         out = "{" + compoundValueP->toJson(false) + "}";
-      }
-    }
-    else
-    {
-      char buf[64];
-
-      switch (valueType)
-      {
-      case orion::ValueTypeString:
-        out = stringValue;
-        break;
-
-      case orion::ValueTypeNumber:
-        if (type == DATE_TYPE)
-        {
-          out = isodate2str(numberValue);
-        }
-        else // regular number
-        {
-          snprintf(buf, sizeof(buf), "%f", numberValue);
-          out = buf;
-        }
-        break;
-
-      case orion::ValueTypeBoolean:
-        snprintf(buf, sizeof(buf), "%s", boolValue? "true" : "false");
-        out = buf;
-        break;
-
-      default:
-        out = "ERROR";
-        break;
       }
     }
   }
@@ -1124,6 +1068,12 @@ void ContextAttribute::release(void)
   }
 
   metadataVector.release();
+  if (previousValue != NULL)
+  {
+    previousValue->release();
+    delete previousValue;
+    previousValue = NULL;
+  }
 }
 
 
@@ -1143,8 +1093,6 @@ std::string ContextAttribute::getName(void)
 */
 std::string ContextAttribute::getValue(void) const
 {
-  char buffer[64];
-
   switch (valueType)
   {
   case orion::ValueTypeString:
@@ -1152,12 +1100,15 @@ std::string ContextAttribute::getValue(void) const
     break;
 
   case orion::ValueTypeNumber:
-    snprintf(buffer, sizeof(buffer), "%f", numberValue);
-    return std::string(buffer);
+    return toString(numberValue);
     break;
 
   case orion::ValueTypeBoolean:
     return boolValue ? "true" : "false";
+    break;
+
+  case orion::ValueTypeNone:
+    return "null";
     break;
 
   default:
@@ -1178,4 +1129,61 @@ std::string ContextAttribute::getValue(void) const
 ContextAttribute* ContextAttribute::clone(void)
 {
   return new ContextAttribute(this);
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextAttribute::compoundItemExists - 
+*/
+bool ContextAttribute::compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP)
+{
+  std::vector<std::string>   compoundPathV;
+  orion::CompoundValueNode*  current = compoundValueP;
+  int                        levels;
+
+  if (compoundPath == "")
+  {
+    return false;
+  }
+
+  if (compoundValueP == NULL)
+  {
+    return false;
+  }
+
+  levels = stringSplit(compoundPath, '.', compoundPathV);
+
+  if ((compoundPathV.size() == 0) || (levels == 0))
+  {
+    return false;
+  }
+
+  for (int ix = 0; ix < levels; ++ix)
+  {
+    bool found = false;
+
+    for (unsigned int cIx = 0; cIx < current->childV.size(); ++cIx)
+    {
+      if (current->childV[cIx]->name == compoundPathV[ix])
+      {
+        current = current->childV[cIx];
+        found   = true;
+        break;
+      }
+    }
+
+    if (found == false)
+    {
+      return false;
+    }
+  }
+
+  if (compoundItemPP != NULL)
+  {
+    *compoundItemPP = current;
+  }
+
+  return true;
 }

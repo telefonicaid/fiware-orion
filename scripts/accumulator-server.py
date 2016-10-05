@@ -36,15 +36,46 @@ __author__ = 'fermin'
 #   "Content-Type: application/x-www-form-urlencoded" has been problematic in the pass)
 
 from flask import Flask, request, Response
-from sys import argv, exit
+from getopt import getopt, GetoptError
 from datetime import datetime
 from math import trunc
 from time import sleep
+import sys
 import os
 import atexit
 import string
 import signal
 import json
+
+def usage_and_exit(msg):
+    """
+    Print usage message and exit"
+
+    :param msg: optional error message to print
+    """
+
+    if msg != '':
+        print msg
+        print
+
+    usage()
+    sys.exit(1)
+
+
+def usage():
+    """
+    Print usage message
+    """
+
+    print 'Usage: %s --host <host> --port <port> --url <server url> --pretty-print -v -u' % os.path.basename(__file__)
+    print ''
+    print 'Parameters:'
+    print "  --host <host>: host to use database to use (default is '0.0.0.0')"
+    print "  --port <port>: port to use (default is 1028)"
+    print "  --url <server url>: server URL to use (default is /accumulate)"
+    print "  --pretty-print: pretty print mode"
+    print "  -v: verbose mode"
+    print "  -u: print this usage message"
 
 
 # This function is registered to be called upon termination
@@ -58,32 +89,30 @@ server_url = '/accumulate'
 verbose    = 0
 pretty     = False
 
-# FIXME: this is a mess... need to use a more ordered way of passing arguments
-if len(argv) > 1:
-    port       = int(argv[1])
+try:
+    opts, args = getopt(sys.argv[1:], 'vu', ['host=', 'port=', 'url=', 'pretty-print' ])
+except GetoptError:
+    usage_and_exit('wrong parameter')
 
-if len(argv) > 2:
-    server_url = argv[2]
-
-if len(argv) > 3:
-    if argv[3] == 'on':
+for opt, arg in opts:
+    if opt == '-u':
+        usage()
+        sys.exit(0)
+    elif opt == '--host':
+        host = arg
+    elif opt == '--url':
+        server_url = arg
+    elif opt == '--port':
+        try:
+            port = int(arg)
+        except ValueError:
+            usage_and_exit('port parameter must be an integer')
+    elif opt == '-v':
         verbose = 1
-    if argv[3] == '--pretty-print':
+    elif opt == '--pretty-print':
         pretty = True
     else:
-        host = argv[3]
-
-if len(argv) > 4:
-    if argv[4] == '--pretty-print':
-        pretty = True
-    if argv[4] == 'on':
-        verbose = 1
-
-if len(argv) > 5:
-    if argv[5] == '--pretty-print':
-        pretty = True
-    if argv[5] == 'on':
-        verbose = 1
+        usage_and_exit()
 
 if verbose:
     print "verbose mode is on"
@@ -147,6 +176,14 @@ def unoresponse():
 def qnoresponse():
     sleep(10)
     return Response(status=200)
+
+# This response has been designed to test the #2360 case, but is general enough to be
+# used in other future cases
+@app.route("/badresponse/queryContext", methods=['POST'])
+def bad_response():
+    r = Response(status=404)
+    r.data = '{"name":"ENTITY_NOT_FOUND","message":"The entity with the requested id [qa_name_01] was not found."}'
+    return r
 
 @app.route("/v1/updateContext", methods=['POST'])
 @app.route("/v1/queryContext", methods=['POST'])

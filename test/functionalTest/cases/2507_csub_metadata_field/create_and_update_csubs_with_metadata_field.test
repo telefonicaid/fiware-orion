@@ -1,0 +1,261 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Create and update csubs with metatata field
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create subscription with metadata: foo
+# 02. Get subscription and see metadata: foo
+# 03. Update subscription without touching metadata
+# 04. Get subscription and see metadata: foo
+# 05. Update subscription with metadata: bar, ruu
+# 06. Get subscription and see metadata: bar, ruu
+#
+
+echo "01. Create subscription with metadata: foo"
+echo "=========================================="
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attrs": [ ]
+         }
+    },
+    "notification": {
+        "http": {"url": "http://localhost:1234/notify"},
+        "metadata": [ "foo" ],
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. Get subscription and see metadata: foo"
+echo "=========================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "03. Update subscription without touching metadata"
+echo "================================================="
+payload='{
+  "expires": "2060-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "04. Get subscription and see metadata: foo"
+echo "=========================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "05. Update subscription with metadata: bar, ruu"
+echo "==============================================="
+payload='{
+  "notification": {
+    "http": {"url": "http://localhost:1234/notify"},
+    "metadata": [ "bar", "ruu" ],
+    "attrs": [ ]
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "06. Get subscription and see metadata: bar, ruu"
+echo "==============================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription with metadata: foo
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Get subscription and see metadata: foo
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 282
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "expires": "2050-04-05T14:00:00.00Z",
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "http": {
+                "url": "http://localhost:1234/notify"
+            },
+            "metadata": [
+                "foo"
+            ]
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+03. Update subscription without touching metadata
+=================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Get subscription and see metadata: foo
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 282
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "expires": "2060-04-05T14:00:00.00Z",
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "http": {
+                "url": "http://localhost:1234/notify"
+            },
+            "metadata": [
+                "foo"
+            ]
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+05. Update subscription with metadata: bar, ruu
+===============================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Get subscription and see metadata: bar, ruu
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 288
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "expires": "2060-04-05T14:00:00.00Z",
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "http": {
+                "url": "http://localhost:1234/notify"
+            },
+            "metadata": [
+                "bar",
+                "ruu"
+            ]
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -407,8 +407,9 @@ PaArgument paArgs[] =
 static const char* validLogLevels[] = 
 {
   "NONE",
+  "FATAL",
   "ERROR",
-  "WARNING",
+  "WARN",
   "INFO",
   "DEBUG",
   NULL
@@ -1125,7 +1126,8 @@ static const char* validLogLevels[] =
   { "*", INV, INV_ALL_COMPS, "", badRequest       }
 
 #define LOGLEVEL_REQUESTS_V2                                                         \
-  { "PUT",   LOGLEVEL,  LOGLEVEL_COMPS_V2, "", logLevelTreat                      }, \
+  { "PUT",   LOGLEVEL,  LOGLEVEL_COMPS_V2, "", changeLogLevel                     }, \
+  { "GET",   LOGLEVEL,  LOGLEVEL_COMPS_V2, "", getLogLevel                        }, \
   { "*",     LOGLEVEL,  LOGLEVEL_COMPS_V2, "", badVerbPutOnly                     }
 
 #define SEM_STATE_REQUESTS                                                           \
@@ -1552,14 +1554,13 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
   free(mode);
 }
 
-#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | srv=SERVICE | subsrv=SUB_SERVICE | from=FROM_IP | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
+#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
 /* ****************************************************************************
 *
 * main -
 */
 int main(int argC, char* argV[])
 {
-
   lmTransactionReset();
 
   uint16_t       rushPort = 0;
@@ -1610,7 +1611,7 @@ int main(int argC, char* argV[])
   paConfig("usage and exit on any warning", (void*) true);
   paConfig("no preamble",                   NULL);
   paConfig("valid log level strings",       validLogLevels);
-  paConfig("default value",                 "-logLevel", "WARNING");
+  paConfig("default value",                 "-logLevel", "WARN");
 
 
   //

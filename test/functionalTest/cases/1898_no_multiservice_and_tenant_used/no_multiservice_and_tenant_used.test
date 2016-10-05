@@ -35,7 +35,7 @@ accumulatorStart --pretty-print
 # 02. Create entity without tenant
 # 03. Create entity with empty tenant
 # 04. Create entity with tenant abc
-# 05. Dump accelerator, see three notifications
+# 05. Dump accumulator, see three notifications
 #
 
 echo "01. Create a subcription to catch everything, for accumulator"
@@ -99,7 +99,7 @@ echo
 echo
 
 
-echo "05. Dump accelerator, see three notifications"
+echo "05. Dump accumulator, see three notifications"
 echo "============================================="
 accumulatorDump
 echo
@@ -121,7 +121,7 @@ Date: REGEX(.*)
 ================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2?type=none
+Location: /v2/entities/E2?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -131,7 +131,7 @@ Date: REGEX(.*)
 ===================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E3?type=none
+Location: /v2/entities/E3?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -141,16 +141,16 @@ Date: REGEX(.*)
 =================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E4?type=none
+Location: /v2/entities/E4?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-05. Dump accelerator, see three notifications
+05. Dump accumulator, see three notifications
 =============================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 125
+Content-Length: 128
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -163,18 +163,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A2": {
                 "metadata": {},
-                "type": "none",
+                "type": "Number",
                 "value": 2
             },
             "id": "E2",
-            "type": "none"
+            "type": "Thing"
         }
     ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 125
+Content-Length: 128
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -187,18 +187,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A3": {
                 "metadata": {}, 
-                "type": "none", 
+                "type": "Number", 
                 "value": 3
             }, 
             "id": "E3", 
-            "type": "none"
+            "type": "Thing"
         }
     ], 
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 125
+Content-Length: 128
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -212,11 +212,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A4": {
                 "metadata": {}, 
-                "type": "none", 
+                "type": "Number", 
                 "value": 4
             }, 
             "id": "E4", 
-            "type": "none"
+            "type": "Thing"
         }
     ], 
     "subscriptionId": "REGEX([0-9a-f]{24})"

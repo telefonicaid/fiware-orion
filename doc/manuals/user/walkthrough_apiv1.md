@@ -8,31 +8,31 @@
     * [Issuing commands to the broker](#issuing-commands-to-the-broker)
 * [Context management using NGSI10](#context-management-using-ngsi10)
     * [NGSI10 standard operations](#ngsi10-standard-operations)
-	  * [Entity Creation](#entity-creation)
-	  * [Query Context operation](#query-context-operation)
-	  * [Update Context elements](#update-context-elements)
-          * [Context Subscriptions](#context-subscriptions)
-	  * [Summary of NGSI10 standard operations URLs](#summary-of-ngsi10-standard-operations-urls)
+	    * [Entity Creation](#entity-creation)
+	    * [Query Context operation](#query-context-operation)
+	    * [Update Context elements](#update-context-elements)
+            * [Context Subscriptions](#context-subscriptions)
+	    * [Summary of NGSI10 standard operations URLs](#summary-of-ngsi10-standard-operations-urls)
     * [NGSI10 convenience operations](#ngsi10-convenience-operations)
-	  * [Convenience Entity Creation](#convenience-entity-creation)
-	  * [Convenience Query Context](#convenience-query-context)
-	  * [Getting all entities](#getting-all-entities)
-	  * [Browsing all types and detailed information on a type](#browsing-all-types-and-detailed-information-on-a-type)
-	  * [Convenience Update Context](#convenience-update-context)
-	  * [Convenience operations for context subscriptions](#convenience-operations-for-context-subscriptions)
-	  * [Summary of NGSI10 convenience operations URLs](#summary-of-ngsi10-convenience-operations-urls)
+	    * [Convenience Entity Creation](#convenience-entity-creation)
+	    * [Convenience Query Context](#convenience-query-context)
+	    * [Getting all entities](#getting-all-entities)
+	    * [Browsing all types and detailed information on a type](#browsing-all-types-and-detailed-information-on-a-type)
+	    * [Convenience Update Context](#convenience-update-context)
+	    * [Convenience operations for context subscriptions](#convenience-operations-for-context-subscriptions)
+	    * [Summary of NGSI10 convenience operations URLs](#summary-of-ngsi10-convenience-operations-urls)
 * [Context availability management using NGSI9](#context-availability-management-using-ngsi9)
     * [NGSI9 standard operations](#ngsi9-standard-operations)
-	  * [Register Context operation](#register-context-operation)
-	  * [Discover Context Availability operation](#discover-context-availability-operation)
-	  * [Context availability subscriptions](#context-availability-subscriptions)
-	  * [Summary of NGSI9 standard operations URLs](#summary-of-ngsi9-standard-operations-urls)
+	    * [Register Context operation](#register-context-operation)
+	    * [Discover Context Availability operation](#discover-context-availability-operation)
+	    * [Context availability subscriptions](#context-availability-subscriptions)
+	    * [Summary of NGSI9 standard operations URLs](#summary-of-ngsi9-standard-operations-urls)
     * [NGSI9 convenience operations](#ngsi9-convenience-operations)
-	  * [Convenience Register Context](#convenience-register-context)
-	  * [Only-type entity registrations using convenience operations](#only-type-entity-registrations-using-convenience-operations)
-	  * [Convenience Discover Context Availability](#convenience-discover-context-availability)
-	  * [Convenience operations for context availability subscriptions](#convenience-operations-for-context-availability-subscriptions)
-	  * [Summary of NGSI9 convenience operations URLs](#summary-of-ngsi9-convenience-operations-urls) 
+	    * [Convenience Register Context](#convenience-register-context)
+	    * [Only-type entity registrations using convenience operations](#only-type-entity-registrations-using-convenience-operations)
+	    * [Convenience Discover Context Availability](#convenience-discover-context-availability)
+	    * [Convenience operations for context availability subscriptions](#convenience-operations-for-context-availability-subscriptions)
+	    * [Summary of NGSI9 convenience operations URLs](#summary-of-ngsi9-convenience-operations-urls) 
 
 ## Introduction
 
@@ -117,8 +117,7 @@ tutorials.
 ### Starting the broker for the tutorials
 
 Before starting, you need to install the broker as described in the
-[Installation and Administration
-Guide](../../../README.md#installation).
+[Installation and Administration Guide](../admin/install.md).
 
 The tutorials assume that you don't have any previous content in the
 Orion Context Broker database. In order to do so, follow the [delete
@@ -154,7 +153,7 @@ command:
 ```
 # cd /dir/where/accumulator-server/is/downloaded
 # chmod a+x accumulator-server.py
-# ./accumulator-server.py 1028 /accumulate ::1 on
+# ./accumulator-server.py --port 1028 --url /accumulate --host ::1 -v
 ```
 
 The accumulator-server.py is also part of the contextBroker-test package (see [optional packages section in how to install](../admin/install.md#optional-packages)). The script is located at `/usr/share/contextBroker/tests/accumulator-server.py` after installation. However, if you only need the accumulator-server.py it uses to be simpler just downloading it from GitHub, as suggested above.

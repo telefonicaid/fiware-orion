@@ -78,6 +78,8 @@ char            paLogLevel[256];
 #define PAI_REST         PafUnchanged, { 'N', 'a', 'm', 'e', 0 }, 0, 0, false, false, false, true, false, false, 0
 #define PAI_REST_U       PafUnchanged, { 'N', 'a', 'm', 'e', 0 }, 0, 0, false, false, false, true, false, true,  0
 #define PAI_END_OF_ARGS  { "^D", NULL, "NADA", PaLastArg, PaReq, 0, 0, 0, "", PAI_REST }
+#define LOGLEVEL_DESC    "initial log level (NONE, FATAL, ERROR, WARN, INFO, DEBUG)"
+
 /* ****************************************************************************
 *
 * paBuiltin - 
@@ -120,7 +122,7 @@ PaiArgument paBuiltin[] =
   { "",           paVisual,        "!VISUAL",     PaStr,  PaHid,  0, PaNL, PaNL, "visual",              PAI_REST   },
   { "-t",         paTraceV,        "TRACE",       PaStr,  PaOpt,  0, PaNL, PaNL, "trace level",         PAI_REST_U },
   { "--silent",   &paSilent,       "SILENT",      PaBool, PaHid,  F,    T,    F, "silent mode",         PAI_REST_U },
-  { "-logLevel",  &paLogLevel,     "LOG_LEVEL",   PaStr,  PaOpt,  0, PaNL, PaNL, "initial log level (NONE, ERROR, WARNING, INFO, DEBUG)", PAI_REST_U },
+  { "-logLevel",  &paLogLevel,     "LOG_LEVEL",   PaStr,  PaOpt,  0, PaNL, PaNL, LOGLEVEL_DESC,         PAI_REST_U },
   { "-v",         &paVerbose,      "VERBOSE",     PaBool, PaOpt,  F,    T,    F, "verbose mode",        PAI_REST_U },
   { "-vv",        &paVerbose2,     "VERBOSE2",    PaBool, PaOpt,  F,    T,    F, "verbose2 mode",       PAI_REST_U },
   { "-vvv",       &paVerbose3,     "VERBOSE3",    PaBool, PaOpt,  F,    T,    F, "verbose3 mode",       PAI_REST_U },

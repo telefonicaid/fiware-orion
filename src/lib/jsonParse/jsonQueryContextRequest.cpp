@@ -240,13 +240,30 @@ static std::string scopeValue(const std::string& path, const std::string& value,
 
     reqDataP->qcr.scopeP->value = value;
 
-    reqDataP->qcr.scopeP->stringFilterP = new StringFilter();
+    reqDataP->qcr.scopeP->stringFilterP = new StringFilter(SftQ);
     bool b = reqDataP->qcr.scopeP->stringFilterP->parse(value.c_str(), &errorString);
 
     if (b != true)
     {
       delete reqDataP->qcr.scopeP->stringFilterP;
       reqDataP->qcr.scopeP->stringFilterP = NULL;
+
+      return errorString;
+    }
+  }
+  else if (reqDataP->qcr.scopeP->type == SCOPE_TYPE_SIMPLE_QUERY_MD)
+  {
+    std::string errorString;
+
+    reqDataP->qcr.scopeP->value = value;
+
+    reqDataP->qcr.scopeP->mdStringFilterP = new StringFilter(SftMq);
+    bool b = reqDataP->qcr.scopeP->mdStringFilterP->parse(value.c_str(), &errorString);
+
+    if (b != true)
+    {
+      delete reqDataP->qcr.scopeP->mdStringFilterP;
+      reqDataP->qcr.scopeP->mdStringFilterP = NULL;
 
       return errorString;
     }

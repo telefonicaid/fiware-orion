@@ -135,6 +135,7 @@ public:
       delete compoundValueRoot;
 
     servicePathV.clear();
+    httpHeaders.release();
   }
 
   MHD_Connection*            connection;
@@ -160,6 +161,7 @@ public:
   std::string                ip;
   std::string                apiVersion;
   RequestType                requestType;
+  std::string                acceptHeaderError;
 
   std::map<std::string, std::string>   uriParam;
   std::map<std::string, bool>          uriParamOptions;

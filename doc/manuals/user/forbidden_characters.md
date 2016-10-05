@@ -15,7 +15,7 @@ following characters are forbidden in any request:
 -   (
 -   )
 
-Any attemp of using them will result in a NGSI 400 Bad Request response
+Any attempt of using them will result in a NGSI 400 Bad Request response
 like this:
 
     {
@@ -51,6 +51,7 @@ are involved, anyway.
 There are some exception cases in which the above restrictions do not apply. In particular, in the following fields:
 
 * URL parameter `q` and the value of "FIWARE::StringQuery" scope allow the special characters needed by the Simple Query Language
+* URL parameter `mq` and the value of "FIWARE::StringQuery::Metadata" scope allow the special characters needed by the Simple Query Language
 * URL parameter `georel` and `coords` and the corresponding fields in the "FIWARE::Location::NGSIv2" scope allow `;`
 
 ## Specific restrictions for ID fields

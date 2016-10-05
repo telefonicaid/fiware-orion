@@ -43,25 +43,25 @@ struct EntID
   std::string id;
   std::string idPattern;
   std::string type;
+  std::string typePattern;
   std::string toJson();
 
-  EntID(const std::string& idA, const std::string& idPatternA, const std::string& typeA):
+  EntID(const std::string& idA, const std::string& idPatternA,
+        const std::string& typeA, const std::string& typePatternA):
     id(idA),
     idPattern(idPatternA),
-    type(typeA)
+    type(typeA),
+    typePattern(typePatternA)
   {}
-
-  EntID():
-    id(),
-    idPattern(),
-    type()
+  EntID()
   {}
 
 };
 
 inline bool operator==(const EntID& lhs, const EntID& rhs)
 {
-  return (lhs.id == rhs.id) && (lhs.idPattern == rhs.idPattern) && (lhs.type == rhs.type);
+  return (lhs.id == rhs.id) && (lhs.idPattern == rhs.idPattern)
+      && (lhs.type == rhs.type) && (lhs.typePattern == rhs.typePattern);
 }
 
 inline bool operator!=(const EntID& lhs, const EntID& rhs){ return !(lhs == rhs); }
@@ -69,6 +69,7 @@ inline bool operator!=(const EntID& lhs, const EntID& rhs){ return !(lhs == rhs)
 struct Notification
 {
   std::vector<std::string> attributes;
+  std::vector<std::string> metadata;
   bool                     blacklist;
   long long                timesSent;
   long long                lastNotification;

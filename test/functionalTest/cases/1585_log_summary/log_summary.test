@@ -90,7 +90,7 @@ echo
 
 echo "06. grep SUMMARY in log-file (4 transactions, 1 bad input)"
 echo "=========================================================="
-egrep 'SUMMARY' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F']:' '{ print $2 }' | sed 's/(/_/g' | sed 's/)/_/g'
+egrep 'SUMMARY' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }' | sed 's/(/_/g' | sed 's/)/_/g'
 echo
 echo
 
@@ -111,7 +111,7 @@ echo
 
 echo "09. grep SUMMARY in log-file (1 transaction and NO bad input since last time, also, Bad Input is no longer active)"
 echo "=================================================================================================================="
-egrep 'SUMMARY' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F']:' '{ print $2 }' | sed 's/(/_/g' | sed 's/)/_/g'
+egrep 'SUMMARY' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }' | sed 's/(/_/g' | sed 's/)/_/g'
 echo
 echo
 
@@ -132,7 +132,7 @@ echo
 
 echo "12. grep SUMMARY in log-file (1 transaction and one bad input since last time)"
 echo "=============================================================================="
-egrep 'SUMMARY' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F']:' '{ print $2 }' | sed 's/(/_/g' | sed 's/)/_/g'
+egrep 'SUMMARY' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }' | sed 's/(/_/g' | sed 's/)/_/g'
 echo
 echo
 
@@ -169,11 +169,16 @@ Date: REGEX(.*)
 03. GETT /v2/entities - bad verb
 ================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
+Content-Length: 63
+Content-Type: application/json
 Allow: POST, GET
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
 
 
 04. POST /v2/entities without payload
@@ -196,10 +201,10 @@ Date: REGEX(.*)
 
 06. grep SUMMARY in log-file (4 transactions, 1 bad input)
 ==========================================================
- Transactions: REGEX((4 _new: 4_|5 _new: 5_))
- DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
- Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
- Bad input active alarms: 1, raised: _total: 1, new: 1_, released: _total: 0, new: 0_
+Transactions: REGEX((4 _new: 4_|5 _new: 5_))
+DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Bad input active alarms: 1, raised: _total: 1, new: 1_, released: _total: 0, new: 0_
 
 
 07. GET /v2/entities (just to clear out Bad Input)
@@ -219,14 +224,14 @@ Date: REGEX(.*)
 
 09. grep SUMMARY in log-file (1 transaction and NO bad input since last time, also, Bad Input is no longer active)
 ==================================================================================================================
- Transactions: REGEX((4 _new: 4_|5 _new: 5_))
- DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
- Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
- Bad input active alarms: 1, raised: _total: 1, new: 1_, released: _total: 0, new: 0_
- Transactions: REGEX((5 _new: 1_|6 _new: 1_))
- DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
- Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
- Bad input active alarms: 0, raised: _total: 1, new: 0_, released: _total: 1, new: 1_
+Transactions: REGEX((4 _new: 4_|5 _new: 5_))
+DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Bad input active alarms: 1, raised: _total: 1, new: 1_, released: _total: 0, new: 0_
+Transactions: REGEX((5 _new: 1_|6 _new: 1_))
+DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Bad input active alarms: 0, raised: _total: 1, new: 0_, released: _total: 1, new: 1_
 
 
 10. PUT /v2/noService
@@ -249,18 +254,18 @@ Date: REGEX(.*)
 
 12. grep SUMMARY in log-file (1 transaction and one bad input since last time)
 ==============================================================================
- Transactions: REGEX((4 _new: 4_|5 _new: 5_))
- DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
- Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
- Bad input active alarms: 1, raised: _total: 1, new: 1_, released: _total: 0, new: 0_
- Transactions: REGEX((5 _new: 1_|6 _new: 1_))
- DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
- Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
- Bad input active alarms: 0, raised: _total: 1, new: 0_, released: _total: 1, new: 1_
- Transactions: REGEX((6 _new: 1_|7 _new: 1_))
- DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
- Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
- Bad input active alarms: 1, raised: _total: 2, new: 1_, released: _total: 1, new: 0_
+Transactions: REGEX((4 _new: 4_|5 _new: 5_))
+DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Bad input active alarms: 1, raised: _total: 1, new: 1_, released: _total: 0, new: 0_
+Transactions: REGEX((5 _new: 1_|6 _new: 1_))
+DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Bad input active alarms: 0, raised: _total: 1, new: 0_, released: _total: 1, new: 1_
+Transactions: REGEX((6 _new: 1_|7 _new: 1_))
+DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Bad input active alarms: 1, raised: _total: 2, new: 1_, released: _total: 1, new: 0_
 
 
 --TEARDOWN--

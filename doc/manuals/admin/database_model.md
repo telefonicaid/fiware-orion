@@ -50,14 +50,21 @@ Fields:
         object or JSON vector to represent an structured value (see
         section about [structured attribute values in user
         manual](../user/structured_attribute_valued.md)).
-    -   **md** (optional): custom metadata. This is a vector of metadata
-        objects, each one with a **name**, **type** and **value**.
+    -   **md** (optional): custom metadata. This is a keymap of metadata
+        objects. The key is generated with the metadata
+        name (changing "." for "=", as "." is not a valid character in
+        MongoDB document keys), e.g. a metadata with name "m.x" will
+        use the key "m=x". The object value of each key has two
+        fields: **type** and **value** (of the metadata).
+    -   **mdNames**: an array of strings. Its elements are the names of the
+        metadata of the attribute. Here the "." to "="
+        replacement is not done.
     -   **creDate**: the timestamp corresponding to attribute creation
         (as a consequence of append).
     -   **modDate**: the timestamp corresponding to last
-        attribute update. It matches creDate if the attribute has not be
+        attribute update. It matches creDate if the attribute has not been
         modified after creation.
--   **attrNames**: an array of string. Its elements are the names of the
+-   **attrNames**: an array of strings. Its elements are the names of the
     attributes of the entity (without IDs). In this case, the "." to "="
     replacement is not done.
 -   **creDate**: the timestamp corresponding
@@ -66,12 +73,12 @@ Fields:
     that it uses to be the same that a modDate corresponding to at least
     one of the attributes (not always: it will not be the same if the
     last update was a DELETE operation). It matches creDate if the
-    entity has not be modified after creation.
+    entity has not been modified after creation.
 -   **location** (optional): geographic location of the entity, composed
     of the following fields:
     -   **attrName**: the attribute name that identifies the geographic
         location in the attrs array
-    -   **coords**: a GJSON representing the location of the entity. See
+    -   **coords**: a GeoJSON representing the location of the entity. See
         below for more details.
 
 Regarding `location.coords` in can use several formats:
@@ -130,18 +137,17 @@ Example document:
            "value": "282",
            "creDate" : 1389376081,
            "modDate" : 1389376120,
-           "md" : [
-              { 
-                 "name" : "customMD1",
+           "md" : {
+              "customMD1": {
                  "type" : "string",
                  "value" : "AKAKA"
               },
-              {
-                 "name" : "customMD2",
+              "customMD2": {
                  "type" : "integer",
                  "value" : "23232"
               }
-           ]
+           },
+           "mdNames": [ "customMD1", "customMD2" ]
        },
        "A2_ID101": {
            "type": "TA2",
@@ -276,15 +282,18 @@ Fields:
 -   **throttling**: minimum interval between notifications. 0 or -1 means no throttling.
 -   **reference**: the URL for notifications
 -   **entities**: an array of entities (mandatory). The JSON for each
-    entity contains **id**, **type** and **isPattern**.
+    entity contains **id**, **type**, **isPattern** and **isTypePattern**. Note that,
+    due to legacy reasons, **isPattern** may be `"true"` or `"false"` (text) while
+    **isTypePattern** may be `true` or `false` (boolean).
 -   **attrs**: an array of attribute names (strings) (optional).
--   **blacklist**: a boolean field that expecifies if `attrs` has to be interpreted
-    as a whitelist (if `blacklist` is equal to "false" or doesn't exist) or a
-    blacklist (if `blacklist` is equal to "true").
--   **conditions**: a list of conditions that trigger notifications.
+-   **blacklist**: a boolean field that specifies if `attrs` has to be interpreted
+    as a whitelist (if `blacklist` is equal to `false` or doesn't exist) or a
+    blacklist (if `blacklist` is equal to `true`).
+-   **metadata**: an array of metadata names (strings) (optional).
+-   **conditions**: a list of attributes that trigger notifications.
 -   **expression**: an expression used to evaluate if notifications has
     to be sent or not when updates come. It may be composed of the following
-    fields: q, georel, geometry and/or coords (optional)
+    fields: q, mq, georel, geometry and/or coords (optional)
 -   **count**: the number of notifications sent associated to
     the subscription.   
 -   **format**: the format to use to send notification, possible values are **JSON**
@@ -311,23 +320,18 @@ Example document:
                 {
                         "id" : ".*",
                         "type" : "Room",
-                        "isPattern" : "true"
+                        "isPattern" : "true",
+                        "isTypePattern": false
                 }
         ],
         "attrs" : [
                 "humidity",
                 "temperature"
         ],
-        "conditions" : [
-                {
-                        "type" : "ONCHANGE",
-                        "value" : [
-                                "temperature "
-                        ]
-                }
-        ],
+        "conditions" : [ "temperature" ],
         "expression" : {
                 "q" : "temperature>40",
+                "mq" : "temperature.accuracy<1",
                 "geometry" : "",
                 "coords" : "",
                 "georel" : ""

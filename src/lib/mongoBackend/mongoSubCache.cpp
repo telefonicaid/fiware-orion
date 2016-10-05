@@ -57,8 +57,8 @@ using namespace mongo;
 *  -1:  Database Error - id-field not found
 *  -2:  Out of memory (either returns -2 or exit the entire broker)
 *  -3:  No patterned entity found
-*  -4:  The vector of notify-conditions is empty
 *  -5:  Error parsing string filter
+*  -6:  Error parsing metadata string filter
 *
 * Note that the 'count' of the inserted subscription is set to ZERO.
 *
@@ -95,20 +95,17 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // 04. Extract data from subP
   //
-  std::string               renderFormatString = sub.hasField(CSUB_FORMAT)? getFieldF(sub, CSUB_FORMAT).String() : "legacy";  // NGSIv1 JSON is 'default' (for old db-content)
-  std::vector<BSONElement>  eVec               = getFieldF(sub, CSUB_ENTITIES).Array();
-  std::vector<BSONElement>  attrVec            = getFieldF(sub, CSUB_ATTRS).Array();
-  std::vector<BSONElement>  condVec            = getFieldF(sub, CSUB_CONDITIONS).Array();
+  std::string               renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";  // NGSIv1 JSON is 'default' (for old db-content)
   RenderFormat              renderFormat       = stringToRenderFormat(renderFormatString);
 
   cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);
   cSubP->subscriptionId        = strdup(idField.OID().toString().c_str());
-  cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getFieldF(sub, CSUB_SERVICE_PATH).String().c_str() : "/");
+  cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(sub, CSUB_SERVICE_PATH).c_str() : "/");
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       : 0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
-  cSubP->status                = sub.hasField(CSUB_STATUS)?           getFieldF(sub, CSUB_STATUS).String().c_str()         : "active";
+  cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS).c_str()         : "active";
   cSubP->count                 = 0;
   cSubP->next                  = NULL;
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
@@ -127,12 +124,13 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   if (sub.hasField(CSUB_EXPR))
   {
-    mongo::BSONObj expression = getFieldF(sub, CSUB_EXPR).Obj();
+    mongo::BSONObj expression = getObjectFieldF(sub, CSUB_EXPR);
 
     if (expression.hasField(CSUB_EXPR_Q))
     {
       std::string errorString;
-      cSubP->expression.q = getFieldF(expression, CSUB_EXPR_Q).String();
+
+      cSubP->expression.q = getStringFieldF(expression, CSUB_EXPR_Q);
       if (cSubP->expression.q != "")
       {
         if (!cSubP->expression.stringFilter.parse(cSubP->expression.q.c_str(), &errorString))
@@ -145,19 +143,36 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
       }
     }
 
+    if (expression.hasField(CSUB_EXPR_MQ))
+    {
+      std::string errorString;
+
+      cSubP->expression.mq = getStringFieldF(expression, CSUB_EXPR_MQ);
+      if (cSubP->expression.mq != "")
+      {
+        if (!cSubP->expression.mdStringFilter.parse(cSubP->expression.mq.c_str(), &errorString))
+        {
+          LM_E(("Runtime Error (error parsing md string filter: %s)", errorString.c_str()));
+          subCacheItemDestroy(cSubP);
+          delete cSubP;
+          return -6;
+        }
+      }
+    }
+
     if (expression.hasField(CSUB_EXPR_GEOM))
     {
-      cSubP->expression.geometry = getFieldF(expression, CSUB_EXPR_GEOM).String();
+      cSubP->expression.geometry = getStringFieldF(expression, CSUB_EXPR_GEOM);
     }
 
     if (expression.hasField(CSUB_EXPR_COORDS))
     {
-      cSubP->expression.coords = getFieldF(expression, CSUB_EXPR_COORDS).String();
+      cSubP->expression.coords = getStringFieldF(expression, CSUB_EXPR_COORDS);
     }
 
     if (expression.hasField(CSUB_EXPR_GEOREL))
     {
-      cSubP->expression.georel = getFieldF(expression, CSUB_EXPR_GEOREL).String();
+      cSubP->expression.georel = getStringFieldF(expression, CSUB_EXPR_GEOREL);
     }
   }
 
@@ -165,6 +180,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // 05. Push Entity-data names to EntityInfo Vector (cSubP->entityInfos)
   //
+  std::vector<BSONElement>  eVec = getFieldF(sub, CSUB_ENTITIES).Array();
   for (unsigned int ix = 0; ix < eVec.size(); ++ix)
   {
     BSONObj entity = eVec[ix].embeddedObject();
@@ -175,10 +191,11 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
       continue;
     }
 
-    std::string id        = getStringFieldF(entity, ENT_ENTITY_ID);
-    std::string isPattern = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(entity, CSUB_ENTITY_ISPATTERN) : "false";
-    std::string type      = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldF(entity, CSUB_ENTITY_TYPE)      : "";
-    EntityInfo* eiP       = new EntityInfo(id, type, isPattern);
+    std::string id            = getStringFieldF(entity, ENT_ENTITY_ID);
+    std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(entity, CSUB_ENTITY_ISPATTERN) : "false";
+    std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldF(entity, CSUB_ENTITY_TYPE)      : "";
+    bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
+    EntityInfo* eiP           = new EntityInfo(id, type, isPattern, isTypePattern);
 
     cSubP->entityIdInfos.push_back(eiP);
   }
@@ -195,51 +212,14 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // 06. Push attribute names to Attribute Vector (cSubP->attributes)
   //
-  for (unsigned int ix = 0; ix < attrVec.size(); ++ix)
-  {
-    std::string s = attrVec[ix].String();
-    cSubP->attributes.push_back(s);
-  }
-
+  setStringVectorF(sub, CSUB_ATTRS, &(cSubP->attributes));
 
 
   //
-  // 07. Fill in cSubP->notifyConditionVector from condVec
+  // 07. Fill in cSubP->notifyConditionV from condVec
   //
-  for (unsigned int ix = 0; ix < condVec.size(); ++ix)
-  {
-    BSONObj                   condition = condVec[ix].embeddedObject();
-    std::string               condType;
-    std::vector<BSONElement>  valueVec;
+  setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
 
-    condType = getStringFieldF(condition, CSUB_CONDITIONS_TYPE);
-    if (condType != ON_CHANGE_CONDITION)
-    {
-      continue;
-    }
-
-    NotifyCondition* ncP = new NotifyCondition();
-    ncP->type = condType;
-
-    valueVec = getFieldF(condition, CSUB_CONDITIONS_VALUE).Array();
-    for (unsigned int vIx = 0; vIx < valueVec.size(); ++vIx)
-    {
-      std::string condValue;
-
-      condValue = valueVec[vIx].String();
-      ncP->condValueList.push_back(condValue);
-    }
-
-    cSubP->notifyConditionVector.push_back(ncP);
-  }
-
-  if (cSubP->notifyConditionVector.size() == 0)  // Cleanup
-  {
-    LM_E(("ERROR (empty notifyConditionVector) - cleaning up"));
-    subCacheItemDestroy(cSubP);
-    delete cSubP;
-    return -4;
-  }
 
   subCacheItemInsert(cSubP);
 
@@ -257,8 +237,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 *  -1: Empty subscriptionId
 *  -2: Empty servicePath
 *  -3: Out of memory (either this or EXIT)
-*  -4: Subscription not valid for sub-cache (no patterns)
-*  -5: Subscription not valid for sub-cache (empty notify-condition vector)
+*  -4: Subscription not valid for sub-cache (no entity ids)
 *
 *
 * Note that the 'count' of the inserted subscription is set to ZERO.
@@ -273,10 +252,12 @@ int mongoSubCacheItemInsert
   long long           expirationTime,
   const std::string&  status,
   const std::string&  q,
+  const std::string&  mq,
   const std::string&  geometry,
   const std::string&  coords,
   const std::string&  georel,
   StringFilter*       stringFilterP,
+  StringFilter*       mdStringFilterP,
   RenderFormat        renderFormat
 )
 {
@@ -326,10 +307,11 @@ int mongoSubCacheItemInsert
       continue;
     }
 
-    std::string id        = getStringFieldF(entity, ENT_ENTITY_ID);
-    std::string isPattern = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(entity, CSUB_ENTITY_ISPATTERN) : "false";
-    std::string type      = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldF(entity, CSUB_ENTITY_TYPE)      : "";
-    EntityInfo* eiP       = new EntityInfo(id, type, isPattern);
+    std::string id            = getStringFieldF(entity, ENT_ENTITY_ID);
+    std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(entity, CSUB_ENTITY_ISPATTERN) : "false";
+    std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldF(entity, CSUB_ENTITY_TYPE)      : "";
+    bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
+    EntityInfo* eiP           = new EntityInfo(id, type, isPattern, isTypePattern);
 
     cSubP->entityIdInfos.push_back(eiP);
   }
@@ -345,9 +327,6 @@ int mongoSubCacheItemInsert
   //
   // 04. Extract data from mongo sub
   //
-  std::vector<BSONElement>  attrVec       = getFieldF(sub, CSUB_ATTRS).Array();
-  std::vector<BSONElement>  condVec       = getFieldF(sub, CSUB_CONDITIONS).Array();
-
   if ((lastNotificationTime == -1) && (sub.hasField(CSUB_LASTNOTIFICATION)))
   {
     //
@@ -368,6 +347,7 @@ int mongoSubCacheItemInsert
   cSubP->count                 = 0;
   cSubP->status                = status;
   cSubP->expression.q          = q;
+  cSubP->expression.mq         = mq;
   cSubP->expression.geometry   = geometry;
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
@@ -383,14 +363,14 @@ int mongoSubCacheItemInsert
 
 
   //
-  // String Filter
+  // String Filters
   //
+  std::string errorString;
+
   if (stringFilterP != NULL)
   {
-    std::string errorString;
-
     //
-    // NOTE
+    // NOTE (for both 'q' and 'mq' string filters)
     //   Here, the subscription should have a String Filter but if fill() fails, it won't.
     //   The subscription is already in mongo and hopefully this erroneous situation is fixed 
     //   once the sub-cache is refreshed.
@@ -401,56 +381,28 @@ int mongoSubCacheItemInsert
     cSubP->expression.stringFilter.fill(stringFilterP, &errorString);
   }
 
+  if (mdStringFilterP != NULL)
+  {
+    cSubP->expression.mdStringFilter.fill(mdStringFilterP, &errorString);
+  }
+
   LM_T(LmtSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
 
 
   //
   // 06. Push attribute names to Attribute Vector (cSubP->attributes)
   //
-  for (unsigned int ix = 0; ix < attrVec.size(); ++ix)
-  {
-    std::string s = attrVec[ix].String();
-    cSubP->attributes.push_back(s);
-  }
-
-
+  setStringVectorF(sub, CSUB_ATTRS, &(cSubP->attributes));
 
   //
-  // 07. Fill in cSubP->notifyConditionVector from condVec
+  // 07. Push metadata names to Metadata Vector (cSubP->metadatas)
   //
-  for (unsigned int ix = 0; ix < condVec.size(); ++ix)
-  {
-    BSONObj                   condition = condVec[ix].embeddedObject();
-    std::string               condType;
-    std::vector<BSONElement>  valueVec;
+  setStringVectorF(sub, CSUB_METADATA, &(cSubP->metadata));
 
-    condType = getStringFieldF(condition, CSUB_CONDITIONS_TYPE);
-    if (condType != ON_CHANGE_CONDITION)
-    {
-      continue;
-    }
-
-    NotifyCondition* ncP = new NotifyCondition();
-    ncP->type = condType;
-
-    valueVec = getFieldF(condition, CSUB_CONDITIONS_VALUE).Array();
-    for (unsigned int vIx = 0; vIx < valueVec.size(); ++vIx)
-    {
-      std::string condValue;
-
-      condValue = valueVec[vIx].String();
-      ncP->condValueList.push_back(condValue);
-    }
-
-    cSubP->notifyConditionVector.push_back(ncP);
-  }
-
-  if (cSubP->notifyConditionVector.size() == 0)
-  {
-    subCacheItemDestroy(cSubP);
-    delete cSubP;
-    return -5;
-  }
+  //
+  // 08. Fill in cSubP->notifyConditionV from condVec
+  //
+  setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
 
   subCacheItemInsert(cSubP);
 
@@ -477,7 +429,7 @@ void mongoSubCacheRefresh(const std::string& database)
 {
   LM_T(LmtSubCache, ("Refreshing subscription cache for DB '%s'", database.c_str()));
 
-  BSONObj                   query       = BSON("conditions.type" << ON_CHANGE_CONDITION);
+  BSONObj                   query;      // empty query (all subscriptions)
   std::string               db          = database;
   std::string               tenant      = tenantFromDb(db);
   std::string               collection  = getSubscribeContextCollectionName(tenant);
@@ -507,7 +459,6 @@ void mongoSubCacheRefresh(const std::string& database)
     }
 
     int r = mongoSubCacheItemInsert(tenant.c_str(), sub);
-
     if (r == 0)
     {
       ++subNo;

@@ -25,9 +25,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <regex.h>
 #include <string>
 #include <vector>
-#include <regex.h>
 
 #include "mongo/client/dbclient.h"
 
@@ -38,9 +38,6 @@
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 #include "apiTypesV2/Subscription.h"
-#include "apiTypesV2/HttpInfo.h"
-
-using namespace mongo;
 
 
 
@@ -68,14 +65,20 @@ typedef enum SubCacheState
 */
 struct EntityInfo
 {
+  std::string   entityId;
   bool          isPattern;
   regex_t       entityIdPattern;
-  std::string   entityId;
-  std::string   entityType;
   bool          entityIdPatternToBeFreed;
 
+  std::string   entityType;
+  bool          isTypePattern;
+  regex_t       entityTypePattern;
+  bool          entityTypePatternToBeFreed;
+
+
   EntityInfo() {}
-  EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern);
+  EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern,
+             bool _isTypePattern);
   ~EntityInfo() { release(); }
 
   bool          match(const std::string& idPattern, const std::string& type);
@@ -93,7 +96,8 @@ struct CachedSubscription
 {
   std::vector<EntityInfo*>    entityIdInfos;
   std::vector<std::string>    attributes;
-  NotifyConditionVector       notifyConditionVector;
+  std::vector<std::string>    metadata;
+  std::vector<std::string>    notifyConditionV;
   char*                       tenant;
   char*                       servicePath;
   char*                       subscriptionId;
@@ -147,6 +151,17 @@ extern void subCacheDestroy(void);
 
 /* ****************************************************************************
 *
+* subCacheDisable -
+*
+*/
+#ifdef UNIT_TEST
+void subCacheDisable(void);
+#endif
+
+
+
+/* ****************************************************************************
+*
 * subCacheItemDestroy - 
 */
 extern void subCacheItemDestroy(CachedSubscription* cSubP);
@@ -163,6 +178,14 @@ extern int subCacheItems(void);
 
 /* ****************************************************************************
 *
+* subCacheEntryPresent -
+*/
+extern void subCacheEntryPresent(CachedSubscription* cSubP);
+
+
+
+/* ****************************************************************************
+*
 * subCachePresent - 
 */
 extern void subCachePresent(const char* title);
@@ -171,38 +194,7 @@ extern void subCachePresent(const char* title);
 
 /* ****************************************************************************
 *
-* subCacheItemInsert - 
-*/
-extern void subCacheItemInsert
-(
-  const char*                   tenant,
-  const char*                   servicePath,
-  const ngsiv2::HttpInfo&       httpInfo,
-  const EntityIdVector&         entityIdVector,
-  const AttributeList&          attributeList,
-  const NotifyConditionVector&  notifyConditionVector,
-  const char*                   subscriptionId,
-  int64_t                       expiration,
-  int64_t                       throttling,
-  RenderFormat                  renderFormat,
-  bool                          notificationDone,
-  int64_t                       lastNotificationTime,
-  StringFilter*                 stringFilterP,
-  const std::string&            status,
-  const std::string&            q,
-  const std::string&            geometry,
-  const std::string&            coords,
-  const std::string&            georel,
-  bool                          blacklist = false
-);
-
-
-/* ****************************************************************************
-*
 * subCacheItemInsert -
-*
-* NGSIv2 wrapper
-*
 */
 extern void subCacheItemInsert
 (
@@ -211,7 +203,8 @@ extern void subCacheItemInsert
   const ngsiv2::HttpInfo&            httpInfo,
   const std::vector<ngsiv2::EntID>&  entities,
   const std::vector<std::string>&    attributes,
-  const std::vector<std::string>&    condAttributes,
+  const std::vector<std::string>&    metadata,
+  const std::vector<std::string>&    conditionAttrs,
   const char*                        subscriptionId,
   int64_t                            expiration,
   int64_t                            throttling,
@@ -219,6 +212,7 @@ extern void subCacheItemInsert
   bool                               notificationDone,
   int64_t                            lastNotificationTime,
   StringFilter*                      stringFilterP,
+  StringFilter*                      mdStringFilterP,
   const std::string&                 status,
   const std::string&                 q,
   const std::string&                 geometry,
@@ -305,7 +299,16 @@ extern void subCacheMatch
 *
 * subCacheStatisticsGet - 
 */
-extern void subCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* updates, int* items, char* list, int listSize);
+extern void subCacheStatisticsGet
+(
+  int*   refreshes,
+  int*   inserts,
+  int*   removes,
+  int*   updates,
+  int*   items,
+  char*  list,
+  int    listSize
+);
 
 
 

@@ -58,16 +58,6 @@ costly in terms of performance).
 
 Related with: https://github.com/telefonicaid/fiware-orion/issues/2073
 
-## Metadata vector and object values not implemented yet
-
-NGSIv2 specification allows metadata value to be JSON Array or Object. However, such datatypes are yet to be
-implemented for metadata values in Orion.
-
-## Default type for entities, attributes and metadata
-
-Currently, Orion uses the string `none` as default for entities/attributes/metadata at creation/update time.
-However, this may change in the future, as described in https://github.com/telefonicaid/fiware-orion/issues/2223.
-
 ## Scope functionality
 
 Orion implements a `scope` field in the `POST /v2/op/update` operation (you can see
@@ -86,30 +76,41 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 
 * **description**: optional (max length 1024)
 * **subject**: mandatory
-  * **entities**: mandatory
-    * **id** or **idPattern**: one of them is mandatory (but both at the same time is not allowed). id
-      must follow NGSIv2 restrictions for IDs. idPattern must be not empty and a valid regex.
-    * **type**: optional (but if present it must follow NGSIv2 restrictions for IDs)
-  * **condition**: optional (but if present it must have a content, i.e. `{}` is not allowed)
-    * **attrs**: optional (but if present it must be a list; empty list is allowed)
-    * **expression**: optional (but if present it must have a content, i.e. `{}` is not allowed)
-      * **q**: optional (but if present it must be not empty, i.e. `""` is not allowed)
-      * **georel**: optional (but if present it must be not empty, i.e. `""` is not allowed)
-      * **geometry**: optional (but if present it must be not empty, i.e. `""` is not allowed)
-      * **coords**: optional (but if present it must be not empty, i.e. `""` is not allowed)
+    * **entities**: mandatory
+        * **id** or **idPattern**: one of them is mandatory (but both at the same time is not allowed). id
+            must follow NGSIv2 restrictions for IDs. idPattern must be not empty and a valid regex.
+        * **type**: optional (but if present it must follow NGSIv2 restrictions for IDs)
+    * **condition**: optional (but if present it must have a content, i.e. `{}` is not allowed)
+        * **attrs**: optional (but if present it must be a list; empty list is allowed)
+        * **expression**: optional (but if present it must have a content, i.e. `{}` is not allowed)
+            * **q**: optional (but if present it must be not empty, i.e. `""` is not allowed)
+            * **georel**: optional (but if present it must be not empty, i.e. `""` is not allowed)
+            * **geometry**: optional (but if present it must be not empty, i.e. `""` is not allowed)
+            * **coords**: optional (but if present it must be not empty, i.e. `""` is not allowed)
 * **notification**:
-  * **http**: must be present if `httpCustom` is omitted, forbidden otherwise
-    * **url**: mandatory (must be a valid URL)
-  * **httpCustom**: must be present if `http` is omitted, forbidden otherwise
-    * **url**: mandatory (must be not empty)
-    * **headers**: optional (but if present it must have a content, i.e. `{}` is not allowed)
-    * **qs**: optional (but if present it must have a content, i.e. `{}` is not allowed)
-    * **method**: optional (but if present it must be a valid HTTP method)
-    * **payload**: optional (empty string is allowed)
-  * **attrs**: optional (but if present it must be a list; empty list is allowed)
-  * **exceptAttrs**: optional (but it cannot be present if `attrs` is also used; if present it must be a non-empty list)
-  * **attrsFormat**: optional (but if present it must be a valid attrs format keyword)
+    * **http**: must be present if `httpCustom` is omitted, forbidden otherwise
+        * **url**: mandatory (must be a valid URL)
+    * **httpCustom**: must be present if `http` is omitted, forbidden otherwise
+        * **url**: mandatory (must be not empty)
+        * **headers**: optional (but if present it must have a content, i.e. `{}` is not allowed)
+        * **qs**: optional (but if present it must have a content, i.e. `{}` is not allowed)
+        * **method**: optional (but if present it must be a valid HTTP method)
+        * **payload**: optional (empty string is allowed)
+    * **attrs**: optional (but if present it must be a list; empty list is allowed)
+    * **metadata**: optional (but if present it must be a list; empty list is allowed)
+    * **exceptAttrs**: optional (but it cannot be present if `attrs` is also used; if present it must be a non-empty list)
+    * **attrsFormat**: optional (but if present it must be a valid attrs format keyword)
 * **throttling**: optional (must be an integer)
-* **expires**: optional (must be a date)
+* **expires**: optional (must be a date or empty string "")
 * **status**: optional (must be a valid status keyword)
 
+
+# actionType metadata
+
+From NGSIv2 specification section "Special metadata in notifications", regarding `actionType` metadata:
+
+> Its value depend on the request operation type: `update` for updates,
+> `append` for creation and `delete` for deletion. Its type is always `Text`.
+
+Current Orion implementation supports "update" and "append". The "delete" case will be
+supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).

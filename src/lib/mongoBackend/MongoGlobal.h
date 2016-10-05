@@ -258,6 +258,16 @@ extern bool includedEntity(EntityId en, const EntityIdVector& entityIdV);
 extern bool includedAttribute(const ContextRegistrationAttribute& attr, const AttributeList& attrsV);
 
 
+
+/* *****************************************************************************
+*
+* processAreaScopeV2 -
+*
+*/
+extern bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery);
+
+
+
 /* ****************************************************************************
 *
 * entitiesQuery -
@@ -310,12 +320,7 @@ extern bool registrationsQuery
   long long*                          countP       = NULL
 );
 
-/* ****************************************************************************
-*
-* someEmptyCondValue -
-*
-*/
-extern bool someEmptyCondValue(const BSONObj& sub);
+
 
 /* ****************************************************************************
 *
@@ -366,7 +371,8 @@ extern BSONArray processConditionVector
   const std::string&               status,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsFilter,
-  bool                             blacklist = false
+  bool                             blacklist,
+  bool                             metadataFlags
 );
 
 
@@ -383,6 +389,7 @@ extern BSONArray processConditionVector
   const std::vector<std::string>&    condAttributesV,
   const std::vector<ngsiv2::EntID>&  entitiesV,
   const std::vector<std::string>&    notifAttributesV,
+  const std::vector<std::string>&    metadataV,
   const std::string&                 subId,
   const ngsiv2::HttpInfo&            httpInfo,
   bool*                              notificationDone,
@@ -394,7 +401,7 @@ extern BSONArray processConditionVector
   const std::string&                 status,
   const std::string&                 fiwareCorrelator,
   const std::vector<std::string>&    attrsOrder,
-  bool                               blacklist = false
+  bool                               blacklist
 );
 
 

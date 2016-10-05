@@ -11,6 +11,7 @@
 * [Mutex policy impact in performance](#mutex-policy-impact-in-performance)
 * [Outgoing HTTP connections timeout](#outgoing-http-connections-timeout)
 * [Subscription cache](#subscription-cache)
+* [Geo-subscription performance considerations](#geo-subscription-performance-considerations)
 
 ##  MongoDB configuration
 
@@ -45,11 +46,11 @@ to decide what to prioritize.
 However, in order to help administrators in this task, the following indexes are recommended:
 
 * Collection [entities](database_model.md#entities-collection)
-  * `_id.id`
-  * `_id.type`
-  * `_id.servicePath`
-  * `attrNames`
-  * `creDate`
+    * `_id.id`
+    * `_id.type`
+    * `_id.servicePath`
+    * `attrNames`
+    * `creDate`
 
 The only index that Orion Context Broker actually ensures is the "2dsphere" in the `location.coords`
 field in the entities collection, due to functional needs [geo-location functionality](../user/geolocation.md).
@@ -209,7 +210,7 @@ are mainly for Orion developers, to help to identify bugs in the code. Their val
 ## Log impact in performance
 
 [Logs](logs.md) can have a severe impact on performance. Thus, in high level scenarios, it is recommended to use `-logLevel`
-ERROR or WARNING. We have found in some situations that the saving between `-logLevel WARNING` and `-logLevel INFO`
+ERROR or WARN. We have found in some situations that the saving between `-logLevel WARN` and `-logLevel INFO`
 can be around 50% in performance.
 
 [Top](#top)
@@ -279,5 +280,19 @@ to full consistency) but there is more stress on CB and DB. Large intervals mean
 propagate, but the stress on CB and DB is lower.
 
 As a final note, you can disable cache completely using the `-noCache` CLI option, but that is not a recommended configuration.
+
+[Top](#top)
+
+# [Geo-subscription performance considerations]
+
+Current support of georel, geometry and coords expression fields in NGSIv2 subscriptions (aka geo-subscriptions)
+relies on MongoDB geo-query capabilities. While all other conditions associated to subscriptions (e.g. query filter,
+etc.) are evaluated on a memory image of the updated entity, the ones related with the georel, geometry and coords of
+a given subscription need a query in the DB.
+
+However, note that the impact on performance shouldn't be too heavy (the operation invoked in MongoDB is `count()`
+which is relatively light).
+
+Our [future plan](https://github.com/telefonicaid/fiware-orion/issues/2396) is to implement geo-subscription matching in memory (as the rest of the conditions), but this is not a priority at the moment.
 
 [Top](#top)

@@ -108,7 +108,7 @@ Date: REGEX(.*)
 03. Check entity after PATCH
 ============================
 HTTP/1.1 200 OK
-Content-Length: 291
+Content-Length: 293
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -116,14 +116,14 @@ Date: REGEX(.*)
 {
     "humidity": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 60
     },
     "id": "room",
     "location": {
         "metadata": {
             "crs": {
-                "type": "none",
+                "type": "Text",
                 "value": "WGS84"
             }
         },
@@ -133,11 +133,11 @@ Date: REGEX(.*)
     "temperature": {
         "metadata": {
             "my_meta": {
-                "type": "none",
+                "type": "Text",
                 "value": "5678"
             }
         },
-        "type": "none",
+        "type": "None",
         "value": null
     },
     "type": "Room"

@@ -174,7 +174,7 @@ Date: REGEX(.*)
 {
     "A": {
         "metadata": {},
-        "type": "none",
+        "type": "Text",
         "value": "foo"
     },
     "dateCreated": {
@@ -250,7 +250,7 @@ Date: REGEX(.*)
 {
     "A": {
         "metadata": {},
-        "type": "none",
+        "type": "Text",
         "value": "bar"
     },
     "dateCreated": {

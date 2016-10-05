@@ -690,7 +690,14 @@ std::string postUpdateContext
     if (fails == response.contextElementResponseVector.size())
     {
       // If all CER result in error, then it isn't a partial update, but a regular NotFound
-      parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "No context element found", "NotFound");
+      if (ciP->apiVersion == "v1")
+      {
+        parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "No context element found", "NotFound");
+      }
+      else
+      {
+        parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "The requested entity has not been found. Check type and id", "NotFound");
+      }
     }
     else if (fails > 0)
     {

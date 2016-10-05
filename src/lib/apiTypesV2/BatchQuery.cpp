@@ -60,7 +60,7 @@ std::string BatchQuery::check(ConnectionInfo* ciP, RequestType requestType)
   std::string res;
   std::string err;
 
-  if (((res = entities.check(ciP, requestType))                != "OK") ||
+  if (((res = entities.check(ciP, requestType))          != "OK") ||
       ((res = attributeV.check(requestType, "", err, 0)) != "OK") ||
       ((res = scopeV.check(requestType, "", err, 0))     != "OK"))
   {

@@ -11,20 +11,19 @@ This document explains some consideration to take into account regarding such co
 ## Native JSON types
 
 NGSIv2 allows to create/update attributes (and metadata) whose values use JSON native 
-types (number, boolean, string, etc.). However, NGSIv1 uses a JSON parser that converts 
+types (number, boolean, string, etc.). Unfortunately, NGSIv1 uses a JSON parser that converts 
 numbers and boolean values to string at creation/update time. Thus, an attempt of 
 setting `A=2` using NGSIv1 will actually store `A="2"` in the Orion database.
 
-However, NGSIv1 rendering is able to retrieve attributes values stored using 
-non-string JSON native types correctly. Thus, if you set `A=2` using NGSIv2 and retrieve that 
-attribute using NGSIv1 you will get `A=2`. Currently this work for attribute simple
-values, i.e. compound attribute values or metadata values always use string-based rendering.
+However, NGSIv1 rendering is able to correctly retrieve attribute values stored using 
+non-string JSON native types. Thus, if you set `A=2` using NGSIv2 and retrieve that 
+attribute using NGSIv1, you will get `A=2`.
 
 ## Filtering
 
 You can use the filtering capabilities developed for NGSIv2 (`GET /v2/entities?q=<query>`) also 
 in NGSIv1 using a Scope element in the payload of `POST /v1/queryContext`. See 
-[the following section](filtering.md#string-filter) for details.
+[the following section](filtering.md#string-filters) for details.
 
 However, take into account that some of the filters (e. g. greater/less, range, etc.) are thought
 for numeric values. Thus, in order to work properly, these filters (although using a 
@@ -57,7 +56,8 @@ order can be used only in NGSIv2.
 NGSIv2 allows several notification modes depending on the `attrsFormat` field associated to the
 subscription. Apart from the values described in the NGSIv2 specification, Orion also support
 `legacy` value in order to send notifications in NGSIv1 format. This way, users can have the
-enhancements of NGSIv2 subscriptions (e.g. filtering) with NGSIv1 legacy notifications receivers.
+enhancements of NGSIv2 subscriptions (e.g. filtering or special metadata in notifications) with
+NGSIv1 legacy notifications receivers.
 
 ## NGSIv2 query update forwarding to Context Providers
 

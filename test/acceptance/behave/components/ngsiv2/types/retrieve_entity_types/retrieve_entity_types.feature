@@ -64,7 +64,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | entities_id       | room1       |
       | attributes_number | 2           |
       | attributes_name   | temperature |
-      | attributes_value  | 34          |
+      | attributes_value  | high        |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -146,6 +146,10 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                |
+      | Fiware-Service     | test_type_happy_path |
+      | Fiware-ServicePath | /test                |
     When get entity types
       | parameter | value |
       | options   | count |
@@ -154,10 +158,249 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     Then verify that receive an "OK" http code
     And verify headers in response
       | parameter          | value      |
-      | fiware-total-count | 4          |
-      | fiware-correlator  | [a-f0-9-]* |
-    And verify that entity types returned in response are: "house,home"
+      | Fiware-Total-Count | 4          |
+      | Fiware-Correlator  | [a-f0-9-]* |
+    And verify that entity types returned in response are: "car,home"
     And verify that attributes types are returned in response based on the info in the recorder
+
+  # ------------------------ Content-Type header ----------------------------------------------
+  @with_content_type @BUG_2128
+  Scenario Outline:  try to get entity types using NGSI v2 API with Content-Type header
+    Given  a definition of headers
+      | parameter          | value                |
+      | Fiware-Service     | test_type_happy_path |
+      | Fiware-ServicePath | /test                |
+      | Content-Type       | application/json     |
+    And initialize entity groups recorder
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | home        |
+      | entities_id       | room1       |
+      | attributes_number | 2           |
+      | attributes_name   | temperature |
+      | attributes_value  | high        |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value    |
+      | entities_type     | house    |
+      | entities_id       | room2    |
+      | attributes_number | 2        |
+      | attributes_name   | pressure |
+      | attributes_value  | low      |
+      | attributes_type   | bar      |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value                    |
+      | entities_id       | room3                    |
+      | attributes_number | 2                        |
+      | attributes_name   | timestamp                |
+      | attributes_value  | 2017-06-17T07:21:24.238Z |
+      | attributes_type   | DateTime                 |
+      | metadatas_number  | 2                        |
+      | metadatas_name    | very_hot                 |
+      | metadatas_type    | alarm                    |
+      | metadatas_value   | random=10                |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value     |
+      | entities_type     | car       |
+      | entities_id       | vehicle   |
+      | attributes_number | 2         |
+      | attributes_name   | brake     |
+      | attributes_value  | 25        |
+      | attributes_type   | seconds   |
+      | metadatas_number  | 2         |
+      | metadatas_name    | very_hot  |
+      | metadatas_type    | alarm     |
+      | metadatas_value   | random=10 |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value |
+      | entities_type     | car   |
+      | entities_id       | moto  |
+      | attributes_number | 2     |
+      | attributes_name   | speed |
+      | attributes_value  | 45    |
+      | attributes_type   | km_h  |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                |
+      | Fiware-Service     | test_type_happy_path |
+      | Fiware-ServicePath | /test                |
+      | Content-Type       | <content_type>       |
+    When get entity types
+      | parameter | value |
+      | options   | count |
+      | limit     | 2     |
+      | offset    | 1     |
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                                                        |
+      | error       | BadRequest                                                                                   |
+      | description | Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden |
+    Examples:
+      | content_type                      |
+      | application/json                  |
+      | application/xml                   |
+      | application/x-www-form-urlencoded |
+      | multipart/form-data               |
+      | text/plain                        |
+      | text/html                         |
+      | dsfsdfsdf                         |
+      | <sdsd>                            |
+      | (eeqweqwe)                        |
+
+  @with_empty_content_type @BUG_2364 @skip
+  Scenario:  try to get entity types using NGSI v2 API with Content-Type header and empty value
+    Given  a definition of headers
+      | parameter          | value                |
+      | Fiware-Service     | test_type_happy_path |
+      | Fiware-ServicePath | /test                |
+      | Content-Type       | application/json     |
+    And initialize entity groups recorder
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | home        |
+      | entities_id       | room1       |
+      | attributes_number | 2           |
+      | attributes_name   | temperature |
+      | attributes_value  | 34          |
+      | attributes_type   | celsius     |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value    |
+      | entities_type     | house    |
+      | entities_id       | room2    |
+      | attributes_number | 2        |
+      | attributes_name   | pressure |
+      | attributes_value  | low      |
+      | attributes_type   | bar      |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value                    |
+      | entities_id       | room3                    |
+      | attributes_number | 2                        |
+      | attributes_name   | timestamp                |
+      | attributes_value  | 2017-06-17T07:21:24.238Z |
+      | attributes_type   | DateTime                 |
+      | metadatas_number  | 2                        |
+      | metadatas_name    | very_hot                 |
+      | metadatas_type    | alarm                    |
+      | metadatas_value   | random=10                |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value     |
+      | entities_type     | car       |
+      | entities_id       | vehicle   |
+      | attributes_number | 2         |
+      | attributes_name   | brake     |
+      | attributes_value  | 25        |
+      | attributes_type   | seconds   |
+      | metadatas_number  | 2         |
+      | metadatas_name    | very_hot  |
+      | metadatas_type    | alarm     |
+      | metadatas_value   | random=10 |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
+      | parameter         | value |
+      | entities_type     | car   |
+      | entities_id       | moto  |
+      | attributes_number | 2     |
+      | attributes_name   | speed |
+      | attributes_value  | 45    |
+      | attributes_type   | km_h  |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                |
+      | Fiware-Service     | test_type_happy_path |
+      | Fiware-ServicePath | /test                |
+      | Content-Type       |                      |
+    When get entity types
+      | parameter | value |
+      | options   | count |
+      | limit     | 2     |
+      | offset    | 1     |
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                                                        |
+      | error       | BadRequest                                                                                   |
+      | description | Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden |
 
   # ------------------------ Service header ----------------------------------------------
   @service
@@ -175,7 +418,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | entities_id       | room1       |
       | attributes_number | 2           |
       | attributes_name   | temperature |
-      | attributes_value  | 34          |
+      | attributes_value  | high        |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -198,9 +441,13 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                                  |
+      | Fiware-Service     | the same value of the previous request |
+      | Fiware-ServicePath | /test                                  |
     When get entity types
     Then verify that receive an "OK" http code
-    And verify that entity types returned in response are: "none,home"
+    And verify that entity types returned in response are: "Thing,home"
     And verify that attributes types are returned in response based on the info in the recorder
     Examples:
       | service            |
@@ -225,7 +472,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | entities_id       | room1       |
       | attributes_number | 2           |
       | attributes_name   | temperature |
-      | attributes_value  | 34          |
+      | attributes_value  | high        |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -248,9 +495,12 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value |
+      | Fiware-ServicePath | /test |
     When get entity types
     Then verify that receive an "OK" http code
-    And verify that entity types returned in response are: "none,home"
+    And verify that entity types returned in response are: "Thing,home"
     And verify that attributes types are returned in response based on the info in the recorder
 
   @service_error
@@ -291,7 +541,6 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | description | bad length - a tenant name can be max 50 characters long |
 
  # ------------------------ Service path header --------------------------------------
-  @service_path.row<row.id>
   @service_path @BUG_1423
   Scenario Outline:  get entities type using NGSI v2 with several service paths headers
     Given  a definition of headers
@@ -307,7 +556,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | entities_id       | room1       |
       | attributes_number | 2           |
       | attributes_name   | temperature |
-      | attributes_value  | 34          |
+      | attributes_value  | high        |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -330,9 +579,13 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                                  |
+      | Fiware-Service     | test_type_service_path                 |
+      | Fiware-ServicePath | the same value of the previous request |
     When get entity types
     Then verify that receive an "OK" http code
-    And verify that entity types returned in response are: "none,home"
+    And verify that entity types returned in response are: "Thing,home"
     And verify that attributes types are returned in response based on the info in the recorder
     Examples:
       | service_path                                                  |
@@ -361,6 +614,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_number | 2           |
       | attributes_name   | temperature |
       | attributes_value  | 34          |
+      | attributes_value  | celsius     |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -383,9 +637,12 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter      | value                  |
+      | Fiware-Service | test_type_service_path |
     When get entity types
     Then verify that receive an "OK" http code
-    And verify that entity types returned in response are: "none,home"
+    And verify that entity types returned in response are: "Thing,home"
     And verify that attributes types are returned in response based on the info in the recorder
 
   @service_path_error
@@ -457,7 +714,6 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | description | too many components in ServicePath |
 
   # --- types ---
-  @types_multiples.row<row.id>
   @types_multiples @BUG_2046
   Scenario Outline:  get entities type using NGSI v2 with multiples type
     Given  a definition of headers
@@ -480,13 +736,17 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | type   | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value               |
+      | Fiware-Service     | test_type_multiples |
+      | Fiware-ServicePath | /test               |
     When get entity types
       | parameter | value |
       | options   | count |
     Then verify that receive an "OK" http code
     And verify headers in response
       | parameter          | value    |
-      | fiware-total-count | <number> |
+      | Fiware-Total-Count | <number> |
     And verify that attributes types are returned in response based on the info in the recorder
     Examples:
       | number |
@@ -544,13 +804,17 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value               |
+      | Fiware-Service     | test_type_multiples |
+      | Fiware-ServicePath | /test               |
     When get entity types
       | parameter | value |
       | options   | count |
     Then verify that receive an "OK" http code
     And verify headers in response
       | parameter          | value |
-      | fiware-total-count | 1     |
+      | Fiware-Total-Count | 1     |
     And verify that entity types returned in response are: "home"
     And verify that attributes types are returned in response based on the info in the recorder
 
@@ -560,7 +824,6 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | parameter          | value               |
       | Fiware-Service     | test_type_multiples |
       | Fiware-ServicePath | /test               |
-      | Content-Type       | application/json    |
     And initialize entity groups recorder
     When get entity types
       | parameter | value |
@@ -568,13 +831,12 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     Then verify that receive an "OK" http code
     And verify headers in response
       | parameter          | value      |
-      | fiware-total-count | 0          |
-      | fiware-correlator  | [a-f0-9-]* |
-    And verify that entity types returned in response are: "home"
+      | Fiware-Total-Count | 0          |
+      | Fiware-Correlator  | [a-f0-9-]* |
+    And verify that entity types returned in response are: ""
 
   # ------------------ queries parameters -------------------------------
   # --- limit and offset ---
-  @only_limit.row<row.id>
   @only_limit
   Scenario Outline:  get entities type using NGSI v2 with only limit query parameter
     Given  a definition of headers
@@ -590,7 +852,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | entities_id       | room1       |
       | attributes_number | 2           |
       | attributes_name   | temperature |
-      | attributes_value  | 34          |
+      | attributes_value  | high        |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -645,6 +907,10 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value           |
+      | Fiware-Service     | test_type_limit |
+      | Fiware-ServicePath | /test           |
     When get entity types
       | parameter | value   |
       | limit     | <limit> |
@@ -652,12 +918,11 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     And verify that entity types returned in response are: "<types>"
     And verify that attributes types are returned in response based on the info in the recorder
     Examples:
-      | limit | types         |
-      | 1     | car           |
-      | 2     | home,car      |
-      | 10    | none,home,car |
+      | limit | types          |
+      | 1     | Thing          |
+      | 2     | car,Thing      |
+      | 10    | Thing,home,car |
 
-  @only_limit_wrong.row<row.id>
   @only_limit_wrong
   Scenario Outline:  try to get entities type using NGSI v2 with only wrong limit query parameter
     Given  a definition of headers
@@ -674,11 +939,16 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_number | 2           |
       | attributes_name   | temperature |
       | attributes_value  | 34          |
+      | attributes_type   | celsius     |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                      |
+      | Fiware-Service     | test_type_only_limit_error |
+      | Fiware-ServicePath | /test                      |
     When get entity types
       | parameter | value   |
       | limit     | <limit> |
@@ -710,12 +980,16 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | entities_id       | room1       |
       | attributes_number | 2           |
       | attributes_name   | temperature |
-      | attributes_value  | 34          |
+      | attributes_value  | high        |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                      |
+      | Fiware-Service     | test_type_only_limit_error |
+      | Fiware-ServicePath | /test                      |
     When get entity types
       | parameter | value |
       | limit     | 0     |
@@ -741,11 +1015,16 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_number | 2           |
       | attributes_name   | temperature |
       | attributes_value  | 34          |
+      | attributes_type   | celsius     |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                      |
+      | Fiware-Service     | test_type_only_limit_error |
+      | Fiware-ServicePath | /test                      |
     When get entity types
       | parameter | value |
       | limit     |       |
@@ -770,7 +1049,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | entities_id       | room1       |
       | attributes_number | 2           |
       | attributes_name   | temperature |
-      | attributes_value  | 34          |
+      | attributes_value  | high        |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -838,6 +1117,10 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                 |
+      | Fiware-Service     | test_type_only_offset |
+      | Fiware-ServicePath | /test                 |
     When get entity types
       | parameter | value    |
       | parameter | value    |
@@ -846,10 +1129,10 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     And verify that entity types returned in response are: "<types>"
     And verify that attributes types are returned in response based on the info in the recorder
     Examples:
-      | offset | types               |
-      | 0      | house,home,car,none |
-      | 1      | house,home,none     |
-      | 20     |                     |
+      | offset | types                |
+      | 0      | house,home,car,Thing |
+      | 1      | car,house,home       |
+      | 20     |                      |
 
   @only_offset_not_decimal
   Scenario Outline:  try to get entities type using NGSI v2 with only offset query parameter, but the value is not a decimal number
@@ -866,12 +1149,16 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | entities_id       | room1       |
       | attributes_number | 2           |
       | attributes_name   | temperature |
-      | attributes_value  | 34          |
+      | attributes_value  | high        |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                       |
+      | Fiware-Service     | test_type_only_offset_error |
+      | Fiware-ServicePath | /test                       |
     When get entity types
       | parameter | value    |
       | offset    | <offset> |
@@ -888,7 +1175,6 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | <2     |
       | %@#    |
 
-  @limit_offsets.row<row.id>
   @limit_offsets
   Scenario Outline:  get entities type using NGSI v2 with limit and offset queries parameters
     Given  a definition of headers
@@ -905,6 +1191,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_number | 2           |
       | attributes_name   | temperature |
       | attributes_value  | 34          |
+      | attributes_type   | celsius     |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -972,6 +1259,10 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_list_limit_offset |
+      | Fiware-ServicePath | /test                  |
     When get entity types
       | parameter | value    |
       | limit     | <limit>  |
@@ -980,11 +1271,11 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     And verify that entity types returned in response are: "<types>"
     And verify that attributes types are returned in response based on the info in the recorder
     Examples:
-      | limit | offset | types           |
-      | 1     | 0      | none,home,car   |
-      | 20    | 1      | home,house,none |
-      | 1     | 20     | home            |
-      | 5     | 2      | none,house      |
+      | limit | offset | types          |
+      | 1     | 0      | Thing,home,car |
+      | 20    | 1      | car,home,house |
+      | 1     | 20     | home           |
+      | 5     | 2      | home,house     |
 
  # --- options=count ---
   @only_count_unknown
@@ -1002,12 +1293,16 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | entities_id       | room1       |
       | attributes_number | 2           |
       | attributes_name   | temperature |
-      | attributes_value  | 34          |
+      | attributes_value  | high        |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value           |
+      | Fiware-Service     | test_type_count |
+      | Fiware-ServicePath | /test           |
     When get entity types
       | parameter | value   |
       | options   | zxczxcz |
@@ -1033,11 +1328,16 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_number | 2           |
       | attributes_name   | temperature |
       | attributes_value  | 34          |
+      | attributes_type   | celsius     |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value           |
+      | Fiware-Service     | test_type_count |
+      | Fiware-ServicePath | /test           |
     When get entity types
       | parameter | value |
       | options   |       |
@@ -1062,7 +1362,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | entities_id       | room1       |
       | attributes_number | 2           |
       | attributes_name   | temperature |
-      | attributes_value  | 34          |
+      | attributes_value  | high        |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -1130,17 +1430,20 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value           |
+      | Fiware-Service     | test_type_count |
+      | Fiware-ServicePath | /test           |
     When get entity types
       | parameter | value |
       | options   | count |
     Then verify that receive an "OK" http code
-    And verify that entity types returned in response are: "house,home,none,car"
+    And verify that entity types returned in response are: "house,home,Thing,car"
     And verify that attributes types are returned in response based on the info in the recorder
     And verify headers in response
       | parameter          | value |
-      | fiware-total-count | 4     |
+      | Fiware-Total-Count | 4     |
 
-  @limit_offset_count.row<row.id>
   @limit_offset_count @BUG_2046
   Scenario Outline:  get entities type using NGSI v2 with limit, offset and options=count queries parameters
     Given  a definition of headers
@@ -1157,6 +1460,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_number | 2           |
       | attributes_name   | temperature |
       | attributes_value  | 34          |
+      | attributes_type   | celsius     |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -1224,6 +1528,10 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value                  |
+      | Fiware-Service     | test_list_limit_offset |
+      | Fiware-ServicePath | /test                  |
     When get entity types
       | parameter | value    |
       | limit     | <limit>  |
@@ -1234,13 +1542,13 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     And verify that attributes types are returned in response based on the info in the recorder
     And verify headers in response
       | parameter          | value |
-      | fiware-total-count | 4     |
+      | Fiware-Total-Count | 4     |
     Examples:
-      | limit | offset | types               |
-      | 1     | 0      | car                 |
-      | 20    | 1      | home,car,house,none |
-      | 1     | 20     |                     |
-      | 5     | 2      | house,none          |
+      | limit | offset | types                |
+      | 1     | 0      | Thing                |
+      | 20    | 1      | home,car,house,Thing |
+      | 1     | 20     |                      |
+      | 5     | 2      | house,home           |
 
  # --- options=value ---
   @only_count_value
@@ -1258,12 +1566,16 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | entities_id       | room1       |
       | attributes_number | 2           |
       | attributes_name   | temperature |
-      | attributes_value  | 34          |
+      | attributes_value  | high        |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value            |
+      | Fiware-Service     | test_type_values |
+      | Fiware-ServicePath | /test            |
     When get entity types
       | parameter | value |
       | options   | value |

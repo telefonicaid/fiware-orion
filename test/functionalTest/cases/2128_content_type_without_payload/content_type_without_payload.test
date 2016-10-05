@@ -1,0 +1,148 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Response On Entity Not Found On Update Attribute
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Send a PUT /v2/entities/E1 without payload, see error 411
+# 02. Send a PATCH /v2/entities/E1 without payload, see error 411
+# 03. Send a POST /v2/entities/E1 without payload, see error 411
+# 04. Send a GET with Content-Type application/json, see error 400
+# 05. Send a DELETE with Content-Type application/json, see error 400
+#
+
+echo "01. Send a PUT /v2/entities/E1 without payload, see error 411"
+echo "============================================================="
+orionCurl --url /v2/entities/E1 -X PUT
+echo
+echo
+
+
+echo "02. Send a PATCH /v2/entities/E1 without payload, see error 411"
+echo "==============================================================="
+orionCurl --url /v2/entities/E1 -X PATCH
+echo
+echo
+
+
+echo "03. Send a POST /v2/entities/E1 without payload, see error 411"
+echo "=============================================================="
+orionCurl --url /v2/entities/E1 -X POST
+echo
+echo
+
+
+echo "04. Send a GET with Content-Type application/json, see error 400"
+echo "================================================================"
+orionCurl --url /v2/entities/E1 --in application/json
+echo
+echo
+ 
+
+echo "05. Send a DELETE with Content-Type application/json, see error 400"
+echo "==================================================================="
+orionCurl --url /v2/entities/E1 --in application/json -X DELETE
+echo
+echo
+ 
+
+--REGEXPECT-- 
+01. Send a PUT /v2/entities/E1 without payload, see error 411
+=============================================================
+HTTP/1.1 411 Length Required
+Content-Length: 98
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Zero/No Content-Length in PUT/POST/PATCH request",
+    "error": "ContentLengthRequired"
+}
+
+
+02. Send a PATCH /v2/entities/E1 without payload, see error 411
+===============================================================
+HTTP/1.1 411 Length Required
+Content-Length: 98
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Zero/No Content-Length in PUT/POST/PATCH request",
+    "error": "ContentLengthRequired"
+}
+
+
+03. Send a POST /v2/entities/E1 without payload, see error 411
+==============================================================
+HTTP/1.1 411 Length Required
+Content-Length: 98
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Zero/No Content-Length in PUT/POST/PATCH request",
+    "error": "ContentLengthRequired"
+}
+
+
+04. Send a GET with Content-Type application/json, see error 400
+================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 131
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden",
+    "error": "BadRequest"
+}
+
+
+05. Send a DELETE with Content-Type application/json, see error 400
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 131
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

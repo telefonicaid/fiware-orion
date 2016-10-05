@@ -28,10 +28,11 @@
 #include <string>
 #include <vector>
 
+#include "mongo/client/dbclient.h"
+
 #include "orionTypes/OrionValueType.h"
 #include "ngsi/Request.h"
-
-#include "mongo/client/dbclient.h"
+#include "parse/CompoundValueNode.h"
 
 
 
@@ -41,10 +42,21 @@
 *
 * Metadata interpreted by Orion Context Broker, i.e. not custom metadata
 */
-#define NGSI_MD_ID       "ID"
-#define NGSI_MD_LOCATION "location"
-#define NGSI_MD_CREDATE  "creDate"    // FIXME P5: to be used for creDate (currenly only in DB)
-#define NGSI_MD_MODDATE  "modDate"    // FIXME P5: to be used for modDate (currenly only in DB)
+#define NGSI_MD_ID                 "ID"
+#define NGSI_MD_LOCATION           "location"
+#define NGSI_MD_CREDATE            "creDate"    // FIXME P5: to be used for creDate (currenly only in DB)
+#define NGSI_MD_MODDATE            "modDate"    // FIXME P5: to be used for modDate (currenly only in DB)
+#define NGSI_MD_PREVIOUSVALUE      "previousValue"   // Special metadata
+#define NGSI_MD_ACTIONTYPE         "actionType"      // Special metadata
+#define NGSI_MD_ALL                "*"               // Special metadata (alias meaning "all metadata")
+#define NGSI_MD_ACTIONTYPE_UPDATE  "update"
+#define NGSI_MD_ACTIONTYPE_APPEND  "append"
+#define NGSI_MD_ACTIONTYPE_DELETE  "delete"          // FIXME #1494: reserved for future use
+
+#if 0
+// FIXME #910: disabled by the moment, maybe removed at the end
+#define NGSI_MD_NOTIF_ONSUBCHANGE  "ngsi:onSubscriptionChange"
+#endif
 
 
 
@@ -58,12 +70,13 @@ typedef struct Metadata
   std::string  name;         // Mandatory
   std::string  type;         // Optional
 
-  // Mandatory
-  orion::ValueType   valueType;    // Type of value: taken from JSON parse
-  std::string        stringValue;  // "value" as a String
-  double             numberValue;  // "value" as a Number
-  bool               boolValue;    // "value" as a Boolean
-  bool               typeGiven;    // Was 'type' part of the incoming payload?
+  bool         typeGiven;    // Was 'type' part of the incoming payload?
+
+  orion::ValueType           valueType;    // Type of value: taken from JSON parse
+  std::string                stringValue;  // "value" as a String
+  double                     numberValue;  // "value" as a Number
+  bool                       boolValue;    // "value" as a Boolean
+  orion::CompoundValueNode*  compoundValueP;
 
   Metadata();
   Metadata(Metadata* mP, bool useDefaultType = false);
@@ -71,7 +84,8 @@ typedef struct Metadata
   Metadata(const std::string& _name, const std::string& _type, const std::string& _value);
   Metadata(const std::string& _name, const std::string& _type, double _value);
   Metadata(const std::string& _name, const std::string& _type, bool _value);
-  Metadata(const mongo::BSONObj& mdB);
+  Metadata(const std::string& _name, const mongo::BSONObj& mdB);
+  ~Metadata();
 
   std::string  render(const std::string& indent, bool comma = false);
   std::string  toJson(bool isLastElement);
@@ -79,6 +93,7 @@ typedef struct Metadata
   void         release(void);
   void         fill(const struct Metadata& md);
   std::string  toStringValue(void) const;
+  bool         compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
   std::string  check(ConnectionInfo*     ciP,
                      RequestType         requestType,
