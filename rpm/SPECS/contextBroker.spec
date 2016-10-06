@@ -164,6 +164,9 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Thu Sep 06 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.2.4-1
+- Fix: giving a semaphore in case of mongo exception, which was causing the broker to be unable to serve requests involving the database, and possibly even to crash due to lack of resources (#2571)
+
 * Thu Sep 22 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.2.3-1
 - Fix: missing expression sub-fields (q, etc.) in csubs makes Orion to crash
 
