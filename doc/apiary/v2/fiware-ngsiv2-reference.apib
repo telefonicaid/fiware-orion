@@ -1807,6 +1807,9 @@ Response:
 Creates a new subscription.
 The subscription is represented by a JSON object as described at the beginning of this section.
 
+Using `expires` with value equal to empty string (`""`) equals to omit the field, i.e. creating
+a permanent subscription.
+
 Response:
 
 * Successful operation uses 201 Created
@@ -1900,6 +1903,9 @@ Response:
 ### Update subscription [PATCH /v2/subscriptions/{subscriptionId}]
 
 Only the fields included in the request are updated in the subscription.
+
+Using `expires` with value equal to empty string (`""`) equals to removing the field, i.e.
+making the subscription permanent.
 
 Response:
 
