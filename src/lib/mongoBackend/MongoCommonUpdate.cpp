@@ -2154,10 +2154,14 @@ static void updateAttrInNotifyCer
           caP->previousValue->compoundValueP = NULL;
         }
 
+#if 0
         if (targetAttr->type != "")
         {
           caP->previousValue->type = caP->type;
         }
+#else
+        caP->previousValue->type = caP->type;
+#endif
 
         /* Set values from target attribute */
         caP->valueType      = targetAttr->valueType;
