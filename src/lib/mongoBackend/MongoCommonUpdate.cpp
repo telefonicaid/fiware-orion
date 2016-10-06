@@ -2151,8 +2151,7 @@ static void updateAttrInNotifyCer
           // We cannot steal this time, as we are going to steal in a next place (see below)
           caP->previousValue->compoundValueP = caP->compoundValueP->clone();
         }
-        else
-        {
+        else {
           caP->previousValue->compoundValueP = NULL;
         }
 
