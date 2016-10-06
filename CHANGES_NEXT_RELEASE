@@ -1,3 +1,4 @@
 - Add: new value for URI param 'options' (options=noAttrDetail) for NGSIv2 queries to exclude attribute detail, making the query faster (#2073) 
+- Fix: type of 'previous value' of a context attribute in notifications (#2553)
 - Fix: giving a semaphore in case of mongo exception, which was causing the broker to be unable to serve requests involving the database, and possibly even to crash due to lack of resources (#2571)
 - Fix: avoid unused attribute type detail in NGSIv1 queries (which was making the queries slower) (#2073)

@@ -2140,6 +2140,7 @@ static void updateAttrInNotifyCer
           caP->previousValue = new ContextAttribute();
         }
 
+        caP->previousValue->type        = caP->type;
         caP->previousValue->valueType   = caP->valueType;
         caP->previousValue->stringValue = caP->stringValue;
         caP->previousValue->boolValue   = caP->boolValue;
@@ -2150,18 +2151,10 @@ static void updateAttrInNotifyCer
           // We cannot steal this time, as we are going to steal in a next place (see below)
           caP->previousValue->compoundValueP = caP->compoundValueP->clone();
         }
-        else {
+        else
+        {
           caP->previousValue->compoundValueP = NULL;
         }
-
-#if 0
-        if (targetAttr->type != "")
-        {
-          caP->previousValue->type = caP->type;
-        }
-#else
-        caP->previousValue->type = caP->type;
-#endif
 
         /* Set values from target attribute */
         caP->valueType      = targetAttr->valueType;
