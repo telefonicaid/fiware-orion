@@ -34,7 +34,7 @@ accumulatorStart --pretty-print
 # 01. Create subscription for E1/A1
 # 02. Create E1/A1 with type: a1
 # 03. See notification and reset
-# 04. Update M1 using PUT /v2/entities/E1/attrs/A1/value
+# 04. Update A1 using PUT /v2/entities/E1/attrs/A1/value
 # 05. See notification and make sure the type of E1/A1 is a1
 #
 
@@ -82,7 +82,7 @@ echo
 echo
 
 
-echo "04. Update M1 using PUT /v2/entities/E1/attrs/A1/value"
+echo "04. Update A1 using PUT /v2/entities/E1/attrs/A1/value"
 echo "======================================================"
 orionCurl --url /v2/entities/E1/attrs/A1/value --payload 4 -X PUT --header "Content-Type: text/plain"
 echo
@@ -145,7 +145,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-04. Update M1 using PUT /v2/entities/E1/attrs/A1/value
+04. Update A1 using PUT /v2/entities/E1/attrs/A1/value
 ======================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
