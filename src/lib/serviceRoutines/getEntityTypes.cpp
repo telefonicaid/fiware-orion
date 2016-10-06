@@ -58,18 +58,24 @@ std::string getEntityTypes
 )
 {
   EntityTypeVectorResponse  response;
-  unsigned int              totalTypes = 0;
+  unsigned int              totalTypes   = 0;
+  unsigned int*             totalTypesP  = NULL;
 
   response.statusCode.fill(SccOk);
 
   // NGSIv1 uses details=on to request count
-  unsigned int* totalTypesP = NULL;
   if (ciP->uriParam["details"] == "on")
   {
     totalTypesP = &totalTypes;
   }
 
-  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP));
+  //
+  // NOTE
+  //   The last parameter for mongoEntityTypes 'bool noAttrDetail' is always
+  //   set to true (meaning to skip the attribute detail) for NGSIv1 requests.
+  //   The parameter is only used for NGSIv2
+  //
+  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP, true));
 
   std::string rendered;
   TIMED_RENDER(rendered = response.render(ciP, ""));

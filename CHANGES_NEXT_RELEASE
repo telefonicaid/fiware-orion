@@ -1,0 +1,2 @@
+- Add: new value for URI param 'options' (options=noAttrDetail) for NGSIv2 queries to exclude attribute detail, making the query faster (#2073) 
+- Fix: avoid unused attribute type detail in NGSIv1 queries (which was making the queries slower) (#2073)
