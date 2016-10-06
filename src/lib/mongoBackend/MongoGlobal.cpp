@@ -1257,6 +1257,7 @@ bool entitiesQuery
 
       cer->statusCode.fill(SccReceiverInternalError, exErr);
       cerV->push_back(cer);
+      releaseMongoConnection(connection);
       return true;
     }
     catch (const std::exception &e)
