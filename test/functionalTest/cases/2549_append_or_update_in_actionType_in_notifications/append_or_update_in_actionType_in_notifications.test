@@ -34,10 +34,12 @@ accumulatorStart --pretty-print
 # 01. Create subscription for E1/A1
 # 02. Create E1/A1 with type: a1
 # 03. See 'append' in notification and reset
-# 04. Update M1 using PUT /v2/entities/E1/attrs/A1/value
-# 05. See 'update' in notification
-# 06. Update M1 using POST /v2/entities/E1/attrs
-# 07. See 'update' in notification
+# 04. Update A1 using PUT /v2/entities/E1/attrs/A1/value
+# 05. See 'update' in notification and reset
+# 06. Update A1 using POST /v2/entities/E1/attrs
+# 07. See 'update' in notification and reset
+# 08. Add A2 using POST /v2/entities/E1/attrs
+# 09. See 'append' in notification
 #
 
 echo "01. Create subscription for E1/A1"
@@ -84,22 +86,22 @@ echo
 echo
 
 
-echo "04. Update M1 using PUT /v2/entities/E1/attrs/A1/value"
+echo "04. Update A1 using PUT /v2/entities/E1/attrs/A1/value"
 echo "======================================================"
 orionCurl --url /v2/entities/E1/attrs/A1/value --payload 4 -X PUT --header "Content-Type: text/plain"
 echo
 echo
 
 
-echo "05. See 'update' in notification"
-echo "================================"
+echo "05. See 'update' in notification and reset"
+echo "=========================================="
 accumulatorDump
 accumulatorReset
 echo
 echo
 
 
-echo "06. Update M1 using POST /v2/entities/E1/attrs"
+echo "06. Update A1 using POST /v2/entities/E1/attrs"
 echo "=============================================="
 payload='{
   "A1": 6
@@ -109,11 +111,30 @@ echo
 echo
 
 
-echo "07. See 'update' in notification"
+echo "07. See 'update' in notification and reset"
+echo "=========================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "08. Add A2 using POST /v2/entities/E1/attrs"
+echo "==========================================="
+payload='{
+  "A2": 8
+}'
+orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "09. See 'append' in notification"
 echo "================================"
 accumulatorDump
 echo
 echo
+
 
 
 --REGEXPECT--
@@ -170,7 +191,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-04. Update M1 using PUT /v2/entities/E1/attrs/A1/value
+04. Update A1 using PUT /v2/entities/E1/attrs/A1/value
 ======================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -179,8 +200,8 @@ Date: REGEX(.*)
 
 
 
-05. See 'update' in notification
-================================
+05. See 'update' in notification and reset
+==========================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 169
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -212,7 +233,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-06. Update M1 using POST /v2/entities/E1/attrs
+06. Update A1 using POST /v2/entities/E1/attrs
 ==============================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -221,8 +242,8 @@ Date: REGEX(.*)
 
 
 
-07. See 'update' in notification
-================================
+07. See 'update' in notification and reset
+==========================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 173
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -245,6 +266,53 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                 "type": "Number", 
                 "value": 6
             }, 
+            "id": "E1", 
+            "type": "Thing"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+08. Add A2 using POST /v2/entities/E1/attrs
+===========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. See 'append' in notification
+================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 220
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {},
+                "type": "Number", 
+                "value": 6
+            }, 
+            "A2": {
+                "metadata": {
+                    "actionType": {
+                        "type": "Text", 
+                        "value": "append"
+                    }
+                }, 
+                "type": "Number", 
+                "value": 8
+            },
             "id": "E1", 
             "type": "Thing"
         }
