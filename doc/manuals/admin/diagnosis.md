@@ -37,10 +37,10 @@ files into memory.
 
 Orion Context Broker can run "standalone", thus context consumer and context producers are
 connected directly to it through its NGSI interface. Thus, it is loosely coupled to other FIWARE GEs.
-However, considering its use in the FIWARE platform, below is a list of the GEs that typically can be
+However, considering its use in the FIWARE platform, below is a list of GEs that can typically be
 connected to the broker:
 
-It typically connects to the IoT Broker GE and ConfMan GE (from IoT chapter GEs), other GEs within the
+Orion Context Broker typically connects to the IoT Broker GE and ConfMan GE (from IoT chapter GEs), other GEs within the
 Data Chapter (such as CEP or BigData) and GEs from the Apps chapter (such as Wirecloud). As an alternative,
 the IoT Broker GE and ConfMan GE could be omitted (if the things-to-device correlation is not needed)
 thus connecting Orion Context Broker directly to the Backend Device Management GE or to the DataHandling GE.
@@ -118,14 +118,14 @@ The symptoms of this problem are:
 - An unexpectedly high number of threads associated to the contextBroker
 - Error messages like this appearing in the logs: `Runtime Error (error creating thread: ...)`
 
-In order to solve this problem, have a look to the following section in [the
-performance tunning documentation](perf_tuning.md#thread-pool-considerations).
+In order to solve this problem, have a look at the following section in [the
+performance tuning documentation](perf_tuning.md#thread-pool-considerations).
 
 [Top](#top)
 
 ### Diagnose memory exhaustion problem
 
-Regarding abnormal consumption of memory, it can be detected by the the
+Regarding abnormal consumption of memory, it can be detected by the
 following symptoms:
 
 -   The broker crashes with a "Segmentation fault" error
@@ -134,14 +134,14 @@ following symptoms:
     Context Broker has only a fix set of permanent connections in use as
     shown below (several ones with the database server and notification receivers and the listening
     TCP socket in 1026 or in the port specified by "-port") but in the
-    case of this problem each new request will appear as a new
+    case of this problem, each new request appears as a new
     connection in use in the list. The same information can be checked
-    using `ps axo pid,ppid,rss,vsz,nlwp,cmd` and looking to the number
+    using `ps axo pid,ppid,rss,vsz,nlwp,cmd` and looking at the number
     of threads (nlwp column), as a new thread is created per request but
     never released. In addition, you can check the broker log and see
     that the processing of new requests stops in the access to the
     MongoDB database (in fact, what is happening is that the MongoDB
-    driver is requesting more dynamic memory to the OS but it doesn't
+    driver is requesting more dynamic memory from the OS but it doesn't
     get any and keeps waiting until some memory gets freed, which
     never happens).
 
@@ -165,11 +165,11 @@ The solution to this problem is restarting the contextBroker, e.g.
 
 The symptoms of this problem are:
 
--   Orion Context Broker send empty responses to REST requests (e.g.
+-   Orion Context Broker sends empty responses to REST requests (e.g.
     with curl the message is typically "empty response from server").
-    Note that it could happen that request on some URLs work
+    Note that it could happen that requests on some URLs work
     normally (e.g. /version) while in others the symptom appears.
--   The MD5SUM of /usr/bin/contextBroker binary (that can be get with
+-   The MD5SUM of /usr/bin/contextBroker binary (that can be obtained with
     "md5sum /usr/bin/contextBroker" is not the right one (check list for
     particular versions at the end of this section).
 -   The prelink package is installed (this can be checked running the
@@ -177,12 +177,12 @@ The symptoms of this problem are:
 
 The cause of this problem is
 [prelink](http://en.wikipedia.org/wiki/Prelink), a program that modifies
-binaries to make them starting faster (which is not very useful for
-binary implementing long running services as contextBroker is) but that
+binaries to make them start faster (which is not very useful for
+binaries implementing long running services, like the contextBroker) but that
 is known to be incompatible with some libraries (in particular, it seems
 to be incompatible with some of the libraries used by Context Broker).
 
-The solution fo this problems is:
+The solution for this problems is:
 
 -   Disable prelink, either implementing one of the following
     alternatives:
@@ -213,7 +213,7 @@ The Orion Context Broker uses the following flows:
 -   From NGSI9/10 applications to the broker, using TCP port 1026 by
     default (this is overridden with "-port" option).
 -   From the broker to subscribed applications, using the port specified
-    by the application in the callback at subscription time.
+    by the application in the callback at subscription creation time.
 -   From the broker to MongoDB database. In the case of running MongoDB
     in the same host as the broker, this is an internal flow (i.e. using
     the loopback interface). The standard port in MongoDB is 27017
@@ -233,9 +233,9 @@ consumers/producers.
 
 ### Diagnose database connection problems
 
-The symptoms of a database connection problem are the following ones:
+The symptoms of a database connection problem are the following:
 
--   At start time. The broker doesn't start and the following message
+-   At startup time. The broker doesn't start and the following message
     appears in the log file:
 
 ` X@08:04:45 main[313]: MongoDB error`
