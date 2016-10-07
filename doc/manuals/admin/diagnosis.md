@@ -55,8 +55,8 @@ The most usual problems that Orion Context Broker may have are related
 to  disk exhaustion due to growing log files and exhaustion of
 other kind of recourses (file descriptors, sockets or threads)
 
-Another possible problems (not so common) are abnormal consumption of memory
-due to leaks and binary spontaneous binary corruption problems
+Another possible problem (not so common) is abnormal consumption of memory
+due to leaks and spontaneous binary corruption problems
 
 ### Diagnose disk exhaustion problem
 
