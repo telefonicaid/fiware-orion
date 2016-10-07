@@ -53,10 +53,10 @@ thus connecting Orion Context Broker directly to the Backend Device Management G
 
 The most usual problems that Orion Context Broker may have are related
 to  disk exhaustion due to growing log files and exhaustion of
-other kind of recourses (file descriptors, sockets or threads)
+other kind of recourses (file descriptors, sockets or threads).
 
-Another possible problem (not so common) is abnormal consumption of memory
-due to leaks and spontaneous binary corruption problems
+Other possible problems (not so common) are abnormal consumption of memory
+due to leaks, and spontaneous binary corruption.
 
 ### Diagnose disk exhaustion problem
 
