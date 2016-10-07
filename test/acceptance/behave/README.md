@@ -121,7 +121,7 @@ file in the same directory that contains the “steps” directory.
            - true: read external file (the file is mandatory) in `PATH_TO_SETTING_FOLDER` (with ssh commands) and execute these automatically (used to create `properties.json`) 
            - false: it does nothing and the creation of `properties.json` will be by user in jenkins console.
        * CB_RUNNING_MODE: is used to determine how is compiled ContextBroker.
-           ContextBroker will be compiled and installed previously by user, `http://fiware-orion.readthedocs.org/en/develop/admin/build_source/index.html`.        
+           ContextBroker will be compiled and installed previously by user, `http://fiware-orion.readthedocs.io/en/master/admin/build_source/index.html`.
            - RPM: CB is installed as RPM, so service tooling will be used to start and stop
            - CLI: plain CB command line interface will be used to start contextBroker, the contextBroker binary (compiled in DEBUG mode) 
              must be available in the system PATH.   
