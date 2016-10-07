@@ -31,7 +31,7 @@ This project is part of [FIWARE](http://www.fiware.org). Check also the [FIWARE 
 Any feedback on this documentation is highly welcome, including bugs, typos
 or things you think should be included but aren't. You can use [github issues](https://github.com/telefonicaid/fiware-orion/issues/new) to provide feedback.
 
-You can find the User & Programmer's Manual and the Installation & Administration Manual on [readthedocs.org](https://fiware-orion.readthedocs.org)
+You can find the User & Programmer's Manual and the Installation & Administration Manual on [readthedocs.org](https://fiware-orion.readthedocs.io)
 
 For documentation previous to Orion 0.23.0 please check the manuals at FIWARE public wiki:
 

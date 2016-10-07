@@ -79,10 +79,10 @@ pip install --upgrade -r requirements.txt --allow-all-external
     configuration.json:                  initial configuration, before of execution
     environment.py                       (generic environment) may define code to run before and after certain events during your testing
     properties.json.base:                reference file with parameters (properties) used in tests (after is copied to properties.json)
-    properties.json:                     initially does not exists. This has parameters necessary to execute the tests (see [properties.json.base](https://github.com/telefonicaid/fiware-orion/tree/develop/test/acceptance/behave#propertiesjsonbase))
+    properties.json:                     initially does not exists. This has parameters necessary to execute the tests (see [properties.json.base](https://github.com/telefonicaid/fiware-orion/tree/master/test/acceptance/behave#propertiesjsonbase))
     README.md:                           this file, a brief explication about this framework to test
     feature_files_structure.md           a brief explication about the feature files structure
-    requirement.txt:                     external library, necessary install before to execute test (see [Quick way](https://github.com/telefonicaid/fiware-orion/tree/develop/test/acceptance/behave#quick-way) section)
+    requirement.txt:                     external library, necessary install before to execute test (see [Quick way](https://github.com/telefonicaid/fiware-orion/tree/master/test/acceptance/behave#quick-way) section)
     behave_all.py                        execute all features in a given directory and its subdirectories
 
 *Note*: The `environment.py` file (optional), if present, must be in the same directory that contains the steps/ directory 
@@ -428,4 +428,4 @@ You can to use multiples tags in each scenario, possibles tags used:
 
     - happy_path, skip, errors_40x, only_develop, too_slow, ISSUE_XXX, BUG_XXX, etc
 
-and to filter scenarios by these tags: see [Executing Tests](https://github.com/telefonicaid/fiware-orion/tree/develop/test/acceptance/behave#executing-tests) section.
+and to filter scenarios by these tags: see [Executing Tests](https://github.com/telefonicaid/fiware-orion/tree/master/test/acceptance/behave#executing-tests) section.

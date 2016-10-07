@@ -8,5 +8,5 @@ In addition, you can subscribe to context information so when some condition occ
 (e.g. a context element has changed) you receive a notification.
 These usage scenarios and the Orion Context Broker features are described in this document.
 
-Github's [README.md](https://github.com/telefonicaid/fiware-orion/blob/develop/README.md) provides a good documentation summary.
+Github's [README.md](https://github.com/telefonicaid/fiware-orion/blob/master/README.md) provides a good documentation summary.
 The [User Manual](user/index.md) and the [Admin Guide](admin/index.md) cover more advanced topics. 

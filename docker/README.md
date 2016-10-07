@@ -141,5 +141,5 @@ on your machine you should change this value to something else, for example `-p 
 
 Anything after the name of the container image (`orion` if you are building, or `fiware/orion` if you are pulling from the repository) is interpreted as a parameter for the Orion Context Broker. In this case we are telling the broker where the MongoDB host is, represented by the name of our other MongoDB container. Take a look at the [documentation](https://github.com/telefonicaid/fiware-orion) for other command-line options.
 
-Orion will be running on [multi-tenant](https://fiware-orion.readthedocs.org/en/develop/user/multitenancy/index.html) mode.
+Orion will be running on [multi-tenant](https://fiware-orion.readthedocs.io/en/master/user/multitenancy/index.html) mode.
    
