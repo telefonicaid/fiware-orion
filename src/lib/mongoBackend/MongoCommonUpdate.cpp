@@ -2408,7 +2408,9 @@ static bool appendContextAttributeItem
   // Note that updateAttrInNotifyCer() may "ruin" targetAttr, as compoundValueP is moved
   // (not copied) to the structure in the notifyCerP and null-ified in targetAttr. Thus, it has
   // to be called after the location processing logic (as this logic may need the compoundValueP
-  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2", NGSI_MD_ACTIONTYPE_APPEND);
+
+  std::string actionType = (actualAppend == true)? NGSI_MD_ACTIONTYPE_APPEND : NGSI_MD_ACTIONTYPE_UPDATE;
+  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2", actionType);
 
   return true;
 }
