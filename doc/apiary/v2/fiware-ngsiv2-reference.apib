@@ -682,7 +682,9 @@ The symbol `:` can be used instead of `==`.
 
 In the case of equal or unequal, if s string to match includes a `,`, you can use simple quote
 (`'`) to disable the special meaning of the comma,  e.g: `color=='light,green','deep,blue'`.
-The first example would match a color with the exact value 'light,green' OR 'deep,blue'.
+The first example would match a color with the exact value 'light,green' OR 'deep,blue'. The
+simple quote syntax can be also used to force string interpretation in filters, e.g.
+`q=tittle=='20'` will match string "20" but not number 20.
 
 Unary negatory statements use the unary operator `!`, while affirmative unary statements use no
 operator at all.
@@ -1021,8 +1023,9 @@ Response code:
       The attributes are retrieved in the order specified by this parameter. If this parameter is
       not included, the attributes are retrieved in arbitrary order.
 
-    + `metadata`: a list of metadata names to include in the response. If omitted, it means "all metadata".
-      The string `*` can be used as member of this list to mean "all the custom (user) metadata".
+    + metadata: accuracy (optional, string) - A list of metadata names to include in the response.
+      If omitted, it means "all metadata". The string `*` can be used as member of this list to
+      mean "all the custom (user) metadata".
 
     + orderBy: temperature,!speed (optional, string) - Criteria for ordering results.
       See "Ordering Results" section for details.
@@ -1153,8 +1156,9 @@ Response:
       this parameter.
       If this parameter is not included, the attributes are retrieved in arbitrary order, and all
       the attributes of the entity are included in the response.
-    + `metadata`: a list of metadata names to include in the response. If omitted, it means "all metadata".
-      The string `*` can be used as member of this list to mean "all the custom (user) metadata".
+    + metadata: accuracy (optional, string) - A list of metadata names to include in the response.
+      If omitted, it means "all metadata". The string `*` can be used as member of this list to
+      mean "all the custom (user) metadata".
     + options (optional, string) - Options dictionary
       + Members
           + keyValues - when used, the response payload uses the `keyValues` simplified entity
@@ -1215,8 +1219,9 @@ Response:
       by this parameter.
       If this parameter is not included, the attributes are retrieved in arbitrary order, and all
       the attributes of the entity are included in the response.
-    + `metadata`: a list of metadata names to include in the response. If omitted, it means "all metadata".
-      The string `*` can be used as member of this list to mean "all the custom (user) metadata".
+    + metadata: accuracy (optional, string) - A list of metadata names to include in the response.
+      If omitted, it means "all metadata". The string `*` can be used as member of this list to mean
+      "all the custom (user) metadata".
     + options (optional, string) - Options dictionary
       + Members
           + keyValues - when used, the response payload uses the `keyValues` simplified entity
@@ -1405,8 +1410,9 @@ Response:
     + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
       entities with the same entity id.
     + attrName: temperature (required, string) - Name of the attribute to be retrieved.
-    + `metadata`: a list of metadata names to include in the response. If omitted, it means "all metadata".
-      The string `*` can be used as member of this list to mean "all the custom (user) metadata".
+    + metadata: accuracy (optional, string) - A list of metadata names to include in the response.
+      If omitted, it means "all metadata". The string `*` can be used as member of this list to
+      mean "all the custom (user) metadata".
 
 + Response 200 (application/json)
 
