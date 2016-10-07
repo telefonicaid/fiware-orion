@@ -268,7 +268,7 @@ ContextElementResponse::ContextElementResponse
     /* Setting custom metadata (if any) */
     if (attr.hasField(ENT_ATTRS_MD))
     {
-
+      LM_W(("KZ: Setting custom metadata"));
       BSONObj                mds = getObjectFieldF(attr, ENT_ATTRS_MD);
       std::set<std::string>  mdsSet;
 
@@ -281,10 +281,28 @@ ContextElementResponse::ContextElementResponse
       }
     }
 
+    LM_W(("KZ: includeCreDate: %s", includeCreDate? "TRUE" : "FALSE"));
+    LM_W(("KZ: includeModDate: %s", includeModDate? "TRUE" : "FALSE"));
+
+    /* Setting system metadata (if requested) */
+    if (includeCreDate)
+    {
+      Metadata*   mdP = new Metadata(DATE_CREATED, DATE_TYPE, (double) getIntOrLongFieldAsLongF(attr, ENT_ATTRS_CREATION_DATE));
+
+      caP->metadataVector.push_back(mdP);
+    }
+
+    if (includeModDate)
+    {
+      Metadata*   mdP = new Metadata(DATE_MODIFIED, DATE_TYPE, (double) getIntOrLongFieldAsLongF(attr, ENT_ATTRS_MODIFICATION_DATE));
+
+      caP->metadataVector.push_back(mdP);
+    }
+
     contextElement.contextAttributeVector.push_back(caP);
   }
 
-  /* creDate and modDate as "virtual" attributes. The entityDoc.hasField(...) part is a safety meassure to prevent entities created with
+  /* creDate and modDate are "virtual" attributes. The entityDoc.hasField(...) part is a safety measure to prevent entities created with
    * very old Orion version which didn't implement creation/modification date */
   if (includeCreDate && entityDoc.hasField(ENT_CREATION_DATE))
   {
