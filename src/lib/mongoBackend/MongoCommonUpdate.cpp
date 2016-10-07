@@ -2132,7 +2132,11 @@ static void updateAttrInNotifyCer
 
     if (caP->name == targetAttr->name)
     {
-      /* If attribute has no value, then its value is not updated (neither is previousValue) */
+      //
+      // FIXME P6: https://github.com/telefonicaid/fiware-orion/issues/2587
+      // If an attribute has no value, then its value is not updated (neither is previousValue).
+      // However this may be problematic ... see the issue
+      //
       if (targetAttr->valueType != ValueTypeNone)
       {
         /* Store previous value (it may be necessary to render previousValue metadata) */
