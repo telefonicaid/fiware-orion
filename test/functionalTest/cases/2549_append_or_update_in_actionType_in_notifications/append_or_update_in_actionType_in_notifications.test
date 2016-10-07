@@ -39,7 +39,9 @@ accumulatorStart --pretty-print
 # 06. Update A1 using POST /v2/entities/E1/attrs
 # 07. See 'update' in notification and reset
 # 08. Add A2 using POST /v2/entities/E1/attrs
-# 09. See 'append' in notification
+# 09. See 'append' in notification and reset
+# 10. Add A3 and update A2 using POST /v2/entities/E1/attrs
+# 11. See 'append' for A3 and 'update' for A2
 #
 
 echo "01. Create subscription for E1/A1"
@@ -129,12 +131,32 @@ echo
 echo
 
 
-echo "09. See 'append' in notification"
-echo "================================"
+echo "09. See 'append' in notification and reset"
+echo "=========================================="
 accumulatorDump
+accumulatorReset
 echo
 echo
 
+
+
+echo "10. Add A3 and update A2 using POST /v2/entities/E1/attrs"
+echo "========================================================="
+payload='{
+  "A2": 10,
+  "A3": 11
+}'
+orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "11. See 'append' for A3 and 'update' for A2"
+echo "==========================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
 
 
 --REGEXPECT--
@@ -284,8 +306,8 @@ Date: REGEX(.*)
 
 
 
-09. See 'append' in notification
-================================
+09. See 'append' in notification and reset
+==========================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 220
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -312,6 +334,63 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                 }, 
                 "type": "Number", 
                 "value": 8
+            },
+            "id": "E1", 
+            "type": "Thing"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+10. Add A3 and update A2 using POST /v2/entities/E1/attrs
+=========================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+11. See 'append' for A3 and 'update' for A2
+===========================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 314
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {},
+                "type": "Number", 
+                "value": 6
+            }, 
+            "A2": {
+                "metadata": {
+                    "actionType": {
+                        "type": "Text", 
+                        "value": "update"
+                    }
+                }, 
+                "type": "Number", 
+                "value": 10
+            },
+            "A3": {
+                "metadata": {
+                    "actionType": {
+                        "type": "Text", 
+                        "value": "append"
+                    }
+                }, 
+                "type": "Number", 
+                "value": 11
             },
             "id": "E1", 
             "type": "Thing"
