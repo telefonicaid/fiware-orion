@@ -18,7 +18,7 @@ have to resort to more concrete and specific testing to pinpoint the
 exact point of failure and a possible solution. Such specific testing is
 out of the scope of this section.
 
-Please report any bug or problem with Orion Context Broker by [opening and issue in github.com](https://github.com/telefonicaid/fiware-orion/issues/new).
+Please report any bug or problem with Orion Context Broker by [opening an issue in github.com](https://github.com/telefonicaid/fiware-orion/issues/new).
 
 ## Resource Availability
 
@@ -99,7 +99,7 @@ for the inequity described in [threadpool considerations](perf_tuning.md#thread-
 to hold. Alternatively, the operating system limit could be raised with
 `ulimit -n <new limit>`.
 
-The following script (provides "as is") may help to trace this kind of problems:
+The following script (provided "as is") may help to trace this kind of problems:
 
 ```
 echo "$(date +%H:%M:%S) $(/usr/sbin/lsof | grep contextBr |grep IPv4 | wc -l)
