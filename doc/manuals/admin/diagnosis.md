@@ -3,8 +3,11 @@
 * [Resource Availability](#resource-availability)
 * [Remote Service Access](#remote-service-access)
 * [Resource consumption](#resource-consumption)
-    * [Diagnose file descriptors exahustion problems](#diagnose-file-descriptors-exahustion-problems)
-    * [Diagnose spontaneous binary corruption problems](#diagnose-spontaneous-binary-corruption-problems)
+    * [Diagnose disk exhaustion problem](#diagnose-disk-exhaustion-problem)
+    * [Diagnose file descriptors or socket exhaustion problem](#diagnose-file-descriptors-or-socket-exhaustion-problem)
+    * [Diagnose thread exahustion problem](#diagnose-thread-exhaustion-problem)
+    * [Diagnose memory exhaustion problem](#diagnose-memory-exhaustion-problem)
+    * [Diagnose spontaneous binary corruption problem](#diagnose-spontaneous-binary-corruption-problem)
 * [I/O Flows](#io-flows)
     * [Diagnose database connection problems](#diagnose-database-connection-problems)
 
@@ -49,8 +52,78 @@ thus connecting Orion Context Broker directly to the Backend Device Management G
 ## Resource consumption
 
 The most usual problems that Orion Context Broker may have are related
-to abnormal consumption of memory due to leaks and disk exhaustion due
-to growing log files.
+to  disk exhaustion due to growing log files and exhaustion of
+other kind of recourses (file descriptors, sockets or threads)
+
+Another possible problems (not so common) are abnormal consumption of memory
+due to leaks and binary spontaneous binary corruption problems
+
+### Diagnose disk exhaustion problem
+
+Regarding disk exhaustion due to growing log files, it can be detected
+by the following symptoms:
+
+-   The disk is full, e.g. `df -h` shows that the space available is 0%
+-   The log file for the broker (usually found in the
+    directory /var/log/contextBroker) is very big
+
+The solutions for this problem are the following:
+
+-   Stop the broker, remove the log file and start the broker again
+-   Configure [log rotation](logs.md)
+-   Reduce the log verbosity level, e.g. if you are using `-t 0-255` the
+    log will grow very fast so, in case of problems, please avoid using
+    unneeded trace levels.
+
+[Top](#top)
+
+### Diagnose file descriptors or socket exhaustion problem
+
+The symptoms of this problem are:
+
+-   Orion Context Broker is having problems managing network connections,
+    e.g. incoming connections are not handled and/or notifications cannot
+    be sent.
+-   You are using threadpool notification mode (in theory it could happen
+    in other notification modes, but it is highly improbable).
+-   The number of file descriptors used by Orion is close to the operating
+    system limit (i.e. `ulimit -n`). In order to get the number of used
+    file descriptors by a given process the following command can be used:
+
+```
+lsof -p <pid> | wc -l
+```
+
+The solution to the problem is to ensure that Orion is properly configured in order
+for the inequity described in [threadpool considerations](perf_tuning.md#thread-pool-considerations)
+to hold. Alternatively, the operating system limit could be raised with
+`ulimit -n <new limit>`.
+
+The following script (provides "as is") may help to trace this kind of problems:
+
+```
+echo "$(date +%H:%M:%S) $(/usr/sbin/lsof | grep contextBr |grep IPv4 | wc -l)
+      $(netstat |grep TIME_WAIT |wc -l) $(netstat |grep ESTABLISHED |wc -l)
+      $(tail -200 /var/log/contextBroker/contextBroker.log |grep "Timeout was reached" |wc -l)
+      $(uptime | awk '{print $10" "$11" "$12}' |tr -d ",")
+      $(vmstat |grep -v io |grep -v free)"  &>> /var/log/contextBroker/stats.log
+```
+
+[Top](#top)
+
+### Diagnose thread exahustion problem
+
+The symptoms of this problem are:
+
+- An unexpectedly high number of threads associated to the contextBroker
+- Error messages like this appearing in the logs: `Runtime Error (error creating thread: ...)`
+
+In order to solve this problem, have a look to the following section in [the
+performance tunning documentation](perf_tuning.md#thread-pool-considerations).
+
+[Top](#top)
+
+### Diagnose memory exhaustion problem
 
 Regarding abnormal consumption of memory, it can be detected by the the
 following symptoms:
@@ -86,46 +159,9 @@ contextBr 7100      orion    7u  IPv4 6749373      0t0  TCP *:1026 (LISTEN)
 The solution to this problem is restarting the contextBroker, e.g.
 `/etc/init.d/contextBroker restart`.
 
-Regarding disk exhaustion due to growing log files, it can be detected
-by the following symptoms:
-
--   The disk is full, e.g. `df -h` shows that the space available is 0%
--   The log file for the broker (usually found in the
-    directory /var/log/contextBroker) is very big
-
-The solutions for this problem are the following:
-
--   Stop the broker, remove the log file and start the broker again
--   Configure [log rotation](logs.md)
--   Reduce the log verbosity level, e.g. if you are using `-t 0-255` the
-    log will grow very fast so, in case of problems, please avoid using
-    unneeded trace levels.
-
-### Diagnose file descriptors exhaustion problems
-
-The symptoms of this problem are:
-
--   Orion Context Broker is having problems managing network connections,
-    e.g. incoming connections are not handled and/or notifications cannot
-    be sent.
--   You are using threadpool notification mode (in theory it could happen
-    in other notification modes, but it is highly improbable).
--   The number of file descriptors used by Orion is close to the operating
-    system limit (i.e. `ulimit -n`). In order to get the number of used
-    file descriptors by a given process the following command can be used:
-
-```
-lsof -p <pid> | wc -l
-```
-
-The solution to the problem is to ensure that Orion is properly configured in order
-for the inequity described in [threadpool considerations](perf_tuning.md#thread-pool-considerations)
-to hold. Alternatively, the operating system limit could be raised with
-`ulimit -n <new limit>`.
-
 [Top](#top)
 
-### Diagnose spontaneous binary corruption problems
+### Diagnose spontaneous binary corruption problem
 
 The symptoms of this problem are:
 

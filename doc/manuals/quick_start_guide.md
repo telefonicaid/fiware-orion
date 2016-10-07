@@ -15,6 +15,10 @@ First of all, you need an account in FIWARE Lab, so register for one in [the fol
     Password:
     Token: <this is the token you need>
 
+(Take into account that tokens generated in this way
+[will expire after 1 hour](http://stackoverflow.com/questions/39835218/orion-context-broker-global-instance-token),
+time enough to complete the rest of the steps in this guide ;)
+
 Let's assume that the authentication token you got is in the AUTH_TOKEN shell variable. Now, let's start querying some real-time information from the city sensors of Santander (in particular, a sound level meter):
 ``` 
 curl orion.lab.fiware.org:1026/v2/entities/urn:smartsantander:testbed:357 \
