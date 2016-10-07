@@ -62,9 +62,13 @@ if [ "$dateCreated" != "$dateModified" ]
 then
   echo dateCreated $dateCreated differs from dateModified
 fi
-if [ "$dateCreated" != "T_0" ]
+if [ "$dateCreated" != "$T_0" ]
 then
-  echo invalid dateCreated: $dateCreated
+  echo "invalid dateCreated"
+  echo "dateCreated: $dateCreated"
+  echo "should be:   $T_0"
+fi
+
 echo
 echo
 
@@ -93,12 +97,16 @@ dateModified=$(echo "$_response" | python -mjson.tool | grep value | awk -F '"' 
 
 if [ "$dateCreated" != "$T_0" ]
 then
-  echo dateCreated $dateCreated differs from $T_0
+  echo "invalid dateCreated"
+  echo "dateCreated: $dateCreated"
+  echo "should be:   $T_0"
 fi
 
 if [ "$dateModified" != "$T_1" ]
 then
-  echo dateModified $dateModified differs from $T_1
+  echo "invalid dateModified"
+  echo "dateModified: $dateModified"
+  echo "should be:   $T_1"
 fi
 
 echo
@@ -162,8 +170,8 @@ Date: REGEX(.*)
 
 
 
-04. GET E1/A1, see dateModified > dateCreated
-=============================================
+04. GET E1/A1, check dateModified and dateCreated
+=================================================
 HTTP/1.1 200 OK
 Content-Length: 108
 Content-Type: application/json
@@ -180,7 +188,7 @@ Date: REGEX(.*)
     "type": "Number",
     "value": 3
 }
-=============================================
+=================================================
 HTTP/1.1 200 OK
 Content-Length: 109
 Content-Type: application/json
