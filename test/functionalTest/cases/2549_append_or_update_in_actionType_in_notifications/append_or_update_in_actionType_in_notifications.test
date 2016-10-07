@@ -32,7 +32,7 @@ accumulatorStart --pretty-print
 
 #
 # 01. Create subscription for E1/A1
-# 02. Create E1/A1 with type: a1
+# 02. Create E1/A1
 # 03. See 'append' in notification and reset
 # 04. Update A1 using PUT /v2/entities/E1/attrs/A1/value
 # 05. See 'update' in notification and reset
@@ -64,8 +64,8 @@ echo
 echo
 
 
-echo "02. Create E1/A1 with type: a1"
-echo "=============================="
+echo "02. Create E1/A1"
+echo "================"
 payload='{
   "id": "E1",
   "A1": {
@@ -148,8 +148,8 @@ Date: REGEX(.*)
 
 
 
-02. Create E1/A1 with type: a1
-==============================
+02. Create E1/A1
+================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=Thing
