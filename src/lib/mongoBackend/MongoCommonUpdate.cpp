@@ -2132,6 +2132,11 @@ static void updateAttrInNotifyCer
 
     if (caP->name == targetAttr->name)
     {
+      //
+      // FIXME P6: https://github.com/telefonicaid/fiware-orion/issues/2587
+      // If an attribute has no value, then its value is not updated (neither is previousValue).
+      // However this may be problematic ... see the issue
+      //
       if (targetAttr->valueType != ValueTypeNone)
       {
         /* Store previous value (it may be necessary to render previousValue metadata) */
@@ -2140,6 +2145,7 @@ static void updateAttrInNotifyCer
           caP->previousValue = new ContextAttribute();
         }
 
+        caP->previousValue->type        = caP->type;
         caP->previousValue->valueType   = caP->valueType;
         caP->previousValue->stringValue = caP->stringValue;
         caP->previousValue->boolValue   = caP->boolValue;
@@ -2152,11 +2158,6 @@ static void updateAttrInNotifyCer
         }
         else {
           caP->previousValue->compoundValueP = NULL;
-        }
-
-        if (targetAttr->type != "")
-        {
-          caP->previousValue->type = caP->type;
         }
 
         /* Set values from target attribute */
@@ -2176,6 +2177,8 @@ static void updateAttrInNotifyCer
         caP->compoundValueP        = targetAttr->compoundValueP;
         targetAttr->compoundValueP = NULL;
       }
+
+      /* Set attribute type (except if new value is "", which means that the type is not going to change) */
       if (targetAttr->type != "")
       {
         caP->type = targetAttr->type;
