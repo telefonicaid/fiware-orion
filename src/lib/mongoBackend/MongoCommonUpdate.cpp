@@ -2132,6 +2132,7 @@ static void updateAttrInNotifyCer
 
     if (caP->name == targetAttr->name)
     {
+      /* If attribute has no value, then its value is not updated (neither is previousValue) */
       if (targetAttr->valueType != ValueTypeNone)
       {
         /* Store previous value (it may be necessary to render previousValue metadata) */
@@ -2172,6 +2173,8 @@ static void updateAttrInNotifyCer
         caP->compoundValueP        = targetAttr->compoundValueP;
         targetAttr->compoundValueP = NULL;
       }
+
+      /* Set attribute type (except if new value is "", which means that the type is not going to change) */
       if (targetAttr->type != "")
       {
         caP->type = targetAttr->type;
