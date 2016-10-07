@@ -101,7 +101,7 @@ The list of available options is the following:
     be changed dynamically using the [management REST
     interface](management_api.md). Details of the
     available tracelevels and their values can be found
-    [here](https://github.com/telefonicaid/fiware-orion/blob/develop/src/lib/logMsg/traceLevels.h)
+    [here](https://github.com/telefonicaid/fiware-orion/blob/master/src/lib/logMsg/traceLevels.h)
     (as a C struct).
 -   **-fg**. Runs broker in foreground (useful for debugging). Log output is printed on standard output
     (in addition to the log file, but using a simplified format).
