@@ -268,7 +268,6 @@ ContextElementResponse::ContextElementResponse
     /* Setting custom metadata (if any) */
     if (attr.hasField(ENT_ATTRS_MD))
     {
-      LM_W(("KZ: Setting custom metadata"));
       BSONObj                mds = getObjectFieldF(attr, ENT_ATTRS_MD);
       std::set<std::string>  mdsSet;
 
@@ -280,9 +279,6 @@ ContextElementResponse::ContextElementResponse
         caP->metadataVector.push_back(md);
       }
     }
-
-    LM_W(("KZ: includeCreDate: %s", includeCreDate? "TRUE" : "FALSE"));
-    LM_W(("KZ: includeModDate: %s", includeModDate? "TRUE" : "FALSE"));
 
     /* Setting system metadata (if requested) */
     if (includeCreDate)
