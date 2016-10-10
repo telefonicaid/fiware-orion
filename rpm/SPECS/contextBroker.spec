@@ -164,7 +164,7 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
-* Mon 10 Oct 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.4.1-1 
+* Mon Oct 10 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.4.1-1 
 - Add: new value for URI param 'options' (options=noAttrDetail) for NGSIv2 queries to exclude attribute detail, making the query faster (#2073) 
 - Fix: wrong type in previousValue metadata for notifications triggered by PUT /v2/entities/{id}/attrs/{name}/value (#2553)
 - Fix: giving a semaphore in case of mongo exception, which was causing the broker to be unable to serve requests involving the database, and possibly even to crash due to lack of resources (#2571)
