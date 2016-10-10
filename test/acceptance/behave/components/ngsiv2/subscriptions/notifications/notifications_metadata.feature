@@ -127,8 +127,48 @@ Feature: verify notifications with specials metadata from subscriptions using NG
       | actionType,previousValue   |
       | actionType,previousValue,* |
 
+  @metadata_create_entity_types @BUG_2587 @skip
+  Scenario Outline:  send a notification using NGSI v2 with special metadata when an entity is created nas several data type (bool, object, int, etc)
+    Given  a definition of headers
+      | parameter          | value                       |
+      | Fiware-Service     | test_notif_metadata_created |
+      | Fiware-ServicePath | /test                       |
+      | Content-Type       | application/json            |
+    # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter             | value                           |
+      | subject_idPattern     | .*                              |
+      | condition_attrs       | without condition field         |
+      | notification_http_url | http://replace_host:1045/notify |
+      | notification_metadata | actionType,previousValue,*      |
+    And create a new subscription
+    And verify that receive a "Created" http code
+    # These properties below are used in entity request
+    And properties to entities
+      | parameter        | value             |
+      | entities_type    | "random=3"        |
+      | entities_id      | "room2"           |
+      | attributes_name  | "temperature"     |
+      | attributes_value | <attribute_value> |
+      | attributes_type  | "celsius"         |
+      | metadatas_name   | "very_hot"        |
+      | metadatas_type   | "alarm"           |
+      | metadatas_value  | "hot"             |
+    When create an entity in raw and "normalized" modes
+    And verify that receive a "Created" http code
+    Then get notification sent to listener
+    And verify metadata in notification with "actionType,previousValue,*"
+    Examples:
+      | attribute_value    |
+      | null               |
+      | "erter"            |
+      | 34                 |
+      | 454.67             |
+      | [1,2,3,4,"5"]      |
+      | {"a": "b", "c": 3} |
+
   @metadata_update_entity_post @ISSUE_2549
-  Scenario Outline: send a notification using NGSI v2 with special metadata when an entity attribute is updated or appended
+  Scenario Outline: send a notification using NGSI v2 with special metadata when an entity attribute is updated
     Given  a definition of headers
       | parameter          | value                           |
       | Fiware-Service     | test_notif_metadata_update_post |
@@ -169,6 +209,156 @@ Feature: verify notifications with specials metadata from subscriptions using NG
       | metadatas_name    | very_hot    |
       | metadatas_type    | alarm       |
       | metadatas_value   | cold        |
+    When update or append attributes by ID "room2" and with "normalized" mode
+    And verify that receive an "No Content" http code
+    Then get notification sent to listener
+    And verify metadata in notification with "<metadata>"
+    Examples:
+      | metadata                   |
+      | previousValue              |
+      | previousValue,*            |
+      | actionType                 |
+      | actionType,*               |
+      | actionType,previousValue   |
+      | actionType,previousValue,* |
+
+  @metadata_update_entity_post_types @ISSUE_2549 @BUG_2587 @skip
+  Scenario Outline: send a notification using NGSI v2 with special metadata when an entity attribute is updated and several data types
+    Given  a definition of headers
+      | parameter          | value                           |
+      | Fiware-Service     | test_notif_metadata_update_post |
+      | Fiware-ServicePath | /test                           |
+      | Content-Type       | application/json                |
+    # These properties below are used in entity request
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | random=3    |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | random=5    |
+      | attributes_type  | celsius     |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | hot         |
+    And create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter             | value                           |
+      | subject_idPattern     | .*                              |
+      | condition_attrs       | without condition field         |
+      | notification_http_url | http://replace_host:1045/notify |
+      | notification_metadata | actionType,previousValue,*      |
+    And create a new subscription
+    And verify that receive a "Created" http code
+    # These properties below are used in entity request
+    And properties to entities
+      | parameter        | value             |
+      | attributes_name  | "temperature"     |
+      | attributes_value | <attribute_value> |
+      | attributes_type  | "celsius"         |
+      | metadatas_name   | "very_hot"        |
+      | metadatas_type   | "alarm"           |
+      | metadatas_value  | "cold"            |
+    When update or append attributes by ID "room2" in raw and "normalized" modes
+    And verify that receive an "No Content" http code
+    Then get notification sent to listener
+    And verify metadata in notification with "actionType,previousValue,*"
+    Examples:
+      | attribute_value    |
+      | null               |
+      | "erter"            |
+      | 34                 |
+      | 454.67             |
+      | [1,2,3,4,"5"]      |
+      | {"a": "b", "c": 3} |
+
+
+  @metadata_update_entity_post_only_type @ISSUE_2549 @BUG_2588 @skip
+  Scenario: send a notification using NGSI v2 with special metadata when an entity attribute is updated with only attribute type
+    Given  a definition of headers
+      | parameter          | value                           |
+      | Fiware-Service     | test_notif_metadata_update_post |
+      | Fiware-ServicePath | /test                           |
+      | Content-Type       | application/json                |
+    # These properties below are used in entity request
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | random=3    |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 35          |
+      | attributes_type  | celsius     |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | hot         |
+    And create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter             | value                           |
+      | subject_idPattern     | .*                              |
+      | condition_attrs       | without condition field         |
+      | notification_http_url | http://replace_host:1045/notify |
+      | notification_metadata | actionType,previousValue,*      |
+    And create a new subscription
+    And verify that receive a "Created" http code
+    # These properties below are used in entity request
+    And properties to entities
+      | parameter        | value         |
+      | attributes_name  | "temperature" |
+      | attributes_value | "35"          |
+      | attributes_type  | "fahrenheit"  |
+      | metadatas_name   | "very_hot"    |
+      | metadatas_type   | "alarm"       |
+      | metadatas_value  | "hot"         |
+    When update or append attributes by ID "room2" in raw and "normalized" modes
+    And verify that receive an "No Content" http code
+    Then get notification sent to listener
+    And verify metadata in notification with "actionType,previousValue,*"
+
+  @metadata_update_entity_post @ISSUE_2549
+  Scenario Outline: send a notification using NGSI v2 with special metadata when an entity attribute is appended via update
+    Given  a definition of headers
+      | parameter          | value                           |
+      | Fiware-Service     | test_notif_metadata_update_post |
+      | Fiware-ServicePath | /test                           |
+      | Content-Type       | application/json                |
+    # These properties below are used in entity request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | random=3    |
+      | entities_id       | room2       |
+      | attributes_number | 3           |
+      | attributes_name   | temperature |
+      | attributes_value  | random=5    |
+      | attributes_type   | celsius     |
+      | metadatas_number  | 2           |
+      | metadatas_name    | very_hot    |
+      | metadatas_type    | alarm       |
+      | metadatas_value   | hot         |
+    And create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter             | value                           |
+      | subject_idPattern     | .*                              |
+      | condition_attrs       | without condition field         |
+      | notification_http_url | http://replace_host:1045/notify |
+      | notification_metadata | <metadata>                      |
+    And create a new subscription
+    And verify that receive a "Created" http code
+    # These properties below are used in update request
+    And properties to entities
+      | parameter         | value    |
+      | attributes_number | 2        |
+      | attributes_name   | humidity |
+      | attributes_value  | random=8 |
+      | attributes_type   | absolute |
+      | metadatas_number  | 2        |
+      | metadatas_name    | very_hot |
+      | metadatas_type    | alarm    |
+      | metadatas_value   | cold     |
     When update or append attributes by ID "room2" and with "normalized" mode
     And verify that receive an "No Content" http code
     Then get notification sent to listener
@@ -292,7 +482,7 @@ Feature: verify notifications with specials metadata from subscriptions using NG
       | actionType,previousValue   |
       | actionType,previousValue,* |
 
-  @metadata_update_attribute_value_put  @BUG_2553 @skip
+  @metadata_update_attribute_value_put  @BUG_2553
   Scenario Outline:  send a notification using NGSI v2 with special metadata when an entity attribute value is updated
     Given  a definition of headers
       | parameter          | value                                 |
