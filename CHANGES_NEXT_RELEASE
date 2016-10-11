@@ -1,0 +1,1 @@
+- Fix: over-logging of Runtime Error traces not representing actual error (#2597)
