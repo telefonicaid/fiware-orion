@@ -307,6 +307,7 @@ HttpStatusCode mongoQueryContext
     reqSemTake(__FUNCTION__, "ngsi10 query request", SemReadOp, &reqSemTaken);
     ok = entitiesQuery(requestP->entityIdVector,
                        requestP->attributeList,
+                       &requestP->metadataList,
                        requestP->restriction,
                        &rawCerV,
                        &err,

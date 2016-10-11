@@ -61,6 +61,7 @@ typedef struct ContextElementResponse
   ContextElementResponse(ContextElementResponse* cerP);
   ContextElementResponse(const mongo::BSONObj&  entityDoc,
                          const AttributeList&   attrL,
+                         AttributeList*         metadataList,
                          bool                   includeEmpty = true,
                          bool                   includeCreDate = false,
                          bool                   includeModDate = false,

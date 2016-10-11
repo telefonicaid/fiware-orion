@@ -1017,6 +1017,7 @@ bool entitiesQuery
 (
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
+  AttributeList*                   metadataList,
   const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
@@ -1280,7 +1281,7 @@ bool entitiesQuery
     // Build CER from BSON retrieved from DB
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
-    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, includeCreDate, includeModDate, apiVersion);
+    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, metadataList, includeEmpty, includeCreDate, includeModDate, apiVersion);
     cer->statusCode.fill(SccOk);
 
     /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
@@ -1864,7 +1865,7 @@ static bool processOnChangeConditionForSubscription
 (
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
-  const std::vector<std::string>   metadataV,
+  const std::vector<std::string>&  metadataV,
   ConditionValueList*              condValues,
   const std::string&               subId,
   const HttpInfo&                  notifyHttpInfo,
@@ -1882,15 +1883,17 @@ static bool processOnChangeConditionForSubscription
   NotifyContextRequest          ncr;
   ContextElementResponseVector  rawCerV;
   AttributeList                 emptyList;
+  AttributeList                 metadataList;
 
-  if (!blacklist && !entitiesQuery(enV, attrL, *resP, &rawCerV, &err, true, tenant, servicePathV))
+  metadataList.fill(metadataV);
+  if (!blacklist && !entitiesQuery(enV, attrL, &metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
 
     return false;
   }
-  else if (blacklist && !entitiesQuery(enV, emptyList, *resP, &rawCerV, &err, true, tenant, servicePathV))
+  else if (blacklist && !entitiesQuery(enV, emptyList, &metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
@@ -1925,7 +1928,7 @@ static bool processOnChangeConditionForSubscription
       ContextElementResponseVector  allCerV;
 
 
-      if (!entitiesQuery(enV, emptyList, *resP, &rawCerV, &err, false, tenant, servicePathV))
+      if (!entitiesQuery(enV, emptyList, &metadataList, *resP, &rawCerV, &err, false, tenant, servicePathV))
       {
         rawCerV.release();
         ncr.contextElementResponseVector.release();
@@ -1969,12 +1972,12 @@ static bool processOnChangeConditionForSubscription
 * processConditionVector -
 *
 */
-BSONArray processConditionVector
+static BSONArray processConditionVector
 (
   NotifyConditionVector*           ncvP,
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
-  const std::vector<std::string>   metadataV,
+  const std::vector<std::string>&  metadataV,
   const std::string&               subId,
   const HttpInfo&                  httpInfo,
   bool*                            notificationDone,

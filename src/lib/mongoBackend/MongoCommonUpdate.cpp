@@ -1828,6 +1828,42 @@ static void setPreviousValueMetadata(ContextElementResponse* notifyCerP)
 
 /* ****************************************************************************
 *
+* setDateCreatedMetadata -
+*/
+static void setDateCreatedMetadata(ContextElementResponse* notifyCerP)
+{
+  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
+
+    // FIXME PR: where do I get the value of dateCreated?
+    Metadata* mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, (double) 12345);
+    caP->metadataVector.push_back(mdP);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* setDateModifiedMetadata -
+*/
+static void setDateModifiedMetadata(ContextElementResponse* notifyCerP)
+{
+  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
+
+    // FIXME PR: where do I get the value of dateModified?
+    Metadata* mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, (double) 12346);
+    caP->metadataVector.push_back(mdP);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * processSubscriptions - send a notification for each subscription in the map
 */
 static bool processSubscriptions
@@ -1935,7 +1971,7 @@ static bool processSubscriptions
       }
     }
 
-    /* Set special metadatas */
+    /* Set special metadata */
     if (std::find(tSubP->metadata.begin(), tSubP->metadata.end(), NGSI_MD_ACTIONTYPE) != tSubP->metadata.end())
     {
       setActionTypeMetadata(notifyCerP);
@@ -1945,6 +1981,17 @@ static bool processSubscriptions
     {
       setPreviousValueMetadata(notifyCerP);
     }
+
+    if (std::find(tSubP->metadata.begin(), tSubP->metadata.end(), NGSI_MD_DATECREATED) != tSubP->metadata.end())
+    {
+      setDateCreatedMetadata(notifyCerP);
+    }
+
+    if (std::find(tSubP->metadata.begin(), tSubP->metadata.end(), NGSI_MD_DATEMODIFIED) != tSubP->metadata.end())
+    {
+      setDateModifiedMetadata(notifyCerP);
+    }
+
 
     /* Send notification */
     LM_T(LmtSubCache, ("NOT ignored: %s", tSubP->cacheSubId.c_str()));
@@ -3072,8 +3119,9 @@ static void updateEntity
   }
 
   /* Build CER used for notifying (if needed) */
-  AttributeList emptyAttrL;
-  ContextElementResponse* notifyCerP = new ContextElementResponse(r, emptyAttrL);
+  AttributeList            emptyAttrL;
+  AttributeList            metadataList;
+  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL, &metadataList);
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates

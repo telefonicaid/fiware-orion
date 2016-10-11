@@ -42,6 +42,7 @@ typedef struct AttributeList
   std::vector<std::string>  attributeV;
 
   void         fill(const std::vector<std::string>& aVec);
+  void         fill(const std::string& commaSeparatedList);
   std::string  render(const std::string& indent, bool comma = false);
   std::string  toString(void);
   void         present(const std::string& indent);
@@ -58,6 +59,11 @@ typedef struct AttributeList
                      int                 counter);
 
   std::string  operator[](unsigned int ix)  const
+  {
+    return attributeV[ix];
+  }
+
+  std::string  get(unsigned int ix)  const
   {
     return attributeV[ix];
   }

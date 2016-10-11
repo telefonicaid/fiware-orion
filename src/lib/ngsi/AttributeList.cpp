@@ -31,6 +31,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/string.h"
 #include "ngsi/AttributeList.h"
 
 
@@ -45,6 +46,17 @@ void AttributeList::fill(const std::vector<std::string>& aVec)
   {
     attributeV.push_back(aVec[ix]);
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* AttributeList::fill - 
+*/
+void AttributeList::fill(const std::string& commaSeparatedList)
+{
+  stringSplit(commaSeparatedList, ',', attributeV);
 }
 
 

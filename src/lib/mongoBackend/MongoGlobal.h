@@ -277,6 +277,7 @@ extern bool entitiesQuery
 (
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
+  AttributeList*                   metadataList,
   const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
@@ -348,32 +349,6 @@ extern EntityIdVector subToEntityIdVector(const BSONObj& sub);
 *
 */
 extern AttributeList subToAttributeList(const BSONObj& attrL);
-
-
-/* ****************************************************************************
-*
-* processConditionVector -
-*
-*/
-extern BSONArray processConditionVector
-(
-  NotifyConditionVector*           ncvP,
-  const EntityIdVector&            enV,
-  const AttributeList&             attrL,
-  const std::string&               subId,
-  const ngsiv2::HttpInfo&          httpInfo,
-  bool*                            notificationDone,
-  RenderFormat                     renderFormat,
-  const std::string&               tenant,
-  const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV,
-  const Restriction*               resP,
-  const std::string&               status,
-  const std::string&               fiwareCorrelator,
-  const std::vector<std::string>&  attrsFilter,
-  bool                             blacklist,
-  bool                             metadataFlags
-);
 
 
 

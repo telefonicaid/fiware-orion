@@ -407,6 +407,10 @@ The following strings must not be used as metadata names:
 
 * `actionType`, as it is a reserved metadata (see "Special metadata in notifications" section).
 
+* `dateCreated`, as it is a reserved metadata (see "Special metadata in notifications" section).
+
+* `dateModified`, as it is a reserved metadata (see "Special metadata in notifications" section).
+
 * `*`, as it has an special meaning as "all the custom (user) metadata".
 
 ## Ordering Results
@@ -939,6 +943,12 @@ nature of the event that triggered the notification. These metadata are:
 * `actionType`. It is included if the attribute to which it is attached was included in the request
   that triggered the notification. Its value depend on the request operation type: `update`
   for updates, `append` for creation and `delete` for deletion. Its type is always `Text`.
+
+* `dateCreated`.  It is included, for all attributes, in the notification if the subscription 
+  specifies `dateCreated` in notification.metadata vector.
+* `dateModified`.  It is included, for all attributes, in the notification if the subscription
+  specifies `dateModified` in notification.metadata vector.
+  
 
 ## Group API Entry Point
 

@@ -134,6 +134,7 @@ ContextElementResponse::ContextElementResponse
 (
   const mongo::BSONObj&  entityDoc,
   const AttributeList&   attrL,
+  AttributeList*         metadataList,
   bool                   includeEmpty,
   bool                   includeCreDate,
   bool                   includeModDate,
@@ -281,14 +282,14 @@ ContextElementResponse::ContextElementResponse
     }
 
     /* Setting system metadata (if requested) */
-    if (includeCreDate)
+    if (metadataList->lookup(DATE_CREATED))
     {
       Metadata*   mdP = new Metadata(DATE_CREATED, DATE_TYPE, (double) getIntOrLongFieldAsLongF(attr, ENT_ATTRS_CREATION_DATE));
 
       caP->metadataVector.push_back(mdP);
     }
 
-    if (includeModDate)
+    if (metadataList->lookup(DATE_MODIFIED))
     {
       Metadata*   mdP = new Metadata(DATE_MODIFIED, DATE_TYPE, (double) getIntOrLongFieldAsLongF(attr, ENT_ATTRS_MODIFICATION_DATE));
 

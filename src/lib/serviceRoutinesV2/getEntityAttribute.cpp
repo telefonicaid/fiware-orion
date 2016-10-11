@@ -74,7 +74,8 @@ std::string getEntityAttribute
 
   // 01. Fill in QueryContextRequest
   parseDataP->qcr.res.fill(compV[2], type, "false", EntityTypeEmptyOrNotEmpty, "");
-
+  parseDataP->qcr.res.metadataList.fill(ciP->uriParam["metadata"]);
+  
 
   // 02. Call standard op postQueryContext
   postQueryContext(ciP, components, compV, parseDataP);
