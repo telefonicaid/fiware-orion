@@ -1784,7 +1784,7 @@ static void setPreviousValueMetadata(ContextElementResponse* notifyCerP)
       continue;
     }
 
-    Metadata* mdP;
+    Metadata* mdP = NULL;
     if (previousValueP->compoundValueP == NULL)
     {
       switch (previousValueP->valueType)
