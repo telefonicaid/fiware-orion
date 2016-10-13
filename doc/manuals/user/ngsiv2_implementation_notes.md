@@ -144,7 +144,7 @@ From NGSIv2 specification regarding subscription throttling:
 > throttling: Minimal period of time in seconds which must elapse between two consecutive notifications. It is optional.
 
 The way in which Orion implements this is discarding notifications during the throttling guard period. Thus, nofications may be lost
-if they arrive too close. If your use case doesn't support losing notifications in this way, then you should not use throttling.
+if they arrive too close in time. If your use case doesn't support losing notifications this way, then you should not use throttling.
 
 In addition, Orion implements throttling in a local way. In multi-CB configurations, take into account that the last-notification
 measure is local to each Orion node. Although each node periodically synchronizes with the DB in order to get potencially newer
