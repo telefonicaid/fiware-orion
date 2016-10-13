@@ -166,6 +166,9 @@ ContextAttribute::ContextAttribute()
   typeGiven             = false;
   previousValue         = NULL;
 
+  creDate = 0;
+  modDate = 0;
+
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
 }
@@ -200,6 +203,9 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
   skip                  = false;
   typeGiven             = caP->typeGiven;
   previousValue         = NULL;
+
+  creDate = caP->creDate;
+  modDate = caP->modDate;
 
   providingApplication.set(caP->providingApplication.get());
   providingApplication.setMimeType(caP->providingApplication.getMimeType());
@@ -265,6 +271,9 @@ ContextAttribute::ContextAttribute
   typeGiven             = false;
   previousValue         = NULL;
 
+  creDate = 0;
+  modDate = 0;
+
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
 }
@@ -297,6 +306,9 @@ ContextAttribute::ContextAttribute
   skip                  = false;
   typeGiven             = false;
   previousValue         = NULL;
+
+  creDate = 0;
+  modDate = 0;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -331,6 +343,9 @@ ContextAttribute::ContextAttribute
   typeGiven             = false;
   previousValue         = NULL;
 
+  creDate = 0;
+  modDate = 0;
+
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
 }
@@ -364,6 +379,9 @@ ContextAttribute::ContextAttribute
   typeGiven             = false;
   previousValue         = NULL;
 
+  creDate = 0;
+  modDate = 0;
+
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
 }
@@ -392,6 +410,9 @@ ContextAttribute::ContextAttribute
   skip                  = false;
   typeGiven             = false;
   previousValue         = NULL;
+
+  creDate = 0;
+  modDate = 0;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);

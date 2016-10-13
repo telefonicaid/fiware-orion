@@ -93,10 +93,10 @@ extern void compoundValueBson(std::vector<CompoundValueNode*> children, BSONArra
 */
 static bool isNotCustomMetadata(std::string md)
 {
-  if (md != NGSI_MD_ID        &&
-      md != NGSI_MD_LOCATION  &&
-      md != NGSI_MD_CREDATE   &&
-      md != NGSI_MD_MODDATE)
+  if (md != NGSI_MD_ID            &&
+      md != NGSI_MD_LOCATION      &&
+      md != NGSI_MD_DATECREATED   &&
+      md != NGSI_MD_DATEMODIFIED)
   {
     return false;
   }
@@ -3121,12 +3121,12 @@ static void updateEntity
   /* Build CER used for notifying (if needed) */
   AttributeList            emptyAttrL;
   AttributeList            metadataList;
-  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL, &metadataList);
+  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL, metadataList);
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
-  notifyCerP->contextElement.creDate = r.hasField(ENT_CREATION_DATE)     ? getIntOrLongFieldAsLongF(r, ENT_CREATION_DATE)     : -1;
-  notifyCerP->contextElement.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getIntOrLongFieldAsLongF(r, ENT_MODIFICATION_DATE) : -1;
+  notifyCerP->contextElement.entityId.creDate = r.hasField(ENT_CREATION_DATE)     ? getIntOrLongFieldAsLongF(r, ENT_CREATION_DATE)     : -1;
+  notifyCerP->contextElement.entityId.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getIntOrLongFieldAsLongF(r, ENT_MODIFICATION_DATE) : -1;
 
   if (!processContextAttributeVector(ceP,
                                      action,
@@ -3180,7 +3180,7 @@ static void updateEntity
   {
     int now = getCurrentTime();
     toSet.append(ENT_MODIFICATION_DATE, now);
-    notifyCerP->contextElement.modDate = now;
+    notifyCerP->contextElement.entityId.modDate = now;
   }
 
   // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
@@ -3215,7 +3215,7 @@ static void updateEntity
     int now = getCurrentTime();
     updatedEntity.append("$set", BSON(ENT_ATTRS << toSetObj << ENT_ATTRNAMES << toPushArr << ENT_MODIFICATION_DATE << now));
 
-    notifyCerP->contextElement.modDate = now;
+    notifyCerP->contextElement.entityId.modDate = now;
   }
   else
   {
@@ -3697,8 +3697,8 @@ void processContextElement
         // Set action type
         setActionType(notifyCerP, NGSI_MD_ACTIONTYPE_APPEND);
 
-        notifyCerP->contextElement.creDate = now;
-        notifyCerP->contextElement.modDate = now;
+        notifyCerP->contextElement.entityId.creDate = now;
+        notifyCerP->contextElement.entityId.modDate = now;
 
         notifyCerP->contextElement.entityId.servicePath = servicePathV.size() > 0? servicePathV[0] : "";
         processSubscriptions(subsToNotify, notifyCerP, &errReason, tenant, xauthToken, fiwareCorrelator);

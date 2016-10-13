@@ -38,7 +38,7 @@
 *
 * EntityId::EntityId -
 */
-EntityId::EntityId()
+EntityId::EntityId(): creDate(0), modDate(0)
 {
 }
 
@@ -67,7 +67,9 @@ EntityId::EntityId
 ) : id(_id),
     type(_type),
     isPattern(_isPattern),
-    isTypePattern(_isTypePattern)
+    isTypePattern(_isTypePattern),
+    creDate(0),
+    modDate(0)
 {
 }
 
@@ -212,6 +214,8 @@ void EntityId::fill(const struct EntityId* eidP, bool useDefaultType)
   isPattern     = eidP->isPattern;
   isTypePattern = eidP->isTypePattern;
   servicePath   = eidP->servicePath;
+  creDate       = eidP->creDate;
+  modDate       = eidP->modDate;
 
   if (useDefaultType && (type == ""))
   {

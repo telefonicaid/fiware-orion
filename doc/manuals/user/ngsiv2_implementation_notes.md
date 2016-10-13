@@ -124,3 +124,19 @@ When used, the `types` list associated to each attribute name is set to `[]`.
 Using this option, Orion solves these queries much faster, especially in the case of a large number of attributes, each one with a different type.
 This can be very useful if your use case doesn't need the attribute type detail.
 In some cases savings from 30 seconds to 0.5 seconds with the `noAttrDetails` option have been detected.
+
+<!-- To enable this when options get removed from the stable version. Note that in RC-2016.10 is still included
+
+# Deprecated features
+
+Although we try to minimize the changes in the stable version of the NGSIv2 specification, some of
+them has been needed at the end. Thus, there is changed functionality that doesn't appear in the current
+NGSIv2 stable specification document but Orion stills supporting them
+(as [deprecated functionality](../deprecated.md)) in order to keep backward compability.
+
+In particular, the usage of `dateCreated` and `dateModified` in the `options` parameter (introduced
+in stable RC-2016.05 and removed in ...) is still supported, e.g. `options=dateModified`. However,
+you are highly encouraged to use `attrs` instead (i.e. `attrs=dateModified,*`).
+
+-->
+

@@ -150,7 +150,6 @@ std::string ContextAttributeVector::toJsonTypes(void)
 */
 std::string ContextAttributeVector::toJson
 (
-  bool                             isLastElement,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   const std::vector<std::string>&  metadataFilter,
@@ -177,7 +176,7 @@ std::string ContextAttributeVector::toJson
   //
   int validAttributes = 0;
   std::map<std::string, bool>  uniqueMap;
-  if (attrsFilter.size() == 0)
+  if ((attrsFilter.size() == 0) || (std::find(attrsFilter.begin(), attrsFilter.end(), ALL_ATTRS) != attrsFilter.end()))
   {
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
@@ -231,7 +230,7 @@ std::string ContextAttributeVector::toJson
 
   uniqueMap.clear();
 
-  if (attrsFilter.size() == 0)
+  if (attrsFilter.size() == 0 || (std::find(attrsFilter.begin(), attrsFilter.end(), ALL_ATTRS) != attrsFilter.end()))
   {
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
@@ -281,6 +280,7 @@ std::string ContextAttributeVector::toJson
       }
     }
   }
+
   return out;
 }
 

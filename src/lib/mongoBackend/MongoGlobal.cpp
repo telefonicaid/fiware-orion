@@ -998,6 +998,73 @@ bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
 }
 
 
+#if 0
+/* ****************************************************************************
+*
+* addDatesForEntity -
+*/
+static void addDatesForEntity(ContextElementResponse* cerP, bool includeCreDate, bool includeModDate)
+{
+  if (includeCreDate && cerP->contextElement.entityId.creDate != 0)
+  {
+    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, cerP->contextElement.entityId.creDate);
+    cerP->contextElement.contextAttributeVector.push_back(caP);
+  }
+
+  if (includeModDate && cerP->contextElement.entityId.modDate != 0)
+  {
+    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, cerP->contextElement.entityId.modDate);
+    cerP->contextElement.contextAttributeVector.push_back(caP);
+  }
+}
+#endif
+
+
+
+/* ****************************************************************************
+*
+* addDatesForAttrs -
+*/
+static void addDatesForAttrs(ContextElementResponse* cerP, bool includeCreDate, bool includeModDate)
+{
+  for (unsigned int ix = 0; ix < cerP->contextElement.contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = cerP->contextElement.contextAttributeVector[ix];
+    if (includeCreDate && caP->creDate != 0)
+    {
+      Metadata*   mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, caP->creDate);
+      caP->metadataVector.push_back(mdP);
+    }
+
+    if (includeModDate && caP->modDate != 0)
+    {
+      Metadata*   mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, caP->modDate);
+      caP->metadataVector.push_back(mdP);
+    }
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* isCustomAttr -
+*
+* Check that the parameter is a not custom attr, e.g. dateCreated
+*
+* FIXME P2: this function probably could be moved to another place "closer" to attribute classes
+*/
+static bool isCustomAttr(std::string attrName)
+{
+  if ((attrName != DATE_CREATED) && (attrName != DATE_MODIFIED) && (attrName != ALL_ATTRS))
+  {
+    return false;
+  }
+
+  return true;
+}
+
+
 
 /* ****************************************************************************
 *
@@ -1017,7 +1084,7 @@ bool entitiesQuery
 (
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
-  AttributeList*                   metadataList,
+  const AttributeList&             metadataList,
   const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
@@ -1030,8 +1097,10 @@ bool entitiesQuery
   long long*                       countP,
   bool*                            badInputP,
   const std::string&               sortOrderList,
+#if 0
   bool                             includeCreDate,
   bool                             includeModDate,
+#endif
   const std::string&               apiVersion
 )
 {
@@ -1069,8 +1138,13 @@ bool entitiesQuery
   {
     std::string attrName = attrL[ix];
 
-    attrs.append(attrName);
-    LM_T(LmtMongo, ("Attribute query token: '%s'", attrName.c_str()));
+    /* Custom metadata (e.g. dateCreated) are not "real" attributes in the DB, so they cannot
+     * be included in the search query */
+    if (!isCustomAttr(attrName))
+    {
+      attrs.append(attrName);
+      LM_T(LmtMongo, ("Attribute query token: '%s'", attrName.c_str()));
+    }
   }
 
   if (attrs.arrSize() > 0)
@@ -1281,14 +1355,21 @@ bool entitiesQuery
     // Build CER from BSON retrieved from DB
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
-    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, metadataList, includeEmpty, includeCreDate, includeModDate, apiVersion);
-    cer->statusCode.fill(SccOk);
+    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, metadataList, includeEmpty, apiVersion);
+
+    addDatesForAttrs(cer, metadataList.lookup(NGSI_MD_DATECREATED), metadataList.lookup(NGSI_MD_DATEMODIFIED));
 
     /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
     for (unsigned int ix = 0; ix < attrL.size(); ++ix)
-    {
+    {      
       bool         found     = false;
       std::string  attrName  = attrL[ix];
+
+      /* The special case "*" is not taken into account*/
+      if (attrName == ALL_ATTRS)
+      {
+        continue;
+      }
 
       for (unsigned int jx = 0; jx < cer->contextElement.contextAttributeVector.size(); ++jx)
       {
@@ -1886,14 +1967,14 @@ static bool processOnChangeConditionForSubscription
   AttributeList                 metadataList;
 
   metadataList.fill(metadataV);
-  if (!blacklist && !entitiesQuery(enV, attrL, &metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
+  if (!blacklist && !entitiesQuery(enV, attrL, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
 
     return false;
   }
-  else if (blacklist && !entitiesQuery(enV, emptyList, &metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
+  else if (blacklist && !entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
@@ -1928,7 +2009,7 @@ static bool processOnChangeConditionForSubscription
       ContextElementResponseVector  allCerV;
 
 
-      if (!entitiesQuery(enV, emptyList, &metadataList, *resP, &rawCerV, &err, false, tenant, servicePathV))
+      if (!entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, false, tenant, servicePathV))
       {
         rawCerV.release();
         ncr.contextElementResponseVector.release();

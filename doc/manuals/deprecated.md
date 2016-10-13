@@ -15,6 +15,8 @@ not mantained or evolved any longer. In particular:
 
 A list of deprecated features and the version in which they were deprecated follows:
 
+* The usage of `options` URL parameter in order to include `dateCreated` and/or `dateModified`
+  attributes in NGSIv2 is deprecated in Orion 1.5.0. Please use `attrs` URI parameter instead.
 * `/ngsi10` and `/ngsi9` as URL path prefixes are deprecated in Orion 1.2.0. Please,
   use `/v1` and `/v1/registry` instead.
 * `location` metadata to specify entity location is deprecated in Orion 1.1.0. The new way
@@ -61,6 +63,7 @@ The following table provides information about the last Orion version supporting
 
 | **Removed feature**                                                        | **Last Orion version supporting feature** | **That version release date**   |
 |----------------------------------------------------------------------------|-------------------------------------------|---------------------------------|
+| `dateCreated` and `dateModified` in `options` URI parameter                | Not yet defined                           | Not yet defined                 |
 | `/ngsi10` and `/ngsi9` URL prefixes                                        | Not yet defined                           | Not yet defined                 |
 | `location` metadata to specify entity location                             | Not yet defined                           | Not yet defined                 |
 | XML API                                                                    | 0.28.0                                    | February 29th, 2016             |

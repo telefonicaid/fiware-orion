@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Get entity dates
+Get entity dates using options parameter
 
 --SHELL-INIT--
 dbInit CB
@@ -57,14 +57,14 @@ echo
 
 echo "02a. Get entity with dates"
 echo "=========================="
-orionCurl --url '/v2/entities/E?attrs=dateCreated,dateModified,*'
+orionCurl --url /v2/entities/E?options=dateCreated,dateModified
 echo
 echo
 
 
 echo "02b. Get entity with dates keyValues"
 echo "===================================="
-orionCurl --url '/v2/entities/E?options=keyValues&attrs=dateCreated,dateModified,*'
+orionCurl --url /v2/entities/E?options=dateCreated,dateModified,keyValues
 CRE_DATE=$(echo "$_response" | python -mjson.tool | grep dateCreated | awk -F '"' '{print $4}')
 MOD_DATE=$(echo "$_response" | python -mjson.tool | grep dateModified | awk -F '"' '{print $4}')
 echo
@@ -73,7 +73,7 @@ echo
 
 echo "02c. Get entity with dates values"
 echo "================================="
-orionCurl --url '/v2/entities/E?options=values&attrs=dateCreated,dateModified,A'
+orionCurl --url '/v2/entities/E?options=dateCreated,dateModified,values&attrs=dateCreated,dateModified,A'
 echo
 echo
 
@@ -112,14 +112,14 @@ echo
 
 echo "05a. Get entity with dates"
 echo "=========================="
-orionCurl --url '/v2/entities/E?attrs=dateCreated,dateModified,*'
+orionCurl --url /v2/entities/E?options=dateCreated,dateModified
 echo
 echo
 
 
 echo "05b. Get entity with dates keyValues"
 echo "===================================="
-orionCurl --url '/v2/entities/E?options=keyValues&attrs=dateCreated,dateModified,*'
+orionCurl --url /v2/entities/E?options=dateCreated,dateModified,keyValues
 CRE_DATE=$(echo "$_response" | python -mjson.tool | grep dateCreated | awk -F '"' '{print $4}')
 MOD_DATE=$(echo "$_response" | python -mjson.tool | grep dateModified | awk -F '"' '{print $4}')
 #echo "$_response" | python -mjson.tool | grep dateCreated
@@ -129,7 +129,7 @@ echo
 
 echo "05c. Get entity with dates values"
 echo "================================="
-orionCurl --url '/v2/entities/E?options=values&attrs=dateCreated,dateModified,A'
+orionCurl --url '/v2/entities/E?options=dateCreated,dateModified,values&attrs=dateCreated,dateModified,A'
 echo
 echo
 

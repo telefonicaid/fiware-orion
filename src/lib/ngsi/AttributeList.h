@@ -47,7 +47,7 @@ typedef struct AttributeList
   std::string  toString(void);
   void         present(const std::string& indent);
   void         release(void);
-  bool         lookup(const std::string& attributeName);
+  bool         lookup(const std::string& attributeName) const;
   void         push_back(const std::string& attributeName);
   void         push_back_if_absent(const std::string& attributeName);
   unsigned int size(void) const;

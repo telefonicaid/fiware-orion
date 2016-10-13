@@ -103,7 +103,7 @@ static bool includedAttribute(const ContextAttribute& attr, const AttributeList&
   // This is the case in which the queryContextRequest doesn't include attributes,
   // so all the attributes are included in the response
   //
-  if (attrsV.size() == 0)
+  if (attrsV.size() == 0 || attrsV.lookup(ALL_ATTRS))
   {
     return true;
   }
@@ -134,10 +134,8 @@ ContextElementResponse::ContextElementResponse
 (
   const mongo::BSONObj&  entityDoc,
   const AttributeList&   attrL,
-  AttributeList*         metadataList,
+  const AttributeList&   metadataList,  //FIXME PR: do we need it for metadata= filtering? or it is done at render?
   bool                   includeEmpty,
-  bool                   includeCreDate,
-  bool                   includeModDate,
   const std::string&     apiVersion
 )
 {
@@ -180,7 +178,7 @@ ContextElementResponse::ContextElementResponse
     std::string mdId  = idPart(attrName);
     ca.type           = getStringFieldF(attr, ENT_ATTRS_TYPE);
 
-    // Skip attribute if the attribute is in the list (or attrL is empty)
+    // Skip attribute if the attribute is in the list (or attrL is empty or includes "*")
     if (!includedAttribute(ca, attrL))
     {
       continue;
@@ -281,6 +279,7 @@ ContextElementResponse::ContextElementResponse
       }
     }
 
+#if 0
     /* Setting system metadata (if requested) */
     if (metadataList->lookup(DATE_CREATED))
     {
@@ -295,10 +294,33 @@ ContextElementResponse::ContextElementResponse
 
       caP->metadataVector.push_back(mdP);
     }
+#endif
+    /* Set creDate and modDate at attribute level */
+    if (attr.hasField(ENT_ATTRS_CREATION_DATE))
+    {
+      caP->creDate = (double) getIntOrLongFieldAsLongF(attr, ENT_ATTRS_CREATION_DATE);
+    }
+
+    if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
+    {
+      caP->modDate = (double) getIntOrLongFieldAsLongF(attr, ENT_ATTRS_MODIFICATION_DATE);
+    }
 
     contextElement.contextAttributeVector.push_back(caP);
   }
 
+  /* Set creDate and modDate at entity level */
+  if (entityDoc.hasField(ENT_CREATION_DATE))
+  {
+    contextElement.entityId.creDate = (double) getIntOrLongFieldAsLongF(entityDoc, ENT_CREATION_DATE);
+  }
+
+  if (entityDoc.hasField(ENT_MODIFICATION_DATE))
+  {
+    contextElement.entityId.modDate = (double) getIntOrLongFieldAsLongF(entityDoc, ENT_MODIFICATION_DATE);
+  }
+
+#if 0
   /* creDate and modDate are "virtual" attributes. The entityDoc.hasField(...) part is a safety measure to prevent entities created with
    * very old Orion version which didn't implement creation/modification date */
   if (includeCreDate && entityDoc.hasField(ENT_CREATION_DATE))
@@ -312,6 +334,7 @@ ContextElementResponse::ContextElementResponse
     ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, (double) getIntOrLongFieldAsLongF(entityDoc, ENT_MODIFICATION_DATE));
     contextElement.contextAttributeVector.push_back(caP);
   }
+#endif
 }
 
 

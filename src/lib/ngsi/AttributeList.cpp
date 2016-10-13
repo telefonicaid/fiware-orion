@@ -145,7 +145,7 @@ void AttributeList::release(void)
 *
 * lookup - 
 */
-bool AttributeList::lookup(const std::string& attributeName)
+bool AttributeList::lookup(const std::string& attributeName) const
 {
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
   {
