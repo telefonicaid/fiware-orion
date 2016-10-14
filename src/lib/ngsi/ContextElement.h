@@ -48,12 +48,6 @@ typedef struct ContextElement
   ContextAttributeVector   contextAttributeVector;  // Optional
   MetadataVector           domainMetadataVector;    // Optional
 
-#if 0
-  // FIXME PR: redundant with the same information at EntityID level?
-  double creDate;   // Needed for subscription filter evaluation
-  double modDate;   // Neeeed for subscription filter evaluation
-#endif
-
   std::vector<ProvidingApplication> providingApplicationList;    // Not part of NGSI, used internally for CPr forwarding functionality
 
   ContextElement();

@@ -998,28 +998,6 @@ bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
 }
 
 
-#if 0
-/* ****************************************************************************
-*
-* addDatesForEntity -
-*/
-static void addDatesForEntity(ContextElementResponse* cerP, bool includeCreDate, bool includeModDate)
-{
-  if (includeCreDate && cerP->contextElement.entityId.creDate != 0)
-  {
-    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, cerP->contextElement.entityId.creDate);
-    cerP->contextElement.contextAttributeVector.push_back(caP);
-  }
-
-  if (includeModDate && cerP->contextElement.entityId.modDate != 0)
-  {
-    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, cerP->contextElement.entityId.modDate);
-    cerP->contextElement.contextAttributeVector.push_back(caP);
-  }
-}
-#endif
-
-
 
 /* ****************************************************************************
 *
@@ -1097,10 +1075,6 @@ bool entitiesQuery
   long long*                       countP,
   bool*                            badInputP,
   const std::string&               sortOrderList,
-#if 0
-  bool                             includeCreDate,
-  bool                             includeModDate,
-#endif
   const std::string&               apiVersion
 )
 {

@@ -279,22 +279,6 @@ ContextElementResponse::ContextElementResponse
       }
     }
 
-#if 0
-    /* Setting system metadata (if requested) */
-    if (metadataList->lookup(DATE_CREATED))
-    {
-      Metadata*   mdP = new Metadata(DATE_CREATED, DATE_TYPE, (double) getIntOrLongFieldAsLongF(attr, ENT_ATTRS_CREATION_DATE));
-
-      caP->metadataVector.push_back(mdP);
-    }
-
-    if (metadataList->lookup(DATE_MODIFIED))
-    {
-      Metadata*   mdP = new Metadata(DATE_MODIFIED, DATE_TYPE, (double) getIntOrLongFieldAsLongF(attr, ENT_ATTRS_MODIFICATION_DATE));
-
-      caP->metadataVector.push_back(mdP);
-    }
-#endif
     /* Set creDate and modDate at attribute level */
     if (attr.hasField(ENT_ATTRS_CREATION_DATE))
     {
@@ -319,22 +303,6 @@ ContextElementResponse::ContextElementResponse
   {
     contextElement.entityId.modDate = (double) getIntOrLongFieldAsLongF(entityDoc, ENT_MODIFICATION_DATE);
   }
-
-#if 0
-  /* creDate and modDate are "virtual" attributes. The entityDoc.hasField(...) part is a safety measure to prevent entities created with
-   * very old Orion version which didn't implement creation/modification date */
-  if (includeCreDate && entityDoc.hasField(ENT_CREATION_DATE))
-  {
-    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, (double) getIntOrLongFieldAsLongF(entityDoc, ENT_CREATION_DATE));
-    contextElement.contextAttributeVector.push_back(caP);
-  }
-
-  if (includeModDate && entityDoc.hasField(ENT_MODIFICATION_DATE))
-  {
-    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, (double) getIntOrLongFieldAsLongF(entityDoc, ENT_MODIFICATION_DATE));
-    contextElement.contextAttributeVector.push_back(caP);
-  }
-#endif
 }
 
 

@@ -305,17 +305,6 @@ HttpStatusCode mongoQueryContext
 
     ContextElementResponseVector rawCerV;
 
-    // If the attribute list was in the payload, then requestP->attributeList is already filled and
-    // nothing else needs to be done. Otherwise, attemp to fill it with the connent of the "attrs" parameter
-#if 0
-    if (requestP->attributeList.size() == 0)
-    {
-      // FIXME P5: stringSplit() is not honoring the argument passing guidelines: the third parameter
-      // should be a pointer instead of a refererence
-      stringSplit(uriParams[URI_PARAM_ATTRIBUTES], ',', requestP->attributeList.attributeV);
-    }
-#endif
-
     // dateCreated and dateModified options are still supported although deprecated.
     // Note that we check for attr list emptyness, as in that case the "*" needs
     // to be added to print also user attributes
@@ -354,10 +343,6 @@ HttpStatusCode mongoQueryContext
                        countP,
                        &badInput,
                        sortOrderList,
-#if 0
-                       options[DATE_CREATED],
-                       options[DATE_MODIFIED],
-#endif
                        apiVersion);
 
     if (badInput)

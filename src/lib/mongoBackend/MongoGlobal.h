@@ -290,10 +290,6 @@ extern bool entitiesQuery
   long long*                       countP         = NULL,
   bool*                            badInputP      = NULL,
   const std::string&               sortOrderList  = "",
-#if 0
-  bool                             creDateOption  = false,
-  bool                             modDateOption  = false,
-#endif
   const std::string&               apiVersion     = "v1"
 );
 
