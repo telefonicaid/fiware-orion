@@ -1828,6 +1828,30 @@ static void setPreviousValueMetadata(ContextElementResponse* notifyCerP)
 
 /* ****************************************************************************
 *
+* setDateCreatedAttribute -
+*/
+static void setDateCreatedAttribute(ContextElementResponse* notifyCerP)
+{
+  ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, notifyCerP->contextElement.entityId.creDate);
+  notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+}
+
+
+
+/* ****************************************************************************
+*
+* setDateModifiedAttribute -
+*/
+static void setDateModifiedAttribute(ContextElementResponse* notifyCerP)
+{
+  ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, notifyCerP->contextElement.entityId.modDate);
+  notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+}
+
+
+
+/* ****************************************************************************
+*
 * setDateCreatedMetadata -
 */
 static void setDateCreatedMetadata(ContextElementResponse* notifyCerP)
@@ -1836,9 +1860,11 @@ static void setDateCreatedMetadata(ContextElementResponse* notifyCerP)
   {
     ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
 
-    // FIXME PR: where do I get the value of dateCreated?
-    Metadata* mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, (double) 12345);
-    caP->metadataVector.push_back(mdP);
+    if (caP->creDate != 0)
+    {
+      Metadata* mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, caP->creDate);
+      caP->metadataVector.push_back(mdP);
+    }
   }
 }
 
@@ -1854,9 +1880,11 @@ static void setDateModifiedMetadata(ContextElementResponse* notifyCerP)
   {
     ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
 
-    // FIXME PR: where do I get the value of dateModified?
-    Metadata* mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, (double) 12346);
-    caP->metadataVector.push_back(mdP);
+    if (caP->modDate != 0)
+    {
+      Metadata* mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, caP->modDate);
+      caP->metadataVector.push_back(mdP);
+    }
   }
 }
 
@@ -1969,6 +1997,17 @@ static bool processSubscriptions
       {
         continue;
       }
+    }
+
+    /* Set special attributes */
+    if (tSubP->attrL.lookup(DATE_CREATED))
+    {
+      setDateCreatedAttribute(notifyCerP);
+    }
+
+    if (tSubP->attrL.lookup(DATE_MODIFIED))
+    {
+      setDateModifiedAttribute(notifyCerP);
     }
 
     /* Set special metadata */
@@ -3697,13 +3736,21 @@ void processContextElement
         // Build CER used for notifying (if needed). Service Path vector shouldn't have more than
         // one item, so it should be safe to get item 0
         //
-        ContextElementResponse* notifyCerP = new ContextElementResponse(ceP, apiVersion == "v2");
+        ContextElementResponse* notifyCerP = new ContextElementResponse(ceP, apiVersion == "v2");        
 
         // Set action type
         setActionType(notifyCerP, NGSI_MD_ACTIONTYPE_APPEND);
 
+        // Set creaDate and modDate times
         notifyCerP->contextElement.entityId.creDate = now;
         notifyCerP->contextElement.entityId.modDate = now;
+
+        for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+        {
+          ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
+          caP->creDate = now;
+          caP->modDate = now;
+        }
 
         notifyCerP->contextElement.entityId.servicePath = servicePathV.size() > 0? servicePathV[0] : "";
         processSubscriptions(subsToNotify, notifyCerP, &errReason, tenant, xauthToken, fiwareCorrelator);
