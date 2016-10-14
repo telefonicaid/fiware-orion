@@ -716,6 +716,18 @@ std::string ContextAttribute::toJson
 {
   std::string  out;
 
+  // Add special metadata representing attribute dates
+  if ((creDate != 0) && (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_DATECREATED) != metadataFilter.end()))
+  {
+    Metadata* mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, creDate);
+    metadataVector.push_back(mdP);
+  }
+  if ((modDate != 0) && (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_DATEMODIFIED) != metadataFilter.end()))
+  {
+    Metadata* mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, modDate);
+    metadataVector.push_back(mdP);
+  }
+
   if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_KEYVALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
   {
     out = (renderFormat == NGSI_V2_KEYVALUES)? JSON_STR(name) + ":" : "";
