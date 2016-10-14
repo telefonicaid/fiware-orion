@@ -398,7 +398,7 @@ Date: REGEX(.*)
             "metadata": {
                 "dateCreated": {
                     "type": "DateTime",
-                    "value": "REGEX(.*)"
+                    "value": "REGEX(2\d\d\d\-.*)"
                 }
             },
             "type": "Text",
@@ -424,7 +424,7 @@ Date: REGEX(.*)
             "metadata": {
                 "dateModified": {
                     "type": "DateTime",
-                    "value": "REGEX(.*)"
+                    "value": "REGEX(2\d\d\d\-.*)"
                 }
             },
             "type": "Text",
@@ -450,11 +450,11 @@ Date: REGEX(.*)
             "metadata": {
                 "dateCreated": {
                     "type": "DateTime",
-                    "value": "REGEX(.*)"
+                    "value": "REGEX(2\d\d\d\-.*)"
                 },
                 "dateModified": {
                     "type": "DateTime",
-                    "value": "REGEX(.*)"
+                    "value": "REGEX(2\d\d\d\-.*)"
                 }
             },
             "type": "Text",
@@ -488,11 +488,11 @@ Date: REGEX(.*)
                 },
                 "dateCreated": {
                     "type": "DateTime",
-                    "value": "REGEX(.*)"
+                    "value": "REGEX(2\d\d\d\-.*)"
                 },
                 "dateModified": {
                     "type": "DateTime",
-                    "value": "REGEX(.*)"
+                    "value": "REGEX(2\d\d\d\-.*)"
                 }
             },
             "type": "Text",
@@ -522,11 +522,11 @@ Date: REGEX(.*)
                 },
                 "dateCreated": {
                     "type": "DateTime",
-                    "value": "REGEX(.*)"
+                    "value": "REGEX(2\d\d\d\-.*)"
                 },
                 "dateModified": {
                     "type": "DateTime",
-                    "value": "REGEX(.*)"
+                    "value": "REGEX(2\d\d\d\-.*)"
                 }
             },
             "type": "Text",
@@ -577,7 +577,7 @@ Date: REGEX(.*)
         "metadata": {
             "dateCreated": {
                 "type": "DateTime",
-                "value": "REGEX(.*)"
+                "value": "REGEX(2\d\d\d\-.*)"
             }
         },
         "type": "Text",
@@ -601,7 +601,7 @@ Date: REGEX(.*)
         "metadata": {
             "dateModified": {
                 "type": "DateTime",
-                "value": "REGEX(.*)"
+                "value": "REGEX(2\d\d\d\-.*)"
             }
         },
         "type": "Text",
@@ -625,11 +625,11 @@ Date: REGEX(.*)
         "metadata": {
             "dateCreated": {
                 "type": "DateTime",
-                "value": "REGEX(.*)"
+                "value": "REGEX(2\d\d\d\-.*)"
             },
             "dateModified": {
                 "type": "DateTime",
-                "value": "REGEX(.*)"
+                "value": "REGEX(2\d\d\d\-.*)"
             }
         },
         "type": "Text",
@@ -661,11 +661,11 @@ Date: REGEX(.*)
             },
             "dateCreated": {
                 "type": "DateTime",
-                "value": "REGEX(.*)"
+                "value": "REGEX(2\d\d\d\-.*)"
             },
             "dateModified": {
                 "type": "DateTime",
-                "value": "REGEX(.*)"
+                "value": "REGEX(2\d\d\d\-.*)"
             }
         },
         "type": "Text",
@@ -693,11 +693,11 @@ Date: REGEX(.*)
             },
             "dateCreated": {
                 "type": "DateTime",
-                "value": "REGEX(.*)"
+                "value": "REGEX(2\d\d\d\-.*)"
             },
             "dateModified": {
                 "type": "DateTime",
-                "value": "REGEX(.*)"
+                "value": "REGEX(2\d\d\d\-.*)"
             }
         },
         "type": "Text",
@@ -745,7 +745,7 @@ Date: REGEX(.*)
         "metadata": {
             "dateCreated": {
                 "type": "DateTime",
-                "value": "REGEX(.*)"
+                "value": "REGEX(2\d\d\d\-.*)"
             }
         },
         "type": "Text",
@@ -767,7 +767,7 @@ Date: REGEX(.*)
         "metadata": {
             "dateModified": {
                 "type": "DateTime",
-                "value": "REGEX(.*)"
+                "value": "REGEX(2\d\d\d\-.*)"
             }
         },
         "type": "Text",
@@ -789,11 +789,11 @@ Date: REGEX(.*)
         "metadata": {
             "dateCreated": {
                 "type": "DateTime",
-                "value": "REGEX(.*)"
+                "value": "REGEX(2\d\d\d\-.*)"
             },
             "dateModified": {
                 "type": "DateTime",
-                "value": "REGEX(.*)"
+                "value": "REGEX(2\d\d\d\-.*)"
             }
         },
         "type": "Text",
@@ -823,11 +823,11 @@ Date: REGEX(.*)
             },
             "dateCreated": {
                 "type": "DateTime",
-                "value": "REGEX(.*)"
+                "value": "REGEX(2\d\d\d\-.*)"
             },
             "dateModified": {
                 "type": "DateTime",
-                "value": "REGEX(.*)"
+                "value": "REGEX(2\d\d\d\-.*)"
             }
         },
         "type": "Text",
@@ -853,11 +853,11 @@ Date: REGEX(.*)
             },
             "dateCreated": {
                 "type": "DateTime",
-                "value": "REGEX(.*)"
+                "value": "REGEX(2\d\d\d\-.*)"
             },
             "dateModified": {
                 "type": "DateTime",
-                "value": "REGEX(.*)"
+                "value": "REGEX(2\d\d\d\-.*)"
             }
         },
         "type": "Text",
@@ -900,7 +900,7 @@ Date: REGEX(.*)
     "metadata": {
         "dateCreated": {
             "type": "DateTime",
-            "value": "REGEX(.*)"
+            "value": "REGEX(2\d\d\d\-.*)"
         }
     },
     "type": "Text",
@@ -920,7 +920,7 @@ Date: REGEX(.*)
     "metadata": {
         "dateModified": {
             "type": "DateTime",
-            "value": "REGEX(.*)"
+            "value": "REGEX(2\d\d\d\-.*)"
         }
     },
     "type": "Text",
@@ -940,11 +940,11 @@ Date: REGEX(.*)
     "metadata": {
         "dateCreated": {
             "type": "DateTime",
-            "value": "REGEX(.*)"
+            "value": "REGEX(2\d\d\d\-.*)"
         },
         "dateModified": {
             "type": "DateTime",
-            "value": "REGEX(.*)"
+            "value": "REGEX(2\d\d\d\-.*)"
         }
     },
     "type": "Text",
@@ -972,11 +972,11 @@ Date: REGEX(.*)
         },
         "dateCreated": {
             "type": "DateTime",
-            "value": "REGEX(.*)"
+            "value": "REGEX(2\d\d\d\-.*)"
         },
         "dateModified": {
             "type": "DateTime",
-            "value": "REGEX(.*)"
+            "value": "REGEX(2\d\d\d\-.*)"
         }
     },
     "type": "Text",
@@ -1000,11 +1000,11 @@ Date: REGEX(.*)
         },
         "dateCreated": {
             "type": "DateTime",
-            "value": "REGEX(.*)"
+            "value": "REGEX(2\d\d\d\-.*)"
         },
         "dateModified": {
             "type": "DateTime",
-            "value": "REGEX(.*)"
+            "value": "REGEX(2\d\d\d\-.*)"
         }
     },
     "type": "Text",
@@ -1046,7 +1046,7 @@ Date: REGEX(.*)
             "metadata": {
                 "dateCreated": {
                     "type": "DateTime",
-                    "value": "REGEX(.*)"
+                    "value": "REGEX(2\d\d\d\-.*)"
                 }
             },
             "type": "Text",
@@ -1072,7 +1072,7 @@ Date: REGEX(.*)
             "metadata": {
                 "dateModified": {
                     "type": "DateTime",
-                    "value": "REGEX(.*)"
+                    "value": "REGEX(2\d\d\d\-.*)"
                 }
             },
             "type": "Text",
@@ -1098,11 +1098,11 @@ Date: REGEX(.*)
             "metadata": {
                 "dateCreated": {
                     "type": "DateTime",
-                    "value": "REGEX(.*)"
+                    "value": "REGEX(2\d\d\d\-.*)"
                 },
                 "dateModified": {
                     "type": "DateTime",
-                    "value": "REGEX(.*)"
+                    "value": "REGEX(2\d\d\d\-.*)"
                 }
             },
             "type": "Text",
@@ -1136,11 +1136,11 @@ Date: REGEX(.*)
                 },
                 "dateCreated": {
                     "type": "DateTime",
-                    "value": "REGEX(.*)"
+                    "value": "REGEX(2\d\d\d\-.*)"
                 },
                 "dateModified": {
                     "type": "DateTime",
-                    "value": "REGEX(.*)"
+                    "value": "REGEX(2\d\d\d\-.*)"
                 }
             },
             "type": "Text",
@@ -1170,11 +1170,11 @@ Date: REGEX(.*)
                 },
                 "dateCreated": {
                     "type": "DateTime",
-                    "value": "REGEX(.*)"
+                    "value": "REGEX(2\d\d\d\-.*)"
                 },
                 "dateModified": {
                     "type": "DateTime",
-                    "value": "REGEX(.*)"
+                    "value": "REGEX(2\d\d\d\-.*)"
                 }
             },
             "type": "Text",

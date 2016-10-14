@@ -180,12 +180,12 @@ Date: REGEX(.*)
     "dateCreated": {
         "metadata": {},
         "type": "DateTime",
-        "value": "REGEX(.*)"
+        "value": "REGEX(2\d\d\d\-.*)"
     },
     "dateModified": {
         "metadata": {},
         "type": "DateTime",
-        "value": "REGEX(.*)"
+        "value": "REGEX(2\d\d\d\-.*)"
     },
     "id": "E",
     "type": "T"
@@ -256,12 +256,12 @@ Date: REGEX(.*)
     "dateCreated": {
         "metadata": {},
         "type": "DateTime",
-        "value": "REGEX(.*)"
+        "value": "REGEX(2\d\d\d\-.*)"
     },
     "dateModified": {
         "metadata": {},
         "type": "DateTime",
-        "value": "REGEX(.*)"
+        "value": "REGEX(2\d\d\d\-.*)"
     },
     "id": "E",
     "type": "T"

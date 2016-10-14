@@ -183,7 +183,7 @@ Date: REGEX(.*)
 02. GET E1/A1, see dateCreated == dateModified
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 108
+Content-Length: 176
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -192,7 +192,7 @@ Date: REGEX(.*)
     "metadata": {
         "dateCreated": {
             "type": "DateTime",
-            "value": "REGEX(.*)"
+            "value": "REGEX(2\d\d\d\-.*)"
         }
     },
     "type": "Number",
@@ -200,7 +200,7 @@ Date: REGEX(.*)
 }
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 109
+Content-Length: 178
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -209,7 +209,7 @@ Date: REGEX(.*)
     "metadata": {
         "dateModified": {
             "type": "DateTime",
-            "value": "REGEX(.*)"
+            "value": "REGEX(2\d\d\d\-.*)"
         }
     },
     "type": "Number",
@@ -229,7 +229,7 @@ Date: REGEX(.*)
 04. GET E1/A1, check dateModified and dateCreated
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 108
+Content-Length: 176
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -238,7 +238,7 @@ Date: REGEX(.*)
     "metadata": {
         "dateCreated": {
             "type": "DateTime",
-            "value": "REGEX(.*)"
+            "value": "REGEX(2\d\d\d\-.*)"
         }
     },
     "type": "Number",
@@ -246,7 +246,7 @@ Date: REGEX(.*)
 }
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 109
+Content-Length: 178
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -255,7 +255,7 @@ Date: REGEX(.*)
     "metadata": {
         "dateModified": {
             "type": "DateTime",
-            "value": "REGEX(.*)"
+            "value": "REGEX(2\d\d\d\-.*)"
         }
     },
     "type": "Number",
@@ -276,7 +276,7 @@ Date: REGEX(.*)
 06. Dump accumulator to see dateCreated and dateModified for E1/A1
 ==================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 264
+Content-Length: 401
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -291,11 +291,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                 "metadata": {
                     "dateCreated": {
                         "type": "DateTime", 
-                        "value": "REGEX(.*)"
+                        "value": "REGEX(2\d\d\d\-.*)"
                     }, 
                     "dateModified": {
                         "type": "DateTime", 
-                        "value": "REGEX(.*)"
+                        "value": "REGEX(2\d\d\d\-.*)"
                     }
                 }, 
                 "type": "Number", 
@@ -322,7 +322,7 @@ Date: REGEX(.*)
 08. Dump accumulator to see dateCreated and dateModified for E1/A1
 ==================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 265
+Content-Length: 402
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -337,11 +337,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                 "metadata": {
                     "dateCreated": {
                         "type": "DateTime", 
-                        "value": "REGEX(.*)"
+                        "value": "REGEX(2\d\d\d\-.*)"
                     }, 
                     "dateModified": {
                         "type": "DateTime", 
-                        "value": "REGEX(.*)"
+                        "value": "REGEX(2\d\d\d\-.*)"
                     }
                 }, 
                 "type": "Number", 
