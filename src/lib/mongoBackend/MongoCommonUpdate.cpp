@@ -1696,7 +1696,7 @@ static bool processOnChangeConditionForUpdateContext
   {
     ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
 
-    if ((attrL.size() == 0) || (blacklist == true))
+    if ((attrL.size() == 0) || attrL.lookup(ALL_ATTRS) || (blacklist == true))
     {
       /* Empty attribute list in the subscription mean that all attributes are added */
       cer.contextElement.contextAttributeVector.push_back(caP);
@@ -1832,8 +1832,11 @@ static void setPreviousValueMetadata(ContextElementResponse* notifyCerP)
 */
 static void setDateCreatedAttribute(ContextElementResponse* notifyCerP)
 {
-  ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, notifyCerP->contextElement.entityId.creDate);
-  notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+  if (notifyCerP->contextElement.entityId.creDate != 0)
+  {
+    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, notifyCerP->contextElement.entityId.creDate);
+    notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+  }
 }
 
 
@@ -1844,8 +1847,11 @@ static void setDateCreatedAttribute(ContextElementResponse* notifyCerP)
 */
 static void setDateModifiedAttribute(ContextElementResponse* notifyCerP)
 {
-  ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, notifyCerP->contextElement.entityId.modDate);
-  notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+  if (notifyCerP->contextElement.entityId.modDate != 0)
+  {
+    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, notifyCerP->contextElement.entityId.modDate);
+    notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+  }
 }
 
 
