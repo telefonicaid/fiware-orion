@@ -119,7 +119,7 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 
 ## `actionType` metadata
 
-From NGSIv2 specification section "Special metadata in notifications", regarding `actionType` metadata:
+From NGSIv2 specification section ""System/builtin in metadata"", regarding `actionType` metadata:
 
 > Its value depend on the request operation type: `update` for updates,
 > `append` for creation and `delete` for deletion. Its type is always `Text`.

@@ -11,7 +11,7 @@ for special metadata that are interpreted by Orion:
 
 -   [ID](#metadata-id-for-attributes)
 -   location, which is currently [deprecated](../deprecated.md), but still supported
--   The ones defined in "Special metadata in notifications" section in the NGSIv2 spec
+-   The ones defined in "System/builtin in metadata" section in the NGSIv2 spec
 
 Its management is slightly different in NGSIv1 and NGSIv2, so it is
 described in different sections.
@@ -414,7 +414,7 @@ metadata (not included by default) must be included.
 * previousValue
 * actionType
 
-Details about their meaning can be found in the "Special metadata in notifications" section in
+Details about their meaning can be found in the ""System/builtin in metadata"" section in
 the NGSIv2 specification.
 
 Note that using the following

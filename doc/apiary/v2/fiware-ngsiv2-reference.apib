@@ -372,12 +372,21 @@ name to the `metadata` URL parameter (or payload field in POST /v2/op/query oper
 subscription (`metadata` sub-field within `notification`).
 
 The list of system/builtin metadata is as follows:
-* `dateCreated` (type: `DateTime`): entity creation date as an ISO 8601 string.
-* `dateModified` (type: `DateTime`): entity modification date as an ISO 8601 string.
-* `previousValue` (type: any): only in notifications. See "Special metadata in notifications" section.
-* `actionType` (type: `Text`): only in notifications. See "Special metadata in notifications" section.
 
-Like regular attributes, they can be  used in `mq` filters. However, they cannot be used in resource URLs.
+* `dateCreated` (type: `DateTime`): attribute creation date as an ISO 8601 string.
+
+* `dateModified` (type: `DateTime`): attribute modification date as an ISO 8601 string.
+
+* `previousValue` (type: any): only in notifications. The value of this metadata is the previous
+  value (to the request triggering the notification) of the associated attribute. The type of this metadata
+  must be the previous type of the associated attribute. If the type/value of `previousValue` is the same
+  type/value than in the associated attribute, then the attribute has not actually changed its value.
+
+* `actionType` (type: `Text`): only in notifications.  It is included if the attribute to which it is attached
+  was included in the request that triggered the notification. Its value depend on the request operation
+  type: `update` for updates, `append` for creation and `delete` for deletion. Its type is always `Text`.
+
+Like regular metadata, they can be  used in `mq` filters. However, they cannot be used in resource URLs.
 
 ## Field syntax restrictions
 
@@ -973,27 +982,6 @@ Some considerations to take into account:
 Note that if a custom payload is used for the notification (the field `payload` is given in the
 corresponding subscription), then a value of `custom` is used for the `Ngsiv2-AttrsFormat` header
 in the notification.
-
-## Special metadata in notifications
-
-The `metadata` field (within the `notification` field) can be used to select a set of special
-attribute metadata included by notifications and aimed at providing more information about the
-nature of the event that triggered the notification. These metadata are:
-
-* `previousValue`. The value of this metadata must be the previous value of the associated attribute.
-  The type of this metadata must be the previous type of the associated attribute. If the
-  type/value of `previousValue` is the same type/value than in the associated attribute, then the
-  attribute has not actually changed its value.
-
-* `actionType`. It is included if the attribute to which it is attached was included in the request
-  that triggered the notification. Its value depend on the request operation type: `update`
-  for updates, `append` for creation and `delete` for deletion. Its type is always `Text`.
-
-* `dateCreated`.  It is included, for all attributes, in the notification if the subscription 
-  specifies `dateCreated` in notification.metadata vector.
-* `dateModified`.  It is included, for all attributes, in the notification if the subscription
-  specifies `dateModified` in notification.metadata vector.
-  
 
 ## Group API Entry Point
 
