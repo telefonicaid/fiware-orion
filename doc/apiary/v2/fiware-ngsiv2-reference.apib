@@ -344,22 +344,40 @@ meaning:
 * `geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`. They have special semantics
   related with entity location. See "Geospatial properties of entities" section.
 
-## Virtual Attributes
+## System/builtin Attributes
 
 There are entity properties that are not directly modifiable by NGSIv2 clients, but that can be
 rendered by NGSIv2 servers to provide extra information. From a representation point of view, they
 are just like regular attributes, with name, value and type.
 
-Virtual attributes are not rendered by default. In order to render a specific attribute, add its
-name to the `options` URL parameter.
+System/builtin attributes are not rendered by default. In order to render a specific attribute, add its
+name to the `attrs` parameter in URLs (or payload field in POST /v2/op/query operation) or
+subscription (`attrs` sub-field within `notification`).
 
-The list of virtual attributes is as follows:
+The list of system/builtin attributes is as follows:
 * `dateCreated` (type: `DateTime`): entity creation date as an ISO 8601 string.
 * `dateModified` (type: `DateTime`): entity modification date as an ISO 8601 string.
 
-
-Like regular attributes, they can be  used in `attrs`, `q` filters and `orderBy`.
+Like regular attributes, they can be  used in `q` filters and `orderBy`.
 However, they cannot be used in resource URLs.
+
+## System/builtin Metadata
+
+There are attribute properties that are not directly modifiable by NGSIv2 clients, but that can be
+rendered by NGSIv2 servers to provide extra information. From a representation point of view, they
+are just like regular metadata, with name, value and type.
+
+System/builtin metadata are not rendered by default. In order to render a specific metadata, add its
+name to the `metadata` URL parameter (or payload field in POST /v2/op/query operation) or
+subscription (`metadata` sub-field within `notification`).
+
+The list of system/builtin metadata is as follows:
+* `dateCreated` (type: `DateTime`): entity creation date as an ISO 8601 string.
+* `dateModified` (type: `DateTime`): entity modification date as an ISO 8601 string.
+* `previousValue` (type: any): only in notifications. See "Special metadata in notifications" section.
+* `actionType` (type: `Text`): only in notifications. See "Special metadata in notifications" section.
+
+Like regular attributes, they can be  used in `mq` filters. However, they cannot be used in resource URLs.
 
 ## Field syntax restrictions
 
@@ -397,21 +415,19 @@ The following strings must not be used as attribute names:
 * `geo:distance`, as it would conflict with the string used in `orderBy` for proximity to
   center point.
 
-* Virtual attribute names (see specific section on "Virtual Attributes")
+* System/builtin attribute names (see specific section on "System/builtin Attributes")
+
+* `*`, as it has an special meaning as "all the custom/user attributes" (see section on
+  "Filtering out attributes and metadata").
 
 ## Metadata names restrictions
 
 The following strings must not be used as metadata names:
 
-* `previousValue`, as it is a reserved metadata (see "Special metadata in notifications" section).
+* System/builtin metadata names (see specific section on "System/builtin Metadata")
 
-* `actionType`, as it is a reserved metadata (see "Special metadata in notifications" section).
-
-* `dateCreated`, as it is a reserved metadata (see "Special metadata in notifications" section).
-
-* `dateModified`, as it is a reserved metadata (see "Special metadata in notifications" section).
-
-* `*`, as it has an special meaning as "all the custom (user) metadata".
+* `*`, as it has an special meaning as "all the custom/user metadata" (see section on
+  "Filtering out attributes and metadata").
 
 ## Ordering Results
 
@@ -780,6 +796,35 @@ must be sent.
 * If there is more than one attribute exposing location labeled as *default location*, then the
   query is declared ambiguous and an HTTP error response with a ``409`` code must be sent. 
 
+## Filtering out attributes and metadata
+
+The `attrs` URL parameter (or field in POST /v2/op/query) can be used in retrieve operations
+to specify the list of attributes that must be included in the response. In a similar way, the
+`metadata` URL parameter (or field in POST /v2/op/query) can be used to specify the list metadata
+that must be included in the response.
+
+By default, if `attrs` is omitted (or `metadata` is omitted) then all the attributes (all the
+metadata) are included, except system/builtin attributes (metadata). In order to include
+system/builtin attributes (metadata) they have to be explicitly included in `attrs` (`metadata`).
+
+E.g. to include only attributes A and B:
+
+`attrs=A,B`
+
+Note that including *only* system/builtin attributes (metadata) will avoid any user-defined
+attribute (metadata). If you want to include system/builtin attributes (metadata) *and* user-defined
+attributes (metadata) at the same time then
+
+* The user-defined attributes (metadata) have to be explictly included, e.g. to include the user-defined
+  attributes A and B along the system/builtin attribute `dateModified` use: `attrs=dateModified,A,B`.
+* The special value `*` can be used as an alias meaning "all user-defined attributes (metadata)", e.g.
+  to include all the user-defined attributes along with the system/builtin attribute `dateModified`
+  use: `attrs=dateModified,*`.
+
+Note that `attrs` and `metadata` fields can be also used in subscriptions (as sub-fiedls of `notification`)
+with the same meaning to specify which attributes (metadata) to include in the notifications associated
+to that subscription.
+
 ## Notification Messages
 
 Notifications include two fields:
@@ -1032,10 +1077,10 @@ Response code:
       are to be included in the response.
       The attributes are retrieved in the order specified by this parameter. If this parameter is
       not included, the attributes are retrieved in arbitrary order.
+      See "Filtering out attributes and metadata" section for more detail.
 
     + metadata: accuracy (optional, string) - A list of metadata names to include in the response.
-      If omitted, it means "all metadata". The string `*` can be used as member of this list to
-      mean "all the custom (user) metadata".
+      See "Filtering out attributes and metadata" section for more detail.
 
     + orderBy: temperature,!speed (optional, string) - Criteria for ordering results.
       See "Ordering Results" section for details.
@@ -1163,12 +1208,11 @@ Response:
       entities with the same entity id.
     + attrs: temperature,humidity (optional, string) - Comma-separated list of attribute names whose
       data must be included in the response. The attributes are retrieved in the order specified by
-      this parameter.
+      this parameter. See "Filtering out attributes and metadata" section for more detail.
       If this parameter is not included, the attributes are retrieved in arbitrary order, and all
       the attributes of the entity are included in the response.
     + metadata: accuracy (optional, string) - A list of metadata names to include in the response.
-      If omitted, it means "all metadata". The string `*` can be used as member of this list to
-      mean "all the custom (user) metadata".
+      See "Filtering out attributes and metadata" section for more detail.
     + options (optional, string) - Options dictionary
       + Members
           + keyValues - when used, the response payload uses the `keyValues` simplified entity
@@ -1229,9 +1273,9 @@ Response:
       by this parameter.
       If this parameter is not included, the attributes are retrieved in arbitrary order, and all
       the attributes of the entity are included in the response.
+      See "Filtering out attributes and metadata" section for more detail.
     + metadata: accuracy (optional, string) - A list of metadata names to include in the response.
-      If omitted, it means "all metadata". The string `*` can be used as member of this list to mean
-      "all the custom (user) metadata".
+      See "Filtering out attributes and metadata" section for more detail.
     + options (optional, string) - Options dictionary
       + Members
           + keyValues - when used, the response payload uses the `keyValues` simplified entity
@@ -1421,8 +1465,7 @@ Response:
       entities with the same entity id.
     + attrName: temperature (required, string) - Name of the attribute to be retrieved.
     + metadata: accuracy (optional, string) - A list of metadata names to include in the response.
-      If omitted, it means "all metadata". The string `*` can be used as member of this list to
-      mean "all the custom (user) metadata".
+      See "Filtering out attributes and metadata" section for more detail.
 
 + Response 200 (application/json)
 
@@ -1709,7 +1752,7 @@ A `notification` object contains the following subfields:
   + `attrs`: List of attributes to be included in notification messages. It also defines the
     order in which attributes must appear in notifications when `attrsFormat` `value` is used
     (see "Notification Messages" section). An empty list means that all attributes are to be
-    included in notifications.
+    included in notifications. See "Filtering out attributes and metadata" section for more detail.
   + `exceptAttrs`: List of attributes to be excluded from the notification message, i.e.
      a notification message includes all entity attributes except the ones listed in this field.
   + If neither `attrs` nor `exceptAttrs` is specified, all attributes are included in
@@ -1720,9 +1763,8 @@ A `notification` object contains the following subfields:
   Accepted values are `normalized` (default), `keyValues` or `values`.
   If `attrsFormat` takes any value different
   than those, an error is raised. See detail in "Notification Messages" section.
-+ `metadata` (optional): List of metadata to be included in notification messages. By default all
-  metadata are included except the special ones described at "Special metadata in notifications"
-  section. The string `*` can be used as member of this list to mean "all the custom (user) metadata".
++ `metadata` (optional): List of metadata to be included in notification messages.
+  See "Filtering out attributes and metadata" section for more detail.
 + `timesSent` (not editable, only present in GET operations): Number of notifications sent due to
    this subscription.
 + `lastNotification` (not editable, only present in GET operations): Last notification date in ISO8601 format.
@@ -2206,8 +2248,8 @@ The payload may contain the following elements (all of them optional):
    JSON object with a `type` (a JSON string) and `value` (whose type depends on the `type`
    property).
    The different available scopes are described elsewhere.
-+ `metadata`: a list of metadata names to include in the response. If omitted, it means "all metadata".
-   The string `*` can be used as member of this list to mean "all the custom (user) metadata".
++ `metadata`: a list of metadata names to include in the response.
+   See "Filtering out attributes and metadata" section for more detail.
 
 Response code:
 
