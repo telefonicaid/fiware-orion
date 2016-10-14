@@ -202,7 +202,7 @@ static void setEntities(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
   if (subUp.subjectProvided && !subUp.fromNgsiv1)
   {
     // NGSIv1 doesn't allow to change entities,
-    // see https://fiware-orion.readthedocs.io/en/develop/user/updating_regs_and_subs/index.html
+    // see https://fiware-orion.readthedocs.io/en/master/user/updating_regs_and_subs/index.html
     setEntities(subUp, b);
   }
   else
@@ -383,7 +383,7 @@ static void setCondsAndInitialNotify
       // a whole). In addition, NGSIv1 doesn't allow to update notification attributes. Both
       // (entities and notification attributes) are passed in subOrig.
       //
-      // See: https://fiware-orion.readthedocs.io/en/develop/user/updating_regs_and_subs/index.html
+      // See: https://fiware-orion.readthedocs.io/en/master/user/updating_regs_and_subs/index.html
       setCondsAndInitialNotifyNgsiv1(subUp, subOrig, subUp.id, status, httpInfo.url, attrsFormat,
                                      tenant, servicePathV, xauthToken, fiwareCorrelator,
                                      b, notificationDone);
@@ -469,7 +469,22 @@ static void setExpression(const SubscriptionUpdate& subUp, const BSONObj& subOri
   }
   else
   {
-    BSONObj expression = getObjectFieldF(subOrig, CSUB_EXPR);
+    BSONObj expression;
+    if (subOrig.hasField(CSUB_EXPR))
+    {
+      expression = getObjectFieldF(subOrig, CSUB_EXPR);
+    }
+    else
+    {
+      /* This part of the if clause corresponds to csub that were created before expression was invented
+       * (using an old Orion version) which are now being updated. In this case, we introduce an empty
+       * expression, but with all the expected fiedls */
+      expression = BSON(CSUB_EXPR_Q      << "" <<
+                        CSUB_EXPR_MQ     << "" <<
+                        CSUB_EXPR_GEOM   << "" <<
+                        CSUB_EXPR_COORDS << "" <<
+                        CSUB_EXPR_GEOREL << "");
+    }
     b->append(CSUB_EXPR, expression);
     LM_T(LmtMongo, ("Subscription expression: %s", expression.toString().c_str()));
   }
@@ -605,6 +620,21 @@ void updateInCache
 
   LM_T(LmtSubCache, ("update: %s", doc.toString().c_str()));
 
+  std::string q;
+  std::string mq;
+  std::string geom;
+  std::string coords;
+  std::string georel;
+  if (doc.hasField(CSUB_EXPR))
+  {
+    BSONObj expr = getObjectFieldF(doc, CSUB_EXPR);
+    q      = expr.hasField(CSUB_EXPR_Q)?      getStringFieldF(expr, CSUB_EXPR_Q)      : "";
+    mq     = expr.hasField(CSUB_EXPR_MQ)?     getStringFieldF(expr, CSUB_EXPR_MQ)     : "";
+    geom   = expr.hasField(CSUB_EXPR_GEOM)?   getStringFieldF(expr, CSUB_EXPR_GEOM)   : "";
+    coords = expr.hasField(CSUB_EXPR_COORDS)? getStringFieldF(expr, CSUB_EXPR_COORDS) : "";
+    georel = expr.hasField(CSUB_EXPR_GEOREL)? getStringFieldF(expr, CSUB_EXPR_GEOREL) : "";
+  }
+
   int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
                                           doc,
                                           subUp.id.c_str(),
@@ -612,11 +642,7 @@ void updateInCache
                                           lastNotification,
                                           doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
                                           doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_STATUS) : STATUS_ACTIVE,
-                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_Q) : "",
-                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_MQ) : "",
-                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_GEOM) : "",
-                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_COORDS) : "",
-                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_GEOREL) : "",
+                                          q, mq, geom, coords, georel,
                                           stringFilterP,
                                           mdStringFilterP,
                                           doc.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(doc, CSUB_FORMAT)) : NGSI_V2_NORMALIZED);

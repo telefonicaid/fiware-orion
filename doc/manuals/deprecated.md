@@ -55,7 +55,7 @@ information in the case you want to use old versions:
 * Documentation corresponding to old versions can be found:
   * For 0.23.0 and before: documentation is available at FIWARE public wiki ([user manual](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide)
     and [admin manual](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide)).
-  * For 0.24.0 or newer: documentation is available at [readthedocs.org](https://fiware-orion.readthedocs.org).
+  * For 0.24.0 or newer: documentation is available at [readthedocs.io](https://fiware-orion.readthedocs.io).
     Use the panel in the left bottom corner to navigate to the right version.
 * Docker images corresponding to Orion 0.24.0 and newer can be found at [Dockerhub](https://hub.docker.com/r/fiware/orion/tags/).
 

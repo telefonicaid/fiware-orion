@@ -745,7 +745,7 @@ Let's examine in detail the different elements included in the payload:
     that update attribute values too frequently. In multi-CB configurations, take
     into account that the last-notification measure is local to each CB node. Although
     each node periodically synchronizes with the DB in order to get potencially newer
-    values (more on this [here](perf_tuning.md#subscription-cache) it may happen that
+    values (more on this [here](perf_tuning.md#subscription-cache)) it may happen that
     a particular node has an old value, so throttling is not 100% accurate.
 
 The response corresponding to that request uses 201 Created as HTTP response code.

@@ -94,7 +94,7 @@ client = MongoClient('localhost', 27017)
 db = client[DB]
 
 # csub document processing is based on the model described at
-# https://github.com/telefonicaid/fiware-orion/blob/develop/doc/manuals/admin/database_model.md#csubs-collection
+# https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/admin/database_model.md#csubs-collection
 n = 0
 to_delete = []
 for doc in db[COL].find():
