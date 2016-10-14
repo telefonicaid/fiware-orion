@@ -1329,13 +1329,13 @@ bool entitiesQuery
     // Build CER from BSON retrieved from DB
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
-    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, metadataList, includeEmpty, apiVersion);
+    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, apiVersion);
 
     addDatesForAttrs(cer, metadataList.lookup(NGSI_MD_DATECREATED), metadataList.lookup(NGSI_MD_DATEMODIFIED));
 
     /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
     for (unsigned int ix = 0; ix < attrL.size(); ++ix)
-    {      
+    {
       bool         found     = false;
       std::string  attrName  = attrL[ix];
 

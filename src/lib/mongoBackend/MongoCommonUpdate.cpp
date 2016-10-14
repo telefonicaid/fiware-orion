@@ -3170,8 +3170,7 @@ static void updateEntity
 
   /* Build CER used for notifying (if needed) */
   AttributeList            emptyAttrL;
-  AttributeList            metadataList;
-  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL, metadataList);
+  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL);
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
@@ -3742,7 +3741,7 @@ void processContextElement
         // Build CER used for notifying (if needed). Service Path vector shouldn't have more than
         // one item, so it should be safe to get item 0
         //
-        ContextElementResponse* notifyCerP = new ContextElementResponse(ceP, apiVersion == "v2");        
+        ContextElementResponse* notifyCerP = new ContextElementResponse(ceP, apiVersion == "v2");
 
         // Set action type
         setActionType(notifyCerP, NGSI_MD_ACTIONTYPE_APPEND);

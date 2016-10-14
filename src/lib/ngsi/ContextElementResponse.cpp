@@ -134,7 +134,6 @@ ContextElementResponse::ContextElementResponse
 (
   const mongo::BSONObj&  entityDoc,
   const AttributeList&   attrL,
-  const AttributeList&   metadataList,  //FIXME PR: do we need it for metadata= filtering? or it is done at render?
   bool                   includeEmpty,
   const std::string&     apiVersion
 )
