@@ -53,7 +53,8 @@ public:
                                         RenderFormat                               renderFormat,
                                         const std::vector<std::string>&            attrsOrder,
                                         const std::vector<std::string>&            metadataFilter,
-                                        bool                                       blackList = false);
+                                        bool                                       blackList,
+                                        const std::string&                         subscriptionId);
 
   virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr,
                                                     const std::string&                url,

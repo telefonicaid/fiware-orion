@@ -28,6 +28,7 @@
 #include "alarmMgr/alarmMgr.h"
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
+#include "cache/subCache.h"
 
 
 
@@ -41,6 +42,8 @@ void* startSenderThread(void* p)
     char                portV[STRING_SIZE_FOR_INT];
     std::string         url;
     
+    LM_W(("KZ: In startSenderThread. subscription id '%s'", params->subscriptionId.c_str()));
+
     snprintf(portV, sizeof(portV), "%d", params->port);
     url = params->ip + ":" + portV + params->resource;
 
@@ -63,6 +66,7 @@ void* startSenderThread(void* p)
 
       std::map<std::string, std::string> headers;
 
+      LM_W(("KZ: In Notifier::sendNotifyContextRequest, calling httpRequestSend"));
       r = httpRequestSend(params->ip,
                           params->port,
                           params->protocol,
@@ -84,6 +88,11 @@ void* startSenderThread(void* p)
       {
         statisticsUpdate(NotifyContextSent, params->mimeType);
         alarmMgr.notificationErrorReset(url);
+      }
+      else
+      {
+        LM_W(("KZ: In Notifier::sendNotifyContextRequest, httpRequestSend error ..."));
+        subCacheItemErrorStatus(params->tenant.c_str(), params->subscriptionId.c_str(), 1);
       }
     }
     else

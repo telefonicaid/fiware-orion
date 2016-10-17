@@ -299,6 +299,7 @@ void setCondsAndInitialNotify
 
   /* Conds vector (and maybe an initial notification) */
   *notificationDone = false;
+  LM_W(("KZ: calling processConditionVector for sub '%s'", sub.id.c_str()));
   BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             sub.subject.entities,
                                             notifAttributesV,
@@ -314,7 +315,8 @@ void setCondsAndInitialNotify
                                             status,
                                             fiwareCorrelator,
                                             notifAttributesV,
-                                            blacklist);
+                                            blacklist,
+                                            subId);
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));

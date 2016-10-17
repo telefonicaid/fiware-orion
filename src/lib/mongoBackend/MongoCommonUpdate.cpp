@@ -1732,6 +1732,7 @@ static bool processOnChangeConditionForUpdateContext
   // FIXME: we use a proper origin name
   ncr.originator.set("localhost");
 
+  LM_W(("KZ: Calling sendNotifyContextRequest for sub '%s'", subId.c_str()));
   getNotifier()->sendNotifyContextRequest(&ncr,
                                           httpInfo,
                                           tenant,
@@ -1740,7 +1741,8 @@ static bool processOnChangeConditionForUpdateContext
                                           renderFormat,
                                           attrsOrder,
                                           metadataV,
-                                          blacklist);
+                                          blacklist,
+                                          subId);
   return true;
 }
 

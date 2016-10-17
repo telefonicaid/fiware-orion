@@ -38,7 +38,7 @@
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
 #include "ngsiNotify/Notifier.h"
-
+#include "cache/subCache.h"
 
 
 /* ****************************************************************************
@@ -260,6 +260,7 @@ typedef struct NotificationAsTemplateParams
   RenderFormat                     renderFormat;
   std::vector<std::string>         attrsOrder;
   std::vector<std::string>         metadataFilter;
+  std::string                      subscriptionId;
 } NotificationAsTemplateParams;
 
 
@@ -281,20 +282,31 @@ typedef struct NotificationAsTemplateParams
 */
 void* sendNotifyContextRequestAsPerTemplate(void* p)
 {
-  NotificationAsTemplateParams* paramP = (NotificationAsTemplateParams*) p;
+  LM_W(("KZ: In sendNotifyContextRequestAsPerTemplate"));
+  NotificationAsTemplateParams*  paramP = (NotificationAsTemplateParams*) p;
+  int                            errors = 0;
 
   for (unsigned int ix = 0; ix < paramP->ncrP->contextElementResponseVector.size(); ++ix)
   {
-    templateNotify(paramP->ncrP->subscriptionId,
-                   paramP->ncrP->contextElementResponseVector[ix]->contextElement,
-                   paramP->httpInfo,
-                   paramP->tenant,
-                   paramP->xauthToken,
-                   paramP->fiwareCorrelator,
-                   paramP->renderFormat,
-                   paramP->attrsOrder,
-                   paramP->metadataFilter);
+    bool r;
+
+    r = templateNotify(paramP->ncrP->subscriptionId,
+                       paramP->ncrP->contextElementResponseVector[ix]->contextElement,
+                       paramP->httpInfo,
+                       paramP->tenant,
+                       paramP->xauthToken,
+                       paramP->fiwareCorrelator,
+                       paramP->renderFormat,
+                       paramP->attrsOrder,
+                       paramP->metadataFilter);
+
+    if (r == false)
+    {
+      ++errors;
+    }
   }
+
+  subCacheItemErrorStatus(paramP->tenant.c_str(), paramP->ncrP->subscriptionId.c_str(), errors);
 
   paramP->ncrP->release();
   delete paramP->ncrP;
@@ -319,9 +331,12 @@ void Notifier::sendNotifyContextRequest
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsOrder,
   const std::vector<std::string>&  metadataFilter,
-  bool                             blackList
+  bool                             blackList,
+  const std::string&               subscriptionId
 )
 {
+  LM_W(("KZ: In Notifier::sendNotifyContextRequest. subId == '%s', tenant == '%s'", subscriptionId.c_str(), tenant.c_str()));
+
     ConnectionInfo  ci;
     Verb            verb = httpInfo.verb;
 
@@ -361,6 +376,8 @@ void Notifier::sendNotifyContextRequest
       paramP->renderFormat     = renderFormat;
       paramP->attrsOrder       = attrsOrder;
       paramP->metadataFilter   = metadataFilter;
+      paramP->tenant           = tenant;
+      paramP->subscriptionId   = subscriptionId;
 
       pthread_t  tid;
       int        r = pthread_create(&tid, NULL, sendNotifyContextRequestAsPerTemplate, (void*) paramP);
@@ -454,6 +471,7 @@ void Notifier::sendNotifyContextRequest
     params->mimeType         = JSON;
     params->renderFormat     = renderFormatToString(renderFormat);
     params->fiwareCorrelator = fiwareCorrelator;
+    params->subscriptionId   = subscriptionId;
 
     strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 

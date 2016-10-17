@@ -350,32 +350,6 @@ extern EntityIdVector subToEntityIdVector(const BSONObj& sub);
 extern AttributeList subToAttributeList(const BSONObj& attrL);
 
 
-/* ****************************************************************************
-*
-* processConditionVector -
-*
-*/
-extern BSONArray processConditionVector
-(
-  NotifyConditionVector*           ncvP,
-  const EntityIdVector&            enV,
-  const AttributeList&             attrL,
-  const std::string&               subId,
-  const ngsiv2::HttpInfo&          httpInfo,
-  bool*                            notificationDone,
-  RenderFormat                     renderFormat,
-  const std::string&               tenant,
-  const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV,
-  const Restriction*               resP,
-  const std::string&               status,
-  const std::string&               fiwareCorrelator,
-  const std::vector<std::string>&  attrsFilter,
-  bool                             blacklist,
-  bool                             metadataFlags
-);
-
-
 
 /* ****************************************************************************
 *
@@ -401,7 +375,8 @@ extern BSONArray processConditionVector
   const std::string&                 status,
   const std::string&                 fiwareCorrelator,
   const std::vector<std::string>&    attrsOrder,
-  bool                               blacklist
+  bool                               blacklist,
+  const std::string&                 subscriptionId
 );
 
 

@@ -116,6 +116,17 @@ std::string SubscriptionId::get(void) const
 
 /* ****************************************************************************
 *
+* SubscriptionId::c_str -
+*/
+const char* SubscriptionId::c_str(void) const
+{
+  return string.c_str();
+}
+
+
+
+/* ****************************************************************************
+*
 * SubscriptionId::present -
 */
 void SubscriptionId::present(const std::string& indent)

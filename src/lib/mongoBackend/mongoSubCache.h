@@ -87,7 +87,9 @@ extern void mongoSubCacheUpdate
   const std::string&  tenant,
   const std::string&  subId,
   long long           count,
-  long long           lastNotificationTime
+  long long           lastNotificationTime,
+  uint32_t            lastFailure,
+  uint32_t            timesFailed
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOSUBCACHE_H_

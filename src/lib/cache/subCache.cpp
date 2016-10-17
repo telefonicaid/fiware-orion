@@ -794,6 +794,8 @@ void subCacheItemInsert
   cSubP->notifyConditionV      = conditionAttrs;
   cSubP->attributes            = attributes;
   cSubP->metadata              = metadata;
+  cSubP->lastFailure           = -1;
+  cSubP->timesFailed           = 0;
 
 
   //
@@ -1118,6 +1120,8 @@ typedef struct CachedSubSaved
 {
   int64_t  lastNotificationTime;
   int64_t  count;
+  int32_t  lastFailure;
+  int32_t  timesFailed;
 } CachedSubSaved;
 
 
@@ -1156,6 +1160,8 @@ void subCacheSync(void)
   subCacheState = ScsSynchronizing;
 
 
+  LM_W(("KZ: In subCacheSync"));
+
   //
   // 1. Save subscriptionId, lastNotificationTime, and count for all items in cache
   //
@@ -1177,6 +1183,8 @@ void subCacheSync(void)
 
     cssP->lastNotificationTime = cSubP->lastNotificationTime;
     cssP->count                = cSubP->count;
+    cssP->lastFailure          = cSubP->lastFailure;
+    cssP->timesFailed          = cSubP->timesFailed;
 
     savedSubV[cSubP->subscriptionId] = cssP;
     cSubP = cSubP->next;
@@ -1209,7 +1217,7 @@ void subCacheSync(void)
 
   //
   // 4. Update 'count' for each item in savedSubV where count != 0
-  // 5. Update 'lastNotificationTime' foreach item in savedSubV where lastNotificationTime != 0
+  // 5. Update 'lastNotificationTime' for each item in savedSubV where lastNotificationTime != 0
   //
   cSubP = subCache.head;
   while (cSubP != NULL)
@@ -1224,7 +1232,7 @@ void subCacheSync(void)
 
     std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
 
-    mongoSubCacheUpdate(tenant, cSubP->subscriptionId, cssP->count, cssP->lastNotificationTime);
+    mongoSubCacheUpdate(tenant, cSubP->subscriptionId, cssP->count, cssP->lastNotificationTime, cssP->lastFailure, cssP->timesFailed);
     cSubP = cSubP->next;
   }
 
@@ -1284,4 +1292,39 @@ void subCacheStart(void)
     return;
   }
   pthread_detach(tid);
+}
+
+
+
+/* ****************************************************************************
+*
+* subCacheItemErrorStatus - 
+*/
+void subCacheItemErrorStatus(const char* tenant, const char* subscriptionId, int errors)
+{
+  CachedSubscription* subP = subCacheItemLookup(tenant, subscriptionId);
+
+  LM_W(("KZ: In subCacheItemErrorStatus. errors == %d ('%s' / '%s')", errors, tenant, subscriptionId));
+
+  if (subP == NULL)
+  {
+    const char* errorString = "intent to update error status of non-existing subscription";
+
+    alarmMgr.badInput(clientIp, errorString);
+    LM_W(("KZ: In subCacheItemErrorStatus - non-existing subscription"));
+    return;
+  }
+
+  if (errors == 0)
+  {
+    subP->lastFailure  = -1;
+    subP->timesFailed  = 0;
+    LM_W(("KZ: In subCacheItemErrorStatus - reset lastFailure to %d and timesFailed to %d", subP->lastFailure, subP->timesFailed));
+  }
+  else
+  {
+    subP->lastFailure  = time(NULL);
+    subP->timesFailed += errors;
+    LM_W(("KZ: In subCacheItemErrorStatus - set lastFailure to %d and timesFailed to %d", subP->lastFailure, subP->timesFailed));
+  }
 }

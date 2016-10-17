@@ -1875,7 +1875,8 @@ static bool processOnChangeConditionForSubscription
   const Restriction*               resP,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist
+  bool                             blacklist,
+  const std::string&               subscriptionId
 )
 {
   std::string                   err;
@@ -1940,7 +1941,8 @@ static bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
-        getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataV, blacklist);
+        LM_W(("KZ: Calling sendNotifyContextRequest for sub '%s', tenant '%s'", subscriptionId.c_str(), tenant.c_str()));
+        getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataV, blacklist, subscriptionId);
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
@@ -1951,7 +1953,8 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
-      getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataV, blacklist);
+      LM_W(("KZ: Calling sendNotifyContextRequest for sub '%s', tenant '%s'", subscriptionId.c_str(), tenant.c_str()));
+      getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataV, blacklist, subscriptionId);
       ncr.contextElementResponseVector.release();
 
       return true;
@@ -1969,7 +1972,7 @@ static bool processOnChangeConditionForSubscription
 * processConditionVector -
 *
 */
-BSONArray processConditionVector
+static BSONArray processConditionVector
 (
   NotifyConditionVector*           ncvP,
   const EntityIdVector&            enV,
@@ -1986,7 +1989,8 @@ BSONArray processConditionVector
   const std::string&               status,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist
+  bool                             blacklist,
+  const std::string&               subscriptionId
 )
 {
   BSONArrayBuilder conds;
@@ -2005,6 +2009,7 @@ BSONArray processConditionVector
         conds.append(nc->condValueList[jx]);
       }
 
+      LM_W(("KZ: calling processOnChangeConditionForSubscription for sub '%s', tenant '%s'", subscriptionId.c_str(), tenant.c_str()));
       if ((status == STATUS_ACTIVE) &&
           (processOnChangeConditionForSubscription(enV,
                                                    attrL,
@@ -2019,7 +2024,8 @@ BSONArray processConditionVector
                                                    resP,
                                                    fiwareCorrelator,
                                                    attrsOrder,
-                                                   blacklist)))
+                                                   blacklist,
+                                                   subscriptionId)))
       {
         *notificationDone = true;
       }
@@ -2061,7 +2067,8 @@ BSONArray processConditionVector
   const std::string&               status,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist
+  bool                             blacklist,
+  const std::string&               subscriptionId
 )
 {
   NotifyConditionVector ncV;
@@ -2072,6 +2079,7 @@ BSONArray processConditionVector
   entIdStdVector2EntityIdVector(entitiesV, &enV);
   attrL.fill(notifAttributesV);
 
+  LM_W(("KZ: calling processConditionVector for sub '%s', tenant '%s'", subscriptionId.c_str(), tenant.c_str()));
   BSONArray arr = processConditionVector(&ncV,
                                          enV,
                                          attrL,
@@ -2087,7 +2095,8 @@ BSONArray processConditionVector
                                          status,
                                          fiwareCorrelator,
                                          attrsOrder,
-                                         blacklist);
+                                         blacklist,
+                                         subscriptionId);
 
   enV.release();
   ncV.release();

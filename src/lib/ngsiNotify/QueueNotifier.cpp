@@ -70,11 +70,13 @@ void QueueNotifier::sendNotifyContextRequest
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsOrder,
   const std::vector<std::string>&  metadataFilter,
-  bool                             blacklist
+  bool                             blacklist,
+  const std::string&               subscriptionId
 )
 {
   ConnectionInfo ci;
 
+  LM_W(("KZ: In QueueNotifier::sendNotifyContextRequest. subId == %s", subscriptionId.c_str()));
   //
   // FIXME P5: analyze how much of the code of this function is the same as in Notifier::sendNotifyContextRequest
   // and could be refactored to common functions
@@ -155,6 +157,8 @@ void QueueNotifier::sendNotifyContextRequest
   params->mimeType         = JSON;
   params->renderFormat     = renderFormatToString(renderFormat, false);
   params->fiwareCorrelator = fiwareCorrelator;
+  params->subscriptionId   = subscriptionId;
+
   strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
   clock_gettime(CLOCK_REALTIME, &params->timeStamp);

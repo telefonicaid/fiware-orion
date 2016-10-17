@@ -145,6 +145,9 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
   subP->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(r, CSUB_LASTNOTIFICATION) : -1;
   subP->notification.timesSent        = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : -1;
   subP->notification.blacklist        = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(r, CSUB_BLACKLIST)                   : false;
+  subP->notification.lastFailure      = r.hasField(CSUB_LASTFAILURE)?      getIntFieldF(r, CSUB_LASTFAILURE)                  : -1;
+  subP->notification.timesFailed      = r.hasField(CSUB_TIMESFAILED)?      getIntFieldF(r, CSUB_TIMESFAILED)                  : 0;
+
 
   // Attributes format
   subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(r, CSUB_FORMAT)) : NGSI_V1_LEGACY;

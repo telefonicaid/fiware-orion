@@ -105,11 +105,12 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       : 0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
-  cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS).c_str()         : "active";
+  cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS).c_str()            : "active";
+  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                   : false;
+  cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getIntField(sub, CSUB_LASTFAILURE)                   : -1;
+  cSubP->timesFailed           = sub.hasField(CSUB_TIMESFAILED)?      getIntField(sub, CSUB_TIMESFAILED)                   : 0;
   cSubP->count                 = 0;
   cSubP->next                  = NULL;
-  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
-
 
   //
   // 04.2 httpInfo
@@ -427,6 +428,7 @@ int mongoSubCacheItemInsert
 */
 void mongoSubCacheRefresh(const std::string& database)
 {
+  LM_W(("KZ: Refreshing subscription cache for DB '%s'", database.c_str()));
   LM_T(LmtSubCache, ("Refreshing subscription cache for DB '%s'", database.c_str()));
 
   BSONObj                   query;      // empty query (all subscriptions)
@@ -475,12 +477,21 @@ void mongoSubCacheRefresh(const std::string& database)
 *
 * mongoSubCacheUpdate - update subscription in mongo with count and lastNotificationTime
 */
-void mongoSubCacheUpdate(const std::string& tenant, const std::string& subId, long long count, long long lastNotificationTime)
+void mongoSubCacheUpdate
+(
+  const std::string& tenant,
+  const std::string& subId,
+  long long          count,
+  long long          lastNotificationTime,
+  uint32_t           lastFailure,
+  uint32_t           timesFailed
+)
 {
   std::string  collection  = getSubscribeContextCollectionName(tenant);
   BSONObj      condition;
   BSONObj      update;
   std::string  err;
+
 
   if (count != 0)
   {
@@ -494,6 +505,7 @@ void mongoSubCacheUpdate(const std::string& tenant, const std::string& subId, lo
     }
   }
 
+
   if (lastNotificationTime != 0)
   {
     // Update lastNotificationTime    
@@ -506,6 +518,35 @@ void mongoSubCacheUpdate(const std::string& tenant, const std::string& subId, lo
     if (collectionUpdate(collection, condition, update, false, &err) != true)
     {
       LM_E(("Internal Error (error updating 'lastNotification' for a subscription)"));
+    }
+  }
+
+
+  if (lastFailure != 0)
+  {
+    // Update lastFailure    
+    condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
+                       BSON(CSUB_LASTFAILURE << BSON("$lt" << lastFailure)) <<
+                       BSON(CSUB_LASTFAILURE << BSON("$exists" << false)))
+                    );
+    update    = BSON("$set" << BSON(CSUB_LASTFAILURE << lastFailure));
+
+    if (collectionUpdate(collection, condition, update, false, &err) != true)
+    {
+      LM_E(("Internal Error (error updating 'lastFailure' for a subscription)"));
+    }
+  }
+
+
+  if (timesFailed != 0)
+  {
+    // Update timesFailed
+    condition = BSON("_id"  << OID(subId));
+    update    = BSON("$inc" << BSON(CSUB_TIMESFAILED << timesFailed));
+
+    if (collectionUpdate(collection, condition, update, false, &err) != true)
+    {
+      LM_E(("Internal Error (error updating 'timesFailed' for a subscription)"));
     }
   }
 }

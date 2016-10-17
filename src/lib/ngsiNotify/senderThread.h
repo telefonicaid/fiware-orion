@@ -58,6 +58,7 @@ typedef struct SenderThreadParams
   std::string     renderFormat;
   std::string     fiwareCorrelator;
   struct timespec timeStamp;
+  std::string     subscriptionId;
 } SenderThreadParams;
 
 

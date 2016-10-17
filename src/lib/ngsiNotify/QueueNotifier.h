@@ -60,7 +60,8 @@ public:
                                 RenderFormat                     renderFormat,
                                 const std::vector<std::string>&  attrsOrder,
                                 const std::vector<std::string>&  metadataFilter,
-                                bool                             blacklist = false);
+                                bool                             blacklist,
+                                const std::string&               subscriptionId);
   int start();
 
 private:
