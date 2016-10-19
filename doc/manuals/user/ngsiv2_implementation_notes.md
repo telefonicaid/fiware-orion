@@ -157,7 +157,7 @@ is not 100% accurate.
 
 Although we try to minimize the changes in the stable version of the NGSIv2 specification, a few changes
 have been needed in the end. Thus, there is changed functionality that doesn't appear in the current
-NGSIv2 stable specification document but Orion is still supporting them
+NGSIv2 stable specification document but that Orion still supports
 (as [deprecated functionality](../deprecated.md)) in order to keep backward compability.
 
 In particular, the usage of `dateCreated` and `dateModified` in the `options` parameter (introduced
