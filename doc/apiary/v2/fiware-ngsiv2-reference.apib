@@ -435,7 +435,7 @@ The following strings must not be used as metadata names:
 
 * System/builtin metadata names (see specific section on "System/builtin Metadata")
 
-* `*`, as it has an special meaning as "all the custom/user metadata" (see section on
+* `*`, as it has a special meaning as "all the custom/user metadata" (see section on
   "Filtering out attributes and metadata").
 
 ## Ordering Results
@@ -809,7 +809,7 @@ must be sent.
 
 The `attrs` URL parameter (or field in POST /v2/op/query) can be used in retrieve operations
 to specify the list of attributes that must be included in the response. In a similar way, the
-`metadata` URL parameter (or field in POST /v2/op/query) can be used to specify the list metadata
+`metadata` URL parameter (or field in POST /v2/op/query) can be used to specify the list of metadata
 that must be included in the response.
 
 By default, if `attrs` is omitted (or `metadata` is omitted) then all the attributes (all the
@@ -825,13 +825,13 @@ attribute (metadata). If you want to include system/builtin attributes (metadata
 attributes (metadata) at the same time then
 
 * The user-defined attributes (metadata) have to be explictly included, e.g. to include the user-defined
-  attributes A and B along the system/builtin attribute `dateModified` use: `attrs=dateModified,A,B`.
-* The special value `*` can be used as an alias meaning "all user-defined attributes (metadata)", e.g.
+  attributes A and B along with the system/builtin attribute `dateModified`, use: `attrs=dateModified,A,B`.
+* The special value `*` can be used as an alias meaning "all user-defined attributes (metadata)", e.g.,
   to include all the user-defined attributes along with the system/builtin attribute `dateModified`
   use: `attrs=dateModified,*`.
 
-Note that `attrs` and `metadata` fields can be also used in subscriptions (as sub-fiedls of `notification`)
-with the same meaning to specify which attributes (metadata) to include in the notifications associated
+Note that the `attrs` and `metadata` fields can be used also in subscriptions (as sub-fields of `notification`)
+with the same meaning to specify which attributes (metadata) to include in notifications associated
 to that subscription.
 
 ## Notification Messages
