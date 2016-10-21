@@ -42,7 +42,7 @@
 *
 * Entity::Entity - 
 */
-Entity::Entity(): typeGiven(false), renderId(true)
+Entity::Entity(): typeGiven(false), renderId(true), creDate(0), modDate(0)
 {
 
 }
@@ -81,10 +81,28 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
   {
     std::string out;
     std::vector<std::string> metadataFilter;
+    std::vector<std::string> attrsFilter;
 
     if (ciP->uriParam[URI_PARAM_METADATA] != "")
     {
       stringSplit(ciP->uriParam[URI_PARAM_METADATA], ',', metadataFilter);
+    }
+
+    if (ciP->uriParam[URI_PARAM_ATTRIBUTES] != "")
+    {
+      stringSplit(ciP->uriParam[URI_PARAM_ATTRIBUTES], ',', attrsFilter);
+    }
+
+    // Add special attributes representing entity dates
+    if ((creDate != 0) && (ciP->uriParamOptions[DATE_CREATED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end())))
+    {
+      ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, creDate);
+      attributeVector.push_back(caP);
+    }
+    if ((modDate != 0) && (ciP->uriParamOptions[DATE_MODIFIED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_MODIFIED) != attrsFilter.end())))
+    {
+      ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, modDate);
+      attributeVector.push_back(caP);
     }
 
     if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
@@ -92,10 +110,7 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
       out = "[";
       if (attributeVector.size() != 0)
       {
-        std::vector<std::string> attrsFilter;
-
-        stringSplit(ciP->uriParam[URI_PARAM_ATTRIBUTES], ',', attrsFilter);
-        out += attributeVector.toJson(true, renderFormat, attrsFilter, metadataFilter);
+        out += attributeVector.toJson(renderFormat, attrsFilter, metadataFilter, false);
       }
       out += "]";        
     }
@@ -115,11 +130,7 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
       std::string attrsOut;
       if (attributeVector.size() != 0)
       {
-        std::vector<std::string> attrsFilter;
-
-        stringSplit(ciP->uriParam[URI_PARAM_ATTRIBUTES], ',', attrsFilter);
-
-        attrsOut += attributeVector.toJson(true, renderFormat, attrsFilter, metadataFilter);
+        attrsOut += attributeVector.toJson(renderFormat, attrsFilter, metadataFilter, false);
       }
 
       //
@@ -237,11 +248,22 @@ void Entity::present(const std::string& indent)
 *
 * Entity::fill - 
 */
-void Entity::fill(const std::string& _id, const std::string& _type, const std::string& _isPattern, ContextAttributeVector* aVec)
+void Entity::fill
+(
+  const std::string&       _id,
+  const std::string&       _type,
+  const std::string&       _isPattern,
+  ContextAttributeVector*  aVec,
+  double                   _creDate,
+  double                   _modDate
+)
 {
   id         = _id;
   type       = _type;
   isPattern  = _isPattern;
+
+  creDate    = _creDate;
+  modDate    = _modDate;
 
   attributeVector.fill(aVec);
 }
@@ -270,7 +292,8 @@ void Entity::fill(QueryContextResponse* qcrsP)
   else
   {
     ContextElement* ceP = &qcrsP->contextElementResponseVector[0]->contextElement;
-    fill(ceP->entityId.id, ceP->entityId.type, ceP->entityId.isPattern, &ceP->contextAttributeVector);
+    fill(ceP->entityId.id, ceP->entityId.type, ceP->entityId.isPattern, &ceP->contextAttributeVector,
+         ceP->entityId.creDate, ceP->entityId.modDate);
   }
 }
 

@@ -119,7 +119,7 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 
 ## `actionType` metadata
 
-From NGSIv2 specification section "Special metadata in notifications", regarding `actionType` metadata:
+From NGSIv2 specification section ""System/builtin in metadata"", regarding `actionType` metadata:
 
 > Its value depend on the request operation type: `update` for updates,
 > `append` for creation and `delete` for deletion. Its type is always `Text`.
@@ -150,3 +150,18 @@ In addition, Orion implements throttling in a local way. In multi-CB configurati
 measure is local to each Orion node. Although each node periodically synchronizes with the DB in order to get potencially newer
 values (more on this [here](perf_tuning.md#subscription-cache)) it may happen that a particular node has an old value, so throttling
 is not 100% accurate.
+
+<!-- To enable this when options get removed from the stable version. Note that in RC-2016.10 is still included
+
+## Deprecated features
+
+Although we try to minimize the changes in the stable version of the NGSIv2 specification, a few changes
+have been needed in the end. Thus, there is changed functionality that doesn't appear in the current
+NGSIv2 stable specification document but that Orion still supports
+(as [deprecated functionality](../deprecated.md)) in order to keep backward compability.
+
+In particular, the usage of `dateCreated` and `dateModified` in the `options` parameter (introduced
+in stable RC-2016.05 and removed in ...) is still supported, e.g. `options=dateModified`. However,
+you are highly encouraged to use `attrs` instead (i.e. `attrs=dateModified,*`).
+
+-->

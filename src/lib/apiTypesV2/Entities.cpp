@@ -145,6 +145,8 @@ void Entities::fill(QueryContextResponse* qcrsP)
     eP->id        = ceP->entityId.id;
     eP->type      = ceP->entityId.type;
     eP->isPattern = ceP->entityId.isPattern;
+    eP->creDate   = ceP->entityId.creDate;
+    eP->modDate   = ceP->entityId.modDate;
 
     eP->attributeVector.fill(&ceP->contextAttributeVector);
     vec.push_back(eP);

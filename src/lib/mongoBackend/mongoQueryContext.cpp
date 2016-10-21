@@ -26,6 +26,7 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+#include "common/string.h"
 
 #include "common/sem.h"
 #include "alarmMgr/alarmMgr.h"
@@ -302,11 +303,34 @@ HttpStatusCode mongoQueryContext
     bool        badInput     = false;
     bool        reqSemTaken;
 
-    ContextElementResponseVector rawCerV;    
+    ContextElementResponseVector rawCerV;
+
+    // dateCreated and dateModified options are still supported although deprecated.
+    // Note that we check for attr list emptyness, as in that case the "*" needs
+    // to be added to print also user attributes
+    if (options[DATE_CREATED])
+    {
+      if (requestP->attributeList.size() == 0)
+      {
+        requestP->attributeList.push_back(ALL_ATTRS);
+      }
+
+      requestP->attributeList.push_back(DATE_CREATED);
+    }
+    if (options[DATE_MODIFIED])
+    {
+      if (requestP->attributeList.size() == 0)
+      {
+        requestP->attributeList.push_back(ALL_ATTRS);
+      }
+
+      requestP->attributeList.push_back(DATE_MODIFIED);
+    }
 
     reqSemTake(__FUNCTION__, "ngsi10 query request", SemReadOp, &reqSemTaken);
     ok = entitiesQuery(requestP->entityIdVector,
                        requestP->attributeList,
+                       requestP->metadataList,
                        requestP->restriction,
                        &rawCerV,
                        &err,
@@ -319,8 +343,6 @@ HttpStatusCode mongoQueryContext
                        countP,
                        &badInput,
                        sortOrderList,
-                       options[DATE_CREATED],
-                       options[DATE_MODIFIED],
                        apiVersion);
 
     if (badInput)

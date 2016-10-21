@@ -2052,7 +2052,7 @@ bool StringFilter::qMatch(ContextElementResponse* cerP)
     {
       caP            = &ca;
       ca.valueType   = orion::ValueTypeNumber;
-      ca.numberValue = (itemP->left == DATE_CREATED)? cerP->contextElement.creDate : cerP->contextElement.modDate;
+      ca.numberValue = (itemP->left == DATE_CREATED)? cerP->contextElement.entityId.creDate : cerP->contextElement.entityId.modDate;
     }
     else if (itemP->op != SfopNotExists)
     {

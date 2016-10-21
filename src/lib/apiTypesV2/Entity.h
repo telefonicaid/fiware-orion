@@ -51,6 +51,9 @@ public:
   bool                    typeGiven;        // Was 'type' part of the incoming payload?
   bool                    renderId;         // Should id and type be rendered in JSON?
 
+  double                  creDate;          // used by dateCreated functionality in NGSIv2
+  double                  modDate;          // used by dateModified functionality in NGSIv2
+
   Entity();
   ~Entity();
 
@@ -58,7 +61,12 @@ public:
   std::string  check(ConnectionInfo*  ciP, RequestType requestType);
   void         present(const std::string& indent);
   void         release(void);
-  void         fill(const std::string& id, const std::string& type, const std::string& isPattern, ContextAttributeVector* aVec);
+  void         fill(const std::string&       id,
+                    const std::string&       type,
+                    const std::string&       isPattern,
+                    ContextAttributeVector*  aVec,
+                    double                   creDate,
+                    double                   modDate);
   void         fill(QueryContextResponse* qcrsP);
   void         hideIdAndType(bool hide = true);
 };
