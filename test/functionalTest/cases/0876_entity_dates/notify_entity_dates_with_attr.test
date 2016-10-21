@@ -897,7 +897,7 @@ Date: REGEX(.*)
 ==============================================================
 POST http://localhost:9997/notify
 Content-Length: 124
-User-Agent: orion/1.4.0-next libcurl/7.38.0
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:9997
 Accept: application/json
