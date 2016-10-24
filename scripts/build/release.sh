@@ -159,12 +159,12 @@ fi
 mv /tmp/README.md README.md
 
 # Adjust Dockerfile GIT_REV_ORION. Note that the procedure is not symmetric (like in version.h), as
-# dev release sets 'develop' and not 'X.Y.Z-next"
+# dev release sets 'master' and not 'X.Y.Z-next"
 if [ "$BROKER_RELEASE" != "dev" ]
 then
-  sed "s/ENV GIT_REV_ORION develop/ENV GIT_REV_ORION $NEW_VERSION/" docker/Dockerfile > /tmp/Dockerfile
+  sed "s/ENV GIT_REV_ORION master/ENV GIT_REV_ORION $NEW_VERSION/" docker/Dockerfile > /tmp/Dockerfile
 else
-  sed "s/ENV GIT_REV_ORION $currentVersion/ENV GIT_REV_ORION develop/" docker/Dockerfile > /tmp/Dockerfile
+  sed "s/ENV GIT_REV_ORION $currentVersion/ENV GIT_REV_ORION master/" docker/Dockerfile > /tmp/Dockerfile
 fi
 mv /tmp/Dockerfile docker/Dockerfile
 
