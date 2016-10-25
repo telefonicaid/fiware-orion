@@ -1669,6 +1669,14 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     {
       k = ENT_MODIFICATION_DATE;
     }
+    else if (left == itemP->attributeName + "." + ENT_ATTRS_MD "." + NGSI_MD_DATECREATED)
+    {
+      k = std::string(ENT_ATTRS) + "." + itemP->attributeName + "." + ENT_ATTRS_CREATION_DATE;
+    }
+    else if (left == itemP->attributeName + "." + ENT_ATTRS_MD "." + NGSI_MD_DATEMODIFIED)
+    {
+      k = std::string(ENT_ATTRS) + "." + itemP->attributeName + "." + ENT_ATTRS_MODIFICATION_DATE;
+    }
     else
     {
       k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
