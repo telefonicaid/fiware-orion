@@ -2279,6 +2279,10 @@ static void updateAttrInNotifyCer
       /* Set actionType */
       caP->actionType = actionType;
 
+      /* Set modification date */
+      int now = getCurrentTime();
+      caP->modDate = now;
+
       /* Metadata */
       for (unsigned int jx = 0; jx < targetAttr->metadataVector.size(); jx++)
       {
@@ -2332,6 +2336,10 @@ static void updateAttrInNotifyCer
 
   /* Reached this point, it means that it is a new attribute (APPEND case) */
   ContextAttribute* caP = new ContextAttribute(targetAttr, useDefaultType);
+
+  int now = getCurrentTime();
+  caP->creDate = now;
+  caP->modDate = now;
 
   if (caP->compoundValueP)
   {

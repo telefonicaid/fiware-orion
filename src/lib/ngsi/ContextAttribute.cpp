@@ -1035,6 +1035,12 @@ void ContextAttribute::present(const std::string& indent, int ix)
   LM_T(LmtPresent, ("%s  Type:      %s", 
 		    indent.c_str(), 
 		    type.c_str()));
+  LM_T(LmtPresent, ("%s  creDate:   %f",
+        creDate,
+        type.c_str()));
+  LM_T(LmtPresent, ("%s  modDate:   %f",
+        modDate,
+        type.c_str()));
 
   if (compoundValueP == NULL)
   {

@@ -1,7 +1,7 @@
 - Add: Added URI parameter metadata=metadata-name-list for NGSIv2 retrieve requests (#2544)
 - Add: Added 'metadata' as part of the payload for POST /v2/op/query (#2544)
 - Add: implement 'attrs' (and 'attributes' for POST /v2/op/query) in the same way than 'metadata', including special meaning of '*' (#2455)
-- Add: metadata timestamps (dateCreated + dateModified) for attributes (as for entities) (#876)
+- Add: metadata timestamps (dateCreated + dateModified) for attributes (as for entities), including filtering capabilities (#876)
 - Add: new value for URI param 'options' (options=noAttrDetail) for NGSIv2 queries to exclude attribute detail, making the query faster (#2073) 
 - Fix: wrong type in previousValue metadata for notifications triggered by PUT /v2/entities/{id}/attrs/{name}/value (#2553)
 - Fix: giving a semaphore in case of mongo exception, which was causing the broker to be unable to serve requests involving the database, and possibly even to crash due to lack of resources (#2571)
