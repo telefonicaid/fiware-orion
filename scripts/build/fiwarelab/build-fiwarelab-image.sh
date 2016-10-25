@@ -76,7 +76,7 @@ Welcome! This VM includes Orion Context Broker and Cygnus. In order to update to
 the lastest version of them, it is strongly recommended you run the following commands:
  
  yum install contextBroker
- yum install cygnus
+ yum install cygnus-ngsi
  
 Orion Context Broker and Cygnus run as service by default (in port 1026, and 5050 and 8081 respectively).
 You need to have these ports allowed in this VM security group in order to allow external access.
@@ -146,7 +146,7 @@ sudo chkconfig contextBroker on
 sudo /etc/init.d/contextBroker start
 
 # Install Cygnus
-sudo yum install -y cygnus
+sudo yum install -y cygnus-ngsi
 
 # CentOS seems to have a quite restrictive iptables configuration in the base image. Thus,
 # we need to explictely set an rule for incoming traffic on ports 1026, 5050 and 8081. Alternativelly, 
