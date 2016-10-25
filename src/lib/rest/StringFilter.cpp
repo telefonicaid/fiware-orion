@@ -778,6 +778,7 @@ bool StringFilterItem::matchEquals(Metadata* mdP)
 
   if ((valueType == SfvtNumberRange) || (valueType == SfvtDateRange))
   {
+    LM_W(("FGM: %f > %f > %f", numberRangeFrom, mdP->numberValue, numberRangeTo));
     if ((mdP->numberValue < numberRangeFrom) || (mdP->numberValue > numberRangeTo))
     {
       return false;
@@ -986,6 +987,7 @@ bool StringFilterItem::matchEquals(ContextAttribute* caP)
   //
   if ((valueType == SfvtNumberRange) || (valueType == SfvtDateRange))
   {
+    LM_W(("FGM: %f > %f > %f", numberRangeFrom, caP->numberValue, numberRangeTo));
     if ((caP->numberValue < numberRangeFrom) || (caP->numberValue > numberRangeTo))
     {
       return false;
@@ -1311,6 +1313,7 @@ bool StringFilterItem::matchGreaterThan(orion::CompoundValueNode* cvP)
 */
 bool StringFilterItem::matchGreaterThan(Metadata* mdP)
 {
+  LM_W(("FGM: this is matchGreaterThan"));
   //
   // First of all, are we treating with a compound?
   // If so, check for errors and if all OK, delegate to other function
@@ -1329,11 +1332,13 @@ bool StringFilterItem::matchGreaterThan(Metadata* mdP)
 
   if (!compatibleType(mdP))
   {
+    LM_W(("FGM: not compatible"));
     return false;
   }
 
   if (mdP->valueType == orion::ValueTypeNumber)
   {
+    LM_W(("FGM: %f > %f", mdP->numberValue, numberValue));
     if (mdP->numberValue > numberValue)
     {
       return true;
@@ -1928,10 +1933,19 @@ bool StringFilter::mqMatch(ContextElementResponse* cerP)
   {
     StringFilterItem*  itemP = filters[ix];
     ContextAttribute*  caP   = cerP->contextElement.getAttribute(itemP->attributeName);
+#if 0
     Metadata*          mdP   = (caP == NULL)? NULL : caP->metadataVector.lookupByName(itemP->metadataName);
+#endif
+
+    LM_W(("FGM: %s", itemP->metadataName.c_str()));
+    LM_W(("FGM: %s", itemP->attributeName.c_str()));
+    LM_W(("FGM: %s", itemP->left.c_str()));
+    LM_W(("FGM: %s", itemP->left.c_str()));
 
     if ((itemP->op == SfopExists) || (itemP->op == SfopNotExists))
     {
+
+      Metadata*  mdP = (caP == NULL)? NULL : caP->metadataVector.lookupByName(itemP->metadataName);
 
       if (itemP->compoundPath.size() == 0)
       {
@@ -1958,13 +1972,44 @@ bool StringFilter::mqMatch(ContextElementResponse* cerP)
         }
       }
     }
+#if 0
     else if (mdP == NULL)
     {
       // Next checkings need an actual metadata to evaluate matching condition. This
       // "shorcut" checking for NULL will avoid crashes
       return false;
     }
-    else if ((itemP->op == SfopEquals) && (itemP->matchEquals(mdP) == false))
+#endif
+
+    if (caP == NULL)
+    {
+      return false;
+    }
+
+    Metadata*  mdP = NULL;
+    Metadata   md;
+
+    std::string ss;
+    caP->present("", 0); // FGM
+
+    if ((itemP->metadataName == NGSI_MD_DATECREATED) || (itemP->metadataName == NGSI_MD_DATEMODIFIED))
+    {
+      mdP            = &md;
+      md.valueType   = orion::ValueTypeNumber;
+      md.numberValue = (itemP->metadataName == NGSI_MD_DATECREATED)? caP->creDate : caP->modDate;
+    }
+    else if (itemP->op != SfopNotExists)  // FIXME PR: really needed?
+    {
+      mdP = caP->metadataVector.lookupByName(itemP->metadataName);
+
+      // If the metadata doesn't exist, no need to go further: filter fails
+      if (mdP == NULL)
+      {
+        return false;
+      }
+    }
+
+    if ((itemP->op == SfopEquals) && (itemP->matchEquals(mdP) == false))
     {
       return false;
     }
@@ -2062,7 +2107,7 @@ bool StringFilter::qMatch(ContextElementResponse* cerP)
       ca.valueType   = orion::ValueTypeNumber;
       ca.numberValue = (itemP->left == DATE_CREATED)? cerP->contextElement.entityId.creDate : cerP->contextElement.entityId.modDate;
     }
-    else if (itemP->op != SfopNotExists)
+    else if (itemP->op != SfopNotExists)  // FIXME PR: really needed?
     {
       caP = cerP->contextElement.getAttribute(itemP->attributeName);
 

@@ -33,13 +33,15 @@ accumulatorStart --pretty-print
 #
 # Same steps than filter_datecreated.test but using dateCreated at attribute level
 #
-# 01. At t_0: Create subscription with mq: A.dateCreated==t_2..t_4
+# 01. At t_0: Create subscription with mq: A.dateCreated==t_2..t_6
 # 02. At t_1: Create entity E1 (not notif)
-# 03. At t_2: Create entity E2 (notif)
-# 04. At t_3: Create entity E3 (notif)
-# 05. At t_4: Create entity E4 (notif)
-# 06. At t_5: Create entity E5 (not notif)
+# 03. At t_3: Create entity E2 (notif)
+# 04. At t_4: Create entity E3 (notif)
+# 05. At t_5: Create entity E4 (notif)
+# 06. At t_7: Create entity E5 (not notif)
 # 07. Get accumulator dump (3 notifications): E2, E3, E4
+#
+# Note we avoid to use t_2 and t_6 to create entities, as they are "edge" cases in the range limits
 #
 
 T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
@@ -78,6 +80,7 @@ echo
 
 echo "02. At t_1: Create entity E1 (not notif)"
 echo "========================================"
+sleep 1s
 payload='{
   "id": "E1",
   "type": "T",
@@ -87,10 +90,10 @@ orionCurl --url /v2/entities?options=keyValues --payload "$payload"
 echo
 echo
 
-sleep 2.1
 
-echo "03. At t_2: Create entity E2 (notif)"
+echo "03. At t_3: Create entity E2 (notif)"
 echo "===================================="
+sleep 2s
 payload='{
   "id": "E2",
   "type": "T",
@@ -101,8 +104,9 @@ echo
 echo
 
 
-echo "04. At t_3: Create entity E3 (notif)"
+echo "04. At t_4: Create entity E3 (notif)"
 echo "===================================="
+sleep 1s
 payload='{
   "id": "E3",
   "type": "T",
@@ -113,8 +117,9 @@ echo
 echo
 
 
-echo "05. At t_4: Create entity E4 (notif)"
+echo "05. At t_5: Create entity E4 (notif)"
 echo "===================================="
+sleep 1s
 payload='{
   "id": "E4",
   "type": "T",
@@ -124,11 +129,10 @@ orionCurl --url /v2/entities?options=keyValues --payload "$payload"
 echo
 echo
 
-sleep 5
 
-
-echo "06. At t_5: Create entity E5 (not notif)"
+echo "06. At t_7: Create entity E5 (not notif)"
 echo "========================================"
+sleep 2s
 payload='{
   "id": "E5",
   "type": "T",
@@ -147,8 +151,8 @@ echo
 
 
 --REGEXPECT--
-01. At t_0: Create subscription with q: dateCreated==t_2..t_6
-=============================================================
+01. At t_0: Create subscription with mq: A.dateCreated==t_2..t_6
+================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -167,7 +171,7 @@ Date: REGEX(.*)
 
 
 
-03. At t_2: Create entity E2 (notif)
+03. At t_3: Create entity E2 (notif)
 ====================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -177,7 +181,7 @@ Date: REGEX(.*)
 
 
 
-04. At t_3: Create entity E3 (notif)
+04. At t_4: Create entity E3 (notif)
 ====================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -187,7 +191,7 @@ Date: REGEX(.*)
 
 
 
-05. At t_4: Create entity E4 (notif)
+05. At t_5: Create entity E4 (notif)
 ====================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -197,7 +201,7 @@ Date: REGEX(.*)
 
 
 
-06. At t_5: Create entity E5 (not notif)
+06. At t_7: Create entity E5 (not notif)
 ========================================
 HTTP/1.1 201 Created
 Content-Length: 0
