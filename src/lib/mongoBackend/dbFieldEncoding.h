@@ -28,17 +28,19 @@
 
 #include <string>
 
+#include "common/globals.h"
+
 /* ****************************************************************************
 *
 * basePart, idPart -
 *
 * Helper functions for entitysQuery to split the attribute name string into part,
-* e.g. "A1__ID1" into "A1" and "ID1"
+* e.g. "A1()ID1" into "A1" and "ID1"
 */
 inline std::string basePart(std::string name)
 {
-  /* Search for "__" */
-  std::size_t pos = name.find("__");
+  /* Search for "()" */
+  std::size_t pos = name.find(MD_ID_SEPARATOR);
   if (pos == std::string::npos)
   {
     /* If not found, return just 'name' */
@@ -52,8 +54,8 @@ inline std::string basePart(std::string name)
 
 inline std::string idPart(std::string name)
 {
-  /* Search for "__" */
-  std::size_t pos = name.find("__");
+  /* Search for "()" */
+  std::size_t pos = name.find(MD_ID_SEPARATOR);
   if (pos == std::string::npos)
   {
     /* If not found, return just "" */
