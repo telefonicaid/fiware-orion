@@ -46,6 +46,9 @@ class EntityId
 
   std::string  servicePath;  // Not part of payload, just an internal field
 
+  double       creDate;       // used by dateCreated functionality in NGSIv2
+  double       modDate;       // used by dateModified functionality in NGSIv2
+
   EntityId();
   EntityId(EntityId* eP);
   EntityId(const std::string&  _id,

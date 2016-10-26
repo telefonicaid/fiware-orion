@@ -48,9 +48,6 @@ typedef struct ContextElement
   ContextAttributeVector   contextAttributeVector;  // Optional
   MetadataVector           domainMetadataVector;    // Optional
 
-  double creDate;   // Needed for subscription filter evaluation
-  double modDate;   // Neeeed for subscription filter evaluation
-
   std::vector<ProvidingApplication> providingApplicationList;    // Not part of NGSI, used internally for CPr forwarding functionality
 
   ContextElement();

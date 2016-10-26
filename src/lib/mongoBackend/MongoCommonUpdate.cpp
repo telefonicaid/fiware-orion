@@ -93,10 +93,10 @@ extern void compoundValueBson(std::vector<CompoundValueNode*> children, BSONArra
 */
 static bool isNotCustomMetadata(std::string md)
 {
-  if (md != NGSI_MD_ID        &&
-      md != NGSI_MD_LOCATION  &&
-      md != NGSI_MD_CREDATE   &&
-      md != NGSI_MD_MODDATE)
+  if (md != NGSI_MD_ID            &&
+      md != NGSI_MD_LOCATION      &&
+      md != NGSI_MD_DATECREATED   &&
+      md != NGSI_MD_DATEMODIFIED)
   {
     return false;
   }
@@ -1696,7 +1696,7 @@ static bool processOnChangeConditionForUpdateContext
   {
     ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
 
-    if ((attrL.size() == 0) || (blacklist == true))
+    if ((attrL.size() == 0) || attrL.lookup(ALL_ATTRS) || (blacklist == true))
     {
       /* Empty attribute list in the subscription mean that all attributes are added */
       cer.contextElement.contextAttributeVector.push_back(caP);
@@ -1784,7 +1784,7 @@ static void setPreviousValueMetadata(ContextElementResponse* notifyCerP)
       continue;
     }
 
-    Metadata* mdP;
+    Metadata* mdP = NULL;
     if (previousValueP->compoundValueP == NULL)
     {
       switch (previousValueP->valueType)
@@ -1821,6 +1821,76 @@ static void setPreviousValueMetadata(ContextElementResponse* notifyCerP)
     }
 
     caP->metadataVector.push_back(mdP);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* setDateCreatedAttribute -
+*/
+static void setDateCreatedAttribute(ContextElementResponse* notifyCerP)
+{
+  if (notifyCerP->contextElement.entityId.creDate != 0)
+  {
+    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, notifyCerP->contextElement.entityId.creDate);
+    notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* setDateModifiedAttribute -
+*/
+static void setDateModifiedAttribute(ContextElementResponse* notifyCerP)
+{
+  if (notifyCerP->contextElement.entityId.modDate != 0)
+  {
+    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, notifyCerP->contextElement.entityId.modDate);
+    notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* setDateCreatedMetadata -
+*/
+static void setDateCreatedMetadata(ContextElementResponse* notifyCerP)
+{
+  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
+
+    if (caP->creDate != 0)
+    {
+      Metadata* mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, caP->creDate);
+      caP->metadataVector.push_back(mdP);
+    }
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* setDateModifiedMetadata -
+*/
+static void setDateModifiedMetadata(ContextElementResponse* notifyCerP)
+{
+  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
+
+    if (caP->modDate != 0)
+    {
+      Metadata* mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, caP->modDate);
+      caP->metadataVector.push_back(mdP);
+    }
   }
 }
 
@@ -1935,7 +2005,18 @@ static bool processSubscriptions
       }
     }
 
-    /* Set special metadatas */
+    /* Set special attributes */
+    if (tSubP->attrL.lookup(DATE_CREATED))
+    {
+      setDateCreatedAttribute(notifyCerP);
+    }
+
+    if (tSubP->attrL.lookup(DATE_MODIFIED))
+    {
+      setDateModifiedAttribute(notifyCerP);
+    }
+
+    /* Set special metadata */
     if (std::find(tSubP->metadata.begin(), tSubP->metadata.end(), NGSI_MD_ACTIONTYPE) != tSubP->metadata.end())
     {
       setActionTypeMetadata(notifyCerP);
@@ -1945,6 +2026,17 @@ static bool processSubscriptions
     {
       setPreviousValueMetadata(notifyCerP);
     }
+
+    if (std::find(tSubP->metadata.begin(), tSubP->metadata.end(), NGSI_MD_DATECREATED) != tSubP->metadata.end())
+    {
+      setDateCreatedMetadata(notifyCerP);
+    }
+
+    if (std::find(tSubP->metadata.begin(), tSubP->metadata.end(), NGSI_MD_DATEMODIFIED) != tSubP->metadata.end())
+    {
+      setDateModifiedMetadata(notifyCerP);
+    }
+
 
     /* Send notification */
     LM_T(LmtSubCache, ("NOT ignored: %s", tSubP->cacheSubId.c_str()));
@@ -2187,6 +2279,10 @@ static void updateAttrInNotifyCer
       /* Set actionType */
       caP->actionType = actionType;
 
+      /* Set modification date */
+      int now = getCurrentTime();
+      caP->modDate = now;
+
       /* Metadata */
       for (unsigned int jx = 0; jx < targetAttr->metadataVector.size(); jx++)
       {
@@ -2240,6 +2336,10 @@ static void updateAttrInNotifyCer
 
   /* Reached this point, it means that it is a new attribute (APPEND case) */
   ContextAttribute* caP = new ContextAttribute(targetAttr, useDefaultType);
+
+  int now = getCurrentTime();
+  caP->creDate = now;
+  caP->modDate = now;
 
   if (caP->compoundValueP)
   {
@@ -3077,13 +3177,13 @@ static void updateEntity
   }
 
   /* Build CER used for notifying (if needed) */
-  AttributeList emptyAttrL;
-  ContextElementResponse* notifyCerP = new ContextElementResponse(r, emptyAttrL);
+  AttributeList            emptyAttrL;
+  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL);
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
-  notifyCerP->contextElement.creDate = r.hasField(ENT_CREATION_DATE)     ? getIntOrLongFieldAsLongF(r, ENT_CREATION_DATE)     : -1;
-  notifyCerP->contextElement.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getIntOrLongFieldAsLongF(r, ENT_MODIFICATION_DATE) : -1;
+  notifyCerP->contextElement.entityId.creDate = r.hasField(ENT_CREATION_DATE)     ? getIntOrLongFieldAsLongF(r, ENT_CREATION_DATE)     : -1;
+  notifyCerP->contextElement.entityId.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getIntOrLongFieldAsLongF(r, ENT_MODIFICATION_DATE) : -1;
 
   if (!processContextAttributeVector(ceP,
                                      action,
@@ -3137,7 +3237,7 @@ static void updateEntity
   {
     int now = getCurrentTime();
     toSet.append(ENT_MODIFICATION_DATE, now);
-    notifyCerP->contextElement.modDate = now;
+    notifyCerP->contextElement.entityId.modDate = now;
   }
 
   // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
@@ -3172,7 +3272,7 @@ static void updateEntity
     int now = getCurrentTime();
     updatedEntity.append("$set", BSON(ENT_ATTRS << toSetObj << ENT_ATTRNAMES << toPushArr << ENT_MODIFICATION_DATE << now));
 
-    notifyCerP->contextElement.modDate = now;
+    notifyCerP->contextElement.entityId.modDate = now;
   }
   else
   {
@@ -3654,8 +3754,16 @@ void processContextElement
         // Set action type
         setActionType(notifyCerP, NGSI_MD_ACTIONTYPE_APPEND);
 
-        notifyCerP->contextElement.creDate = now;
-        notifyCerP->contextElement.modDate = now;
+        // Set creaDate and modDate times
+        notifyCerP->contextElement.entityId.creDate = now;
+        notifyCerP->contextElement.entityId.modDate = now;
+
+        for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+        {
+          ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
+          caP->creDate = now;
+          caP->modDate = now;
+        }
 
         notifyCerP->contextElement.entityId.servicePath = servicePathV.size() > 0? servicePathV[0] : "";
         processSubscriptions(subsToNotify, notifyCerP, &errReason, tenant, xauthToken, fiwareCorrelator);

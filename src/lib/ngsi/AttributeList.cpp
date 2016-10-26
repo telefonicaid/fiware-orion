@@ -31,6 +31,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/string.h"
 #include "ngsi/AttributeList.h"
 
 
@@ -45,6 +46,17 @@ void AttributeList::fill(const std::vector<std::string>& aVec)
   {
     attributeV.push_back(aVec[ix]);
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* AttributeList::fill - 
+*/
+void AttributeList::fill(const std::string& commaSeparatedList)
+{
+  stringSplit(commaSeparatedList, ',', attributeV);
 }
 
 
@@ -133,7 +145,7 @@ void AttributeList::release(void)
 *
 * lookup - 
 */
-bool AttributeList::lookup(const std::string& attributeName)
+bool AttributeList::lookup(const std::string& attributeName) const
 {
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
   {
@@ -196,4 +208,25 @@ void AttributeList::clone(const AttributeList& aList)
   {
     push_back(aList[ix]);
   }
+}
+
+
+/* ****************************************************************************
+*
+* AttributeList::toString - 
+*/
+std::string AttributeList::toString(void)
+{
+  std::string out;
+
+  for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
+  {
+    out += attributeV[ix];
+    if (ix < attributeV.size() - 1)
+    {
+      out += ",";
+    }
+  }
+
+  return out;
 }

@@ -15,7 +15,7 @@ resources of the system being tested (a VMware-based VM) are: 2 vCPU (on a
 physical host based on Intel Xeon E5620@2.40GHz) and 4GB RAM. Both Orion
 and MongoDB run in the same VM. The tool to generate load is JMeter,
 using the configuration that can be found at [the following
-location](https://github.com/telefonicaid/fiware-orion/tree/develop/test/LoadTest)
+location](https://github.com/telefonicaid/fiware-orion/tree/master/test/LoadTest)
 (orionPerformanceOnlyQueries\_v2.0.jmx,
 orionPerformanceOnlyAppends\_v2.0.jmx and
 orionPerformanceAppendsAndUpdates\_v2.0.jmx) and running in a separate

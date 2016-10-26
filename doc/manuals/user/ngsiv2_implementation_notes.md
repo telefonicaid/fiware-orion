@@ -1,5 +1,17 @@
 #<a name="top"></a>NGSIv2 Implementation Notes
 
+* [Forbidden characters](#forbidden-characters)
+* [Custom payload decoding on notifications](#custom-payload-decoding-on-notifications)
+* [Option to disable custom notifications](#option-to-disable-custom-notifications)
+* [Limit to attributes for entity location](#limit-to-attributes-for-entity-location)
+* [Legacy attribute format in notifications](#legacy-attribute-format-in-notifications)
+* [Scope functionality](#scope-functionality)
+* [Error responses](#error-responses)
+* [Subscription payload validations](#subscription-payload-validations)
+* [`actionType` metadata](#actiontype-metadata)
+* [`noAttrDetail` option](#noattrdetail-option)
+* [Notification throttling](#notification-throttling)
+
 This document describes some considerations to take into account
 regarding the specific implementation done by Orion Context Broker
 of the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
@@ -70,43 +82,44 @@ The error response rules defined in https://github.com/telefonicaid/fiware-orion
 the ones described in "Error Responses" section in the NGSIv2 specification. In particular, Orion Context
 Broker never responds with "InvalidModification (422)", using "Unprocessable (422)" instead.
 
-# Subscription payload validations
+## Subscription payload validations
 
 The particular validations that Orion implements on NGSIv2 subscription payloads are the following ones:
 
 * **description**: optional (max length 1024)
 * **subject**: mandatory
-  * **entities**: mandatory
-    * **id** or **idPattern**: one of them is mandatory (but both at the same time is not allowed). id
-      must follow NGSIv2 restrictions for IDs. idPattern must be not empty and a valid regex.
-    * **type**: optional (but if present it must follow NGSIv2 restrictions for IDs)
-  * **condition**: optional (but if present it must have a content, i.e. `{}` is not allowed)
-    * **attrs**: optional (but if present it must be a list; empty list is allowed)
-    * **expression**: optional (but if present it must have a content, i.e. `{}` is not allowed)
-      * **q**: optional (but if present it must be not empty, i.e. `""` is not allowed)
-      * **georel**: optional (but if present it must be not empty, i.e. `""` is not allowed)
-      * **geometry**: optional (but if present it must be not empty, i.e. `""` is not allowed)
-      * **coords**: optional (but if present it must be not empty, i.e. `""` is not allowed)
+    * **entities**: mandatory
+        * **id** or **idPattern**: one of them is mandatory (but both at the same time is not allowed). id
+            must follow NGSIv2 restrictions for IDs. idPattern must be not empty and a valid regex.
+        * **type**: optional (but if present it must follow NGSIv2 restrictions for IDs)
+    * **condition**: optional (but if present it must have a content, i.e. `{}` is not allowed)
+        * **attrs**: optional (but if present it must be a list; empty list is allowed)
+        * **expression**: optional (but if present it must have a content, i.e. `{}` is not allowed)
+            * **q**: optional (but if present it must be not empty, i.e. `""` is not allowed)
+            * **georel**: optional (but if present it must be not empty, i.e. `""` is not allowed)
+            * **geometry**: optional (but if present it must be not empty, i.e. `""` is not allowed)
+            * **coords**: optional (but if present it must be not empty, i.e. `""` is not allowed)
 * **notification**:
-  * **http**: must be present if `httpCustom` is omitted, forbidden otherwise
-    * **url**: mandatory (must be a valid URL)
-  * **httpCustom**: must be present if `http` is omitted, forbidden otherwise
-    * **url**: mandatory (must be not empty)
-    * **headers**: optional (but if present it must have a content, i.e. `{}` is not allowed)
-    * **qs**: optional (but if present it must have a content, i.e. `{}` is not allowed)
-    * **method**: optional (but if present it must be a valid HTTP method)
-    * **payload**: optional (empty string is allowed)
-  * **attrs**: optional (but if present it must be a list; empty list is allowed)
-  * **metadata**: optional (but if present it must be a list; empty list is allowed)
-  * **exceptAttrs**: optional (but it cannot be present if `attrs` is also used; if present it must be a non-empty list)
-  * **attrsFormat**: optional (but if present it must be a valid attrs format keyword)
+    * **http**: must be present if `httpCustom` is omitted, forbidden otherwise
+        * **url**: mandatory (must be a valid URL)
+    * **httpCustom**: must be present if `http` is omitted, forbidden otherwise
+        * **url**: mandatory (must be not empty)
+        * **headers**: optional (but if present it must have a content, i.e. `{}` is not allowed)
+        * **qs**: optional (but if present it must have a content, i.e. `{}` is not allowed)
+        * **method**: optional (but if present it must be a valid HTTP method)
+        * **payload**: optional (empty string is allowed)
+    * **attrs**: optional (but if present it must be a list; empty list is allowed)
+    * **metadata**: optional (but if present it must be a list; empty list is allowed)
+    * **exceptAttrs**: optional (but it cannot be present if `attrs` is also used; if present it must be a non-empty list)
+    * **attrsFormat**: optional (but if present it must be a valid attrs format keyword)
 * **throttling**: optional (must be an integer)
 * **expires**: optional (must be a date or empty string "")
 * **status**: optional (must be a valid status keyword)
 
-# actionType metadata
 
-From NGSIv2 specification section "Special metadata in notifications", regarding `actionType` metadata:
+## `actionType` metadata
+
+From NGSIv2 specification section ""System/builtin in metadata"", regarding `actionType` metadata:
 
 > Its value depend on the request operation type: `update` for updates,
 > `append` for creation and `delete` for deletion. Its type is always `Text`.
@@ -114,7 +127,7 @@ From NGSIv2 specification section "Special metadata in notifications", regarding
 Current Orion implementation supports "update" and "append". The "delete" case will be
 supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).
 
-# `noAttrDetail` option
+## `noAttrDetail` option
 
 The value `noAttrDetail` of the URI param `options` may be used in order to avoid NGSIv2 type browsing queries
 (`GET /v2/types` and `GET /v2/types/<type>`) to provide attribute type details.
@@ -123,3 +136,32 @@ When used, the `types` list associated to each attribute name is set to `[]`.
 Using this option, Orion solves these queries much faster, especially in the case of a large number of attributes, each one with a different type.
 This can be very useful if your use case doesn't need the attribute type detail.
 In some cases savings from 30 seconds to 0.5 seconds with the `noAttrDetails` option have been detected.
+
+## Notification throttling
+
+From NGSIv2 specification regarding subscription throttling:
+
+> throttling: Minimal period of time in seconds which must elapse between two consecutive notifications. It is optional.
+
+The way in which Orion implements this is discarding notifications during the throttling guard period. Thus, nofications may be lost
+if they arrive too close in time. If your use case doesn't support losing notifications this way, then you should not use throttling.
+
+In addition, Orion implements throttling in a local way. In multi-CB configurations, take into account that the last-notification
+measure is local to each Orion node. Although each node periodically synchronizes with the DB in order to get potencially newer
+values (more on this [here](perf_tuning.md#subscription-cache)) it may happen that a particular node has an old value, so throttling
+is not 100% accurate.
+
+<!-- To enable this when options get removed from the stable version. Note that in RC-2016.10 is still included
+
+## Deprecated features
+
+Although we try to minimize the changes in the stable version of the NGSIv2 specification, a few changes
+have been needed in the end. Thus, there is changed functionality that doesn't appear in the current
+NGSIv2 stable specification document but that Orion still supports
+(as [deprecated functionality](../deprecated.md)) in order to keep backward compability.
+
+In particular, the usage of `dateCreated` and `dateModified` in the `options` parameter (introduced
+in stable RC-2016.05 and removed in ...) is still supported, e.g. `options=dateModified`. However,
+you are highly encouraged to use `attrs` instead (i.e. `attrs=dateModified,*`).
+
+-->

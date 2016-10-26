@@ -1,0 +1,329 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Comkpound values with identical tags
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. V2: Try to create an entity E1 with attr A1 with compound value { "a": 1, "a": 2 } - see error
+# 02. V2: Create an entity E2 with attr A1 with compound value { "a": 1, "b": { "a": 2 } } - OK
+# 03. V2: Try to create an entity E3 with attr A1 with compound value { "a": 1, "b": { "b": 2 } } - OK
+# 04. V1: Try to create an entity E4 with attr A1 with compound value { "a": 1, "a": 2 } - see error
+# 05. V1: Create an entity E5 with attr A1 with compound value { "a": 1, "b": { "a": 2 } } - OK
+# 06. V1: Try to create an entity E6 with attr A1 with compound value { "a": 1, "b": { "b": 2 } } - OK
+# 07. V2: Try to create an entity E7 with attr A1 with compound value { "a": 1, "b": { "a": 1, "a": 2} } - see error
+# 08. V1: Try to create an entity E7 with attr A1 with compound value { "a": 1, "b": { "a": 1, "a": 2} } - see error
+#
+
+echo '01. V2: Try to create an entity E1 with attr A1 with compound value { "a": 1, "a": 2 } - see error'
+echo '=================================================================================================='
+payload='{
+  "id": "E1",
+  "A1": {
+    "value": { "a": 1, "a": 2 }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '02. V2: Create an entity E2 with attr A1 with compound value { "a": 1, "b": { "a": 2 } } - OK'
+echo '============================================================================================='
+payload='{
+  "id": "E2",
+  "A1": {
+    "value": { "a": 1, "b": { "a": 2 } }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '03. V2: Try to create an entity E3 with attr A1 with compound value { "a": 1, "b": { "b": 2 } } - OK'
+echo '===================================================================================================='
+payload='{
+  "id": "E3",
+  "A1": {
+    "value": { "a": 1, "b": { "b": 2 } }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '04. V1: Try to create an entity E4 with attr A1 with compound value { "a": 1, "a": 2 } - see error'
+echo '=================================================================================================='
+payload='{
+  "contextElements": [
+    {
+      "id": "E4",
+      "attributes": [
+        {
+          "name": "A1",
+          "value": { "a": 1, "a": 2 }
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+
+echo '05. V1: Create an entity E5 with attr A1 with compound value { "a": 1, "b": { "a": 2 } } - OK'
+echo '============================================================================================='
+payload='{
+  "contextElements": [
+    {
+      "id": "E5",
+      "attributes": [
+        {
+          "name": "A1",
+          "value": { "a": 1, "b": { "a": 2 } }
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo '06. V1: Try to create an entity E6 with attr A1 with compound value { "a": 1, "b": { "b": 2 } } - OK'
+echo '===================================================================================================='
+payload='{
+  "contextElements": [
+    {
+      "id": "E6",
+      "attributes": [
+        {
+          "name": "A1",
+          "value": { "a": 1, "b": { "b": 2 } }
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo '07. V2: Try to create an entity E7 with attr A1 with compound value { "a": 1, "b": { "a": 1, "a": 2} } - see error'
+echo '=================================================================================================================='
+payload='{
+  "id": "E7",
+  "A1": {
+    "value": { "a": 1, "b": { "a": 1, "a": 2 } }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '08. V1: Try to create an entity E7 with attr A1 with compound value { "a": 1, "b": { "a": 1, "a": 2} } - see error'
+echo '=================================================================================================================='
+payload='{
+  "contextElements": [
+    {
+      "id": "E7",
+      "attributes": [
+        {
+          "name": "A1",
+          "value": { "a": 1, "b": { "a": 1, "a": 2 } }
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. V2: Try to create an entity E1 with attr A1 with compound value { "a": 1, "a": 2 } - see error
+==================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 74
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "duplicated tag-name: /a/ in path: /",
+    "error": "BadRequest"
+}
+
+
+02. V2: Create an entity E2 with attr A1 with compound value { "a": 1, "b": { "a": 2 } } - OK
+=============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. V2: Try to create an entity E3 with attr A1 with compound value { "a": 1, "b": { "b": 2 } } - OK
+====================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. V1: Try to create an entity E4 with attr A1 with compound value { "a": 1, "a": 2 } - see error
+==================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 158
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400",
+        "details": "compound value error: duplicated tag-name: /a/ in path: /",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+05. V1: Create an entity E5 with attr A1 with compound value { "a": 1, "b": { "a": 2 } } - OK
+=============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 375
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "",
+                        "value": ""
+                    }
+                ],
+                "id": "E5",
+                "isPattern": "false",
+                "type": ""
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+06. V1: Try to create an entity E6 with attr A1 with compound value { "a": 1, "b": { "b": 2 } } - OK
+====================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 375
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "",
+                        "value": ""
+                    }
+                ],
+                "id": "E6",
+                "isPattern": "false",
+                "type": ""
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+07. V2: Try to create an entity E7 with attr A1 with compound value { "a": 1, "b": { "a": 1, "a": 2} } - see error
+==================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "duplicated tag-name: /a/ in path: /b/",
+    "error": "BadRequest"
+}
+
+
+08. V1: Try to create an entity E7 with attr A1 with compound value { "a": 1, "b": { "a": 1, "a": 2} } - see error
+==================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 159
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400",
+        "details": "compound value error: duplicated tag-name: /a/ in path: /b",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

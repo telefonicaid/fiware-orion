@@ -103,7 +103,7 @@ static bool includedAttribute(const ContextAttribute& attr, const AttributeList&
   // This is the case in which the queryContextRequest doesn't include attributes,
   // so all the attributes are included in the response
   //
-  if (attrsV.size() == 0)
+  if (attrsV.size() == 0 || attrsV.lookup(ALL_ATTRS))
   {
     return true;
   }
@@ -135,8 +135,6 @@ ContextElementResponse::ContextElementResponse
   const mongo::BSONObj&  entityDoc,
   const AttributeList&   attrL,
   bool                   includeEmpty,
-  bool                   includeCreDate,
-  bool                   includeModDate,
   const std::string&     apiVersion
 )
 {
@@ -179,7 +177,7 @@ ContextElementResponse::ContextElementResponse
     std::string mdId  = idPart(attrName);
     ca.type           = getStringFieldF(attr, ENT_ATTRS_TYPE);
 
-    // Skip attribute if the attribute is in the list (or attrL is empty)
+    // Skip attribute if the attribute is in the list (or attrL is empty or includes "*")
     if (!includedAttribute(ca, attrL))
     {
       continue;
@@ -268,7 +266,6 @@ ContextElementResponse::ContextElementResponse
     /* Setting custom metadata (if any) */
     if (attr.hasField(ENT_ATTRS_MD))
     {
-
       BSONObj                mds = getObjectFieldF(attr, ENT_ATTRS_MD);
       std::set<std::string>  mdsSet;
 
@@ -281,21 +278,29 @@ ContextElementResponse::ContextElementResponse
       }
     }
 
+    /* Set creDate and modDate at attribute level */
+    if (attr.hasField(ENT_ATTRS_CREATION_DATE))
+    {
+      caP->creDate = (double) getIntOrLongFieldAsLongF(attr, ENT_ATTRS_CREATION_DATE);
+    }
+
+    if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
+    {
+      caP->modDate = (double) getIntOrLongFieldAsLongF(attr, ENT_ATTRS_MODIFICATION_DATE);
+    }
+
     contextElement.contextAttributeVector.push_back(caP);
   }
 
-  /* creDate and modDate as "virtual" attributes. The entityDoc.hasField(...) part is a safety meassure to prevent entities created with
-   * very old Orion version which didn't implement creation/modification date */
-  if (includeCreDate && entityDoc.hasField(ENT_CREATION_DATE))
+  /* Set creDate and modDate at entity level */
+  if (entityDoc.hasField(ENT_CREATION_DATE))
   {
-    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, (double) getIntOrLongFieldAsLongF(entityDoc, ENT_CREATION_DATE));
-    contextElement.contextAttributeVector.push_back(caP);
+    contextElement.entityId.creDate = (double) getIntOrLongFieldAsLongF(entityDoc, ENT_CREATION_DATE);
   }
 
-  if (includeModDate && entityDoc.hasField(ENT_MODIFICATION_DATE))
+  if (entityDoc.hasField(ENT_MODIFICATION_DATE))
   {
-    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, (double) getIntOrLongFieldAsLongF(entityDoc, ENT_MODIFICATION_DATE));
-    contextElement.contextAttributeVector.push_back(caP);
+    contextElement.entityId.modDate = (double) getIntOrLongFieldAsLongF(entityDoc, ENT_MODIFICATION_DATE);
   }
 }
 

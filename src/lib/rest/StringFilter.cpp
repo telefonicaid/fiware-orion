@@ -1669,6 +1669,14 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     {
       k = ENT_MODIFICATION_DATE;
     }
+    else if (left == itemP->attributeName + "." + ENT_ATTRS_MD "." + NGSI_MD_DATECREATED)
+    {
+      k = std::string(ENT_ATTRS) + "." + itemP->attributeName + "." + ENT_ATTRS_CREATION_DATE;
+    }
+    else if (left == itemP->attributeName + "." + ENT_ATTRS_MD "." + NGSI_MD_DATEMODIFIED)
+    {
+      k = std::string(ENT_ATTRS) + "." + itemP->attributeName + "." + ENT_ATTRS_MODIFICATION_DATE;
+    }
     else
     {
       k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
@@ -1920,10 +1928,11 @@ bool StringFilter::mqMatch(ContextElementResponse* cerP)
   {
     StringFilterItem*  itemP = filters[ix];
     ContextAttribute*  caP   = cerP->contextElement.getAttribute(itemP->attributeName);
-    Metadata*          mdP   = (caP == NULL)? NULL : caP->metadataVector.lookupByName(itemP->metadataName);
 
     if ((itemP->op == SfopExists) || (itemP->op == SfopNotExists))
     {
+
+      Metadata*  mdP = (caP == NULL)? NULL : caP->metadataVector.lookupByName(itemP->metadataName);
 
       if (itemP->compoundPath.size() == 0)
       {
@@ -1950,13 +1959,34 @@ bool StringFilter::mqMatch(ContextElementResponse* cerP)
         }
       }
     }
-    else if (mdP == NULL)
+
+    /* From here, the approach is very similar to the one used in qMatch() function */
+    if (caP == NULL)
     {
-      // Next checkings need an actual metadata to evaluate matching condition. This
-      // "shorcut" checking for NULL will avoid crashes
       return false;
     }
-    else if ((itemP->op == SfopEquals) && (itemP->matchEquals(mdP) == false))
+
+    Metadata*  mdP = NULL;
+    Metadata   md;
+
+    if ((itemP->metadataName == NGSI_MD_DATECREATED) || (itemP->metadataName == NGSI_MD_DATEMODIFIED))
+    {
+      mdP            = &md;
+      md.valueType   = orion::ValueTypeNumber;
+      md.numberValue = (itemP->metadataName == NGSI_MD_DATECREATED)? caP->creDate : caP->modDate;
+    }
+    else if (itemP->op != SfopNotExists)
+    {
+      mdP = caP->metadataVector.lookupByName(itemP->metadataName);
+
+      // If the metadata doesn't exist, no need to go further: filter fails
+      if (mdP == NULL)
+      {
+        return false;
+      }
+    }
+
+    if ((itemP->op == SfopEquals) && (itemP->matchEquals(mdP) == false))
     {
       return false;
     }
@@ -2052,7 +2082,7 @@ bool StringFilter::qMatch(ContextElementResponse* cerP)
     {
       caP            = &ca;
       ca.valueType   = orion::ValueTypeNumber;
-      ca.numberValue = (itemP->left == DATE_CREATED)? cerP->contextElement.creDate : cerP->contextElement.modDate;
+      ca.numberValue = (itemP->left == DATE_CREATED)? cerP->contextElement.entityId.creDate : cerP->contextElement.entityId.modDate;
     }
     else if (itemP->op != SfopNotExists)
     {

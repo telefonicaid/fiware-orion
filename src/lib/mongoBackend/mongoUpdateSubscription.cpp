@@ -202,7 +202,7 @@ static void setEntities(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
   if (subUp.subjectProvided && !subUp.fromNgsiv1)
   {
     // NGSIv1 doesn't allow to change entities,
-    // see https://fiware-orion.readthedocs.io/en/develop/user/updating_regs_and_subs/index.html
+    // see https://fiware-orion.readthedocs.io/en/master/user/updating_regs_and_subs/index.html
     setEntities(subUp, b);
   }
   else
@@ -383,7 +383,7 @@ static void setCondsAndInitialNotify
       // a whole). In addition, NGSIv1 doesn't allow to update notification attributes. Both
       // (entities and notification attributes) are passed in subOrig.
       //
-      // See: https://fiware-orion.readthedocs.io/en/develop/user/updating_regs_and_subs/index.html
+      // See: https://fiware-orion.readthedocs.io/en/master/user/updating_regs_and_subs/index.html
       setCondsAndInitialNotifyNgsiv1(subUp, subOrig, subUp.id, status, httpInfo.url, attrsFormat,
                                      tenant, servicePathV, xauthToken, fiwareCorrelator,
                                      b, notificationDone);

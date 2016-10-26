@@ -28,6 +28,7 @@
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/errorMessages.h"
+#include "rest/uriParamNames.h"
 
 #include "apiTypesV2/Attribute.h"
 #include "rest/ConnectionInfo.h"
@@ -74,7 +75,8 @@ std::string getEntityAttribute
 
   // 01. Fill in QueryContextRequest
   parseDataP->qcr.res.fill(compV[2], type, "false", EntityTypeEmptyOrNotEmpty, "");
-
+  parseDataP->qcr.res.metadataList.fill(ciP->uriParam[URI_PARAM_METADATA]);
+  
 
   // 02. Call standard op postQueryContext
   postQueryContext(ciP, components, compV, parseDataP);

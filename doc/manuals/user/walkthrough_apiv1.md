@@ -8,31 +8,31 @@
     * [Issuing commands to the broker](#issuing-commands-to-the-broker)
 * [Context management using NGSI10](#context-management-using-ngsi10)
     * [NGSI10 standard operations](#ngsi10-standard-operations)
-	  * [Entity Creation](#entity-creation)
-	  * [Query Context operation](#query-context-operation)
-	  * [Update Context elements](#update-context-elements)
-          * [Context Subscriptions](#context-subscriptions)
-	  * [Summary of NGSI10 standard operations URLs](#summary-of-ngsi10-standard-operations-urls)
+	    * [Entity Creation](#entity-creation)
+	    * [Query Context operation](#query-context-operation)
+	    * [Update Context elements](#update-context-elements)
+            * [Context Subscriptions](#context-subscriptions)
+	    * [Summary of NGSI10 standard operations URLs](#summary-of-ngsi10-standard-operations-urls)
     * [NGSI10 convenience operations](#ngsi10-convenience-operations)
-	  * [Convenience Entity Creation](#convenience-entity-creation)
-	  * [Convenience Query Context](#convenience-query-context)
-	  * [Getting all entities](#getting-all-entities)
-	  * [Browsing all types and detailed information on a type](#browsing-all-types-and-detailed-information-on-a-type)
-	  * [Convenience Update Context](#convenience-update-context)
-	  * [Convenience operations for context subscriptions](#convenience-operations-for-context-subscriptions)
-	  * [Summary of NGSI10 convenience operations URLs](#summary-of-ngsi10-convenience-operations-urls)
+	    * [Convenience Entity Creation](#convenience-entity-creation)
+	    * [Convenience Query Context](#convenience-query-context)
+	    * [Getting all entities](#getting-all-entities)
+	    * [Browsing all types and detailed information on a type](#browsing-all-types-and-detailed-information-on-a-type)
+	    * [Convenience Update Context](#convenience-update-context)
+	    * [Convenience operations for context subscriptions](#convenience-operations-for-context-subscriptions)
+	    * [Summary of NGSI10 convenience operations URLs](#summary-of-ngsi10-convenience-operations-urls)
 * [Context availability management using NGSI9](#context-availability-management-using-ngsi9)
     * [NGSI9 standard operations](#ngsi9-standard-operations)
-	  * [Register Context operation](#register-context-operation)
-	  * [Discover Context Availability operation](#discover-context-availability-operation)
-	  * [Context availability subscriptions](#context-availability-subscriptions)
-	  * [Summary of NGSI9 standard operations URLs](#summary-of-ngsi9-standard-operations-urls)
+	    * [Register Context operation](#register-context-operation)
+	    * [Discover Context Availability operation](#discover-context-availability-operation)
+	    * [Context availability subscriptions](#context-availability-subscriptions)
+	    * [Summary of NGSI9 standard operations URLs](#summary-of-ngsi9-standard-operations-urls)
     * [NGSI9 convenience operations](#ngsi9-convenience-operations)
-	  * [Convenience Register Context](#convenience-register-context)
-	  * [Only-type entity registrations using convenience operations](#only-type-entity-registrations-using-convenience-operations)
-	  * [Convenience Discover Context Availability](#convenience-discover-context-availability)
-	  * [Convenience operations for context availability subscriptions](#convenience-operations-for-context-availability-subscriptions)
-	  * [Summary of NGSI9 convenience operations URLs](#summary-of-ngsi9-convenience-operations-urls) 
+	    * [Convenience Register Context](#convenience-register-context)
+	    * [Only-type entity registrations using convenience operations](#only-type-entity-registrations-using-convenience-operations)
+	    * [Convenience Discover Context Availability](#convenience-discover-context-availability)
+	    * [Convenience operations for context availability subscriptions](#convenience-operations-for-context-availability-subscriptions)
+	    * [Summary of NGSI9 convenience operations URLs](#summary-of-ngsi9-convenience-operations-urls) 
 
 ## Introduction
 
@@ -1033,7 +1033,7 @@ Let's examine in detail the different elements included in the payload:
     that update attribute values too frequently. In multi-CB configurations, take
     into account that the last-notification measure is local to each CB node. Although
     each node periodically synchronizes with DB in order to get potencially newer
-    values (more on this [here](perf_tuning.md#subscription-cache) it may happen that
+    values (more on this [here](perf_tuning.md#subscription-cache)) it may happen that
     a particular node has an old value, so throttling is not 100% accurate.
 
 The response corresponding to that request contains a subscription ID (a
