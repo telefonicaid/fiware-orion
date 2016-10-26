@@ -73,7 +73,6 @@ typedef struct ContextAttributeVector
                             const std::vector<std::string>&  attrsFilter,
                             const std::vector<std::string>&  metadataV,
                             bool                             blacklist) const;
-
   std::string        toJsonTypes(void);
 
 } ContextAttributeVector;
