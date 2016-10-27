@@ -8,5 +8,6 @@
 - Fix: avoid unused attribute type detail in NGSIv1 queries (which was making the queries slower) (#2073)
 - Fix: more accurate actionType in notifications (#2549)
 - Fix: over-logging of Runtime Error traces not representing actual error (#2597)
+- Fix: support attributes with double underscore as part of the name (#2453)
 - Fix: GIT_REV_ORION Docker for master branch needs be master
 - Deprecated: dateCreated and dateModified as valid 'options' in NGSIv2 (use 'attrs' instead) (#2455 and #2450)

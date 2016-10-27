@@ -705,11 +705,11 @@ static bool updateAttribute
 {
   actualUpdate = false;
 
-  /* Attributes with metadata ID are stored as <attrName>__<ID> in the attributes embedded document */
+  /* Attributes with metadata ID are stored as <attrName>()<ID> in the attributes embedded document */
   std::string effectiveName = dbDotEncode(caP->name);
   if (caP->getId() != "")
   {
-    effectiveName += "__" + caP->getId();
+    effectiveName += MD_ID_SEPARATOR + caP->getId();
   }
 
   if (isReplace)
@@ -805,7 +805,7 @@ static bool appendAttribute
 
   if (caP->getId() != "")
   {
-    effectiveName += "__" + caP->getId();
+    effectiveName += MD_ID_SEPARATOR + caP->getId();
   }
 
   /* APPEND with existing attribute equals to UPDATE */
@@ -876,12 +876,12 @@ static bool appendAttribute
 */
 static bool legalIdUsage(BSONObj& attrs, ContextAttribute* caP)
 {
-  std::string prefix = caP->name + "__";
+  std::string prefix = caP->name + MD_ID_SEPARATOR;
 
   if (caP->getId() == "")
   {
     /* Attribute attempting to append doesn't have any ID. Thus, no attribute with same name can have ID in attrs,
-     * i.e. no attribute starting with "<attrName>" can at the same time start with "<attrName>__" */
+     * i.e. no attribute starting with "<attrName>" can at the same time start with "<attrName>()" */
     std::set<std::string> attrNames;
     attrs.getFieldNames(attrNames);
 
@@ -899,7 +899,7 @@ static bool legalIdUsage(BSONObj& attrs, ContextAttribute* caP)
   else
   {
     /* Attribute attempting to append has ID. Thus, no attribute with same name cannot have ID in attrs,
-     * i.e. no attribute starting with "<attrName>" can at the same time have a name not starting with "<attrName>__"
+     * i.e. no attribute starting with "<attrName>" can at the same time have a name not starting with "<attrName>()"
      */
     std::set<std::string> attrNames;
 
@@ -963,7 +963,7 @@ static bool legalIdUsage(const ContextAttributeVector& caV)
 *
 * Returns true if an attribute was deleted, false otherwise
 *
-* Attributes with metadata ID are stored as <attrName>__<ID> in the attributes embedded document
+* Attributes with metadata ID are stored as <attrName>()<ID> in the attributes embedded document
 */
 static bool deleteAttribute
 (
@@ -977,7 +977,7 @@ static bool deleteAttribute
 
   if (caP->getId() != "")
   {
-    effectiveName += "__" + caP->getId();
+    effectiveName += MD_ID_SEPARATOR + caP->getId();
   }
 
   if (!attrs.hasField(effectiveName.c_str()))
@@ -2855,7 +2855,7 @@ static bool createEntity
     std::string effectiveName = dbDotEncode(attrsV[ix]->name);
     if (attrId.length() != 0)
     {
-      effectiveName += "__" + attrId;
+      effectiveName += MD_ID_SEPARATOR + attrId;
     }
 
     LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s}",
