@@ -1,1 +1,2 @@
 - Fix: over-logging of Runtime Error traces not representing actual error (#2597)
+- Fix: support attributes with double underscore as part of the name (#2453)
