@@ -63,7 +63,7 @@ int QueueNotifier::start()
 void QueueNotifier::sendNotifyContextRequest
 (
   NotifyContextRequest*            ncr,
-  const std::string&               url,
+  const ngsiv2::HttpInfo&          httpInfo,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
@@ -74,6 +74,26 @@ void QueueNotifier::sendNotifyContextRequest
 )
 {
   ConnectionInfo ci;
+
+
+  // Now, if it is a "custom" notification (with template)
+  // we delegate to parent method, and do not use the pool
+  // of threads. (To be changed in a future version)
+  // This is a workaround for issue #2622
+
+  if (httpInfo.custom && !disableCusNotif)
+  {
+    return Notifier::sendNotifyContextRequest(
+          ncr,
+          httpInfo,
+          tenant,
+          xauthToken,
+          fiwareCorrelator,
+          renderFormat,
+          attrsOrder,
+          metadataFilter,
+          blacklist);
+  }
 
   //
   // FIXME P5: analyze how much of the code of this function is the same as in Notifier::sendNotifyContextRequest
@@ -130,9 +150,9 @@ void QueueNotifier::sendNotifyContextRequest
   std::string  uriPath;
   std::string  protocol;
 
-  if (!parseUrl(url, host, port, uriPath, protocol))
+  if (!parseUrl(httpInfo.url, host, port, uriPath, protocol))
   {
-    std::string details = std::string("sending NotifyContextRequest: malformed URL: '") + url + "'";
+    std::string details = std::string("sending NotifyContextRequest: malformed URL: '") + httpInfo.url + "'";
     alarmMgr.badInput(clientIp, details);
 
     return;
