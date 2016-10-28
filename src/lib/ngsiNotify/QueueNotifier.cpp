@@ -63,7 +63,7 @@ int QueueNotifier::start()
 void QueueNotifier::sendNotifyContextRequest
 (
   NotifyContextRequest*            ncr,
-  const std::string&               url,
+  const ngsiv2::HttpInfo&          httpInfo,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
@@ -130,9 +130,9 @@ void QueueNotifier::sendNotifyContextRequest
   std::string  uriPath;
   std::string  protocol;
 
-  if (!parseUrl(url, host, port, uriPath, protocol))
+  if (!parseUrl(httpInfo.url, host, port, uriPath, protocol))
   {
-    std::string details = std::string("sending NotifyContextRequest: malformed URL: '") + url + "'";
+    std::string details = std::string("sending NotifyContextRequest: malformed URL: '") + httpInfo.url + "'";
     alarmMgr.badInput(clientIp, details);
 
     return;
