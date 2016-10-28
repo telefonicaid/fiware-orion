@@ -11,3 +11,4 @@
 - Fix: support attributes with double underscore as part of the name (#2453)
 - Fix: GIT_REV_ORION Docker for master branch needs be master
 - Deprecated: dateCreated and dateModified as valid 'options' in NGSIv2 (use 'attrs' instead) (#2455 and #2450)
+- Fix: threadpool mode was not actually used, even if -notificationMode is set so; this fix solves the problem for not-custom notifications (partial fix for #2622)
