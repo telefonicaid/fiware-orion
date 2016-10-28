@@ -75,6 +75,26 @@ void QueueNotifier::sendNotifyContextRequest
 {
   ConnectionInfo ci;
 
+
+  // Now, if it is a "custom" notification (with template)
+  // we delegate to parent method, and do not use the pool
+  // of threads. (To be changed in a future version)
+
+  //
+  if (httpInfo.custom && !disableCusNotif)
+  {
+    return Notifier::sendNotifyContextRequest(
+          ncr,
+          httpInfo,
+          tenant,
+          xauthToken,
+          fiwareCorrelator,
+          renderFormat,
+          attrsOrder,
+          metadataFilter,
+          blacklist);
+  }
+
   //
   // FIXME P5: analyze how much of the code of this function is the same as in Notifier::sendNotifyContextRequest
   // and could be refactored to common functions
