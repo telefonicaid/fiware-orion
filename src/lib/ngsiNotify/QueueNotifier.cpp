@@ -79,8 +79,8 @@ void QueueNotifier::sendNotifyContextRequest
   // Now, if it is a "custom" notification (with template)
   // we delegate to parent method, and do not use the pool
   // of threads. (To be changed in a future version)
+  // This is a workaround for issue #2622
 
-  //
   if (httpInfo.custom && !disableCusNotif)
   {
     return Notifier::sendNotifyContextRequest(
