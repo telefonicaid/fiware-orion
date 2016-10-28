@@ -300,8 +300,8 @@ static void prepareDatabaseWithAttributeIds(void) {
     BSONObj en1 = BSON("_id" << BSON("id" << "E10" << "type" << "T") <<
                        "attrNames" << BSON_ARRAY("A1" << "A2") <<
                        "attrs" << BSON(
-                          "A1__ID1" << BSON("type" << "TA1" << "value" << "A") <<
-                          "A1__ID2" << BSON("type" << "TA1" << "value" << "B") <<
+                          "A1()ID1" << BSON("type" << "TA1" << "value" << "A") <<
+                          "A1()ID2" << BSON("type" << "TA1" << "value" << "B") <<
                           "A2"      << BSON("type" << "TA2" << "value" << "D")
                           )
                       );
@@ -309,8 +309,8 @@ static void prepareDatabaseWithAttributeIds(void) {
     BSONObj en2 = BSON("_id" << BSON("id" << "E11" << "type" << "T") <<
                        "attrNames" << BSON_ARRAY("A1" << "A2") <<
                        "attrs" << BSON(
-                          "A1__ID1" << BSON("type" << "TA1" << "value" << "E") <<
-                          "A1__ID2" << BSON("type" << "TA1" << "value" << "F") <<
+                          "A1()ID1" << BSON("type" << "TA1" << "value" << "E") <<
+                          "A1()ID2" << BSON("type" << "TA1" << "value" << "F") <<
                           "A2"      << BSON("type" << "TA2" << "value" << "H")
                           )
                       );
