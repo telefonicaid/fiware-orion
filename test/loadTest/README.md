@@ -78,12 +78,12 @@ Example:
 ./jmeter.sh -n -t orion_updates_ngsiv2.jmx -JHOST=10.10.10.1 -JTHREADS=100 -JTEST_TIME=60 -JATTRIBUTES=3
 ```
 
-**orion_soak_test_ngsiv1.jm**: script used to soak tests using NGSI v1. This script only use one host.
+**orion_soak_test_ngsiv1.jmx** and **orion_soak_test_ngsiv1_ngsiv2.jmx**: scripts used to soak tests using NGSI v1 or NGSI v2. This script only use one host.
 Soak Testing is a type of performance test that verifies a system's stability and performance characteristics over an extended period of time (three days in this case).
 Script flow using NGSI v1:
-  - One thread that creates a ONCHANGE subscription and returns the total of subcriptions each 30 secs with a random "notifyConditions" attribute (between A00 and A20).
+  - One thread that creates a subscription and returns the total of subcriptions each 30 secs with a random "notifyConditions" attribute (between A00 and A20).
   - One thread that get subcriptionIds and remove all subcriptions each 7200s (2hrs).
-  - N threads that send random updates (APPEND) (between E0000 and E9999) with random attributes name (between A00 and A20) and try to get values of a  random entity (between E0000 and E9999) if it does exist. 
+  - N threads that send random entity updates (between E0000 and E9999) with random attributes name (between A00 and A20) and try to get values of a  random entity (between E0000 and E9999) if it does exist. 
  
 Properties:
 ```
@@ -99,12 +99,12 @@ Properties:
 		* TIME_INSTANT        - if true is appended a "timeInstant" attribute in each entity (default: true)
 		* RANDOM_TIME_INSTANT - if this is greater than 0 is generated a string of N random characters, else it is generated a date with zulu format. (default: 0)
 		* SUBSC_REFERENCE     - host  and port to receive notifications (mock) (default: http//localhost:8090/notify)
-		* SUBSC_DURATION      - Duration of the subscriptions in seconds (default: 60)		
+		* SUBSC_DURATION      - Duration of the subscriptions in seconds (default: 60)	
+		* VERSION_PERCENTAGE  - determine the version percentage, where "0" is V1 and "100" es V2 (only used in orion_soak_test_ngsiv1_ngsiv2.jmx script)	
 ```
 
 Report files (listeners):
 ```
-  * tps_<date>.csv: this graph shows the number of transactions per second for each sampler (jp@gc - Transactions per Second).
   * reports_<date>.csv: which displays values for all request made during the test and an individual row for each named request in your test(Aggregate Report).
   * perfmon_<date>.csv: Some metric types (CPU, Memory, TCP) are show in graphic (jp@gc - Perfom Metrics Collector)
   * errors__<date>.csv:  shows a tree of all sample responses, allowing you to view the response for any sample (only errors are stored) (View Results Tree).
@@ -112,8 +112,9 @@ Report files (listeners):
 
 Example:
 ```
- ./jmeter -n  -t orion_soak_test_ngsiv1.jmx -JHOST=localhost -JTEST_TIME=259200 -JTHREADS=100 -JSERVICE="soak_test" -JATTRIBUTES=5 -JSUBSC_DURATION=8000
-```
+ ./jmeter.sh -n -t orion_soak_test_ngsiv1.jmx -JHOST=localhost -JTEST_TIME=259200 -JTHREADS=100 -JSERVICE="soak_test" -JATTRIBUTES=5 -JSUBSC_DURATION=8000
+ ./jmeter.sh -n -t orion_soak_test_ngsiv1_ngsiv2.jmx -JHOST=localhost -JTEST_TIME=172800 -JTHREADS=100 -JSERVICE="soak_test" -JATTRIBUTES=15 -JSUBSC_REFERENCE="http://localhost:8090/notify" -JSUBSC_DURATION=8000 -JVERSION_PERCENTAGE=100`
+``
 
 
 
