@@ -53,7 +53,7 @@ public:
   QueueNotifier(size_t queueSize, int numThreads);
 
   void sendNotifyContextRequest(NotifyContextRequest*            ncr,
-                                const std::string&               url,
+                                const ngsiv2::HttpInfo&          httpInfo,
                                 const std::string&               tenant,
                                 const std::string&               xauthToken,
                                 const std::string&               fiwareCorrelator,
