@@ -1878,7 +1878,7 @@ AttributeList subToAttributeList(const BSONObj& sub)
 *
 * setOnSubscriptionMetadata -
 *
-* FIXME #910: disabled by the moment, maybe removed at the end
+* FIXME #920: disabled by the moment, maybe removed at the end
 */
 static void setOnSubscriptionMetadata(ContextElementResponseVector* cerVP)
 {
@@ -1961,7 +1961,7 @@ static bool processOnChangeConditionForSubscription
   rawCerV.release();
 
 #if 0
-  // FIXME #910: disabled by the moment, maybe removed at the end
+  // FIXME #920: disabled by the moment, maybe removed at the end
   /* Append notification metadata */
   if (metadataFlags)
   {
