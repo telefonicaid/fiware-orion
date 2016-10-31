@@ -164,6 +164,22 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Mon Oct 31 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.5.0-1
+- Add: Added URI parameter metadata=metadata-name-list for NGSIv2 retrieve requests (#2544)
+- Add: Added 'metadata' as part of the payload for POST /v2/op/query (#2544)
+- Add: implement 'attrs' (and 'attributes' for POST /v2/op/query) in the same way than 'metadata', including special meaning of '*' (#2455)
+- Add: metadata timestamps (dateCreated + dateModified) for attributes (as for entities), including filtering capabilities (#876)
+- Add: new value for URI param 'options' (options=noAttrDetail) for NGSIv2 queries to exclude attribute detail, making the query faster (#2073) 
+- Fix: wrong type in previousValue metadata for notifications triggered by PUT /v2/entities/{id}/attrs/{name}/value (#2553)
+- Fix: giving a semaphore in case of mongo exception, which was causing the broker to be unable to serve requests involving the database, and possibly even to crash due to lack of resources (#2571)
+- Fix: avoid unused attribute type detail in NGSIv1 queries (which was making the queries slower) (#2073)
+- Fix: more accurate actionType in notifications (#2549)
+- Fix: over-logging of Runtime Error traces not representing actual error (#2597)
+- Fix: support attributes with double underscore as part of the name (#2453)
+- Fix: GIT_REV_ORION Docker for master branch needs be master
+- Deprecated: dateCreated and dateModified as valid 'options' in NGSIv2 (use 'attrs' instead) (#2455 and #2450)
+- Fix: threadpool mode was not actually used, even if -notificationMode is set so; this fix solves the problem for not-custom notifications (partial fix for #2622)
+
 * Fri Sep 30 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.4.0-1
 - Add: notification metadata previousValue and actionType (except 'delete') (#2507)
 - Add: filtering metadata in notifications (#2507)
