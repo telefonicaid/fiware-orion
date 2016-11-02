@@ -550,11 +550,6 @@ function brokerStart()
     traceLevels=0-255
   fi
 
-  if [ "$ipVersion" == "" ]
-  then
-    ipVersion="both"
-  fi
-
   localBrokerStop $role
   localBrokerStart $role $traceLevels $ipVersion $xParams
 }
