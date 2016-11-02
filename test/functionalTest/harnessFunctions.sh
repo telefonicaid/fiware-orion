@@ -519,7 +519,7 @@ function brokerStart()
   shift
 
   # Check for --noCache and --cache options in 'extraParams'
-  xParams=""
+  xParams=" -notificationMode threadpool:200:20 "
   while [ "$#" != 0 ]
   do
     if   [ "$1" == "--noCache" ];            then noCache=ON;
@@ -548,6 +548,11 @@ function brokerStart()
   if [ "$traceLevels" == "" ]
   then
     traceLevels=0-255
+  fi
+
+  if [ "$ipVersion" == "" ]
+  then
+    ipVersion="both"
   fi
 
   localBrokerStop $role
