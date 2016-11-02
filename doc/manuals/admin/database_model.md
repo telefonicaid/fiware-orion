@@ -1,7 +1,7 @@
 This page has been moved!
 
 In order to reach the new page, just change `develop` to `master` in the URL. The following link
-should send you to the right place: [click here](http://fiware-orion.readthedocs.io/en/master/database_model/index.html).
+should send you to the right place: [click here](http://fiware-orion.readthedocs.io/en/master/admin/database_model/index.html).
 
 This is due to a change in our main development branch at github repository (from `develop` to `master`), so
 old references to develop are now obsolete. Unfortunatelly, ReadTheDocs cannot implement automatic redirect
