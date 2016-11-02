@@ -1,16 +1,11 @@
-# Mixing standard and convenience operations
+This page has been moved!
 
-You can mix standard and convenience operations 
-without any problem. Note that the set of URLs used by standard
-operations
-([NGSI10](walkthrough_apiv1.md#summary-of-ngsi10-standard-operations-urls) and
-[NGSI9](walkthrough_apiv1.md#summary-of-ngsi9-standard-operations-urls)) and the
-set of URLs used by convenience operations
-([NGSI10](walkthrough_apiv1.md#summary-of-ngsi10-standard-operations-url) and
-[NGSI9](walkthrough_apiv1.md#summary-of-ngsi9-standard-operations-urls)) are
-orthogonal.
+In order to reach the new page, just change `develop` to `master` in the URL. The following link
+should send you to the right place: [click here](http://fiware-orion.readthedocs.io/en/master/user/std_conv_mix/index.html).
 
-However, take into account some convenience operations don't allow to
-specify any type for entities nor for attributes, so the rules described
-in [using empty types section](empty_types.md#using-empty-types) apply.
+This is due to a change in our main development branch at github repository (from `develop` to `master`), so
+old references to develop are now obsolete. Unfortunatelly, ReadTheDocs cannot implement automatic redirect
+for this case (or we don't know how to do it :), see [this issue](https://github.com/rtfd/readthedocs.org/issues/2444)
+opened at ReadTheDocs github repository).
 
+Sorry for the inconveniences.

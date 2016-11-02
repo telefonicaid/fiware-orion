@@ -1,40 +1,11 @@
-# Using empty types
+This page has been moved!
 
-You can use empty types in entities in NGSI9/NGSI10 operations. In fact,
-convenience operations implicitly use empty types in this way by default
-You can use the `/type/<type>/id/<id>` pattern instead of `<id>` in
-convenience operations URLs to specify a type).
+In order to reach the new page, just change `develop` to `master` in the URL. The following link
+should send you to the right place: [click here](http://fiware-orion.readthedocs.io/en/master/user/empty_types/index.html).
 
-Moreover, you can use empty entity types in discover context
-availability or query context operations. In this case, the absence of
-type in the query is interpreted as "any type".
+This is due to a change in our main development branch at github repository (from `develop` to `master`), so
+old references to develop are now obsolete. Unfortunatelly, ReadTheDocs cannot implement automatic redirect
+for this case (or we don't know how to do it :), see [this issue](https://github.com/rtfd/readthedocs.org/issues/2444)
+opened at ReadTheDocs github repository).
 
-For example, let's consider having the following context in Orion
-Context Broker:
-
--   Entity 1:
-    -   ID: Room1
-    -   Type: Room
--   Entity 2:
-    -   ID: Room1
-    -   Type: Space
-
-A discoveryContextAvailability/querycontext using:
-
-```
-  ...
-  "entities": [
-      {
-          "type": "",
-          "isPattern": "false",
-          "id": "Room1"
-      }
-  ]
-  ...
-```
-
-will match both Entity 1 and Entity 2.
-
-Regarding attributes, they can be created without type in updateContext
-APPEND. If attribute type is left empty in subsequent updateContext UPDATEs, then
-the type is not updated and attribute keeps its previous type.
+Sorry for the inconveniences.
