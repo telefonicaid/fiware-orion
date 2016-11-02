@@ -519,7 +519,7 @@ function brokerStart()
   shift
 
   # Check for --noCache and --cache options in 'extraParams'
-  xParams=" -notificationMode threadpool:200:20 "
+  xParams=""
   while [ "$#" != 0 ]
   do
     if   [ "$1" == "--noCache" ];            then noCache=ON;
