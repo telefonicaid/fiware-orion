@@ -197,7 +197,7 @@ file in the same directory that contains the “steps” directory.
     
  Properties used by listeners
 - listeners
-    *  LISTENER_NOTIF: listener host used to notfications
+    *  LISTENER_NOTIF: listener host used to notify
 
 
 ## Actions pre-defined in Feature Descriptions (Pre and/or Post Actions)
@@ -393,7 +393,7 @@ The Context Broker must start with "DEBUG" level in "CB_EXTRA_OPS" field into pr
           | metadatas_type      | "alarm"                             |
           | metadatas_value     | "default"                           |
         ```             
-  - if "attr_value" has "timestamp in last minutes" as value is generated a timestamp with N last minutes of current timestamp
+  - if "attr_value" has "timestamp in last minutes=N" as value then a timestamp with N last minutes of current timestamp is generated
        
   Logs:     
   - If don´t want verify the value of something trace in log, use `ignored` as value.
