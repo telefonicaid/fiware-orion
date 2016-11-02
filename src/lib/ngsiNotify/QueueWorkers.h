@@ -31,10 +31,10 @@
 class QueueWorkers
 {
 public:
-  QueueWorkers(SyncQOverflow<SenderThreadParams*> *pQ, int numThreads): pQueue(pQ), numberOfThreads(numThreads) {}
+  QueueWorkers(SyncQOverflow<std::vector<SenderThreadParams*>*> *pQ, int numThreads): pQueue(pQ), numberOfThreads(numThreads) {}
   int start();
 private:
-    SyncQOverflow<SenderThreadParams*> *pQueue;
+    SyncQOverflow<std::vector<SenderThreadParams*>*> *pQueue;
     int numberOfThreads;
 };
 

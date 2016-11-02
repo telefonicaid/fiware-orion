@@ -22,6 +22,9 @@
 *
 * Author: Fermin Galan
 */
+
+#include <vector>
+
 #include <curl/curl.h>
 
 #include "logMsg/logMsg.h"
@@ -54,416 +57,34 @@ Notifier::~Notifier (void)
 }
 
 
-
-/* ****************************************************************************
-*
-* templateNotify - 
-*
-* This function performs the necessary substitutions according to the template of
-* subscription to form the desired notification and send it to the endpoint specified
-* in the subscription.
-* 
-* 
-*/
-static bool templateNotify
-(
-  const SubscriptionId&            subscriptionId,
-  const ContextElement&            ce,
-  const ngsiv2::HttpInfo&          httpInfo,
-  const std::string&               tenant,
-  const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator,
-  RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsOrder,
-  const std::vector<std::string>&  metadataFilter
-)
-{
-  Verb                                verb = httpInfo.verb;
-  std::string                         method;
-  std::string                         url;
-  std::string                         payload;
-  std::string                         mimeType;
-  std::map<std::string, std::string>  qs;
-  std::map<std::string, std::string>  headers;
-
-
-  //
-  // 1. Verb/Method
-  //
-  if (verb == NOVERB)
-  {
-    // Default verb/method is POST
-    verb = POST;
-  }
-  method = verbName(verb);
-
-
-  //
-  // 2. URL
-  //
-  macroSubstitute(&url, httpInfo.url, ce);
-
-
-  //
-  // 3. Payload
-  //
-  if (httpInfo.payload == "")
-  {
-    NotifyContextRequest   ncr;
-    ContextElementResponse cer;
-    
-    cer.contextElement = ce;
-    ncr.subscriptionId = subscriptionId;
-    ncr.contextElementResponseVector.push_back(&cer);
-    payload  = ncr.toJson(renderFormat, attrsOrder, metadataFilter);
-    mimeType = "application/json";
-  }
-  else
-  {
-    macroSubstitute(&payload, httpInfo.payload, ce);
-    char* pload  = curl_unescape(payload.c_str(), payload.length());
-    payload      = pload;
-    renderFormat = NGSI_V2_CUSTOM;
-    mimeType     = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
-    free(pload);
-  }
-
-
-  //
-  // 4. URI Params (Query Strings)
-  //
-  for (std::map<std::string, std::string>::const_iterator it = httpInfo.qs.begin(); it != httpInfo.qs.end(); ++it)
-  {
-    std::string key   = it->first;
-    std::string value = it->second;
-
-    macroSubstitute(&key,   it->first, ce);
-    macroSubstitute(&value, it->second, ce);
-    if ((value == "") || (key == ""))
-    {
-      // To avoid e.g '?a=&b=&c='
-      continue;
-    }
-    qs[key] = value;
-  }
-
-
-  //
-  // 5. HTTP Headers
-  //
-  for (std::map<std::string, std::string>::const_iterator it = httpInfo.headers.begin(); it != httpInfo.headers.end(); ++it)
-  {
-    std::string key   = it->first;
-    std::string value = it->second;
-
-    macroSubstitute(&key,   it->first, ce);
-    macroSubstitute(&value, it->second, ce);
-
-    if (key == "")
-    {
-      // To avoid empty header name
-      continue;
-    }
-
-    headers[key] = value;
-  }
-
-
-  //
-  // 6. Split URI in protocol, host, port and path
-  //
-  std::string  protocol;
-  std::string  host;
-  int          port;
-  std::string  uriPath;
-
-  if (!parseUrl(url, host, port, uriPath, protocol))
-  {
-    LM_E(("Runtime Error (not sending NotifyContextRequest: malformed URL: '%s')", httpInfo.url.c_str()));
-    return false;
-  }
-
-
-  //
-  // 7. Add URI params from template to uriPath
-  //
-  std::string  uri = uriPath;
-
-  if (qs.size() != 0)
-  {
-    uri += "?";
-
-    int ix = 0;
-    for (std::map<std::string, std::string>::iterator it = qs.begin(); it != qs.end(); ++it)
-    {
-      if (ix != 0)
-      {
-        uri += "&";
-      }
-
-      uri += it->first + "=" + it->second;
-      ++ix;
-    }
-  }
-
-
-  //
-  // 8. Send the request
-  //
-  //    NOTE: the HTTP headers are sent to httpRequestSend via parameter 'extraHeaders'
-  //
-  std::string  out;
-  int          r;
-
-  r = httpRequestSend(host,
-                      port,
-                      protocol,
-                      method,
-                      tenant,
-                      ce.entityId.servicePath,
-                      xauthToken,
-                      uri,
-                      mimeType,
-                      payload,
-                      fiwareCorrelator,
-                      renderFormatToString(renderFormat),
-                      true,                // Use Rush if CLI '--rush' allows it
-                      true,                // wait for response
-                      &out,
-                      headers,
-                      "application/json",  // Accept Format
-                      -1);                 // Timeout in milliseconds, depends on CLI '-httpTimeout'
-
-  if (r == 0)
-  {
-    statisticsUpdate(NotifyContextSent, JSON);
-    alarmMgr.notificationErrorReset(url);
-    return true;
-  }
-
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
-* NotificationAsTemplateParams - 
-*/
-typedef struct NotificationAsTemplateParams
-{
-  NotifyContextRequest*            ncrP;
-  ngsiv2::HttpInfo                 httpInfo;
-  std::string                      tenant;
-  std::string                      xauthToken;
-  std::string                      fiwareCorrelator;
-  RenderFormat                     renderFormat;
-  std::vector<std::string>         attrsOrder;
-  std::vector<std::string>         metadataFilter;
-} NotificationAsTemplateParams;
-
-
-
-/* ****************************************************************************
-*
-* sendNotifyContextRequestAsPerTemplate -
-*
-* This function splits the contextElementResponseVector for the notification
-* into N notifications, one per item in the vector.
-* This is done like this as otherwise the substitutions in the template would
-* not be possible.
-*
-* Note as well that sendNotifyContextRequestAsPerTemplate runs in a separate thread and all
-* N notifications are sent in a serialized manner, awaiting an ACK from the notification-receiver
-* before continuing with the next notification.
-* Actually, awaiting an ACK or a timeout (which is 5 seconds by default and configurable using the CLI
-* option '-httpTimeout').
-*/
-void* sendNotifyContextRequestAsPerTemplate(void* p)
-{
-  NotificationAsTemplateParams* paramP = (NotificationAsTemplateParams*) p;
-
-  for (unsigned int ix = 0; ix < paramP->ncrP->contextElementResponseVector.size(); ++ix)
-  {
-    templateNotify(paramP->ncrP->subscriptionId,
-                   paramP->ncrP->contextElementResponseVector[ix]->contextElement,
-                   paramP->httpInfo,
-                   paramP->tenant,
-                   paramP->xauthToken,
-                   paramP->fiwareCorrelator,
-                   paramP->renderFormat,
-                   paramP->attrsOrder,
-                   paramP->metadataFilter);
-  }
-
-  paramP->ncrP->release();
-  delete paramP->ncrP;
-  delete paramP;
-
-  return NULL;
-}
-
-
-
 /* ****************************************************************************
 *
 * Notifier::sendNotifyContextRequest -
 */
 void Notifier::sendNotifyContextRequest
 (
-  NotifyContextRequest*            ncrP,
-  const ngsiv2::HttpInfo&          httpInfo,
-  const std::string&               tenant,
-  const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator,
-  RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsOrder,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             blackList
-)
+    NotifyContextRequest*            ncrP,
+    const ngsiv2::HttpInfo&          httpInfo,
+    const std::string&               tenant,
+    const std::string&               xauthToken,
+    const std::string&               fiwareCorrelator,
+    RenderFormat                     renderFormat,
+    const std::vector<std::string>&  attrsOrder,
+    const std::vector<std::string>&  metadataFilter,
+    bool                             blackList
+    )
 {
-    ConnectionInfo  ci;
-    Verb            verb = httpInfo.verb;
 
-    if ((verb == NOVERB) || (verb == UNKNOWNVERB) || disableCusNotif)
-    {
-      // Default verb/method (or the one in case of disabled custom notifications) is POST
-      verb = POST;
-    }
+  pthread_t                         tid;
+  std::vector<SenderThreadParams*>  *paramsV = Notifier::buildSenderParams(ncrP, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blackList);
 
-    //
-    // If any of the 'template parameters' is used by the subscripion, then it is not a question of an ordinary notification but one using templates.
-    // Ordinary notifications are simply sent, all of it as one message.
-    //
-    // Notifications for subscriptions using templates are more complex:
-    //   - if there is more than one entity for the notification, split into N notifications, one per entity
-    //   - if 'url' contains substitution keys, substitute the keys for their current values
-    //   - if 'qs' contains query strings, add this to 'url', with the proper substitutions done
-    //   - if 'headers' is non-empty, perform eventual substitutions and make sure the information is added as HTTP headers for the notification
-    //   - if 'payload' is given, use that string as template instead of the default payload string, substituting all fields that are to be substituted
-    //   - if 'method' is given, then a custom HTTP method is used (instead of POST, which is default)
-    //
-    // Redirect to the method sendNotifyContextRequestAsPerTemplate() when 'httpInfo.custom' is TRUE.
-    // 'httpInfo.custom' is FALSE by default and set to TRUE by the json parser.
-    //
-    //
-    // Note that disableCusNotif (taken from CLI) could disable custom notifications and force to use regular ones
-    //
-    if (httpInfo.custom && !disableCusNotif)
-    {
-      NotificationAsTemplateParams* paramP = new NotificationAsTemplateParams();
-
-      paramP->ncrP             = ncrP->clone();
-      paramP->httpInfo         = httpInfo;
-      paramP->tenant           = tenant;
-      paramP->xauthToken       = xauthToken;
-      paramP->fiwareCorrelator = fiwareCorrelator;
-      paramP->renderFormat     = renderFormat;
-      paramP->attrsOrder       = attrsOrder;
-      paramP->metadataFilter   = metadataFilter;
-
-      pthread_t  tid;
-      int        r = pthread_create(&tid, NULL, sendNotifyContextRequestAsPerTemplate, (void*) paramP);
-
-      if (r != 0)
-      {
-        delete paramP;
-        LM_E(("Runtime Error (error creating thread for notifications: %d)", r));
-        return;
-      }
-
-      pthread_detach(tid);
-      return;
-    }
-
-
-    //
-    // Creating the value of the Fiware-ServicePath HTTP header.
-    // This is a comma-separated list of the service-paths in the same order as the entities come in the payload
-    //
-    std::string spathList;
-    bool        atLeastOneNotDefault = false;
-
-    for (unsigned int ix = 0; ix < ncrP->contextElementResponseVector.size(); ++ix)
-    {
-      EntityId* eP = &ncrP->contextElementResponseVector[ix]->contextElement.entityId;
-
-      if (spathList != "")
-      {
-        spathList += ",";
-      }
-      spathList += eP->servicePath;
-      atLeastOneNotDefault = atLeastOneNotDefault || (eP->servicePath != "/");
-    }
-
-    //
-    // FIXME P8: the stuff about atLeastOneNotDefault was added after PR #729, which makes "/" the default servicePath in
-    // request not having that header. However, this causes as side-effect that a
-    // "Fiware-ServicePath: /" or "Fiware-ServicePath: /,/" header is added in notifications, thus breaking several tests harness.
-    // Given that the "clean" implementation of Fiware-ServicePath propagation will be implemented
-    // soon (it has been scheduled for version 0.19.0, see https://github.com/telefonicaid/fiware-orion/issues/714)
-    // we introduce the atLeastOneNotDefault hack. Once #714 gets implemented,
-    // this FIXME will be removed (and all the test harness adjusted, if needed)
-    //
-    if (!atLeastOneNotDefault)
-    {
-      spathList = "";
-    }
-    
-    ci.outMimeType = JSON;
-
-    std::string payloadString;
-    if (renderFormat == NGSI_V1_LEGACY)
-    {
-      payloadString = ncrP->render(&ci, NotifyContext, "");
-    }
-    else
-    {
-      payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
-    }
-
-    /* Parse URL */
-    std::string  host;
-    int          port;
-    std::string  uriPath;
-    std::string  protocol;
-
-    if (!parseUrl(httpInfo.url, host, port, uriPath, protocol))
-    {
-      LM_E(("Runtime Error (not sending NotifyContextRequest: malformed URL: '%s')", httpInfo.url.c_str()));
-      return;
-    }
-
-    /* Set Content-Type */
-    std::string content_type = "application/json";
-
-    /* Send the message (no wait for response), in a separate thread to avoid blocking */
-    pthread_t            tid;
-    SenderThreadParams*  params = new SenderThreadParams();
-
-    params->ip               = host;
-    params->port             = port;
-    params->protocol         = protocol;
-    params->verb             = verbName(verb);
-    params->tenant           = tenant;
-    params->servicePath      = spathList;
-    params->xauthToken       = xauthToken;
-    params->resource         = uriPath;
-    params->content_type     = content_type;
-    params->content          = payloadString;
-    params->mimeType         = JSON;
-    params->renderFormat     = renderFormatToString(renderFormat);
-    params->fiwareCorrelator = fiwareCorrelator;
-
-    strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
-
-    int ret = pthread_create(&tid, NULL, startSenderThread, params);
-    if (ret != 0)
-    {
-      LM_E(("Runtime Error (error creating thread: %d)", ret));
-      return;
-    }
-    pthread_detach(tid);
+  int ret = pthread_create(&tid, NULL, startSenderThread, paramsV);
+  if (ret != 0)
+  {
+    LM_E(("Runtime Error (error creating thread: %d)", ret));
+    return;
+  }
+  pthread_detach(tid);
 }
 
 
@@ -522,7 +143,10 @@ void Notifier::sendNotifyContextAvailabilityRequest
 
     strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
-    int ret = pthread_create(&tid, NULL, startSenderThread, params);
+    std::vector<SenderThreadParams*>* paramsV = new std::vector<SenderThreadParams*>;
+    paramsV->push_back(params);
+
+    int ret = pthread_create(&tid, NULL, startSenderThread, paramsV);
     if (ret != 0)
     {
       LM_E(("Runtime Error (error creating thread: %d)", ret));
@@ -530,3 +154,338 @@ void Notifier::sendNotifyContextAvailabilityRequest
     }
     pthread_detach(tid);
 }
+
+
+
+
+/* ****************************************************************************
+*
+* buildSenderParamsFromTemplate -
+*
+* This function performs the necessary substitutions according to the template of
+* subscription to form the desired notification and send it to the endpoint specified
+* in the subscription.
+*
+*
+*/
+static std::vector<SenderThreadParams*>* buildSenderParamsVectorFromTemplate
+(
+    const SubscriptionId&                subscriptionId,
+    const ContextElementResponseVector&  cv,
+    const ngsiv2::HttpInfo&              httpInfo,
+    const std::string&                   tenant,
+    const std::string&                   xauthToken,
+    const std::string&                   fiwareCorrelator,
+    RenderFormat                         renderFormat,
+    const std::vector<std::string>&      attrsOrder,
+    const std::vector<std::string>&      metadataFilter
+    )
+{
+
+  std::vector<SenderThreadParams*>*   paramsV;
+
+
+  paramsV = new std::vector<SenderThreadParams*>;
+
+  for (unsigned ix = 0; ix < cv.size(); ix++)
+  {
+    Verb                                verb    = httpInfo.verb;
+    std::string                         method;
+    std::string                         url;
+    std::string                         payload;
+    std::string                         mimeType;
+    std::map<std::string, std::string>  qs;
+    std::map<std::string, std::string>  headers;
+    const ContextElement&               ce      = cv[ix]->contextElement;
+
+    //
+    // 1. Verb/Method
+    //
+    if (verb == NOVERB)
+    {
+      // Default verb/method is POST
+      verb = POST;
+    }
+    method = verbName(verb);
+
+
+    //
+    // 2. URL
+    //
+    macroSubstitute(&url, httpInfo.url, ce);
+
+
+    //
+    // 3. Payload
+    //
+
+    if (httpInfo.payload == "")
+    {
+      NotifyContextRequest   ncr;
+      ContextElementResponse cer;
+
+      cer.contextElement = ce;
+      ncr.subscriptionId = subscriptionId;
+      ncr.contextElementResponseVector.push_back(&cer);
+      payload  = ncr.toJson(renderFormat, attrsOrder, metadataFilter);
+      mimeType = "application/json";
+    }
+    else
+    {
+      macroSubstitute(&payload, httpInfo.payload, ce);
+      char* pload  = curl_unescape(payload.c_str(), payload.length());
+      payload      = std::string(pload);
+      renderFormat = NGSI_V2_CUSTOM;
+      mimeType     = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
+      free(pload);
+    }
+
+
+    //
+    // 4. URI Params (Query Strings)
+    //
+    for (std::map<std::string, std::string>::const_iterator it = httpInfo.qs.begin(); it != httpInfo.qs.end(); ++it)
+    {
+      std::string key   = it->first;
+      std::string value = it->second;
+
+      macroSubstitute(&key,   it->first, ce);
+      macroSubstitute(&value, it->second, ce);
+      if ((value == "") || (key == ""))
+      {
+        // To avoid e.g '?a=&b=&c='
+        continue;
+      }
+      qs[key] = value;
+    }
+
+
+    //
+    // 5. HTTP Headers
+    //
+    for (std::map<std::string, std::string>::const_iterator it = httpInfo.headers.begin(); it != httpInfo.headers.end(); ++it)
+    {
+      std::string key   = it->first;
+      std::string value = it->second;
+
+      macroSubstitute(&key,   it->first, ce);
+      macroSubstitute(&value, it->second, ce);
+
+      if (key == "")
+      {
+        // To avoid empty header name
+        continue;
+      }
+
+      headers[key] = value;
+    }
+
+
+    //
+    // 6. Split URI in protocol, host, port and path
+    //
+    std::string  protocol;
+    std::string  host;
+    int          port;
+    std::string  uriPath;
+
+    if (!parseUrl(url, host, port, uriPath, protocol))
+    {
+      LM_E(("Runtime Error (not sending NotifyContextRequest: malformed URL: '%s')", httpInfo.url.c_str()));
+      return paramsV;  //empty vector
+    }
+
+
+    //
+    // 7. Add URI params from template to uriPath
+    //
+    std::string  uri = uriPath;
+
+    if (qs.size() != 0)
+    {
+      uri += "?";
+
+      int ix = 0;
+      for (std::map<std::string, std::string>::iterator it = qs.begin(); it != qs.end(); ++it)
+      {
+        if (ix != 0)
+        {
+          uri += "&";
+        }
+
+        uri += it->first + "=" + it->second;
+        ++ix;
+      }
+    }
+
+
+    SenderThreadParams *params = new SenderThreadParams();
+
+    params->ip               = host;
+    params->port             = port;
+    params->protocol         = protocol;
+    params->verb             = method;
+    params->tenant           = tenant;
+    params->servicePath      = ce.entityId.servicePath;
+    params->xauthToken       = xauthToken;
+    params->resource         = uri;
+    params->content_type     = mimeType;
+    params->content          = payload;
+    params->mimeType         = JSON;
+    params->renderFormat     = renderFormatToString(renderFormat);
+    params->fiwareCorrelator = fiwareCorrelator;
+    params->extraHeaders     = headers;
+
+    paramsV->push_back(params);
+  }
+
+  return paramsV;
+}
+
+
+/* ****************************************************************************
+*
+* Notifier::buildSenderParams -
+*/
+std::vector<SenderThreadParams*>* Notifier::buildSenderParams
+(
+  NotifyContextRequest*            ncrP,
+  const ngsiv2::HttpInfo&          httpInfo,
+  const std::string&               tenant,
+  const std::string&               xauthToken,
+  const std::string&               fiwareCorrelator,
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsOrder,
+  const std::vector<std::string>&  metadataFilter,
+  bool                             blackList
+)
+{
+    ConnectionInfo                    ci;
+    Verb                              verb = httpInfo.verb;
+    std::vector<SenderThreadParams*>* paramsV = new std::vector<SenderThreadParams*>();
+
+
+    if ((verb == NOVERB) || (verb == UNKNOWNVERB) || disableCusNotif)
+    {
+      // Default verb/method (or the one in case of disabled custom notifications) is POST
+      verb = POST;
+    }
+
+    //
+    // If any of the 'template parameters' is used by the subscripion, then it is not a question of an ordinary notification but one using templates.
+    // Ordinary notifications are simply sent, all of it as one message.
+    //
+    // Notifications for subscriptions using templates are more complex:
+    //   - if there is more than one entity for the notification, split into N notifications, one per entity
+    //   - if 'url' contains substitution keys, substitute the keys for their current values
+    //   - if 'qs' contains query strings, add this to 'url', with the proper substitutions done
+    //   - if 'headers' is non-empty, perform eventual substitutions and make sure the information is added as HTTP headers for the notification
+    //   - if 'payload' is given, use that string as template instead of the default payload string, substituting all fields that are to be substituted
+    //   - if 'method' is given, then a custom HTTP method is used (instead of POST, which is default)
+    //
+    // Redirect to the method sendNotifyContextRequestAsPerTemplate() when 'httpInfo.custom' is TRUE.
+    // 'httpInfo.custom' is FALSE by default and set to TRUE by the json parser.
+    //
+    //
+    // Note that disableCusNotif (taken from CLI) could disable custom notifications and force to use regular ones
+    //
+    if (httpInfo.custom && !disableCusNotif)
+    {
+
+        return buildSenderParamsVectorFromTemplate(ncrP->subscriptionId,
+                       ncrP->contextElementResponseVector,
+                       httpInfo,
+                       tenant,
+                       xauthToken,
+                       fiwareCorrelator,
+                       renderFormat,
+                       attrsOrder,
+                       metadataFilter);
+    }
+
+    //
+    // Creating the value of the Fiware-ServicePath HTTP header.
+    // This is a comma-separated list of the service-paths in the same order as the entities come in the payload
+    //
+    std::string spathList;
+    bool        atLeastOneNotDefault = false;
+
+    for (unsigned int ix = 0; ix < ncrP->contextElementResponseVector.size(); ++ix)
+    {
+      EntityId* eP = &ncrP->contextElementResponseVector[ix]->contextElement.entityId;
+
+      if (spathList != "")
+      {
+        spathList += ",";
+      }
+      spathList += eP->servicePath;
+      atLeastOneNotDefault = atLeastOneNotDefault || (eP->servicePath != "/");
+    }
+
+    //
+    // FIXME P8: the stuff about atLeastOneNotDefault was added after PR #729, which makes "/" the default servicePath in
+    // request not having that header. However, this causes as side-effect that a
+    // "Fiware-ServicePath: /" or "Fiware-ServicePath: /,/" header is added in notifications, thus breaking several tests harness.
+    // Given that the "clean" implementation of Fiware-ServicePath propagation will be implemented
+    // soon (it has been scheduled for version 0.19.0, see https://github.com/telefonicaid/fiware-orion/issues/714)
+    // we introduce the atLeastOneNotDefault hack. Once #714 gets implemented,
+    // this FIXME will be removed (and all the test harness adjusted, if needed)
+    //
+    if (!atLeastOneNotDefault)
+    {
+      spathList = "";
+    }
+
+    ci.outMimeType = JSON;
+
+    std::string payloadString;
+    if (renderFormat == NGSI_V1_LEGACY)
+    {
+      payloadString = ncrP->render(&ci, NotifyContext, "");
+    }
+    else
+    {
+      payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
+    }
+
+    /* Parse URL */
+    std::string  host;
+    int          port;
+    std::string  uriPath;
+    std::string  protocol;
+
+    if (!parseUrl(httpInfo.url, host, port, uriPath, protocol))
+    {
+      LM_E(("Runtime Error (not sending NotifyContextRequest: malformed URL: '%s')", httpInfo.url.c_str()));
+      return paramsV;  //empty vector
+    }
+
+    /* Set Content-Type */
+    std::string content_type = "application/json";
+
+
+    SenderThreadParams*  params = new SenderThreadParams();
+
+    params->ip               = host;
+    params->port             = port;
+    params->protocol         = protocol;
+    params->verb             = verbName(verb);
+    params->tenant           = tenant;
+    params->servicePath      = spathList;
+    params->xauthToken       = xauthToken;
+    params->resource         = uriPath;
+    params->content_type     = content_type;
+    params->content          = payloadString;
+    params->mimeType         = JSON;
+    params->renderFormat     = renderFormatToString(renderFormat);
+    params->fiwareCorrelator = fiwareCorrelator;
+
+    // Cuidadito con esto
+    strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
+
+
+    paramsV->push_back(params);
+    return paramsV;
+
+}
+
