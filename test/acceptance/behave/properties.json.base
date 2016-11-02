@@ -29,5 +29,9 @@
         "MONGO_DATABASE": "orion",
         "MONGO_RETRIES": "5",
         "MONGO_DELAY_TO_RETRY" : "5"
+   },
+
+   "listeners": {
+        "LISTENER_NOTIF": "localhost"
    }
 }
