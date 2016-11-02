@@ -78,13 +78,20 @@ void Notifier::sendNotifyContextRequest
   pthread_t                         tid;
   std::vector<SenderThreadParams*>  *paramsV = Notifier::buildSenderParams(ncrP, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blackList);
 
-  int ret = pthread_create(&tid, NULL, startSenderThread, paramsV);
-  if (ret != 0)
+  if (!paramsV->empty()) // al least one param, an empty vector means an error happened
   {
-    LM_E(("Runtime Error (error creating thread: %d)", ret));
-    return;
+    int ret = pthread_create(&tid, NULL, startSenderThread, paramsV);
+    if (ret != 0)
+    {
+      LM_E(("Runtime Error (error creating thread: %d)", ret));
+      for (unsigned ix = 0; ix < paramsV->size(); ix++) {
+        delete (*paramsV)[ix];
+      }
+      delete paramsV;
+      return;
+    }
+    pthread_detach(tid);
   }
-  pthread_detach(tid);
 }
 
 
@@ -168,7 +175,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
 *
 *
 */
-static std::vector<SenderThreadParams*>* buildSenderParamsVectorFromTemplate
+static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 (
     const SubscriptionId&                subscriptionId,
     const ContextElementResponseVector&  cv,
@@ -392,7 +399,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     if (httpInfo.custom && !disableCusNotif)
     {
 
-        return buildSenderParamsVectorFromTemplate(ncrP->subscriptionId,
+        return buildSenderParamsCustom(ncrP->subscriptionId,
                        ncrP->contextElementResponseVector,
                        httpInfo,
                        tenant,
