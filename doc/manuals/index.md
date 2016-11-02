@@ -1,12 +1,11 @@
-# Welcome to Orion Context Broker.
+This page has been moved!
 
-Orion is a C++ implementation of the NGSI9/10 REST API binding developed as a part of the FIWARE platform.
+In order to reach the new page, just change `develop` to `master` in the URL. The following link
+should send you to the right place: [click here](http://fiware-orion.readthedocs.io/en/master/index.html).
 
-Orion Context Broker allows you to manage all the whole lifecycle of context information including updates, queries, registrations and subscriptions.
-Using the Orion Context Broker, you are able to register context elements and manage them through updates and queries.
-In addition, you can subscribe to context information so when some condition occurs
-(e.g. a context element has changed) you receive a notification.
-These usage scenarios and the Orion Context Broker features are described in this document.
+This is due to a change in our main development branch at github repository (from `develop` to `master`), so
+old references to develop are now obsolete. Unfortunatelly, ReadTheDocs cannot implement automatic redirect
+for this case (or we don't know how to do it :), see [this issue](https://github.com/rtfd/readthedocs.org/issues/2444)
+opened at ReadTheDocs github repository).
 
-Github's [README.md](https://github.com/telefonicaid/fiware-orion/blob/develop/README.md) provides a good documentation summary.
-The [User Manual](user/index.md) and the [Admin Guide](admin/index.md) cover more advanced topics. 
+Sorry for the inconveniences.
