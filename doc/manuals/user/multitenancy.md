@@ -1,48 +1,11 @@
-# Multi tenancy
+This page has been moved!
 
-The Orion Context Broker implements a simple multitenant/multiservice
-model based and logical database separation, to ease service/tenant
-based authorization policies provided by other FIWARE components or
-third party software, e.g. the ones in the FIWARE security framework
-(PEP proxy, IDM and Access Control). This functionality is activated
-when the "-multiservice" command line option is used. When
-"-multiservice" is used, Orion uses the "Fiware-Service" HTTP header in
-the request to identify the service/tenant. If the header is not present
-in the HTTP request, the default service/tenant is used.
+In order to reach the new page, just change `develop` to `master` in the URL. The following link
+should send you to the right place: [click here](http://fiware-orion.readthedocs.io/en/master/user/multitenancy/index.html).
 
-Multitenant/multiservice ensures that the
-entities/attributes/subscriptions of one service/tenant are "invisible"
-to other services/tentants. For example, queryContext on tenantA space
-will never return entities/attributes from tenantB space. This isolation
-is based on database separation, which [details are described in the
-Installation and Administration
-manual](../admin/database_admin.md#multiservicemultitenant-database-separation).
+This is due to a change in our main development branch at github repository (from `develop` to `master`), so
+old references to develop are now obsolete. Unfortunatelly, ReadTheDocs cannot implement automatic redirect
+for this case (or we don't know how to do it :), see [this issue](https://github.com/rtfd/readthedocs.org/issues/2444)
+opened at ReadTheDocs github repository).
 
-In addition, note that when "-multiservice" is used Orion includes the
-"Fiware-Service" header in the notifyContextRequest and
-notifyContextAvailability request messages associated to subscriptions
-in the given tenant/service (except for the default service/tenant, in
-which case the header is not present), e.g.:
-
-    POST http://127.0.0.1:9977/notify
-    Content-Length: 725
-    User-Agent: orion/0.13.0
-    Host: 127.0.0.1:9977
-    Accept: application/json
-    Fiware-Service: t_02
-    Content-Type: application/json
-
-    {
-    ...
-    }
-
-Regarding service/tenant name syntax, it must be a string of
-alphanumeric characters (and the "\_" symbol). Maximum length is 50
-characters,
-which should be enough for most use cases. Orion Context Broker
-interprets the tentant name in lowercase, thus, although you can use
-tenants such as in updateContext "MyService" it is not advisable, as the
-notifications related with that tenant will be sent with "myservice"
-and, in that sense, it is not coherent the tentant you used in
-updateContext compared with the one that Orion sends in
-notifyContextRequest.
+Sorry for the inconveniences.

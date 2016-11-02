@@ -1,6 +1,11 @@
-# Introduction
+This page has been moved!
 
-Welcome to Orion's User & Programmer Guide!
+In order to reach the new page, just change `develop` to `master` in the URL. The following link
+should send you to the right place: [click here](http://fiware-orion.readthedocs.io/en/master/user/index.html).
 
-Any feedback on this document is highly welcome, including bug reports, typos or stuff you think should be included but is not.
-Please send the feedback through [Github](https://github.com/telefonicaid/fiware-orion.git). Thanks in advance!
+This is due to a change in our main development branch at github repository (from `develop` to `master`), so
+old references to develop are now obsolete. Unfortunatelly, ReadTheDocs cannot implement automatic redirect
+for this case (or we don't know how to do it :), see [this issue](https://github.com/rtfd/readthedocs.org/issues/2444)
+opened at ReadTheDocs github repository).
+
+Sorry for the inconveniences.

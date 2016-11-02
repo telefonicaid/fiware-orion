@@ -1,39 +1,11 @@
-# Deleting entities (using NGSIv2)
+This page has been moved!
 
-Entities can be deleted using `DELETE /v2/entities/{id}` (in case the entity id
-univocally identifies the entity) or `DELETE /v2/entities/{id}?type={entityType}`
-(in case the type is also needed to fully identify the entity).
+In order to reach the new page, just change `develop` to `master` in the URL. The following link
+should send you to the right place: [click here](http://fiware-orion.readthedocs.io/en/master/user/delete_entity/index.html).
 
-You can also use the batch operation `POST /op/update` to remove entities, using
-`actionType` DELETE.
+This is due to a change in our main development branch at github repository (from `develop` to `master`), so
+old references to develop are now obsolete. Unfortunatelly, ReadTheDocs cannot implement automatic redirect
+for this case (or we don't know how to do it :), see [this issue](https://github.com/rtfd/readthedocs.org/issues/2444)
+opened at ReadTheDocs github repository).
 
-# Deleting entities (using NGSIv1)
-
-Apart from [deleting individual attributes from a given entity](append_and_delete.md),
-you can also delete an entire entity, including all its attributes and
-their corresponding metadata. In order to do so, the updateContext
-operation is used, with DELETE as actionType and with an empty
-list of attributes, as in the following example:
-
-```
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
-    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
-    "contextElements": [
-        {
-            "type": "T",
-            "isPattern": "false",
-            "id": "E1"
-        }
-    ],
-    "updateAction": "DELETE"
-}
-EOF
-```
-
-You can also use the following equivalent convenience operation:
-```
-curl localhost:1026/v1/contextEntities/E1 -s -S \
-    --header 'Content-Type: application/json' \
-    --header 'Accept: application/json' -X DELETE
-```
+Sorry for the inconveniences.
