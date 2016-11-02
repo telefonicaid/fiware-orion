@@ -33,6 +33,7 @@ from tools.NGSI_v2 import NGSI
 
 # constants
 MONGO_ENV = u'mongo_env'
+LISTENER_ENV = u'listeners'
 
 properties_class = Properties()
 
@@ -48,8 +49,10 @@ def properties_to_subscriptions(context):
     properties to subscription (previous step to create or update subcription request)
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
+    listener_endpoint = properties_class.read_properties()[LISTENER_ENV]["LISTENER_NOTIF"]  # listeners properties dict
+
     __logger__.info("Define the properties used in the subcription request")
-    context.cb.properties_to_subcription(context)
+    context.cb.properties_to_subcription(context, listener_endpoint)
 
 
 @step(u'create a new subscription')
