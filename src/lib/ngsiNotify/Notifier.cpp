@@ -1,4 +1,4 @@
-/*
+﻿/*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 *
@@ -84,7 +84,8 @@ void Notifier::sendNotifyContextRequest
     if (ret != 0)
     {
       LM_E(("Runtime Error (error creating thread: %d)", ret));
-      for (unsigned ix = 0; ix < paramsV->size(); ix++) {
+      for (unsigned ix = 0; ix < paramsV->size(); ix++)
+      {
         delete (*paramsV)[ix];
       }
       delete paramsV;
@@ -167,12 +168,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
 
 /* ****************************************************************************
 *
-* buildSenderParamsFromTemplate -
-*
-* This function performs the necessary substitutions according to the template of
-* subscription to form the desired notification and send it to the endpoint specified
-* in the subscription.
-*
+* buildSenderParamsCustom -
 *
 */
 static std::vector<SenderThreadParams*>* buildSenderParamsCustom
@@ -368,8 +364,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 )
 {
     ConnectionInfo                    ci;
-    Verb                              verb = httpInfo.verb;
-    std::vector<SenderThreadParams*>* paramsV = new std::vector<SenderThreadParams*>();
+    Verb                              verb    = httpInfo.verb;
+    std::vector<SenderThreadParams*>* paramsV = NULL;
 
 
     if ((verb == NOVERB) || (verb == UNKNOWNVERB) || disableCusNotif)
@@ -390,9 +386,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     //   - if 'payload' is given, use that string as template instead of the default payload string, substituting all fields that are to be substituted
     //   - if 'method' is given, then a custom HTTP method is used (instead of POST, which is default)
     //
-    // Redirect to the method sendNotifyContextRequestAsPerTemplate() when 'httpInfo.custom' is TRUE.
-    // 'httpInfo.custom' is FALSE by default and set to TRUE by the json parser.
-    //
     //
     // Note that disableCusNotif (taken from CLI) could disable custom notifications and force to use regular ones
     //
@@ -409,6 +402,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
                        attrsOrder,
                        metadataFilter);
     }
+
+    paramsV = new std::vector<SenderThreadParams*>();
 
     //
     // Creating the value of the Fiware-ServicePath HTTP header.

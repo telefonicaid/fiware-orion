@@ -518,6 +518,8 @@ function brokerStart()
   shift
   shift
 
+  notificationModeGiven=FALSE
+
   # Check for --noCache and --cache options in 'extraParams'
   xParams=""
   while [ "$#" != 0 ]
@@ -526,6 +528,11 @@ function brokerStart()
     elif [ "$1" == "--cache" ];              then noCache=OFF;
     elif [ "$1" == "-noCache" ];             then noCache=ON;
     elif [ "$1" == "-cache" ];               then noCache=OFF;
+    elif [ "$1" == "-notificationMode" ] || [ "$1" == "--notificationMode" ]
+    then
+        notificationModeGiven=TRUE
+        xParams="$xParams $1 $2"
+        shift
     else xParams=$xParams' '$1
     fi
     shift
@@ -539,19 +546,32 @@ function brokerStart()
     fi
   fi
 
-  if [ "$role" == "" ]
-  then
+ # Not given notificationMode but not forbidden, use default
+ if [ "$notificationModeGiven" == "FALSE" ]  &&  [ "$CB_THREADPOOL" == "ON" ]
+ then
+    xParams=$xParams' -notificationMode threadpool:200:20'
+ fi
+
+ if [ "$role" == "" ]
+ then
     echo "No role given as first parameter for brokerStart"
     return
-  fi
+ fi
 
   if [ "$traceLevels" == "" ]
   then
     traceLevels=0-255
   fi
 
+  if [ "$ipVersion" == "" ]
+  then
+    ipVersion=BOTH
+  fi
+
+
   localBrokerStop $role
   localBrokerStart $role $traceLevels $ipVersion $xParams
+
 }
 
 
