@@ -307,6 +307,10 @@ Fields:
 -   **qs**: optional field to store the query parameters keymap for notification customization functionality in NGSIv2.
 -   **method**: optional field to store the HTTP method for notification customization functionality in NGSIv2.
 -   **payload**: optional field to store the payload for notification customization functionality in NGSIv2.
+-   **lastFailure**: the time when last notification failure occurred. Not present or present but with a value of -1 if the
+    subscription is OK.
+-   **timesFailed**: number of consecutive notifiction errors for the subscription. Not present or present but with a value of 0
+    if the subscription is OK.
 
 Example document:
 
