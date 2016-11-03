@@ -250,7 +250,7 @@ fi
 # whether to start the broker with pool of threads or not.
 # Do not overwrite if a value is passed from environment
 #
-if [ "$CB_THREADPOOL" == ""]
+if [ "$CB_THREADPOOL" == "" ]
 then
   export CB_THREADPOOL=$threadpool
 fi
