@@ -42,6 +42,8 @@ accumulatorStart --pretty-print
 # 08. Dump accelerator, see 2 notification
 # 09. Update sub (with invalid url)
 # 10. GET subscription, see a 1 in timesFailed
+# 11. Update E1, to provoke notification that doesn't work
+# 12. GET subscription, see a 2 in timesFailed
 #
 
 echo "01. Create entity E1"

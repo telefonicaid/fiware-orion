@@ -66,7 +66,6 @@ namespace ngsiv2
   {
     JsonHelper jh;
 
-    LM_W(("In Subscription::toJson"));
     jh.addString("id", this->id);
     if (this->description != "")
     {

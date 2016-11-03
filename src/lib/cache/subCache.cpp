@@ -246,11 +246,6 @@ bool             subCacheActive      = false;
 bool             subCacheMultitenant = false;
 
 
-// TEMP
-CachedSubscription* subCacheHead(void)
-{
-  return subCache.head;
-}
 
 /* ****************************************************************************
 *
@@ -786,7 +781,8 @@ void subCacheItemInsert
   cSubP->expirationTime        = expirationTime;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
-  cSubP->lastFailure           = 0;
+  cSubP->lastFailure           = -1;
+  cSubP->timesFailed           = 0;
   cSubP->renderFormat          = renderFormat;
   cSubP->next                  = NULL;
   cSubP->count                 = (notificationDone == true)? 1 : 0;
@@ -800,7 +796,6 @@ void subCacheItemInsert
   cSubP->notifyConditionV      = conditionAttrs;
   cSubP->attributes            = attributes;
   cSubP->metadata              = metadata;
-  cSubP->timesFailed           = 0;
 
 
   //
