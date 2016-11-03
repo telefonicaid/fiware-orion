@@ -93,7 +93,8 @@ void QueueNotifier::sendNotifyContextRequest
           renderFormat,
           attrsOrder,
           metadataFilter,
-          blacklist);
+          blacklist,
+          subscriptionId);
   }
 
   //
