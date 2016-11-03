@@ -1,4 +1,4 @@
-/*
+﻿/*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 *
@@ -84,7 +84,8 @@ void Notifier::sendNotifyContextRequest
     if (ret != 0)
     {
       LM_E(("Runtime Error (error creating thread: %d)", ret));
-      for (unsigned ix = 0; ix < paramsV->size(); ix++) {
+      for (unsigned ix = 0; ix < paramsV->size(); ix++)
+      {
         delete (*paramsV)[ix];
       }
       delete paramsV;
@@ -389,9 +390,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     //   - if 'headers' is non-empty, perform eventual substitutions and make sure the information is added as HTTP headers for the notification
     //   - if 'payload' is given, use that string as template instead of the default payload string, substituting all fields that are to be substituted
     //   - if 'method' is given, then a custom HTTP method is used (instead of POST, which is default)
-    //
-    // Redirect to the method sendNotifyContextRequestAsPerTemplate() when 'httpInfo.custom' is TRUE.
-    // 'httpInfo.custom' is FALSE by default and set to TRUE by the json parser.
     //
     //
     // Note that disableCusNotif (taken from CLI) could disable custom notifications and force to use regular ones
