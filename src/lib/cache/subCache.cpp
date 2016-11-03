@@ -1125,8 +1125,8 @@ typedef struct CachedSubSaved
 {
   int64_t  lastNotificationTime;
   int64_t  count;
-  int32_t  lastFailure;
-  int32_t  timesFailed;
+  int64_t  lastFailure;
+  int64_t  timesFailed;
 } CachedSubSaved;
 
 
@@ -1159,20 +1159,6 @@ typedef struct CachedSubSaved
 */
 void subCacheSync(void)
 {
-  // -- TEMP --------------------------------------------------------
-  CachedSubscription* csP = subCacheHead();
-
-  LM_W(("KZ: Synching subscription cache"));
-  if (csP != NULL)
-  {
-    LM_W(("KZ: Before refresh: csP->lastFailure: %d", csP->lastFailure));
-    LM_W(("KZ: Before refresh: csP->timesFailed: %d", csP->timesFailed));
-  }
-  else
-    LM_W(("KZ: Before refresh: sub cache is empty"));
-  // ------------------------------------------------------------------
-
-
   std::map<std::string, CachedSubSaved*> savedSubV;
 
   cacheSemTake(__FUNCTION__, "Synchronizing subscription cache");
@@ -1260,6 +1246,9 @@ void subCacheSync(void)
 
       // Keeping lastFailure in sub cache
       cSubP->lastFailure = cssP->lastFailure;
+
+      // Setting timesFailed to zero, as DB already incremented
+      cSubP->timesFailed = 0;
     }
 
     cSubP = cSubP->next;
@@ -1278,18 +1267,6 @@ void subCacheSync(void)
 
   subCacheState = ScsIdle;
   cacheSemGive(__FUNCTION__, "Synchronizing subscription cache");
-
-  // -- TEMP --------------------------------------------------------
-  csP = subCacheHead();
-
-  if (csP != NULL)
-  {
-    LM_W(("KZ: After refresh: csP->lastFailure: %d", csP->lastFailure));
-    LM_W(("KZ: After refresh: csP->timesFailed: %d", csP->timesFailed));
-  }
-  else
-    LM_W(("KZ: After refresh: sub cache is empty"));
-  // ------------------------------------------------------------------
 }
 
 

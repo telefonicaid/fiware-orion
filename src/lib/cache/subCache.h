@@ -110,8 +110,8 @@ struct CachedSubscription
   SubscriptionExpression      expression;
   bool                        blacklist;
   ngsiv2::HttpInfo            httpInfo;
-  int32_t                     lastFailure;  // timestamp of last failure, -1 if sub is working
-  int32_t                     timesFailed;  // number of consecutive errors, 0 ifsub is working
+  int64_t                     lastFailure;  // timestamp of last failure, -1 if sub is working
+  int64_t                     timesFailed;  // number of consecutive errors, 0 if sub is working
   struct CachedSubscription*  next;
 };
 

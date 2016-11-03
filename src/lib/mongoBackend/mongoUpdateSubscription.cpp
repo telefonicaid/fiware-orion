@@ -465,18 +465,22 @@ static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subC
 */
 static long long setLastFailure(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
+  if (subCacheP == NULL)
+  {
+    return -1;
+  }
+
   long long lastFailure = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTFAILURE);
 
   //
   // Compare with 'lastFailure' from the sub-cache.
   // If the cached value of lastFailure is higher, then use it.
   //
-  if ((subCacheP != NULL) && (subCacheP->lastFailure > lastFailure))
+  if (subCacheP->lastFailure > lastFailure)
   {
     lastFailure = subCacheP->lastFailure;
+    setLastFailure(lastFailure, b);
   }
-
-  setLastFailure(lastFailure, b);
 
   return lastFailure;
 }
@@ -489,7 +493,7 @@ static long long setLastFailure(const BSONObj& subOrig, CachedSubscription* subC
 */
 static void setTimesFailed(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
-  if (subCacheP->timesFailed < 0)
+  if ((subCacheP == NULL) || (subCacheP->timesFailed <= 0))
   {
     return;
   }

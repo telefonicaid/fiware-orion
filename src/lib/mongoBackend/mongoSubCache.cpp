@@ -107,10 +107,11 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
   cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS).c_str()            : "active";
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                   : false;
-  cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getIntField(sub, CSUB_LASTFAILURE)                   : -1;
-  cSubP->timesFailed           = sub.hasField(CSUB_TIMESFAILED)?      getIntField(sub, CSUB_TIMESFAILED)                   : 0;
+  cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(sub, CSUB_LASTFAILURE)      : -1;
+  cSubP->timesFailed           = sub.hasField(CSUB_TIMESFAILED)?      getIntOrLongFieldAsLongF(sub, CSUB_TIMESFAILED)      : 0;
   cSubP->count                 = 0;
   cSubP->next                  = NULL;
+
 
   //
   // 04.2 httpInfo
@@ -485,8 +486,8 @@ void mongoSubCacheUpdate
   const std::string& subId,
   long long          count,
   long long          lastNotificationTime,
-  uint32_t           lastFailure,
-  uint32_t           timesFailed
+  long long          lastFailure,
+  long long          timesFailed
 )
 {
   std::string  collection  = getSubscribeContextCollectionName(tenant);
@@ -523,7 +524,7 @@ void mongoSubCacheUpdate
   }
 
 
-  if (lastFailure != 0)
+  if (lastFailure > 0)
   {
     // Update lastFailure    
     condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
@@ -537,9 +538,20 @@ void mongoSubCacheUpdate
       LM_E(("Internal Error (error updating 'lastFailure' for a subscription)"));
     }
   }
+  else
+  {
+    // Set lastFailure to -1
+    condition = BSON("_id" << OID(subId));
+    update    = BSON("$set" << BSON(CSUB_LASTFAILURE << (long long) -1));
+
+    if (collectionUpdate(collection, condition, update, false, &err) != true)
+    {
+      LM_E(("Internal Error (error updating 'lastFailure' for a subscription)"));
+    }
+  }
 
 
-  if (timesFailed > 0)
+  if (timesFailed != 0)
   {
     // Update timesFailed
     condition = BSON("_id"  << OID(subId));

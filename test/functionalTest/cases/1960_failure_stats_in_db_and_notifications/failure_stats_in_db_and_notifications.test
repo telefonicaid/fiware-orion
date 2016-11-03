@@ -118,9 +118,12 @@ echo
 echo
 
 
+# Await sub-cache contents to be dumped into database
+sleep 3.1
+
+
 echo "05. GET subscription, see NO error stats in notification field"
 echo "=============================================================="
-sleep 3.1
 orionCurl --url /v2/subscriptions
 echo
 echo
@@ -136,9 +139,12 @@ echo
 echo
 
 
+# Await sub-cache contents to be dumped into database
+sleep 3.1
+
+
 echo "07. GET subscription, see NO error stats in notification field"
 echo "=============================================================="
-sleep 3.1
 orionCurl --url /v2/subscriptions
 echo
 echo
@@ -150,10 +156,6 @@ accumulatorDump
 echo
 echo
 
-
-echo "----------------- mongo before sub update ----------------"
-echo 'db.csubs.findOne()' | mongo ftest
-echo "-----------------------------------------------------------------"
 
 echo "09. Update sub (with invalid url)"
 echo "================================="
@@ -179,12 +181,9 @@ orionCurl --url /v2/subscriptions/$subId --payload "$payload" -X PATCH
 echo
 echo
 
+
+# Await sub-cache contents to be dumped into database
 sleep 3.1
-
-echo "----------------- mongo after sub update ----------------"
-echo 'db.csubs.findOne()' | mongo ftest
-echo "-----------------------------------------------------------------"
-
 
 echo "10. GET subscription, see a 1 in timesFailed"
 echo "============================================"
@@ -196,12 +195,15 @@ echo
 echo "11. Update E1, to provoke notification that doesn't work"
 echo "========================================================"
 payload='{
-  "A1": 6
+  "A1": 11
 }'
 orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
 echo
 echo
 
+
+# Sleep a little to let previous step terminate
+sleep 0.5
 
 echo "12. GET subscription, see a 2 in timesFailed"
 echo "============================================"
@@ -416,6 +418,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
+
 10. GET subscription, see a 1 in timesFailed
 ============================================
 HTTP/1.1 200 OK
@@ -461,6 +464,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
+
 12. GET subscription, see a 2 in timesFailed
 ============================================
 HTTP/1.1 200 OK
@@ -496,6 +500,7 @@ Date: REGEX(.*)
         }
     }
 ]
+
 
 --TEARDOWN--
 brokerStop CB
