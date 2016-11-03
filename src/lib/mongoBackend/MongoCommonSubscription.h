@@ -31,6 +31,8 @@
 #include "mongo/client/dbclient.h"
 #include "apiTypesV2/Subscription.h"
 
+
+
 /* ****************************************************************************
 *
 * setNewSubscriptionId -
@@ -102,6 +104,7 @@ extern void setStatus(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b)
 extern void setEntities(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
 
 
+
 /* ****************************************************************************
 *
 * setAttrs -
@@ -151,6 +154,22 @@ extern void setLastNotification(long long lastNotification, BSONObjBuilder* b);
 *
 */
 extern void setCount(long long count, BSONObjBuilder* b);
+
+
+
+/* ****************************************************************************
+*
+* setLastFailure -
+*/
+extern void setLastFailure(long long lastFailure, BSONObjBuilder* b);
+
+
+
+/* ****************************************************************************
+*
+* setTimesFailed -
+*/
+extern void setTimesFailed(long long timesFailed, BSONObjBuilder* b);
 
 
 

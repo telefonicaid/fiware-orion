@@ -66,6 +66,7 @@ namespace ngsiv2
   {
     JsonHelper jh;
 
+    LM_W(("In Subscription::toJson"));
     jh.addString("id", this->id);
     if (this->description != "")
     {
@@ -135,7 +136,7 @@ namespace ngsiv2
       jh.addRaw("metadata", vectorToJson(this->metadata));
     }
 
-    if (this->lastFailure != -1)
+    if (this->lastFailure > 0)
     {
       jh.addDate("lastFailure", this->lastFailure);
     }

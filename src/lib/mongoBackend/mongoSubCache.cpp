@@ -241,7 +241,9 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 *  -4: Subscription not valid for sub-cache (no entity ids)
 *
 *
-* Note that the 'count' of the inserted subscription is set to ZERO.
+* Note that the 'count' and 'timesFailed' of the inserted subscription is set to ZERO.
+* This is because the sub cache only counts the increments in these accumulating counters,
+* so that other CBs, operating on the same DB will not overwrite the value of these accumulators
 */
 int mongoSubCacheItemInsert
 (
@@ -250,6 +252,7 @@ int mongoSubCacheItemInsert
   const char*         subscriptionId,
   const char*         servicePath,
   int                 lastNotificationTime,
+  int                 lastFailure,
   long long           expirationTime,
   const std::string&  status,
   const std::string&  q,
@@ -428,7 +431,6 @@ int mongoSubCacheItemInsert
 */
 void mongoSubCacheRefresh(const std::string& database)
 {
-  LM_W(("KZ: Refreshing subscription cache for DB '%s'", database.c_str()));
   LM_T(LmtSubCache, ("Refreshing subscription cache for DB '%s'", database.c_str()));
 
   BSONObj                   query;      // empty query (all subscriptions)
@@ -492,7 +494,6 @@ void mongoSubCacheUpdate
   BSONObj      update;
   std::string  err;
 
-
   if (count != 0)
   {
     // Update count
@@ -538,7 +539,7 @@ void mongoSubCacheUpdate
   }
 
 
-  if (timesFailed != 0)
+  if (timesFailed > 0)
   {
     // Update timesFailed
     condition = BSON("_id"  << OID(subId));

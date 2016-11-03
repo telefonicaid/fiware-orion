@@ -241,11 +241,16 @@ typedef struct SubCache
 *
 * subCache -
 */
-static SubCache  subCache            = { NULL, NULL, 0 };
+static SubCache  subCache            = { NULL, NULL, 0, 0, 0, 0 };
 bool             subCacheActive      = false;
 bool             subCacheMultitenant = false;
 
 
+// TEMP
+CachedSubscription* subCacheHead(void)
+{
+  return subCache.head;
+}
 
 /* ****************************************************************************
 *
@@ -781,6 +786,7 @@ void subCacheItemInsert
   cSubP->expirationTime        = expirationTime;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
+  cSubP->lastFailure           = 0;
   cSubP->renderFormat          = renderFormat;
   cSubP->next                  = NULL;
   cSubP->count                 = (notificationDone == true)? 1 : 0;
@@ -794,7 +800,6 @@ void subCacheItemInsert
   cSubP->notifyConditionV      = conditionAttrs;
   cSubP->attributes            = attributes;
   cSubP->metadata              = metadata;
-  cSubP->lastFailure           = -1;
   cSubP->timesFailed           = 0;
 
 
@@ -1154,13 +1159,25 @@ typedef struct CachedSubSaved
 */
 void subCacheSync(void)
 {
+  // -- TEMP --------------------------------------------------------
+  CachedSubscription* csP = subCacheHead();
+
+  LM_W(("KZ: Synching subscription cache"));
+  if (csP != NULL)
+  {
+    LM_W(("KZ: Before refresh: csP->lastFailure: %d", csP->lastFailure));
+    LM_W(("KZ: Before refresh: csP->timesFailed: %d", csP->timesFailed));
+  }
+  else
+    LM_W(("KZ: Before refresh: sub cache is empty"));
+  // ------------------------------------------------------------------
+
+
   std::map<std::string, CachedSubSaved*> savedSubV;
 
   cacheSemTake(__FUNCTION__, "Synchronizing subscription cache");
   subCacheState = ScsSynchronizing;
 
-
-  LM_W(("KZ: In subCacheSync"));
 
   //
   // 1. Save subscriptionId, lastNotificationTime, and count for all items in cache
@@ -1206,11 +1223,22 @@ void subCacheSync(void)
   while (cSubP != NULL)
   {
     CachedSubSaved* cssP = savedSubV[cSubP->subscriptionId];
-    if ((cssP != NULL) && (cssP->lastNotificationTime <= cSubP->lastNotificationTime))
+
+    if (cssP != NULL)
     {
-      // cssP->lastNotificationTime older than what's currently in DB => throw away
-      cssP->lastNotificationTime = 0;
+      if (cssP->lastNotificationTime <= cSubP->lastNotificationTime)
+      {
+        // cssP->lastNotificationTime is older than what's currently in DB => throw away
+        cssP->lastNotificationTime = 0;
+      }
+
+      if (cssP->lastFailure < cSubP->lastFailure)
+      {
+        // cssP->lastFailure is older than what's currently in DB => throw away
+        cssP->lastFailure = 0;
+      }
     }
+
     cSubP = cSubP->next;
   }
 
@@ -1224,15 +1252,16 @@ void subCacheSync(void)
   {
     CachedSubSaved* cssP = savedSubV[cSubP->subscriptionId];
 
-    if (cssP == NULL)
+    if (cssP != NULL)
     {
-      cSubP = cSubP->next;
-      continue;
+      std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
+
+      mongoSubCacheUpdate(tenant, cSubP->subscriptionId, cssP->count, cssP->lastNotificationTime, cssP->lastFailure, cssP->timesFailed);
+
+      // Keeping lastFailure in sub cache
+      cSubP->lastFailure = cssP->lastFailure;
     }
 
-    std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
-
-    mongoSubCacheUpdate(tenant, cSubP->subscriptionId, cssP->count, cssP->lastNotificationTime, cssP->lastFailure, cssP->timesFailed);
     cSubP = cSubP->next;
   }
 
@@ -1249,6 +1278,18 @@ void subCacheSync(void)
 
   subCacheState = ScsIdle;
   cacheSemGive(__FUNCTION__, "Synchronizing subscription cache");
+
+  // -- TEMP --------------------------------------------------------
+  csP = subCacheHead();
+
+  if (csP != NULL)
+  {
+    LM_W(("KZ: After refresh: csP->lastFailure: %d", csP->lastFailure));
+    LM_W(("KZ: After refresh: csP->timesFailed: %d", csP->timesFailed));
+  }
+  else
+    LM_W(("KZ: After refresh: sub cache is empty"));
+  // ------------------------------------------------------------------
 }
 
 
@@ -1304,14 +1345,11 @@ void subCacheItemErrorStatus(const char* tenant, const char* subscriptionId, int
 {
   CachedSubscription* subP = subCacheItemLookup(tenant, subscriptionId);
 
-  LM_W(("KZ: In subCacheItemErrorStatus. errors == %d ('%s' / '%s')", errors, tenant, subscriptionId));
-
   if (subP == NULL)
   {
     const char* errorString = "intent to update error status of non-existing subscription";
 
     alarmMgr.badInput(clientIp, errorString);
-    LM_W(("KZ: In subCacheItemErrorStatus - non-existing subscription"));
     return;
   }
 
@@ -1319,12 +1357,10 @@ void subCacheItemErrorStatus(const char* tenant, const char* subscriptionId, int
   {
     subP->lastFailure  = -1;
     subP->timesFailed  = 0;
-    LM_W(("KZ: In subCacheItemErrorStatus - reset lastFailure to %d and timesFailed to %d", subP->lastFailure, subP->timesFailed));
   }
   else
   {
     subP->lastFailure  = time(NULL);
     subP->timesFailed += errors;
-    LM_W(("KZ: In subCacheItemErrorStatus - set lastFailure to %d and timesFailed to %d", subP->lastFailure, subP->timesFailed));
   }
 }

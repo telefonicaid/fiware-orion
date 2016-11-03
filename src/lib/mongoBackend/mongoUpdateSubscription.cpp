@@ -458,6 +458,51 @@ static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subC
 }
 
 
+
+/* ****************************************************************************
+*
+* setLastFailure -
+*/
+static long long setLastFailure(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
+{
+  long long lastFailure = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTFAILURE);
+
+  //
+  // Compare with 'lastFailure' from the sub-cache.
+  // If the cached value of lastFailure is higher, then use it.
+  //
+  if ((subCacheP != NULL) && (subCacheP->lastFailure > lastFailure))
+  {
+    lastFailure = subCacheP->lastFailure;
+  }
+
+  setLastFailure(lastFailure, b);
+
+  return lastFailure;
+}
+
+
+
+/* ****************************************************************************
+*
+* setTimesFailed - 
+*/
+static void setTimesFailed(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
+{
+  if (subCacheP->timesFailed < 0)
+  {
+    return;
+  }
+
+  long long timesFailed = getIntOrLongFieldAsLongF(subOrig, CSUB_TIMESFAILED);
+
+  timesFailed += subCacheP->timesFailed;
+
+  setTimesFailed(timesFailed, b);
+}
+
+
+
 /* ****************************************************************************
 *
 * setExpression -
@@ -542,10 +587,11 @@ static void setMetadata(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
 */
 void updateInCache
 (
-  const BSONObj& doc,
-  const SubscriptionUpdate& subUp,
-  const std::string& tenant,
-  long long lastNotification
+  const BSONObj&             doc,
+  const SubscriptionUpdate&  subUp,
+  const std::string&         tenant,
+  long long                  lastNotification,
+  long long                  lastFailure
 )
 {
   // StringFilter in Scope?
@@ -611,6 +657,7 @@ void updateInCache
                                           subUp.id.c_str(),
                                           servicePathCache,
                                           lastNotification,
+                                          lastFailure,
                                           doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
                                           doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_STATUS) : STATUS_ACTIVE,
                                           doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_Q) : "",
@@ -702,9 +749,10 @@ std::string mongoUpdateSubscription
 
   // Build the BSON object (using subOrig as starting point plus some info from cache)
   BSONObjBuilder b;
-  std::string         servicePath  = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];  
+  std::string         servicePath      = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];  
   bool                notificationDone = false;
   long long           lastNotification = 0;
+  long long           lastFailure      = 0;
 
   CachedSubscription* subCacheP = NULL;
   if (!noCache)
@@ -752,6 +800,9 @@ std::string mongoUpdateSubscription
     setCount(0, subOrig, &b);
   }
 
+  lastFailure = setLastFailure(subOrig, subCacheP, &b);
+  setTimesFailed(subOrig, subCacheP, &b);
+
   setExpression(subUp, subOrig, &b);
   setFormat(subUp, subOrig, &b);
 
@@ -768,7 +819,7 @@ std::string mongoUpdateSubscription
   // Update in cache
   if (!noCache)
   {
-    updateInCache(doc, subUp, tenant, lastNotification);
+    updateInCache(doc, subUp, tenant, lastNotification, lastFailure);
   }
 
 

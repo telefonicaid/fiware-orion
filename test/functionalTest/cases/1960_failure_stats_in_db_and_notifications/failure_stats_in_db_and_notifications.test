@@ -36,9 +36,12 @@ accumulatorStart --pretty-print
 # 02. Create sub (with invalid url), matching E1
 # 03. GET subscription, see error stats in notification field
 # 04. Update sub (with OK url), matching E1
-# 05. GET subscription, see error stats in notification field
-# 06. Update E1, to provoke notification that now works and error stats should be cleared out
+# 05. GET subscription, see NO error stats in notification field
+# 06. Update E1, to provoke notification that now works
 # 07. GET subscription, see NO error stats in notification field
+# 08. Dump accelerator, see 2 notification
+# 09. Update sub (with invalid url)
+# 10. GET subscription, see a 1 in timesFailed
 #
 
 echo "01. Create entity E1"
@@ -79,9 +82,129 @@ echo
 echo
 
 
+# Sleep > 3 seconds to get a cache refresh
+sleep 3.1
+
+
 echo "03. GET subscription, see error stats in notification field"
 echo "==========================================================="
-sleep 3
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "04. Update sub (with OK url), matching E1"
+echo "========================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [ ]
+  }
+}'
+orionCurl --url /v2/subscriptions/$subId --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "05. GET subscription, see NO error stats in notification field"
+echo "=============================================================="
+sleep 3.1
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "06. Update E1, to provoke notification that now works"
+echo "====================================================="
+payload='{
+  "A1": 6
+}'
+orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "07. GET subscription, see NO error stats in notification field"
+echo "=============================================================="
+sleep 3.1
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "08. Dump accelerator, see 2 notification"
+echo "========================================"
+accumulatorDump
+echo
+echo
+
+
+echo "----------------- mongo before sub update ----------------"
+echo 'db.csubs.findOne()' | mongo ftest
+echo "-----------------------------------------------------------------"
+
+echo "09. Update sub (with invalid url)"
+echo "================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://nohost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [ ]
+  }
+}'
+orionCurl --url /v2/subscriptions/$subId --payload "$payload" -X PATCH
+echo
+echo
+
+sleep 3.1
+
+echo "----------------- mongo after sub update ----------------"
+echo 'db.csubs.findOne()' | mongo ftest
+echo "-----------------------------------------------------------------"
+
+
+echo "10. GET subscription, see a 1 in timesFailed"
+echo "============================================"
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "11. Update E1, to provoke notification that doesn't work"
+echo "========================================================"
+payload='{
+  "A1": 6
+}'
+orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "12. GET subscription, see a 2 in timesFailed"
+echo "============================================"
 orionCurl --url /v2/subscriptions
 echo
 echo
@@ -97,6 +220,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
+
 02. Create sub (with invalid url), matching E1
 ==============================================
 HTTP/1.1 201 Created
@@ -110,7 +234,53 @@ Date: REGEX(.*)
 03. GET subscription, see error stats in notification field
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 424
+Content-Length: 328
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "http": {
+                "url": "http://nohost:REGEX(\d+)/notify"
+            },
+            "lastFailure": "REGEX(.*)",
+            "lastNotification": "REGEX(.*)",
+            "timesFailed": 1,
+            "timesSent": 1
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1"
+                }
+            ]
+        }
+    }
+]
+
+
+04. Update sub (with OK url), matching E1
+=========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. GET subscription, see NO error stats in notification field
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 275
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -123,27 +293,209 @@ Date: REGEX(.*)
             "attrsFormat": "normalized",
             "http": {
                 "url": "http://localhost:REGEX(\d+)/notify"
-            }
+            },
+            "lastNotification": "REGEX(.*)",
+            "timesSent": 2
         },
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": [
-                    "temp"
-                ],
-                "expression": {
-                    "q": "temp==10"
-                }
+                "attrs": []
             },
             "entities": [
                 {
-                    "id": "Room"
+                    "id": "E1"
                 }
             ]
         }
     }
 ]
 
+
+06. Update E1, to provoke notification that now works
+=====================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. GET subscription, see NO error stats in notification field
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 275
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/notify"
+            },
+            "lastNotification": "REGEX(.*)",
+            "timesSent": 3
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1"
+                }
+            ]
+        }
+    }
+]
+
+
+08. Dump accelerator, see 2 notification
+========================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 125
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 1
+            }, 
+            "id": "E1", 
+            "type": "T1"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 125
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 6
+            }, 
+            "id": "E1", 
+            "type": "T1"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+09. Update sub (with invalid url)
+=================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+10. GET subscription, see a 1 in timesFailed
+============================================
+HTTP/1.1 200 OK
+Content-Length: 328
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "http": {
+                "url": "http://nohost:REGEX(\d+)/notify"
+            },
+            "lastFailure": "REGEX(.*)",
+            "lastNotification": "REGEX(.*)",
+            "timesFailed": 1,
+            "timesSent": 4
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1"
+                }
+            ]
+        }
+    }
+]
+
+
+11. Update E1, to provoke notification that doesn't work
+========================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+12. GET subscription, see a 2 in timesFailed
+============================================
+HTTP/1.1 200 OK
+Content-Length: 328
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "http": {
+                "url": "http://nohost:REGEX(\d+)/notify"
+            },
+            "lastFailure": "REGEX(.*)",
+            "lastNotification": "REGEX(.*)",
+            "timesFailed": 2,
+            "timesSent": 5
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1"
+                }
+            ]
+        }
+    }
+]
 
 --TEARDOWN--
 brokerStop CB

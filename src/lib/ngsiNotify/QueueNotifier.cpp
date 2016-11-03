@@ -76,7 +76,6 @@ void QueueNotifier::sendNotifyContextRequest
 {
   ConnectionInfo ci;
 
-  LM_W(("KZ: In QueueNotifier::sendNotifyContextRequest. subId == %s", subscriptionId.c_str()));
   //
   // FIXME P5: analyze how much of the code of this function is the same as in Notifier::sendNotifyContextRequest
   // and could be refactored to common functions

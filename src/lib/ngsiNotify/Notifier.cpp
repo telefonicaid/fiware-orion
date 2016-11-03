@@ -282,7 +282,6 @@ typedef struct NotificationAsTemplateParams
 */
 void* sendNotifyContextRequestAsPerTemplate(void* p)
 {
-  LM_W(("KZ: In sendNotifyContextRequestAsPerTemplate"));
   NotificationAsTemplateParams*  paramP = (NotificationAsTemplateParams*) p;
   int                            errors = 0;
 
@@ -335,8 +334,6 @@ void Notifier::sendNotifyContextRequest
   const std::string&               subscriptionId
 )
 {
-  LM_W(("KZ: In Notifier::sendNotifyContextRequest. subId == '%s', tenant == '%s'", subscriptionId.c_str(), tenant.c_str()));
-
     ConnectionInfo  ci;
     Verb            verb = httpInfo.verb;
 

@@ -1941,7 +1941,6 @@ static bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
-        LM_W(("KZ: Calling sendNotifyContextRequest for sub '%s', tenant '%s'", subscriptionId.c_str(), tenant.c_str()));
         getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataV, blacklist, subscriptionId);
         allCerV.release();
         ncr.contextElementResponseVector.release();
@@ -1953,7 +1952,6 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
-      LM_W(("KZ: Calling sendNotifyContextRequest for sub '%s', tenant '%s'", subscriptionId.c_str(), tenant.c_str()));
       getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataV, blacklist, subscriptionId);
       ncr.contextElementResponseVector.release();
 
@@ -2009,7 +2007,6 @@ static BSONArray processConditionVector
         conds.append(nc->condValueList[jx]);
       }
 
-      LM_W(("KZ: calling processOnChangeConditionForSubscription for sub '%s', tenant '%s'", subscriptionId.c_str(), tenant.c_str()));
       if ((status == STATUS_ACTIVE) &&
           (processOnChangeConditionForSubscription(enV,
                                                    attrL,
@@ -2079,7 +2076,6 @@ BSONArray processConditionVector
   entIdStdVector2EntityIdVector(entitiesV, &enV);
   attrL.fill(notifAttributesV);
 
-  LM_W(("KZ: calling processConditionVector for sub '%s', tenant '%s'", subscriptionId.c_str(), tenant.c_str()));
   BSONArray arr = processConditionVector(&ncV,
                                          enV,
                                          attrL,
