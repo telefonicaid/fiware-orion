@@ -364,8 +364,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 )
 {
     ConnectionInfo                    ci;
-    Verb                              verb = httpInfo.verb;
-    std::vector<SenderThreadParams*>* paramsV = new std::vector<SenderThreadParams*>();
+    Verb                              verb    = httpInfo.verb;
+    std::vector<SenderThreadParams*>* paramsV = NULL;
 
 
     if ((verb == NOVERB) || (verb == UNKNOWNVERB) || disableCusNotif)
@@ -402,6 +402,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
                        attrsOrder,
                        metadataFilter);
     }
+
+    paramsV = new std::vector<SenderThreadParams*>();
 
     //
     // Creating the value of the Fiware-ServicePath HTTP header.
