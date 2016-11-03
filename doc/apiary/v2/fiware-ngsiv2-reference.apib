@@ -447,7 +447,7 @@ The value of `orderBy` can be:
 * The keyword `geo:distance` to order results by distance to a reference geometry when a "near"
   (`georel=near`) spatial relationship is used. 
 
-* A comma-separated list of attributes (including virtual attributes), e.g. `temperature,!humidity`.
+* A comma-separated list of attributes (including system/builtin attributes), e.g. `temperature,!humidity`.
   Results are ordered by the first attribute. On ties, the results are ordered by the second
   attribute and so on. A "!" before the attribute name means that the order is reversed.
 
