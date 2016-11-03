@@ -247,9 +247,13 @@ fi
 # -----------------------------------------------------------------------------
 #
 # The function brokerStart looks at the env var CB_THREADPOOL to decide
-# whether to start the broker with the --noThreadpool option or not
+# whether to start the broker with pool of threads or not.
+# Do not overwrite if a value is passed from environment
 #
-export CB_THREADPOOL=$threadpool
+if [ "$CB_THREADPOOL" == ""]
+then
+  export CB_THREADPOOL=$threadpool
+fi
 
 # ------------------------------------------------------------------------------
 #
