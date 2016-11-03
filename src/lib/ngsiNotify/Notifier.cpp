@@ -482,9 +482,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->renderFormat     = renderFormatToString(renderFormat);
     params->fiwareCorrelator = fiwareCorrelator;
 
-    // Cuidadito con esto
-    strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
-
 
     paramsV->push_back(params);
     return paramsV;
