@@ -54,7 +54,7 @@ def update_ok(doc, n_conditions):
     return True
 
 if len(sys.argv) != 2:
-    print "invalid number of arguments, please check https://fiware-orion.readthedocs.io/en/develop/admin/upgrading_crossing_1-3-0/index.html"
+    print "invalid number of arguments, please check https://fiware-orion.readthedocs.io/en/master/admin/upgrading_crossing_1-3-0/index.html"
     sys.exit()
 
 DB = sys.argv[1]
@@ -62,7 +62,7 @@ COL = 'csubs'
 
 # Warn user
 print "WARNING!!!! This script modifies your '%s' database. It is STRONGLY RECOMMENDED that you" % DB
-print "do a backup of your database before using it as described in https://fiware-orion.readthedocs.io/en/develop/admin/database_admin/index.html#backup. Use this script at your own risk."
+print "do a backup of your database before using it as described in https://fiware-orion.readthedocs.io/en/master/admin/database_admin/index.html#backup. Use this script at your own risk."
 print "If you are sure you want to continue type 'yes' and press Enter"
 
 confirm = raw_input()
@@ -202,4 +202,4 @@ print '  * error:               %d' % error
 
 if skipped > 0:
     print "------------------------------------------------------"
-    print "WARNING: some csub were skipped. Please check the documentation at https://fiware-orion.readthedocs.io/en/develop/admin/upgrading_crossing_1-3-0/index.html"
+    print "WARNING: some csub were skipped. Please check the documentation at https://fiware-orion.readthedocs.io/en/master/admin/upgrading_crossing_1-3-0/index.html"

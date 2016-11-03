@@ -71,6 +71,14 @@
 
 /* ****************************************************************************
 *
+* metadata ID separator
+*/
+#define MD_ID_SEPARATOR "()"
+
+
+
+/* ****************************************************************************
+*
 * Default Types for entities, attributes and metadata
 */
 #define DEFAULT_ENTITY_TYPE       "Thing"
@@ -90,6 +98,7 @@
 */
 #define DATE_CREATED   "dateCreated"
 #define DATE_MODIFIED  "dateModified"
+#define ALL_ATTRS      "*"
 
 
 

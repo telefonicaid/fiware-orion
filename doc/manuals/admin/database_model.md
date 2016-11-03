@@ -39,9 +39,9 @@ Fields:
 -   **attrs** is an keymap of the different attributes that have been
     created for that entity. The key is generated with the attribute
     name (changing "." for "=", as "." is not a valid character in
-    MongoDB document keys), appending '\_\_<id>' in the case of having
+    MongoDB document keys), appending `()<id>` in the case of having
     and ID. For example, the attribute with name "my.attr" with ID "id1"
-    will use the following key: "my=attr\_\_id2". Each one of the
+    will use the following key: `my=attr()id2`. Each one of the
     elements in the map has the following information:
     -   **type**: the attribute type
     -   **value**: the attribute value (for those attribute that has
@@ -149,7 +149,7 @@ Example document:
            },
            "mdNames": [ "customMD1", "customMD2" ]
        },
-       "A2_ID101": {
+       "A2()ID101": {
            "type": "TA2",
            "value": "176",
            "creDate" : 1389376244,

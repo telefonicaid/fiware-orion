@@ -277,6 +277,7 @@ extern bool entitiesQuery
 (
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
+  const AttributeList&             metadataList,
   const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
@@ -289,8 +290,6 @@ extern bool entitiesQuery
   long long*                       countP         = NULL,
   bool*                            badInputP      = NULL,
   const std::string&               sortOrderList  = "",
-  bool                             includeCreDate = false,
-  bool                             includeModDate = false,
   const std::string&               apiVersion     = "v1"
 );
 

@@ -111,11 +111,12 @@ static void setSubject(Subscription* s, const BSONObj& r)
   if (r.hasField(CSUB_EXPR))
   {
     mongo::BSONObj expression = getObjectFieldF(r, CSUB_EXPR);
-    std::string    q          = getStringFieldF(expression, CSUB_EXPR_Q);
-    std::string    mq         = getStringFieldF(expression, CSUB_EXPR_MQ);
-    std::string    geo        = getStringFieldF(expression, CSUB_EXPR_GEOM);
-    std::string    coords     = getStringFieldF(expression, CSUB_EXPR_COORDS);
-    std::string    georel     = getStringFieldF(expression, CSUB_EXPR_GEOREL);
+
+    std::string    q          = expression.hasField(CSUB_EXPR_Q)      ? getStringFieldF(expression, CSUB_EXPR_Q)      : "";
+    std::string    mq         = expression.hasField(CSUB_EXPR_MQ)     ? getStringFieldF(expression, CSUB_EXPR_MQ)     : "";
+    std::string    geo        = expression.hasField(CSUB_EXPR_GEOM)   ? getStringFieldF(expression, CSUB_EXPR_GEOM)   : "";
+    std::string    coords     = expression.hasField(CSUB_EXPR_COORDS) ? getStringFieldF(expression, CSUB_EXPR_COORDS) : "";
+    std::string    georel     = expression.hasField(CSUB_EXPR_GEOREL) ? getStringFieldF(expression, CSUB_EXPR_GEOREL) : "";
 
     s->subject.condition.expression.q        = q;
     s->subject.condition.expression.mq       = mq;

@@ -92,8 +92,7 @@ std::string MetadataVector::render(const std::string& indent, bool comma)
 */
 bool MetadataVector::matchFilter(const std::string& mdName, const std::vector<std::string>& metadataFilter)
 {
-
-  /* Metadata filtering only in the case of actual metadata vector not conatining "*" */
+  /* Metadata filtering only in the case of actual metadata vector not containing "*" */
   if ((metadataFilter.size() == 0) || (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_ALL) != metadataFilter.end()))
   {
     return true;

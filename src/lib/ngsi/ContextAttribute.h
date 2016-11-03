@@ -67,6 +67,9 @@ public:
   orion::CompoundValueNode*  compoundValueP;
   bool                       typeGiven;               // Was 'type' part of the incoming payload?
 
+  double                     creDate;                 // used by dateCreated functionality in NGSIv2
+  double                     modDate;                 // used by dateModified functionality in NGSIv2
+
   std::string                actionType;              // Used by special metadata in notifications functionality
   ContextAttribute*          previousValue;           // Used by special metadata in notifications functionality
                                                       // (Note we are forced to use a pointer for this, as we are using

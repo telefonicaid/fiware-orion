@@ -295,8 +295,8 @@ static void prepareDatabaseWithAttributeIds(void) {
     BSONObj en = BSON("_id" << BSON("id" << "E10" << "type" << "T10") <<
                       "attrNames" << BSON_ARRAY("A1" << "A2") <<
                        "attrs" << BSON(
-                          "A1__ID1" << BSON("type" << "TA1" << "value" << "val11") <<
-                          "A1__ID2" << BSON("type" << "TA1" << "value" << "val12") <<
+                          "A1()ID1" << BSON("type" << "TA1" << "value" << "val11") <<
+                          "A1()ID2" << BSON("type" << "TA1" << "value" << "val12") <<
                           "A2" << BSON("type" << "TA2" << "value" << "val2")
                           )
                       );
@@ -4661,7 +4661,7 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
     ASSERT_EQ(1, attrNames.size());
-    a1 = attrs.getField("A1__ID1").embeddedObject();
+    a1 = attrs.getField("A1()ID1").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
@@ -6163,8 +6163,8 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(3, attrs.nFields());
     ASSERT_EQ(2, attrNames.size());
-    BSONObj a1id1 = attrs.getField("A1__ID1").embeddedObject();
-    BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
+    BSONObj a1id1 = attrs.getField("A1()ID1").embeddedObject();
+    BSONObj a1id2 = attrs.getField("A1()ID2").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
@@ -6349,8 +6349,8 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(3, attrs.nFields());
     ASSERT_EQ(2, attrNames.size());
-    BSONObj a1id1 = attrs.getField("A1__ID1").embeddedObject();
-    BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
+    BSONObj a1id1 = attrs.getField("A1()ID1").embeddedObject();
+    BSONObj a1id2 = attrs.getField("A1()ID2").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
@@ -6529,9 +6529,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(4, attrs.nFields());
     ASSERT_EQ(2, attrNames.size());
-    BSONObj a1id1 = attrs.getField("A1__ID1").embeddedObject();
-    BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
-    BSONObj a1id3 = attrs.getField("A1__ID3").embeddedObject();
+    BSONObj a1id1 = attrs.getField("A1()ID1").embeddedObject();
+    BSONObj a1id2 = attrs.getField("A1()ID2").embeddedObject();
+    BSONObj a1id3 = attrs.getField("A1()ID3").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
@@ -6719,9 +6719,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(5, attrs.nFields());
     ASSERT_EQ(3, attrNames.size());
-    BSONObj a1id1 = attrs.getField("A1__ID1").embeddedObject();
-    BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
-    BSONObj a1id3 = attrs.getField("A1__ID3").embeddedObject();
+    BSONObj a1id1 = attrs.getField("A1()ID1").embeddedObject();
+    BSONObj a1id2 = attrs.getField("A1()ID2").embeddedObject();
+    BSONObj a1id3 = attrs.getField("A1()ID3").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
     a3 = attrs.getField("A3").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
@@ -6908,8 +6908,8 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(3, attrs.nFields());
     ASSERT_EQ(2, attrNames.size());
-    BSONObj a1id1 = attrs.getField("A1__ID1").embeddedObject();
-    BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
+    BSONObj a1id1 = attrs.getField("A1()ID1").embeddedObject();
+    BSONObj a1id2 = attrs.getField("A1()ID2").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
@@ -7083,8 +7083,8 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(3, attrs.nFields());
     ASSERT_EQ(2, attrNames.size());
-    BSONObj a1id1 = attrs.getField("A1__ID1").embeddedObject();
-    BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
+    BSONObj a1id1 = attrs.getField("A1()ID1").embeddedObject();
+    BSONObj a1id2 = attrs.getField("A1()ID2").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
@@ -7262,7 +7262,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
     ASSERT_EQ(2, attrNames.size());
-    BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
+    BSONObj a1id2 = attrs.getField("A1()ID2").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
@@ -7444,7 +7444,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
     ASSERT_EQ(1, attrNames.size());
-    BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
+    BSONObj a1id2 = attrs.getField("A1()ID2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id2, "type"));
     EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));

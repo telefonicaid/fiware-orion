@@ -55,6 +55,7 @@ typedef struct QueryContextRequest
   Restriction       restriction;    // Optional
 
   int               restrictions;
+  AttributeList     metadataList;     // From URI param 'metadata'
   std::string       contextProvider;  // Not part of the payload - used internally only
 
   QueryContextRequest();

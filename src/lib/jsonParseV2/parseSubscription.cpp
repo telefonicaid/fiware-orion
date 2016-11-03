@@ -882,18 +882,22 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
     }
 
     std::string attrName = iter->GetString();
+
     if (attrName.empty())
     {
       return badInput(ciP, "attrs element is empty");
     }
+
     if (forbiddenIdCharsV2(attrName.c_str()))
     {
       return badInput(ciP, "attrs element has forbidden char");
     }
+
     if (attrName.length() > MAX_ID_LEN)
     {
       return badInput(ciP, "max attribute length exceeded");
     }
+
     vec->push_back(attrName);
   }
 

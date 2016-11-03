@@ -126,7 +126,7 @@ void UpdateContextSubscriptionRequest::toNgsiv2Subscription(SubscriptionUpdate* 
   subUp->fromNgsiv1 = true;
 
   // Fields that can be modified in a NGSIv1 subscription
-  // (See https://fiware-orion.readthedocs.io/en/develop/user/updating_regs_and_subs/index.html)
+  // (See https://fiware-orion.readthedocs.io/en/master/user/updating_regs_and_subs/index.html)
   //
   //  * notifyConditions (within subject in NGSIv2)
   //  * throttling       (root field in NGSIv2)

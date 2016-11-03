@@ -166,6 +166,9 @@ ContextAttribute::ContextAttribute()
   typeGiven             = false;
   previousValue         = NULL;
 
+  creDate = 0;
+  modDate = 0;
+
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
 }
@@ -200,6 +203,9 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
   skip                  = false;
   typeGiven             = caP->typeGiven;
   previousValue         = NULL;
+
+  creDate = caP->creDate;
+  modDate = caP->modDate;
 
   providingApplication.set(caP->providingApplication.get());
   providingApplication.setMimeType(caP->providingApplication.getMimeType());
@@ -265,6 +271,9 @@ ContextAttribute::ContextAttribute
   typeGiven             = false;
   previousValue         = NULL;
 
+  creDate = 0;
+  modDate = 0;
+
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
 }
@@ -297,6 +306,9 @@ ContextAttribute::ContextAttribute
   skip                  = false;
   typeGiven             = false;
   previousValue         = NULL;
+
+  creDate = 0;
+  modDate = 0;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -331,6 +343,9 @@ ContextAttribute::ContextAttribute
   typeGiven             = false;
   previousValue         = NULL;
 
+  creDate = 0;
+  modDate = 0;
+
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
 }
@@ -364,6 +379,9 @@ ContextAttribute::ContextAttribute
   typeGiven             = false;
   previousValue         = NULL;
 
+  creDate = 0;
+  modDate = 0;
+
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
 }
@@ -392,6 +410,9 @@ ContextAttribute::ContextAttribute
   skip                  = false;
   typeGiven             = false;
   previousValue         = NULL;
+
+  creDate = 0;
+  modDate = 0;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -694,6 +715,18 @@ std::string ContextAttribute::toJson
 )
 {
   std::string  out;
+
+  // Add special metadata representing attribute dates
+  if ((creDate != 0) && (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_DATECREATED) != metadataFilter.end()))
+  {
+    Metadata* mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, creDate);
+    metadataVector.push_back(mdP);
+  }
+  if ((modDate != 0) && (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_DATEMODIFIED) != metadataFilter.end()))
+  {
+    Metadata* mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, modDate);
+    metadataVector.push_back(mdP);
+  }
 
   if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_KEYVALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
   {
@@ -1002,6 +1035,12 @@ void ContextAttribute::present(const std::string& indent, int ix)
   LM_T(LmtPresent, ("%s  Type:      %s", 
 		    indent.c_str(), 
 		    type.c_str()));
+  LM_T(LmtPresent, ("%s  creDate:   %f",
+        creDate,
+        type.c_str()));
+  LM_T(LmtPresent, ("%s  modDate:   %f",
+        modDate,
+        type.c_str()));
 
   if (compoundValueP == NULL)
   {

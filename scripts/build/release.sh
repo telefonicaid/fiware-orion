@@ -152,19 +152,19 @@ touch CHANGES_NEXT_RELEASE
 # dev release sets 'latest' and not 'X.Y.Z-next"
 if [ "$BROKER_RELEASE" != "dev" ]
 then
-  sed "s/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=latest)](http:\/\/fiware-orion.readthedocs.org\/en\/latest\/?badge=latest)/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=$NEW_VERSION)](http:\/\/fiware-orion.readthedocs.org\/en\/$NEW_VERSION\/?badge=$NEW_VERSION)/" README.md > /tmp/README.md
+  sed "s/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=latest)](http:\/\/fiware-orion.readthedocs.io\/en\/latest\/?badge=latest)/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=$NEW_VERSION)](http:\/\/fiware-orion.readthedocs.io\/en\/$NEW_VERSION\/?badge=$NEW_VERSION)/" README.md > /tmp/README.md
 else
-  sed "s/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=$currentVersion)](http:\/\/fiware-orion.readthedocs.org\/en\/$currentVersion\/?badge=$currentVersion)/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=latest)](http:\/\/fiware-orion.readthedocs.org\/en\/latest\/?badge=latest)/" README.md > /tmp/README.md
+  sed "s/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=$currentVersion)](http:\/\/fiware-orion.readthedocs.io\/en\/$currentVersion\/?badge=$currentVersion)/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=latest)](http:\/\/fiware-orion.readthedocs.io\/en\/latest\/?badge=latest)/" README.md > /tmp/README.md
 fi
 mv /tmp/README.md README.md
 
 # Adjust Dockerfile GIT_REV_ORION. Note that the procedure is not symmetric (like in version.h), as
-# dev release sets 'develop' and not 'X.Y.Z-next"
+# dev release sets 'master' and not 'X.Y.Z-next"
 if [ "$BROKER_RELEASE" != "dev" ]
 then
-  sed "s/ENV GIT_REV_ORION develop/ENV GIT_REV_ORION $NEW_VERSION/" docker/Dockerfile > /tmp/Dockerfile
+  sed "s/ENV GIT_REV_ORION master/ENV GIT_REV_ORION $NEW_VERSION/" docker/Dockerfile > /tmp/Dockerfile
 else
-  sed "s/ENV GIT_REV_ORION $currentVersion/ENV GIT_REV_ORION develop/" docker/Dockerfile > /tmp/Dockerfile
+  sed "s/ENV GIT_REV_ORION $currentVersion/ENV GIT_REV_ORION master/" docker/Dockerfile > /tmp/Dockerfile
 fi
 mv /tmp/Dockerfile docker/Dockerfile
 

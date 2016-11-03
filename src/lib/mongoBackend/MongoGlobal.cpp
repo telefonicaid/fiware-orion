@@ -1001,6 +1001,51 @@ bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
 
 /* ****************************************************************************
 *
+* addDatesForAttrs -
+*/
+static void addDatesForAttrs(ContextElementResponse* cerP, bool includeCreDate, bool includeModDate)
+{
+  for (unsigned int ix = 0; ix < cerP->contextElement.contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = cerP->contextElement.contextAttributeVector[ix];
+    if (includeCreDate && caP->creDate != 0)
+    {
+      Metadata*   mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, caP->creDate);
+      caP->metadataVector.push_back(mdP);
+    }
+
+    if (includeModDate && caP->modDate != 0)
+    {
+      Metadata*   mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, caP->modDate);
+      caP->metadataVector.push_back(mdP);
+    }
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* isCustomAttr -
+*
+* Check that the parameter is a not custom attr, e.g. dateCreated
+*
+* FIXME P2: this function probably could be moved to another place "closer" to attribute classes
+*/
+static bool isCustomAttr(std::string attrName)
+{
+  if ((attrName != DATE_CREATED) && (attrName != DATE_MODIFIED) && (attrName != ALL_ATTRS))
+  {
+    return false;
+  }
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
 * entitiesQuery -
 *
 * This method is used by queryContext and subscribeContext (ONCHANGE conditions). It takes
@@ -1017,6 +1062,7 @@ bool entitiesQuery
 (
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
+  const AttributeList&             metadataList,
   const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
@@ -1029,8 +1075,6 @@ bool entitiesQuery
   long long*                       countP,
   bool*                            badInputP,
   const std::string&               sortOrderList,
-  bool                             includeCreDate,
-  bool                             includeModDate,
   const std::string&               apiVersion
 )
 {
@@ -1068,8 +1112,13 @@ bool entitiesQuery
   {
     std::string attrName = attrL[ix];
 
-    attrs.append(attrName);
-    LM_T(LmtMongo, ("Attribute query token: '%s'", attrName.c_str()));
+    /* Custom metadata (e.g. dateCreated) are not "real" attributes in the DB, so they cannot
+     * be included in the search query */
+    if (!isCustomAttr(attrName))
+    {
+      attrs.append(attrName);
+      LM_T(LmtMongo, ("Attribute query token: '%s'", attrName.c_str()));
+    }
   }
 
   if (attrs.arrSize() > 0)
@@ -1280,14 +1329,21 @@ bool entitiesQuery
     // Build CER from BSON retrieved from DB
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
-    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, includeCreDate, includeModDate, apiVersion);
-    cer->statusCode.fill(SccOk);
+    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, apiVersion);
+
+    addDatesForAttrs(cer, metadataList.lookup(NGSI_MD_DATECREATED), metadataList.lookup(NGSI_MD_DATEMODIFIED));
 
     /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
     for (unsigned int ix = 0; ix < attrL.size(); ++ix)
     {
       bool         found     = false;
       std::string  attrName  = attrL[ix];
+
+      /* The special case "*" is not taken into account*/
+      if (attrName == ALL_ATTRS)
+      {
+        continue;
+      }
 
       for (unsigned int jx = 0; jx < cer->contextElement.contextAttributeVector.size(); ++jx)
       {
@@ -1822,7 +1878,7 @@ AttributeList subToAttributeList(const BSONObj& sub)
 *
 * setOnSubscriptionMetadata -
 *
-* FIXME #910: disabled by the moment, maybe removed at the end
+* FIXME #920: disabled by the moment, maybe removed at the end
 */
 static void setOnSubscriptionMetadata(ContextElementResponseVector* cerVP)
 {
@@ -1864,7 +1920,7 @@ static bool processOnChangeConditionForSubscription
 (
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
-  const std::vector<std::string>   metadataV,
+  const std::vector<std::string>&  metadataV,
   ConditionValueList*              condValues,
   const std::string&               subId,
   const HttpInfo&                  notifyHttpInfo,
@@ -1883,15 +1939,17 @@ static bool processOnChangeConditionForSubscription
   NotifyContextRequest          ncr;
   ContextElementResponseVector  rawCerV;
   AttributeList                 emptyList;
+  AttributeList                 metadataList;
 
-  if (!blacklist && !entitiesQuery(enV, attrL, *resP, &rawCerV, &err, true, tenant, servicePathV))
+  metadataList.fill(metadataV);
+  if (!blacklist && !entitiesQuery(enV, attrL, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
 
     return false;
   }
-  else if (blacklist && !entitiesQuery(enV, emptyList, *resP, &rawCerV, &err, true, tenant, servicePathV))
+  else if (blacklist && !entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
@@ -1904,7 +1962,7 @@ static bool processOnChangeConditionForSubscription
   rawCerV.release();
 
 #if 0
-  // FIXME #910: disabled by the moment, maybe removed at the end
+  // FIXME #920: disabled by the moment, maybe removed at the end
   /* Append notification metadata */
   if (metadataFlags)
   {
@@ -1926,7 +1984,7 @@ static bool processOnChangeConditionForSubscription
       ContextElementResponseVector  allCerV;
 
 
-      if (!entitiesQuery(enV, emptyList, *resP, &rawCerV, &err, false, tenant, servicePathV))
+      if (!entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, false, tenant, servicePathV))
       {
         rawCerV.release();
         ncr.contextElementResponseVector.release();
@@ -1975,7 +2033,7 @@ static BSONArray processConditionVector
   NotifyConditionVector*           ncvP,
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
-  const std::vector<std::string>   metadataV,
+  const std::vector<std::string>&  metadataV,
   const std::string&               subId,
   const HttpInfo&                  httpInfo,
   bool*                            notificationDone,

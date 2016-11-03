@@ -1339,7 +1339,6 @@ class NGSI:
         meta_names_list = []
         meta_values_list = []
         meta_types_list = []
-
         if entity_context["metadatas_number"] > 1:
             for i in range(int(entity_context["metadatas_number"])):
                 meta_names_list.append("%s_%s" % (entity_context["metadatas_name"], str(i)))
@@ -1781,7 +1780,7 @@ class NGSI:
             for i in range (len(meta_names_list)):  # number of ametadata attribute notified
                 for meta_flag in special_meta:      # number of metadata flags
                     # previousValue metadata verification
-                    if meta_flag == "previousValue" and previous_value["value"] is not None:
+                    if meta_flag == "previousValue" and previous_value["value"] is not None and previous_value["name"] == meta_names_list[i]:
                         assert "previousValue" in metadata, " ERROR - the previousValue does not exist im metadata: %s" % str (metadata)
                         assert metadata["previousValue"]["type"] == previous_value["type"], \
                             " ERROR - the previousValue type is not Text: %s" % previous_value["type"]

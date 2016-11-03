@@ -79,10 +79,10 @@ pip install --upgrade -r requirements.txt --allow-all-external
     configuration.json:                  initial configuration, before of execution
     environment.py                       (generic environment) may define code to run before and after certain events during your testing
     properties.json.base:                reference file with parameters (properties) used in tests (after is copied to properties.json)
-    properties.json:                     initially does not exists. This has parameters necessary to execute the tests (see [properties.json.base](https://github.com/telefonicaid/fiware-orion/tree/develop/test/acceptance/behave#propertiesjsonbase))
+    properties.json:                     initially does not exists. This has parameters necessary to execute the tests (see [properties.json.base](https://github.com/telefonicaid/fiware-orion/tree/master/test/acceptance/behave#propertiesjsonbase))
     README.md:                           this file, a brief explication about this framework to test
     feature_files_structure.md           a brief explication about the feature files structure
-    requirement.txt:                     external library, necessary install before to execute test (see [Quick way](https://github.com/telefonicaid/fiware-orion/tree/develop/test/acceptance/behave#quick-way) section)
+    requirement.txt:                     external library, necessary install before to execute test (see [Quick way](https://github.com/telefonicaid/fiware-orion/tree/master/test/acceptance/behave#quick-way) section)
     behave_all.py                        execute all features in a given directory and its subdirectories
 
 *Note*: The `environment.py` file (optional), if present, must be in the same directory that contains the steps/ directory 
@@ -121,7 +121,7 @@ file in the same directory that contains the “steps” directory.
            - true: read external file (the file is mandatory) in `PATH_TO_SETTING_FOLDER` (with ssh commands) and execute these automatically (used to create `properties.json`) 
            - false: it does nothing and the creation of `properties.json` will be by user in jenkins console.
        * CB_RUNNING_MODE: is used to determine how is compiled ContextBroker.
-           ContextBroker will be compiled and installed previously by user, `http://fiware-orion.readthedocs.org/en/develop/admin/build_source/index.html`.        
+           ContextBroker will be compiled and installed previously by user, `http://fiware-orion.readthedocs.io/en/master/admin/build_source/index.html`.
            - RPM: CB is installed as RPM, so service tooling will be used to start and stop
            - CLI: plain CB command line interface will be used to start contextBroker, the contextBroker binary (compiled in DEBUG mode) 
              must be available in the system PATH.   
@@ -194,6 +194,10 @@ file in the same directory that contains the “steps” directory.
     * MONGO_DATABASE: mongo database (sth by default).
     * MONGO_RETRIES: number of retries for data verification.
     * MONGO_DELAY_TO_RETRY: time in seconds to delay in each retry.
+    
+ Properties used by listeners
+- listeners
+    *  LISTENER_NOTIF: listener host used to notify
 
 
 ## Actions pre-defined in Feature Descriptions (Pre and/or Post Actions)
@@ -231,8 +235,8 @@ Feature: feature name...
 ## Notification listener
 
 The notification listener is executed automatically (a HTTP server as a daemon) in local IP where test are executed. 
-If you wish use the local IP in the url to notification, put in `notification_http_url` field the `replace_host` value, ex: 
-    `http://replace_host:1234/notify` -->  it string is replaced internally by the local IP (used to notifications).
+If you wish to use a listener, put in `notification_http_url` field the `replace_host` value, ex:
+    `http://replace_host:1234/notify` -->  it string is replaced internally by the LISTENER_NOTIF property (see properties.json.base).
 
 
 ## Summary of Features and Scenarios
@@ -389,6 +393,7 @@ The Context Broker must start with "DEBUG" level in "CB_EXTRA_OPS" field into pr
           | metadatas_type      | "alarm"                             |
           | metadatas_value     | "default"                           |
         ```             
+  - if "attr_value" has "timestamp in last minutes=N" as value then a timestamp with N last minutes of current timestamp is generated
        
   Logs:     
   - If don´t want verify the value of something trace in log, use `ignored` as value.
@@ -418,7 +423,7 @@ The Context Broker must start with "DEBUG" level in "CB_EXTRA_OPS" field into pr
   - In expression value have multiples expressions uses `&` as separator, and in each operation use `>>>` as separator between the key and the value,
      ex:
          `| condition_expression | q>>>temperature>40&georel>>>near&geometry>>>point&coords>>>40.6391 |`
-  - If `notification_http_url` has `replace_host` value, ex: http://replace_host:1234/notify, it string is replaced internally by the hostname (used to notifications).
+  - If `notification_http_url` has `replace_host` value, ex: http://replace_host:1234/notify, it string is replaced internally by the LISTENER_NOTIF property (see properties.json.base)
   - If you do like to use the subscriptionId of the subscription created previously, use `previous subs` value
  
 
@@ -428,4 +433,4 @@ You can to use multiples tags in each scenario, possibles tags used:
 
     - happy_path, skip, errors_40x, only_develop, too_slow, ISSUE_XXX, BUG_XXX, etc
 
-and to filter scenarios by these tags: see [Executing Tests](https://github.com/telefonicaid/fiware-orion/tree/develop/test/acceptance/behave#executing-tests) section.
+and to filter scenarios by these tags: see [Executing Tests](https://github.com/telefonicaid/fiware-orion/tree/master/test/acceptance/behave#executing-tests) section.
