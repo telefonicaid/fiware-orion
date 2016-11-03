@@ -63,7 +63,7 @@ export PATH=$PATH:$PWD/scripts
 #
 # global variables
 #
-CASES_DIR=cases
+CASES_DIR=cases2
 
 
 
