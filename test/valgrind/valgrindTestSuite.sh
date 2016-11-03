@@ -59,6 +59,12 @@ export CB_TEST_PORT=9999
 #
 export PATH=$PATH:$PWD/scripts
 
+# -----------------------------------------------------------------------------
+#
+# global variables
+#
+CASES_DIR=cases
+
 
 
 # -----------------------------------------------------------------------------
@@ -404,7 +410,7 @@ function setNumberOfTests()
 
   if [ "$runHarness" -eq "1" ]
   then
-    for file in $(find ../functionalTest/cases -name "$TEST_FILTER")
+    for file in $(find ../functionalTest/$CASES_DIR -name "$TEST_FILTER")
     do
       noOfTests=$noOfTests+1
     done
@@ -609,7 +615,7 @@ then
     exit 1
   fi
 
-  cd $SRC_TOP/test/functionalTest/cases
+  cd $SRC_TOP/test/functionalTest/$CASES_DIR
   vMsg TEST_FILTER: $TEST_FILTER
   for file in $(find . -name "$TEST_FILTER" | sort)
   do
@@ -650,7 +656,7 @@ then
 
     # In the case of harness test, we check that the test is implemented checking
     # that the word VALGRIND_READY apears in the .test file (usually, in a commented line)
-    grep VALGRIND_READY $SRC_TOP/test/functionalTest/cases/$directory/$file > /dev/null 2>&1
+    grep VALGRIND_READY $SRC_TOP/test/functionalTest/$CASES_DIR/$directory/$file > /dev/null 2>&1
     if [ "$?" -ne "0" ]
     then
       printNotImplementedString $htest
@@ -678,8 +684,8 @@ then
       vMsg status=$status
       if [ "$status" != "0" ]
       then
-        mv /tmp/testHarness         test/functionalTest/cases/$directory/$htest.harness.out
-        cp /tmp/contextBroker.log   test/functionalTest/cases/$directory/$htest.contextBroker.log
+        mv /tmp/testHarness         test/functionalTest/$CASES_DIR/$directory/$htest.harness.out
+        cp /tmp/contextBroker.log   test/functionalTest/$CASES_DIR/$directory/$htest.contextBroker.log
         detailForOkString=" (no leak but ftest error $status)"
         harnessErrorV[$harnessErrors]="$xTestNo: $file (exit code $status)"
         harnessErrors=$harnessErrors+1
@@ -692,13 +698,13 @@ then
         exit 3
       fi
 
-      mv /tmp/valgrind.out test/functionalTest/cases/$directory/$htest.valgrind.out
+      mv /tmp/valgrind.out test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
       
       typeset -i headEndLine1
       typeset -i headEndLine2
       vMsg processing $directory/$htest.valgrind.out in $(pwd)
       vMsg "calling processResult"
-      processResult test/functionalTest/cases/$directory/$htest.valgrind.out
+      processResult test/functionalTest/$CASES_DIR/$directory/$htest.valgrind.out
       vMsg "called processResult"
     else
       if [ "$dryLeaks" == "on" ]
