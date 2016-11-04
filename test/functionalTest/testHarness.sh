@@ -22,6 +22,7 @@
 #
 # Author: Ken Zangelin
 
+
 date
 testStartTime=$(date +%s.%2N)
 MAX_TRIES=${CB_MAX_TRIES:-3}
@@ -98,6 +99,7 @@ function usage()
   echo "$empty [--no-duration (removes duration mark on successful tests)]"
   echo "$empty [--noCache (force broker to be started with the option --noCache)]"
   echo "$empty [--cache (force broker to be started without the option --noCache)]"
+  echo "$empty [--noThreadpool (do not use a threadpool, unless specified by a test case. If not set, a thread pool of 200:20 is used by default in test cases which do not set notificationMode options)]"
   echo "$empty [ <directory or file> ]*"
   echo
   echo "* Please note that if a directory is passed as parameter, its entire path must be given, not only the directory-name"
@@ -196,23 +198,25 @@ showDuration=on
 fromIx=0
 ixList=""
 noCache=""
+threadpool=ON
 
 vMsg "parsing options"
 while [ "$#" != 0 ]
 do
-  if   [ "$1" == "-u" ];            then usage 0;
-  elif [ "$1" == "-v" ];            then verbose=on;
-  elif [ "$1" == "--dryrun" ];      then dryrun=on;
-  elif [ "$1" == "--keep" ];        then keep=on;
-  elif [ "$1" == "--stopOnError" ]; then stopOnError=on;
-  elif [ "$1" == "--filter" ];      then testFilter="$2"; filterGiven=yes; shift;
-  elif [ "$1" == "--match" ];       then match="$2"; shift;
-  elif [ "$1" == "--dir" ];         then dir="$2"; dirGiven=yes; shift;
-  elif [ "$1" == "--fromIx" ];      then fromIx=$2; shift;
-  elif [ "$1" == "--ixList" ];      then ixList=$2; shift;
-  elif [ "$1" == "--no-duration" ]; then showDuration=off;
-  elif [ "$1" == "--noCache" ];     then noCache=ON;
-  elif [ "$1" == "--cache" ];       then noCache=OFF;
+  if   [ "$1" == "-u" ];             then usage 0;
+  elif [ "$1" == "-v" ];             then verbose=on;
+  elif [ "$1" == "--dryrun" ];       then dryrun=on;
+  elif [ "$1" == "--keep" ];         then keep=on;
+  elif [ "$1" == "--stopOnError" ];  then stopOnError=on;
+  elif [ "$1" == "--filter" ];       then testFilter="$2"; filterGiven=yes; shift;
+  elif [ "$1" == "--match" ];        then match="$2"; shift;
+  elif [ "$1" == "--dir" ];          then dir="$2"; dirGiven=yes; shift;
+  elif [ "$1" == "--fromIx" ];       then fromIx=$2; shift;
+  elif [ "$1" == "--ixList" ];       then ixList=$2; shift;
+  elif [ "$1" == "--no-duration" ];  then showDuration=off;
+  elif [ "$1" == "--noCache" ];      then noCache=ON;
+  elif [ "$1" == "--cache" ];        then noCache=OFF;
+  elif [ "$1" == "--noThreadpool" ]; then threadpool=OFF;
   else
     if [ "$dirOrFile" == "" ]
     then
@@ -240,6 +244,16 @@ then
   export CB_NO_CACHE=$noCache
 fi
 
+# -----------------------------------------------------------------------------
+#
+# The function brokerStart looks at the env var CB_THREADPOOL to decide
+# whether to start the broker with pool of threads or not.
+# Do not overwrite if a value is passed from environment
+#
+if [ "$CB_THREADPOOL" == "" ]
+then
+  export CB_THREADPOOL=$threadpool
+fi
 
 # ------------------------------------------------------------------------------
 #
@@ -830,7 +844,7 @@ do
       fi
 
       runTest $testFile $tryNo
-      if [ $shellResult == "0" ]
+      if [ "$shellResult" == "0" ]
       then
         if [ $tryNo != 1 ]
         then
