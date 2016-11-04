@@ -1,0 +1,1 @@
+- Fix: -logAppend as default in configuration for RPM package (#2637)
