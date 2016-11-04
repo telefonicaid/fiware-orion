@@ -64,7 +64,7 @@ public:
   int start();
 
 private:
- SyncQOverflow<SenderThreadParams*>  queue;
+ SyncQOverflow<std::vector<SenderThreadParams*>*>  queue;
  QueueWorkers                        workers;
 
 };
