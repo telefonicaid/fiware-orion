@@ -1,1 +1,2 @@
 - Fix: threadpool mode not actually used for custom notifications, even if -notificationMode is set so (#2622)
+- Fix: -logAppend as default in configuration for RPM package (#2637)
