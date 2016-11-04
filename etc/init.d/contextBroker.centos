@@ -92,7 +92,8 @@ broker_start()
     printf "%-50s" "Starting ${NAME}..."
     if [[ -x ${EXECUTABLE} ]]; then
         # logs are always managed by CB and written to file inside directory BROKER_LOG_DIR (see /etc/sysconfig/contextBroker) and rotated by logrotate
-        su $BROKER_USER -c "${EXECUTABLE} ${BROKER_OPTS} &> /dev/null"
+        BROKER_STDERR_LOG=${BROKER_LOG_DIR}/${NAME}-error.log
+        su $BROKER_USER -c "${EXECUTABLE} ${BROKER_OPTS} 1>/dev/null 2>${BROKER_STDERR_LOG}"
         sleep 2 # wait some time to let the contextbroker start
         PID=$(cat ${BROKER_PID_FILE} 2> /dev/null)
         if [[ -z "${PID}" ]]; then
