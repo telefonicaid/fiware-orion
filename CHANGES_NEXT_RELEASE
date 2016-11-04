@@ -1,5 +1,4 @@
 - Fix: threadpool mode not actually used for custom notifications, even if -notificationMode is set so (#2622)
 - Fix: -logAppend as default in configuration for RPM package (#2637)
-- Fix: Default log output for stdout is now the same format as in the log file. Use new CLI option '-logForHumans' to nodify this. (Issue #2609)
-- Add: New CLI option: '-logToScreen', to make the broker send traces to stdout (formerly the option '-fg' did this) (Issue #2609)
+- Fix: Default log output for stdout is now the same format as in the log file. Use new CLI option '-logForHumans' to modify this. (Issue #2609)
 - Add: New CLI option: '-logForHumans', to make the screen log output readable for humans (Issue #2609)

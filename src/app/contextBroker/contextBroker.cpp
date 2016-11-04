@@ -271,7 +271,6 @@ int             lsPeriod;
 bool            relogAlarms;
 bool            strictIdv1;
 bool            disableCusNotif;
-bool            logToScreen;
 bool            logForHumans;
 
 
@@ -397,7 +396,6 @@ PaArgument paArgs[] =
   { "-strictNgsiv1Ids",             &strictIdv1,      "CHECK_ID_V1",           PaBool, PaOpt, false, false, true, CHECK_v1_ID_DESC      },
   { "-disableCustomNotifications",  &disableCusNotif, "DISABLE_CUSTOM_NOTIF",  PaBool, PaOpt, false, false, true, DISABLE_CUSTOM_NOTIF  },
 
-  { "-logToScreen",   &logToScreen,     "LOG_TO_SCREEN",      PaBool, PaOpt, false, false, true,             LOG_TO_SCREEN_DESC  },
   { "-logForHumans",  &logForHumans,    "LOG_FOR_HUMANS",     PaBool, PaOpt, false, false, true,             LOG_FOR_HUMANS_DESC },
 
   PA_END_OF_ARGS
@@ -1620,9 +1618,9 @@ int main(int argC, char* argV[])
 
 
   //
-  // If option '-logToScreen' is set, print traces to stdout as well, otherwise, only to file
+  // If option '-fg' is set, print traces to stdout as well, otherwise, only to file
   //
-  if (paIsSet(argC, argV, "-logToScreen") || paIsSet(argC, argV, "-fg"))
+  if (paIsSet(argC, argV, "-fg"))
   {
     paConfig("log to screen",                 (void*) true);
 
