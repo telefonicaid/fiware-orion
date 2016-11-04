@@ -1,5 +1,0 @@
-- Fix: over-logging of Runtime Error traces not representing actual error (#2597)
-- Fix: support attributes with double underscore as part of the name (#2453)
-- Fix: threadpool mode was not actually used, even if -notificationMode is set so; this fix solves the problem for not-custom notifications (partial fix for #2622)
-- Fix: threadpool mode not actually used for custom notifications, even if -notificationMode is set so (#2622)
-- Fix: -logAppend as default in configuration for RPM package (#2637)
