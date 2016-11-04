@@ -1625,9 +1625,13 @@ int main(int argC, char* argV[])
     paConfig("log to screen",                 (void*) true);
 
     if (paIsSet(argC, argV, "-logForHumans"))
+    {
       paConfig("screen line format", (void*) "TYPE@TIME  FILE[LINE]: TEXT");
+    }
     else
+    {
       paConfig("screen line format", LOG_FILE_LINE_FORMAT);
+    }
   }
 
   paParse(paArgs, argC, (char**) argV, 1, false);
