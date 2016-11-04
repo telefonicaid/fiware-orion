@@ -25,7 +25,7 @@ notifyFormat_ngsi10
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0
+brokerStart CB 0 IPv4 --cache
 
 --SHELL--
 
@@ -151,7 +151,7 @@ echo "===================================="
 brokerStop -v CB
 echo "Broker Stopped"
 sleep 1
-brokerStart CB > /dev/null
+brokerStart CB 0 IPv4 --cache > /dev/null
 echo "Broker Restarted"
 sleep 1
 echo
