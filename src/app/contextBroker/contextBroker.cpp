@@ -1622,7 +1622,7 @@ int main(int argC, char* argV[])
   //
   // If option '-logToScreen' is set, print traces to stdout as well, otherwise, only to file
   //
-  if (paIsSet(argC, argV, "-logToScreen"))
+  if (paIsSet(argC, argV, "-logToScreen") || paIsSet(argC, argV, "-fg"))
   {
     paConfig("log to screen",                 (void*) true);
 
