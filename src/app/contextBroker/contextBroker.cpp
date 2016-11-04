@@ -271,7 +271,8 @@ int             lsPeriod;
 bool            relogAlarms;
 bool            strictIdv1;
 bool            disableCusNotif;
-
+bool            logToScreen;
+bool            logForHumans;
 
 
 
@@ -324,7 +325,8 @@ bool            disableCusNotif;
 #define RELOGALARMS_DESC       "log messages for existing alarms beyond the raising alarm log message itself"
 #define CHECK_v1_ID_DESC       "additional checks for id fields in the NGSIv1 API"
 #define DISABLE_CUSTOM_NOTIF   "disable NGSIv2 custom notifications"
-
+#define LOG_TO_SCREEN_DESC     "log to screen"
+#define LOG_FOR_HUMANS_DESC    "human readible log to screen"
 
 
 
@@ -389,11 +391,14 @@ PaArgument paArgs[] =
   { "-statTiming",     &statTiming,     "STAT_TIMING",      PaBool, PaOpt, false, false, true, STAT_TIMING       },
   { "-statNotifQueue", &statNotifQueue, "STAT_NOTIF_QUEUE", PaBool, PaOpt, false, false, true, STAT_NOTIF_QUEUE  },
 
-  { "-logSummary",     &lsPeriod,       "LOG_SUMMARY_PERIOD", PaInt,PaOpt,   0,     0,     ONE_MONTH_PERIOD, LOG_SUMMARY_DESC },
+  { "-logSummary",     &lsPeriod,       "LOG_SUMMARY_PERIOD", PaInt,  PaOpt, 0,     0,     ONE_MONTH_PERIOD, LOG_SUMMARY_DESC },
   { "-relogAlarms",    &relogAlarms,    "RELOG_ALARMS",       PaBool, PaOpt, false, false, true,             RELOGALARMS_DESC },
 
   { "-strictNgsiv1Ids",             &strictIdv1,      "CHECK_ID_V1",           PaBool, PaOpt, false, false, true, CHECK_v1_ID_DESC      },
   { "-disableCustomNotifications",  &disableCusNotif, "DISABLE_CUSTOM_NOTIF",  PaBool, PaOpt, false, false, true, DISABLE_CUSTOM_NOTIF  },
+
+  { "-logToScreen",   &logToScreen,     "LOG_TO_SCREEN",      PaBool, PaOpt, false, false, true,             LOG_TO_SCREEN_DESC  },
+  { "-logForHumans",  &logForHumans,    "LOG_FOR_HUMANS",     PaBool, PaOpt, false, false, true,             LOG_FOR_HUMANS_DESC },
 
   PA_END_OF_ARGS
 };
@@ -1615,12 +1620,16 @@ int main(int argC, char* argV[])
 
 
   //
-  // If option '-fg' is set, print traces to stdout as well, otherwise, only to file
+  // If option '-logToScreen' is set, print traces to stdout as well, otherwise, only to file
   //
-  if (paIsSet(argC, argV, "-fg"))
+  if (paIsSet(argC, argV, "-logToScreen"))
   {
     paConfig("log to screen",                 (void*) true);
-    paConfig("screen line format",            (void*) "TYPE@TIME  FILE[LINE]: TEXT");
+
+    if (paIsSet(argC, argV, "-logForHumans"))
+      paConfig("screen line format", (void*) "TYPE@TIME  FILE[LINE]: TEXT");
+    else
+      paConfig("screen line format", LOG_FILE_LINE_FORMAT);
   }
 
   paParse(paArgs, argC, (char**) argV, 1, false);

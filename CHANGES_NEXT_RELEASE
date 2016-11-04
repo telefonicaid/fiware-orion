@@ -1,0 +1,3 @@
+-Fix: The CLI option '-fg' now ONLY makes the broker run in foreground. Separate options added for log stuff (Issue #2609)
+-Add: New CLI option: '-logToScreen', to make the broker send traces to stdout (formerly the option '-fg' did this) (Issue #2609)
+-Add: New CLI option: '-logForHumans', to make the screen log output readable for humans (Issue #2609)

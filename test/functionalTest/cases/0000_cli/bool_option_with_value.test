@@ -84,5 +84,7 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-relogAlarms' (log messages for existing alarms beyond the raising alarm log message itself)]
                       [option '-strictNgsiv1Ids' (additional checks for id fields in the NGSIv1 API)]
                       [option '-disableCustomNotifications' (disable NGSIv2 custom notifications)]
+                      [option '-logToScreen' (log to screen)]
+                      [option '-logForHumans' (human readible log to screen)]
 
 --TEARDOWN--

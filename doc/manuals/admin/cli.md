@@ -152,3 +152,5 @@ The list of available options is the following:
 -   **-disableCustomNotifications**. Disabled NGSIv2 custom notifications. In particular:
     * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
     * No `${...}` macro substitution is performed.
+-   **-logToScreen**. To make the broker send traces to standard out (stdout) as well as to the log file.
+-   **-logForHumans**. To make the traces to standard out formated for humans (note that the traces in the log file are not affected)
