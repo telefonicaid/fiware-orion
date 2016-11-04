@@ -164,6 +164,13 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Fri Nov 04 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.4.2-1
+- Fix: over-logging of Runtime Error traces not representing actual error (#2597)
+- Fix: support attributes with double underscore as part of the name (#2453)
+- Fix: threadpool mode was not actually used, even if -notificationMode is set so; this fix solves the problem for not-custom notifications (partial fix for #2622)
+- Fix: threadpool mode not actually used for custom notifications, even if -notificationMode is set so (#2622)
+- Fix: -logAppend as default in configuration for RPM package (#2637)
+
 * Mon Oct 10 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.4.1-1 
 - Add: new value for URI param 'options' (options=noAttrDetail) for NGSIv2 queries to exclude attribute detail, making the query faster (#2073) 
 - Fix: wrong type in previousValue metadata for notifications triggered by PUT /v2/entities/{id}/attrs/{name}/value (#2553)
