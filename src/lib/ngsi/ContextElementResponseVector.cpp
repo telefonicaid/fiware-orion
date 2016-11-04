@@ -162,7 +162,7 @@ void ContextElementResponseVector::push_back(ContextElementResponse* item)
 *
 * ContextElementResponseVector::size -
 */
-unsigned int ContextElementResponseVector::size(void)
+unsigned int ContextElementResponseVector::size(void) const
 {
     
   return vec.size();

@@ -54,7 +54,7 @@ typedef struct ContextElementResponseVector
                                   bool                             blacklist = false);
   void                     present(const std::string& indent);
   void                     push_back(ContextElementResponse* item);
-  unsigned int             size(void);
+  unsigned int             size(void) const;
   ContextElementResponse*  lookup(EntityId* eP, HttpStatusCode code = SccNone);
   void                     release();
   void                     fill(ContextElementResponseVector& cerV);

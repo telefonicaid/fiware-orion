@@ -62,6 +62,7 @@ int QueueNotifier::start()
 */
 void QueueNotifier::sendNotifyContextRequest
 (
+<<<<<<< HEAD
   NotifyContextRequest*            ncr,
   const ngsiv2::HttpInfo&          httpInfo,
   const std::string&               tenant,
@@ -74,8 +75,7 @@ void QueueNotifier::sendNotifyContextRequest
   const std::string&               subscriptionId
 )
 {
-  ConnectionInfo ci;
-
+  std::vector<SenderThreadParams*> *paramsV = Notifier::buildSenderParams(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blacklist);
 
   // Now, if it is a "custom" notification (with template)
   // we delegate to parent method, and do not use the pool
@@ -97,101 +97,25 @@ void QueueNotifier::sendNotifyContextRequest
           subscriptionId);
   }
 
-  //
-  // FIXME P5: analyze how much of the code of this function is the same as in Notifier::sendNotifyContextRequest
-  // and could be refactored to common functions
-  //
-
-  //
-  // Creating the value of the Fiware-ServicePath HTTP header.
-  // This is a comma-separated list of the service-paths in the same order as the entities come in the payload
-  //
-  std::string spathList;
-  bool atLeastOneNotDefault = false;
-  for (unsigned int ix = 0; ix < ncr->contextElementResponseVector.size(); ++ix)
+  for (unsigned ix = 0; ix < paramsV->size(); ix++)
   {
-    EntityId* eP = &ncr->contextElementResponseVector[ix]->contextElement.entityId;
-
-    if (spathList != "")
-    {
-      spathList += ",";
-    }
-    spathList += eP->servicePath;
-    atLeastOneNotDefault = atLeastOneNotDefault || (eP->servicePath != "/");
+    clock_gettime(CLOCK_REALTIME, &(((*paramsV)[ix])->timeStamp));
   }
 
-  //
-  // FIXME P8: the stuff about atLeastOneNotDefault was added after PR #729, which makes "/" the default servicePath in
-  // request not having that header. However, this causes as side-effect that a
-  // "Fiware-ServicePath: /" or "Fiware-ServicePath: /,/" header is added in notifications, thus breaking several tests harness.
-  // Given that the "clean" implementation of Fiware-ServicePath propagation will be implemented
-  // soon (it has been scheduled for version 0.19.0, see https://github.com/telefonicaid/fiware-orion/issues/714)
-  // we introduce the atLeastOneNotDefault hack. Once #714 gets implemented,
-  // this FIXME will be removed (and all the test harness adjusted, if needed)
-  //
-  if (!atLeastOneNotDefault)
-  {
-    spathList = "";
-  }
-
-  ci.outMimeType = JSON;
-  std::string payload;
-
-  if (renderFormat == NGSI_V1_LEGACY)
-  {
-    payload = ncr->render(&ci, NotifyContext, "");
-  }
-  else
-  {
-    payload = ncr->toJson(renderFormat, attrsOrder, metadataFilter, blacklist);
-  }
-
-  /* Parse URL */
-  std::string  host;
-  int          port;
-  std::string  uriPath;
-  std::string  protocol;
-
-  if (!parseUrl(httpInfo.url, host, port, uriPath, protocol))
-  {
-    std::string details = std::string("sending NotifyContextRequest: malformed URL: '") + httpInfo.url + "'";
-    alarmMgr.badInput(clientIp, details);
-
-    return;
-  }
-
-  /* Set Content-Type */
-  std::string content_type = "application/json";
-
-  SenderThreadParams* params = new SenderThreadParams();
-  params->ip               = host;
-  params->port             = port;
-  params->protocol         = protocol;
-  params->verb             = "POST";
-  params->tenant           = tenant;
-  params->servicePath      = spathList;
-  params->xauthToken       = xauthToken;
-  params->resource         = uriPath;
-  params->content_type     = content_type;
-  params->content          = payload;
-  params->mimeType         = JSON;
-  params->renderFormat     = renderFormatToString(renderFormat, false);
-  params->fiwareCorrelator = fiwareCorrelator;
-  params->subscriptionId   = subscriptionId;
-
-  strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
-
-  clock_gettime(CLOCK_REALTIME, &params->timeStamp);
-
-  bool enqueued = queue.try_push(params);
+  bool enqueued = queue.try_push(paramsV);
   if (!enqueued)
   {
-   QueueStatistics::incReject();
+    QueueStatistics::incReject();
 
-   LM_E(("Runtime Error (notification queue is full)"));
-   delete params;
+    LM_E(("Runtime Error (notification queue is full)"));
+    for (unsigned ix = 0; ix < paramsV->size(); ix++)
+    {
+      delete (*paramsV)[ix];
+    }
 
-   return;
+    delete paramsV;
+
+    return;
   }
 
   QueueStatistics::incIn();

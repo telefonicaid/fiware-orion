@@ -34,6 +34,8 @@
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsiNotify/ThreadData.h"
 
+#include "ngsiNotify/senderThread.h"
+
 
 
 /* ****************************************************************************
@@ -61,6 +63,17 @@ public:
                                                     const std::string&                tenant,
                                                     const std::string&                fiwareCorrelator,
                                                     RenderFormat                      renderFormat);
+protected:
+  static std::vector<SenderThreadParams*>* buildSenderParams(NotifyContextRequest*            ncrP,
+                                                             const ngsiv2::HttpInfo&          httpInfo,
+                                                             const std::string&               tenant,
+                                                             const std::string&               xauthToken,
+                                                             const std::string&               fiwareCorrelator,
+                                                             RenderFormat                     renderFormat,
+                                                             const std::vector<std::string>&  attrsOrder,
+                                                             const std::vector<std::string>&  metadataFilter,
+                                                             bool                             blackList
+  );
 };
 
 #endif  // SRC_LIB_NGSINOTIFY_NOTIFIER_H_

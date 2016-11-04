@@ -38,7 +38,10 @@
 */
 void* startSenderThread(void* p)
 {
-    SenderThreadParams* params = (SenderThreadParams*) p;
+  std::vector<SenderThreadParams*>* paramsV = (std::vector<SenderThreadParams*>*) p;
+  for(unsigned ix = 0; ix < paramsV->size(); ix++)
+  {
+    SenderThreadParams* params = (SenderThreadParams*) (*paramsV)[ix];
     char                portV[STRING_SIZE_FOR_INT];
     std::string         url;
     
@@ -47,7 +50,7 @@ void* startSenderThread(void* p)
 
     strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
-    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s", 
+    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
                        params->ip.c_str(),
                        params->port,
                        params->verb.c_str(),
@@ -79,7 +82,7 @@ void* startSenderThread(void* p)
                           true,
                           NOTIFICATION_WAIT_MODE,
                           &out,
-                          headers);
+                          params->extraHeaders);
 
       if (r == 0)
       {
@@ -100,7 +103,11 @@ void* startSenderThread(void* p)
 
     /* Delete the parameters after using them */
     delete params;
+  }
 
-    pthread_exit(NULL);
-    return NULL;
+  /* Delete the parameters vector after using it */
+  delete paramsV;
+
+  pthread_exit(NULL);
+  return NULL;
 }

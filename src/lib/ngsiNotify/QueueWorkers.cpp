@@ -71,7 +71,7 @@ int QueueWorkers::start()
 */
 static void* workerFunc(void* pSyncQ)
 {
-  SyncQOverflow<SenderThreadParams*>*  queue = (SyncQOverflow<SenderThreadParams*> *) pSyncQ;
+  SyncQOverflow<std::vector<SenderThreadParams*>*>*  queue = (SyncQOverflow<std::vector<SenderThreadParams*>*> *) pSyncQ;
   CURL*                                curl;
 
   // Initialize curl context
@@ -85,81 +85,88 @@ static void* workerFunc(void* pSyncQ)
 
   for (;;)
   {
-    SenderThreadParams* params = queue->pop();
-    struct timespec     now;
-    struct timespec     howlong;
-    size_t              estimatedQSize;
+    std::vector<SenderThreadParams*>* paramsV = queue->pop();
 
-    QueueStatistics::incOut();
-    clock_gettime(CLOCK_REALTIME, &now);
-    clock_difftime(&now, &params->timeStamp, &howlong);
-    estimatedQSize = queue->size();
-    QueueStatistics::addTimeInQWithSize(&howlong, estimatedQSize);
+    for (unsigned ix = 0; ix < paramsV->size(); ix++) {
+      struct timespec     now;
+      struct timespec     howlong;
+      size_t              estimatedQSize;
 
-    strncpy(transactionId, params->transactionId, sizeof(transactionId));
+      SenderThreadParams* params = (*paramsV)[ix];
 
-    LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
-                       params->ip.c_str(),
-                       params->port,
-                       params->verb.c_str(),
-                       params->tenant.c_str(),
-                       params->servicePath.c_str(),
-                       params->xauthToken.c_str(),
-                       params->resource.c_str(),
-                       params->content_type.c_str()));
+      QueueStatistics::incOut();
+      clock_gettime(CLOCK_REALTIME, &now);
+      clock_difftime(&now, &params->timeStamp, &howlong);
+      estimatedQSize = queue->size();
+      QueueStatistics::addTimeInQWithSize(&howlong, estimatedQSize);
 
-    if (simulatedNotification)
-    {
-      LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
-      __sync_fetch_and_add(&noOfSimulatedNotifications, 1);
-    }
-    else // we'll send the notification
-    {
-      std::string  out;
-      int          r;
+      strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
-      std::map<std::string, std::string> noHeaders;
-      r =  httpRequestSendWithCurl(curl,
-                                   params->ip,
-                                   params->port,
-                                   params->protocol,
-                                   params->verb,
-                                   params->tenant,
-                                   params->servicePath,
-                                   params->xauthToken,
-                                   params->resource,
-                                   params->content_type,
-                                   params->content,
-                                   params->fiwareCorrelator,
-                                   params->renderFormat,
-                                   true,
-                                   NOTIFICATION_WAIT_MODE,
-                                   &out,
-                                   noHeaders);
+      LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
+                         params->ip.c_str(),
+                         params->port,
+                         params->verb.c_str(),
+                         params->tenant.c_str(),
+                         params->servicePath.c_str(),
+                         params->xauthToken.c_str(),
+                         params->resource.c_str(),
+                         params->content_type.c_str()));
 
-      //
-      // FIXME: ok and error counter should be incremented in the other notification modes (generalizing the concept, i.e.
-      // not as member of QueueStatistics:: which seems to be tied to just the threadpool notification mode)
-      //
-      char portV[STRING_SIZE_FOR_INT];
-      snprintf(portV, sizeof(portV), "%d", params->port);
-      std::string url = params->ip + ":" + portV + params->resource;
-
-      if (r == 0)
+      if (simulatedNotification)
       {
-        statisticsUpdate(NotifyContextSent, params->mimeType);
-        QueueStatistics::incSentOK();
-        alarmMgr.notificationErrorReset(url);
+        LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
+        __sync_fetch_and_add(&noOfSimulatedNotifications, 1);
       }
-      else
+      else // we'll send the notification
       {
-        QueueStatistics::incSentError();
-        alarmMgr.notificationError(url, "notification failure for queue worker");
+        std::string  out;
+        int          r;
+
+        r =  httpRequestSendWithCurl(curl,
+                                     params->ip,
+                                     params->port,
+                                     params->protocol,
+                                     params->verb,
+                                     params->tenant,
+                                     params->servicePath,
+                                     params->xauthToken,
+                                     params->resource,
+                                     params->content_type,
+                                     params->content,
+                                     params->fiwareCorrelator,
+                                     params->renderFormat,
+                                     true,
+                                     NOTIFICATION_WAIT_MODE,
+                                     &out,
+                                     params->extraHeaders);
+
+        //
+        // FIXME: ok and error counter should be incremented in the other notification modes (generalizing the concept, i.e.
+        // not as member of QueueStatistics:: which seems to be tied to just the threadpool notification mode)
+        //
+        char portV[STRING_SIZE_FOR_INT];
+        snprintf(portV, sizeof(portV), "%d", params->port);
+        std::string url = params->ip + ":" + portV + params->resource;
+
+        if (r == 0)
+        {
+          statisticsUpdate(NotifyContextSent, params->mimeType);
+          QueueStatistics::incSentOK();
+          alarmMgr.notificationErrorReset(url);
+        }
+        else
+        {
+          QueueStatistics::incSentError();
+          alarmMgr.notificationError(url, "notification failure for queue worker");
+        }
       }
+
+      // Free params memory
+      delete params;
     }
 
-    // Free params memory
-    delete params;
+    // Free params vector memory
+    delete paramsV;
 
     // Reset curl for next iteration
     curl_easy_reset(curl);
