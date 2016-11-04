@@ -54,4 +54,6 @@ BROKER_DATABASE_NAME=orion
 
 # Use the following variable if you need extra ops
 #BROKER_EXTRA_OPS="-t 0-255"
-BROKER_EXTRA_OPS="-multiservice"
+# We need to start the CB with log append mode to not overwrite previous logs and logrotate work correctly
+BROKER_EXTRA_OPS="-multiservice -logAppend"
+
