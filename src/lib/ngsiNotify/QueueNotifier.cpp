@@ -81,7 +81,7 @@ void QueueNotifier::sendNotifyContextRequest
   bool enqueued = queue.try_push(paramsV);
   if (!enqueued)
   {
-    QueueStatistics::incReject();
+    QueueStatistics::incReject(paramsV->size());
 
     LM_E(("Runtime Error (notification queue is full)"));
     for (unsigned ix = 0; ix < paramsV->size(); ix++) {
@@ -92,6 +92,6 @@ void QueueNotifier::sendNotifyContextRequest
     return;
   }
 
-  QueueStatistics::incIn();
+  QueueStatistics::incIn(paramsV->size());
 
 }
