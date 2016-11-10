@@ -38,7 +38,7 @@ brokerStart CB
 # 03d. Update attr D with value null and type T2 using batch update UPDATE
 # 03e. Update attr E with value null and type T2 using batch update APPEND
 # 03f. Update attr F with attr value null directly
-# 04.  Get entity and see five attrs value null and type T2 a one with value null and type T1
+# 04.  Get entity and see five attrs value null and type T2 and one with value null and type T1
 #
 
 echo "01. Create entity with six attrs value X and type T1"
@@ -170,8 +170,8 @@ echo
 echo
 
 
-echo "04. Get entity and see five attrs value null and type T2 a one with value null and type T1"
-echo "=========================================================================================="
+echo "04. Get entity and see five attrs value null and type T2 and one with value null and type T1"
+echo "============================================================================================"
 orionCurl --url /v2/entities/E
 echo
 echo
@@ -286,8 +286,8 @@ Date: REGEX(.*)
 
 
 
-04. Get entity and see five attrs value null and type T2 a one with value null and type T1
-==========================================================================================
+04. Get entity and see five attrs value null and type T2 and one with value null and type T1
+============================================================================================
 HTTP/1.1 200 OK
 Content-Length: 291
 Content-Type: application/json
