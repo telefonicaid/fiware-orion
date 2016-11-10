@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
- Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+ Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 
  This file is part of Orion Context Broker.
 
@@ -63,4 +63,3 @@ def update_entities_in_a_single_batch_operation(context, op):
 
     context.resp = context.cb.batch_update(queries_parameters, op)
     __logger__.info("...updated entities in a single batch operation")
-    
