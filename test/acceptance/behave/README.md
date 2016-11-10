@@ -335,6 +335,12 @@ The Context Broker must start with "DEBUG" level in "CB_EXTRA_OPS" field into pr
 | update_context_provider_registration        |  (pending)   | PATCH   | /v2/registrations/`<registration_id>`                | Yes       | No             |   
 | delete_context_provider_registration        |  (pending)   | DELETE  | /v2/registrations/`<registration_id>`                | No        | No             |   
 |                                                                                                                                                          |
+|**batch_operations folder**                                                                                                                               |
+| update                                      |     55       | POST    | v2/op/update                                         | Yes       | Yes            |   
+| query                                       |  (pending)   | POST    | v2/op/query                                          | Yes       | Yes            |   
+| register                                    |  (pending)   | POST    | v2/op/register                                       | Yes       | Yes            |   
+| discover                                    |  (pending)   | POST    | v2/op/discover                                       | Yes       | Yes            |   
+|                                                                                                                                                          |
 |**alarms folder**                            |  (pending)   |                                                                                             |
 |                                                                                                                                                          |
 |**cli_parameters folder**                    |  (pending)   |                                                                                             |
