@@ -112,6 +112,7 @@ static bool isNotCustomMetadata(std::string md)
 * FIXME P1: excellent candidate for a method for either
 *           ContextAttribute or MetadataVector (or both)
 */
+
 static bool hasMetadata(std::string name, std::string type, ContextAttribute* caP)
 {
   for (unsigned int ix = 0; ix < caP->metadataVector.size() ; ++ix)
@@ -126,6 +127,7 @@ static bool hasMetadata(std::string name, std::string type, ContextAttribute* ca
 
   return false;
 }
+
 
 
 
@@ -544,7 +546,9 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
     appendMetadata(&mdBuilder, &mdNamesBuilder, mdP, apiVersion == "v2");
   }
 
+
   /* Second, for each metadata previously in the metadata vector but *not included in the request*, add it as is */
+
   int      mdSize = 0;
   BSONObj  md;
   if (attr.hasField(ENT_ATTRS_MD))
@@ -562,14 +566,18 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 
       mdSize++;
 
-      if (!hasMetadata(dbDotDecode(md.name), md.type, caP))
+      if (apiVersion != "v2" || caP->onlyValue)
       {
-        appendMetadata(&mdBuilder, &mdNamesBuilder, &md, apiVersion == "v2");
+        if (!hasMetadata(dbDotDecode(md.name), md.type, caP))
+        {
+          appendMetadata(&mdBuilder, &mdNamesBuilder, &md, false);
+        }
       }
 
       // Any compound values in md is released by Metadata::~Metadata
     }
   }
+
 
   BSONObj mdNew = mdBuilder.obj();
 
