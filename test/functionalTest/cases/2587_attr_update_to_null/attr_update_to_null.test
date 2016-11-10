@@ -30,30 +30,45 @@ brokerStart CB
 --SHELL--
 
 #
-# 01.  Create entity with three attrs value X and type T1
-# 02 . Get entity and see three attrs value X and type T1
-# 03a. Update attr A with value null and type T2 using PATCH entity
-# 03b. Update attr B with value null and type T2 using PUT on attr
-# 03c. Update attr C with attr value null directly
-# 04.  Get entity and see two attrs value null and type T2 a one with value null and type T1
+# 01.  Create entity with six attrs value X and type T1
+# 02 . Get entity and see six attrs value X and type T1
+# 03a. Update attr A with value null and type T2 using PATCH on entity
+# 03b. Update attr B with value null and type T2 using POST on entity
+# 03c. Update attr C with value null and type T2 using PUT on attr
+# 03d. Update attr D with value null and type T2 using batch update UPDATE
+# 03e. Update attr E with value null and type T2 using batch update APPEND
+# 03f. Update attr F with attr value null directly
+# 04.  Get entity and see four attrs value null and type T2 a one with value null and type T1
 #
 
-echo "01. Create entity with three attrs value X and type T1"
-echo "======================================================"
+echo "01. Create entity with six attrs value X and type T1"
+echo "===================================================="
 payload='{
   "id": "E",
   "type": "T",
   "A": {
-      "value": "X",
-      "type": "T1"
+    "value": "X",
+    "type": "T1"
   },
   "B": {
-     "value": "X",
-     "type": "T1"
+    "value": "X",
+    "type": "T1"
   },
   "C": {
-     "value": "X",
-     "type": "T1"
+    "value": "X",
+    "type": "T1"
+  },
+  "D": {
+    "value": "X",
+    "type": "T1"
+  },
+  "E": {
+    "value": "X",
+    "type": "T1"
+  },
+  "F": {
+    "value": "X",
+    "type": "T1"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -61,15 +76,15 @@ echo
 echo
 
 
-echo "02. Get entity and see three attrs value X and type T1"
-echo "======================================================"
+echo "02. Get entity and see six attrs value X and type T1"
+echo "===================================================="
 orionCurl --url /v2/entities/E
 echo
 echo
 
 
-echo "03a. Update attr B with value null and type T2 using PATCH entity"
-echo "================================================================="
+echo "03a. Update attr B with value null and type T2 using PATCH on entity"
+echo "===================================================================="
 payload='{
   "A": {
     "type": "T2",
@@ -81,21 +96,76 @@ echo
 echo
 
 
-echo "03b. Update attr B with value null and type T2 using PUT on attr"
+echo "03b. Update attr B with value null and type T2 using POST on entity"
+echo "===================================================================="
+payload='{
+  "B": {
+    "type": "T2",
+    "value": null
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload" -X POST
+echo
+echo
+
+
+echo "03c. Update attr C with value null and type T2 using PUT on attr"
 echo "================================================================"
 payload='{
   "type": "T2",
   "value": null
 }'
-orionCurl --url /v2/entities/E/attrs/B --payload "$payload" -X PUT
+orionCurl --url /v2/entities/E/attrs/C --payload "$payload" -X PUT
 echo
 echo
 
 
-echo "03c. Update attr C with attr value null directly"
-echo "================================================================"
+echo "03d. Update attr D with value null and type T2 using batch update UPDATE"
+echo "========================================================================"
+payload='{
+  "actionType": "UPDATE",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E",
+      "D": {
+         "type": "T2",
+         "value": null
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "03d. Update attr E with value null and type T2 using batch update APPEND"
+echo "========================================================================"
+payload='{
+  "actionType": "APPEND",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E",
+      "E": {
+         "type": "T2",
+         "value": null
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "03f. Update attr F with attr value null directly"
+echo "================================================"
 payload='null'
-orionCurl --url /v2/entities/E/attrs/C/value --payload "$payload" --in text -X PUT
+orionCurl --url /v2/entities/E/attrs/F/value --payload "$payload" --in text -X PUT
 echo
 echo
 
@@ -108,8 +178,8 @@ echo
 
 
 --REGEXPECT--
-01. Create entity with three attrs value X and type T1
-======================================================
+01. Create entity with six attrs value X and type T1
+====================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E?type=T
@@ -118,10 +188,10 @@ Date: REGEX(.*)
 
 
 
-02. Get entity and see three attrs value X and type T1
-======================================================
+02. Get entity and see six attrs value X and type T1
+====================================================
 HTTP/1.1 200 OK
-Content-Length: 153
+Content-Length: 285
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -142,13 +212,28 @@ Date: REGEX(.*)
         "type": "T1",
         "value": "X"
     },
+    "D": {
+        "metadata": {},
+        "type": "T1",
+        "value": "X"
+    },
+    "E": {
+        "metadata": {},
+        "type": "T1",
+        "value": "X"
+    },
+    "F": {
+        "metadata": {},
+        "type": "T1",
+        "value": "X"
+    },
     "id": "E",
     "type": "T"
 }
 
 
-03a. Update attr B with value null and type T2 using PATCH entity
-=================================================================
+03a. Update attr B with value null and type T2 using PATCH on entity
+====================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -156,7 +241,16 @@ Date: REGEX(.*)
 
 
 
-03b. Update attr B with value null and type T2 using PUT on attr
+03b. Update attr B with value null and type T2 using POST on entity
+====================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03c. Update attr C with value null and type T2 using PUT on attr
 ================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -165,8 +259,26 @@ Date: REGEX(.*)
 
 
 
-03c. Update attr C with attr value null directly
-================================================================
+03d. Update attr D with value null and type T2 using batch update UPDATE
+========================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03d. Update attr E with value null and type T2 using batch update APPEND
+========================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03f. Update attr F with attr value null directly
+================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -177,7 +289,7 @@ Date: REGEX(.*)
 04. Get entity and see attr value null and type T2
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 156
+Content-Length: 291
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -194,6 +306,21 @@ Date: REGEX(.*)
         "value": null
     },
     "C": {
+        "metadata": {},
+        "type": "T2",
+        "value": null
+    },
+    "D": {
+        "metadata": {},
+        "type": "T2",
+        "value": null
+    },
+    "E": {
+        "metadata": {},
+        "type": "T2",
+        "value": null
+    },
+    "F": {
         "metadata": {},
         "type": "T1",
         "value": null
