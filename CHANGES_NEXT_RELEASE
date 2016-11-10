@@ -3,3 +3,4 @@
 - Fix: Default log output for stdout is now the same format as in the log file. Use new CLI option '-logForHumans' to modify this. (#2609)
 - Add: New CLI option: '-logForHumans', to make the screen log output readable for humans (#2609)
 - Fix: subscription PATCH not working for notification.attrs and notification.exceptAttrs subfields (#2647)
+- Fix: PATCH attr adding metadata item instead of replacing (#1788)
