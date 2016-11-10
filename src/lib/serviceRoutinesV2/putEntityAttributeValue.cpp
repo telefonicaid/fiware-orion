@@ -75,6 +75,7 @@ std::string putEntityAttributeValue
   // 01. Fill in UpdateContextRequest with data from URI and payload
   parseDataP->av.attribute.name = attributeName;
   parseDataP->av.attribute.type = "";  // Overwrite 'none', as no type can be given in 'value' payload
+  parseDataP->av.attribute.onlyValue = true;
 
   std::string err = parseDataP->av.attribute.check(ciP,ciP->requestType,"","", 0);
   if (err != "OK")

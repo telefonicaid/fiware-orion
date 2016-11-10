@@ -75,6 +75,9 @@ public:
                                                       // (Note we are forced to use a pointer for this, as we are using
                                                       // ContextAttribute field in the ContextAttribute type declaration)
 
+
+  bool                      onlyValue;                // Used when ony the value is meaningful in v2 updates of value, without regarding metadata
+
   ~ContextAttribute();
   ContextAttribute();
   ContextAttribute(ContextAttribute* caP, bool useDefaultType = false);
