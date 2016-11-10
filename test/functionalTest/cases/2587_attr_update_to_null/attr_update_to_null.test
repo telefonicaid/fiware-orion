@@ -83,7 +83,7 @@ echo
 echo
 
 
-echo "03a. Update attr B with value null and type T2 using PATCH on entity"
+echo "03a. Update attr A with value null and type T2 using PATCH on entity"
 echo "===================================================================="
 payload='{
   "A": {
@@ -170,8 +170,8 @@ echo
 echo
 
 
-echo "04. Get entity and see attr value null and type T2"
-echo "=================================================="
+echo "04. Get entity and see four attrs value null and type T2 a one with value null and type T1"
+echo "=========================================================================================="
 orionCurl --url /v2/entities/E
 echo
 echo
@@ -232,7 +232,7 @@ Date: REGEX(.*)
 }
 
 
-03a. Update attr B with value null and type T2 using PATCH on entity
+03a. Update attr A with value null and type T2 using PATCH on entity
 ====================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -286,8 +286,8 @@ Date: REGEX(.*)
 
 
 
-04. Get entity and see attr value null and type T2
-==================================================
+04. Get entity and see four attrs value null and type T2 a one with value null and type T1
+==========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 291
 Content-Type: application/json
