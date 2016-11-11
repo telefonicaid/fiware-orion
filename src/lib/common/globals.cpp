@@ -453,14 +453,46 @@ static int timezoneOffset(const char* tz)
     return 0;
   }
 
-  // Trying the <time>±hh:mm format
+  // All other cases start by + or -
+  if ((tz[0] != '+') && (tz[0] != '-'))
+  {
+    return -1;
+  }
 
-  // Trying the <time>±hhmm format
+  bool positive = (tz[0] == '+');
+  int offset = -1;
+  int h, m;
 
-  // Trying the <time>±hh format
+  if (sscanf(tz + 1, "%2d:%2d", &h, &m) == 2)      // Trying the <time>±hh:mm format
+  {
+    LM_W(("FGM: case 1, tz: %s, h: %d, m: %d", tz, h, m));
+    offset = h * 60 * 60 + m * 60;
+  }
+  else if (sscanf(tz + 1, "%2d%2d", &h, &m) == 2)  // Trying the <time>±hhmm format
+  {
+    LM_W(("FGM: case 2, tz: %s, h: %d, m: %d", tz, h, m));
+    offset = h * 60 * 60 + m * 60;
+  }
+  else if (sscanf(tz + 1, "%2d", &h) == 1)         // Trying the <time>±hh format
+  {
+    LM_W(("FGM: case 3, tz: %s, h: %d", tz, h));
+    offset = h * 60 * 60;
+  }
 
-  // wrong timezone
-  return -1;
+  if (offset == -1)
+  {
+    // wrong timezone
+    return -1;
+  }
+
+  if (positive)
+  {
+    return offset;
+  }
+  else
+  {
+    return -offset;
+  }
 }
 
 
@@ -509,6 +541,7 @@ int64_t parse8601Time(const std::string& ss)
   {
     return -1;
   }
+  LM_W(("FGM: offset %d", offset));
 
   // Note that at the present moment we are not doing anything with mileseconds, but
   // in the future we could use that to increase time resolution (however, not as part
@@ -516,13 +549,13 @@ int64_t parse8601Time(const std::string& ss)
 
   struct tm time;
   time.tm_year = y - 1900; // Year since 1900
-  time.tm_mon = M - 1;     // 0-11
+  time.tm_mon  = M - 1;    // 0-11
   time.tm_mday = d;        // 1-31
   time.tm_hour = h;        // 0-23
-  time.tm_min = m;         // 0-59
-  time.tm_sec = (int)s;    // 0-61 (0-60 in C++11)
+  time.tm_min  = m;        // 0-59
+  time.tm_sec  = (int)s;   // 0-61 (0-60 in C++11)
 
-  return (int64_t) (timegm(&time) + timezoneOffset(tz));
+  return (int64_t) (timegm(&time) - offset);
 
 #if 0
   struct tm   tm = {0};
