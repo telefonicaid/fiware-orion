@@ -418,7 +418,7 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
     Then verify that receive an "No Content" http code
     And verify that an entity is updated in mongo
 
-  @attribute_metadata_replace @BUG_1788 @skip
+  @attribute_metadata_replace_without_meta_type @BUG_1788
   Scenario:  update an attribute by entity ID using NGSI v2 and append a new metadata without metadata type
     Given  a definition of headers
       | parameter          | value                               |
@@ -445,15 +445,14 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
     And properties to entities
       | parameter       | value       |
       | attributes_name | temperature |
-    #  | attributes_value | 45          |
       | metadatas_name  | my_meta     |
       | metadatas_value | 5678        |
     When update attributes by ID "room" if it exists and with "normalized" mode
     Then verify that receive an "No Content" http code
     And verify that an entity is updated in mongo
 
-  @attribute_metadata_replace @BUG_1788 @skip
-  Scenario:  update an attribute by entity ID using NGSI v2 and append a new metadata without metadata type
+  @attribute_metadata_replace_with_meta_type @BUG_1788
+  Scenario:  update an attribute by entity ID using NGSI v2 and append a new metadata with metadata type
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_attribute_metadata_name_update |
@@ -479,7 +478,6 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
     And properties to entities
       | parameter        | value       |
       | attributes_name  | temperature |
-      | attributes_value | 45          |
       | metadatas_name   | my_meta     |
       | metadatas_value  | 5678        |
       | metadatas_type   | nothing     |
