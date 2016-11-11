@@ -98,7 +98,7 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
       | APPEND_STRICT |
 
   @action_type_update_normalized
-  Scenario:  update several entities  with batch operations) using NGSIv2 in normalized format
+  Scenario:  update several entities with batch operations using NGSIv2 in normalized format
     Given  a definition of headers
       | parameter          | value                     |
       | Fiware-Service     | test_op_update_happy_path |
@@ -129,7 +129,7 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
     Then verify that receive a "No Content" http code
 
   @action_type_update_key_values
-  Scenario:  update several entities  with batch operations) using NGSIv2 in keyvalues format
+  Scenario:  update several entities with batch operations using NGSIv2 in keyvalues format
     Given  a definition of headers
       | parameter          | value                     |
       | Fiware-Service     | test_op_update_happy_path |
@@ -162,7 +162,7 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
     Then verify that receive a "No Content" http code
 
   @action_type_delete
-  Scenario:  delete several entities  with batch operations) using NGSIv2 in normalized format
+  Scenario:  delete several entities with batch operations using NGSIv2 in normalized format
     Given  a definition of headers
       | parameter          | value                     |
       | Fiware-Service     | test_op_update_happy_path |
@@ -190,7 +190,7 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
     Then verify that receive a "No Content" http code
 
   @action_type_delete_key_values
-  Scenario:  delete several entities  with batch operations) using NGSIv2 in keyvalues format
+  Scenario:  delete several entities with batch operations using NGSIv2 in keyvalues format
     Given  a definition of headers
       | parameter          | value                     |
       | Fiware-Service     | test_op_update_happy_path |
