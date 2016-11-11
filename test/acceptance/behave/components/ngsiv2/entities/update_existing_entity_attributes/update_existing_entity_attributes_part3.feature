@@ -418,7 +418,7 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
     Then verify that receive an "No Content" http code
     And verify that an entity is updated in mongo
 
-  @attribute_metadata_replace @BUG_1788
+  @attribute_metadata_replace_without_meta_type @BUG_1788
   Scenario:  update an attribute by entity ID using NGSI v2 and append a new metadata without metadata type
     Given  a definition of headers
       | parameter          | value                               |
@@ -451,7 +451,7 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
     Then verify that receive an "No Content" http code
     And verify that an entity is updated in mongo
 
-  @attribute_metadata_replace_2 @BUG_1788
+  @attribute_metadata_replace_with_meta_type @BUG_1788
   Scenario:  update an attribute by entity ID using NGSI v2 and append a new metadata with metadata type
     Given  a definition of headers
       | parameter          | value                               |
