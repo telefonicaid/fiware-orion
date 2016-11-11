@@ -465,17 +465,14 @@ static int timezoneOffset(const char* tz)
 
   if (sscanf(tz + 1, "%2d:%2d", &h, &m) == 2)      // Trying the <time>±hh:mm format
   {
-    LM_W(("FGM: case 1, tz: %s, h: %d, m: %d", tz, h, m));
     offset = h * 60 * 60 + m * 60;
   }
   else if (sscanf(tz + 1, "%2d%2d", &h, &m) == 2)  // Trying the <time>±hhmm format
   {
-    LM_W(("FGM: case 2, tz: %s, h: %d, m: %d", tz, h, m));
     offset = h * 60 * 60 + m * 60;
   }
   else if (sscanf(tz + 1, "%2d", &h) == 1)         // Trying the <time>±hh format
   {
-    LM_W(("FGM: case 3, tz: %s, h: %d", tz, h));
     offset = h * 60 * 60;
   }
 
@@ -512,7 +509,15 @@ int64_t parse8601Time(const std::string& ss)
   char tz[10];
   float s;
 
-  // FIXME PR: this is currently unsafe, see http://stackoverflow.com/questions/1621394/how-to-prevent-scanf-causing-a-buffer-overflow-in-c
+  // Lenght check, to avoid buffer overflow in tz[]. Calculation is as follows:
+  //
+  //  5 (year with "-") + 3 * 2 (day and month with "-" or "T")
+  //  3 * 3 (hour/minute/second with ":" or ".") + 3 (miliseconds) + 6 (worst case timezone: "+01:00" = 29
+  if (ss.length() > 29)
+  {
+    return -1;
+  }
+
   int n = sscanf(ss.c_str(), "%d-%d-%dT%d:%d:%f%s", &y, &M, &d, &h, &m, &s, tz);
 
   if ((n != 3) && (n != 6) && (n != 7))
@@ -541,7 +546,6 @@ int64_t parse8601Time(const std::string& ss)
   {
     return -1;
   }
-  LM_W(("FGM: offset %d", offset));
 
   // Note that at the present moment we are not doing anything with mileseconds, but
   // in the future we could use that to increase time resolution (however, not as part
@@ -556,18 +560,6 @@ int64_t parse8601Time(const std::string& ss)
   time.tm_sec  = (int)s;   // 0-61 (0-60 in C++11)
 
   return (int64_t) (timegm(&time) - offset);
-
-#if 0
-  struct tm   tm = {0};
-  const char* p;
-
-  p = strptime (s.c_str(), " %Y-%m-%dT%T", &tm);
-  if (p == NULL)
-  {
-    return -1;
-  }
-  return (int64_t) timegm(&tm);
-#endif
 }
 
 
