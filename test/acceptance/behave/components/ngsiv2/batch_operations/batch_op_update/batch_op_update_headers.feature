@@ -90,13 +90,13 @@ Feature: Batch operation - update using NGSI v2. "POST" - /v2/op/update plus pay
       | Fiware-ServicePath | /test                     |
       | Content-Type       | application/json          |
     # These properties below are used in bach operation request
-    And define a entity properties to update in a single batch operation in "keyValues" mode
+    And define a entity properties to update in a single batch operation
       | parameter        | value       |
       | entities_type    | house       |
       | entities_id      | room1       |
       | attributes_name  | temperature |
       | attributes_value | 34          |
-    And define a entity properties to update in a single batch operation in "keyValues" mode
+    And define a entity properties to update in a single batch operation
       | parameter        | value       |
       | entities_type    | home        |
       | entities_id      | room2       |
@@ -120,13 +120,13 @@ Feature: Batch operation - update using NGSI v2. "POST" - /v2/op/update plus pay
       | Fiware-ServicePath | /test                     |
       | Content-Type       | application/json          |
     # These properties below are used in bach operation request
-    And define a entity properties to update in a single batch operation in "keyValues" mode
+    And define a entity properties to update in a single batch operation
       | parameter        | value       |
       | entities_type    | house       |
       | entities_id      | room1       |
       | attributes_name  | temperature |
       | attributes_value | 34          |
-    And define a entity properties to update in a single batch operation in "keyValues" mode
+    And define a entity properties to update in a single batch operation
       | parameter        | value       |
       | entities_type    | home        |
       | entities_id      | room2       |
@@ -137,13 +137,13 @@ Feature: Batch operation - update using NGSI v2. "POST" - /v2/op/update plus pay
       | parameter | value     |
       | options   | keyValues |
     And verify that receive a "No Content" http code
-    And define a entity properties to update in a single batch operation in "keyValues" mode
+    And define a entity properties to update in a single batch operation
       | parameter        | value       |
       | entities_type    | house       |
       | entities_id      | room1       |
       | attributes_name  | temperature |
       | attributes_value | 56          |
-    And define a entity properties to update in a single batch operation in "keyValues" mode
+    And define a entity properties to update in a single batch operation
       | parameter        | value       |
       | entities_type    | home        |
       | entities_id      | room2       |
