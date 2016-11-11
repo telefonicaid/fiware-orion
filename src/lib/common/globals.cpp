@@ -25,6 +25,7 @@
 #include <time.h>
 #include <stdint.h>
 #include <math.h>
+#include <stdio.h>
 
 #include <string>
 
@@ -426,15 +427,104 @@ int64_t parse8601(const std::string& s)
   return accumulated;
 }
 
+
+
+/*****************************************************************************
+*
+* timezoneOffset -
+*
+* Returns the time offset corresponding to a given timezone. Only the ISO8601 timezonoe
+* formats are supported (https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators):
+*
+* <time>Z
+* <time>±hh:mm
+* <time>±hhmm
+* <time>±hh
+*
+* The value -1 is used as "wrong timezone" (note that no timezone corresponds to an
+* offset of just one negative second)
+*
+*/
+static int timezoneOffset(const char* tz)
+{
+  // Trying the <time>Z format
+  if (strcmp(tz, "Z") == 0)
+  {
+    return 0;
+  }
+
+  // Trying the <time>±hh:mm format
+
+  // Trying the <time>±hhmm format
+
+  // Trying the <time>±hh format
+
+  // wrong timezone
+  return -1;
+}
+
+
+
 /*****************************************************************************
 *
 * parse8601Time -
 *
-* This is common code for Duration and Throttling (at least)
+* This is common code for Duration and Throttling (at least).
+*
+* Based in http://stackoverflow.com/questions/26895428/how-do-i-parse-an-iso-8601-date-with-optional-milliseconds-to-a-struct-tm-in-c
 *
 */
-int64_t parse8601Time(const std::string& s)
+int64_t parse8601Time(const std::string& ss)
 {
+  int y, M, d, h, m;
+  char tz[10];
+  float s;
+
+  // FIXME PR: this is currently unsafe, see http://stackoverflow.com/questions/1621394/how-to-prevent-scanf-causing-a-buffer-overflow-in-c
+  int n = sscanf(ss.c_str(), "%d-%d-%dT%d:%d:%f%s", &y, &M, &d, &h, &m, &s, tz);
+
+  if ((n != 3) && (n != 6) && (n != 7))
+  {
+    // We need at least year, month and day. In addition, hour, minute and seconds have to
+    // be provided together. Timezone is optional
+    return -1;
+  }
+
+  if (n == 3)
+  {
+    // Asumming 0:0:0
+    h = 0;
+    m = 0;
+    s = 0;
+    snprintf(tz, sizeof(tz), "%s", "Z");
+  }
+
+  if (n == 6)
+  {
+    snprintf(tz, sizeof(tz), "%s", "Z");
+  }
+
+  int offset = timezoneOffset(tz);
+  if (offset == -1)
+  {
+    return -1;
+  }
+
+  // Note that at the present moment we are not doing anything with mileseconds, but
+  // in the future we could use that to increase time resolution (however, not as part
+  // of the tm struct)
+
+  struct tm time;
+  time.tm_year = y - 1900; // Year since 1900
+  time.tm_mon = M - 1;     // 0-11
+  time.tm_mday = d;        // 1-31
+  time.tm_hour = h;        // 0-23
+  time.tm_min = m;         // 0-59
+  time.tm_sec = (int)s;    // 0-61 (0-60 in C++11)
+
+  return (int64_t) (timegm(&time) + timezoneOffset(tz));
+
+#if 0
   struct tm   tm = {0};
   const char* p;
 
@@ -444,6 +534,7 @@ int64_t parse8601Time(const std::string& s)
     return -1;
   }
   return (int64_t) timegm(&tm);
+#endif
 }
 
 

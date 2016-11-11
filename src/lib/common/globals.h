@@ -283,7 +283,7 @@ extern int64_t parse8601(const std::string& s);
 * This is common code for Duration and Throttling (at least)
 *
 */
-int64_t parse8601Time(const std::string& s);
+extern int64_t parse8601Time(const std::string& s);
 
 
 
@@ -297,7 +297,7 @@ int64_t parse8601Time(const std::string& s);
 * Unless readonly, add one to the transactionId and return it.
 * If readonly - just return the current transactionId.
 */
-int transactionIdGet(bool readonly = true);
+extern int transactionIdGet(bool readonly = true);
 
 
 
@@ -323,7 +323,7 @@ extern void transactionIdSet(void);
 *
 * correlatorIdSet - 
 */
-void correlatorIdSet(const char* corrId);
+extern void correlatorIdSet(const char* corrId);
 
 
 
