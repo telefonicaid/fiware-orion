@@ -40,11 +40,12 @@ def define_a_entity_to_update_in_a_single_batch_operation(context):
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
     entity_dict = {}
-    __logger__.info("append new entities properties to update bach operation...")
+    __logger__.info("append new entities properties to update batch operation...")
     if context.table is not None:
         for row in context.table:
             entity_dict[row["parameter"]] = row["value"]
     context.cb.batch_op_entities_properties(entity_dict)
+
 
 @step(u'update entities in a single batch operation "([^"]*)"')
 def update_entities_in_a_single_batch_operation(context, op):
