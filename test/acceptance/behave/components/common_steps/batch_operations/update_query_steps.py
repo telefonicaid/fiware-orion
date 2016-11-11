@@ -34,19 +34,17 @@ __logger__ = logging.getLogger("steps")
 # ------------------ create_entities ------------------------------------------------
 
 @step(u'define a entity properties to update in a single batch operation')
-@step(u'define a entity properties to update in a single batch operation in "([^"]*)" mode')
-def define_a_entity_to_update_in_a_single_batch_operation(context, mode="normalized"):
+def define_a_entity_to_update_in_a_single_batch_operation(context):
     """
     define a entity to update in a single batch operation (pre-step to be used in "update entities in a single batch operation")
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
-    :param mode: format used, ex: normalized (default) or keyValues (defined in "options" query param)
     """
     entity_dict = {}
-    __logger__.info("append a new entity as \"%s\" mode in update bach operation..." % mode)
+    __logger__.info("append new entities properties to update bach operation...")
     if context.table is not None:
         for row in context.table:
             entity_dict[row["parameter"]] = row["value"]
-    context.cb.batch_op_entities_properties(entity_dict, mode)
+    context.cb.batch_op_entities_properties(entity_dict)
 
 @step(u'update entities in a single batch operation "([^"]*)"')
 def update_entities_in_a_single_batch_operation(context, op):

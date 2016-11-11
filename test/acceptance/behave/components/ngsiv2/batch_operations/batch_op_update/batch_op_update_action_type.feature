@@ -79,7 +79,7 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
       | Fiware-ServicePath | /test                     |
       | Content-Type       | application/json          |
     # These properties below are used in bach operation request
-    And define a entity properties to update in a single batch operation in "keyValues" mode
+    And define a entity properties to update in a single batch operation
       | parameter          | value       |
       | entities_number    | 5           |
       | entities_prefix_id | true        |
@@ -147,7 +147,7 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
       | attributes_type    | celsius     |
     When update entities in a single batch operation "APPEND"
     And verify that receive a "No Content" http code
-    And define a entity properties to update in a single batch operation in "keyValues" mode
+    And define a entity properties to update in a single batch operation
       | parameter          | value       |
       | entities_number    | 5           |
       | entities_prefix_id | true        |
@@ -208,7 +208,7 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
       | attributes_type    | celsius     |
     When update entities in a single batch operation "APPEND"
     And verify that receive a "No Content" http code
-    And define a entity properties to update in a single batch operation in "keyValues" mode
+    And define a entity properties to update in a single batch operation
       | parameter          | value |
       | entities_number    | 5     |
       | entities_prefix_id | true  |
