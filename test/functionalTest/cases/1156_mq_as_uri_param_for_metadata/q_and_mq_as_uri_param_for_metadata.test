@@ -42,7 +42,7 @@ accumulatorStart --pretty-print
 # 09. Modify the subscription to have q=A1 AND mq=A1.M1
 # 10. Dump accumulator, see E1 and E2, then reset accumulator
 # 11a. GET E3, just to check the value/type of its A1 attribute
-# 11b. Update E3, adding M1 to A1
+# 11b. Update E3, setting M1 to A1
 # 11c. GET E3, just to check the value/type of its A1 attribute
 # 12. Dump accumulator, see E3
 #
@@ -213,8 +213,8 @@ echo
 echo
 
 
-echo "11b. Update E3, adding M1 to A1"
-echo "==============================="
+echo "11b. Update E3, setting M1 to A1"
+echo "================================"
 payload='{
   "A1": {
     "metadata": {
@@ -474,8 +474,8 @@ Date: REGEX(.*)
 }
 
 
-11b. Update E3, adding M1 to A1
-===============================
+11b. Update E3, setting M1 to A1
+================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -486,7 +486,7 @@ Date: REGEX(.*)
 11c. GET E3, just to check the value/type of its A1 attribute
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 139
+Content-Length: 106
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -495,10 +495,6 @@ Date: REGEX(.*)
     "A1": {
         "metadata": {
             "M1": {
-                "type": "Number",
-                "value": 3
-            },
-            "M2": {
                 "type": "Number",
                 "value": 3
             }

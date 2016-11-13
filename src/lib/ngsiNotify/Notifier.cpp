@@ -71,12 +71,13 @@ void Notifier::sendNotifyContextRequest
     RenderFormat                     renderFormat,
     const std::vector<std::string>&  attrsOrder,
     const std::vector<std::string>&  metadataFilter,
-    bool                             blackList
-    )
+    bool                             blackList,
+    const std::string&               subscriptionId
+)
 {
 
   pthread_t                         tid;
-  std::vector<SenderThreadParams*>  *paramsV = Notifier::buildSenderParams(ncrP, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blackList);
+  std::vector<SenderThreadParams*>  *paramsV = Notifier::buildSenderParams(ncrP, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blackList, subscriptionId);
 
   if (!paramsV->empty()) // al least one param, an empty vector means an error happened
   {

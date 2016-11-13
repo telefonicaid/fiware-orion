@@ -72,7 +72,8 @@ protected:
                                                              RenderFormat                     renderFormat,
                                                              const std::vector<std::string>&  attrsOrder,
                                                              const std::vector<std::string>&  metadataFilter,
-                                                             bool                             blackList
+                                                             bool                             blackList,
+                                                             const std::string&               subscriptionId
   );
 };
 

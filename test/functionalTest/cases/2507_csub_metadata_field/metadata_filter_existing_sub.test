@@ -139,7 +139,12 @@ echo "========================================="
 payload='{
   "A": {
     "value": "x",
-    "type": "Text"
+    "type": "Text",
+    "metadata": {
+      "M1": { "value": "10", "type": "Number" },
+      "M2": { "value": "20", "type": "Number" },
+      "M3": { "value": "30", "type": "Number" }
+    }
   }
 }'
 orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload"
@@ -176,7 +181,12 @@ echo "========================================="
 payload='{
   "A": {
     "value": "y",
-    "type": "Text"
+    "type": "Text",
+    "metadata": {
+      "M1": { "value": "10", "type": "Number" },
+      "M2": { "value": "20", "type": "Number" },
+      "M3": { "value": "30", "type": "Number" }
+    }
   }
 }'
 orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload"
@@ -213,7 +223,12 @@ echo "========================================="
 payload='{
   "A": {
     "value": "z",
-    "type": "Text"
+    "type": "Text",
+    "metadata": {
+      "M1": { "value": "10", "type": "Number" },
+      "M2": { "value": "20", "type": "Number" },
+      "M3": { "value": "30", "type": "Number" }
+    }
   }
 }'
 orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload"

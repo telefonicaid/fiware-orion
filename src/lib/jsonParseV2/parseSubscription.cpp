@@ -617,6 +617,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     subsP->notification.blacklist = false;
+    subsP->blacklistProvided      = true;
   }
   else if (notification.HasMember("exceptAttrs"))
   {
@@ -633,6 +634,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     subsP->notification.blacklist = true;
+    subsP->blacklistProvided      = true;
   }
 
   // metadata

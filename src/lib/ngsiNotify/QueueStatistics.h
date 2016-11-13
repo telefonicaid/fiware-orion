@@ -48,7 +48,7 @@ public:
   *
   * incIn -
   */
-  static void incIn();
+  static void incIn(int n=1);
 
   /* ****************************************************************************
   *
@@ -60,7 +60,7 @@ public:
   *
   * incOut -
   */
-  static void incOut();
+  static void incOut(int n=1);
 
   /* ****************************************************************************
   *
@@ -72,7 +72,7 @@ public:
   *
   * incReject -
   */
-  static void incReject();
+  static void incReject(int n=1);
 
   /* ****************************************************************************
   *

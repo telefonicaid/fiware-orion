@@ -164,6 +164,7 @@ ContextAttribute::ContextAttribute()
   found                 = false;
   skip                  = false;
   typeGiven             = false;
+  onlyValue             = false;
   previousValue         = NULL;
 
   creDate = 0;
@@ -202,6 +203,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
   found                 = caP->found;
   skip                  = false;
   typeGiven             = caP->typeGiven;
+  onlyValue             = caP->onlyValue;
   previousValue         = NULL;
 
   creDate = caP->creDate;
@@ -269,6 +271,7 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  onlyValue             = false;
   previousValue         = NULL;
 
   creDate = 0;
@@ -305,6 +308,7 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  onlyValue             = false;
   previousValue         = NULL;
 
   creDate = 0;
@@ -341,6 +345,7 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  onlyValue             = false;
   previousValue         = NULL;
 
   creDate = 0;

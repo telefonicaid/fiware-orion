@@ -62,7 +62,6 @@ int QueueNotifier::start()
 */
 void QueueNotifier::sendNotifyContextRequest
 (
-<<<<<<< HEAD
   NotifyContextRequest*            ncr,
   const ngsiv2::HttpInfo&          httpInfo,
   const std::string&               tenant,
@@ -75,7 +74,7 @@ void QueueNotifier::sendNotifyContextRequest
   const std::string&               subscriptionId
 )
 {
-  std::vector<SenderThreadParams*> *paramsV = Notifier::buildSenderParams(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blacklist);
+  std::vector<SenderThreadParams*> *paramsV = Notifier::buildSenderParams(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blacklist, subscriptionId);
 
   // Now, if it is a "custom" notification (with template)
   // we delegate to parent method, and do not use the pool
@@ -105,7 +104,7 @@ void QueueNotifier::sendNotifyContextRequest
   bool enqueued = queue.try_push(paramsV);
   if (!enqueued)
   {
-    QueueStatistics::incReject();
+    QueueStatistics::incReject(paramsV->size());
 
     LM_E(("Runtime Error (notification queue is full)"));
     for (unsigned ix = 0; ix < paramsV->size(); ix++)
@@ -118,5 +117,5 @@ void QueueNotifier::sendNotifyContextRequest
     return;
   }
 
-  QueueStatistics::incIn();
+  QueueStatistics::incIn(paramsV->size());
 }
