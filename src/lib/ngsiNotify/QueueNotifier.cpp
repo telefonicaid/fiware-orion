@@ -62,16 +62,16 @@ int QueueNotifier::start()
 */
 void QueueNotifier::sendNotifyContextRequest
 (
-  NotifyContextRequest*            ncr,
-  const ngsiv2::HttpInfo&          httpInfo,
-  const std::string&               tenant,
-  const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator,
-  RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsOrder,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             blacklist,
-  const std::string&               subscriptionId
+    NotifyContextRequest*            ncr,
+    const ngsiv2::HttpInfo&          httpInfo,
+    const std::string&               tenant,
+    const std::string&               xauthToken,
+    const std::string&               fiwareCorrelator,
+    RenderFormat                     renderFormat,
+    const std::vector<std::string>&  attrsOrder,
+    const std::vector<std::string>&  metadataFilter,
+    bool                             blacklist,
+    const std::string&               subscriptionId
 )
 {
   std::vector<SenderThreadParams*> *paramsV = Notifier::buildSenderParams(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blacklist, subscriptionId);
