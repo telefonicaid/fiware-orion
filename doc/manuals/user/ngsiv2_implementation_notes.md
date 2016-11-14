@@ -98,11 +98,13 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
     * **entities**: mandatory
         * **id** or **idPattern**: one of them is mandatory (but both at the same time is not allowed). id
             must follow NGSIv2 restrictions for IDs. idPattern must be not empty and a valid regex.
-        * **type**: optional (but if present it must follow NGSIv2 restrictions for IDs)
+        * **type** or **typePattern**: optional (but both at the same time is not allowed). type must 
+            follow NGSIv2 restrictions for IDs. typePattern must be not empty and a valid regex.
     * **condition**: optional (but if present it must have a content, i.e. `{}` is not allowed)
         * **attrs**: optional (but if present it must be a list; empty list is allowed)
         * **expression**: optional (but if present it must have a content, i.e. `{}` is not allowed)
             * **q**: optional (but if present it must be not empty, i.e. `""` is not allowed)
+            * **mq**: optional (but if present it must be not empty, i.e. `""` is not allowed)
             * **georel**: optional (but if present it must be not empty, i.e. `""` is not allowed)
             * **geometry**: optional (but if present it must be not empty, i.e. `""` is not allowed)
             * **coords**: optional (but if present it must be not empty, i.e. `""` is not allowed)
