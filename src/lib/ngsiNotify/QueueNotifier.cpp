@@ -76,46 +76,23 @@ void QueueNotifier::sendNotifyContextRequest
 {
   std::vector<SenderThreadParams*> *paramsV = Notifier::buildSenderParams(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blacklist, subscriptionId);
 
-  // Now, if it is a "custom" notification (with template)
-  // we delegate to parent method, and do not use the pool
-  // of threads. (To be changed in a future version)
-  // This is a workaround for issue #2622
-
-  if (httpInfo.custom && !disableCusNotif)
-  {
-    return Notifier::sendNotifyContextRequest(
-          ncr,
-          httpInfo,
-          tenant,
-          xauthToken,
-          fiwareCorrelator,
-          renderFormat,
-          attrsOrder,
-          metadataFilter,
-          blacklist,
-          subscriptionId);
-  }
-
-  for (unsigned ix = 0; ix < paramsV->size(); ix++)
-  {
+  for (unsigned ix = 0; ix < paramsV->size(); ix++) {
     clock_gettime(CLOCK_REALTIME, &(((*paramsV)[ix])->timeStamp));
   }
-
   bool enqueued = queue.try_push(paramsV);
   if (!enqueued)
   {
     QueueStatistics::incReject(paramsV->size());
 
     LM_E(("Runtime Error (notification queue is full)"));
-    for (unsigned ix = 0; ix < paramsV->size(); ix++)
-    {
+    for (unsigned ix = 0; ix < paramsV->size(); ix++) {
       delete (*paramsV)[ix];
     }
-
     delete paramsV;
 
     return;
   }
 
   QueueStatistics::incIn(paramsV->size());
+
 }
