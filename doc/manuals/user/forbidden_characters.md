@@ -98,7 +98,7 @@ Notification data is for entity with id `DC_S1-D41` and type `Room`, including a
 
 ```
 PUT http://foo.com/entity/DC_S1-D41?type=Room
-Content-Type: text/plain
+Content-Type: application/json 
 Content-Length: 43
 
 { "temperature": 23.4, "asString": "23.4" }
