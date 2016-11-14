@@ -50,10 +50,10 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
   @action_type_append_normalized
   Scenario Outline:  append several entities with batch operations using NGSI v2 with APPEND and APPEND_STRICT in normalized format
     Given  a definition of headers
-      | parameter          | value                     |
-      | Fiware-Service     | test_op_update_happy_path |
-      | Fiware-ServicePath | /test                     |
-      | Content-Type       | application/json          |
+      | parameter          | value                      |
+      | Fiware-Service     | test_op_update_action_type |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
     # These properties below are used in bach operation request
     And define a entity properties to update in a single batch operation
       | parameter          | value       |
@@ -74,10 +74,10 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
   @action_type_append_key_values
   Scenario Outline:  append several entities with batch operations using NGSI v2 with APPEND and APPEND_STRICT in normalized format in keyValues format
     Given  a definition of headers
-      | parameter          | value                     |
-      | Fiware-Service     | test_op_update_happy_path |
-      | Fiware-ServicePath | /test                     |
-      | Content-Type       | application/json          |
+      | parameter          | value                      |
+      | Fiware-Service     | test_op_update_action_type |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
     # These properties below are used in bach operation request
     And define a entity properties to update in a single batch operation
       | parameter          | value       |
@@ -100,10 +100,10 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
   @action_type_update_normalized
   Scenario:  update several entities with batch operations using NGSIv2 in normalized format
     Given  a definition of headers
-      | parameter          | value                     |
-      | Fiware-Service     | test_op_update_happy_path |
-      | Fiware-ServicePath | /test                     |
-      | Content-Type       | application/json          |
+      | parameter          | value                      |
+      | Fiware-Service     | test_op_update_action_type |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
     # These properties below are used in bach operation request
     And define a entity properties to update in a single batch operation
       | parameter          | value       |
@@ -131,10 +131,10 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
   @action_type_update_key_values
   Scenario:  update several entities with batch operations using NGSIv2 in keyvalues format
     Given  a definition of headers
-      | parameter          | value                     |
-      | Fiware-Service     | test_op_update_happy_path |
-      | Fiware-ServicePath | /test                     |
-      | Content-Type       | application/json          |
+      | parameter          | value                      |
+      | Fiware-Service     | test_op_update_action_type |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
     # These properties below are used in bach operation request
     And define a entity properties to update in a single batch operation
       | parameter          | value       |
@@ -164,10 +164,10 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
   @action_type_delete
   Scenario:  delete several entities with batch operations using NGSIv2 in normalized format
     Given  a definition of headers
-      | parameter          | value                     |
-      | Fiware-Service     | test_op_update_happy_path |
-      | Fiware-ServicePath | /test                     |
-      | Content-Type       | application/json          |
+      | parameter          | value                      |
+      | Fiware-Service     | test_op_update_action_type |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
     # These properties below are used in bach operation request
     And define a entity properties to update in a single batch operation
       | parameter          | value       |
@@ -192,10 +192,10 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
   @action_type_delete_key_values
   Scenario:  delete several entities with batch operations using NGSIv2 in keyvalues format
     Given  a definition of headers
-      | parameter          | value                     |
-      | Fiware-Service     | test_op_update_happy_path |
-      | Fiware-ServicePath | /test                     |
-      | Content-Type       | application/json          |
+      | parameter          | value                      |
+      | Fiware-Service     | test_op_update_action_type |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
     # These properties below are used in bach operation request
     And define a entity properties to update in a single batch operation
       | parameter          | value       |
@@ -222,10 +222,10 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
   @action_type_empty @BUG_2653 @skip
   Scenario:  try to append entities with batch operations using NGSI v2 with empty action
     Given  a definition of headers
-      | parameter          | value                     |
-      | Fiware-Service     | test_op_update_happy_path |
-      | Fiware-ServicePath | /test                     |
-      | Content-Type       | application/json          |
+      | parameter          | value                            |
+      | Fiware-Service     | test_op_update_action_type_error |
+      | Fiware-ServicePath | /test                            |
+      | Content-Type       | application/json                 |
     # These properties below are used in bach operation request
     And define a entity properties to update in a single batch operation
       | parameter          | value       |
@@ -245,10 +245,10 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
   @action_type_unknown @BUG_2653 @skip
   Scenario:  try to append entities with batch operations using NGSI v2 with unknown action
     Given  a definition of headers
-      | parameter          | value                     |
-      | Fiware-Service     | test_op_update_happy_path |
-      | Fiware-ServicePath | /test                     |
-      | Content-Type       | application/json          |
+      | parameter          | value                            |
+      | Fiware-Service     | test_op_update_action_type_error |
+      | Fiware-ServicePath | /test                            |
+      | Content-Type       | application/json                 |
     # These properties below are used in bach operation request
     And define a entity properties to update in a single batch operation
       | parameter          | value       |
@@ -268,10 +268,10 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
   @action_type_without
   Scenario:  try to append entities with batch operations using NGSI v2 without actionType field
     Given  a definition of headers
-      | parameter          | value                     |
-      | Fiware-Service     | test_op_update_happy_path |
-      | Fiware-ServicePath | /test                     |
-      | Content-Type       | application/json          |
+      | parameter          | value                            |
+      | Fiware-Service     | test_op_update_action_type_error |
+      | Fiware-ServicePath | /test                            |
+      | Content-Type       | application/json                 |
     # These properties below are used in bach operation request
     And define a entity properties to update in a single batch operation
       | parameter          | value       |
@@ -291,10 +291,10 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
   @action_type_not_plain_ascii @BUG_2653 @skip
   Scenario Outline:  try to append entities with batch operations using NGSI v2 with not plain ascii in actionType field
     Given  a definition of headers
-      | parameter          | value                     |
-      | Fiware-Service     | test_op_update_happy_path |
-      | Fiware-ServicePath | /test                     |
-      | Content-Type       | application/json          |
+      | parameter          | value                            |
+      | Fiware-Service     | test_op_update_action_type_error |
+      | Fiware-ServicePath | /test                            |
+      | Content-Type       | application/json                 |
     # These properties below are used in bach operation request
     And define a entity properties to update in a single batch operation
       | parameter          | value       |
@@ -319,10 +319,10 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
   @action_type_forbidden @BUG_2653 @skip
   Scenario Outline:  try to append entities with batch operations using NGSI v2 with forbidden chars in actionType field
     Given  a definition of headers
-      | parameter          | value                     |
-      | Fiware-Service     | test_op_update_happy_path |
-      | Fiware-ServicePath | /test                     |
-      | Content-Type       | application/json          |
+      | parameter          | value                            |
+      | Fiware-Service     | test_op_update_action_type_error |
+      | Fiware-ServicePath | /test                            |
+      | Content-Type       | application/json                 |
     # These properties below are used in bach operation request
     And define a entity properties to update in a single batch operation
       | parameter          | value       |
@@ -350,3 +350,28 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
       | house_&     |
       | house_/     |
       | house_#     |
+
+  @action_type_malformed
+  Scenario:  try to append an entity with batch operations using NGSI v2 but the actionType is malformed, without quotes
+    Given  a definition of headers
+      | parameter          | value                            |
+      | Fiware-Service     | test_op_update_action_type_error |
+      | Fiware-ServicePath | /test                            |
+      | Content-Type       | application/json                 |
+    # These properties below are used in bach operation request
+    And define a entity properties to update in a single batch operation
+      | parameter        | value         |
+      | entities_type    | "house"       |
+      | entities_id      | "room1"       |
+      | attributes_name  | "temperature" |
+      | attributes_type  | "celsius"     |
+      | attributes_value | 34            |
+      | metadatas_name   | "alarm"       |
+      | metadatas_type   | "hot"         |
+      | metadatas_value  | "warning"     |
+    When update entities in a single batch operation "APPEND" in raw mode
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                |
+      | error       | ParseError                           |
+      | description | Errors found in incoming JSON buffer |
