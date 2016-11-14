@@ -41,7 +41,7 @@ Feature: entities id and entities type in update batch operation using NGSI v2. 
   Check: verify mongo is installed successfully
 
   Actions After each Scenario:
-  #Setup: delete database in mongo
+  Setup: delete database in mongo
 
   Actions After the Feature:
   Setup: stop ContextBroker
