@@ -7,7 +7,7 @@
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 #
-# Orion Context Broker is distributed in the hope that it will be useful,
+# Orion Context Broker is Españadistributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 # General Public License for more details.
@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Cover the bugfix for attr name checks in POST /v2/op/update
+Cover the bugfix for md type checks in POST /v2/op/update
 
 --SHELL-INIT--
 dbInit CB
@@ -30,15 +30,96 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Update using attr name with not plain ASCII and see error
-# 02. Update using empty attr and see error
-# 03. Update using attr name exceding length and see error
-# 04. Update using attr name with forbidden chars and see error
+# 01. Update using md type with not plain ASCII and see error
+# 02. Update using empty md type and see error
+# 03. Update using md type exceding length and see error
+# 04. Update using md type with forbidden chars and see error
 # 05. Check no entity has been created
 #
 
 
-echo "01. Update using attr name with not plain ASCII and see error"
+echo "01. Update using md type with not plain ASCII and see error"
+echo "==========================================================="
+payload='{
+  "actionType": "APPEND",
+  "entities":
+  [
+    {
+      "type": "T1",
+      "id":   "E1",
+      "A1": {
+         "type": "Text",
+         "value": "X",
+         "metadata": {
+           "MD1": {
+             "type": "España",
+             "value": "Y"
+           }
+         }
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "02. Update using empty md type and see error"
+echo "============================================"
+payload='{
+  "actionType": "APPEND",
+  "entities":
+  [
+    {
+      "type": "T1",
+      "id":   "E1",
+      "A1": {
+         "type": "Text",
+         "value": "X",
+         "metadata": {
+           "MD1": {
+             "type": "",
+             "value": "Y"
+           }
+         }
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "03. Update using md type exceding length and see error"
+echo "======================================================"
+payload='{
+  "actionType": "APPEND",
+  "entities":
+  [
+    {
+      "type": "T1",
+      "id":   "E1",
+      "A1": {
+         "type": "Text",
+         "value": "X",
+         "metadata": {
+           "MD1": {
+             "type": "OcwFMyjqjYYw1j0RcxSiDIsIyApJd3Y3xXL1iJAWaRDgEC4ROzdJZcemVmwC6AGoCOT6X1WM7rssozuyUwRztQMMcac1qma63zRRu0UoNJXNH58DlN6Sy1164IXmo1SY0iZ7ZeW1L3q0dOPjCXcWd5JTf12kDySRvketTkl9WVe7fv5Smabe92ySYfdNiY7hegeafcOEcTQwdtjhV2jsnRUUkLqH8o4Mny8xzgxCt65NuiAP5eIfkafWjmVSSHBKE",
+             "value": "Y"
+           }
+         }
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "04. Update using md type with forbidden chars and see error"
 echo "============================================================="
 payload='{
   "actionType": "APPEND",
@@ -47,72 +128,15 @@ payload='{
     {
       "type": "T1",
       "id":   "E1",
-      "España": {
+      "A1": {
          "type": "Text",
-         "value": "X"
-      }
-    }
-  ]
-}'
-orionCurl --url /v2/op/update --payload "$payload"
-echo
-echo
-
-
-echo "02. Update using empty attr and see error"
-echo "========================================="
-payload='{
-  "actionType": "APPEND",
-  "entities":
-  [
-    {
-      "type": "T1",
-      "id":   "E1",
-      "": {
-         "type": "Text",
-         "value": "X"
-      }
-    }
-  ]
-}'
-orionCurl --url /v2/op/update --payload "$payload"
-echo
-echo
-
-
-echo "03. Update using attr name exceding length and see error"
-echo "========================================================"
-payload='{
-  "actionType": "APPEND",
-  "entities":
-  [
-    {
-      "type": "T1",
-      "id":   "E1",
-      "OcwFMyjqjYYw1j0RcxSiDIsIyApJd3Y3xXL1iJAWaRDgEC4ROzdJZcemVmwC6AGoCOT6X1WM7rssozuyUwRztQMMcac1qma63zRRu0UoNJXNH58DlN6Sy1164IXmo1SY0iZ7ZeW1L3q0dOPjCXcWd5JTf12kDySRvketTkl9WVe7fv5Smabe92ySYfdNiY7hegeafcOEcTQwdtjhV2jsnRUUkLqH8o4Mny8xzgxCt65NuiAP5eIfkafWjmVSSHBKE": {
-         "type": "Text",
-         "value": "X"
-      }
-    }
-  ]
-}'
-orionCurl --url /v2/op/update --payload "$payload"
-echo
-echo
-
-
-echo "04. Update using attr name with forbidden chars and see error"
-echo "============================================================="
-payload='{
-  "actionType": "APPEND",
-  "entities":
-  [
-    {
-      "type": "T1",
-      "id":   "E1",
-      "house<flat>": {
-         "type": "Text",
-         "value": "X"
+         "value": "X",
+         "metadata": {
+           "A1": {
+             "type": "house<flat>",
+             "value": "Y"
+           }
+         }
       }
     }
   ]
@@ -130,58 +154,58 @@ echo
 
 
 --REGEXPECT--
-01. Update using attr name with not plain ASCII and see error
+01. Update using md type with not plain ASCII and see error
+===========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 74
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid characters in metadata type",
+    "error": "BadRequest"
+}
+
+
+02. Update using empty md type and see error
+============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 87
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "metadata type length: 0, min length supported: 1",
+    "error": "BadRequest"
+}
+
+
+03. Update using md type exceding length and see error
+======================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 91
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "metadata type length: 257, max length supported: 256",
+    "error": "BadRequest"
+}
+
+
+04. Update using md type with forbidden chars and see error
 =============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
+Content-Length: 74
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Invalid characters in attribute name",
-    "error": "BadRequest"
-}
-
-
-02. Update using empty attr and see error
-=========================================
-HTTP/1.1 400 Bad Request
-Content-Length: 88
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "attribute name length: 0, min length supported: 1",
-    "error": "BadRequest"
-}
-
-
-03. Update using attr name exceding length and see error
-========================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 92
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "attribute name length: 257, max length supported: 256",
-    "error": "BadRequest"
-}
-
-
-04. Update using attr name with forbidden chars and see error
-=============================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "Invalid characters in attribute name",
+    "description": "Invalid characters in metadata type",
     "error": "BadRequest"
 }
 

@@ -71,6 +71,7 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
         return "invalid JSON type for entity id";
       }
 
+#if 0
       if (strlen(iter->value.GetString()) == 0)
       {
         return "entity id is empty";
@@ -85,6 +86,7 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
       {
         return "max length exceeded in entity id";
       }
+#endif
 
       eP->id = iter->value.GetString();
     }
@@ -112,6 +114,7 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
         return "invalid JSON type for entity type";
       }
 
+#if 0
       if (strlen(iter->value.GetString()) == 0)
       {
         return "entity type is empty";
@@ -126,6 +129,7 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
       {
         return "max length exceeded in entity type";
       }
+#endif
 
       eP->type      = iter->value.GetString();
       eP->typeGiven = true;
@@ -170,5 +174,6 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
     }
   }
 
-  return "OK";
+  // This assumes that parseEntityObject() is always called from the batch update logic (or that this value works for all callers)
+  return eP->check(ciP, BatchUpdateRequest);
 }

@@ -71,13 +71,13 @@ echo
 01. Update using entity type with not plain ASCII and see error
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 74
+Content-Length: 72
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "forbidden characters in entity type",
+    "description": "Invalid characters in entity type",
     "error": "BadRequest"
 }
 

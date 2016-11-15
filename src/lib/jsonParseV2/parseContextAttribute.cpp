@@ -273,31 +273,27 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     }
   }
 
+#if 0
   if (caP->name == "")
   {
     alarmMgr.badInput(clientIp, "no 'name' for ContextAttribute");
     ciP->httpStatusCode = SccBadRequest;
     return "no 'name' for ContextAttribute";
   }
-
-  if (forbiddenIdChars(ciP->apiVersion, caP->name.c_str()))
-  {
-    alarmMgr.badInput(clientIp, "forbidden characters in attribute name");
-    ciP->httpStatusCode = SccBadRequest;
-    return "forbidden characters in attribute name";
-  }
-
-  if ((ciP->apiVersion == "v2") && (caP->name.length() > MAX_ID_LEN))
-  {
-    alarmMgr.badInput(clientIp, "max length exceeded in attribute name");
-    ciP->httpStatusCode = SccBadRequest;
-    return "max length exceeded in attribute name";
-  }
-
+#endif
 
   if (!caP->typeGiven)
   {
     caP->type = (compoundVector)? defaultType(orion::ValueTypeVector) : defaultType(caP->valueType);
+  }
+
+  // This assumes that parseContextAttribute() is always called from the batch update logic (or that this value works for all callers)
+  std::string r = caP->check(ciP, BatchUpdateRequest, "", "", 0);
+  if (r != "OK")
+  {
+    alarmMgr.badInput(clientIp, r);
+    ciP->httpStatusCode = SccBadRequest;
+    return r;
   }
 
   return "OK";

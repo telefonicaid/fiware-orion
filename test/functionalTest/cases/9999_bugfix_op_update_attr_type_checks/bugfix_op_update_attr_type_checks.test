@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Cover the bugfix for attr name checks in POST /v2/op/update
+Cover the bugfix for attr type checks in POST /v2/op/update
 
 --SHELL-INIT--
 dbInit CB
@@ -30,15 +30,15 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Update using attr name with not plain ASCII and see error
-# 02. Update using empty attr and see error
-# 03. Update using attr name exceding length and see error
-# 04. Update using attr name with forbidden chars and see error
+# 01. Update using attr type with not plain ASCII and see error
+# 02. Update using empty attr type and see error
+# 03. Update using attr type exceding length and see error
+# 04. Update using attr type with forbidden chars and see error
 # 05. Check no entity has been created
 #
 
 
-echo "01. Update using attr name with not plain ASCII and see error"
+echo "01. Update using attr type with not plain ASCII and see error"
 echo "============================================================="
 payload='{
   "actionType": "APPEND",
@@ -47,8 +47,8 @@ payload='{
     {
       "type": "T1",
       "id":   "E1",
-      "España": {
-         "type": "Text",
+      "A1": {
+         "type": "España",
          "value": "X"
       }
     }
@@ -59,8 +59,8 @@ echo
 echo
 
 
-echo "02. Update using empty attr and see error"
-echo "========================================="
+echo "02. Update using empty attr type and see error"
+echo "=============================================="
 payload='{
   "actionType": "APPEND",
   "entities":
@@ -68,8 +68,8 @@ payload='{
     {
       "type": "T1",
       "id":   "E1",
-      "": {
-         "type": "Text",
+      "A1": {
+         "type": "",
          "value": "X"
       }
     }
@@ -80,7 +80,7 @@ echo
 echo
 
 
-echo "03. Update using attr name exceding length and see error"
+echo "03. Update using attr type exceding length and see error"
 echo "========================================================"
 payload='{
   "actionType": "APPEND",
@@ -89,8 +89,8 @@ payload='{
     {
       "type": "T1",
       "id":   "E1",
-      "OcwFMyjqjYYw1j0RcxSiDIsIyApJd3Y3xXL1iJAWaRDgEC4ROzdJZcemVmwC6AGoCOT6X1WM7rssozuyUwRztQMMcac1qma63zRRu0UoNJXNH58DlN6Sy1164IXmo1SY0iZ7ZeW1L3q0dOPjCXcWd5JTf12kDySRvketTkl9WVe7fv5Smabe92ySYfdNiY7hegeafcOEcTQwdtjhV2jsnRUUkLqH8o4Mny8xzgxCt65NuiAP5eIfkafWjmVSSHBKE": {
-         "type": "Text",
+      "A1": {
+         "type": "OcwFMyjqjYYw1j0RcxSiDIsIyApJd3Y3xXL1iJAWaRDgEC4ROzdJZcemVmwC6AGoCOT6X1WM7rssozuyUwRztQMMcac1qma63zRRu0UoNJXNH58DlN6Sy1164IXmo1SY0iZ7ZeW1L3q0dOPjCXcWd5JTf12kDySRvketTkl9WVe7fv5Smabe92ySYfdNiY7hegeafcOEcTQwdtjhV2jsnRUUkLqH8o4Mny8xzgxCt65NuiAP5eIfkafWjmVSSHBKE",
          "value": "X"
       }
     }
@@ -101,7 +101,7 @@ echo
 echo
 
 
-echo "04. Update using attr name with forbidden chars and see error"
+echo "04. Update using attr type with forbidden chars and see error"
 echo "============================================================="
 payload='{
   "actionType": "APPEND",
@@ -110,8 +110,8 @@ payload='{
     {
       "type": "T1",
       "id":   "E1",
-      "house<flat>": {
-         "type": "Text",
+      "A1": {
+         "type": "house<flat>",
          "value": "X"
       }
     }
@@ -130,7 +130,7 @@ echo
 
 
 --REGEXPECT--
-01. Update using attr name with not plain ASCII and see error
+01. Update using attr type with not plain ASCII and see error
 =============================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 75
@@ -139,13 +139,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Invalid characters in attribute name",
+    "description": "Invalid characters in attribute type",
     "error": "BadRequest"
 }
 
 
-02. Update using empty attr and see error
-=========================================
+02. Update using empty attr type and see error
+==============================================
 HTTP/1.1 400 Bad Request
 Content-Length: 88
 Content-Type: application/json
@@ -153,12 +153,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "attribute name length: 0, min length supported: 1",
+    "description": "attribute type length: 0, min length supported: 1",
     "error": "BadRequest"
 }
 
 
-03. Update using attr name exceding length and see error
+03. Update using attr type exceding length and see error
 ========================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 92
@@ -167,12 +167,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "attribute name length: 257, max length supported: 256",
+    "description": "attribute type length: 257, max length supported: 256",
     "error": "BadRequest"
 }
 
 
-04. Update using attr name with forbidden chars and see error
+04. Update using attr type with forbidden chars and see error
 =============================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 75
@@ -181,7 +181,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Invalid characters in attribute name",
+    "description": "Invalid characters in attribute type",
     "error": "BadRequest"
 }
 

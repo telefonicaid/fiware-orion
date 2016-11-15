@@ -174,6 +174,13 @@ std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
   ssize_t len;
   char errorMsg[128];
 
+  if (((ciP->apiVersion == "v2") && (len = strlen(id.c_str())) < MIN_ID_LEN))
+  {
+    snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, min length supported: %d", len, MIN_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
   if ((requestType == EntitiesRequest) && (id == ""))
   {
     return "No Entity ID";

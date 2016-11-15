@@ -30,12 +30,38 @@ brokerStart CB
 --SHELL--
 
 #
+# 01. Update using empty entity type and see error
 # 01. Update using entity type exceding length and see error
 # 02. Check no entity has been created
 #
 
 
-echo "01. Update using entity type exceding length and see error"
+echo "01. Update using empty entity type and see error"
+echo "=========================================================="
+payload='{
+  "actionType": "APPEND",
+  "entities":
+  [
+    {
+      "type": "",
+      "id":   "E1",
+      "A1": {
+         "type": "Text",
+         "value": "X"
+      },
+      "A2": {
+         "type": "Text",
+         "value": "Y"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "02. Update using entity type exceding length and see error"
 echo "=========================================================="
 payload='{
   "actionType": "APPEND",
@@ -60,7 +86,7 @@ echo
 echo
 
 
-echo "02. Check no entity has been created"
+echo "03. Check no entity has been created"
 echo "===================================="
 orionCurl --url /v2/entities
 echo
@@ -68,21 +94,35 @@ echo
 
 
 --REGEXPECT--
-01. Update using entity type exceding length and see error
+01. Update using empty entity type and see error
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
+Content-Length: 85
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "max length exceeded in entity type",
+    "description": "entity type length: 0, min length supported: 1",
     "error": "BadRequest"
 }
 
 
-02. Check no entity has been created
+02. Update using entity type exceding length and see error
+==========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 89
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity type length: 257, max length supported: 256",
+    "error": "BadRequest"
+}
+
+
+03. Check no entity has been created
 ====================================
 HTTP/1.1 200 OK
 Content-Length: 2

@@ -71,13 +71,13 @@ echo
 01. Update using entity id with forbidden chars and see error
 =============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 72
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "forbidden characters in entity id",
+    "description": "Invalid characters in entity id",
     "error": "BadRequest"
 }
 

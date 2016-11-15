@@ -304,6 +304,13 @@ std::string Metadata::check
   size_t len;
   char   errorMsg[128];
 
+  if (ciP->apiVersion == "v2" && (len = strlen(name.c_str())) < MIN_ID_LEN)
+  {
+    snprintf(errorMsg, sizeof errorMsg, "metadata name length: %zd, min length supported: %d", len, MIN_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
   if (name == "")
   {
     alarmMgr.badInput(clientIp, "missing metadata name");
