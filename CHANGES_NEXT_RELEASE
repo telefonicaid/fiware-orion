@@ -4,5 +4,5 @@
 - Add: New CLI option: '-logForHumans', to make the screen log output readable for humans (#2609)
 - Fix: subscription PATCH not working for notification.attrs and notification.exceptAttrs subfields (#2647)
 - Fix: PATCH attr wrongly adding metadata item instead of replacing (#1788)
-- Fix: support ISO8601 timezones at DateTime creation/update time (#2632)
-- Fix: partial DateTime in format 'year-month-day' are interpreted as 00:00:00 on that day both at creation/update and filters (#2631)
+- Add: support ISO8601 timezones at DateTime attributes and metadata creation/update time and filters (#2632)
+- Add: support for partial representation format at DateTime attributes and metadata creation/update and filters (#2631)

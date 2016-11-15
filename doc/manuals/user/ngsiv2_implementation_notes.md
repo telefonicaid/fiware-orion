@@ -79,7 +79,7 @@ enhancements of NGSIv2 subscriptions (e.g. filtering) with NGSIv1 legacy notific
 From "Special Attribute Types" section at NGSIv2 specification:
 
 > DateTime: identifies dates, in ISO8601 format. These attributes can be used with the query operators greater-than,
-> less-than, greater-or-equal, less-or-equal and range
+> less-than, greater-or-equal, less-or-equal and range.
 
 The following considerations have to be taken into account at attribute creation/update time or when used in `q` and `mq` filters:
 
@@ -88,24 +88,25 @@ The following considerations have to be taken into account at attribute creation
   * `YYYY`: year (four digits)
   * `MM`: month (two digits)
   * `DD`: day (two digits)
-* Regarding `<time> it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Times):
+* Regarding `<time>` it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Times):
   * `Thh:mm:ss.sss` or `Thhmmss.sss`. At the present moment, Orion is able to process times including microseconds although
     internally they are stored as `.000`. However, this may change in the future (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2670)).
   * `Thh:mm:ss` or `Thhmmss`.
   * `Thh:mm` or `Thhmm`. Seconds are set to `00` in this case.
   * `Thh`. Minutes and seconds are set to `00` in this case.
   * If `<time>` is ommited, then hours, minutes and seconds are set to `00`.
-* Regarding `<timezones> it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators):
-  * Z
-  * ±hh:mm
-  * ±hhmm
-  * ±hh
-* ISO8601 specifies that *"if no UTC relation information is given with a time representation, the time is assumed to be in local time*.
-  However, this in ambiguous when client and server are in different zones. Thus, in order to solve this ambiguety, Orion will always
+* Regarding `<timezones>` it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators):
+  * `Z`
+  * `±hh:mm`
+  * `±hhmm`
+  * `±hh`
+* ISO8601 specifies that *"if no UTC relation information is given with a time representation, the time is assumed to be in local time"*.
+  However, this is ambiguous when client and server are in different zones. Thus, in order to solve this ambiguety, Orion will always
   assume timezone `Z` when timezone designator is ommited.
 
-Orion always provides datetime attributes/metadata in UTC/Zulu (which is the best default option, as clients/receivers may be running
-in any timezone). This may change in the future (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2663)).
+Orion always provides datetime attributes/metadata using the format `YYYY-MM-DDThh:mm:ss.sssZ`. Note it uses UTC/Zulu
+timezone (which is the best default option, as clients/receivers may be running in any timezone). This may change in the
+future (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2663)).
 
 [Top](#top)
 

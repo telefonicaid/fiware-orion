@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Support partial date time creations (only date, not time)
+Support partial date time creations
 
 --SHELL-INIT--
 dbInit CB
@@ -30,17 +30,77 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Creating date time using only date
-# 02. Check that it has been created corresponding to 00:00:00 that day
+# 01. Creating entity with several attributes using all partial date variants, all meaning same date
+# 02. Get entity
 #
 
-echo "01. Creating date time using only date"
-echo "======================================"
+echo "01. Creating entity with several attributes using all partial date variants, all meaning same date"
+echo "=================================================================================================="
 payload='{
   "id": "E",
   "type": "T",
   "D01": {
     "value": "2016-10-01",
+    "type": "DateTime"
+  },
+  "D02": {
+    "value": "2016-10-01Z",
+    "type": "DateTime"
+  },
+  "D03": {
+    "value": "2016-10-01T00",
+    "type": "DateTime"
+  },
+  "D04": {
+    "value": "2016-10-01T00Z",
+    "type": "DateTime"
+  },
+  "D05": {
+    "value": "2016-10-01T00:00",
+    "type": "DateTime"
+  },
+  "D06": {
+    "value": "2016-10-01T00:00Z",
+    "type": "DateTime"
+  },
+  "D07": {
+    "value": "2016-10-01T00:00:00",
+    "type": "DateTime"
+  },
+  "D08": {
+    "value": "2016-10-01T00:00:00Z",
+    "type": "DateTime"
+  },
+  "D09": {
+    "value": "2016-10-01T00:00:00.000",
+    "type": "DateTime"
+  },
+  "D10": {
+    "value": "2016-10-01T00:00:00.000Z",
+    "type": "DateTime"
+  },
+  "D11": {
+    "value": "2016-10-01T0000",
+    "type": "DateTime"
+  },
+  "D12": {
+    "value": "2016-10-01T0000Z",
+    "type": "DateTime"
+  },
+  "D13": {
+    "value": "2016-10-01T000000",
+    "type": "DateTime"
+  },
+  "D14": {
+    "value": "2016-10-01T000000Z",
+    "type": "DateTime"
+  },
+  "D15": {
+    "value": "2016-10-01T000000.000",
+    "type": "DateTime"
+  },
+  "D16": {
+    "value": "2016-10-01T000000.000Z",
     "type": "DateTime"
   }
 }'
@@ -49,16 +109,16 @@ echo
 echo
 
 
-echo "02. Check that it has been created corresponding to 00:00:00 that day"
-echo "====================================================================="
+echo "02. Get entity"
+echo "=============="
 orionCurl --url /v2/entities/E
 echo
 echo
 
 
 --REGEXPECT--
-01. Creating date time using only date
-======================================
+01. Creating entity with several attributes using all partial date variants, all meaning same date
+==================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E?type=T
@@ -67,16 +127,91 @@ Date: REGEX(.*)
 
 
 
-02. Check that it has been created corresponding to 00:00:00 that day
-=====================================================================
+02. Get entity
+==============
 HTTP/1.1 200 OK
-Content-Length: 95
+Content-Length: 1205
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "D01": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T00:00:00.00Z"
+    },
+    "D02": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T00:00:00.00Z"
+    },
+    "D03": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T00:00:00.00Z"
+    },
+    "D04": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T00:00:00.00Z"
+    },
+    "D05": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T00:00:00.00Z"
+    },
+    "D06": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T00:00:00.00Z"
+    },
+    "D07": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T00:00:00.00Z"
+    },
+    "D08": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T00:00:00.00Z"
+    },
+    "D09": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T00:00:00.00Z"
+    },
+    "D10": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T00:00:00.00Z"
+    },
+    "D11": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T00:00:00.00Z"
+    },
+    "D12": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T00:00:00.00Z"
+    },
+    "D13": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T00:00:00.00Z"
+    },
+    "D14": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T00:00:00.00Z"
+    },
+    "D15": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T00:00:00.00Z"
+    },
+    "D16": {
         "metadata": {},
         "type": "DateTime",
         "value": "2016-10-01T00:00:00.00Z"

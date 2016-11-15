@@ -518,27 +518,51 @@ int64_t parse8601Time(const std::string& ss)
     return -1;
   }
 
-  int n = sscanf(ss.c_str(), "%d-%d-%dT%d:%d:%f%s", &y, &M, &d, &h, &m, &s, tz);
+  // According to https://en.wikipedia.org/wiki/ISO_8601#Times, the following formats have to be supported
+  //
+  // hh:mm:ss.sss or  hhmmss.sss
+  // hh:mm:ss     or  hhmmss
+  // hh:mm        or  hhmm
+  // hh
+  //
+  // With regards the first case (hh:mm:ss.sss or hhmmss.sss) note that by the way sscanf() works for the %f
+  // formater, this will work not only with .000, but also with .0, .00, .0000, etc. This is not as strict as
+  // the ISO8601 format is (which as far as I understand stick strictly to miliseconds). However this little
+  // extra flexibility doesn't hurt anybody
 
-  if ((n != 3) && (n != 6) && (n != 7))
+  // Default timezone is Z, sscanf will override it if an explicit timezone is provided
+  snprintf(tz, sizeof(tz), "%s", "Z");
+
+  if (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d:%2d:%f%s", &y, &M, &d, &h, &m, &s, tz) >= 6 )    // Trying hh:mm:ss.sss or hh:mm:ss
   {
-    // We need at least year, month and day. In addition, hour, minute and seconds have to
-    // be provided together. Timezone is optional
-    return -1;
+    // All info filled, nothing to set
   }
-
-  if (n == 3)
+  else if (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d%2d%f%s", &y, &M, &d, &h, &m, &s, tz) >= 6)  // Trying hhmmss.sss or hhmmss
   {
-    // Asumming 0:0:0
+    // All info filled, nothing to set
+  }
+  else if (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d:%2d%s", &y, &M, &d, &h, &m, tz) >= 5)       // Trying hh:mm
+  {
+    s = 0;
+  }
+  else if (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d%2d%s", &y, &M, &d, &h, &m, tz) >= 5)        // Trying hhmm
+  {
+    s = 0;
+  }
+  else if (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d%s", &y, &M, &d, &h, tz) >= 4)               // Trying hh
+  {
+    m = 0;
+    s = 0;
+  }
+  else if (sscanf(ss.c_str(), "%4d-%2d-%2d%s", &y, &M, &d, tz) >= 3)                       // Trying just date
+  {
     h = 0;
     m = 0;
     s = 0;
-    snprintf(tz, sizeof(tz), "%s", "Z");
   }
-
-  if (n == 6)
+  else
   {
-    snprintf(tz, sizeof(tz), "%s", "Z");
+    return -1;
   }
 
   int offset = timezoneOffset(tz);

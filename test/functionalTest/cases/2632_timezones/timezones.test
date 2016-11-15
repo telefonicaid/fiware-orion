@@ -39,6 +39,10 @@ echo "==================================================================="
 payload='{
   "id": "E",
   "type": "T",
+  "D00": {
+    "value": "2016-10-01T01:23:45.000",
+    "type": "DateTime"
+  },
   "D01": {
     "value": "2016-10-01T01:23:45.000Z",
     "type": "DateTime"
@@ -110,12 +114,17 @@ Date: REGEX(.*)
 02. Get entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 835
+Content-Length: 909
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
+    "D00": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T01:23:45.00Z"
+    },
     "D01": {
         "metadata": {},
         "type": "DateTime",
