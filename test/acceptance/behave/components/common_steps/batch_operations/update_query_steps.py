@@ -53,7 +53,7 @@ def update_entities_in_a_single_batch_operation(context, op):
     """
     allows to create, update and/or delete several entities in a single batch operation
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
-    :param op: operations allowed (APPEND, APPEND_STRICT, UPDATE, DELETE)
+    :param op: operations allowed (APPEND, APPEND_STRICT, UPDATE, DELETE and REPLACE)
     """
     __logger__.debug("updating entities in a single batch operation using %s..." % op)
     queries_parameters = {}
@@ -70,7 +70,7 @@ def update_entities_in_a_single_batch_operation_in_raw_mode(context, op):
     allows to create, update and/or delete several entities in a single batch operation in raw mode
     used mainly with data type as boolean, dict, list, null, numeric, etc
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
-    :param op: operations allowed (APPEND, APPEND_STRICT, UPDATE, DELETE)
+    :param op: operations allowed (APPEND, APPEND_STRICT, UPDATE, DELETE and REPLACE)
     """
     __logger__.debug("updating entities in a single batch operation using %s in raw mode..." % op)
     queries_parameters = {}
