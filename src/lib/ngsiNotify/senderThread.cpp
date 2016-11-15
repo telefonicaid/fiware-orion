@@ -91,7 +91,7 @@ void* startSenderThread(void* p)
       }
       else
       {
-        subCacheItemErrorStatus(params->tenant.c_str(), params->subscriptionId.c_str(), 1);
+        subCacheItemNotificationErrorStatus(params->tenant.c_str(), params->subscriptionId.c_str(), 1);
       }
     }
     else

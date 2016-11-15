@@ -331,8 +331,8 @@ extern void subCacheStatisticsReset(const char* by);
 
 /* ****************************************************************************
 *
-* subCacheItemErrorStatus - 
+* subCacheItemNotificationErrorStatus - 
 */
-extern void subCacheItemErrorStatus(const char* tenant, const char* subscriptionId, int errors);
+extern void subCacheItemNotificationErrorStatus(const char* tenant, const char* subscriptionId, int errors);
 
 #endif  // SRC_LIB_CACHE_SUBCACHE_H_

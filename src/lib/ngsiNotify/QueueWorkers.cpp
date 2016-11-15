@@ -159,7 +159,7 @@ static void* workerFunc(void* pSyncQ)
         {
           QueueStatistics::incSentError();
           alarmMgr.notificationError(url, "notification failure for queue worker");
-          subCacheItemErrorStatus(params->tenant.c_str(), params->subscriptionId.c_str(), 1);
+          subCacheItemNotificationErrorStatus(params->tenant.c_str(), params->subscriptionId.c_str(), 1);
         }
       }
 

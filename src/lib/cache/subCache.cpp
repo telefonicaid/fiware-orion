@@ -1312,9 +1312,16 @@ void subCacheStart(void)
 
 /* ****************************************************************************
 *
-* subCacheItemErrorStatus - 
+* subCacheItemNotificationErrorStatus - 
+*
+* This function marks a subscription to be erroneous, i.e. notifications are
+* not working.
+* A timestamp for this last failure is set for the sub-item in the sub-cache  and
+* the consecutive number of notification errors for the subscription is incremented.
+*
+* If 'errors' == 0, then the subscription is marked as non-erroneous.
 */
-void subCacheItemErrorStatus(const char* tenant, const char* subscriptionId, int errors)
+void subCacheItemNotificationErrorStatus(const char* tenant, const char* subscriptionId, int errors)
 {
   CachedSubscription* subP = subCacheItemLookup(tenant, subscriptionId);
 
