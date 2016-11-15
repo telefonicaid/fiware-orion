@@ -333,6 +333,6 @@ extern void subCacheStatisticsReset(const char* by);
 *
 * subCacheItemNotificationErrorStatus - 
 */
-extern void subCacheItemNotificationErrorStatus(const char* tenant, const char* subscriptionId, int errors);
+extern void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::string& subscriptionId, int errors);
 
 #endif  // SRC_LIB_CACHE_SUBCACHE_H_

@@ -1321,9 +1321,9 @@ void subCacheStart(void)
 *
 * If 'errors' == 0, then the subscription is marked as non-erroneous.
 */
-void subCacheItemNotificationErrorStatus(const char* tenant, const char* subscriptionId, int errors)
+void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::string& subscriptionId, int errors)
 {
-  CachedSubscription* subP = subCacheItemLookup(tenant, subscriptionId);
+  CachedSubscription* subP = subCacheItemLookup(tenant.c_str(), subscriptionId.c_str());
 
   if (subP == NULL)
   {
