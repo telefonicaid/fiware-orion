@@ -27,6 +27,7 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
+#include "parse/forbiddenChars.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseEntityObject.h"
 #include "jsonParseV2/parseContextAttribute.h"
@@ -70,6 +71,21 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
         return "invalid JSON type for entity id";
       }
 
+      if (strlen(iter->value.GetString()) == 0)
+      {
+        return "entity id is empty";
+      }
+
+      if (forbiddenIdCharsV2(iter->value.GetString()))
+      {
+        return "forbidden characters in entity id";
+      }
+
+      if (strlen(iter->value.GetString()) > MAX_ID_LEN)
+      {
+        return "max length exceeded in entity id";
+      }
+
       eP->id = iter->value.GetString();
     }
     else if (name == "idPattern")
@@ -94,6 +110,21 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
       if (type != "String")
       {
         return "invalid JSON type for entity type";
+      }
+
+      if (strlen(iter->value.GetString()) == 0)
+      {
+        return "entity type is empty";
+      }
+
+      if (forbiddenIdCharsV2(iter->value.GetString()))
+      {
+        return "forbidden characters in entity type";
+      }
+
+      if (strlen(iter->value.GetString()) > MAX_ID_LEN)
+      {
+        return "max length exceeded in entity type";
       }
 
       eP->type      = iter->value.GetString();
