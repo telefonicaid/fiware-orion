@@ -55,6 +55,7 @@ BatchUpdate::~BatchUpdate()
 *
 * BatchUpdate::check - 
 */
+#if 0
 std::string BatchUpdate::check(ConnectionInfo* ciP, RequestType requestType)
 {
   std::string res;
@@ -78,7 +79,7 @@ std::string BatchUpdate::check(ConnectionInfo* ciP, RequestType requestType)
 
   return "OK";
 }
-
+#endif
 
 
 /* ****************************************************************************

@@ -50,7 +50,7 @@ BatchQuery::~BatchQuery()
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * BatchQuery::check - 
@@ -80,7 +80,7 @@ std::string BatchQuery::check(ConnectionInfo* ciP, RequestType requestType)
 
   return "OK";
 }
-
+#endif
 
 
 /* ****************************************************************************

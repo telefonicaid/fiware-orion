@@ -174,7 +174,7 @@ std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
   ssize_t len;
   char errorMsg[128];
 
-  if (((ciP->apiVersion == "v2") && (len = strlen(id.c_str())) < MIN_ID_LEN))
+  if (((ciP->apiVersion == "v2") && (len = strlen(id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
   {
     snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
@@ -206,7 +206,7 @@ std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
     return std::string(errorMsg);
   }
 
-  if (ciP->apiVersion == "v2" && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  if ((ciP->apiVersion == "v2") && ((len = strlen(type.c_str())) < MIN_ID_LEN) && (requestType != BatchQueryRequest))
   {
     snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
