@@ -495,7 +495,7 @@ void mongoSubCacheUpdate
   BSONObj      update;
   std::string  err;
 
-  if (count != 0)
+  if (count > 0)
   {
     // Update count
     condition = BSON("_id"  << OID(subId));
@@ -508,7 +508,7 @@ void mongoSubCacheUpdate
   }
 
 
-  if (lastNotificationTime != 0)
+  if (lastNotificationTime > 0)
   {
     // Update lastNotificationTime    
     condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
@@ -551,7 +551,7 @@ void mongoSubCacheUpdate
   }
 
 
-  if (timesFailed != 0)
+  if (timesFailed > 0)
   {
     // Update timesFailed
     condition = BSON("_id"  << OID(subId));
