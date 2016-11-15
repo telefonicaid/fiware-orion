@@ -28,6 +28,7 @@
 
 #include "ngsi/ContextAttribute.h"
 #include "parse/CompoundValueNode.h"
+#include "parse/forbiddenChars.h"
 #include "alarmMgr/alarmMgr.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseContextAttribute.h"
@@ -278,6 +279,21 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     ciP->httpStatusCode = SccBadRequest;
     return "no 'name' for ContextAttribute";
   }
+
+  if (forbiddenIdChars(ciP->apiVersion, caP->name.c_str()))
+  {
+    alarmMgr.badInput(clientIp, "forbidden characters in attribute name");
+    ciP->httpStatusCode = SccBadRequest;
+    return "forbidden characters in attribute name";
+  }
+
+  if ((ciP->apiVersion == "v2") && (caP->name.length() > MAX_ID_LEN))
+  {
+    alarmMgr.badInput(clientIp, "max length exceeded in attribute name");
+    ciP->httpStatusCode = SccBadRequest;
+    return "max length exceeded in attribute name";
+  }
+
 
   if (!caP->typeGiven)
   {
