@@ -89,8 +89,9 @@ The following considerations have to be taken into account at attribute creation
   * `MM`: month (two digits)
   * `DD`: day (two digits)
 * Regarding `<time>` it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Times):
-  * `Thh:mm:ss.sss` or `Thhmmss.sss`. At the present moment, Orion is able to process times including microseconds although
-    internally they are stored as `.000`. However, this may change in the future (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2670)).
+  * `Thh:mm:ss.sss` or `Thhmmss.sss`. At the present moment, Orion is able to process times including microseconds (or even
+    smaller resolutions) although internally they are stored as `.00`. However, this may change in the future
+    (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2670)).
   * `Thh:mm:ss` or `Thhmmss`.
   * `Thh:mm` or `Thhmm`. Seconds are set to `00` in this case.
   * `Thh`. Minutes and seconds are set to `00` in this case.
@@ -104,7 +105,7 @@ The following considerations have to be taken into account at attribute creation
   However, this is ambiguous when client and server are in different zones. Thus, in order to solve this ambiguety, Orion will always
   assume timezone `Z` when timezone designator is ommited.
 
-Orion always provides datetime attributes/metadata using the format `YYYY-MM-DDThh:mm:ss.sssZ`. Note it uses UTC/Zulu
+Orion always provides datetime attributes/metadata using the format `YYYY-MM-DDThh:mm:ss.ssZ`. Note it uses UTC/Zulu
 timezone (which is the best default option, as clients/receivers may be running in any timezone). This may change in the
 future (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2663)).
 

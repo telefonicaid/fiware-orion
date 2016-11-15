@@ -526,9 +526,8 @@ int64_t parse8601Time(const std::string& ss)
   // hh
   //
   // With regards the first case (hh:mm:ss.sss or hhmmss.sss) note that by the way sscanf() works for the %f
-  // formater, this will work not only with .000, but also with .0, .00, .0000, etc. This is not as strict as
-  // the ISO8601 format is (which as far as I understand stick strictly to miliseconds). However this little
-  // extra flexibility doesn't hurt anybody
+  // formater, this will work not only with .000, but also with .0, .00, .0000, etc. This is fine with ISO8601
+  // which states that "There is no limit on the number of decimal places for the decimal fraction".
 
   // Default timezone is Z, sscanf will override it if an explicit timezone is provided
   snprintf(tz, sizeof(tz), "%s", "Z");
