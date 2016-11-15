@@ -71,23 +71,6 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
         return "invalid JSON type for entity id";
       }
 
-#if 0
-      if (strlen(iter->value.GetString()) == 0)
-      {
-        return "entity id is empty";
-      }
-
-      if (forbiddenIdCharsV2(iter->value.GetString()))
-      {
-        return "forbidden characters in entity id";
-      }
-
-      if (strlen(iter->value.GetString()) > MAX_ID_LEN)
-      {
-        return "max length exceeded in entity id";
-      }
-#endif
-
       eP->id = iter->value.GetString();
     }
     else if (name == "idPattern")
@@ -113,23 +96,6 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
       {
         return "invalid JSON type for entity type";
       }
-
-#if 0
-      if (strlen(iter->value.GetString()) == 0)
-      {
-        return "entity type is empty";
-      }
-
-      if (forbiddenIdCharsV2(iter->value.GetString()))
-      {
-        return "forbidden characters in entity type";
-      }
-
-      if (strlen(iter->value.GetString()) > MAX_ID_LEN)
-      {
-        return "max length exceeded in entity type";
-      }
-#endif
 
       eP->type      = iter->value.GetString();
       eP->typeGiven = true;

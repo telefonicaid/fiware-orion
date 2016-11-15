@@ -273,15 +273,6 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     }
   }
 
-#if 0
-  if (caP->name == "")
-  {
-    alarmMgr.badInput(clientIp, "no 'name' for ContextAttribute");
-    ciP->httpStatusCode = SccBadRequest;
-    return "no 'name' for ContextAttribute";
-  }
-#endif
-
   if (!caP->typeGiven)
   {
     caP->type = (compoundVector)? defaultType(orion::ValueTypeVector) : defaultType(caP->valueType);
