@@ -71,13 +71,12 @@ void Notifier::sendNotifyContextRequest
     RenderFormat                     renderFormat,
     const std::vector<std::string>&  attrsOrder,
     const std::vector<std::string>&  metadataFilter,
-    bool                             blackList,
-    const std::string&               subscriptionId
+    bool                             blackList
 )
 {
 
   pthread_t                         tid;
-  std::vector<SenderThreadParams*>  *paramsV = Notifier::buildSenderParams(ncrP, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blackList, subscriptionId);
+  std::vector<SenderThreadParams*>  *paramsV = Notifier::buildSenderParams(ncrP, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blackList);
 
   if (!paramsV->empty()) // al least one param, an empty vector means an error happened
   {
@@ -362,8 +361,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsOrder,
   const std::vector<std::string>&  metadataFilter,
-  bool                             blackList,
-  const std::string&               subscriptionId
+  bool                             blackList
 )
 {
     ConnectionInfo                    ci;
@@ -483,7 +481,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->mimeType         = JSON;
     params->renderFormat     = renderFormatToString(renderFormat);
     params->fiwareCorrelator = fiwareCorrelator;
-    params->subscriptionId   = subscriptionId;
+    params->subscriptionId   = ncrP->subscriptionId.get();
 
 
     paramsV->push_back(params);

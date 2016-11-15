@@ -55,8 +55,7 @@ public:
                                         RenderFormat                               renderFormat,
                                         const std::vector<std::string>&            attrsOrder,
                                         const std::vector<std::string>&            metadataFilter,
-                                        bool                                       blackList,
-                                        const std::string&                         subscriptionId);
+                                        bool                                       blackList);
 
   virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr,
                                                     const std::string&                url,
@@ -72,8 +71,7 @@ protected:
                                                              RenderFormat                     renderFormat,
                                                              const std::vector<std::string>&  attrsOrder,
                                                              const std::vector<std::string>&  metadataFilter,
-                                                             bool                             blackList,
-                                                             const std::string&               subscriptionId
+                                                             bool                             blackList
   );
 };
 

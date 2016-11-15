@@ -70,11 +70,10 @@ void QueueNotifier::sendNotifyContextRequest
     RenderFormat                     renderFormat,
     const std::vector<std::string>&  attrsOrder,
     const std::vector<std::string>&  metadataFilter,
-    bool                             blacklist,
-    const std::string&               subscriptionId
+    bool                             blacklist
 )
 {
-  std::vector<SenderThreadParams*> *paramsV = Notifier::buildSenderParams(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blacklist, subscriptionId);
+  std::vector<SenderThreadParams*> *paramsV = Notifier::buildSenderParams(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blacklist);
 
   for (unsigned ix = 0; ix < paramsV->size(); ix++) {
     clock_gettime(CLOCK_REALTIME, &(((*paramsV)[ix])->timeStamp));
