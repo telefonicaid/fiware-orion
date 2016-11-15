@@ -69,27 +69,27 @@ TEST(UpdateActionType, check)
   utInit();
 
   uat.set("Append");
-  checked = uat.check(UpdateContext, "", "", 0);
+  checked = uat.check();
   EXPECT_STREQ(expected1.c_str(), checked.c_str());
 
   uat.set("Update");
-  checked = uat.check(RegisterContext, "", "", 0);
+  checked = uat.check();
   EXPECT_STREQ(expected2.c_str(), checked.c_str());
 
   uat.set("APPEND");
-  checked = uat.check(RegisterContext, "", "", 0);
+  checked = uat.check();
   EXPECT_STREQ(expected2.c_str(), checked.c_str());
 
   uat.set("Delete");
-  checked = uat.check(RegisterContext, "", "", 0);
+  checked = uat.check();
   EXPECT_STREQ(expected2.c_str(), checked.c_str());
 
   uat.set("APPEND2");
-  checked = uat.check(RegisterContext, "", "", 0);
+  checked = uat.check();
   EXPECT_STREQ(expected3.c_str(), checked.c_str());
 
   uat.set("");
-  checked = uat.check(RegisterContext, "", "", 0);
+  checked = uat.check();
   EXPECT_STREQ(expected4.c_str(), checked.c_str());
 
   utExit();
