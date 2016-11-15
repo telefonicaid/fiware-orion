@@ -90,7 +90,7 @@ class NGSI:
 
             query = {"_id.id": {'$regex': '%s.*' % entity_id},
                      "_id.servicePath": service_path,
-                     "_id.type": entity_type}
+                     "_id.type": {'$regex': '%s.*' % entity_type}}
 
         __logger__.info("Database verified: %s" % database_name)
         __logger__.info("collection verified: %s" % collection)
@@ -118,7 +118,7 @@ class NGSI:
             else:
                 # prefix plus _<consecutive>. ex: room1_2
                 attr_name = "%s_%s" % (entities_contexts["attributes_name"], str(a))
-
+            attr_name = remove_quote(attr_name)
             if entities_contexts["attributes_name"] is not None:
                 assert attr_name in entity[u'attrNames'], \
                     " ERROR -- attribute name: %s is not stored in attrNames list" % attr_name
@@ -132,10 +132,10 @@ class NGSI:
 
                 assert attr_name in entity[u'attrs'], \
                     " ERROR -- attribute: %s is not stored in mongo" % attr_name
-                assert entities_contexts["attributes_value"] == entity[u'attrs'][attr_name][u'value'], \
+                assert remove_quote(entities_contexts["attributes_value"]) == entity[u'attrs'][attr_name][u'value'], \
                     " ERROR -- attribute value: %s is not stored successful in mongo" % str(entities_contexts["attributes_value"])
                 if entities_contexts["attributes_type"] != "none":
-                    assert entities_contexts["attributes_type"] == entity[u'attrs'][attr_name][u'type'], \
+                    assert remove_quote(entities_contexts["attributes_type"]) == entity[u'attrs'][attr_name][u'type'], \
                         " ERROR -- attribute type: %s is not stored successful in mongo" % entities_contexts["attributes_type"]
                 # verify metadatas
                 if entities_contexts["metadatas_number"] > 0:
@@ -148,13 +148,13 @@ class NGSI:
                         # '.' char is forbidden in MongoDB keys, so it needs to be replaced in attribute name.
                         # (we chose '=' as it is a forbidden character in the API). When returning information to user,
                         # the '=' is translated back to '.', thus from user perspective all works fine.
-                        meta_name = meta_name.replace(".", "=")
+                        meta_name = remove_quote(meta_name.replace(".", "="))
                         assert meta_name in md, \
                             " ERROR - missing the metadata name \"%s\" " % meta_name
-                        assert entities_contexts["metadatas_value"] == md[meta_name][u'value'], \
+                        assert remove_quote(entities_contexts["metadatas_value"]) == md[meta_name][u'value'], \
                             " ERROR -- metadata value: %s is not stored successful in mongo" % entities_contexts["metadatas_value"]
                         if entities_contexts["metadatas_type"] != "none":
-                            assert entities_contexts["metadatas_type"] == md[meta_name][u'type'], \
+                            assert remove_quote(entities_contexts["metadatas_type"]) == md[meta_name][u'type'], \
                                 " ERROR -- metadata type: %s is not stored successful in mongo" % entities_contexts["metadatas_type"]
                 assert u'creDate' in entity[u'attrs'][attr_name], \
                     " ERROR -- creDate field into attribute does not exists in document"
@@ -206,8 +206,8 @@ class NGSI:
                     }
         """
 
-        curs_list = self.__get_mongo_cursor(mongo_driver, headers, type=entities_contexts["entities_type"],
-                                            id=entities_contexts["entities_id"])
+        curs_list = self.__get_mongo_cursor(mongo_driver, headers, type=remove_quote(entities_contexts["entities_type"]),
+                                            id=remove_quote(entities_contexts["entities_id"]))
 
         # verify entities
         for i in range(int(entities_contexts["entities_number"])):
