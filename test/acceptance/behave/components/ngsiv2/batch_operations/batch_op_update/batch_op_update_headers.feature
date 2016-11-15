@@ -159,7 +159,7 @@ Feature: Batch operation - update using NGSI v2. "POST" - /v2/op/update plus pay
       | APPEND_STRICT |
 
   @happy_path
-  Scenario:  update several entities  with batch operations) using NGSIv2
+  Scenario:  update several entities with batch operations using NGSIv2
     Given  a definition of headers
       | parameter          | value                     |
       | Fiware-Service     | test_op_update_happy_path |
@@ -202,7 +202,7 @@ Feature: Batch operation - update using NGSI v2. "POST" - /v2/op/update plus pay
     Then verify that receive a "No Content" http code
 
   @happy_path
-  Scenario:  delete several entities  with batch operations) using NGSIv2
+  Scenario:  delete several entities with batch operations using NGSIv2
     Given  a definition of headers
       | parameter          | value                     |
       | Fiware-Service     | test_op_update_happy_path |
