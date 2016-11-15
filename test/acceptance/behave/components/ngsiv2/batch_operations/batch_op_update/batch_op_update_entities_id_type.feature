@@ -119,6 +119,36 @@ Feature: entities id and entities type in update batch operation using NGSI v2. 
       | 1000     |
       | 5000     |
 
+  @entities_id_duplicated
+  Scenario:  append entities with batch operations using NGSI v2 with duplicated entities id
+    Given  a definition of headers
+      | parameter          | value                      |
+      | Fiware-Service     | test_op_update_entities_id |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
+   # These properties below are used in batch operation request
+    And define a entity properties to update in a single batch operation
+      | parameter        | value       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_type  | celsius     |
+      | attributes_value | 4           |
+    And define a entity properties to update in a single batch operation
+      | parameter        | value    |
+      | entities_id      | room     |
+      | attributes_name  | humidity |
+      | attributes_type  | absolute |
+      | attributes_value | 100      |
+    And define a entity properties to update in a single batch operation
+      | parameter        | value       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_type  | kelvin      |
+      | attributes_value | 345         |
+    When update entities in a single batch operation "APPEND"
+    Then verify that receive a "No Content" http code
+    And verify that entities are stored in mongo
+
   @entities_id_not_plain_ascii @BUG_2658 @skip
   Scenario Outline: try to append entities with batch operations using NGSI v2 with not plain ascii in entities type
     Given  a definition of headers
@@ -173,6 +203,27 @@ Feature: entities id and entities type in update batch operation using NGSI v2. 
       | parameter   | value                                            |
       | error       | BadRequest                                       |
       | description | entity id length: 257, max length supported: 256 |
+
+  @entities_id_length_zero @BUG_2659 @skip
+  Scenario:  try to update entities with update batch operations using NGSI v2 with length zero in the entity id
+    Given  a definition of headers
+      | parameter          | value                            |
+      | Fiware-Service     | test_op_update_entities_id_error |
+      | Fiware-ServicePath | /test                            |
+      | Content-Type       | application/json                 |
+     # These properties below are used in update beh batch operation request
+    And define a entity properties to update in a single batch operation
+      | parameter        | value         |
+      | entities_type    | "house"       |
+      | entities_id      | ""            |
+      | attributes_name  | "temperature" |
+      | attributes_value | 34            |
+    When update entities in a single batch operation "'APPEND'" in raw mode
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                |
+      | error       | BadRequest           |
+      | description | entities id is empty |
 
   @entities_id_without
   Scenario: try to append entities with batch operations using NGSI v2 without entities id value
@@ -301,6 +352,27 @@ Feature: entities id and entities type in update batch operation using NGSI v2. 
       | null            |
 
   # --------------------- entities type -------------------------
+  @entities_type_without
+  Scenario:  append entities with batch operations using NGSI v2 without entities type
+    Given  a definition of headers
+      | parameter          | value                        |
+      | Fiware-Service     | test_op_update_entities_type |
+      | Fiware-ServicePath | /test                        |
+      | Content-Type       | application/json             |
+    # These properties below are used in bach operation request
+    And define a entity properties to update in a single batch operation
+      | parameter        | value       |
+      | entities_id      | room_3      |
+      | attributes_name  | temperature |
+      | attributes_type  | celsius     |
+      | attributes_value | 4           |
+      | metadatas_name   | alarm       |
+      | metadatas_type   | hot         |
+      | metadatas_value  | warning     |
+    When update entities in a single batch operation "APPEND"
+    Then verify that receive a "No Content" http code
+    And verify that entities are stored in mongo
+
   @entities_type
   Scenario Outline:  append entities with batch operations using NGSI v2 with several entities type values
     Given  a definition of headers
@@ -449,6 +521,27 @@ Feature: entities id and entities type in update batch operation using NGSI v2. 
       | error       | BadRequest                                         |
       | description | entity typè length: 257, max length supported: 256 |
 
+  @entities_type_length_zero @BUG_2659 @skip
+  Scenario: try to  update entities with update batch operations using NGSI v2 with length zero in the entity type
+    Given  a definition of headers
+      | parameter          | value                              |
+      | Fiware-Service     | test_op_update_entities_type_error |
+      | Fiware-ServicePath | /test                              |
+      | Content-Type       | application/json                   |
+     # These properties below are used in update beh batch operation request
+    And define a entity properties to update in a single batch operation
+      | parameter        | value         |
+      | entities_type    | ""            |
+      | entities_id      | "room1"       |
+      | attributes_name  | "temperature" |
+      | attributes_value | 34            |
+    When update entities in a single batch operation "'APPEND'" in raw mode
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                  |
+      | error       | BadRequest             |
+      | description | entities type is empty |
+
   @entities_type_wrong @BUG_2666 @skip
   Scenario Outline: try to append entities with batch operations using NGSI v2 with wrong entities type value
     Given  a definition of headers
@@ -549,4 +642,3 @@ Feature: entities id and entities type in update batch operation using NGSI v2. 
       | {"a":34}        |
       | ["34", "a", 45] |
       | null            |
-
