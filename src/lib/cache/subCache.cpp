@@ -1130,14 +1130,15 @@ typedef struct CachedSubSaved
 *
 * subCacheSync -
 *
-* 1. Save subscriptionId, lastNotificationTime, and count for all items in cache (savedSubV)
+* 1. Save subscriptionId, lastNotificationTime, count, lastFailure, and timesFailed for all items in cache (savedSubV)
 * 2. Refresh cache (count set to 0)
-* 3. Compare lastNotificationTime in savedSubV with the new cache-contents and:
+* 3. Compare lastNotificationTime/lastFailure in savedSubV with the new cache-contents and:
 *    3.1 Update cache-items where 'saved lastNotificationTime' > 'cached lastNotificationTime'
 *    3.2 Remember this more correct lastNotificationTime (must be flushed to mongo) -
 *        by clearing out (set to 0) those lastNotificationTimes that are newer in cache
-* 4. Update 'count' for each item in savedSubV where count != 0
-* 5. Update 'lastNotificationTime' foreach item in savedSubV where lastNotificationTime != 0
+*    Same same with lastFailure
+* 4. Update 'count/timesFailed' for each item in savedSubV where non-zero
+* 5. Update 'lastNotificationTime/lastFailure' foreach item in savedSubV where non-zero
 * 6. Free the vector created in step 1 - savedSubV
 *
 * NOTE
@@ -1161,7 +1162,7 @@ void subCacheSync(void)
 
 
   //
-  // 1. Save subscriptionId, lastNotificationTime, and count for all items in cache
+  // 1. Save subscriptionId, lastNotificationTime, count, lastFailure, and timesFailed for all items in cache
   //
   CachedSubscription* cSubP = subCache.head;
 
@@ -1198,7 +1199,7 @@ void subCacheSync(void)
 
 
   //
-  // 3. Compare lastNotificationTime in savedSubV with the new cache-contents
+  // 3. Compare lastNotificationTime/lastFailure in savedSubV with the new cache-contents
   //
   cSubP = subCache.head;
   while (cSubP != NULL)
@@ -1225,8 +1226,8 @@ void subCacheSync(void)
 
 
   //
-  // 4. Update 'count' for each item in savedSubV where count != 0
-  // 5. Update 'lastNotificationTime' for each item in savedSubV where lastNotificationTime != 0
+  // 4. Update 'count/timesFailed' for each item in savedSubV where non-zero
+  // 5. Update 'lastNotificationTime/lastFailure' for each item in savedSubV where non-zero
   //
   cSubP = subCache.head;
   while (cSubP != NULL)
