@@ -278,7 +278,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     caP->type = (compoundVector)? defaultType(orion::ValueTypeVector) : defaultType(caP->valueType);
   }
 
-  // FIXME PW2: weird... one argument is a sub-argument of the other. ciP should be expanded to the minimum set
+  // FIXME P2: weird... one argument is a sub-argument of the other. ciP should be expanded to the minimum set
   // of needed arguments
   std::string r = caP->check(ciP, ciP->requestType, "", "", 0);
   if (r != "OK")
