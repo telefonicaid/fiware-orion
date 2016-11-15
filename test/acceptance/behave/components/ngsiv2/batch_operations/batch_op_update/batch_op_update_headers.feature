@@ -83,6 +83,52 @@ Feature: Batch operation - update using NGSI v2. "POST" - /v2/op/update plus pay
       | APPEND_STRICT |
 
   @happy_path
+  Scenario:  replace several entities with batch operations using NGSI v2
+    Given  a definition of headers
+      | parameter          | value                     |
+      | Fiware-Service     | test_op_update_happy_path |
+      | Fiware-ServicePath | /test                     |
+      | Content-Type       | application/json          |
+    # These properties below are used in bach operation request
+    And define a entity properties to update in a single batch operation
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | metadatas_name   | warning     |
+      | metadatas_value  | hot         |
+      | metadatas_type   | alarm       |
+    And define a entity properties to update in a single batch operation
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | warning     |
+      | metadatas_value  | cold        |
+      | metadatas_type   | alarm       |
+    When update entities in a single batch operation "APPEND"
+    Then verify that receive a "No Content" http code
+    And verify that entities are stored in mongo
+    And initialize entity groups recorder
+    And define a entity properties to update in a single batch operation
+      | parameter        | value    |
+      | entities_type    | house    |
+      | entities_id      | room1    |
+      | attributes_name  | humidity |
+      | attributes_type  | absolute |
+      | attributes_value | 100      |
+      | metadatas_name   | warning  |
+      | metadatas_value  | high     |
+      | metadatas_type   | alarm    |
+    When update entities in a single batch operation "REPLACE"
+    Then verify that receive a "No Content" http code
+    And verify that entities are stored in mongo
+
+  @happy_path
   Scenario Outline:  update several entities with batch operations using NGSI v2 with keyValues format
     Given  a definition of headers
       | parameter          | value                     |
@@ -181,13 +227,13 @@ Feature: Batch operation - update using NGSI v2. "POST" - /v2/op/update plus pay
       | options   | keyValues |
     And verify that receive a "No Content" http code
     And define a entity properties to update in a single batch operation
-      | parameter        | value       |
-      | entities_type    | house       |
-      | entities_id      | room1       |
+      | parameter     | value |
+      | entities_type | house |
+      | entities_id   | room1 |
     And define a entity properties to update in a single batch operation
-      | parameter        | value       |
-      | entities_type    | home        |
-      | entities_id      | room2       |
+      | parameter     | value |
+      | entities_type | home  |
+      | entities_id   | room2 |
     When update entities in a single batch operation "DELETE"
       | parameter | value     |
       | options   | keyValues |
