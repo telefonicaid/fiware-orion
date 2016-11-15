@@ -4,4 +4,4 @@
 - Add: New CLI option: '-logForHumans', to make the screen log output readable for humans (#2609)
 - Fix: subscription PATCH not working for notification.attrs and notification.exceptAttrs subfields (#2647)
 - Fix: PATCH attr wrongly adding metadata item instead of replacing (#1788)
-- Add: notification failure statistics included in subscriptions (Issue #1960)
+- Add: notification failure information included in subscriptions (#1960)
