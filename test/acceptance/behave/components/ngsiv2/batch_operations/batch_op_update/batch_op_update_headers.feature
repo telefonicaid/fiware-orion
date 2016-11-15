@@ -113,7 +113,7 @@ Feature: Batch operation - update using NGSI v2. "POST" - /v2/op/update plus pay
       | APPEND_STRICT |
 
   @happy_path
-  Scenario Outline:  update and delete several entities  with batch operations) using NGSIv2
+  Scenario:  update several entities  with batch operations) using NGSIv2
     Given  a definition of headers
       | parameter          | value                     |
       | Fiware-Service     | test_op_update_happy_path |
@@ -150,14 +150,48 @@ Feature: Batch operation - update using NGSI v2. "POST" - /v2/op/update plus pay
       | attributes_name  | temperature |
       | attributes_value | 45          |
       | attributes_type  | kelvin      |
-    When update entities in a single batch operation "<operation>"
+    When update entities in a single batch operation "UPDATE"
       | parameter | value     |
       | options   | keyValues |
     Then verify that receive a "No Content" http code
-    Examples:
-      | operation |
-      | DELETE    |
-      | UPDATE    |
+
+  @happy_path
+  Scenario:  delete several entities  with batch operations) using NGSIv2
+    Given  a definition of headers
+      | parameter          | value                     |
+      | Fiware-Service     | test_op_update_happy_path |
+      | Fiware-ServicePath | /test                     |
+      | Content-Type       | application/json          |
+    # These properties below are used in bach operation request
+    And define a entity properties to update in a single batch operation
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    And define a entity properties to update in a single batch operation
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 44          |
+      | attributes_type  | celsius     |
+    When update entities in a single batch operation "APPEND"
+      | parameter | value     |
+      | options   | keyValues |
+    And verify that receive a "No Content" http code
+    And define a entity properties to update in a single batch operation
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room1       |
+    And define a entity properties to update in a single batch operation
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room2       |
+    When update entities in a single batch operation "DELETE"
+      | parameter | value     |
+      | options   | keyValues |
+    Then verify that receive a "No Content" http code
 
   @maximum_size @too_slow
    # 7239 entities is a way of generating a request longer than 1MB (in fact, 1048583 bytes)
