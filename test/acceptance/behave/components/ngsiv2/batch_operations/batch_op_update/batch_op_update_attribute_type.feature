@@ -105,9 +105,8 @@ Feature: Attribute type in update Batch operation using NGSI v2. "POST" - /v2/op
       | random=10       |
       | random=100      |
       | random=256      |
-      | my house        |
 
-  @attributes_type_not_plain_ascii @BUG_2674 @skip
+  @attributes_type_not_plain_ascii @BUG_2674
   Scenario Outline:  try to update entities with update batch operations using NGSI v2 with with not plain ascii in attribute types
     Given  a definition of headers
       | parameter          | value                               |
@@ -136,8 +135,9 @@ Feature: Attribute type in update Batch operation using NGSI v2. "POST" - /v2/op
       | habitación      |
       | españa          |
       | barça           |
+      | my house        |
 
-  @attributes_type_max_length @BUG_2674 @skip
+  @attributes_type_max_length @BUG_2674
   Scenario:  try to update entities with update batch operations using NGSI v2 with an attributes type that exceeds the maximum allowed (256)
     Given  a definition of headers
       | parameter          | value                               |
@@ -162,7 +162,7 @@ Feature: Attribute type in update Batch operation using NGSI v2. "POST" - /v2/op
       | error       | BadRequest                                            |
       | description | attribute type length: 257, max length supported: 256 |
 
-  @attributes_type_length_zero @BUG_2674 @skip
+  @attributes_type_length_zero @BUG_2674
   Scenario:  try to update entities with update batch operations using NGSI v2 with length zero in the attributes type
     Given  a definition of headers
       | parameter          | value                               |
@@ -180,11 +180,11 @@ Feature: Attribute type in update Batch operation using NGSI v2. "POST" - /v2/op
     When update entities in a single batch operation "'APPEND'" in raw mode
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | BadRequest               |
-      | description | attribute typei is empty |
+      | parameter   | value                                             |
+      | error       | BadRequest                                        |
+      | description | attribute type length: 0, min length supported: 1 |
 
-  @attributes_type_wrong @BUG_2674 @skip
+  @attributes_type_wrong @BUG_2674
   Scenario Outline:  try to update entities with update batch operations using NGSI v2 with wrong attributes types
     Given  a definition of headers
       | parameter          | value                               |

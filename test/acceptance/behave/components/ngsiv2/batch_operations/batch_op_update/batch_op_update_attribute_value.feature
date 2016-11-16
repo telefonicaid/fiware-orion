@@ -260,7 +260,7 @@ Feature: Attribute value in update Batch operation using NGSI v2. "POST" - /v2/o
       | room16    | "2017-06-17T07:21:24.238Z"                                                    |
       | room17    | null                                                                          |
 
-  @attributes_value_wrong @BUG_2681 @skip
+  @attributes_value_wrong @BUG_2681
   Scenario Outline:  try to update entities with update batch operations using NGSI v2 with several wrong attributes values
     Given  a definition of headers
       | parameter          | value                                |
