@@ -28,6 +28,7 @@
 
 #include "ngsi/ContextAttribute.h"
 #include "parse/CompoundValueNode.h"
+#include "parse/forbiddenChars.h"
 #include "alarmMgr/alarmMgr.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseContextAttribute.h"
@@ -272,16 +273,19 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     }
   }
 
-  if (caP->name == "")
-  {
-    alarmMgr.badInput(clientIp, "no 'name' for ContextAttribute");
-    ciP->httpStatusCode = SccBadRequest;
-    return "no 'name' for ContextAttribute";
-  }
-
   if (!caP->typeGiven)
   {
     caP->type = (compoundVector)? defaultType(orion::ValueTypeVector) : defaultType(caP->valueType);
+  }
+
+  // FIXME P2: weird... one argument is a sub-argument of the other. ciP should be expanded to the minimum set
+  // of needed arguments
+  std::string r = caP->check(ciP, ciP->requestType, "", "", 0);
+  if (r != "OK")
+  {
+    alarmMgr.badInput(clientIp, r);
+    ciP->httpStatusCode = SccBadRequest;
+    return r;
   }
 
   return "OK";

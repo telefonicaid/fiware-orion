@@ -51,7 +51,6 @@ public:
   BatchQuery();
   ~BatchQuery();
 
-  std::string    check(ConnectionInfo* ciP, RequestType requestType);
   void           present(const std::string& indent);
   void           release(void);
 };

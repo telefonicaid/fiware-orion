@@ -1,0 +1,98 @@
+ Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Cover the bugfix for not plain ASCII chars in entity type in POST /v2/op/update
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Update using entity type with not plain ASCII and see error
+# 02. Check no entity has been created
+#
+
+
+echo "01. Update using entity type with not plain ASCII and see error"
+echo "==============================================================="
+payload='{
+  "actionType": "APPEND",
+  "entities":
+  [
+    {
+      "type": "España",
+      "id":   "E1",
+      "A1": {
+         "type": "Text",
+         "value": "X"
+      },
+      "A2": {
+         "type": "Text",
+         "value": "Y"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "02. Check no entity has been created"
+echo "===================================="
+orionCurl --url /v2/entities
+echo
+echo
+
+
+--REGEXPECT--
+01. Update using entity type with not plain ASCII and see error
+===============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 72
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid characters in entity type",
+    "error": "BadRequest"
+}
+
+
+02. Check no entity has been created
+====================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
