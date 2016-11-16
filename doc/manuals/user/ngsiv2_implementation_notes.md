@@ -11,6 +11,7 @@
 * [`actionType` metadata](#actiontype-metadata)
 * [`noAttrDetail` option](#noattrdetail-option)
 * [Notification throttling](#notification-throttling)
+* [Deprecated features](#deprecated-features)
 
 This document describes some considerations to take into account
 regarding the specific implementation done by Orion Context Broker
@@ -26,11 +27,15 @@ From "Field syntax restrictions" section at NGSIv2 specification:
 The additional restrictions that apply to Orion are the ones describe in the
 [forbidden characters](forbidden_characters.md) section of the manual.
 
+[Top](#top)
+
 ## Custom payload decoding on notifications
 
 Due to forbidden characters restriction, Orion applies an extra decoding step to outgoing
 custom notifications. This is described in detail in [this section](forbidden_characters.md#custom-payload-special-treatment)
 of the manual.
+
+[Top](#top)
 
 ## Option to disable custom notifications
 
@@ -40,6 +45,8 @@ In this case:
 
 * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
 * No `${...}` macro substitution is performed.
+
+[Top](#top)
 
 ## Limit to attributes for entity location
 
@@ -56,19 +63,15 @@ From "Geospatial properties of entities" section at NGSIv2 specification:
 
 In the case of Orion, that limit is one (1) attribute.
 
+[Top](#top)
+
 ## Legacy attribute format in notifications
 
 Apart from the values described for `attrsFormat` in the NGSIv2 specification, Orion also supports a
 `legacy` value, in order to send notifications in NGSIv1 format. This way, users can benefit from the
 enhancements of NGSIv2 subscriptions (e.g. filtering) with NGSIv1 legacy notification receivers.
 
-## Disable attribute detail in GET types operation
-
-Not yet implemented, but is expected that Orion will implmement the `noAttrsType` option for the
-`GET /v2/types` operation in order to not include attribute details (whose aggregation could be
-costly in terms of performance).
-
-Related with: https://github.com/telefonicaid/fiware-orion/issues/2073
+[Top](#top)
 
 ## Scope functionality
 
@@ -76,11 +79,15 @@ Orion implements a `scope` field in the `POST /v2/op/update` operation (you can 
 [an example in the NGSIv2 walkthrough](walkthrough_apiv2.md#batch-operations)). However, note that this syntax is
 somewhat experimental and it hasn't been consolidated in the NGSIv2 specification.
 
+[Top](#top)
+
 ## Error responses
 
 The error response rules defined in https://github.com/telefonicaid/fiware-orion/issues/1286 takes precedence over
 the ones described in "Error Responses" section in the NGSIv2 specification. In particular, Orion Context
 Broker never responds with "InvalidModification (422)", using "Unprocessable (422)" instead.
+
+[Top](#top)
 
 ## Subscription payload validations
 
@@ -91,11 +98,13 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
     * **entities**: mandatory
         * **id** or **idPattern**: one of them is mandatory (but both at the same time is not allowed). id
             must follow NGSIv2 restrictions for IDs. idPattern must be not empty and a valid regex.
-        * **type**: optional (but if present it must follow NGSIv2 restrictions for IDs)
+        * **type** or **typePattern**: optional (but both at the same time is not allowed). type must 
+            follow NGSIv2 restrictions for IDs. typePattern must be not empty and a valid regex.
     * **condition**: optional (but if present it must have a content, i.e. `{}` is not allowed)
         * **attrs**: optional (but if present it must be a list; empty list is allowed)
         * **expression**: optional (but if present it must have a content, i.e. `{}` is not allowed)
             * **q**: optional (but if present it must be not empty, i.e. `""` is not allowed)
+            * **mq**: optional (but if present it must be not empty, i.e. `""` is not allowed)
             * **georel**: optional (but if present it must be not empty, i.e. `""` is not allowed)
             * **geometry**: optional (but if present it must be not empty, i.e. `""` is not allowed)
             * **coords**: optional (but if present it must be not empty, i.e. `""` is not allowed)
@@ -116,6 +125,7 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 * **expires**: optional (must be a date or empty string "")
 * **status**: optional (must be a valid status keyword)
 
+[Top](#top)
 
 ## `actionType` metadata
 
@@ -127,6 +137,8 @@ From NGSIv2 specification section ""System/builtin in metadata"", regarding `act
 Current Orion implementation supports "update" and "append". The "delete" case will be
 supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).
 
+[Top](#top)
+
 ## `noAttrDetail` option
 
 The value `noAttrDetail` of the URI param `options` may be used in order to avoid NGSIv2 type browsing queries
@@ -136,6 +148,8 @@ When used, the `types` list associated to each attribute name is set to `[]`.
 Using this option, Orion solves these queries much faster, especially in the case of a large number of attributes, each one with a different type.
 This can be very useful if your use case doesn't need the attribute type detail.
 In some cases savings from 30 seconds to 0.5 seconds with the `noAttrDetails` option have been detected.
+
+[Top](#top)
 
 ## Notification throttling
 
@@ -151,7 +165,7 @@ measure is local to each Orion node. Although each node periodically synchronize
 values (more on this [here](perf_tuning.md#subscription-cache)) it may happen that a particular node has an old value, so throttling
 is not 100% accurate.
 
-<!-- To enable this when options get removed from the stable version. Note that in RC-2016.10 is still included
+[Top](#top)
 
 ## Deprecated features
 
@@ -161,7 +175,7 @@ NGSIv2 stable specification document but that Orion still supports
 (as [deprecated functionality](../deprecated.md)) in order to keep backward compability.
 
 In particular, the usage of `dateCreated` and `dateModified` in the `options` parameter (introduced
-in stable RC-2016.05 and removed in ...) is still supported, e.g. `options=dateModified`. However,
+in stable RC-2016.05 and removed in RC-2016.10.) is still supported, e.g. `options=dateModified`. However,
 you are highly encouraged to use `attrs` instead (i.e. `attrs=dateModified,*`).
 
--->
+[Top](#top)
