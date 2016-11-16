@@ -32,6 +32,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "alarmMgr/alarmMgr.h"
+#include "rest/uriParamNames.h"
 
 
 
@@ -54,7 +55,10 @@ std::string NotifyContextRequest::render(ConnectionInfo* ciP, RequestType reques
   out += startTag1(indent, tag, false);
   out += subscriptionId.render(NotifyContext, indent + "  ", true);
   out += originator.render(indent  + "  ", contextElementResponseVectorRendered);
-  out += contextElementResponseVector.render(ciP, NotifyContext, indent  + "  ", false);
+  // FIXME PR
+  out += contextElementResponseVector.render(ciP->apiVersion,
+                                             ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
+                                             NotifyContext, indent  + "  ", false);
   out += endTag(indent);
 
   return out;
@@ -114,7 +118,8 @@ std::string NotifyContextRequest::check(ConnectionInfo* ciP, RequestType request
   }
   else if (((res = subscriptionId.check(QueryContext, indent, predetectedError, 0))                    != "OK") ||
            ((res = originator.check(QueryContext, indent, predetectedError, 0))                        != "OK") ||
-           ((res = contextElementResponseVector.check(ciP, QueryContext, indent, predetectedError, 0)) != "OK"))
+           // FIXME PR
+           ((res = contextElementResponseVector.check(ciP->apiVersion, QueryContext, indent, predetectedError, 0)) != "OK"))
   {
     response.responseCode.fill(SccBadRequest, res);
   }

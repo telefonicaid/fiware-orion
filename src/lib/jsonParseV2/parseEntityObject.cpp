@@ -140,6 +140,5 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
     }
   }
 
-  // FIXME PR
   return eP->check(ciP->apiVersion, ciP->requestType);
 }

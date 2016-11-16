@@ -86,11 +86,11 @@ std::string RegisterProviderRequest::render(std::string indent)
 */
 std::string RegisterProviderRequest::check
 (
-  ConnectionInfo* ciP,
-  RequestType     requestType,  
-  std::string     indent,
-  std::string     predetectedError,
-  int             counter
+  const std::string&  apiVersion,
+  RequestType         requestType,
+  std::string         indent,
+  std::string         predetectedError,
+  int                 counter
 )
 {
   DiscoverContextAvailabilityResponse  response;
@@ -100,8 +100,7 @@ std::string RegisterProviderRequest::check
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  // FIXME PR
-  else if (((res = metadataVector.check(ciP->apiVersion))  != "OK") ||
+  else if (((res = metadataVector.check(apiVersion))                        != "OK") ||
            ((res = duration.check(requestType, indent, "", 0))              != "OK") ||
            ((res = providingApplication.check(requestType, indent, "", 0))  != "OK") ||
            ((res = registrationId.check(requestType, indent, "", 0))        != "OK"))

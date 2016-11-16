@@ -60,7 +60,7 @@ typedef struct UpdateContextRequest
   UpdateContextRequest();
   UpdateContextRequest(const std::string& _contextProvider, EntityId* eP);
 
-  std::string        render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
+  std::string        render(ConnectionInfo* ciP, const std::string& indent);
   std::string        check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
   void               release(void);
   ContextAttribute*  attributeLookup(EntityId* eP, const std::string& attributeName);

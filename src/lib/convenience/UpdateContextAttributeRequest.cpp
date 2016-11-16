@@ -54,7 +54,7 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 *
 * render - 
 */
-std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, std::string indent)
+std::string UpdateContextAttributeRequest::render(const std::string& apiVersion, std::string indent)
 {
   std::string tag = "updateContextAttributeRequest";
   std::string out = "";
@@ -77,9 +77,8 @@ std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, std::stri
       isCompoundVector = true;
     }
 
-    // FIXME PR
     out += startTag2(indent + "  ", "value", isCompoundVector, true);
-    out += compoundValueP->render(ciP->apiVersion, indent + "    ");
+    out += compoundValueP->render(apiVersion, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
 
@@ -97,11 +96,11 @@ std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, std::stri
 */
 std::string UpdateContextAttributeRequest::check
 (
-  ConnectionInfo* ciP,
-  RequestType     requestType,
-  std::string     indent,
-  std::string     predetectedError,
-  int             counter
+  const std::string&  apiVersion,
+  RequestType         requestType,
+  std::string         indent,
+  std::string         predetectedError,
+  int                 counter
 )
 {
   StatusCode       response;
@@ -113,8 +112,7 @@ std::string UpdateContextAttributeRequest::check
   {
     response.fill(SccBadRequest, predetectedError);
   }
-  // FIXME
-  else if ((res = metadataVector.check(ciP->apiVersion)) != "OK")
+  else if ((res = metadataVector.check(apiVersion)) != "OK")
   {
     response.fill(SccBadRequest, res);
   }

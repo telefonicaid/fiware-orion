@@ -65,7 +65,7 @@ typedef struct SubscribeContextAvailabilityRequest
 
   SubscribeContextAvailabilityRequest();
   std::string  render(RequestType requestType, const std::string& indent);
-  std::string  check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
+  std::string  check(const std::string& indent, const std::string& predetectedError, int counter);
   void         release(void);
   void         present(const std::string& indent);
 

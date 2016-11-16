@@ -76,7 +76,7 @@ ContextElement::ContextElement(const std::string& id, const std::string& type, c
 *
 * ContextElement::render - 
 */
-std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues)
+std::string ContextElement::render(const std::string& apiVersion, bool asJsonObject, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues)
 {
   std::string  out                              = "";
   std::string  key                              = "contextElement";
@@ -100,10 +100,7 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
 
   out += entityId.render(indent + "  ", commaAfterEntityId, false);
   out += attributeDomainName.render(indent + "  ", commaAfterAttributeDomainName);
-  // FIXME PR
-  out += contextAttributeVector.render(ciP->apiVersion,
-                                       ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
-                                       requestType, indent + "  ", commaAfterContextAttributeVector, omitAttributeValues);
+  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType, indent + "  ", commaAfterContextAttributeVector, omitAttributeValues);
   out += domainMetadataVector.render(indent + "  ", commaAfterDomainMetadataVector);
 
   out += endTag(indent, comma, false);
@@ -173,7 +170,7 @@ ContextAttribute* ContextElement::getAttribute(const std::string& attrName)
 */
 std::string ContextElement::check
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,
@@ -182,7 +179,7 @@ std::string ContextElement::check
 {
   std::string res;
 
-  if ((res = entityId.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+  if ((res = entityId.check(requestType, indent)) != "OK")
   {
     return res;
   }
@@ -192,14 +189,12 @@ std::string ContextElement::check
     return res;
   }
 
-  // FIXME PR ciP->apiVersion
-  if ((res = contextAttributeVector.check(ciP->apiVersion, requestType)) != "OK")
+  if ((res = contextAttributeVector.check(apiVersion, requestType)) != "OK")
   {
     return res;
   }
 
-  // FIXME PR ciP->apiVersion
-  if ((res = domainMetadataVector.check(ciP->apiVersion)) != "OK")
+  if ((res = domainMetadataVector.check(apiVersion)) != "OK")
   {
     return res;
   }

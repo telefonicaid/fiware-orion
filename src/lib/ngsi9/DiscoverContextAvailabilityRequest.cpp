@@ -63,7 +63,7 @@ void DiscoverContextAvailabilityRequest::release(void)
 *
 * DiscoverContextAvailabilityRequest::check - 
 */
-std::string DiscoverContextAvailabilityRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string DiscoverContextAvailabilityRequest::check(const std::string& indent, const std::string& predetectedError)
 {
   DiscoverContextAvailabilityResponse  response;
   std::string                          res;
@@ -76,7 +76,7 @@ std::string DiscoverContextAvailabilityRequest::check(ConnectionInfo* ciP, Reque
   {
     response.errorCode.fill(SccContextElementNotFound);
   }
-  else if (((res = entityIdVector.check(ciP, DiscoverContextAvailability, indent, predetectedError, restrictions))                      != "OK") ||
+  else if (((res = entityIdVector.check(DiscoverContextAvailability, indent))                                                      != "OK") ||
            ((res = attributeList.check(DiscoverContextAvailability, indent, predetectedError, restrictions))                       != "OK") ||
            ((restrictions != 0) && ((res = restriction.check(DiscoverContextAvailability, indent, predetectedError, restrictions)) != "OK")))
   {

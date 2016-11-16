@@ -34,6 +34,7 @@
 #include "ngsi/StatusCode.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
 
 
 
@@ -130,7 +131,8 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
 
   if (contextElementResponseVector.size() > 0)
   {
-    out += contextElementResponseVector.render(ciP, QueryContext, indent + "  ", errorCodeRendered);
+    // FIXME PR
+    out += contextElementResponseVector.render(ciP->apiVersion, ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON, QueryContext, indent + "  ", errorCodeRendered);
   }
 
   if (errorCodeRendered == true)
@@ -163,7 +165,7 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
 *
 * QueryContextResponse::check -
 */
-std::string QueryContextResponse::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string QueryContextResponse::check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError)
 {
   std::string  res;
 
@@ -171,7 +173,8 @@ std::string QueryContextResponse::check(ConnectionInfo* ciP, RequestType request
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextElementResponseVector.check(ciP, QueryContext, indent, predetectedError, 0)) != "OK")
+  // FIXME PR
+  else if ((res = contextElementResponseVector.check(ciP->apiVersion, QueryContext, indent, predetectedError, 0)) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     errorCode.fill(SccBadRequest, res);

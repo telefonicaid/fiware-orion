@@ -119,7 +119,7 @@ std::string QueryContextRequest::render(RequestType requestType, const std::stri
 *
 * QueryContextRequest::check - 
 */
-std::string QueryContextRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string QueryContextRequest::check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError)
 {
   std::string           res;
   QueryContextResponse  response;
@@ -128,7 +128,8 @@ std::string QueryContextRequest::check(ConnectionInfo* ciP, RequestType requestT
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = entityIdVector.check(ciP, QueryContext, indent, predetectedError, 0))            != "OK") ||
+  // FIXME PR
+  else if (((res = entityIdVector.check(QueryContext, indent))                                 != "OK") ||
            ((res = attributeList.check(QueryContext,  indent, predetectedError, 0))            != "OK") ||
            ((res = restriction.check(QueryContext,    indent, predetectedError, restrictions)) != "OK"))
   {

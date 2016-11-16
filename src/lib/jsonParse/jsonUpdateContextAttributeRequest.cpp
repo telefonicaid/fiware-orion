@@ -35,6 +35,7 @@
 #include "jsonParse/jsonUpdateContextAttributeRequest.h"
 #include "parse/nullTreat.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
 
 
 
@@ -165,7 +166,7 @@ void jsonUpcarRelease(ParseData* reqData)
 */
 std::string jsonUpcarCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->upcar.res.check(ciP, UpdateContextAttribute, "", reqData->errorString, 0);
+  return reqData->upcar.res.check(ciP->apiVersion, UpdateContextAttribute, "", reqData->errorString, 0);
 }
 
 

@@ -443,11 +443,7 @@ void jsonUpcrsRelease(ParseData* reqDataP)
 */
 std::string jsonUpcrsCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-  return reqDataP->upcrs.res.check(ciP,
-                                 RtUpdateContextResponse,
-                                 "",
-                                 reqDataP->errorString,
-                                 0);
+  return reqDataP->upcrs.res.check(ciP, "", reqDataP->errorString);
 }
 
 

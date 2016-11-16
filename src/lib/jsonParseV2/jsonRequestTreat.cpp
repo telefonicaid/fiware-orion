@@ -74,7 +74,6 @@ std::string jsonRequestTreat
       return answer;
     }
 
-    // FIXME PR
     if ((answer = parseDataP->ent.res.check(ciP->apiVersion, EntitiesRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
@@ -90,7 +89,6 @@ std::string jsonRequestTreat
       return answer;
     }
 
-    // FIXME PR
     if ((answer = parseDataP->ent.res.check(ciP->apiVersion, EntityRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
@@ -107,7 +105,6 @@ std::string jsonRequestTreat
       return answer;
     }
 
-    // FIXME PR
     if ((answer = parseDataP->attr.attribute.check(ciP->apiVersion, EntityAttributeRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);

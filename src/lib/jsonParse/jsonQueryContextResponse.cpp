@@ -444,11 +444,7 @@ void jsonQcrsRelease(ParseData* reqDataP)
 */
 std::string jsonQcrsCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-  return reqDataP->qcrs.res.check(ciP,
-                                 RtQueryContextResponse,
-                                 "",
-                                 reqDataP->errorString,
-                                 0);
+  return reqDataP->qcrs.res.check(ciP, "", reqDataP->errorString);
 }
 
 

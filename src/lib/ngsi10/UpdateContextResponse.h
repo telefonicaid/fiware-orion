@@ -51,8 +51,8 @@ typedef struct UpdateContextResponse
   UpdateContextResponse(StatusCode& _errorCode);
   ~UpdateContextResponse();
 
-  std::string   render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);  
-  std::string   check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
+  std::string   render(ConnectionInfo* ciP, const std::string& indent);
+  std::string   check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
   void          present(const std::string& indent);
   void          release(void);
   void          fill(UpdateContextResponse* upcrsP);

@@ -325,7 +325,8 @@ ContextElementResponse::ContextElementResponse(ContextElement* ceP, bool useDefa
 */
 std::string ContextElementResponse::render
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
+  bool                asJsonObject,
   RequestType         requestType,
   const std::string&  indent,
   bool                comma,
@@ -336,7 +337,7 @@ std::string ContextElementResponse::render
   std::string out = "";
 
   out += startTag2(indent, key, false, false);
-  out += contextElement.render(ciP, requestType, indent + "  ", true, omitAttributeValues);
+  out += contextElement.render(apiVersion, asJsonObject, requestType, indent + "  ", true, omitAttributeValues);
   out += statusCode.render(indent + "  ", false);
   out += endTag(indent, comma, false);
 
@@ -384,7 +385,7 @@ void ContextElementResponse::release(void)
 */
 std::string ContextElementResponse::check
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,
@@ -393,7 +394,7 @@ std::string ContextElementResponse::check
 {
   std::string res;
 
-  if ((res = contextElement.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+  if ((res = contextElement.check(apiVersion, requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }

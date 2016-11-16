@@ -80,8 +80,9 @@ std::string NotifyContextAvailabilityRequest::check(ConnectionInfo* ciP, Request
   {
     response.responseCode.fill(SccBadRequest, predetectedError);
   }
+  // FIXME PR
   else if (((res = subscriptionId.check(QueryContext, indent, predetectedError, 0))                    != "OK") ||
-           ((res = contextRegistrationResponseVector.check(ciP, QueryContext, indent, predetectedError, 0)) != "OK"))
+           ((res = contextRegistrationResponseVector.check(ciP->apiVersion, QueryContext, indent, predetectedError, 0)) != "OK"))
   {
     response.responseCode.fill(SccBadRequest, res);
   }

@@ -767,11 +767,7 @@ void jsonQcrRelease(ParseData* reqDataP)
 */
 std::string jsonQcrCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-  return reqDataP->qcr.res.check(ciP,
-                                 DiscoverContextAvailability,
-                                 "",
-                                 reqDataP->errorString,
-                                 reqDataP->qcr.res.restrictions);
+  return reqDataP->qcr.res.check(ciP, "", reqDataP->errorString);
 }
 
 

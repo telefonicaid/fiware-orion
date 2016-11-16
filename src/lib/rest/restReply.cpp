@@ -231,7 +231,7 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, co
    else if (tag == "updateContextResponse")
    {
       UpdateContextResponse ucr(errorCode);
-      reply = ucr.render(ciP, UpdateContext, indent);
+      reply = ucr.render(ciP, indent);
    }
    else if (tag == "notifyContextResponse")
    {

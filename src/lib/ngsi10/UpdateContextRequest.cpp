@@ -38,8 +38,8 @@
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
 #include "convenience/UpdateContextAttributeRequest.h"
-
 
 
 /* ****************************************************************************
@@ -68,16 +68,17 @@ UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, 
 *
 * UpdateContextRequest::render - 
 */
-std::string UpdateContextRequest::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent)
+std::string UpdateContextRequest::render(ConnectionInfo* ciP, const std::string& indent)
 {
   std::string  out = "";
   std::string  tag = "updateContextRequest";
 
   // JSON commas:
   // Both fields are MANDATORY, so, comma after "contextElementVector"
-  //
+  //  
   out += startTag1(indent, tag, false);
-  out += contextElementVector.render(ciP, UpdateContext, indent + "  ", true);
+  // FIXME PR
+  out += contextElementVector.render(ciP->apiVersion, ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON, UpdateContext, indent + "  ", true);
   out += updateActionType.render(indent + "  ", false);
   out += endTag(indent, false);
 
@@ -98,14 +99,15 @@ std::string UpdateContextRequest::check(ConnectionInfo* ciP, RequestType request
   if (predetectedError != "")
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
-    return response.render(ciP, UpdateContext, indent);
+    return response.render(ciP, indent);
   }
 
-  if (((res = contextElementVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK") ||
+  // FIXME PR
+  if (((res = contextElementVector.check(ciP->apiVersion, requestType, indent, predetectedError, counter)) != "OK") ||
       ((res = updateActionType.check()) != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
-    return response.render(ciP, UpdateContext, indent);
+    return response.render(ciP, indent);
   }
 
   return "OK";

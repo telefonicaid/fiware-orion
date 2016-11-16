@@ -72,11 +72,8 @@ std::string EntityIdVector::render(const std::string& indent, bool comma)
 */
 std::string EntityIdVector::check
 (
-  ConnectionInfo*     ciP,
-  RequestType         requestType,  
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
+  RequestType         requestType,
+  const std::string&  indent
 )
 {
   // Only OK to be empty if part of a ContextRegistration
@@ -97,7 +94,7 @@ std::string EntityIdVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(requestType, indent)) != "OK")
     {
       alarmMgr.badInput(clientIp, "invalid vector of EntityIds");
       return res;

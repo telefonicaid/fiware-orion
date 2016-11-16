@@ -560,7 +560,6 @@ std::string ContextAttribute::renderAsJsonObject
       isCompoundVector = true;
     }
 
-    // FIXME PR
     out += startTag2(indent + "  ", "value", isCompoundVector, true);
     out += compoundValueP->render(apiVersion, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);

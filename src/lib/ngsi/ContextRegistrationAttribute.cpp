@@ -100,11 +100,8 @@ std::string ContextRegistrationAttribute::render(const std::string& indent, bool
 */
 std::string ContextRegistrationAttribute::check
 (
-  ConnectionInfo*     ciP,
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
+  const std::string&  apiVersion,
+  const std::string&  indent
 )
 {
 
@@ -124,8 +121,7 @@ std::string ContextRegistrationAttribute::check
   }
 
   std::string res;
-  // FIXME PR
-  if ((res = metadataVector.check(ciP->apiVersion)) != "OK")
+  if ((res = metadataVector.check(apiVersion)) != "OK")
   {
     return res;
   }

@@ -278,7 +278,6 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     caP->type = (compoundVector)? defaultType(orion::ValueTypeVector) : defaultType(caP->valueType);
   }
 
-  // FIXME PR
   std::string r = caP->check(ciP->apiVersion, ciP->requestType);
   if (r != "OK")
   {

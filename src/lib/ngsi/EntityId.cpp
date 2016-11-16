@@ -153,11 +153,8 @@ std::string EntityId::toJson(void) const
 */
 std::string EntityId::check
 (
-  ConnectionInfo* ciP,
   RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
+  const std::string&  indent
 )
 {
   if (id == "")

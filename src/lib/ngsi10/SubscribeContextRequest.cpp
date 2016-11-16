@@ -43,7 +43,7 @@ using namespace ngsiv2;
 *
 * SubscribeContextRequest::check - 
 */
-std::string SubscribeContextRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string SubscribeContextRequest::check(const std::string& indent, const std::string& predetectedError, int counter)
 {
   SubscribeContextResponse response;
   std::string              res;
@@ -51,7 +51,7 @@ std::string SubscribeContextRequest::check(ConnectionInfo* ciP, RequestType requ
   /* First, check optional fields only in the case they are present */
   /* Second, check the other (mandatory) fields */
 
-  if (((res = entityIdVector.check(ciP, SubscribeContext, indent, predetectedError, counter))        != "OK") ||
+  if (((res = entityIdVector.check(SubscribeContext, indent))                                   != "OK") ||
       ((res = attributeList.check(SubscribeContext, indent, predetectedError, counter))         != "OK") ||
       ((res = reference.check(SubscribeContext, indent, predetectedError, counter))             != "OK") ||
       ((res = duration.check(SubscribeContext, indent, predetectedError, counter))              != "OK") ||

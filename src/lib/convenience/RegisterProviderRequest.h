@@ -49,7 +49,7 @@ typedef struct RegisterProviderRequest
   RegisterProviderRequest();
 
   std::string  render(std::string indent);
-  std::string  check(ConnectionInfo* ciP, RequestType requestType, std::string indent, std::string preError, int counter);
+  std::string  check(const std::string& apiVersion, RequestType requestType, std::string indent, std::string preError, int counter);
   void         present(std::string indent);
   void         release();
 } RegisterProviderRequest;

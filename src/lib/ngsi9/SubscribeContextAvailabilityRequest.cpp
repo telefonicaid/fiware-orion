@@ -79,7 +79,7 @@ std::string SubscribeContextAvailabilityRequest::render(RequestType requestType,
 *
 * SubscribeContextAvailabilityRequest::check - 
 */
-std::string SubscribeContextAvailabilityRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string SubscribeContextAvailabilityRequest::check(const std::string& indent, const std::string& predetectedError, int counter)
 {
   SubscribeContextAvailabilityResponse response;
   std::string                          res;
@@ -88,7 +88,8 @@ std::string SubscribeContextAvailabilityRequest::check(ConnectionInfo* ciP, Requ
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = entityIdVector.check(ciP, SubscribeContextAvailability, indent, predetectedError, counter))   != "OK") ||
+  // FIXME PR
+  else if (((res = entityIdVector.check(SubscribeContextAvailability, indent))                              != "OK") ||
            ((res = attributeList.check(SubscribeContextAvailability, indent, predetectedError, counter))    != "OK") ||
            ((res = reference.check(SubscribeContextAvailability, indent, predetectedError, counter))        != "OK") ||
            ((res = duration.check(SubscribeContextAvailability, indent, predetectedError, counter))         != "OK") ||

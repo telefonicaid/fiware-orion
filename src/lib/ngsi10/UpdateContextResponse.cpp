@@ -37,6 +37,7 @@
 #include "ngsi/StatusCode.h"
 #include "ngsi10/UpdateContextResponse.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
 
 
 
@@ -82,7 +83,7 @@ UpdateContextResponse::~UpdateContextResponse()
 *
 * UpdateContextResponse::render - 
 */
-std::string UpdateContextResponse::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent)
+std::string UpdateContextResponse::render(ConnectionInfo* ciP, const std::string& indent)
 {
   std::string out = "";
   std::string tag = "updateContextResponse";
@@ -101,7 +102,10 @@ std::string UpdateContextResponse::render(ConnectionInfo* ciP, RequestType reque
       out += errorCode.render(indent + "  ");
     }
     else
-      out += contextElementResponseVector.render(ciP, RtUpdateContextResponse, indent + "  ", false);
+    {
+      // FIXME PR
+      out += contextElementResponseVector.render(ciP->apiVersion, ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON, RtUpdateContextResponse, indent + "  ", false);
+    }
   }
   
   out += endTag(indent);
@@ -118,10 +122,8 @@ std::string UpdateContextResponse::render(ConnectionInfo* ciP, RequestType reque
 std::string UpdateContextResponse::check
 (
   ConnectionInfo*     ciP,
-  RequestType         requestType,
   const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
+  const std::string&  predetectedError
 )
 {
   std::string  res;
@@ -130,7 +132,8 @@ std::string UpdateContextResponse::check
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (contextElementResponseVector.check(ciP, UpdateContext, indent, predetectedError, 0) != "OK")
+  // FIXME PR
+  else if (contextElementResponseVector.check(ciP->apiVersion, UpdateContext, indent, predetectedError, 0) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     errorCode.fill(SccBadRequest, res);
@@ -140,7 +143,7 @@ std::string UpdateContextResponse::check
     return "OK";
   }
 
-  return render(ciP, UpdateContext, indent);
+  return render(ciP, indent);
 }
 
 
