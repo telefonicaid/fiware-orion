@@ -374,8 +374,7 @@ extern BSONArray processConditionVector
   const std::string&                 status,
   const std::string&                 fiwareCorrelator,
   const std::vector<std::string>&    attrsOrder,
-  bool                               blacklist,
-  const std::string&                 subscriptionId
+  bool                               blacklist
 );
 
 

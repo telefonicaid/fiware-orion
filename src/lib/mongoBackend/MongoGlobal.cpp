@@ -1931,8 +1931,7 @@ static bool processOnChangeConditionForSubscription
   const Restriction*               resP,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist,
-  const std::string&               subscriptionId
+  bool                             blacklist
 )
 {
   std::string                   err;
@@ -2045,8 +2044,7 @@ static BSONArray processConditionVector
   const std::string&               status,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist,
-  const std::string&               subscriptionId
+  bool                             blacklist
 )
 {
   BSONArrayBuilder conds;
@@ -2079,8 +2077,7 @@ static BSONArray processConditionVector
                                                    resP,
                                                    fiwareCorrelator,
                                                    attrsOrder,
-                                                   blacklist,
-                                                   subscriptionId)))
+                                                   blacklist)))
       {
         *notificationDone = true;
       }
@@ -2122,8 +2119,7 @@ BSONArray processConditionVector
   const std::string&               status,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist,
-  const std::string&               subscriptionId
+  bool                             blacklist
 )
 {
   NotifyConditionVector ncV;
@@ -2149,8 +2145,7 @@ BSONArray processConditionVector
                                          status,
                                          fiwareCorrelator,
                                          attrsOrder,
-                                         blacklist,
-                                         subscriptionId);
+                                         blacklist);
 
   enV.release();
   ncV.release();
