@@ -41,11 +41,10 @@ TEST(ContextElementResponseVector, check)
   ContextElementResponseVector  cerv;
   ContextElementResponse        cer;
   std::string                   out;
-  ConnectionInfo                ci;
 
   utInit();
 
-  out = cerv.check(&ci, UpdateContext, "", "", 0);
+  out = cerv.check("v1", UpdateContext, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
   cer.contextElement.entityId.id         = "ID";
@@ -54,7 +53,7 @@ TEST(ContextElementResponseVector, check)
   cer.statusCode.fill(SccOk, "details");
 
   cerv.push_back(&cer);
-  out = cerv.check(&ci, UpdateContext, "", "", 0);
+  out = cerv.check("v1", UpdateContext, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
   utExit();
@@ -72,11 +71,10 @@ TEST(ContextElementResponseVector, render)
   ContextElementResponseVector  cerv;
   ContextElementResponse        cer;
   std::string                   out;
-  ConnectionInfo                ci(JSON);
 
   utInit();
 
-  out = cerv.render(&ci, UpdateContextElement, "");
+  out = cerv.render("v1", false, UpdateContextElement, "");
   EXPECT_STREQ("", out.c_str());
 
   cer.contextElement.entityId.id         = "ID";

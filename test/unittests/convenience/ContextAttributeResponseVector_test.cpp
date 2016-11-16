@@ -48,19 +48,17 @@ TEST(ContextAttributeResponseVector, render_json)
   ContextAttributeResponse        car;  
   std::string                     out;
   const char*                     outfile = "ngsi10.contextResponseList.render.invalid.json";
-  ConnectionInfo                  ci;
 
   // 1. empty vector
-  ci.outMimeType = JSON;
   car.statusCode.fill(SccBadRequest, "Empty Vector");
-  out = carV.render(&ci, ContextEntityAttributes, "");
+  out = carV.render("v1", false, ContextEntityAttributes, "");
   EXPECT_STREQ("", out.c_str());
 
   // 2. normal case
   car.contextAttributeVector.push_back(&ca);
   carV.push_back(&car);
 
-  out = carV.render(&ci, ContextEntityAttributes, "");
+  out = carV.render("v1", false, ContextEntityAttributes, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 }
@@ -79,25 +77,23 @@ TEST(ContextAttributeResponseVector, check_json)
   std::string                     out;
   const char*                     outfile1 = "ngsi10.contextAttributeResponse.check1.valid.json";
   const char*                     outfile2 = "ngsi10.contextAttributeResponse.check2.valid.json";
-  ConnectionInfo                  ci(JSON);
 
   // 1. ok
   car.contextAttributeVector.push_back(&ca);
   carV.push_back(&car);
-  out = carV.check(&ci, UpdateContextAttribute, "", "", 0);
+  out = carV.check("v1", false, UpdateContextAttribute, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
   // 2. Predetected Error
-  out = carV.check(&ci, UpdateContextAttribute, "", "PRE ERROR", 0);
+  out = carV.check("v1", false, UpdateContextAttribute, "", "PRE ERROR", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
-
 
   // 3. Bad ContextAttribute
   ContextAttribute  ca2("", "caType", "caValue");
 
   car.contextAttributeVector.push_back(&ca2);
-  out = carV.check(&ci, UpdateContextAttribute, "", "", 0);
+  out = carV.check("v1", false, UpdateContextAttribute, "", "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 }

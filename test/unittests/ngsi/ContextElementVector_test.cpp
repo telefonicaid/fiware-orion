@@ -43,15 +43,14 @@ TEST(ContextElementVector, render)
   EntityId              eId("E_ID", "E_TYPE");
   std::string           rendered;
   ContextElementVector  ceV;
-  ConnectionInfo        ci(JSON);
 
-  rendered = ceV.render(&ci, UpdateContextElement, "", false);
+  rendered = ceV.render("v1", false, UpdateContextElement, "", false);
   EXPECT_STREQ("", rendered.c_str());
 
   ceP->entityId = eId;
   ceV.push_back(ceP);
 
-  rendered = ceV.render(&ci, UpdateContextElement, "", false);
+  rendered = ceV.render("v1", false, UpdateContextElement, "", false);
 
   ceV.release();
 }

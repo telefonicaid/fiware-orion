@@ -48,17 +48,14 @@ TEST(EntityType, present)
 */
 TEST(EntityType, check)
 {
-  ConnectionInfo ci;
-
   utInit();
 
-  ci.outMimeType = JSON;
   EntityType et1("myType");
   EntityType et2("");
 
-  EXPECT_EQ("OK", et1.check(&ci, "", ""));
-  EXPECT_EQ("Empty Type", et2.check(&ci, "", ""));
-  EXPECT_EQ("foo", et1.check(&ci, "", "foo"));
+  EXPECT_EQ("OK", et1.check("v1", ""));
+  EXPECT_EQ("Empty Type", et2.check("v1", ""));
+  EXPECT_EQ("foo", et1.check("v1", "foo"));
 
   utExit();
 }

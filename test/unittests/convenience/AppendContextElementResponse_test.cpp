@@ -46,19 +46,17 @@ TEST(AppendContextElementResponse, render_json)
   std::string                   out;
   const char*                   outfile1 = "ngsi10.appendContextElementResponse.empty.valid.json";
   const char*                   outfile2 = "ngsi10.appendContextElementResponse.badRequest.valid.json";
-  ConnectionInfo                ci;
 
   utInit();
 
   // 1. empty acer
-  ci.outMimeType = JSON;
-  out = acer.render(&ci, AppendContextElement, "");
+  out = acer.render("v1", false, AppendContextElement, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // 2. errorCode 'active'
   acer.errorCode.fill(SccBadRequest, "very bad request");
-  out = acer.render(&ci, AppendContextElement, "");
+  out = acer.render("v1", false, AppendContextElement, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -79,26 +77,24 @@ TEST(AppendContextElementResponse, check_json)
   std::string                   out;
   const char*                   outfile1 = "ngsi10.appendContextElementRequest.check1.postponed.json";
   const char*                   outfile2 = "ngsi10.appendContextElementRequest.check2.postponed.json";
-  ConnectionInfo                ci;
 
   utInit();
 
   // 1. predetected error
-  ci.outMimeType = JSON;
-  out = acer.check(&ci, IndividualContextEntity, "", "PRE ERR", 0);
+  out = acer.check("v1", false, IndividualContextEntity, "", "PRE ERR", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // 2. bad contextAttributeResponseVector
   car.contextAttributeVector.push_back(&ca);
   acer.contextAttributeResponseVector.push_back(&car);
-  out = acer.check(&ci, IndividualContextEntity, "", "", 0);
+  out = acer.check("v1", false, IndividualContextEntity, "", "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // 3. OK
   ca.name = "NAME";
-  out = acer.check(&ci, IndividualContextEntity, "", "", 0);
+  out = acer.check("v1", false, IndividualContextEntity, "", "", 0);
   EXPECT_EQ("OK", out);
 
   utExit();
