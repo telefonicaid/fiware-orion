@@ -77,8 +77,9 @@ std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, std::stri
       isCompoundVector = true;
     }
 
+    // FIXME PR
     out += startTag2(indent + "  ", "value", isCompoundVector, true);
-    out += compoundValueP->render(ciP, indent + "    ");
+    out += compoundValueP->render(ciP->apiVersion, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
 

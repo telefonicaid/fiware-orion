@@ -655,13 +655,13 @@ std::string CompoundValueNode::check(void)
 *
 * render -
 */
-std::string CompoundValueNode::render(ConnectionInfo* ciP, const std::string& indent)
+std::string CompoundValueNode::render(const std::string& apiVersion, const std::string& indent)
 {
   std::string  out       = "";
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
   std::string  key       = (container->valueType == orion::ValueTypeVector)? "item" : name;
 
-  if (ciP->apiVersion == "v2")
+  if (apiVersion == "v2")
   {
     return toJson(true); // FIXME P8: The info on comma-after-or-not is not available here ...
   }
@@ -705,7 +705,7 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, const std::string& in
     {
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
       {
-        out += childV[ix]->render(ciP, indent);
+        out += childV[ix]->render(apiVersion, indent);
       }
     }
     else   // 02/03. Not toplevel
@@ -721,7 +721,7 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, const std::string& in
 
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
       {
-        out += childV[ix]->render(ciP, indent + "  ");
+        out += childV[ix]->render(apiVersion, indent + "  ");
       }
 
       out += indent + "  ]\n";
@@ -736,7 +736,7 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, const std::string& in
     out += startTag2(indent, key, true, container->valueType == orion::ValueTypeObject);
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
-      out += childV[ix]->render(ciP, indent + "  ");
+      out += childV[ix]->render(apiVersion, indent + "  ");
     }
 
     out += endTag(indent, jsonComma, true, true);
@@ -746,7 +746,7 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, const std::string& in
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s) and my container is TOPLEVEL", name.c_str()));
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
-      out += childV[ix]->render(ciP, indent);
+      out += childV[ix]->render(apiVersion, indent);
     }
   }
   else if ((valueType == orion::ValueTypeObject) && (container->valueType == orion::ValueTypeVector))
@@ -755,7 +755,7 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, const std::string& in
     out += startTag2(indent, "", false, false);
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
-      out += childV[ix]->render(ciP, indent + "  ");
+      out += childV[ix]->render(apiVersion, indent + "  ");
     }
 
     out += endTag(indent, jsonComma, false, true);
@@ -769,7 +769,7 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, const std::string& in
 
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
       {
-        out += childV[ix]->render(ciP, indent + "  ");
+        out += childV[ix]->render(apiVersion, indent + "  ");
       }
 
       out += endTag(indent, jsonComma, false, true);
@@ -779,7 +779,7 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, const std::string& in
       LM_T(LmtCompoundValueRender, ("I am the TREE ROOT (%s)", name.c_str()));
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
       {
-        out += childV[ix]->render(ciP, indent);
+        out += childV[ix]->render(apiVersion, indent);
       }
     }
   }

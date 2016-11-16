@@ -560,8 +560,9 @@ std::string ContextAttribute::renderAsJsonObject
       isCompoundVector = true;
     }
 
+    // FIXME PR
     out += startTag2(indent + "  ", "value", isCompoundVector, true);
-    out += compoundValueP->render(ciP, indent + "    ");
+    out += compoundValueP->render(ciP->apiVersion, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
 
@@ -690,8 +691,9 @@ std::string ContextAttribute::render
       isCompoundVector = true;
     }
 
+    // FIXME PR
     out += startTag2(indent + "  ", "value", isCompoundVector, true);
-    out += compoundValueP->render(ciP, indent + "    ");
+    out += compoundValueP->render(ciP->apiVersion, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
 

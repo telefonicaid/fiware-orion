@@ -109,7 +109,8 @@ std::string getEntityAttributeValue
     {
       if (attribute.pcontextAttribute->compoundValueP != NULL)
       {
-        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->render(ciP, ""));
+        // FIXME PR
+        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->render(ciP->apiVersion, ""));
 
         if (attribute.pcontextAttribute->compoundValueP->isObject())
         {
