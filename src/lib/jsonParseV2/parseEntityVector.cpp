@@ -59,7 +59,7 @@ std::string parseEntityVector(ConnectionInfo* ciP, const Value::ConstMemberItera
 
     evP->vec.push_back(eP);
 
-    // FIXME PR: is the logic of this function correct? I mean, parseEntityObject() could result in error, so the push_back maybe
+    // FIXME P5: is the logic of this function correct? I mean, parseEntityObject() could result in error, so the push_back maybe
     // should be done after the parseEntityObject() call (and delete the eP just before return r). Or maybe it doesn't matter... as in the
     // case of error the error is propagated back to result in an OrionError and the evP is not actually used (and properly destroyed during
     // the release step)
