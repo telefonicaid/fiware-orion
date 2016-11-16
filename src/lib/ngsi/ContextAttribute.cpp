@@ -487,7 +487,7 @@ std::string ContextAttribute::getLocation(const std::string& apiVersion) const
 */
 std::string ContextAttribute::renderAsJsonObject
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
   RequestType         request,
   const std::string&  indent,
   bool                comma,
@@ -562,7 +562,7 @@ std::string ContextAttribute::renderAsJsonObject
 
     // FIXME PR
     out += startTag2(indent + "  ", "value", isCompoundVector, true);
-    out += compoundValueP->render(ciP->apiVersion, indent + "    ");
+    out += compoundValueP->render(apiVersion, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
 
@@ -580,15 +580,9 @@ std::string ContextAttribute::renderAsJsonObject
 *
 * renderAsNameString -
 */
-std::string ContextAttribute::renderAsNameString
-(
-  ConnectionInfo*     ciP,
-  RequestType         request,
-  const std::string&  indent,
-  bool                comma
-)
+std::string ContextAttribute::renderAsNameString(const std::string& indent, bool comma)
 {
-  std::string  out                    = "";
+  std::string  out = "";
 
   if (comma)
   {
@@ -626,7 +620,8 @@ std::string ContextAttribute::render
 
   if ((ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (ciP->outMimeType == JSON))
   {
-    return renderAsJsonObject(ciP, request, indent, comma, omitValue);
+    // FIXME PR
+    return renderAsJsonObject(ciP->apiVersion, request, indent, comma, omitValue);
   }
 
   out += startTag2(indent, key, false, false);

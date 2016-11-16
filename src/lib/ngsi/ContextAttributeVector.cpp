@@ -345,10 +345,11 @@ std::string ContextAttributeVector::render
     {
       if (attrsAsName)
       {
-        out += vec[ix]->renderAsNameString(ciP, request, indent + "  ", ix != vec.size() - 1);
+        // FIXME PR
+        out += vec[ix]->renderAsNameString(ciP->apiVersion, request);
       }
       else
-      {
+      {        
         out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
       }
     }
@@ -361,7 +362,8 @@ std::string ContextAttributeVector::render
     {
       if (attrsAsName)
       {
-        out += vec[ix]->renderAsNameString(ciP, request, indent + "  ", ix != vec.size() - 1);
+        // FIXME PR
+        out += vec[ix]->renderAsNameString(ciP->apiVersion, request);
       }
       else
       {
