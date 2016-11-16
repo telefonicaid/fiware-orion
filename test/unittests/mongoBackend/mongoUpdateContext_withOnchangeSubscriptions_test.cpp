@@ -1397,7 +1397,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateNoMatch)
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-      .Times(0);
+            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1448,7 +1448,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendNoMatch)
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-      .Times(0);
+            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1498,7 +1498,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-      .Times(0);
+            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */    
@@ -1548,7 +1548,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchWithoutChang
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-      .Times(0);
+            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2406,7 +2406,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateNoMatch)
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-      .Times(0);
+            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2456,7 +2456,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendNoMatch)
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-      .Times(0);
+            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2506,7 +2506,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-      .Times(0);
+            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */    
@@ -2556,7 +2556,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchWithoutChang
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-      .Times(0);
+            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
