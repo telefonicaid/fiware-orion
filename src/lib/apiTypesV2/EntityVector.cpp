@@ -69,17 +69,13 @@ std::string EntityVector::render(ConnectionInfo* ciP, RequestType requestType, b
 *
 * EntityVector::check -
 */
-std::string EntityVector::check
-(
-  ConnectionInfo*     ciP,
-  RequestType         requestType
-)
+std::string EntityVector::check(const std::string& apiVersion, RequestType requestType)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType)) != "OK")
     {
       alarmMgr.badInput(clientIp, "invalid vector of Entity");
       return res;

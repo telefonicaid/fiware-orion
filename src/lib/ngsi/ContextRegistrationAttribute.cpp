@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "rest/ConnectionInfo.h"
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/ContextRegistrationAttribute.h"
@@ -123,7 +124,8 @@ std::string ContextRegistrationAttribute::check
   }
 
   std::string res;
-  if ((res = metadataVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+  // FIXME PR
+  if ((res = metadataVector.check(ciP->apiVersion)) != "OK")
   {
     return res;
   }

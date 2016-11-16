@@ -46,7 +46,7 @@ class EntityType
   EntityType();
   explicit EntityType(std::string _type);
 
-  std::string   check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
+  std::string   check(const std::string& apiVersion, const std::string& predetectedError);
   std::string   render(ConnectionInfo* ciP, const std::string& indent, bool comma = false, bool typeNameBefore = false);  
   void          present(const std::string& indent);
   void          release(void);

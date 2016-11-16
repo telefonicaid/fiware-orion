@@ -99,7 +99,8 @@ std::string ContextRegistration::check
     return res;
   }
 
-  if ((res = registrationMetadataVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+  // FIXME PR
+  if ((res = registrationMetadataVector.check(ciP->apiVersion)) != "OK")
   {
     return res;
   }

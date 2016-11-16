@@ -113,7 +113,8 @@ std::string textRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
       return answer;
     }
 
-    if ((answer = parseDataP->av.attribute.check(ciP, EntityAttributeValueRequest, "", "", 0)) != "OK")
+    // FIXME PR
+    if ((answer = parseDataP->av.attribute.check(ciP->apiVersion, EntityAttributeValueRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
       return oe.setStatusCodeAndSmartRender(ciP);

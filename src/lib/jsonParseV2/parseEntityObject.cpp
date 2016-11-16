@@ -140,7 +140,6 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
     }
   }
 
-  // FIXME P2: weird... one argument is a sub-argument of the other. ciP should be expanded to the minimum set
-  // of needed arguments
-  return eP->check(ciP, ciP->requestType);
+  // FIXME PR
+  return eP->check(ciP->apiVersion, ciP->requestType);
 }

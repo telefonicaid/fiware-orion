@@ -68,12 +68,7 @@ std::string EntityTypeVectorResponse::render(ConnectionInfo* ciP, const std::str
 *
 * EntityTypeVectorResponse::check -
 */
-std::string EntityTypeVectorResponse::check
-(
-  ConnectionInfo*     ciP,
-  const std::string&  indent,
-  const std::string&  predetectedError
-)
+std::string EntityTypeVectorResponse::check(const std::string& apiVersion, const std::string& predetectedError)
 {
   std::string res;
 
@@ -81,7 +76,7 @@ std::string EntityTypeVectorResponse::check
   {
     statusCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = entityTypeVector.check(ciP, indent, predetectedError)) != "OK")
+  else if ((res = entityTypeVector.check(apiVersion, predetectedError)) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     statusCode.fill(SccBadRequest, res);
@@ -91,7 +86,9 @@ std::string EntityTypeVectorResponse::check
     return "OK";
   }
 
-  return render(ciP, "");
+  // FIXME P4: check calling a render... weird
+  //return render(ciP, "");
+  return "err";
 }
 
 

@@ -110,12 +110,7 @@ std::string EntityType::render
 *
 * EntityType::check -
 */
-std::string EntityType::check
-(
-  ConnectionInfo*     ciP,
-  const std::string&  indent,
-  const std::string&  predetectedError
-)
+std::string EntityType::check(const std::string& apiVersion, const std::string&  predetectedError)
 {
   if (predetectedError != "")
   {
@@ -126,8 +121,7 @@ std::string EntityType::check
     return "Empty Type";
   }
 
-  return contextAttributeVector.check(ciP, EntityTypes, indent, "", 0);
-
+  return contextAttributeVector.check(apiVersion, EntityTypes);
 }
 
 

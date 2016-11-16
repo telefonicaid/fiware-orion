@@ -83,18 +83,13 @@ std::string EntityTypeVector::render
 *
 * EntityTypeVector::check -
 */
-std::string EntityTypeVector::check
-(
-  ConnectionInfo*     ciP,
-  const std::string&  indent,
-  const std::string&  predetectedError
-)
+std::string EntityTypeVector::check(const std::string&  apiVersion, const std::string&  predetectedError)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, indent, predetectedError)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, predetectedError)) != "OK")
     {
      return res;
     }

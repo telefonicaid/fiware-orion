@@ -48,7 +48,7 @@ public:
   ~Entities();
 
   std::string  render(ConnectionInfo* ciP, RequestType requestType);
-  std::string  check(ConnectionInfo*  ciP, RequestType requestType);
+  std::string  check(const std::string& apiVersion, RequestType requestType);
   void         present(const std::string& indent);
   void         release(void);
   void         fill(QueryContextResponse* qcrsP);

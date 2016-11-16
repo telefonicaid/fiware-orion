@@ -380,20 +380,13 @@ std::string ContextAttributeVector::render
 *
 * ContextAttributeVector::check - 
 */
-std::string ContextAttributeVector::check
-(
-  ConnectionInfo*     ciP,
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string ContextAttributeVector::check(const std::string& apiVersion, RequestType requestType)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, 0)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType)) != "OK")
       return res;
   }
 

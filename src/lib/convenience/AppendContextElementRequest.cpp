@@ -100,11 +100,13 @@ std::string AppendContextElementRequest::check
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeVector.check(ciP, AppendContextElement, indent, predetectedError, counter)) != "OK")
+  // FIXME PR
+  else if ((res = contextAttributeVector.check(ciP->apiVersion, AppendContextElement)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }
-  else if ((res = domainMetadataVector.check(ciP, AppendContextElement, indent, predetectedError, counter)) != "OK")
+  // FIXME PR
+  else if ((res = domainMetadataVector.check(ciP->apiVersion)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }

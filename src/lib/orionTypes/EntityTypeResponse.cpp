@@ -78,7 +78,8 @@ std::string EntityTypeResponse::check
   {
     statusCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = entityType.check(ciP, indent, predetectedError)) != "OK")
+  // FIXME PR
+  else if ((res = entityType.check(ciP->apiVersion, predetectedError)) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     statusCode.fill(SccBadRequest, res);

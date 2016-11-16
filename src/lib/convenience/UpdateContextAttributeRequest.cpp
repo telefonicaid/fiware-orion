@@ -112,7 +112,8 @@ std::string UpdateContextAttributeRequest::check
   {
     response.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = metadataVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+  // FIXME
+  else if ((res = metadataVector.check(ciP->apiVersion)) != "OK")
   {
     response.fill(SccBadRequest, res);
   }

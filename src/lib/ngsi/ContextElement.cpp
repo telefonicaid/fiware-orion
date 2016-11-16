@@ -188,12 +188,14 @@ std::string ContextElement::check
     return res;
   }
 
-  if ((res = contextAttributeVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+  // FIXME PR ciP->apiVersion
+  if ((res = contextAttributeVector.check(ciP->apiVersion, requestType)) != "OK")
   {
     return res;
   }
 
-  if ((res = domainMetadataVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+  // FIXME PR ciP->apiVersion
+  if ((res = domainMetadataVector.check(ciP->apiVersion)) != "OK")
   {
     return res;
   }

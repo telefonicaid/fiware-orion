@@ -955,19 +955,12 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
 *
 * ContextAttribute::check - 
 */
-std::string ContextAttribute::check
-(
-  ConnectionInfo*     ciP,
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string ContextAttribute::check(const std::string& apiVersion, RequestType requestType)
 {
   size_t len;
   char errorMsg[128];
 
-  if (((ciP->apiVersion == "v2") && (len = strlen(name.c_str())) < MIN_ID_LEN) && (requestType != EntityAttributeValueRequest))
+  if (((apiVersion == "v2") && (len = strlen(name.c_str())) < MIN_ID_LEN) && (requestType != EntityAttributeValueRequest))
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute name length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
@@ -986,7 +979,7 @@ std::string ContextAttribute::check
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdChars(ciP->apiVersion, name.c_str()))
+  if (forbiddenIdChars(apiVersion, name.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the name of an attribute");
     return "Invalid characters in attribute name";
@@ -1000,14 +993,14 @@ std::string ContextAttribute::check
   }
 
 
-  if (ciP->apiVersion == "v2" && (requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  if (apiVersion == "v2" && (requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
-  if ((requestType != EntityAttributeValueRequest) && forbiddenIdChars(ciP->apiVersion, type.c_str()))
+  if ((requestType != EntityAttributeValueRequest) && forbiddenIdChars(apiVersion, type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute");
     return "Invalid characters in attribute type";
@@ -1027,7 +1020,7 @@ std::string ContextAttribute::check
     }
   }
 
-  return metadataVector.check(ciP, requestType, indent + "  ", predetectedError, counter);
+  return metadataVector.check(apiVersion);
 }
 
 

@@ -77,7 +77,8 @@ std::string putEntityAttributeValue
   parseDataP->av.attribute.type = "";  // Overwrite 'none', as no type can be given in 'value' payload
   parseDataP->av.attribute.onlyValue = true;
 
-  std::string err = parseDataP->av.attribute.check(ciP,ciP->requestType,"","", 0);
+  // FIXME PR
+  std::string err = parseDataP->av.attribute.check(ciP->apiVersion, ciP->requestType);
   if (err != "OK")
   {
     OrionError oe(SccBadRequest, err, "BadRequest");

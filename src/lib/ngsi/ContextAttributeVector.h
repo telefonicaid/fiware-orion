@@ -56,11 +56,7 @@ typedef struct ContextAttributeVector
   ContextAttribute*  operator[](unsigned int ix) const;
 
 
-  std::string        check(ConnectionInfo* ciP,
-                           RequestType          requestType,
-                           const std::string&   indent,
-                           const std::string&   predetectedError,
-                           int                  counter);
+  std::string        check(const std::string& apiVersion, RequestType requestType);
 
   std::string        render(ConnectionInfo*     ciP,
                             RequestType         requestType,

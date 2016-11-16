@@ -47,7 +47,7 @@ class EntityTypeVector
   void          push_back(EntityType* item);
   unsigned int  size(void);
   void          release(void);
-  std::string   check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
+  std::string   check(const std::string& apiVersion, const std::string& predetectedError);
   std::string   render(ConnectionInfo* ciP, const std::string& indent, bool comma = false);  
 
   EntityType*   operator[] (unsigned int ix) const;

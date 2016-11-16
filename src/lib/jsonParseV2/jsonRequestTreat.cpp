@@ -74,7 +74,8 @@ std::string jsonRequestTreat
       return answer;
     }
 
-    if ((answer = parseDataP->ent.res.check(ciP, EntitiesRequest)) != "OK")
+    // FIXME PR
+    if ((answer = parseDataP->ent.res.check(ciP->apiVersion, EntitiesRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
       return oe.setStatusCodeAndSmartRender(ciP);
@@ -89,7 +90,8 @@ std::string jsonRequestTreat
       return answer;
     }
 
-    if ((answer = parseDataP->ent.res.check(ciP, EntityRequest)) != "OK")
+    // FIXME PR
+    if ((answer = parseDataP->ent.res.check(ciP->apiVersion, EntityRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
       return oe.setStatusCodeAndSmartRender(ciP);
@@ -105,7 +107,8 @@ std::string jsonRequestTreat
       return answer;
     }
 
-    if ((answer = parseDataP->attr.attribute.check(ciP, EntityAttributeRequest, "", "", 0)) != "OK")
+    // FIXME PR
+    if ((answer = parseDataP->attr.attribute.check(ciP->apiVersion, EntityAttributeRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
       return oe.setStatusCodeAndSmartRender(ciP);

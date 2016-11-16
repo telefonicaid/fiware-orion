@@ -84,7 +84,8 @@ std::string UpdateContextElementRequest::check
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeVector.check(ciP, UpdateContextElement, indent, predetectedError, counter)) != "OK")
+  // FIXME PR
+  else if ((res = contextAttributeVector.check(ciP->apiVersion, UpdateContextElement)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }

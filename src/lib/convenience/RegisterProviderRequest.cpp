@@ -100,7 +100,8 @@ std::string RegisterProviderRequest::check
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = metadataVector.check(ciP, requestType, indent, "", counter))  != "OK") ||
+  // FIXME PR
+  else if (((res = metadataVector.check(ciP->apiVersion))  != "OK") ||
            ((res = duration.check(requestType, indent, "", 0))              != "OK") ||
            ((res = providingApplication.check(requestType, indent, "", 0))  != "OK") ||
            ((res = registrationId.check(requestType, indent, "", 0))        != "OK"))
