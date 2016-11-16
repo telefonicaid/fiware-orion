@@ -219,7 +219,7 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
       | options   | keyValues |
     Then verify that receive a "No Content" http code
 
-  @action_type_empty @BUG_2653 @skip
+  @action_type_empty @BUG_2653
   Scenario:  try to append entities with batch operations using NGSI v2 with empty action
     Given  a definition of headers
       | parameter          | value                            |
@@ -238,11 +238,11 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
     When update entities in a single batch operation ""
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value      |
-      | error       | BadRequest |
-      | description | TBD        |
+      | parameter   | value                    |
+      | error       | BadRequest               |
+      | description | empty update action type |
 
-  @action_type_unknown @BUG_2653 @skip
+  @action_type_unknown @BUG_2653
   Scenario:  try to append entities with batch operations using NGSI v2 with unknown action
     Given  a definition of headers
       | parameter          | value                            |
@@ -261,9 +261,9 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
     When update entities in a single batch operation "dfgdf"
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value      |
-      | error       | BadRequest |
-      | description | TBD        |
+      | parameter   | value                               |
+      | error       | BadRequest                          |
+      | description | invalid update action type: /dfgdf/ |
 
   @action_type_without
   Scenario:  try to append entities with batch operations using NGSI v2 without actionType field
@@ -335,9 +335,9 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
     When update entities in a single batch operation "<action_type>"
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value      |
-      | error       | BadRequest |
-      | description | TBD        |
+      | parameter   | value                      |
+      | error       | BadRequest                 |
+      | description | invalid update action type |
     Examples:
       | action_type |
       | house<flat> |

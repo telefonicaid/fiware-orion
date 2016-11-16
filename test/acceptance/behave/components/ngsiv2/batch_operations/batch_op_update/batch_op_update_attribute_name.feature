@@ -48,7 +48,7 @@ Feature: Attribute name in update Batch operation using NGSI v2. "POST" - /v2/op
 
   #  --------------------- attribute name ---------------------------
 
-  @attribute_name
+  @attribute_name @attribute_name.row<row.id>
   Scenario Outline:  update entities with update batch operations using NGSI v2 with several attribute names
     Given  a definition of headers
       | parameter          | value                         |
@@ -86,9 +86,8 @@ Feature: Attribute name in update Batch operation using NGSI v2. "POST" - /v2/op
       | random=10       |
       | random=100      |
       | random=256      |
-      | my house        |
 
-  @attributes_name_not_plain_ascii @BUG_2673 @skip
+  @attributes_name_not_plain_ascii @BUG_2673
   Scenario Outline:  try to update entities with update batch operations using NGSI v2 with with not plain ascii in attribute names
     Given  a definition of headers
       | parameter          | value                               |
@@ -116,8 +115,10 @@ Feature: Attribute name in update Batch operation using NGSI v2. "POST" - /v2/op
       | habitación      |
       | españa          |
       | barça           |
+      | my house        |
 
-  @attributes_name_max_length @BUG_2673 @skip
+
+  @attributes_name_max_length @BUG_2673
   Scenario:  try to update entities with update batch operations using NGSI v2 with an attributes name that exceeds the maximum allowed (256)
     Given  a definition of headers
       | parameter          | value                               |
@@ -158,11 +159,11 @@ Feature: Attribute name in update Batch operation using NGSI v2. "POST" - /v2/op
     When update entities in a single batch operation "'APPEND'" in raw mode
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                          |
-      | error       | BadRequest                     |
-      | description | no 'name' for ContextAttribute |
+      | parameter   | value                                             |
+      | error       | BadRequest                                        |
+      | description | attribute name length: 0, min length supported: 1 |
 
-  @attributes_name_wrong @BUG_2673 @skip
+  @attributes_name_wrong @BUG_2673
   Scenario Outline:  try to update entities with update batch operations using NGSI v2 with wrong attributes names
     Given  a definition of headers
       | parameter          | value                               |
