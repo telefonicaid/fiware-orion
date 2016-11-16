@@ -27,6 +27,7 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
+#include "parse/forbiddenChars.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseEntityObject.h"
 #include "jsonParseV2/parseContextAttribute.h"
@@ -139,5 +140,7 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
     }
   }
 
-  return "OK";
+  // FIXME P2: weird... one argument is a sub-argument of the other. ciP should be expanded to the minimum set
+  // of needed arguments
+  return eP->check(ciP, ciP->requestType);
 }
