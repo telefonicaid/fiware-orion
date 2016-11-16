@@ -316,7 +316,7 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
       | españa      |
       | barça       |
 
-  @action_type_forbidden @BUG_2653
+  @action_type_forbidden @BUG_2653 @skip
   Scenario Outline:  try to append entities with batch operations using NGSI v2 with forbidden chars in actionType field
     Given  a definition of headers
       | parameter          | value                            |
