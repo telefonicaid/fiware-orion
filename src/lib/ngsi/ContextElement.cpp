@@ -31,6 +31,7 @@
 #include "common/MimeType.h"
 #include "common/globals.h"
 #include "common/tag.h"
+#include "rest/uriParamNames.h"
 #include "ngsi/ContextElement.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/Request.h"
@@ -99,7 +100,10 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
 
   out += entityId.render(indent + "  ", commaAfterEntityId, false);
   out += attributeDomainName.render(indent + "  ", commaAfterAttributeDomainName);
-  out += contextAttributeVector.render(ciP, requestType, indent + "  ", commaAfterContextAttributeVector, omitAttributeValues);
+  // FIXME PR
+  out += contextAttributeVector.render(ciP->apiVersion,
+                                       ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
+                                       requestType, indent + "  ", commaAfterContextAttributeVector, omitAttributeValues);
   out += domainMetadataVector.render(indent + "  ", commaAfterDomainMetadataVector);
 
   out += endTag(indent, comma, false);

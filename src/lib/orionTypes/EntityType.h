@@ -47,7 +47,13 @@ class EntityType
   explicit EntityType(std::string _type);
 
   std::string   check(const std::string& apiVersion, const std::string& predetectedError);
-  std::string   render(ConnectionInfo* ciP, const std::string& indent, bool comma = false, bool typeNameBefore = false);  
+  std::string   render(const std::string&  apiVersion,
+                       bool                asJsonObject,
+                       bool                asJsonOut,
+                       bool                collapsed,
+                       const std::string&  indent,
+                       bool                comma = false,
+                       bool typeNameBefore = false);
   void          present(const std::string& indent);
   void          release(void);
   std::string   toJson(ConnectionInfo* ciP, bool includeType = false);

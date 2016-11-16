@@ -86,9 +86,7 @@ std::string EntityTypeVectorResponse::check(const std::string& apiVersion, const
     return "OK";
   }
 
-  // FIXME P4: check calling a render... weird
-  //return render(ciP, "");
-  return "err";
+  return render(ciP, "");
 }
 
 

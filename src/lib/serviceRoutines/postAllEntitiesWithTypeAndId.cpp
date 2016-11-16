@@ -109,7 +109,9 @@ std::string postAllEntitiesWithTypeAndId
     alarmMgr.badInput(clientIp, "unknown field");
     response.errorCode.fill(SccBadRequest, "invalid payload: unknown fields");
 
-    TIMED_RENDER(out = response.render(ciP, IndividualContextEntity, ""));
+    TIMED_RENDER(out = response.render(ciP->apiVersion,
+                                       ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
+                                       IndividualContextEntity, ""));
 
     return out;
   }
@@ -123,7 +125,9 @@ std::string postAllEntitiesWithTypeAndId
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     response.entity.fill(entityId, entityType, "false");
 
-    TIMED_RENDER(answer = response.render(ciP, AllEntitiesWithTypeAndId, ""));
+    TIMED_RENDER(answer = response.render(ciP->apiVersion,
+                                          ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
+                                          AllEntitiesWithTypeAndId, ""));
 
     parseDataP->acer.res.release();
     return answer;
@@ -135,7 +139,9 @@ std::string postAllEntitiesWithTypeAndId
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     response.entity.fill(entityId, entityType, "false");
 
-    TIMED_RENDER(answer = response.render(ciP, AllEntitiesWithTypeAndId, ""));
+    TIMED_RENDER(answer = response.render(ciP->apiVersion,
+                                          ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
+                                          AllEntitiesWithTypeAndId, ""));
 
     parseDataP->acer.res.release();
     return answer;
@@ -158,7 +164,9 @@ std::string postAllEntitiesWithTypeAndId
 
 
   // 07. Cleanup and return result
-  TIMED_RENDER(answer = response.render(ciP, IndividualContextEntity, ""));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion,
+                                        ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
+                                        IndividualContextEntity, ""));
 
   parseDataP->upcr.res.release();
   response.release();

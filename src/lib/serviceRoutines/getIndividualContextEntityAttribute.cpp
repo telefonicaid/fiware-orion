@@ -120,7 +120,9 @@ std::string getIndividualContextEntityAttribute
 
 
   // 5. Render the ContextAttributeResponse
-  TIMED_RENDER(answer = response.render(ciP, IndividualContextEntityAttribute, ""));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion,
+                                        ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
+                                        IndividualContextEntityAttribute, ""));
 
 
   // 6. Cleanup and return result

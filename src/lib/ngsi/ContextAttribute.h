@@ -91,7 +91,12 @@ public:
   std::string  getId() const;
   std::string  getLocation(const std::string& apiValue ="v1") const;
 
-  std::string  render(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false, bool omitValue = false);
+  std::string  render(const std::string&  apiVersion,
+                      bool                asJsonObject,
+                      RequestType         request,
+                      const std::string&  indent,
+                      bool                comma = false,
+                      bool                omitValue = false);
   std::string  renderAsJsonObject(const std::string& apiVersion, RequestType request, const std::string& indent, bool comma, bool omitValue = false);
   std::string  renderAsNameString(const std::string& indent, bool comma = false);
   std::string  toJson(bool                             isLastElement,

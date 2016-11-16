@@ -70,7 +70,10 @@ EntityType::EntityType(std::string _type): type(_type), count(0)
 */
 std::string EntityType::render
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
+  bool                asJsonObject,
+  bool                asJsonOut,
+  bool                collapsed,
   const std::string&  indent,
   bool                comma,
   bool                typeNameBefore
@@ -79,23 +82,23 @@ std::string EntityType::render
   std::string  out = "";
   std::string  key = "type";
 
-  if ((typeNameBefore == true) && (ciP->outMimeType == JSON))
+  if (typeNameBefore && asJsonOut)
   {
     out += valueTag1(indent  + "  ", "name", type, true);
-    out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", true, true, true);
+    out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, indent + "  ", true, true, true);
   }
   else
   {
     out += startTag2(indent, key, false, false);
 
-    if (ciP->uriParam[URI_PARAM_COLLAPSE] == "true" || contextAttributeVector.size() == 0)
+    if (collapsed || contextAttributeVector.size() == 0)
     {     
       out += valueTag1(indent  + "  ", "name", type, false);
     }
     else
     {
       out += valueTag1(indent  + "  ", "name", type, true);
-      out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false, true, true);
+      out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, indent + "  ", false, true, true);
     }
 
     out += endTag(indent, comma, false);

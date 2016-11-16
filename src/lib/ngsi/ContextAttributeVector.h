@@ -58,7 +58,8 @@ typedef struct ContextAttributeVector
 
   std::string        check(const std::string& apiVersion, RequestType requestType);
 
-  std::string        render(ConnectionInfo*     ciP,
+  std::string        render(const std::string&  apiVersion,
+                            bool                asJsonObject,
                             RequestType         requestType,
                             const std::string&  indent,
                             bool                comma       = false,

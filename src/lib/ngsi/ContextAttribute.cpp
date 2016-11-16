@@ -603,7 +603,8 @@ std::string ContextAttribute::renderAsNameString(const std::string& indent, bool
 */
 std::string ContextAttribute::render
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
+  bool                asJsonObject,
   RequestType         request,
   const std::string&  indent,
   bool                comma,
@@ -618,10 +619,9 @@ std::string ContextAttribute::render
 
   metadataVector.keyNameSet("metadata");
 
-  if ((ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (ciP->outMimeType == JSON))
+  if (asJsonObject)
   {
-    // FIXME PR
-    return renderAsJsonObject(ciP->apiVersion, request, indent, comma, omitValue);
+    return renderAsJsonObject(apiVersion, request, indent, comma, omitValue);
   }
 
   out += startTag2(indent, key, false, false);
@@ -686,9 +686,8 @@ std::string ContextAttribute::render
       isCompoundVector = true;
     }
 
-    // FIXME PR
     out += startTag2(indent + "  ", "value", isCompoundVector, true);
-    out += compoundValueP->render(ciP->apiVersion, indent + "    ");
+    out += compoundValueP->render(apiVersion, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
 

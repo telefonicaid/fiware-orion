@@ -292,7 +292,8 @@ std::string ContextAttributeVector::toJson
 */
 std::string ContextAttributeVector::render
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
+  bool                asJsonObject,
   RequestType         request,
   const std::string&  indent,
   bool                comma,
@@ -316,7 +317,7 @@ std::string ContextAttributeVector::render
   // only one of them should be included in the vector. Any one of them.
   // So, step 1 is to purge the context attribute vector from 'copies'.
   //
-  if ((ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (ciP->outMimeType == JSON))
+  if (asJsonObject)
   {
     std::vector<std::string> added;
 
@@ -345,12 +346,11 @@ std::string ContextAttributeVector::render
     {
       if (attrsAsName)
       {
-        // FIXME PR
-        out += vec[ix]->renderAsNameString(ciP->apiVersion, request);
+        out += vec[ix]->renderAsNameString(apiVersion, request);
       }
       else
-      {        
-        out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
+      {
+        out += vec[ix]->render(apiVersion, asJsonObject, request, indent + "  ", ix != vec.size() - 1, omitValue);
       }
     }
     out += endTag(indent, comma, attrsAsName);
@@ -362,12 +362,11 @@ std::string ContextAttributeVector::render
     {
       if (attrsAsName)
       {
-        // FIXME PR
-        out += vec[ix]->renderAsNameString(ciP->apiVersion, request);
+        out += vec[ix]->renderAsNameString(apiVersion, request);
       }
       else
       {
-        out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
+        out += vec[ix]->render(apiVersion, asJsonObject, request, indent + "  ", ix != vec.size() - 1, omitValue);
       }
     }
     out += endTag(indent, comma, true);

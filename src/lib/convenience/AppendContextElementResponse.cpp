@@ -52,7 +52,12 @@ AppendContextElementResponse::AppendContextElementResponse() : errorCode("errorC
 *
 * AppendContextElementResponse::render - 
 */
-std::string AppendContextElementResponse::render(ConnectionInfo* ciP, RequestType requestType, std::string indent)
+std::string AppendContextElementResponse::render
+(
+  const std::string&  apiVersion,
+  bool                asJsonObject,
+  RequestType         requestType,
+  const std::string& indent)
 {
   std::string tag = "appendContextElementResponse";
   std::string out = "";
@@ -70,7 +75,7 @@ std::string AppendContextElementResponse::render(ConnectionInfo* ciP, RequestTyp
       out += entity.render(indent + "  ", true);
     }
 
-    out += contextAttributeResponseVector.render(ciP, requestType, indent + "  ");
+    out += contextAttributeResponseVector.render(apiVersion, asJsonObject, requestType, indent + "  ");
   }
 
   out += endTag(indent);
@@ -86,11 +91,12 @@ std::string AppendContextElementResponse::render(ConnectionInfo* ciP, RequestTyp
 */
 std::string AppendContextElementResponse::check
 (
-  ConnectionInfo*  ciP,
-  RequestType      requestType,
-  std::string      indent,
-  std::string      predetectedError,
-  int              counter
+  const std::string&  apiVersion,
+  bool                asJsonObject,
+  RequestType         requestType,
+  std::string         indent,
+  std::string         predetectedError,
+  int                 counter
 )
 {
   std::string res;
@@ -99,7 +105,7 @@ std::string AppendContextElementResponse::check
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeResponseVector.check(ciP, requestType, indent, "", counter)) != "OK")
+  else if ((res = contextAttributeResponseVector.check(apiVersion, asJsonObject, requestType, indent, "", counter)) != "OK")
   {
     errorCode.fill(SccBadRequest, res);
   }
@@ -108,7 +114,7 @@ std::string AppendContextElementResponse::check
     return "OK";
   }
 
-  return render(ciP, requestType, indent);
+  return render(apiVersion, asJsonObject, requestType, indent);
 }
 
 
