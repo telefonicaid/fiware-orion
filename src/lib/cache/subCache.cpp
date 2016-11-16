@@ -1310,6 +1310,7 @@ void subCacheStart(void)
 
 
 
+extern bool noCache;
 /* ****************************************************************************
 *
 * subCacheItemNotificationErrorStatus - 
@@ -1323,6 +1324,12 @@ void subCacheStart(void)
 */
 void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::string& subscriptionId, int errors)
 {
+  if (noCache)
+  {
+    mongoSubCacheUpdate(tenant, subscriptionId, 0, 0, time(NULL), errors);
+    return;
+  }
+
   CachedSubscription* subP = subCacheItemLookup(tenant.c_str(), subscriptionId.c_str());
 
   if (subP == NULL)
