@@ -442,7 +442,7 @@ TEST(mongoUpdateContextSubscription, subscriptionNotFound)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -485,7 +485,7 @@ TEST(mongoUpdateContextSubscription, updateDuration)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -577,7 +577,7 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);    
 
@@ -651,7 +651,7 @@ TEST(mongoUpdateContextSubscription, clearThrottling)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -727,7 +727,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -807,7 +807,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -887,7 +887,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -970,7 +970,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1051,7 +1051,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1137,7 +1137,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1222,7 +1222,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1305,7 +1305,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1390,7 +1390,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1478,7 +1478,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1561,7 +1561,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1647,7 +1647,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1749,7 +1749,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860001"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1843,7 +1843,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1_JSON)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860001"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1934,7 +1934,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860002"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2026,7 +2026,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1_disjoint)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860002"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2133,7 +2133,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860022"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2239,7 +2239,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1_disjoint)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860022"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2339,7 +2339,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860002"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2439,7 +2439,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1_disjoint)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860002"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2551,7 +2551,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860022"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2663,7 +2663,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1_disjoint)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860022"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2758,7 +2758,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860001"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2855,7 +2855,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860001"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2953,7 +2953,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CNbis)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860001"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3046,7 +3046,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_disjoint)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860002"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3143,7 +3143,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860002"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3240,7 +3240,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial_disjoint)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860002"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3337,7 +3337,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CNbis)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860002"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3434,7 +3434,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860002"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3546,7 +3546,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_C1)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify3.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860003"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3647,7 +3647,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_C1)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify4.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860004"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3754,7 +3754,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CN)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify3.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860003"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3863,7 +3863,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CNbis)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify3.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860003"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3966,7 +3966,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify4.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860004"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -4071,7 +4071,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CNbis)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify4.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false, "51307b66f481db11bf860004"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -4157,7 +4157,7 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4238,7 +4238,7 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4302,7 +4302,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
             .WillByDefault(Return(fakeSub));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
