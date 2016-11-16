@@ -73,7 +73,12 @@ std::string getAttributesForEntityType
   TIMED_MONGO(mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam, true, ciP->apiVersion));
 
   std::string rendered;
-  TIMED_RENDER(rendered = response.render(ciP, ""));
+  TIMED_RENDER(rendered = response.render(ciP->apiVersion,
+                                          ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
+                                          ciP->outMimeType == JSON,
+                                          ciP->uriParam[URI_PARAM_COLLAPSE] == "true",
+                                          ""));
+
   response.release();
 
   return rendered;

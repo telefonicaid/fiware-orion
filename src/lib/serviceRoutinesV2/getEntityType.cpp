@@ -81,7 +81,7 @@ std::string getEntityType
   }
   else
   {
-    TIMED_RENDER(answer = response.toJson(ciP));
+    TIMED_RENDER(answer = response.toJson());
   }
 
   response.release();

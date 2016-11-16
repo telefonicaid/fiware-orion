@@ -44,14 +44,21 @@
 *
 * EntityTypeResponse::render -
 */
-std::string EntityTypeResponse::render(ConnectionInfo* ciP, const std::string& indent)
+std::string EntityTypeResponse::render
+(
+  const std::string&  apiVersion,
+  bool                asJsonObject,
+  bool                asJsonOut,
+  bool                collapsed,
+  const std::string&  indent
+)
 {
   std::string out                 = "";
   std::string tag                 = "entityTypeAttributesResponse";
 
   out += startTag1(indent, tag, false);
 
-  out += entityType.render(ciP, indent + "  ", true, true);
+  out += entityType.render(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", true, true);
   out += statusCode.render(indent + "  ");
 
   out += endTag(indent);
@@ -67,7 +74,10 @@ std::string EntityTypeResponse::render(ConnectionInfo* ciP, const std::string& i
 */
 std::string EntityTypeResponse::check
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
+  bool                asJsonObject,
+  bool                asJsonOut,
+  bool                collapsed,
   const std::string&  indent,
   const std::string&  predetectedError
 )
@@ -77,9 +87,8 @@ std::string EntityTypeResponse::check
   if (predetectedError != "")
   {
     statusCode.fill(SccBadRequest, predetectedError);
-  }
-  // FIXME PR
-  else if ((res = entityType.check(ciP->apiVersion, predetectedError)) != "OK")
+  }  
+  else if ((res = entityType.check(apiVersion, predetectedError)) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     statusCode.fill(SccBadRequest, res);
@@ -87,7 +96,7 @@ std::string EntityTypeResponse::check
   else
     return "OK";
 
-  return render(ciP, "");
+  return render(apiVersion, asJsonObject, asJsonOut, collapsed, "");
 }
 
 
@@ -121,7 +130,7 @@ void EntityTypeResponse::release(void)
 *
 * EntityTypeResponse::toJson -
 */
-std::string EntityTypeResponse::toJson(ConnectionInfo* ciP)
+std::string EntityTypeResponse::toJson(void)
 {
   std::string  out = "{";
   char         countV[STRING_SIZE_FOR_INT];

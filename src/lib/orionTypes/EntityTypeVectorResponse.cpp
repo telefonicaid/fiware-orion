@@ -43,7 +43,14 @@
 *
 * EntityTypeVectorResponse::render -
 */
-std::string EntityTypeVectorResponse::render(ConnectionInfo* ciP, const std::string& indent)
+std::string EntityTypeVectorResponse::render
+(
+  const std::string&  apiVersion,
+  bool                asJsonObject,
+  bool                asJsonOut,
+  bool                collapsed,
+  const std::string&  indent
+)
 {
   std::string out                 = "";
   std::string tag                 = "entityTypesResponse";
@@ -52,7 +59,7 @@ std::string EntityTypeVectorResponse::render(ConnectionInfo* ciP, const std::str
 
   if (entityTypeVector.size() > 0)
   {
-    out += entityTypeVector.render(ciP, indent + "  ", true);
+    out += entityTypeVector.render(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", true);
   }
 
   out += statusCode.render(indent + "  ");
@@ -68,7 +75,13 @@ std::string EntityTypeVectorResponse::render(ConnectionInfo* ciP, const std::str
 *
 * EntityTypeVectorResponse::check -
 */
-std::string EntityTypeVectorResponse::check(const std::string& apiVersion, const std::string& predetectedError)
+std::string EntityTypeVectorResponse::check
+(
+  const std::string&  apiVersion,
+  bool                asJsonObject,
+  bool                asJsonOut,
+  bool                collapsed,
+  const std::string&  predetectedError)
 {
   std::string res;
 
@@ -86,7 +99,7 @@ std::string EntityTypeVectorResponse::check(const std::string& apiVersion, const
     return "OK";
   }
 
-  return render(ciP, "");
+  return render(apiVersion, asJsonObject, asJsonOut, collapsed, "");
 }
 
 

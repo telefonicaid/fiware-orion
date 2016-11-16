@@ -122,7 +122,9 @@ std::string getAttributeValueInstanceWithTypeAndId
     response.fill(&parseDataP->qcrs.res, entityId, entityTypeFromPath, attributeName, metaID);
   }
 
-  TIMED_RENDER(answer = response.render(ciP, AttributeValueInstance, ""));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion,
+                                        ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
+                                        AttributeValueInstance, ""));
 
   parseDataP->qcr.res.release();
   parseDataP->qcrs.res.release();
