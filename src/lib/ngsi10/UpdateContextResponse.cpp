@@ -83,7 +83,7 @@ UpdateContextResponse::~UpdateContextResponse()
 *
 * UpdateContextResponse::render - 
 */
-std::string UpdateContextResponse::render(ConnectionInfo* ciP, const std::string& indent)
+std::string UpdateContextResponse::render(const std::string& apiVersion, bool asJsonObject, const std::string& indent)
 {
   std::string out = "";
   std::string tag = "updateContextResponse";
@@ -103,8 +103,7 @@ std::string UpdateContextResponse::render(ConnectionInfo* ciP, const std::string
     }
     else
     {
-      // FIXME PR
-      out += contextElementResponseVector.render(ciP->apiVersion, ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON, RtUpdateContextResponse, indent + "  ", false);
+      out += contextElementResponseVector.render(apiVersion, asJsonObject, RtUpdateContextResponse, indent + "  ", false);
     }
   }
   
@@ -121,7 +120,8 @@ std::string UpdateContextResponse::render(ConnectionInfo* ciP, const std::string
 */
 std::string UpdateContextResponse::check
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
+  bool                asJsonObject,
   const std::string&  indent,
   const std::string&  predetectedError
 )
@@ -131,9 +131,8 @@ std::string UpdateContextResponse::check
   if (predetectedError != "")
   {
     errorCode.fill(SccBadRequest, predetectedError);
-  }
-  // FIXME PR
-  else if (contextElementResponseVector.check(ciP->apiVersion, UpdateContext, indent, predetectedError, 0) != "OK")
+  }  
+  else if (contextElementResponseVector.check(apiVersion, UpdateContext, indent, predetectedError, 0) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     errorCode.fill(SccBadRequest, res);
@@ -143,7 +142,7 @@ std::string UpdateContextResponse::check
     return "OK";
   }
 
-  return render(ciP, indent);
+  return render(apiVersion, asJsonObject, indent);
 }
 
 

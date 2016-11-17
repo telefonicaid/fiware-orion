@@ -40,6 +40,7 @@
 #include "jsonParse/jsonQueryContextRequest.h"
 #include "parse/nullTreat.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
 
 using namespace orion;
 
@@ -767,7 +768,8 @@ void jsonQcrRelease(ParseData* reqDataP)
 */
 std::string jsonQcrCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-  return reqDataP->qcr.res.check(ciP, "", reqDataP->errorString);
+  return reqDataP->qcr.res.check(ciP->apiVersion,
+                                 ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON, "", reqDataP->errorString);
 }
 
 

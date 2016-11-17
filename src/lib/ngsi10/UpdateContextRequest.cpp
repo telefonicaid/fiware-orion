@@ -68,7 +68,7 @@ UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, 
 *
 * UpdateContextRequest::render - 
 */
-std::string UpdateContextRequest::render(ConnectionInfo* ciP, const std::string& indent)
+std::string UpdateContextRequest::render(const std::string& apiVersion, bool asJsonObject, const std::string& indent)
 {
   std::string  out = "";
   std::string  tag = "updateContextRequest";
@@ -77,8 +77,7 @@ std::string UpdateContextRequest::render(ConnectionInfo* ciP, const std::string&
   // Both fields are MANDATORY, so, comma after "contextElementVector"
   //  
   out += startTag1(indent, tag, false);
-  // FIXME PR
-  out += contextElementVector.render(ciP->apiVersion, ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON, UpdateContext, indent + "  ", true);
+  out += contextElementVector.render(apiVersion, asJsonObject, UpdateContext, indent + "  ", true);
   out += updateActionType.render(indent + "  ", false);
   out += endTag(indent, false);
 
@@ -91,7 +90,7 @@ std::string UpdateContextRequest::render(ConnectionInfo* ciP, const std::string&
 *
 * UpdateContextRequest::check - 
 */
-std::string UpdateContextRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateContextRequest::check(const std::string& apiVersion, bool asJsonObject, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string            res;
   UpdateContextResponse  response;
@@ -99,15 +98,14 @@ std::string UpdateContextRequest::check(ConnectionInfo* ciP, RequestType request
   if (predetectedError != "")
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
-    return response.render(ciP, indent);
+    return response.render(apiVersion, asJsonObject, indent);
   }
 
-  // FIXME PR
-  if (((res = contextElementVector.check(ciP->apiVersion, requestType, indent, predetectedError, counter)) != "OK") ||
+  if (((res = contextElementVector.check(apiVersion, requestType, indent, predetectedError, counter)) != "OK") ||
       ((res = updateActionType.check()) != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
-    return response.render(ciP, indent);
+    return response.render(apiVersion, asJsonObject, indent);
   }
 
   return "OK";

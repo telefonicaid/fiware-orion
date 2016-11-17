@@ -34,6 +34,8 @@
 #include "orionTypes/QueryContextResponseVector.h"
 #include "ngsi/Request.h"
 
+#include "rest/uriParamNames.h"
+
 
 
 /* ****************************************************************************
@@ -232,7 +234,8 @@ std::string QueryContextResponseVector::render(ConnectionInfo* ciP, const std::s
   }
 
 
-  answer = responseP->render(ciP, QueryContext, "");
+  // FIXME PR
+  answer = responseP->render(ciP->apiVersion, ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON, "");
   responseP->release();
   delete responseP;
 

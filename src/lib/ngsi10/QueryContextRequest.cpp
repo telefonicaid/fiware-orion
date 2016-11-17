@@ -95,7 +95,7 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 *
 * QueryContextRequest::render - 
 */
-std::string QueryContextRequest::render(RequestType requestType, const std::string& indent)
+std::string QueryContextRequest::render(const std::string& indent)
 {
   std::string   out                      = "";
   std::string   tag                      = "queryContextRequest";
@@ -119,7 +119,7 @@ std::string QueryContextRequest::render(RequestType requestType, const std::stri
 *
 * QueryContextRequest::check - 
 */
-std::string QueryContextRequest::check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError)
+std::string QueryContextRequest::check(const std::string& apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError)
 {
   std::string           res;
   QueryContextResponse  response;
@@ -128,7 +128,6 @@ std::string QueryContextRequest::check(ConnectionInfo* ciP, const std::string& i
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  // FIXME PR
   else if (((res = entityIdVector.check(QueryContext, indent))                                 != "OK") ||
            ((res = attributeList.check(QueryContext,  indent, predetectedError, 0))            != "OK") ||
            ((res = restriction.check(QueryContext,    indent, predetectedError, restrictions)) != "OK"))
@@ -141,7 +140,7 @@ std::string QueryContextRequest::check(ConnectionInfo* ciP, const std::string& i
     return "OK";
   }
 
-  return response.render(ciP, QueryContext, indent);
+  return response.render(apiVersion, asJsonObject, indent);
 }
 
 

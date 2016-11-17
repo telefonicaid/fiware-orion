@@ -96,7 +96,7 @@ QueryContextResponse::~QueryContextResponse()
 *
 * QueryContextResponse::render - 
 */
-std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent)
+std::string QueryContextResponse::render(const std::string& apiVersion, bool asJsonObject, const std::string& indent)
 {
   std::string  out               = "";
   std::string  tag               = "queryContextResponse";
@@ -131,8 +131,7 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
 
   if (contextElementResponseVector.size() > 0)
   {
-    // FIXME PR
-    out += contextElementResponseVector.render(ciP->apiVersion, ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON, QueryContext, indent + "  ", errorCodeRendered);
+    out += contextElementResponseVector.render(apiVersion, asJsonObject, QueryContext, indent + "  ", errorCodeRendered);
   }
 
   if (errorCodeRendered == true)
@@ -165,7 +164,7 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
 *
 * QueryContextResponse::check -
 */
-std::string QueryContextResponse::check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError)
+std::string QueryContextResponse::check(const std::string& apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError)
 {
   std::string  res;
 
@@ -173,8 +172,7 @@ std::string QueryContextResponse::check(ConnectionInfo* ciP, const std::string& 
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  // FIXME PR
-  else if ((res = contextElementResponseVector.check(ciP->apiVersion, QueryContext, indent, predetectedError, 0)) != "OK")
+  else if ((res = contextElementResponseVector.check(apiVersion, QueryContext, indent, predetectedError, 0)) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     errorCode.fill(SccBadRequest, res);
@@ -184,7 +182,7 @@ std::string QueryContextResponse::check(ConnectionInfo* ciP, const std::string& 
     return "OK";
   }
 
-  return render(ciP, QueryContext, indent);
+  return render(apiVersion, asJsonObject, indent);
 }
 
 

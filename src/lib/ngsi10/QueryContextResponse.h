@@ -53,8 +53,8 @@ typedef struct QueryContextResponse
   QueryContextResponse(StatusCode& _errorCode);
   ~QueryContextResponse();
 
-  std::string            render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
-  std::string            check(ConnectionInfo* ciP, const std::string&  indent, const std::string&  predetectedError);
+  std::string            render(const std::string& apiVersion, bool asJsonObject, const std::string& indent);
+  std::string            check(const std::string& apiVersion, bool asJsonObject, const std::string&  indent, const std::string&  predetectedError);
   void                   present(const std::string& indent, const std::string& caller);
   void                   release(void);  
   void                   fill(QueryContextResponse* qcrsP);

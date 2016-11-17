@@ -95,7 +95,8 @@ std::string getNgsi10ContextEntityTypes
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
 
-    TIMED_RENDER(answer = parseDataP->qcrs.res.render(ciP, Ngsi10ContextEntityTypes, ""));
+    TIMED_RENDER(answer = parseDataP->qcrs.res.render(ciP->apiVersion,
+                                                      ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON, ""));
 
     parseDataP->qcr.res.release();
     return answer;
@@ -105,7 +106,8 @@ std::string getNgsi10ContextEntityTypes
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
 
-    TIMED_RENDER(answer = parseDataP->qcrs.res.render(ciP, Ngsi10ContextEntityTypes, ""));
+    TIMED_RENDER(answer = parseDataP->qcrs.res.render(ciP->apiVersion,
+                                                      ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON, ""));
 
     parseDataP->qcr.res.release();
     return answer;
@@ -125,7 +127,8 @@ std::string getNgsi10ContextEntityTypes
   {
     parseDataP->qcrs.res.errorCode.details = std::string("entityId::type /") + typeName + "/ non-existent";
 
-    TIMED_RENDER(answer = parseDataP->qcrs.res.render(ciP, Ngsi10ContextEntityTypes, ""));
+    TIMED_RENDER(answer = parseDataP->qcrs.res.render(ciP->apiVersion,
+                                                      ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON, ""));
   }
 
 

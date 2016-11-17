@@ -45,6 +45,7 @@
 
 #include "rest/rest.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
 #include "rest/HttpStatusCode.h"
 #include "rest/mhd.h"
 #include "rest/OrionError.h"
@@ -211,7 +212,7 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, co
    else if (tag == "queryContextResponse")
    {
       QueryContextResponse qcr(errorCode);
-      reply =  qcr.render(ciP, QueryContext, indent);
+      reply =  qcr.render(ciP->apiVersion, ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON, indent);
    }
    else if (tag == "subscribeContextResponse")
    {
@@ -231,7 +232,7 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, co
    else if (tag == "updateContextResponse")
    {
       UpdateContextResponse ucr(errorCode);
-      reply = ucr.render(ciP, indent);
+      reply = ucr.render(ciP->apiVersion, ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON, indent);
    }
    else if (tag == "notifyContextResponse")
    {

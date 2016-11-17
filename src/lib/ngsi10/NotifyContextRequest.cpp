@@ -40,7 +40,7 @@
 *
 * NotifyContextRequest::render -
 */
-std::string NotifyContextRequest::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent)
+std::string NotifyContextRequest::render(const std::string& apiVersion, bool asJsonObject, const std::string& indent)
 {
   std::string  out                                  = "";
   std::string  tag                                  = "notifyContextRequest";
@@ -55,10 +55,7 @@ std::string NotifyContextRequest::render(ConnectionInfo* ciP, RequestType reques
   out += startTag1(indent, tag, false);
   out += subscriptionId.render(NotifyContext, indent + "  ", true);
   out += originator.render(indent  + "  ", contextElementResponseVectorRendered);
-  // FIXME PR
-  out += contextElementResponseVector.render(ciP->apiVersion,
-                                             ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
-                                             NotifyContext, indent  + "  ", false);
+  out += contextElementResponseVector.render(apiVersion, asJsonObject, NotifyContext, indent  + "  ", false);
   out += endTag(indent);
 
   return out;
@@ -107,7 +104,7 @@ std::string NotifyContextRequest::toJson
 *
 * NotifyContextRequest::check
 */
-std::string NotifyContextRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string NotifyContextRequest::check(const std::string& apiVersion, const std::string& indent, const std::string& predetectedError)
 {
   std::string            res;
   NotifyContextResponse  response;
@@ -118,8 +115,7 @@ std::string NotifyContextRequest::check(ConnectionInfo* ciP, RequestType request
   }
   else if (((res = subscriptionId.check(QueryContext, indent, predetectedError, 0))                    != "OK") ||
            ((res = originator.check(QueryContext, indent, predetectedError, 0))                        != "OK") ||
-           // FIXME PR
-           ((res = contextElementResponseVector.check(ciP->apiVersion, QueryContext, indent, predetectedError, 0)) != "OK"))
+           ((res = contextElementResponseVector.check(apiVersion, QueryContext, indent, predetectedError, 0)) != "OK"))
   {
     response.responseCode.fill(SccBadRequest, res);
   }
