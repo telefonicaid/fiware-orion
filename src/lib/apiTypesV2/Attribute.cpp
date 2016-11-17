@@ -40,9 +40,21 @@
 *
 * Attribute::render -
 */
-std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
+std::string Attribute::render
+(
+  // FIXME PR
+  const std::string&  apiVersion,          // in parameter (pass-through)
+  bool                acceptedTextPlain,   // in parameter (pass-through)
+  bool                acceptedJson,        // in parameter (pass-through)
+  MimeType            outFormatSelection,  // in parameter (pass-through)
+  MimeType*           outMimeTypeP,        // out parameter (pass-through)
+  HttpStatusCode*     scP,                 // out parameter (pass-through)
+  bool                keyValues,           // in parameter ciP->uriParamOptions[OPT_KEY_VALUES]
+  const std::string&  metadataList,        // in parameter ciP->uriParam[URI_PARAM_METADATA]
+  RequestType         requestType,         // in parameter
+  bool                comma                // in parameter
+)
 {
-  bool          keyValues  = ciP->uriParamOptions[OPT_KEY_VALUES];
   RenderFormat  renderFormat = (keyValues == true)? NGSI_V2_KEYVALUES : NGSI_V2_NORMALIZED;
 
   if (pcontextAttribute)
@@ -51,15 +63,15 @@ std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool
 
     if (requestType == EntityAttributeValueRequest)
     {
-      out = pcontextAttribute->toJsonAsValue(ciP);
+      out = pcontextAttribute->toJsonAsValue(apiVersion, acceptedTextPlain, acceptedJson, outFormatSelection, outMimeTypeP, scP);
     }
     else
     {
       std::vector<std::string> metadataFilter;
 
-      if (ciP->uriParam[URI_PARAM_METADATA] != "")
+      if (metadataList != "")
       {
-        stringSplit(ciP->uriParam[URI_PARAM_METADATA], ',', metadataFilter);
+        stringSplit(metadataList, ',', metadataFilter);
       }
 
       out = "{";

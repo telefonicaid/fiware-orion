@@ -34,6 +34,7 @@
 #include "ngsi/Request.h"
 #include "ngsi/ProvidingApplication.h"
 #include "parse/CompoundValueNode.h"
+#include "rest/HttpStatusCode.h"
 
 
 
@@ -102,7 +103,12 @@ public:
                       RenderFormat                     renderFormat,
                       const std::vector<std::string>&  metadataFilter,
                       RequestType                      requestType = NoRequest);
-  std::string  toJsonAsValue(ConnectionInfo* ciP);
+  std::string  toJsonAsValue(const std::string&  apiVersion,
+                             bool                acceptedTextPlain,
+                             bool                acceptedJson,
+                             MimeType            outFormatSelection,
+                             MimeType*           outMimeTypeP,
+                             HttpStatusCode*     scP);
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  getName(void);

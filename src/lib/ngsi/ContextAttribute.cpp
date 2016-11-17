@@ -37,7 +37,7 @@
 #include "orionTypes/OrionValueType.h"
 #include "parse/forbiddenChars.h"
 #include "ngsi/ContextAttribute.h"
-#include "rest/ConnectionInfo.h"     // FIXME PR
+#include "rest/HttpStatusCode.h"
 #include "rest/OrionError.h"
 #include "parse/CompoundValueNode.h"
 
@@ -857,22 +857,31 @@ std::string ContextAttribute::toJson
 *
 * toJsonAsValue -
 */
-std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
+std::string ContextAttribute::toJsonAsValue
+(
+  // FIXME PR
+  const std::string&  apiVersion,          // in parameter
+  bool                acceptedTextPlain,   // in parameter  ciP->httpHeaders.accepted("text/plain")
+  bool                acceptedJson,        // in parameter  ciP->httpHeaders.accepted("application/json")
+  MimeType            outFormatSelection,  // in parameter  ciP->httpHeaders.outformatSelect()
+  MimeType*           outMimeTypeP,        // out parameter ciP->outMimeType
+  HttpStatusCode*     scP                  // out parameter ciP->httpStatusCode
+)
 {
   std::string  out;
 
   if (compoundValueP == NULL)  // Not a compound - text/plain must be accepted
   {
-    if (ciP->httpHeaders.accepted("text/plain"))
+    if (acceptedTextPlain)
     {
       char buf[64];
 
-      ciP->outMimeType = TEXT;
+      *outMimeTypeP = TEXT;
 
       switch (valueType)
       {
       case orion::ValueTypeString:
-        if (ciP->apiVersion == "v2")
+        if (apiVersion == "v2")
         { 
           out = '"' + stringValue + '"';
         }
@@ -911,23 +920,23 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
     else
     {
       OrionError oe(SccNotAcceptable, "accepted MIME types: text/plain", "NotAcceptable");
-      ciP->httpStatusCode = SccNotAcceptable;
+      *scP = SccNotAcceptable;
 
       out = oe.toJson();
     }
   }
-  else if (compoundValueP != NULL)  /// Compound: application/json OR text/plain must be accepted
+  else if (compoundValueP != NULL)  // Compound: application/json OR text/plain must be accepted
   {
-    if (!ciP->httpHeaders.accepted("application/json") && !ciP->httpHeaders.accepted("text/plain"))
+    if (!acceptedJson && !acceptedTextPlain)
     {
       OrionError oe(SccNotAcceptable, "accepted MIME types: application/json, text/plain", "NotAcceptable");
-      ciP->httpStatusCode = SccNotAcceptable;
+      *scP = SccNotAcceptable;
 
       out = oe.toJson();
     }
     else
     {
-      ciP->outMimeType = ciP->httpHeaders.outformatSelect();
+      *outMimeTypeP = outFormatSelection;
 
       if (compoundValueP->isVector())
       {
