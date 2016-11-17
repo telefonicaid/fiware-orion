@@ -314,7 +314,7 @@ Date: REGEX(.*)
             "timesFailed": 1,
             "timesSent": 1
         },
-        "status": "active",
+        "status": "failed",
         "subject": {
             "condition": {
                 "attrs": [
