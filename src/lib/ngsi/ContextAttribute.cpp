@@ -859,13 +859,12 @@ std::string ContextAttribute::toJson
 */
 std::string ContextAttribute::toJsonAsValue
 (
-  // FIXME PR
   const std::string&  apiVersion,          // in parameter
-  bool                acceptedTextPlain,   // in parameter  ciP->httpHeaders.accepted("text/plain")
-  bool                acceptedJson,        // in parameter  ciP->httpHeaders.accepted("application/json")
-  MimeType            outFormatSelection,  // in parameter  ciP->httpHeaders.outformatSelect()
-  MimeType*           outMimeTypeP,        // out parameter ciP->outMimeType
-  HttpStatusCode*     scP                  // out parameter ciP->httpStatusCode
+  bool                acceptedTextPlain,   // in parameter
+  bool                acceptedJson,        // in parameter
+  MimeType            outFormatSelection,  // in parameter
+  MimeType*           outMimeTypeP,        // out parameter
+  HttpStatusCode*     scP                  // out parameter
 )
 {
   std::string  out;

@@ -29,8 +29,6 @@
 #include "common/errorMessages.h"
 #include "common/RenderFormat.h"
 #include "common/string.h"
-#include "rest/ConnectionInfo.h"  // FIXME PR
-#include "rest/uriParamNames.h"   // FIXME PR
 #include "apiTypesV2/Attribute.h"
 #include "ngsi10/QueryContextResponse.h"
 
@@ -42,15 +40,14 @@
 */
 std::string Attribute::render
 (
-  // FIXME PR
   const std::string&  apiVersion,          // in parameter (pass-through)
   bool                acceptedTextPlain,   // in parameter (pass-through)
   bool                acceptedJson,        // in parameter (pass-through)
   MimeType            outFormatSelection,  // in parameter (pass-through)
   MimeType*           outMimeTypeP,        // out parameter (pass-through)
   HttpStatusCode*     scP,                 // out parameter (pass-through)
-  bool                keyValues,           // in parameter ciP->uriParamOptions[OPT_KEY_VALUES]
-  const std::string&  metadataList,        // in parameter ciP->uriParam[URI_PARAM_METADATA]
+  bool                keyValues,           // in parameter
+  const std::string&  metadataList,        // in parameter
   RequestType         requestType,         // in parameter
   bool                comma                // in parameter
 )

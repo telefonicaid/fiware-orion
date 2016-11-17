@@ -30,8 +30,6 @@
 
 #include "orionTypes/OrionValueType.h"
 
-struct ConnectionInfo;
-
 
 namespace orion
 {

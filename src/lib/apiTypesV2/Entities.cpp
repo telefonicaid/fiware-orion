@@ -59,9 +59,13 @@ Entities::~Entities()
 * Entities::render - 
 *
 */
-std::string Entities::render(ConnectionInfo* ciP)
+std::string Entities::render
+(
+  std::map<std::string, bool>&         uriParamOptions,
+  std::map<std::string, std::string>&  uriParam
+)
 {
-  return vec.render(ciP);
+  return vec.render(uriParamOptions, uriParam);
 } 
 
 

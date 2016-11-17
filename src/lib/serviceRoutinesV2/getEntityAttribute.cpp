@@ -85,7 +85,15 @@ std::string getEntityAttribute
   // 03. Render entity attribute response
   attribute.fill(&parseDataP->qcrs.res, compV[4]);
 
-  TIMED_RENDER(answer = attribute.render(ciP, EntityAttributeResponse));
+  TIMED_RENDER(answer = attribute.render(ciP->apiVersion,
+                                         ciP->httpHeaders.accepted("text/plain"),
+                                         ciP->httpHeaders.accepted("application/json"),
+                                         ciP->httpHeaders.outformatSelect(),
+                                         &(ciP->outMimeType),
+                                         &(ciP->httpStatusCode),
+                                         ciP->uriParamOptions[OPT_KEY_VALUES],
+                                         ciP->uriParam[URI_PARAM_METADATA],
+                                         EntityAttributeResponse));
 
   if (attribute.oe.reasonPhrase == "TooManyResults")
   {

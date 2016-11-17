@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "logMsg/traceLevels.h"
+#include "logMsg/logMsg.h"
 #include "common/tag.h"
 #include "common/string.h"
 #include "common/globals.h"
@@ -35,8 +36,6 @@
 #include "parse/forbiddenChars.h"
 #include "apiTypesV2/Entity.h"
 #include "ngsi10/QueryContextResponse.h"
-
-#include "rest/ConnectionInfo.h"  // FIXME PR
 
 
 
@@ -71,13 +70,18 @@ Entity::~Entity()
 *   o 'keyValues'  (less verbose, only name and values shown for attributes - no type, no metadatas)
 *   o 'values'     (only the values of the attributes are printed, in a vector)
 */
-std::string Entity::render(ConnectionInfo* ciP, bool comma)
+std::string Entity::render
+(
+  std::map<std::string, bool>&         uriParamOptions,
+  std::map<std::string, std::string>&  uriParam,
+  bool                                 comma
+)
 {
   RenderFormat  renderFormat = NGSI_V2_NORMALIZED;
 
-  if      (ciP->uriParamOptions[OPT_KEY_VALUES]    == true)  { renderFormat = NGSI_V2_KEYVALUES;     }
-  else if (ciP->uriParamOptions[OPT_VALUES]        == true)  { renderFormat = NGSI_V2_VALUES;        }
-  else if (ciP->uriParamOptions[OPT_UNIQUE_VALUES] == true)  { renderFormat = NGSI_V2_UNIQUE_VALUES; }
+  if      (uriParamOptions[OPT_KEY_VALUES]    == true)  { renderFormat = NGSI_V2_KEYVALUES;     }
+  else if (uriParamOptions[OPT_VALUES]        == true)  { renderFormat = NGSI_V2_VALUES;        }
+  else if (uriParamOptions[OPT_UNIQUE_VALUES] == true)  { renderFormat = NGSI_V2_UNIQUE_VALUES; }
 
   if ((oe.details == "") && ((oe.reasonPhrase == "OK") || (oe.reasonPhrase == "")))
   {
@@ -85,23 +89,23 @@ std::string Entity::render(ConnectionInfo* ciP, bool comma)
     std::vector<std::string> metadataFilter;
     std::vector<std::string> attrsFilter;
 
-    if (ciP->uriParam[URI_PARAM_METADATA] != "")
+    if (uriParam[URI_PARAM_METADATA] != "")
     {
-      stringSplit(ciP->uriParam[URI_PARAM_METADATA], ',', metadataFilter);
+      stringSplit(uriParam[URI_PARAM_METADATA], ',', metadataFilter);
     }
 
-    if (ciP->uriParam[URI_PARAM_ATTRIBUTES] != "")
+    if (uriParam[URI_PARAM_ATTRIBUTES] != "")
     {
-      stringSplit(ciP->uriParam[URI_PARAM_ATTRIBUTES], ',', attrsFilter);
+      stringSplit(uriParam[URI_PARAM_ATTRIBUTES], ',', attrsFilter);
     }
 
     // Add special attributes representing entity dates
-    if ((creDate != 0) && (ciP->uriParamOptions[DATE_CREATED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end())))
+    if ((creDate != 0) && (uriParamOptions[DATE_CREATED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end())))
     {
       ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, creDate);
       attributeVector.push_back(caP);
     }
-    if ((modDate != 0) && (ciP->uriParamOptions[DATE_MODIFIED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_MODIFIED) != attrsFilter.end())))
+    if ((modDate != 0) && (uriParamOptions[DATE_MODIFIED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_MODIFIED) != attrsFilter.end())))
     {
       ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, modDate);
       attributeVector.push_back(caP);

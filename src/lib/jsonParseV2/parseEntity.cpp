@@ -68,7 +68,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     alarmMgr.badInput(clientIp, "JSON parse error");
     eP->oe.fill(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
     ciP->httpStatusCode = SccBadRequest;
-    return eP->render(ciP, EntitiesRequest);
+    return eP->render(ciP->uriParamOptions, ciP->uriParam);
   }
 
 
@@ -77,7 +77,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     alarmMgr.badInput(clientIp, "JSON Parse Error");
     eP->oe.fill(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
     ciP->httpStatusCode = SccBadRequest;
-    return eP->render(ciP, EntitiesRequest);
+    return eP->render(ciP->uriParamOptions, ciP->uriParam);
   }
 
 
@@ -89,7 +89,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       eP->oe.fill(SccBadRequest, "no entity id specified", "BadRequest");
       ciP->httpStatusCode = SccBadRequest;;
 
-      return eP->render(ciP, EntitiesRequest);
+      return eP->render(ciP->uriParamOptions, ciP->uriParam);
     }
   }
 
@@ -102,7 +102,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       eP->oe.fill(SccBadRequest, "entity id specified in payload", "BadRequest");
       ciP->httpStatusCode = SccBadRequest;;
 
-      return eP->render(ciP, EntitiesRequest);
+      return eP->render(ciP->uriParamOptions, ciP->uriParam);
     }
 
     if (document.HasMember("type"))
@@ -111,7 +111,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       eP->oe.fill(SccBadRequest, "entity type specified in payload", "BadRequest");
       ciP->httpStatusCode = SccBadRequest;;
 
-      return eP->render(ciP, EntitiesRequest);
+      return eP->render(ciP->uriParamOptions, ciP->uriParam);
     }
   }
   else if (document.ObjectEmpty()) 
@@ -125,7 +125,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     eP->oe.fill(SccBadRequest, "empty payload", "BadRequest");
     ciP->httpStatusCode = SccBadRequest;
 
-    return eP->render(ciP, EntitiesRequest);
+    return eP->render(ciP->uriParamOptions, ciP->uriParam);
   }
 
   int membersFound = 0;
@@ -146,7 +146,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
           eP->oe.fill(SccBadRequest, "invalid JSON type for entity id", "BadRequest");
           ciP->httpStatusCode = SccBadRequest;;
 
-          return eP->render(ciP, EntitiesRequest);
+          return eP->render(ciP->uriParamOptions, ciP->uriParam);
         }
 
         eP->id = iter->value.GetString();
@@ -157,7 +157,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
         eP->oe.fill(SccBadRequest, "invalid input, 'id' as attribute", "BadRequest");
         ciP->httpStatusCode = SccBadRequest;;
 
-        return eP->render(ciP, EntitiesRequest);
+        return eP->render(ciP->uriParamOptions, ciP->uriParam);
       }
     }
     else if (name == "type")
@@ -168,7 +168,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
         eP->oe.fill(SccBadRequest, "invalid JSON type for entity type", "BadRequest");
         ciP->httpStatusCode = SccBadRequest;;
 
-        return eP->render(ciP, EntitiesRequest);
+        return eP->render(ciP->uriParamOptions, ciP->uriParam);
       }
 
       eP->type      = iter->value.GetString();
@@ -187,7 +187,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
         eP->oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
 
-        return eP->render(ciP, EntitiesRequest);
+        return eP->render(ciP->uriParamOptions, ciP->uriParam);
       }
     }
   }
@@ -196,7 +196,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
   {
     eP->oe.fill(SccBadRequest, "empty payload", "BadRequest");
     ciP->httpStatusCode = SccBadRequest;
-    return eP->render(ciP, EntitiesRequest);
+    return eP->render(ciP->uriParamOptions, ciP->uriParam);
   }
 
   if (eidInURL == false)
@@ -207,7 +207,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       eP->oe.fill(SccBadRequest, "empty entity id", "BadRequest");
       ciP->httpStatusCode = SccBadRequest;
 
-      return eP->render(ciP, EntitiesRequest);
+      return eP->render(ciP->uriParamOptions, ciP->uriParam);
     }
   }
 

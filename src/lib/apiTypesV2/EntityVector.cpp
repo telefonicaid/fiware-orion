@@ -42,7 +42,11 @@
 *
 * EntityVector::render -
 */
-std::string EntityVector::render(ConnectionInfo* ciP)
+std::string EntityVector::render
+(
+  std::map<std::string, bool>&         uriParamOptions,
+  std::map<std::string, std::string>&  uriParam
+)
 {
   if (vec.size() == 0)
   {
@@ -55,7 +59,7 @@ std::string EntityVector::render(ConnectionInfo* ciP)
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(ciP, ix != vec.size() - 1);
+    out += vec[ix]->render(uriParamOptions, uriParam, ix != vec.size() - 1);
   }
 
   out += "]";

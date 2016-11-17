@@ -102,7 +102,7 @@ std::string UpdateContextRequest::check(const std::string& apiVersion, bool asJs
 
   // FIXME PR requestType
   //if (((res = contextElementVector.check(apiVersion, requestType, indent, predetectedError, counter)) != "OK") ||
-  if (((res = contextElementVector.check(apiVersion, UpdateContextRequest, indent, predetectedError, counter)) != "OK") ||
+  if (((res = contextElementVector.check(apiVersion, UpdateContext, indent, predetectedError, counter)) != "OK") ||
       ((res = updateActionType.check()) != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);

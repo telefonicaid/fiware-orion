@@ -56,7 +56,7 @@ class EntityTypeVectorResponse
                           const std::string&  predetectedError);
   void              present(const std::string& indent);
   void              release(void);
-  std::string       toJson(ConnectionInfo* ciP);
+  std::string       toJson(bool values);
 };
 
 #endif  // SRC_LIB_UTILITY_ENTITYTYPEVECTORRESPONSE_H_
