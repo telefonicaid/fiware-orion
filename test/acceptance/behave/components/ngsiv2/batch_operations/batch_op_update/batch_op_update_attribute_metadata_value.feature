@@ -49,7 +49,7 @@ Feature: Attribute metadata value in update Batch operation using NGSI v2. "POST
   #  --------------------- attribute metadata value ---------------------------
 
   @attribute_metadata_value
-  Scenario Outline:  update entities with update batch operations using NGSI v2 with several attribute metadata values and without metadata type
+  Scenario Outline:  update entities with update batch operations using NGSI v2 with several attribute metadata values, without metadata type and APPEND actionType
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_op_update_attribute_meta_value |
@@ -65,6 +65,157 @@ Feature: Attribute metadata value in update Batch operation using NGSI v2. "POST
       | metadatas_name   | warning                 |
       | metadatas_value  | <attributes_meta_value> |
     When update entities in a single batch operation "APPEND"
+    Then verify that receive a "No Content" http code
+    And verify that entities are stored in mongo
+    Examples:
+      | attributes_meta_value |
+      | fsdfsd                |
+      | 34                    |
+      | 34.4E-34              |
+      | temp.34               |
+      | temp_34               |
+      | temp-34               |
+      | TEMP34                |
+      | house_flat            |
+      | house.flat            |
+      | house-flat            |
+      | house@flat            |
+      | habitación            |
+      | españa                |
+      | barça                 |
+      | random=10             |
+      | random=100            |
+      | random=1000           |
+      | random=10000          |
+      | random=100000         |
+      | random=500000         |
+      | random=1000000        |
+
+  @attribute_metadata_value
+  Scenario Outline:  update entities with update batch operations using NGSI v2 with several attribute metadata values, without metadata type and APPEND_STRICT actionType
+    Given  a definition of headers
+      | parameter          | value                               |
+      | Fiware-Service     | test_op_update_attribute_meta_value |
+      | Fiware-ServicePath | /test                               |
+      | Content-Type       | application/json                    |
+    # These properties below are used in update beh batch operation request
+    And define a entity properties to update in a single batch operation
+      | parameter        | value                   |
+      | entities_type    | house                   |
+      | entities_id      | room1                   |
+      | attributes_name  | temperature             |
+      | attributes_value | 34                      |
+      | metadatas_name   | warning                 |
+      | metadatas_value  | <attributes_meta_value> |
+    When update entities in a single batch operation "APPEND_STRICT"
+    Then verify that receive a "No Content" http code
+    And verify that entities are stored in mongo
+    Examples:
+      | attributes_meta_value |
+      | fsdfsd                |
+      | 34                    |
+      | 34.4E-34              |
+      | temp.34               |
+      | temp_34               |
+      | temp-34               |
+      | TEMP34                |
+      | house_flat            |
+      | house.flat            |
+      | house-flat            |
+      | house@flat            |
+      | habitación            |
+      | españa                |
+      | barça                 |
+      | random=10             |
+      | random=100            |
+      | random=1000           |
+      | random=10000          |
+      | random=100000         |
+      | random=500000         |
+      | random=1000000        |
+
+  @attribute_metadata_value
+  Scenario Outline:  update entities with update batch operations using NGSI v2 with several attribute metadata values, without metadata type and UPDATE actionType
+    Given  a definition of headers
+      | parameter          | value                               |
+      | Fiware-Service     | test_op_update_attribute_meta_value |
+      | Fiware-ServicePath | /test                               |
+      | Content-Type       | application/json                    |
+    # These properties below are used in update beh batch operation request
+    And define a entity properties to update in a single batch operation
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | metadatas_name   | warning     |
+      | metadatas_value  | 78          |
+    And update entities in a single batch operation "APPEND"
+    And verify that receive a "No Content" http code
+        # These properties below are used in update beh batch operation request
+    And define a entity properties to update in a single batch operation
+      | parameter        | value                   |
+      | entities_type    | house                   |
+      | entities_id      | room1                   |
+      | attributes_name  | temperature             |
+      | attributes_value | 34                      |
+      | metadatas_name   | warning                 |
+      | metadatas_value  | <attributes_meta_value> |
+    When update entities in a single batch operation "UPDATE"
+    Then verify that receive a "No Content" http code
+    And verify that entities are stored in mongo
+    Examples:
+      | attributes_meta_value |
+      | fsdfsd                |
+      | 34                    |
+      | 34.4E-34              |
+      | temp.34               |
+      | temp_34               |
+      | temp-34               |
+      | TEMP34                |
+      | house_flat            |
+      | house.flat            |
+      | house-flat            |
+      | house@flat            |
+      | habitación            |
+      | españa                |
+      | barça                 |
+      | random=10             |
+      | random=100            |
+      | random=1000           |
+      | random=10000          |
+      | random=100000         |
+      | random=500000         |
+      | random=1000000        |
+
+  @attribute_metadata_value
+  Scenario Outline:  update entities with update batch operations using NGSI v2 with several attribute metadata values, without metadata type and REPLACE actionType
+    Given  a definition of headers
+      | parameter          | value                               |
+      | Fiware-Service     | test_op_update_attribute_meta_value |
+      | Fiware-ServicePath | /test                               |
+      | Content-Type       | application/json                    |
+    # These properties below are used in update beh batch operation request
+    And define a entity properties to update in a single batch operation
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | metadatas_name   | warning     |
+      | metadatas_value  | 78          |
+    And update entities in a single batch operation "APPEND"
+    And verify that receive a "No Content" http code
+        # These properties below are used in update beh batch operation request
+    And define a entity properties to update in a single batch operation
+      | parameter        | value                   |
+      | entities_type    | house                   |
+      | entities_id      | room1                   |
+      | attributes_name  | temperature             |
+      | attributes_value | 34                      |
+      | metadatas_name   | warning                 |
+      | metadatas_value  | <attributes_meta_value> |
+    When update entities in a single batch operation "REPLACE"
     Then verify that receive a "No Content" http code
     And verify that entities are stored in mongo
     Examples:
@@ -135,7 +286,6 @@ Feature: Attribute metadata value in update Batch operation using NGSI v2. "POST
       | random=500000         |
       | random=1000000        |
 
-
   @attribute_metadata_value_without
   Scenario:  try update entities with update batch operations using NGSI v2 without attributes values
     Given  a definition of headers
@@ -182,7 +332,7 @@ Feature: Attribute metadata value in update Batch operation using NGSI v2. "POST
       | description | missing metadata value |
 
   @attribute_metadata_value_special
-  Scenario Outline:  create an entity using NGSI v2 with special attributes metatada values without type (compound, vector, boolean, etc)
+  Scenario Outline:  create an entity using NGSI v2 with special attributes metatada values, without type and APPEND actionType (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                                     |
       | Fiware-Service     | test_op_update_attribute_meta_value_error |
@@ -198,6 +348,142 @@ Feature: Attribute metadata value in update Batch operation using NGSI v2. "POST
       | metadatas_name   | "warning"               |
       | metadatas_value  | <attributes_meta_value> |
     When update entities in a single batch operation "'APPEND'" in raw mode
+    Then verify that receive an "No Content" http code
+    Examples:
+      | entity_id | attributes_meta_value                                                         |
+      | room1     | true                                                                          |
+      | room2     | false                                                                         |
+      | room3     | 34                                                                            |
+      | room4     | -34                                                                           |
+      | room5     | 5.00002                                                                       |
+      | room6     | -5.00002                                                                      |
+      | room7     | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
+      | room8     | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
+      | room9     | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
+      | room10    | {"x": "x1","x2": "b"}                                                         |
+      | room11    | {"x": {"x1": "a","x2": "b"}}                                                  |
+      | room12    | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
+      | room13    | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
+      | room14    | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
+      | room15    | "41.3763726, 2.1864475,14"                                                    |
+      | room16    | "2017-06-17T07:21:24.238Z"                                                    |
+      | room17    | null                                                                          |
+
+  @attribute_metadata_value_special
+  Scenario Outline:  create an entity using NGSI v2 with special attributes metatada values, without type and APPEND_STRICT actionType (compound, vector, boolean, etc)
+    Given  a definition of headers
+      | parameter          | value                                     |
+      | Fiware-Service     | test_op_update_attribute_meta_value_error |
+      | Fiware-ServicePath | /test                                     |
+      | Content-Type       | application/json                          |
+     # These properties below are used in update beh batch operation request
+    And define a entity properties to update in a single batch operation
+      | parameter        | value                   |
+      | entities_type    | "house"                 |
+      | entities_id      | "<entity_id>"           |
+      | attributes_name  | "temperature"           |
+      | attributes_value | 56                      |
+      | metadatas_name   | "warning"               |
+      | metadatas_value  | <attributes_meta_value> |
+    When update entities in a single batch operation "'APPEND_STRICT'" in raw mode
+    Then verify that receive an "No Content" http code
+    Examples:
+      | entity_id | attributes_meta_value                                                         |
+      | room1     | true                                                                          |
+      | room2     | false                                                                         |
+      | room3     | 34                                                                            |
+      | room4     | -34                                                                           |
+      | room5     | 5.00002                                                                       |
+      | room6     | -5.00002                                                                      |
+      | room7     | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
+      | room8     | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
+      | room9     | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
+      | room10    | {"x": "x1","x2": "b"}                                                         |
+      | room11    | {"x": {"x1": "a","x2": "b"}}                                                  |
+      | room12    | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
+      | room13    | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
+      | room14    | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
+      | room15    | "41.3763726, 2.1864475,14"                                                    |
+      | room16    | "2017-06-17T07:21:24.238Z"                                                    |
+      | room17    | null                                                                          |
+
+  @attribute_metadata_value_special
+  Scenario Outline:  create an entity using NGSI v2 with special attributes metatada values, without type and UPDATE actionType (compound, vector, boolean, etc)
+    Given  a definition of headers
+      | parameter          | value                                     |
+      | Fiware-Service     | test_op_update_attribute_meta_value_error |
+      | Fiware-ServicePath | /test                                     |
+      | Content-Type       | application/json                          |
+     # These properties below are used in update beh batch operation request
+    And define a entity properties to update in a single batch operation
+      | parameter        | value         |
+      | entities_type    | "house"       |
+      | entities_id      | "<entity_id>" |
+      | attributes_name  | "temperature" |
+      | attributes_value | 56            |
+      | metadatas_name   | "warning"     |
+      | metadatas_value  | 89            |
+    And update entities in a single batch operation "'APPEND'" in raw mode
+    And verify that receive an "No Content" http code
+    # These properties below are used in update beh batch operation request
+    And define a entity properties to update in a single batch operation
+      | parameter        | value                   |
+      | entities_type    | "house"                 |
+      | entities_id      | "<entity_id>"           |
+      | attributes_name  | "temperature"           |
+      | attributes_value | 56                      |
+      | metadatas_name   | "warning"               |
+      | metadatas_value  | <attributes_meta_value> |
+    When update entities in a single batch operation "'UPDATE'" in raw mode
+    Then verify that receive an "No Content" http code
+    Examples:
+      | entity_id | attributes_meta_value                                                         |
+      | room1     | true                                                                          |
+      | room2     | false                                                                         |
+      | room3     | 34                                                                            |
+      | room4     | -34                                                                           |
+      | room5     | 5.00002                                                                       |
+      | room6     | -5.00002                                                                      |
+      | room7     | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
+      | room8     | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
+      | room9     | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
+      | room10    | {"x": "x1","x2": "b"}                                                         |
+      | room11    | {"x": {"x1": "a","x2": "b"}}                                                  |
+      | room12    | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
+      | room13    | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
+      | room14    | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
+      | room15    | "41.3763726, 2.1864475,14"                                                    |
+      | room16    | "2017-06-17T07:21:24.238Z"                                                    |
+      | room17    | null                                                                          |
+
+  @attribute_metadata_value_special
+  Scenario Outline:  create an entity using NGSI v2 with special attributes metatada values, without type and REPLACE actionType (compound, vector, boolean, etc)
+    Given  a definition of headers
+      | parameter          | value                                     |
+      | Fiware-Service     | test_op_update_attribute_meta_value_error |
+      | Fiware-ServicePath | /test                                     |
+      | Content-Type       | application/json                          |
+     # These properties below are used in update beh batch operation request
+    And define a entity properties to update in a single batch operation
+      | parameter        | value         |
+      | entities_type    | "house"       |
+      | entities_id      | "<entity_id>" |
+      | attributes_name  | "temperature" |
+      | attributes_value | 56            |
+      | metadatas_name   | "warning"     |
+      | metadatas_value  | 89            |
+    And update entities in a single batch operation "'APPEND'" in raw mode
+    And verify that receive an "No Content" http code
+    # These properties below are used in update beh batch operation request
+    And define a entity properties to update in a single batch operation
+      | parameter        | value                   |
+      | entities_type    | "house"                 |
+      | entities_id      | "<entity_id>"           |
+      | attributes_name  | "temperature"           |
+      | attributes_value | 56                      |
+      | metadatas_name   | "warning"               |
+      | metadatas_value  | <attributes_meta_value> |
+    When update entities in a single batch operation "'REPLACE'" in raw mode
     Then verify that receive an "No Content" http code
     Examples:
       | entity_id | attributes_meta_value                                                         |
