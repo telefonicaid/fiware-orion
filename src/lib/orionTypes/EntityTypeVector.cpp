@@ -67,7 +67,7 @@ std::string EntityTypeVector::render
 
   if (vec.size() > 0)
   {
-    out += startTag2(indent, key, true, true);
+    out += startTag(indent, key, true, true);
 
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {

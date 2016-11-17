@@ -54,7 +54,7 @@ std::string EntityTypeVectorResponse::render
   std::string out                 = "";
   std::string tag                 = "entityTypesResponse";
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent, tag, false, false);
 
   if (entityTypeVector.size() > 0)
   {

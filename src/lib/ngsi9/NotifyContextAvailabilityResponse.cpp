@@ -69,7 +69,7 @@ std::string NotifyContextAvailabilityResponse::render(const std::string& indent)
 
   responseCode.keyNameSet("responseCode");
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent, tag, false, false);
   out += responseCode.render(indent + "  ");
   out += endTag(indent);
 

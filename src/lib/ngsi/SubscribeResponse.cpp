@@ -51,7 +51,7 @@ std::string SubscribeResponse::render(const std::string& indent, bool comma)
   bool         durationRendered    = !duration.isEmpty();
   bool         throttlingRendered  = !throttling.isEmpty();
 
-  out += startTag1(indent, tag);
+  out += startTag(indent, tag, false);
   out += subscriptionId.render(RtSubscribeResponse, indent + "  ", durationRendered || throttlingRendered);
   out += duration.render(indent + "  ", throttlingRendered);
   out += throttling.render(indent + "  ", false);

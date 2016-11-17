@@ -80,7 +80,7 @@ std::string DiscoverContextAvailabilityResponse::render(const std::string& inden
   // Exactly ONE of responseVector|errorCode is included in the discovery response so,
   // no JSON commas necessary
   //
-  out += startTag1(indent, tag, false);
+  out += startTag(indent, tag, false, false);
   
   if (responseVector.size() > 0)
   {

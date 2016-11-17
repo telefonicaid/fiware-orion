@@ -88,14 +88,16 @@ std::string versionTreat
   std::string uptime = parsedUptime(getTimer()->getCurrentTime() - startTime);
 #endif
 
-  out += startTag1(indent, tag, true, true);
+  out += "{\n";
+  out += startTag(indent, tag, false, true);
   out += valueTag1(indent + "  ", "version",       versionString,   true);
   out += valueTag1(indent + "  ", "uptime",        uptime,          true);
   out += valueTag1(indent + "  ", "git_hash",      GIT_HASH,        true);
   out += valueTag1(indent + "  ", "compile_time",  COMPILE_TIME,    true);
   out += valueTag1(indent + "  ", "compiled_by",   COMPILED_BY,     true);
   out += valueTag1(indent + "  ", "compiled_in",   COMPILED_IN,     false);
-  out += endTag(indent, false, false, true, true);
+  out += endTag(indent, false, false, true);
+  out += "}\n";
 
   ciP->httpStatusCode = SccOk;
   return out;

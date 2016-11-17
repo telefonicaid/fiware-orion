@@ -55,7 +55,7 @@ std::string EntityTypeResponse::render
   std::string out                 = "";
   std::string tag                 = "entityTypeAttributesResponse";
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent, tag, false, false);
 
   out += entityType.render(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", true, true);
   out += statusCode.render(indent + "  ");

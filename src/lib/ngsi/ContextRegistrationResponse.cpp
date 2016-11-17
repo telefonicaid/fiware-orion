@@ -52,7 +52,7 @@ std::string ContextRegistrationResponse::render(const std::string& indent, bool 
   std::string  out               = "";
   bool         errorCodeRendered = errorCode.code != SccNone;
 
-  out += startTag2(indent, key, false, false);
+  out += startTag(indent, key, false, false);
 
   out += contextRegistration.render(indent + "  ", errorCodeRendered, false);
 

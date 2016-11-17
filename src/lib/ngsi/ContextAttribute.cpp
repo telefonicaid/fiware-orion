@@ -498,7 +498,7 @@ std::string ContextAttribute::renderAsJsonObject
   bool         commaAfterContextValue = metadataVector.size() != 0;
   bool         commaAfterType         = !omitValue || commaAfterContextValue;
 
-  out += startTag2(indent, key, false, true);
+  out += startTag(indent, key, false, true);
   out += valueTag1(indent + "  ", "type",         type,  commaAfterType);
 
   if (compoundValueP == NULL)
@@ -559,7 +559,7 @@ std::string ContextAttribute::renderAsJsonObject
       isCompoundVector = true;
     }
 
-    out += startTag2(indent + "  ", "value", isCompoundVector, true);
+    out += startTag(indent + "  ", "value", isCompoundVector, true);
     out += compoundValueP->render(apiVersion, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
@@ -622,7 +622,7 @@ std::string ContextAttribute::render
     return renderAsJsonObject(apiVersion, request, indent, comma, omitValue);
   }
 
-  out += startTag2(indent, key, false, false);
+  out += startTag(indent, key, false, false);
   out += valueTag1(indent + "  ", "name", name,  true);  // attribute.type is always rendered
   out += valueTag1(indent + "  ", "type", type,  commaAfterType);
 
@@ -684,7 +684,7 @@ std::string ContextAttribute::render
       isCompoundVector = true;
     }
 
-    out += startTag2(indent + "  ", "value", isCompoundVector, true);
+    out += startTag(indent + "  ", "value", isCompoundVector, true);
     out += compoundValueP->render(apiVersion, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }

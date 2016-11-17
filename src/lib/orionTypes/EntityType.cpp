@@ -88,7 +88,7 @@ std::string EntityType::render
   }
   else
   {
-    out += startTag2(indent, key, false, false);
+    out += startTag(indent, key, false, false);
 
     if (collapsed || contextAttributeVector.size() == 0)
     {     

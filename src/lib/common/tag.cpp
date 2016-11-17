@@ -210,24 +210,14 @@ std::string jsonInvalidCharsTransformation(const std::string& input)
 *
 * startTag1 -
 */
+#if 0
 std::string startTag1
 (
   const std::string&  indent,
   const std::string&  key,
-  bool                showKey,
-  bool                isToplevel
+  bool                showKey
 )
 {
-  if (isToplevel)
-  {
-    if (showKey == false)
-    {
-      return indent + "{\n" + indent + "  {\n";
-    }
- 
-    return indent + "{\n" + indent + "  " + "\"" + key + "\" : {\n";
-  }
-
   if (showKey == false)
   {
     return indent + "{\n";
@@ -235,14 +225,15 @@ std::string startTag1
 
   return indent + "\"" + key + "\" : {\n";
 }
+#endif
 
 
 
 /* ****************************************************************************
 *
-* startTag2 -
+* startTag -
 */
-std::string startTag2
+std::string startTag
 (
   const std::string&  indent,
   const std::string&  key,
@@ -279,21 +270,14 @@ std::string endTag
   const std::string&  indent,
   bool                comma,
   bool                isVector,
-  bool                nl,
-  bool                isToplevel
+  bool                nl
 )
 {
-  if (isToplevel)
-  {
-    return indent + "}\n}\n";
-  }
-
   std::string out = indent;
 
   out += isVector?    "]"  : "}";
   out += comma?       ","  : "";
   out += nl?          "\n" : "";
-  out += isToplevel?  "}"  : "";
 
   return out;
 }

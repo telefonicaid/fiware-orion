@@ -49,7 +49,7 @@ std::string ConditionValueList::render(const std::string& indent, bool comma)
     return "";
   }
 
-  out += startTag2(indent, tag, true, true);
+  out += startTag(indent, tag, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

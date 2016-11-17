@@ -125,7 +125,7 @@ std::string QueryContextResponse::render(const std::string& apiVersion, bool asJ
   //
   // 02. render 
   //
-  out += startTag1(indent, tag, false);
+  out += startTag(indent, tag, false, false);
 
   if (contextElementResponseVector.size() > 0)
   {

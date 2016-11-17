@@ -41,22 +41,22 @@ TEST(commonTag, startTag)
    std::string      json2  = "  \"TAG\" : {\n";
    std::string      out;
 
-   out = startTag1(indent, tag, false);
+   out = startTag(indent, tag, false, false);
    EXPECT_EQ(json, out);
 
-   out = startTag1(indent, tag, true);
+   out = startTag(indent, tag, false, true);
    EXPECT_EQ(json2, out);
 
-   out = startTag2(indent, tag, false, true);
+   out = startTag(indent, tag, false, true);
    EXPECT_EQ("  \"TAG\" : {\n", out);
 
-   out = startTag2(indent, tag, true, true);
+   out = startTag(indent, tag, true, true);
    EXPECT_EQ("  \"TAG\" : [\n", out);
 
-   out = startTag2(indent, tag, false, false);
+   out = startTag(indent, tag, false, false);
    EXPECT_EQ("  {\n", out);
 
-   out = startTag2(indent, tag, true, false);
+   out = startTag(indent, tag, true, false);
    EXPECT_EQ("  [\n", out);
 
 }

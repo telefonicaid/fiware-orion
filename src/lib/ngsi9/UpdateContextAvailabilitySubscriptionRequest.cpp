@@ -63,7 +63,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::render(const std::stri
   bool          commaAfterAttributeList  = durationRendered || restrictionRendered || subscriptionRendered;
   bool          commaAfterEntityIdVector = attributeListRendered || durationRendered || restrictionRendered || subscriptionRendered;
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent, tag, false, false);
   out += entityIdVector.render(indent + "  ", commaAfterEntityIdVector);
   out += attributeList.render( indent + "  ", commaAfterAttributeList);
   out += duration.render(      indent + "  ", commaAfterDuration);

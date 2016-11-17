@@ -74,7 +74,7 @@ std::string UpdateContextRequest::render(const std::string& apiVersion, bool asJ
   // JSON commas:
   // Both fields are MANDATORY, so, comma after "contextElementVector"
   //  
-  out += startTag1(indent, tag, false);
+  out += startTag(indent, tag, false, false);
   out += contextElementVector.render(apiVersion, asJsonObject, UpdateContext, indent + "  ", true);
   out += updateActionType.render(indent + "  ", false);
   out += endTag(indent, false);

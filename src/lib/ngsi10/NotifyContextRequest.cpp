@@ -50,7 +50,7 @@ std::string NotifyContextRequest::render(const std::string& apiVersion, bool asJ
   //   The only doubt here if whether originator should end in a comma.
   //   This doubt is taken care of by the variable 'contextElementResponseVectorRendered'
   //
-  out += startTag1(indent, tag, false);
+  out += startTag(indent, tag, false, false);
   out += subscriptionId.render(NotifyContext, indent + "  ", true);
   out += originator.render(indent  + "  ", contextElementResponseVectorRendered);
   out += contextElementResponseVector.render(apiVersion, asJsonObject, NotifyContext, indent  + "  ", false);

@@ -54,7 +54,7 @@ std::string AppendContextElementRequest::render(const std::string& apiVersion, b
   std::string tag = "appendContextElementRequest";
   std::string out = "";
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent, tag, false, false);
 
   if (entity.id != "")
   {

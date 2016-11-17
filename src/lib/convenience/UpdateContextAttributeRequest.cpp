@@ -61,7 +61,7 @@ std::string UpdateContextAttributeRequest::render(const std::string& apiVersion,
   std::string indent2 = indent + "  ";
   bool        commaAfterContextValue = metadataVector.size() != 0;
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent, tag, false, false);
   out += valueTag1(indent2, "type", type, true);
 
   if (compoundValueP == NULL)
@@ -77,7 +77,7 @@ std::string UpdateContextAttributeRequest::render(const std::string& apiVersion,
       isCompoundVector = true;
     }
 
-    out += startTag2(indent + "  ", "value", isCompoundVector, true);
+    out += startTag(indent + "  ", "value", isCompoundVector, true);
     out += compoundValueP->render(apiVersion, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }

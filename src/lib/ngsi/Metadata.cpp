@@ -231,7 +231,7 @@ std::string Metadata::render(const std::string& indent, bool comma)
   std::string tag     = "contextMetadata";
   std::string xValue  = toStringValue();
 
-  out += startTag2(indent, tag, false, false);
+  out += startTag(indent, tag, false, false);
   out += valueTag1(indent + "  ", "name", name, true);
   out += valueTag1(indent + "  ", "type", type, true);
 

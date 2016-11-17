@@ -89,7 +89,7 @@ std::string SubscribeContextAvailabilityResponse::render(const std::string& inde
   bool         durationRendered   = !duration.isEmpty();
   bool         errorCodeRendered  = (errorCode.code != SccNone);
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent, tag, false, false);
 
   out += subscriptionId.render(RtSubscribeContextAvailabilityResponse, indent + "  ", durationRendered || errorCodeRendered);
   out += duration.render(indent + "  ", errorCodeRendered);

@@ -85,7 +85,7 @@ std::string UpdateContextResponse::render(const std::string& apiVersion, bool as
   std::string out = "";
   std::string tag = "updateContextResponse";
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent, tag, false, false);
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {

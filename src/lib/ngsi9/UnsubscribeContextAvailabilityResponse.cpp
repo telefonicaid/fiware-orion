@@ -79,7 +79,7 @@ std::string UnsubscribeContextAvailabilityResponse::render(const std::string& in
   std::string out = "";
   std::string tag = "unsubscribeContextAvailabilityResponse";
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent, tag, false, false);
 
   out += subscriptionId.render(RtUnsubscribeContextAvailabilityResponse, indent + "  ", true);  // always json comma - statusCode is mandatory
   out += statusCode.render(indent + "  ");

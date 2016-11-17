@@ -71,7 +71,7 @@ std::string UnsubscribeContextResponse::render(const std::string& indent)
   std::string out = "";
   std::string tag = "unsubscribeContextResponse";
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent, tag, false, false);
   out += subscriptionId.render(RtUnsubscribeContextResponse, indent + "  ", true);
   out += statusCode.render(indent + "  ", false);
   out += endTag(indent);

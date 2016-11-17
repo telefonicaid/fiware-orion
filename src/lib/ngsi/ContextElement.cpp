@@ -89,11 +89,11 @@ std::string ContextElement::render(const std::string& apiVersion, bool asJsonObj
 
   if (requestType == UpdateContext)
   {
-    out += startTag2(indent, key, false, false);
+    out += startTag(indent, key, false, false);
   }
   else
   {
-    out += startTag2(indent, key, false, true);
+    out += startTag(indent, key, false, true);
   }
 
   out += entityId.render(indent + "  ", commaAfterEntityId, false);

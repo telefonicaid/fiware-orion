@@ -732,7 +732,7 @@ std::string CompoundValueNode::render(const std::string& apiVersion, const std::
   else if ((valueType == orion::ValueTypeVector) && (container != this))
   {
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));
-    out += startTag2(indent, key, true, container->valueType == orion::ValueTypeObject);
+    out += startTag(indent, key, true, container->valueType == orion::ValueTypeObject);
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
       out += childV[ix]->render(apiVersion, indent + "  ");
@@ -751,7 +751,7 @@ std::string CompoundValueNode::render(const std::string& apiVersion, const std::
   else if ((valueType == orion::ValueTypeObject) && (container->valueType == orion::ValueTypeVector))
   {
     LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is a Vector", name.c_str()));
-    out += startTag2(indent, "", false, false);
+    out += startTag(indent, "", false, false);
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
       out += childV[ix]->render(apiVersion, indent + "  ");
@@ -764,7 +764,7 @@ std::string CompoundValueNode::render(const std::string& apiVersion, const std::
     if (rootP != this)
     {
       LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is NOT a Vector", name.c_str()));     
-      out += startTag2(indent, key, false, true);
+      out += startTag(indent, key, false, true);
 
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
       {

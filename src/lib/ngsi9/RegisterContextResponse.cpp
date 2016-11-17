@@ -105,7 +105,7 @@ std::string RegisterContextResponse::render(const std::string& indent)
   std::string  tag = "registerContextResponse";
   bool         errorCodeRendered = (errorCode.code != SccNone) && (errorCode.code != SccOk);
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent, tag, false, false);
 
   if (!errorCodeRendered)
   {

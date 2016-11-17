@@ -50,7 +50,7 @@ std::string ContextRegistrationAttributeVector::render(const std::string& indent
     return "";
   }
 
-  out += startTag2(indent, key, true, true);
+  out += startTag(indent, key, true, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);
