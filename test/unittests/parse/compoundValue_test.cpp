@@ -958,14 +958,13 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
 TEST(compoundValue, tenCompounds)
 {
   ParseData                  reqData;
-  ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
   UpdateContextRequest*      upcrP;
   std::string                rendered;
    
   utInit();
 
   upcrP = &reqData.upcr.res;
-  rendered = upcrP->render(&ci, "");
+  rendered = upcrP->render("v1", false, "");
 
   utExit();
 }
