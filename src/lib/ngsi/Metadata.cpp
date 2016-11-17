@@ -42,8 +42,6 @@
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/compoundResponses.h"
 
-#include "rest/ConnectionInfo.h"
-
 using namespace mongo;
 
 

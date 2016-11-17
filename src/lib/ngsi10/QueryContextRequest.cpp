@@ -34,7 +34,6 @@
 #include "ngsi/Restriction.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "ngsi10/QueryContextRequest.h"
-#include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
 #include "apiTypesV2/BatchQuery.h"
 

@@ -23,7 +23,6 @@
 * Author: Ken Zangelin
 */
 #include "ngsi10/UpdateContextResponse.h"
-#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 

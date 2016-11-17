@@ -36,6 +36,8 @@
 #include "apiTypesV2/Entity.h"
 #include "ngsi10/QueryContextResponse.h"
 
+#include "rest/ConnectionInfo.h"  // FIXME PR
+
 
 
 /* ****************************************************************************

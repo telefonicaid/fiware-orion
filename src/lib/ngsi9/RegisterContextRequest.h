@@ -47,7 +47,7 @@ typedef struct RegisterContextRequest
 
   std::string                servicePath;                // Not part of payload, just an internal field
 
-  std::string   render(RequestType requestType, const std::string& indent);
+  std::string   render(const std::string& indent);
   std::string   check(const std::string& apiVersion, const std::string& indent, const std::string& predetectedError, int counter);
   void          present(void);
   void          release(void);

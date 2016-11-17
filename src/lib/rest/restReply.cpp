@@ -181,32 +181,32 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, co
    if (tag == "registerContextResponse")
    {
       RegisterContextResponse rcr("000000000000000000000000", errorCode);
-      reply =  rcr.render(RegisterContext, indent);
+      reply =  rcr.render(indent);
    }
    else if (tag == "discoverContextAvailabilityResponse")
    {
       DiscoverContextAvailabilityResponse dcar(errorCode);
-      reply =  dcar.render(DiscoverContextAvailability, indent);
+      reply =  dcar.render(indent);
    }
    else if (tag == "subscribeContextAvailabilityResponse")
    {
       SubscribeContextAvailabilityResponse scar("000000000000000000000000", errorCode);
-      reply =  scar.render(SubscribeContextAvailability, indent);
+      reply =  scar.render(indent);
    }
    else if (tag == "updateContextAvailabilitySubscriptionResponse")
    {
       UpdateContextAvailabilitySubscriptionResponse ucas(errorCode);
-      reply =  ucas.render(UpdateContextAvailabilitySubscription, indent, 0);
+      reply =  ucas.render(indent, 0);
    }
    else if (tag == "unsubscribeContextAvailabilityResponse")
    {
       UnsubscribeContextAvailabilityResponse ucar(errorCode);
-      reply =  ucar.render(UnsubscribeContextAvailability, indent);
+      reply =  ucar.render(indent);
    }
    else if (tag == "notifyContextAvailabilityResponse")
    {
       NotifyContextAvailabilityResponse ncar(errorCode);
-      reply =  ncar.render(NotifyContextAvailability, indent);
+      reply =  ncar.render(indent);
    }
 
    else if (tag == "queryContextResponse")
@@ -217,17 +217,17 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, co
    else if (tag == "subscribeContextResponse")
    {
       SubscribeContextResponse scr(errorCode);
-      reply =  scr.render(SubscribeContext, indent);
+      reply =  scr.render(indent);
    }
    else if (tag == "updateContextSubscriptionResponse")
    {
       UpdateContextSubscriptionResponse ucsr(errorCode);
-      reply =  ucsr.render(UpdateContextSubscription, indent);
+      reply =  ucsr.render(indent);
    }
    else if (tag == "unsubscribeContextResponse")
    {
       UnsubscribeContextResponse uncr(errorCode);
-      reply =  uncr.render(UnsubscribeContext, indent);
+      reply =  uncr.render(indent);
    }
    else if (tag == "updateContextResponse")
    {
@@ -237,7 +237,7 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, co
    else if (tag == "notifyContextResponse")
    {
       NotifyContextResponse ncr(errorCode);
-      reply =  ncr.render(NotifyContext, indent);
+      reply =  ncr.render(indent);
    }
    else if (tag == "StatusCode")
    {

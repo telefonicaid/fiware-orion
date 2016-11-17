@@ -31,7 +31,6 @@
 #include "ngsi/StatusCode.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
-#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 

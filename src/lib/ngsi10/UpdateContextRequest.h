@@ -30,7 +30,6 @@
 
 #include "ngsi/ContextElementVector.h"
 #include "ngsi/UpdateActionType.h"
-#include "rest/ConnectionInfo.h"
 #include "apiTypesV2/Entity.h"
 #include "apiTypesV2/Entities.h"
 

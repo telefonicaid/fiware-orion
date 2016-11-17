@@ -52,7 +52,7 @@ SubscribeContextAvailabilityRequest::SubscribeContextAvailabilityRequest()
 *
 * SubscribeContextAvailabilityRequest::render - 
 */
-std::string SubscribeContextAvailabilityRequest::render(RequestType requestType, const std::string& indent)
+std::string SubscribeContextAvailabilityRequest::render(const std::string& indent)
 {
   std::string out                      = "";
   std::string tag                      = "subscribeContextAvailabilityRequest";
@@ -99,7 +99,7 @@ std::string SubscribeContextAvailabilityRequest::check(const std::string& indent
   else
     return "OK";
 
-  return response.render(SubscribeContextAvailability, indent);
+  return response.render(indent);
 }
 
 

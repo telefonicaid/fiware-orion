@@ -28,7 +28,6 @@
 #include <string>
 
 #include "ngsi/ContextAttributeVector.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -56,7 +55,7 @@ class EntityType
                        bool typeNameBefore = false);
   void          present(const std::string& indent);
   void          release(void);
-  std::string   toJson(ConnectionInfo* ciP, bool includeType = false);
+  std::string   toJson(bool includeType = false);
 };
 
 #endif  // SRC_LIB_UTILITY_ENTITYTYPE_H_

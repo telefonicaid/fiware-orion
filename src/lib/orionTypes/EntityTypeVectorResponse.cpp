@@ -37,6 +37,8 @@
 #include "rest/uriParamNames.h"
 #include "orionTypes/EntityTypeVectorResponse.h"
 
+#include "rest/ConnectionInfo.h" // FIXME PR
+
 
 
 /* ****************************************************************************
@@ -147,7 +149,7 @@ std::string EntityTypeVectorResponse::toJson(ConnectionInfo* ciP)
     }
     else  // default
     {
-      out += entityTypeVector.vec[ix]->toJson(ciP, true);
+      out += entityTypeVector.vec[ix]->toJson(true);
     }
 
     if (ix != entityTypeVector.vec.size() - 1)

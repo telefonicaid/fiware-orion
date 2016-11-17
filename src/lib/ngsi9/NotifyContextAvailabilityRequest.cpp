@@ -90,7 +90,7 @@ std::string NotifyContextAvailabilityRequest::check(const std::string& apiVersio
     return "OK";
   }
 
-  return response.render(NotifyContextAvailability, indent);
+  return response.render(indent);
 }
 
 

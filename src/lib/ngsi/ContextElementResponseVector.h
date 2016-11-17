@@ -30,7 +30,6 @@
 
 #include "ngsi/ContextElementResponse.h"
 #include "common/RenderFormat.h"
-#include "rest/ConnectionInfo.h"
 
 
 

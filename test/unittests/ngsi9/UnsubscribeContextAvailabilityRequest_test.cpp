@@ -28,7 +28,6 @@
 #include "testDataFromFile.h"
 #include "common/globals.h"
 #include "ngsi/ParseData.h"
-#include "rest/ConnectionInfo.h"
 #include "jsonParse/jsonRequest.h"
 
 #include "ngsi/SubscriptionId.h"
@@ -56,7 +55,7 @@ TEST(UnsubscribeContextAvailabilityRequest, constructorAndCheck)
 
   std::string   out;  
 
-  out = ucar2.check(UnsubscribeContextAvailability, "", "", 0);
+  out = ucar2.check("", "", 0);
   EXPECT_EQ("OK", out);
 
   utExit();

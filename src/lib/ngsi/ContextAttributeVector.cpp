@@ -36,8 +36,6 @@
 #include "common/RenderFormat.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/Request.h"
-#include "rest/ConnectionInfo.h"
-#include "rest/uriParamNames.h"
 
 
 

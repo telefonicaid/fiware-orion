@@ -115,7 +115,7 @@ std::string RegisterProviderRequest::check
   std::string details = std::string("RegisterProviderRequest Error: '") + res + "'";
   alarmMgr.badInput(clientIp, details);
 
-  return response.render(DiscoverContextAvailability, indent);
+  return response.render(indent);
 }
 
 

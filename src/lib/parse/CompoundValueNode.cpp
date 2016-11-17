@@ -34,7 +34,6 @@
 #include "parse/forbiddenChars.h"
 
 #include "orionTypes/OrionValueType.h"
-#include "rest/ConnectionInfo.h"
 #include "parse/CompoundValueNode.h"
 
 

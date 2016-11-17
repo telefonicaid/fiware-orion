@@ -31,7 +31,6 @@
 #include "ngsi/AttributeList.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Restriction.h"
-#include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
 
 

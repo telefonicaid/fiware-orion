@@ -31,7 +31,6 @@
 
 #include "ngsi/ContextElementResponseVector.h"
 #include "ngsi/StatusCode.h"
-#include "rest/ConnectionInfo.h"
 
 
 

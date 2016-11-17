@@ -33,7 +33,6 @@
 #include "common/tag.h"
 #include "common/RenderFormat.h"
 #include "ngsi/ContextElementResponseVector.h"
-#include "rest/ConnectionInfo.h"
 
 
 

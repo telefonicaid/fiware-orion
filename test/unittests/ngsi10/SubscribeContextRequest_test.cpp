@@ -27,7 +27,6 @@
 
 #include "common/globals.h"
 #include "ngsi/ParseData.h"
-#include "rest/ConnectionInfo.h"
 #include "jsonParse/jsonRequest.h"
 
 #include "unittest.h"

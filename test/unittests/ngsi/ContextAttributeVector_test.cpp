@@ -26,7 +26,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ContextAttributeVector.h"
-#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 

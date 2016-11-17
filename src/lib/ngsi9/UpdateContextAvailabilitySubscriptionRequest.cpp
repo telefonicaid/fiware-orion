@@ -51,6 +51,7 @@ UpdateContextAvailabilitySubscriptionRequest::UpdateContextAvailabilitySubscript
 */
 std::string UpdateContextAvailabilitySubscriptionRequest::render(RequestType requestType, const std::string& indent)
 {
+  // FIXME requestType
   std::string   out                      = "";
   std::string   tag                      = "updateContextAvailabilitySubscriptionRequest";
   bool          subscriptionRendered     = subscriptionId.rendered(requestType);
@@ -117,7 +118,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::check(const std::strin
   else
     return "OK";
 
-  return response.render(UpdateContextAvailabilitySubscription, indent, counter);
+  return response.render(indent, counter);
 }
 
 

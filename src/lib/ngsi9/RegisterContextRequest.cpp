@@ -42,7 +42,7 @@
 *
 * RegisterContextRequest::render - 
 */
-std::string RegisterContextRequest::render(RequestType requestType, const std::string& indent)
+std::string RegisterContextRequest::render(const std::string& indent)
 {
   std::string  out                                 = "";
   bool         durationRendered                    = duration.get() != "";
@@ -95,7 +95,7 @@ std::string RegisterContextRequest::check(const std::string& apiVersion, const s
     return "OK";
   }
 
-  return response.render(RegisterContext, indent);
+  return response.render(indent);
 }
 
 

@@ -49,7 +49,7 @@ typedef struct UnsubscribeContextResponse
   UnsubscribeContextResponse(StatusCode& statusCode);
   ~UnsubscribeContextResponse();
 
-  std::string     render(RequestType requestType, const std::string& indent);
+  std::string     render(const std::string& indent);
   void            release(void);
 } UnsubscribeContextResponse;
 

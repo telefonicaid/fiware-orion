@@ -33,7 +33,6 @@
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi/AttributeList.h"
 #include "ngsi10/QueryContextResponse.h"
-#include "rest/ConnectionInfo.h"
 
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"

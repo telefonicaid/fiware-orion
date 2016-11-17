@@ -29,7 +29,6 @@
 #include "common/RenderFormat.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
-#include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/uriParamNames.h"
@@ -124,7 +123,7 @@ std::string NotifyContextRequest::check(const std::string& apiVersion, const std
     return "OK";
   }
 
-  return response.render(NotifyContext, indent);
+  return response.render(indent);
 }
 
 

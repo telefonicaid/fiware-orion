@@ -29,7 +29,8 @@
 #include "common/errorMessages.h"
 #include "common/RenderFormat.h"
 #include "common/string.h"
-#include "rest/uriParamNames.h"
+#include "rest/ConnectionInfo.h"  // FIXME PR
+#include "rest/uriParamNames.h"   // FIXME PR
 #include "apiTypesV2/Attribute.h"
 #include "ngsi10/QueryContextResponse.h"
 

@@ -32,7 +32,6 @@
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/Originator.h"
 #include "ngsi/ContextElementResponseVector.h"
-#include "rest/ConnectionInfo.h"
 
 
 

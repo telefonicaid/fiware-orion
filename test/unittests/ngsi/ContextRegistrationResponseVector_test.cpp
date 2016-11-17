@@ -29,8 +29,6 @@
 
 #include "ngsi/ContextRegistrationResponseVector.h"
 
-#include "rest/ConnectionInfo.h"
-
 
 
 /* ****************************************************************************

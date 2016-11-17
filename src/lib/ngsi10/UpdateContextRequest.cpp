@@ -37,7 +37,6 @@
 #include "ngsi/ContextAttribute.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
-#include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
 #include "convenience/UpdateContextAttributeRequest.h"
 
@@ -101,6 +100,7 @@ std::string UpdateContextRequest::check(const std::string& apiVersion, bool asJs
     return response.render(apiVersion, asJsonObject, indent);
   }
 
+  // FIXME PR requestType
   if (((res = contextElementVector.check(apiVersion, requestType, indent, predetectedError, counter)) != "OK") ||
       ((res = updateActionType.check()) != "OK"))
   {

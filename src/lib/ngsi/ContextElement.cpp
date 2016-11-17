@@ -35,7 +35,6 @@
 #include "ngsi/ContextElement.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/Request.h"
-#include "rest/ConnectionInfo.h"
 
 
 

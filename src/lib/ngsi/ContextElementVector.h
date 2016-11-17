@@ -29,7 +29,6 @@
 #include <vector>
 
 #include "ngsi/ContextElement.h"
-#include "rest/ConnectionInfo.h"
 
 
 

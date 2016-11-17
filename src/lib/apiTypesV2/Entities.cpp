@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "logMsg/traceLevels.h"
+#include "logMsg/logMsg.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "apiTypesV2/Entities.h"
 

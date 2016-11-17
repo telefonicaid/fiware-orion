@@ -85,7 +85,7 @@ std::string DiscoverContextAvailabilityRequest::check(const std::string& indent,
   else
     return "OK";
 
-  return response.render(DiscoverContextAvailability, indent);
+  return response.render(indent);
 }
 
 

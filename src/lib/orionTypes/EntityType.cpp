@@ -156,7 +156,7 @@ void EntityType::release(void)
 *
 * EntityType::toJson -
 */
-std::string EntityType::toJson(ConnectionInfo* ciP, bool includeType)
+std::string EntityType::toJson(bool includeType)
 {
   std::string  out = "{";
   char         countV[STRING_SIZE_FOR_INT];

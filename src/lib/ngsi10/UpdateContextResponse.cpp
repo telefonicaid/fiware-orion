@@ -36,7 +36,6 @@
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/UpdateContextResponse.h"
-#include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
 
 

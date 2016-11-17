@@ -28,7 +28,6 @@
 #include "common/globals.h"
 #include "jsonParse/jsonRequest.h"
 #include "ngsi/ParseData.h"
-#include "rest/ConnectionInfo.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
 
 #include "unittest.h"
@@ -126,7 +125,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, response)
 
   ucas.subscriptionId.set("012345678901234567890123");
 
-  out = ucas.check(UpdateContextAvailabilitySubscription, "", "", 0);
+  out = ucas.check("", "", 0);
   EXPECT_EQ("OK", out);
   
   utExit();

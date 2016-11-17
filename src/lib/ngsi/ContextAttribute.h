@@ -34,7 +34,6 @@
 #include "ngsi/Request.h"
 #include "ngsi/ProvidingApplication.h"
 #include "parse/CompoundValueNode.h"
-#include "rest/ConnectionInfo.h"
 
 
 

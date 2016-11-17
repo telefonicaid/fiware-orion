@@ -61,7 +61,7 @@ std::string SubscribeContextRequest::check(const std::string& indent, const std:
   {
     alarmMgr.badInput(clientIp, res);
     response.subscribeError.errorCode.fill(SccBadRequest, std::string("invalid payload: ") + res);
-    return response.render(SubscribeContext, indent);
+    return response.render(indent);
   }
 
   return "OK";

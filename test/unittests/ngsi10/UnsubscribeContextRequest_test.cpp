@@ -28,7 +28,6 @@
 #include "testDataFromFile.h"
 #include "common/globals.h"
 #include "ngsi/ParseData.h"
-#include "rest/ConnectionInfo.h"
 #include "jsonParse/jsonRequest.h"
 
 #include "unittest.h"
@@ -61,7 +60,7 @@ TEST(UnsubscribeContextRequest, badSubscriptionId_json)
   ucrP->present("");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  out = ucrP->render(UnsubscribeContext, "");
+  out = ucrP->render("");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ucrP->release();

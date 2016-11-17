@@ -25,6 +25,7 @@
 #include "logMsg/logMsg.h"
 
 #include "rest/OrionError.h"
+#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 

@@ -31,7 +31,6 @@
 #include "ngsi/ContextElement.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/AttributeList.h"
-#include "rest/ConnectionInfo.h"
 
 #include "mongo/client/dbclient.h"
 

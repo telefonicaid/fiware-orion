@@ -470,7 +470,7 @@ void jsonUcsrRelease(ParseData* parseDataP)
 std::string jsonUcsrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
   std::string s;
-  s = parseDataP->ucsr.res.check(UpdateContextSubscription, "", parseDataP->errorString, 0);
+  s = parseDataP->ucsr.res.check("", parseDataP->errorString, 0);
   return s;
 }
 

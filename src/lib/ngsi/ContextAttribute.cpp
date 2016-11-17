@@ -37,8 +37,7 @@
 #include "orionTypes/OrionValueType.h"
 #include "parse/forbiddenChars.h"
 #include "ngsi/ContextAttribute.h"
-#include "rest/ConnectionInfo.h"
-#include "rest/uriParamNames.h"
+#include "rest/ConnectionInfo.h"     // FIXME PR
 #include "rest/OrionError.h"
 #include "parse/CompoundValueNode.h"
 

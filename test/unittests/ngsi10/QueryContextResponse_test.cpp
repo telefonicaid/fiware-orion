@@ -25,7 +25,6 @@
 #include "gtest/gtest.h"
 
 #include "ngsi10/QueryContextResponse.h"
-#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 
