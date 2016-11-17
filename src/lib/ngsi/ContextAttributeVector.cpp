@@ -346,7 +346,7 @@ std::string ContextAttributeVector::render
     {
       if (attrsAsName)
       {
-        out += vec[ix]->renderAsNameString(apiVersion, request);
+        out += vec[ix]->renderAsNameString(indent + "  ", ix != vec.size() - 1);
       }
       else
       {
@@ -362,7 +362,7 @@ std::string ContextAttributeVector::render
     {
       if (attrsAsName)
       {
-        out += vec[ix]->renderAsNameString(apiVersion, request);
+        out += vec[ix]->renderAsNameString(indent + "  ", ix != vec.size() - 1);
       }
       else
       {
