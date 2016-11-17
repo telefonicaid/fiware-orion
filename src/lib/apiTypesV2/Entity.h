@@ -57,7 +57,7 @@ public:
   Entity();
   ~Entity();
 
-  std::string  render(ConnectionInfo* ciP, RequestType requestType, bool comma = false);
+  std::string  render(ConnectionInfo* ciP, bool comma = false);
   std::string  check(const std::string& apiVersion, RequestType requestType);
   void         present(const std::string& indent);
   void         release(void);

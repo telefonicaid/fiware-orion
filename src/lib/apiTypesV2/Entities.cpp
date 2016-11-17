@@ -58,9 +58,9 @@ Entities::~Entities()
 * Entities::render - 
 *
 */
-std::string Entities::render(ConnectionInfo* ciP, RequestType requestType)
+std::string Entities::render(ConnectionInfo* ciP)
 {
-  return vec.render(ciP, requestType, false);
+  return vec.render(ciP);
 } 
 
 

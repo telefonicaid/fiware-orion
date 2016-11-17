@@ -97,7 +97,7 @@ std::string postBatchQuery
   {
     entities.fill(&parseDataP->qcrs.res);
 
-    TIMED_RENDER(answer = entities.render(ciP, EntitiesResponse));
+    TIMED_RENDER(answer = entities.render(ciP));
   }
 
   // 04. Cleanup and return result

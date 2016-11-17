@@ -125,7 +125,7 @@ void QueryContextResponseVector::present(void)
 *
 * QueryContextResponseVector::render - 
 */
-std::string QueryContextResponseVector::render(ConnectionInfo* ciP, const std::string& indent, bool details, const std::string& detailsString)
+std::string QueryContextResponseVector::render(const std::string& apiVersion, bool asJsonObject, bool details, const std::string& detailsString)
 {
   QueryContextResponse* responseP = new QueryContextResponse();
   std::string           answer;
@@ -233,9 +233,7 @@ std::string QueryContextResponseVector::render(ConnectionInfo* ciP, const std::s
     }
   }
 
-
-  // FIXME PR
-  answer = responseP->render(ciP->apiVersion, ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON, "");
+  answer = responseP->render(apiVersion, asJsonObject, "");
   responseP->release();
   delete responseP;
 

@@ -88,7 +88,6 @@ std::string SubscribeContextAvailabilityRequest::check(const std::string& indent
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  // FIXME PR
   else if (((res = entityIdVector.check(SubscribeContextAvailability, indent))                              != "OK") ||
            ((res = attributeList.check(SubscribeContextAvailability, indent, predetectedError, counter))    != "OK") ||
            ((res = reference.check(SubscribeContextAvailability, indent, predetectedError, counter))        != "OK") ||

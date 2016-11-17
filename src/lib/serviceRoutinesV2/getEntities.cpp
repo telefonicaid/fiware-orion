@@ -321,7 +321,7 @@ std::string getEntities
     }
     else
     {
-      TIMED_RENDER(answer = entities.render(ciP, EntitiesResponse));
+      TIMED_RENDER(answer = entities.render(ciP));
       ciP->httpStatusCode = SccOk;
     }
   }

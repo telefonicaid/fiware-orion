@@ -47,7 +47,7 @@ public:
   Entities();
   ~Entities();
 
-  std::string  render(ConnectionInfo* ciP, RequestType requestType);
+  std::string  render(ConnectionInfo* ciP);
   std::string  check(const std::string& apiVersion, RequestType requestType);
   void         present(const std::string& indent);
   void         release(void);

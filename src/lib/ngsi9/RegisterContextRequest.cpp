@@ -68,7 +68,7 @@ std::string RegisterContextRequest::render(RequestType requestType, const std::s
 *
 * RegisterContextRequest::check - 
 */
-std::string RegisterContextRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string RegisterContextRequest::check(const std::string& apiVersion, const std::string& indent, const std::string& predetectedError, int counter)
 {
   RegisterContextResponse  response(this);
   std::string              res;
@@ -82,9 +82,8 @@ std::string RegisterContextRequest::check(ConnectionInfo* ciP, RequestType reque
   {
     alarmMgr.badInput(clientIp, "empty contextRegistration list");
     response.errorCode.fill(SccBadRequest, "Empty Context Registration List");
-  }
-  // FIXME PR
-  else if (((res = contextRegistrationVector.check(ciP->apiVersion, RegisterContext, indent, predetectedError, counter)) != "OK") ||
+  } 
+  else if (((res = contextRegistrationVector.check(apiVersion, RegisterContext, indent, predetectedError, counter)) != "OK") ||
            ((res = duration.check(RegisterContext, indent, predetectedError, counter))                  != "OK") ||
            ((res = registrationId.check(RegisterContext, indent, predetectedError, counter))            != "OK"))
   {

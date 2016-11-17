@@ -251,7 +251,7 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, co
       LM_T(LmtRest, ("Unknown tag: '%s', request == '%s'", tag.c_str(), request.c_str()));
       
       ciP->httpStatusCode = oe.code;
-      reply = oe.setStatusCodeAndSmartRender(ciP);
+      reply = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
    }
 
    return reply;

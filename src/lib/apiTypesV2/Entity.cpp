@@ -69,7 +69,7 @@ Entity::~Entity()
 *   o 'keyValues'  (less verbose, only name and values shown for attributes - no type, no metadatas)
 *   o 'values'     (only the values of the attributes are printed, in a vector)
 */
-std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
+std::string Entity::render(ConnectionInfo* ciP, bool comma)
 {
   RenderFormat  renderFormat = NGSI_V2_NORMALIZED;
 
