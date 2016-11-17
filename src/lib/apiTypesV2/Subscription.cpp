@@ -75,7 +75,16 @@ namespace ngsiv2
     {
       jh.addDate("expires", this->expires);
     }
-    jh.addString("status", this->status);
+
+    if (this->notification.timesFailed > 0)
+    {
+      jh.addString("status", "failed");
+    }
+    else
+    {
+      jh.addString("status", this->status);
+    }
+
     jh.addRaw("subject", this->subject.toJson());
     jh.addRaw("notification", this->notification.toJson(renderFormatToString(this->attrsFormat, true, true)));
 

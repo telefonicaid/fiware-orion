@@ -1719,6 +1719,8 @@ A subscription is represented by a JSON object with the following fields:
   If this field is not provided at subscription creation time, new subscriptions are created with
   the `active` status, which can be changed by clients afterwards. For expired subscriptions, this
   attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`).
+  Subscriptions having problems sending notifications have the status set to `failed`, which is set
+  back to `active` once a notification is successfully sent again.
 + `throttling`: Minimal period of time in seconds which must elapse between two consecutive
   notifications. It is optional.
 
@@ -1848,7 +1850,7 @@ Response:
               "lastFailure": "2015-10-06T16:00:00.00Z"
             },
             "expires": "2016-04-05T14:00:00.00Z",
-            "status": "active",
+            "status": "failed",
             "throttling": 5
           }
         ]
