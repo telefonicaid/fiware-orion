@@ -34,8 +34,6 @@
 #include "orionTypes/QueryContextResponseVector.h"
 #include "ngsi/Request.h"
 
-#include "rest/uriParamNames.h"
-
 
 
 /* ****************************************************************************

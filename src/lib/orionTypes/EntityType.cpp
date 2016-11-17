@@ -32,7 +32,6 @@
 #include "common/tag.h"
 #include "common/limits.h"
 #include "ngsi/Request.h"
-#include "rest/uriParamNames.h"
 #include "orionTypes/EntityType.h"
 
 

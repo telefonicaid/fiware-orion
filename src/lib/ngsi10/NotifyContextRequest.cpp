@@ -31,7 +31,6 @@
 #include "ngsi10/NotifyContextResponse.h"
 #include "rest/OrionError.h"
 #include "alarmMgr/alarmMgr.h"
-#include "rest/uriParamNames.h"
 
 
 

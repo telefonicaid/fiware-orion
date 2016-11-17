@@ -34,7 +34,6 @@
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/Request.h"
-#include "rest/uriParamNames.h"
 #include "orionTypes/EntityTypeVectorResponse.h"
 
 

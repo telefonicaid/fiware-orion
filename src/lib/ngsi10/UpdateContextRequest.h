@@ -60,7 +60,7 @@ typedef struct UpdateContextRequest
   UpdateContextRequest(const std::string& _contextProvider, EntityId* eP);
 
   std::string        render(const std::string& apiVersion, bool asJsonObject, const std::string& indent);
-  std::string        check(const std::string& apiVersion, bool asJsonObject, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
+  std::string        check(const std::string& apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError, int counter);
   void               release(void);
   ContextAttribute*  attributeLookup(EntityId* eP, const std::string& attributeName);
 

@@ -31,7 +31,6 @@
 #include "common/MimeType.h"
 #include "common/globals.h"
 #include "common/tag.h"
-#include "rest/uriParamNames.h"
 #include "ngsi/ContextElement.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/Request.h"

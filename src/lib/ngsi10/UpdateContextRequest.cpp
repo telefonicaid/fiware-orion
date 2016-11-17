@@ -37,7 +37,6 @@
 #include "ngsi/ContextAttribute.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
-#include "rest/uriParamNames.h"
 #include "convenience/UpdateContextAttributeRequest.h"
 
 
@@ -89,7 +88,7 @@ std::string UpdateContextRequest::render(const std::string& apiVersion, bool asJ
 *
 * UpdateContextRequest::check - 
 */
-std::string UpdateContextRequest::check(const std::string& apiVersion, bool asJsonObject, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateContextRequest::check(const std::string& apiVersion, bool asJsonObject,  const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string            res;
   UpdateContextResponse  response;
@@ -100,8 +99,6 @@ std::string UpdateContextRequest::check(const std::string& apiVersion, bool asJs
     return response.render(apiVersion, asJsonObject, indent);
   }
 
-  // FIXME PR requestType
-  //if (((res = contextElementVector.check(apiVersion, requestType, indent, predetectedError, counter)) != "OK") ||
   if (((res = contextElementVector.check(apiVersion, UpdateContext, indent, predetectedError, counter)) != "OK") ||
       ((res = updateActionType.check()) != "OK"))
   {

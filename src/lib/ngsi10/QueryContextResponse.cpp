@@ -33,7 +33,6 @@
 #include "rest/HttpStatusCode.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/QueryContextResponse.h"
-#include "rest/uriParamNames.h"
 
 
 
