@@ -36,7 +36,7 @@ TEST(MetadataVector, render)
 {
   Metadata        m("Name", "Type", "Value");
   Metadata        m2("Name2", "Type2", "Value2");
-  MetadataVector  mV("registrationMetadata");
+  MetadataVector  mV;
   const char*     outfile1 = "ngsi.metadataVector.render1.middle.json";
   const char*     outfile2 = "ngsi.metadataVector.render3.middle.json";
   std::string     out;
