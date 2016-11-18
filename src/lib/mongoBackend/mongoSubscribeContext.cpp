@@ -57,7 +57,7 @@ HttpStatusCode mongoSubscribeContext
     std::string subId = mongoCreateSubscription(sub, &oe, tenant, servicePathV, xauthToken, fiwareCorrelator);
 
     if (subId != "")
-    {      
+    {
       if (requestP->duration.isEmpty())
       {
         responseP->subscribeResponse.duration.set(DEFAULT_DURATION);

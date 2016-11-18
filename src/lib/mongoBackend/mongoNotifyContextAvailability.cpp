@@ -45,7 +45,7 @@ HttpStatusCode mongoNotifyContextAvailability
   const std::string&                   tenant,
   const std::string&                   servicePath
 )
-{    
+{
     bool              reqSemTaken;
 
     reqSemTake(__FUNCTION__, "mongo ngsi9 notification", SemWriteOp, &reqSemTaken);

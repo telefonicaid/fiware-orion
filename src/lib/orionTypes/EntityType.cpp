@@ -91,7 +91,7 @@ std::string EntityType::render
     out += startTag2(indent, key, false, false);
 
     if (collapsed || contextAttributeVector.size() == 0)
-    {     
+    {
       out += valueTag1(indent  + "  ", "name", type, false);
     }
     else
