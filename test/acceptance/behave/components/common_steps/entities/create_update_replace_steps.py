@@ -56,6 +56,8 @@ def definition_of_headers(context):
     context.cb = CB(protocol=props["CB_PROTOCOL"], host=props["CB_HOST"], port=props["CB_PORT"])
     __logger__.info("Define header used in request...")
     context.cb.definition_headers(context)
+    # initialize the entities accumulate
+    context.entities_accumulate = []
 
 
 @step(u'modify headers and keep previous values "([^"]*)"')
