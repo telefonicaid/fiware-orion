@@ -68,11 +68,8 @@ class EntityId
                       bool                comma      = false,
                       bool                isInVector = false);
 
-  std::string  check(ConnectionInfo*      ciP,
-                     RequestType          requestType,
-                     const std::string&   indent,
-                     const std::string&   predetectedError,
-                     int                  counter);
+  std::string  check(RequestType          requestType,
+                     const std::string&   indent);
 
   std::string  toJson(void) const;
 };

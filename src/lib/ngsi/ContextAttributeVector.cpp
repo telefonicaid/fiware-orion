@@ -36,8 +36,6 @@
 #include "common/RenderFormat.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/Request.h"
-#include "rest/ConnectionInfo.h"
-#include "rest/uriParamNames.h"
 
 
 
@@ -292,7 +290,8 @@ std::string ContextAttributeVector::toJson
 */
 std::string ContextAttributeVector::render
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
+  bool                asJsonObject,
   RequestType         request,
   const std::string&  indent,
   bool                comma,
@@ -316,7 +315,7 @@ std::string ContextAttributeVector::render
   // only one of them should be included in the vector. Any one of them.
   // So, step 1 is to purge the context attribute vector from 'copies'.
   //
-  if ((ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (ciP->outMimeType == JSON))
+  if (asJsonObject)
   {
     std::vector<std::string> added;
 
@@ -345,11 +344,11 @@ std::string ContextAttributeVector::render
     {
       if (attrsAsName)
       {
-        out += vec[ix]->renderAsNameString(ciP, request, indent + "  ", ix != vec.size() - 1);
+        out += vec[ix]->renderAsNameString(indent + "  ", ix != vec.size() - 1);
       }
       else
       {
-        out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
+        out += vec[ix]->render(apiVersion, asJsonObject, request, indent + "  ", ix != vec.size() - 1, omitValue);
       }
     }
     out += endTag(indent, comma, attrsAsName);
@@ -361,11 +360,11 @@ std::string ContextAttributeVector::render
     {
       if (attrsAsName)
       {
-        out += vec[ix]->renderAsNameString(ciP, request, indent + "  ", ix != vec.size() - 1);
+        out += vec[ix]->renderAsNameString(indent + "  ", ix != vec.size() - 1);
       }
       else
       {
-        out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
+        out += vec[ix]->render(apiVersion, asJsonObject, request, indent + "  ", ix != vec.size() - 1, omitValue);
       }
     }
     out += endTag(indent, comma, true);
@@ -380,20 +379,13 @@ std::string ContextAttributeVector::render
 *
 * ContextAttributeVector::check - 
 */
-std::string ContextAttributeVector::check
-(
-  ConnectionInfo*     ciP,
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string ContextAttributeVector::check(const std::string& apiVersion, RequestType requestType)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, 0)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType)) != "OK")
       return res;
   }
 

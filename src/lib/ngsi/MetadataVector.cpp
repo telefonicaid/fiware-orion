@@ -176,20 +176,13 @@ std::string MetadataVector::toJson(bool isLastElement, const std::vector<std::st
 *
 * MetadataVector::check -
 */
-std::string MetadataVector::check
-(
-  ConnectionInfo*     ciP,
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string MetadataVector::check(const std::string& apiVersion)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion)) != "OK")
     {
       return res;
     }

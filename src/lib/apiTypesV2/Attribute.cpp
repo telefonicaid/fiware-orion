@@ -29,7 +29,6 @@
 #include "common/errorMessages.h"
 #include "common/RenderFormat.h"
 #include "common/string.h"
-#include "rest/uriParamNames.h"
 #include "apiTypesV2/Attribute.h"
 #include "ngsi10/QueryContextResponse.h"
 
@@ -39,9 +38,20 @@
 *
 * Attribute::render -
 */
-std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
+std::string Attribute::render
+(
+  const std::string&  apiVersion,          // in parameter (pass-through)
+  bool                acceptedTextPlain,   // in parameter (pass-through)
+  bool                acceptedJson,        // in parameter (pass-through)
+  MimeType            outFormatSelection,  // in parameter (pass-through)
+  MimeType*           outMimeTypeP,        // out parameter (pass-through)
+  HttpStatusCode*     scP,                 // out parameter (pass-through)
+  bool                keyValues,           // in parameter
+  const std::string&  metadataList,        // in parameter
+  RequestType         requestType,         // in parameter
+  bool                comma                // in parameter
+)
 {
-  bool          keyValues  = ciP->uriParamOptions[OPT_KEY_VALUES];
   RenderFormat  renderFormat = (keyValues == true)? NGSI_V2_KEYVALUES : NGSI_V2_NORMALIZED;
 
   if (pcontextAttribute)
@@ -50,15 +60,15 @@ std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool
 
     if (requestType == EntityAttributeValueRequest)
     {
-      out = pcontextAttribute->toJsonAsValue(ciP);
+      out = pcontextAttribute->toJsonAsValue(apiVersion, acceptedTextPlain, acceptedJson, outFormatSelection, outMimeTypeP, scP);
     }
     else
     {
       std::vector<std::string> metadataFilter;
 
-      if (ciP->uriParam[URI_PARAM_METADATA] != "")
+      if (metadataList != "")
       {
-        stringSplit(ciP->uriParam[URI_PARAM_METADATA], ',', metadataFilter);
+        stringSplit(metadataList, ',', metadataFilter);
       }
 
       out = "{";

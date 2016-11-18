@@ -31,7 +31,6 @@
 #include "ngsi/UpdateActionType.h"
 #include "ngsi/Request.h"
 #include "apiTypesV2/Entities.h"
-#include "rest/ConnectionInfo.h"
 
 
 

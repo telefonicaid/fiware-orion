@@ -670,7 +670,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   if (servicePath[0] != '/')
   {
     OrionError oe(SccBadRequest, "Only /absolute/ Service Paths allowed [a service path must begin with /]");
-    ciP->answer = oe.setStatusCodeAndSmartRender(ciP);
+    ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
     return 1;
   }
 
@@ -679,7 +679,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   if (components > SERVICE_PATH_MAX_LEVELS)
   {
     OrionError oe(SccBadRequest, "too many components in ServicePath");
-    ciP->answer = oe.setStatusCodeAndSmartRender(ciP);
+    ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
     return 2;
   }
 
@@ -688,7 +688,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
     if (strlen(compV[ix].c_str()) > SERVICE_PATH_MAX_COMPONENT_LEN)
     {
       OrionError oe(SccBadRequest, "component-name too long in ServicePath");
-      ciP->answer = oe.setStatusCodeAndSmartRender(ciP);
+      ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
       return 3;
     }
 
@@ -706,7 +706,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
       if (!isalnum(comp[cIx]) && (comp[cIx] != '_'))
       {
         OrionError oe(SccBadRequest, "a component of ServicePath contains an illegal character");
-        ciP->answer = oe.setStatusCodeAndSmartRender(ciP);
+        ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
         return 4;
       }
     }

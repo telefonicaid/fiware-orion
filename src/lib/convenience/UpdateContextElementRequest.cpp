@@ -39,14 +39,14 @@
 *
 * render - 
 */
-std::string UpdateContextElementRequest::render(ConnectionInfo* ciP, RequestType requestType, std::string indent)
+std::string UpdateContextElementRequest::render(const std::string& apiVersion, bool asJsonObject, RequestType requestType, std::string indent)
 {
   std::string tag = "updateContextElementRequest";
   std::string out = "";
 
   out += startTag1(indent, tag, false);
   out += attributeDomainName.render(indent + "  ", true);
-  out += contextAttributeVector.render(ciP, requestType, indent + "  ");
+  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType, indent + "  ");
   out += endTag(indent);
 
   return out;
@@ -70,11 +70,12 @@ std::string UpdateContextElementRequest::render(ConnectionInfo* ciP, RequestType
 */
 std::string UpdateContextElementRequest::check
 (
-  ConnectionInfo*  ciP,
-  RequestType      requestType,
-  std::string      indent,
-  std::string      predetectedError,     // Predetected Error, normally during parsing
-  int              counter
+  const std::string&  apiVersion,
+  bool                asJsonObject,
+  RequestType         requestType,
+  std::string         indent,
+  std::string         predetectedError,     // Predetected Error, normally during parsing
+  int                 counter
 )
 {
   UpdateContextElementResponse  response;
@@ -83,8 +84,8 @@ std::string UpdateContextElementRequest::check
   if (predetectedError != "")
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
-  }
-  else if ((res = contextAttributeVector.check(ciP, UpdateContextElement, indent, predetectedError, counter)) != "OK")
+  }  
+  else if ((res = contextAttributeVector.check(apiVersion, UpdateContextElement)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }
@@ -93,7 +94,7 @@ std::string UpdateContextElementRequest::check
     return "OK";
   }
 
-  return response.render(ciP, requestType, indent);
+  return response.render(apiVersion, asJsonObject, requestType, indent);
 }
 
 

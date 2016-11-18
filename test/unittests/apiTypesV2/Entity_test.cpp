@@ -54,7 +54,6 @@ TEST(Entity, present)
 */
 TEST(Entity, check)
 {
-  ConnectionInfo ci;
 
   utInit();
 
@@ -66,21 +65,21 @@ TEST(Entity, check)
   ContextAttribute* caP = new ContextAttribute("A", "T", "val");
   enP->attributeVector.push_back(caP);
 
-  EXPECT_EQ("OK", enP->check(&ci, EntitiesRequest));
+  EXPECT_EQ("OK", enP->check("v1", EntitiesRequest));
 
   enP->id = "";
-  EXPECT_EQ("No Entity ID", enP->check(&ci, EntitiesRequest));
+  EXPECT_EQ("No Entity ID", enP->check("v1", EntitiesRequest));
 
   enP->id = "E<1>";
-  EXPECT_EQ("Invalid characters in entity id", enP->check(&ci, EntitiesRequest));
+  EXPECT_EQ("Invalid characters in entity id", enP->check("v1", EntitiesRequest));
   enP->id = "E";
 
   enP->type = "T<1>";
-  EXPECT_EQ("Invalid characters in entity type", enP->check(&ci, EntitiesRequest));
+  EXPECT_EQ("Invalid characters in entity type", enP->check("v1", EntitiesRequest));
   enP->type = "T";
 
   enP->isPattern = "<false>";
-  EXPECT_EQ("Invalid characters in entity isPattern", enP->check(&ci, EntitiesRequest));
+  EXPECT_EQ("Invalid characters in entity isPattern", enP->check("v1", EntitiesRequest));
 
   utExit();
 }

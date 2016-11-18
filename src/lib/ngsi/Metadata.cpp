@@ -42,8 +42,6 @@
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/compoundResponses.h"
 
-#include "rest/ConnectionInfo.h"
-
 using namespace mongo;
 
 
@@ -292,19 +290,12 @@ std::string Metadata::render(const std::string& indent, bool comma)
 *
 * Metadata::check -
 */
-std::string Metadata::check
-(
-  ConnectionInfo*     ciP,
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string Metadata::check(const std::string& apiVersion)
 {
   size_t len;
   char   errorMsg[128];
 
-  if (ciP->apiVersion == "v2" && (len = strlen(name.c_str())) < MIN_ID_LEN)
+  if (apiVersion == "v2" && (len = strlen(name.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata name length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
@@ -324,7 +315,7 @@ std::string Metadata::check
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdChars(ciP->apiVersion , name.c_str()))
+  if (forbiddenIdChars(apiVersion , name.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the name of a Metadata");
     return "Invalid characters in metadata name";
@@ -338,14 +329,14 @@ std::string Metadata::check
   }
 
 
-  if (ciP->apiVersion == "v2" && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  if (apiVersion == "v2" && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdChars(ciP->apiVersion, type.c_str()))
+  if (forbiddenIdChars(apiVersion, type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of a Metadata");
     return "Invalid characters in metadata type";

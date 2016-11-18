@@ -32,7 +32,6 @@
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/Originator.h"
 #include "ngsi/ContextElementResponseVector.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -46,12 +45,12 @@ typedef struct NotifyContextRequest
   Originator                    originator;                    // Mandatory
   ContextElementResponseVector  contextElementResponseVector;  // Optional
 
-  std::string   render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
+  std::string   render(const std::string& apiVersion, bool asJsonObject, const std::string& indent);
   std::string   toJson(RenderFormat                     renderFormat,
                        const std::vector<std::string>&  attrsFilter,
                        const std::vector<std::string>&  metadataFilter,
                        bool                             blacklist = false);
-  std::string   check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
+  std::string   check(const std::string& apiVersion, const std::string& indent, const std::string& predetectedError);
   void          present(const std::string& indent);
   void          release(void);
   NotifyContextRequest* clone(void);

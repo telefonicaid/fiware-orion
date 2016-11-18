@@ -30,7 +30,6 @@
 #include "common/globals.h"
 #include "jsonParse/jsonRequest.h"
 #include "ngsi/ParseData.h"
-#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 
@@ -96,7 +95,7 @@ TEST(RegisterContextRequest, json_ok)
   std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", &reqP);
   EXPECT_EQ("OK", result) << "this test should be OK";
 
-  out = rcrP->render(RegisterContext, "");
+  out = rcrP->render("");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   reqP->release(&parseData);

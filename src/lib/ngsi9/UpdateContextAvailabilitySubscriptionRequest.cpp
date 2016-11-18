@@ -49,11 +49,11 @@ UpdateContextAvailabilitySubscriptionRequest::UpdateContextAvailabilitySubscript
 *
 * UpdateContextAvailabilitySubscriptionRequest::render - 
 */
-std::string UpdateContextAvailabilitySubscriptionRequest::render(RequestType requestType, const std::string& indent)
-{
+std::string UpdateContextAvailabilitySubscriptionRequest::render(const std::string& indent)
+{  
   std::string   out                      = "";
   std::string   tag                      = "updateContextAvailabilitySubscriptionRequest";
-  bool          subscriptionRendered     = subscriptionId.rendered(requestType);
+  bool          subscriptionRendered     = subscriptionId.rendered(UpdateContextAvailabilitySubscription);
   bool          restrictionRendered      = restrictions != 0;
   bool          durationRendered         = duration.get() != "";
   bool          attributeListRendered    = attributeList.size() != 0;
@@ -95,7 +95,7 @@ void UpdateContextAvailabilitySubscriptionRequest::present(const std::string& in
 *
 * UpdateContextAvailabilitySubscriptionRequest::check - 
 */
-std::string UpdateContextAvailabilitySubscriptionRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateContextAvailabilitySubscriptionRequest::check(const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string                                    res;
   UpdateContextAvailabilitySubscriptionResponse  response;
@@ -106,7 +106,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::check(ConnectionInfo* 
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = entityIdVector.check(ciP, UpdateContextAvailabilitySubscription, indent, predetectedError, counter))      != "OK") ||
+  else if (((res = entityIdVector.check(UpdateContextAvailabilitySubscription, indent))                                 != "OK") ||
            ((res = attributeList.check(UpdateContextAvailabilitySubscription, indent, predetectedError, counter))       != "OK") ||
            ((res = duration.check(UpdateContextAvailabilitySubscription, indent, predetectedError, counter))            != "OK") ||
            ((res = restriction.check(UpdateContextAvailabilitySubscription, indent, predetectedError, counter))         != "OK") ||
@@ -117,7 +117,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::check(ConnectionInfo* 
   else
     return "OK";
 
-  return response.render(UpdateContextAvailabilitySubscription, indent, counter);
+  return response.render(indent, counter);
 }
 
 

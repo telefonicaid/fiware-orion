@@ -54,7 +54,7 @@ UpdateContextSubscriptionRequest::UpdateContextSubscriptionRequest()
 *
 * UpdateContextSubscriptionRequest::check - 
 */
-std::string UpdateContextSubscriptionRequest::check(RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateContextSubscriptionRequest::check(const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string                       res;
   UpdateContextSubscriptionResponse response;
@@ -76,7 +76,7 @@ std::string UpdateContextSubscriptionRequest::check(RequestType requestType, con
   else
     return "OK";
 
-  return response.render(UpdateContextSubscription, indent);
+  return response.render(indent);
 }
 
 

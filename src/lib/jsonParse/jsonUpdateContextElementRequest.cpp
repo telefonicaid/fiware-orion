@@ -35,6 +35,8 @@
 #include "parse/nullTreat.h"
 #include "ngsi/Request.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
+
 
 
 
@@ -214,7 +216,9 @@ void jsonUcerRelease(ParseData* reqData)
 */
 std::string jsonUcerCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->ucer.res.check(ciP, UpdateContextElement, "", reqData->errorString, 0);
+  return reqData->ucer.res.check(ciP->apiVersion,
+                                 ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
+                                 UpdateContextElement, "", reqData->errorString, 0);
 }
 
 

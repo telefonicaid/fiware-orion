@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "logMsg/traceLevels.h"
+#include "logMsg/logMsg.h"
 #include "common/tag.h"
 #include "common/string.h"
 #include "common/globals.h"
@@ -69,13 +70,18 @@ Entity::~Entity()
 *   o 'keyValues'  (less verbose, only name and values shown for attributes - no type, no metadatas)
 *   o 'values'     (only the values of the attributes are printed, in a vector)
 */
-std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
+std::string Entity::render
+(
+  std::map<std::string, bool>&         uriParamOptions,
+  std::map<std::string, std::string>&  uriParam,
+  bool                                 comma
+)
 {
   RenderFormat  renderFormat = NGSI_V2_NORMALIZED;
 
-  if      (ciP->uriParamOptions[OPT_KEY_VALUES]    == true)  { renderFormat = NGSI_V2_KEYVALUES;     }
-  else if (ciP->uriParamOptions[OPT_VALUES]        == true)  { renderFormat = NGSI_V2_VALUES;        }
-  else if (ciP->uriParamOptions[OPT_UNIQUE_VALUES] == true)  { renderFormat = NGSI_V2_UNIQUE_VALUES; }
+  if      (uriParamOptions[OPT_KEY_VALUES]    == true)  { renderFormat = NGSI_V2_KEYVALUES;     }
+  else if (uriParamOptions[OPT_VALUES]        == true)  { renderFormat = NGSI_V2_VALUES;        }
+  else if (uriParamOptions[OPT_UNIQUE_VALUES] == true)  { renderFormat = NGSI_V2_UNIQUE_VALUES; }
 
   if ((oe.details == "") && ((oe.reasonPhrase == "OK") || (oe.reasonPhrase == "")))
   {
@@ -83,23 +89,23 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
     std::vector<std::string> metadataFilter;
     std::vector<std::string> attrsFilter;
 
-    if (ciP->uriParam[URI_PARAM_METADATA] != "")
+    if (uriParam[URI_PARAM_METADATA] != "")
     {
-      stringSplit(ciP->uriParam[URI_PARAM_METADATA], ',', metadataFilter);
+      stringSplit(uriParam[URI_PARAM_METADATA], ',', metadataFilter);
     }
 
-    if (ciP->uriParam[URI_PARAM_ATTRIBUTES] != "")
+    if (uriParam[URI_PARAM_ATTRIBUTES] != "")
     {
-      stringSplit(ciP->uriParam[URI_PARAM_ATTRIBUTES], ',', attrsFilter);
+      stringSplit(uriParam[URI_PARAM_ATTRIBUTES], ',', attrsFilter);
     }
 
     // Add special attributes representing entity dates
-    if ((creDate != 0) && (ciP->uriParamOptions[DATE_CREATED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end())))
+    if ((creDate != 0) && (uriParamOptions[DATE_CREATED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end())))
     {
       ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, creDate);
       attributeVector.push_back(caP);
     }
-    if ((modDate != 0) && (ciP->uriParamOptions[DATE_MODIFIED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_MODIFIED) != attrsFilter.end())))
+    if ((modDate != 0) && (uriParamOptions[DATE_MODIFIED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_MODIFIED) != attrsFilter.end())))
     {
       ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, modDate);
       attributeVector.push_back(caP);
@@ -169,12 +175,12 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
 *
 * Entity::check - 
 */
-std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
+std::string Entity::check(const std::string& apiVersion, RequestType requestType)
 {
   ssize_t len;
   char errorMsg[128];
 
-  if (((ciP->apiVersion == "v2") && (len = strlen(id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
+  if (((apiVersion == "v2") && (len = strlen(id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
   {
     snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
@@ -193,7 +199,7 @@ std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdChars(ciP->apiVersion, id.c_str()))
+  if (forbiddenIdChars(apiVersion, id.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the id of an entity");
     return "Invalid characters in entity id";
@@ -206,14 +212,14 @@ std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
     return std::string(errorMsg);
   }
 
-  if ((ciP->apiVersion == "v2") && ((len = strlen(type.c_str())) < MIN_ID_LEN) && (requestType != BatchQueryRequest))
+  if ((apiVersion == "v2") && ((len = strlen(type.c_str())) < MIN_ID_LEN) && (requestType != BatchQueryRequest))
   {
     snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdChars(ciP->apiVersion, type.c_str()))
+  if (forbiddenIdChars(apiVersion, type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of an entity");
     return "Invalid characters in entity type";
@@ -225,7 +231,7 @@ std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
     return "Invalid characters in entity isPattern";
   }
 
-  return attributeVector.check(ciP, requestType, "", "", 0);
+  return attributeVector.check(apiVersion, requestType);
 }
 
 

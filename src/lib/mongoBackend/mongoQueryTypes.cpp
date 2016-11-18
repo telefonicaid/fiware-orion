@@ -466,7 +466,7 @@ HttpStatusCode mongoEntityTypes
     }
     // entityType corresponding to nullId case is skipped, as it is (eventually) added outside the for loop
     if (!nullId)
-    {      
+    {
       responseP->entityTypeVector.push_back(entityType);
     }
   }
@@ -496,7 +496,7 @@ HttpStatusCode mongoEntityTypes
   else
   {
     if (totalTypesP != NULL)
-    {      
+    {
       snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %zu. Offset is %u", resultsArray.size(), offset);
       responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
     }

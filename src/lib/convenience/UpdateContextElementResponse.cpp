@@ -52,7 +52,8 @@ UpdateContextElementResponse::UpdateContextElementResponse()
 */
 std::string UpdateContextElementResponse::render
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
+  bool                asJsonObject,
   RequestType         requestType,
   const std::string&  indent
 )
@@ -68,7 +69,7 @@ std::string UpdateContextElementResponse::render
   }
   else
   {
-    out += contextAttributeResponseVector.render(ciP, requestType, indent + "  ");
+    out += contextAttributeResponseVector.render(apiVersion, asJsonObject, requestType, indent + "  ");
   }
 
   out += endTag(indent);
@@ -84,7 +85,8 @@ std::string UpdateContextElementResponse::render
 */
 std::string UpdateContextElementResponse::check
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
+  bool                asJsonObject,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,  // Predetected Error, normally during parsing
@@ -97,7 +99,7 @@ std::string UpdateContextElementResponse::check
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeResponseVector.check(ciP, requestType, indent, "", counter)) != "OK")
+  else if ((res = contextAttributeResponseVector.check(apiVersion, asJsonObject, requestType, indent, "", counter)) != "OK")
   {
     errorCode.fill(SccBadRequest, res);
   }
@@ -106,7 +108,7 @@ std::string UpdateContextElementResponse::check
     return "OK";
   }
 
-  return render(ciP, requestType, indent);
+  return render(apiVersion, asJsonObject, requestType, indent);
 }
 
 

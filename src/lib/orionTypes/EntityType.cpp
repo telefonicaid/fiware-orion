@@ -32,7 +32,6 @@
 #include "common/tag.h"
 #include "common/limits.h"
 #include "ngsi/Request.h"
-#include "rest/uriParamNames.h"
 #include "orionTypes/EntityType.h"
 
 
@@ -70,7 +69,10 @@ EntityType::EntityType(std::string _type): type(_type), count(0)
 */
 std::string EntityType::render
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
+  bool                asJsonObject,
+  bool                asJsonOut,
+  bool                collapsed,
   const std::string&  indent,
   bool                comma,
   bool                typeNameBefore
@@ -79,23 +81,23 @@ std::string EntityType::render
   std::string  out = "";
   std::string  key = "type";
 
-  if ((typeNameBefore == true) && (ciP->outMimeType == JSON))
+  if (typeNameBefore && asJsonOut)
   {
     out += valueTag1(indent  + "  ", "name", type, true);
-    out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", true, true, true);
+    out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, indent + "  ", true, true, true);
   }
   else
   {
     out += startTag2(indent, key, false, false);
 
-    if (ciP->uriParam[URI_PARAM_COLLAPSE] == "true" || contextAttributeVector.size() == 0)
-    {     
+    if (collapsed || contextAttributeVector.size() == 0)
+    {
       out += valueTag1(indent  + "  ", "name", type, false);
     }
     else
     {
       out += valueTag1(indent  + "  ", "name", type, true);
-      out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false, true, true);
+      out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, indent + "  ", false, true, true);
     }
 
     out += endTag(indent, comma, false);
@@ -110,12 +112,7 @@ std::string EntityType::render
 *
 * EntityType::check -
 */
-std::string EntityType::check
-(
-  ConnectionInfo*     ciP,
-  const std::string&  indent,
-  const std::string&  predetectedError
-)
+std::string EntityType::check(const std::string& apiVersion, const std::string&  predetectedError)
 {
   if (predetectedError != "")
   {
@@ -126,8 +123,7 @@ std::string EntityType::check
     return "Empty Type";
   }
 
-  return contextAttributeVector.check(ciP, EntityTypes, indent, "", 0);
-
+  return contextAttributeVector.check(apiVersion, EntityTypes);
 }
 
 
@@ -159,7 +155,7 @@ void EntityType::release(void)
 *
 * EntityType::toJson -
 */
-std::string EntityType::toJson(ConnectionInfo* ciP, bool includeType)
+std::string EntityType::toJson(bool includeType)
 {
   std::string  out = "{";
   char         countV[STRING_SIZE_FOR_INT];

@@ -34,7 +34,6 @@
 #include "ngsi/ParseData.h"
 #include "parse/CompoundValueNode.h"
 #include "parse/compoundValue.h"
-#include "rest/ConnectionInfo.h"
 
 
 

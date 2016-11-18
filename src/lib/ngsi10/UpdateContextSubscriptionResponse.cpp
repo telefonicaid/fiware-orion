@@ -63,7 +63,7 @@ UpdateContextSubscriptionResponse::~UpdateContextSubscriptionResponse() {
 *
 * UpdateContextSubscriptionResponse::render - 
 */
-std::string UpdateContextSubscriptionResponse::render(RequestType requestType, const std::string& indent)
+std::string UpdateContextSubscriptionResponse::render(const std::string& indent)
 {
   std::string out  = "";
   std::string tag  = "updateContextSubscriptionResponse";

@@ -395,7 +395,7 @@ static void setCondsAndInitialNotify
     }
   }
   else
-  {    
+  {
     BSONArray conds = getArrayFieldF(subOrig, CSUB_CONDITIONS);
     b->append(CSUB_CONDITIONS, conds);
     LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));

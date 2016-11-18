@@ -62,7 +62,7 @@ NotifyContextResponse::NotifyContextResponse(StatusCode& sc)
 *
 * NotifyContextResponse::render -
 */
-std::string NotifyContextResponse::render(RequestType requestType, const std::string& indent)
+std::string NotifyContextResponse::render(const std::string& indent)
 {
   std::string out = "";
   std::string tag = "notifyContextResponse";

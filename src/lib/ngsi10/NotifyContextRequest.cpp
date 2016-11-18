@@ -29,7 +29,6 @@
 #include "common/RenderFormat.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
-#include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "alarmMgr/alarmMgr.h"
 
@@ -39,7 +38,7 @@
 *
 * NotifyContextRequest::render -
 */
-std::string NotifyContextRequest::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent)
+std::string NotifyContextRequest::render(const std::string& apiVersion, bool asJsonObject, const std::string& indent)
 {
   std::string  out                                  = "";
   std::string  tag                                  = "notifyContextRequest";
@@ -54,7 +53,7 @@ std::string NotifyContextRequest::render(ConnectionInfo* ciP, RequestType reques
   out += startTag1(indent, tag, false);
   out += subscriptionId.render(NotifyContext, indent + "  ", true);
   out += originator.render(indent  + "  ", contextElementResponseVectorRendered);
-  out += contextElementResponseVector.render(ciP, NotifyContext, indent  + "  ", false);
+  out += contextElementResponseVector.render(apiVersion, asJsonObject, NotifyContext, indent  + "  ", false);
   out += endTag(indent);
 
   return out;
@@ -103,7 +102,7 @@ std::string NotifyContextRequest::toJson
 *
 * NotifyContextRequest::check
 */
-std::string NotifyContextRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string NotifyContextRequest::check(const std::string& apiVersion, const std::string& indent, const std::string& predetectedError)
 {
   std::string            res;
   NotifyContextResponse  response;
@@ -114,7 +113,7 @@ std::string NotifyContextRequest::check(ConnectionInfo* ciP, RequestType request
   }
   else if (((res = subscriptionId.check(QueryContext, indent, predetectedError, 0))                    != "OK") ||
            ((res = originator.check(QueryContext, indent, predetectedError, 0))                        != "OK") ||
-           ((res = contextElementResponseVector.check(ciP, QueryContext, indent, predetectedError, 0)) != "OK"))
+           ((res = contextElementResponseVector.check(apiVersion, QueryContext, indent, predetectedError, 0)) != "OK"))
   {
     response.responseCode.fill(SccBadRequest, res);
   }
@@ -123,7 +122,7 @@ std::string NotifyContextRequest::check(ConnectionInfo* ciP, RequestType request
     return "OK";
   }
 
-  return response.render(NotifyContext, indent);
+  return response.render(indent);
 }
 
 
