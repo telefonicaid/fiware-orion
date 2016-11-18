@@ -738,7 +738,7 @@ std::string CompoundValueNode::render(const std::string& apiVersion, const std::
       out += childV[ix]->render(apiVersion, indent + "  ");
     }
 
-    out += endTag(indent, jsonComma, true, true);
+    out += endTag(indent, jsonComma, true);
   }
   else if ((valueType == orion::ValueTypeVector) && (container == this))
   {
@@ -757,7 +757,7 @@ std::string CompoundValueNode::render(const std::string& apiVersion, const std::
       out += childV[ix]->render(apiVersion, indent + "  ");
     }
 
-    out += endTag(indent, jsonComma, false, true);
+    out += endTag(indent, jsonComma, false);
   }
   else if (valueType == orion::ValueTypeObject)
   {
@@ -771,7 +771,7 @@ std::string CompoundValueNode::render(const std::string& apiVersion, const std::
         out += childV[ix]->render(apiVersion, indent + "  ");
       }
 
-      out += endTag(indent, jsonComma, false, true);
+      out += endTag(indent, jsonComma, false);
     }
     else
     {

@@ -95,7 +95,7 @@ std::string versionTreat
   out += valueTag1(indent + "  ", "compile_time",  COMPILE_TIME,    true);
   out += valueTag1(indent + "  ", "compiled_by",   COMPILED_BY,     true);
   out += valueTag1(indent + "  ", "compiled_in",   COMPILED_IN,     false);
-  out += endTag(indent, false, false, true);
+  out += endTag(indent, false, false);
   out += "}\n";
 
   ciP->httpStatusCode = SccOk;

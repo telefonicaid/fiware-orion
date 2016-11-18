@@ -250,15 +250,13 @@ std::string endTag
 (
   const std::string&  indent,
   bool                comma,
-  bool                isVector,
-  bool                nl
+  bool                isVector
 )
 {
   std::string out = indent;
 
   out += isVector?    "]"  : "}";
   out += comma?       ","  : "";
-  out += nl?          "\n" : "";
 
   return out;
 }

@@ -87,8 +87,7 @@ extern std::string endTag
 (
   const std::string&  indent,
   bool                comma      = false,
-  bool                isVector   = false,
-  bool                nl         = true
+  bool                isVector   = false
 );
 
 
