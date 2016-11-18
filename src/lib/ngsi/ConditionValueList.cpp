@@ -52,7 +52,7 @@ std::string ConditionValueList::render(const std::string& indent, bool comma)
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += valueTag(indent + "  ", "", vec[ix], ix != vec.size() - 1, false);
+    out += valueTag(indent + "  ", "", vec[ix], ix != vec.size() - 1, true);
   }
 
   out += endTag(indent, comma, true);

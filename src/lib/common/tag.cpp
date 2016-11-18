@@ -269,6 +269,8 @@ std::string endTag
 *
 * valueTag -  
 *
+* Function version for string values
+*
 */
 std::string valueTag
 (
@@ -335,7 +337,10 @@ std::string valueTag
 
 /* ****************************************************************************
 *
-* valueTag -  
+* valueTag -
+*
+* Function version for integer values
+*
 */
 std::string valueTag
 (
@@ -350,59 +355,6 @@ std::string valueTag
   snprintf(val, sizeof(val), "%d", value);
 
   return valueTag(indent, key, val, showComma, false, false);
-
-#if 0
-  char val[32];
-
-  snprintf(val, sizeof(val), "%d", value);
-
-  if (showComma == true)
-  {
-    return indent + "\"" + key + "\" : \"" + val + "\",\n";
-  }
-
-  return indent + "\"" + key + "\" : \"" + val + "\"\n";
-#endif
 }
 
 
-#if 0
-/* ****************************************************************************
-*
-* valueTag -  
-*/
-std::string valueTag2
-(
-  const std::string&  indent,
-  const std::string&  key,
-  const std::string&  value,
-  bool                showComma,
-  bool                withoutQuotes
-)
-{
-  //return valueTag(indent, key, value, showComma, false, withoutQuotes);
-
-  std::string eValue = jsonInvalidCharsTransformation(value);
-
-  eValue = withoutQuotes? eValue : JSON_STR(eValue);
-
-  if (key == "")
-  {
-    if (showComma == true)
-    {
-      return indent + eValue + ",\n";
-    }
-    else
-    {
-      return indent + eValue + "\n";
-    }
-  }
-
-  if (showComma == true)
-  {
-    return indent + "\"" + key + "\" : " + eValue + ",\n";
-  }
-
-  return indent + "\"" + key + "\" : " + eValue + "\n";
-}
-#endif
