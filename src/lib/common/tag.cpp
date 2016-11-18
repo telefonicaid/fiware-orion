@@ -255,8 +255,10 @@ std::string endTag
 {
   std::string out = indent;
 
-  out += isVector?    "]"  : "}";
-  out += comma?       ","  : "";
+  out += isVector?  "]"  : "}";
+  out += comma?     ","  : "";
+
+  out += "\n";
 
   return out;
 }
@@ -268,7 +270,7 @@ std::string endTag
 * valueTag -  
 *
 */
-std::string valueTag1
+std::string valueTag
 (
   const std::string&  indent,
   const std::string&  key,
@@ -347,16 +349,24 @@ std::string valueTag
 
   snprintf(val, sizeof(val), "%d", value);
 
+  return valueTag(indent, key, val, showComma, false, false);
+
+#if 0
+  char val[32];
+
+  snprintf(val, sizeof(val), "%d", value);
+
   if (showComma == true)
   {
     return indent + "\"" + key + "\" : \"" + val + "\",\n";
   }
 
   return indent + "\"" + key + "\" : \"" + val + "\"\n";
+#endif
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * valueTag -  
@@ -370,6 +380,8 @@ std::string valueTag2
   bool                withoutQuotes
 )
 {
+  //return valueTag(indent, key, value, showComma, false, withoutQuotes);
+
   std::string eValue = jsonInvalidCharsTransformation(value);
 
   eValue = withoutQuotes? eValue : JSON_STR(eValue);
@@ -393,3 +405,4 @@ std::string valueTag2
 
   return indent + "\"" + key + "\" : " + eValue + "\n";
 }
+#endif

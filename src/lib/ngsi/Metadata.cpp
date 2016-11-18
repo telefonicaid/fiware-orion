@@ -231,12 +231,12 @@ std::string Metadata::render(const std::string& indent, bool comma)
   std::string xValue  = toStringValue();
 
   out += startTag(indent);
-  out += valueTag1(indent + "  ", "name", name, true);
-  out += valueTag1(indent + "  ", "type", type, true);
+  out += valueTag(indent + "  ", "name", name, true);
+  out += valueTag(indent + "  ", "type", type, true);
 
   if (valueType == orion::ValueTypeString)
   {
-    out += valueTag1(indent + "  ", "value", xValue, false);
+    out += valueTag(indent + "  ", "value", xValue, false);
   }
   else if (valueType == orion::ValueTypeNumber)
   {

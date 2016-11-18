@@ -74,7 +74,7 @@ std::string NotifyCondition::render(const std::string& indent, bool notLastInVec
   bool commaAfterType          = condValueListRendered || restrictionRendered;
 
   out += startTag(indent);
-  out += valueTag1(indent + "  ", "type", type, commaAfterType);
+  out += valueTag(indent + "  ", "type", type, commaAfterType);
   out += condValueList.render(indent + "  ",   commaAfterCondValueList);
   out += restriction.render(  indent + "  ",   commaAfterRestriction);
   out += endTag(indent);

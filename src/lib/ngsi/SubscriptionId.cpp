@@ -164,7 +164,7 @@ std::string SubscriptionId::render(RequestType container, const std::string& ind
     }
   }
 
-  return valueTag1(indent, "subscriptionId", xString, comma);
+  return valueTag(indent, "subscriptionId", xString, comma);
 }
 
 

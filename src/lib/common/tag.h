@@ -104,7 +104,7 @@ extern std::string endTag
 * this is NGSIv1 functionality that will be deprecated in the future, the priority
 * to do this is low.
 */
-extern std::string valueTag1
+extern std::string valueTag
 (
   const std::string&  indent,
   const std::string&  key,
@@ -122,6 +122,7 @@ extern std::string valueTag
   bool                showComma     = false
 );
 
+#if 0
 extern std::string valueTag2
 (
   const std::string&  indent,
@@ -130,6 +131,7 @@ extern std::string valueTag2
   bool                showComma     = false,
   bool                withoutQuotes = false
 );
+#endif
 
 
 

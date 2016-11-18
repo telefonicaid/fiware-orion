@@ -83,21 +83,21 @@ TEST(commonTag, valueTag)
    std::string      stringJsonNoComma       = "  \"TAG\" : \"8\"\n";
    std::string      out;
 
-   out = valueTag1(indent, tag, value);
+   out = valueTag(indent, tag, value);
    EXPECT_EQ(jsonNoComma, out);
 
-   out = valueTag1(indent, tag, value, true);
+   out = valueTag(indent, tag, value, true);
    EXPECT_EQ(jsonComma, out);   
 
-   out = valueTag1(indent, tag, value);
+   out = valueTag(indent, tag, value);
    EXPECT_EQ(jsonNoComma, out);   
 
    out = valueTag(indent, tag, 8, false);
    EXPECT_EQ(integerJsonNoComma, out);
 
-   out = valueTag2(indent, tag, "8", true);
+   out = valueTag(indent, tag, "8", true, false);
    EXPECT_EQ(stringJsonComma, out);
 
-   out = valueTag2(indent, tag, "8", false);
+   out = valueTag(indent, tag, "8", false, false);
    EXPECT_EQ(stringJsonNoComma, out);
 }

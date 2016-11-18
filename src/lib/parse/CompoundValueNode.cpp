@@ -668,22 +668,22 @@ std::string CompoundValueNode::render(const std::string& apiVersion, const std::
   if (valueType == orion::ValueTypeString)
   {
     LM_T(LmtCompoundValueRender, ("I am a String (%s)", name.c_str()));
-    out = valueTag1(indent, key, stringValue, jsonComma, container->valueType == orion::ValueTypeVector);
+    out = valueTag(indent, key, stringValue, jsonComma, container->valueType == orion::ValueTypeVector);
   }
   else if (valueType == orion::ValueTypeNumber)
   {
     LM_T(LmtCompoundValueRender, ("I am a number (%s)", name.c_str()));
-    out = valueTag1(indent, key, toString(numberValue), jsonComma, container->valueType == orion::ValueTypeVector, true);
+    out = valueTag(indent, key, toString(numberValue), jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
     LM_T(LmtCompoundValueRender, ("I am a bool (%s)", name.c_str()));
-    out = valueTag1(indent, key, boolValue? "true" : "false", jsonComma, container->valueType == orion::ValueTypeVector, true);
+    out = valueTag(indent, key, boolValue? "true" : "false", jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
   else if (valueType == orion::ValueTypeNone)
   {
     LM_T(LmtCompoundValueRender, ("I am NULL (%s)", name.c_str()));
-    out = valueTag1(indent, key, "null", jsonComma, container->valueType == orion::ValueTypeVector, true);
+    out = valueTag(indent, key, "null", jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
 
 #if 0
