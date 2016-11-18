@@ -28,6 +28,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/sem.h"
+#include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoGlobal.h"
@@ -61,7 +62,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     {
         reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
         responseP->statusCode.fill(SccContextElementNotFound);
-        responseP->oe.fill(SccContextElementNotFound, "The requested subscription has not been found. Check id", "NotFound");
+        responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
         alarmMgr.badInput(clientIp, "no subscriptionId");
         return SccOk;
     }
@@ -77,7 +78,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
       {
         // FIXME: Doubt - invalid OID format?  Or, just a subscription that was not found?
         std::string details = std::string("invalid OID format: '") + requestP->subscriptionId.get() + "'";
-        responseP->oe.fill(SccContextElementNotFound, "The requested subscription has not been found. Check id", "NotFound");
+        responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
         alarmMgr.badInput(clientIp, details);
       }
       else // SccReceiverInternalError
@@ -100,7 +101,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     {
        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
        responseP->statusCode.fill(SccContextElementNotFound, std::string("subscriptionId: /") + requestP->subscriptionId.get() + "/");
-       responseP->oe.fill(SccContextElementNotFound, "The requested subscription has not been found. Check id", "NotFound");
+       responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
        return SccOk;
     }
 

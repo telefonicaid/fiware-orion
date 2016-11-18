@@ -390,7 +390,7 @@ static bool compErrorDetect
 
       if (entityId == "")
       {
-        details = EMPTY_ENTITY_ID;
+        details = ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID;
       }
     }
     else if ((components == 5) && (compV[3] == "attrs"))  // URL: /v2/entities/<entity-id>/attrs/<attr-name>
@@ -400,11 +400,11 @@ static bool compErrorDetect
 
       if (entityId == "")
       {
-        details = EMPTY_ENTITY_ID;
+        details = ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID;
       }
       else if (attrName == "")
       {
-        details = EMPTY_ATTR_NAME;
+        details = ERROR_DESC_BAD_REQUEST_EMPTY_ATTR_NAME;
       }
     }
     else if ((components == 6) && (compV[3] == "attrs") && (compV[5] == "value")) // URL: /v2/entities/<entity-id>/attrs/<attr-name>/value
@@ -414,11 +414,11 @@ static bool compErrorDetect
 
       if (entityId == "")
       {
-        details = EMPTY_ENTITY_ID;
+        details = ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID;
       }
       else if (attrName == "")
       {
-        details = EMPTY_ATTR_NAME;
+        details = ERROR_DESC_BAD_REQUEST_EMPTY_ATTR_NAME;
       }
     }
   }

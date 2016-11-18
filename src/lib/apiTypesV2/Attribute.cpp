@@ -103,7 +103,7 @@ void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
 {
   if (qcrsP->errorCode.code == SccContextElementNotFound)
   {
-    oe.fill(SccContextElementNotFound, "The requested entity has not been found. Check type and id", "NotFound");
+    oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
   }
   else if (qcrsP->errorCode.code != SccOk)
   {
@@ -117,7 +117,7 @@ void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
     //
     // If there are more than one entity, we return an error
     //
-    oe.fill(SccConflict, MORE_MATCHING_ENT, "TooManyResults");
+    oe.fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
   }
   else
   {
@@ -134,7 +134,7 @@ void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
 
     if (pcontextAttribute == NULL)
     {
-      oe.fill(SccContextElementNotFound, "The entity does not have such an attribute", "NotFound");
+      oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
     }
   }
 }

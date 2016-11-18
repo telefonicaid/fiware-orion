@@ -39,6 +39,7 @@
 #include "common/string.h"
 #include "common/wsStrip.h"
 #include "common/globals.h"
+#include "common/errorMessages.h"
 #include "common/defaultValues.h"
 #include "common/clockFunctions.h"
 #include "common/statistics.h"
@@ -879,7 +880,7 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
 {
   if (forbiddenChars(url.c_str()) == true)
   {
-    OrionError error(SccBadRequest, "invalid character in URI");
+    OrionError error(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI);
     ciP->httpStatusCode = error.code;
     ciP->answer         = error.smartRender(ciP->apiVersion);
     return false;

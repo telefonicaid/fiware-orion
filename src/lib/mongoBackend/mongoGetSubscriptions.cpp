@@ -32,6 +32,7 @@
 #include "common/sem.h"
 #include "common/statistics.h"
 #include "common/idCheck.h"
+#include "common/errorMessages.h"
 #include "mongoBackend/mongoGetSubscriptions.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
@@ -375,7 +376,7 @@ void mongoGetSubscription
     releaseMongoConnection(connection);
     LM_T(LmtMongo, ("subscription not found: '%s'", idSub.c_str()));
     reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
-    *oe = OrionError(SccContextElementNotFound, "subscriptionId does not correspond to an active subscription", "NotFound");
+    *oe = OrionError(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
     return;
   }
   releaseMongoConnection(connection);

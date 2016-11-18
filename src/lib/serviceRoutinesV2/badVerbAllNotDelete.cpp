@@ -52,7 +52,7 @@ std::string badVerbAllNotDelete
 )
 {
   std::string  details = std::string("bad verb for url '") + ciP->url + "', method '" + ciP->method + "'";
-  OrionError   oe(SccBadVerb, BAD_VERB);
+  OrionError   oe(SccBadVerb, ERROR_DESC_BAD_VERB);
 
   ciP->httpHeader.push_back("Allow");
   ciP->httpHeaderValue.push_back("GET, PATCH, POST, PUT");
