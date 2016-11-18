@@ -613,8 +613,6 @@ std::string ContextAttribute::render
   bool         commaAfterContextValue = metadataVector.size() != 0;
   bool         commaAfterType         = valueRendered;
 
-  metadataVector.keyNameSet("metadata");
-
   if (asJsonObject)
   {
     return renderAsJsonObject(apiVersion, request, indent, comma, omitValue);

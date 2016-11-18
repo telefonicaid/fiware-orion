@@ -71,8 +71,6 @@ std::string ContextRegistrationAttribute::render(const std::string& indent, bool
 {
   std::string out = "";
 
-  metadataVector.keyNameSet("metadata");
-
   //
   // About JSON commas:
   // The field isDomain is mandatory, so all field before that will
