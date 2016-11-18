@@ -119,7 +119,7 @@ std::string AttributeDomainName::render(const std::string& indent, bool comma)
     return "";
   }
 
-  return valueTag1(indent, "attributeDomainName", string, comma);
+  return valueTag(indent, "attributeDomainName", string, comma);
 }
 
 

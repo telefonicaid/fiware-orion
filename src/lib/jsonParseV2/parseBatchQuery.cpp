@@ -105,7 +105,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       std::string r = parseAttributeList(ciP, iter, &bqrP->attributeV);
 
       if (r != "OK")
-      {        
+      {
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
@@ -117,7 +117,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       std::string r = parseScopeVector(ciP, iter, &bqrP->scopeV);
 
       if (r != "OK")
-      {        
+      {
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;

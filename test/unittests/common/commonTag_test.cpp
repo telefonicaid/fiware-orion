@@ -37,28 +37,16 @@ TEST(commonTag, startTag)
 {
    std::string      tag    = "TAG";
    std::string      indent = "  ";
-   std::string      json   = "  {\n";
-   std::string      json2  = "  \"TAG\" : {\n";
    std::string      out;
 
-   out = startTag(indent, tag, false, false);
-   EXPECT_EQ(json, out);
-
-   out = startTag(indent, tag, false, true);
-   EXPECT_EQ(json2, out);
-
-   out = startTag(indent, tag, false, true);
+   out = startTag(indent, tag, false);
    EXPECT_EQ("  \"TAG\" : {\n", out);
 
-   out = startTag(indent, tag, true, true);
+   out = startTag(indent, tag, true);
    EXPECT_EQ("  \"TAG\" : [\n", out);
 
-   out = startTag(indent, tag, false, false);
+   out = startTag(indent);
    EXPECT_EQ("  {\n", out);
-
-   out = startTag(indent, tag, true, false);
-   EXPECT_EQ("  [\n", out);
-
 }
 
 
@@ -95,21 +83,21 @@ TEST(commonTag, valueTag)
    std::string      stringJsonNoComma       = "  \"TAG\" : \"8\"\n";
    std::string      out;
 
-   out = valueTag1(indent, tag, value);
+   out = valueTag(indent, tag, value);
    EXPECT_EQ(jsonNoComma, out);
 
-   out = valueTag1(indent, tag, value, true);
+   out = valueTag(indent, tag, value, true);
    EXPECT_EQ(jsonComma, out);   
 
-   out = valueTag1(indent, tag, value);
+   out = valueTag(indent, tag, value);
    EXPECT_EQ(jsonNoComma, out);   
 
    out = valueTag(indent, tag, 8, false);
    EXPECT_EQ(integerJsonNoComma, out);
 
-   out = valueTag2(indent, tag, "8", true);
+   out = valueTag(indent, tag, "8", true, false);
    EXPECT_EQ(stringJsonComma, out);
 
-   out = valueTag2(indent, tag, "8", false);
+   out = valueTag(indent, tag, "8", false, false);
    EXPECT_EQ(stringJsonNoComma, out);
 }

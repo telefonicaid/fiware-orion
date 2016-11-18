@@ -210,7 +210,7 @@ int Scope::fill
     }
 
     if (!str2double(coordV[0].c_str(), &latitude))
-    {      
+    {
       *errorStringP = "invalid coordinates";
       pointVectorRelease(pointV);
       pointV.clear();
@@ -393,8 +393,8 @@ std::string Scope::render(const std::string& indent, bool notLastInVector)
   const char* vTag     = "value";
 
   out += startTag(indent);
-  out += valueTag1(indent + "  ", tTag, type, true);
-  out += valueTag1(indent + "  ", vTag, value);
+  out += valueTag(indent + "  ", tTag, type, true);
+  out += valueTag(indent + "  ", vTag, value);
   out += endTag(indent, notLastInVector);
 
   return out;

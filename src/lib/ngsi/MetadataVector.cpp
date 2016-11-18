@@ -39,21 +39,9 @@
 *
 * MetadataVector::MetadataVector -
 */
-MetadataVector::MetadataVector(const std::string& _keyName)
+MetadataVector::MetadataVector(void)
 {
   vec.clear();
-  keyNameSet(_keyName);
-}
-
-
-
-/* ****************************************************************************
-*
-* MetadataVector::keyNameSet -
-*/
-void MetadataVector::keyNameSet(const std::string& _keyName)
-{
-  keyName = _keyName;
 }
 
 
@@ -65,14 +53,13 @@ void MetadataVector::keyNameSet(const std::string& _keyName)
 std::string MetadataVector::render(const std::string& indent, bool comma)
 {
   std::string out = "";
-  std::string key = "metadatas";
 
   if (vec.size() == 0)
   {
     return "";
   }
 
-  out += startTag(indent, key, true);
+  out += startTag(indent, "metadatas", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);

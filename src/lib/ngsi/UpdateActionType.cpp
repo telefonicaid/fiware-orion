@@ -123,7 +123,7 @@ std::string UpdateActionType::render(const std::string& indent, bool comma)
     return "";
   }
 
-  return valueTag1(indent, "updateAction", string, comma);
+  return valueTag(indent, "updateAction", string, comma);
 }
 
 

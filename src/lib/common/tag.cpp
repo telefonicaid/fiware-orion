@@ -250,15 +250,15 @@ std::string endTag
 (
   const std::string&  indent,
   bool                comma,
-  bool                isVector,
-  bool                nl
+  bool                isVector
 )
 {
   std::string out = indent;
 
-  out += isVector?    "]"  : "}";
-  out += comma?       ","  : "";
-  out += nl?          "\n" : "";
+  out += isVector?  "]"  : "}";
+  out += comma?     ","  : "";
+
+  out += "\n";
 
   return out;
 }
@@ -269,8 +269,10 @@ std::string endTag
 *
 * valueTag -  
 *
+* Function version for string values
+*
 */
-std::string valueTag1
+std::string valueTag
 (
   const std::string&  indent,
   const std::string&  key,
@@ -335,7 +337,10 @@ std::string valueTag1
 
 /* ****************************************************************************
 *
-* valueTag -  
+* valueTag -
+*
+* Function version for integer values
+*
 */
 std::string valueTag
 (
@@ -349,49 +354,7 @@ std::string valueTag
 
   snprintf(val, sizeof(val), "%d", value);
 
-  if (showComma == true)
-  {
-    return indent + "\"" + key + "\" : \"" + val + "\",\n";
-  }
-
-  return indent + "\"" + key + "\" : \"" + val + "\"\n";
+  return valueTag(indent, key, val, showComma, false, false);
 }
 
 
-
-/* ****************************************************************************
-*
-* valueTag -  
-*/
-std::string valueTag2
-(
-  const std::string&  indent,
-  const std::string&  key,
-  const std::string&  value,
-  bool                showComma,
-  bool                withoutQuotes
-)
-{
-  std::string eValue = jsonInvalidCharsTransformation(value);
-
-  eValue = withoutQuotes? eValue : JSON_STR(eValue);
-
-  if (key == "")
-  {
-    if (showComma == true)
-    {
-      return indent + eValue + ",\n";
-    }
-    else
-    {
-      return indent + eValue + "\n";
-    }
-  }
-
-  if (showComma == true)
-  {
-    return indent + "\"" + key + "\" : " + eValue + ",\n";
-  }
-
-  return indent + "\"" + key + "\" : " + eValue + "\n";
-}

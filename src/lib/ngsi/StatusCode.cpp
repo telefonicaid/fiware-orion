@@ -109,11 +109,11 @@ std::string StatusCode::render(const std::string& indent, bool comma, bool showK
 
   out += startTag(indent, showKey? keyName : "");
   out += valueTag(indent + "  ", "code", code, true);
-  out += valueTag1(indent + "  ", "reasonPhrase", reasonPhrase, details != "");
+  out += valueTag(indent + "  ", "reasonPhrase", reasonPhrase, details != "");
 
   if (details != "")
   {
-    out += valueTag1(indent + "  ", "details", details, false);
+    out += valueTag(indent + "  ", "details", details, false);
   }
 
   out += endTag(indent, comma);

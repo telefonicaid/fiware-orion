@@ -77,6 +77,8 @@ std::string putIndividualContextEntity
   UpdateContextElementResponse  response;
   std::string                   entityType;
 
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+
   // 01. Take care of URI params
   entityType = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
 
@@ -97,9 +99,8 @@ std::string putIndividualContextEntity
 
 
   // 05. Cleanup and return result
-  TIMED_RENDER(answer = response.render(ciP->apiVersion,
-                                        ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
-                                        IndividualContextEntity, ""));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
+
 
   response.release();
   parseDataP->upcr.res.release();

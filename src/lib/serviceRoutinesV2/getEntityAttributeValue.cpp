@@ -112,7 +112,8 @@ std::string getEntityAttributeValue
                                              &(ciP->httpStatusCode),
                                              ciP->uriParamOptions[OPT_KEY_VALUES],
                                              ciP->uriParam[URI_PARAM_METADATA],
-                                             EntityAttributeValueRequest, false));
+                                             EntityAttributeValueRequest,
+                                             false));
     }
     else
     {

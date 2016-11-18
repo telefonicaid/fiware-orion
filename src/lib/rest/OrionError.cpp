@@ -145,11 +145,11 @@ std::string OrionError::render(void)
   //
   out += startTag(indent, "orionError", false);
   out += valueTag(indent  + "  ", "code",          code,         true);
-  out += valueTag1(indent + "  ", "reasonPhrase",  reasonPhrase, details != "");
+  out += valueTag(indent + "  ", "reasonPhrase",  reasonPhrase, details != "");
 
   if (details != "")
   {
-    out += valueTag1(indent + "  ", "details",       details);
+    out += valueTag(indent + "  ", "details",       details);
   }
 
   out += endTag(indent);

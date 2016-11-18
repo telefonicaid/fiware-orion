@@ -498,7 +498,7 @@ std::string ContextAttribute::renderAsJsonObject
   bool         commaAfterType         = !omitValue || commaAfterContextValue;
 
   out += startTag(indent, name, false);
-  out += valueTag1(indent + "  ", "type",         type,  commaAfterType);
+  out += valueTag(indent + "  ", "type",         type,  commaAfterType);
 
   if (compoundValueP == NULL)
   {
@@ -544,7 +544,7 @@ std::string ContextAttribute::renderAsJsonObject
       // renderAsJsonObject is used in v1 only.
       // => we only need to care about stringValue (not boolValue, numberValue nor nullValue)
       //
-      out += valueTag1(indent + "  ", "value",
+      out += valueTag(indent + "  ", "value",
                             (request != RtUpdateContextResponse)? effectiveValue : "",
                             commaAfterContextValue, false, withoutQuotes);
     }
@@ -613,16 +613,14 @@ std::string ContextAttribute::render
   bool         commaAfterContextValue = metadataVector.size() != 0;
   bool         commaAfterType         = valueRendered;
 
-  metadataVector.keyNameSet("metadata");
-
   if (asJsonObject)
   {
     return renderAsJsonObject(apiVersion, request, indent, comma, omitValue);
   }
 
   out += startTag(indent);
-  out += valueTag1(indent + "  ", "name", name,  true);  // attribute.type is always rendered
-  out += valueTag1(indent + "  ", "type", type,  commaAfterType);
+  out += valueTag(indent + "  ", "name", name,  true);  // attribute.type is always rendered
+  out += valueTag(indent + "  ", "type", type,  commaAfterType);
 
   if (compoundValueP == NULL)
   {
@@ -663,14 +661,17 @@ std::string ContextAttribute::render
         LM_E(("Runtime Error (unknown value type: %d)", valueType));
       }
 
-      out += valueTag2(indent + "  ", "value",
-                              (request != RtUpdateContextResponse)? effectiveValue : "",
-                              commaAfterContextValue, withoutQuotes);
+      out += valueTag(indent + "  ",
+                      "value",
+                      (request != RtUpdateContextResponse)? effectiveValue : "",
+                      commaAfterContextValue,
+                      false,
+                      withoutQuotes);
 
     }
     else if (request == RtUpdateContextResponse)
     {
-      out += valueTag1(indent + "  ", "value", "", commaAfterContextValue);
+      out += valueTag(indent + "  ", "value", "", commaAfterContextValue);
     }
   }
   else
@@ -894,7 +895,7 @@ std::string ContextAttribute::toJsonAsValue
           out = isodate2str(numberValue);
         }
         else // regular number
-        {          
+        {
           out = toString(numberValue);
         }
         break;

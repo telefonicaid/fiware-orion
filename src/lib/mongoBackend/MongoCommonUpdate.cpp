@@ -669,7 +669,7 @@ static bool contextAttributeCustomMetadataToBson(BSONObj* md, BSONArray* mdNames
   *mdNames = mdNamesToAdd.arr();
 
   if (md->nFields() > 0)
-  {    
+  {
     return true;
   }
 
@@ -2913,7 +2913,7 @@ static bool createEntity
 
   /* Add location information in the case it was found */
   if (locAttr.length() > 0)
-  {    
+  {
     insertedDoc.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
                                           ENT_LOCATION_COORDS   << geoJson.obj()));
   }

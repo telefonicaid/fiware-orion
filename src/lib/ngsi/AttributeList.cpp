@@ -78,7 +78,7 @@ std::string AttributeList::render(const std::string& indent, bool comma)
 
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
   {
-    out += valueTag1(indent + "  ", "attribute", attributeV[ix], ix != attributeV.size() - 1, true);
+    out += valueTag(indent + "  ", "attribute", attributeV[ix], ix != attributeV.size() - 1, true);
   }
 
   out += endTag(indent, comma, true);
