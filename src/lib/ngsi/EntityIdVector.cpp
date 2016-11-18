@@ -46,14 +46,13 @@
 std::string EntityIdVector::render(const std::string& indent, bool comma)
 {
   std::string out = "";
-  std::string key = "entities";
 
   if (vec.size() == 0)
   {
     return "";
   }
 
-  out += startTag(indent, key, true, true);
+  out += startTag(indent, "entities", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     out += vec[ix]->render(indent + "  ", ix != vec.size() - 1, true);

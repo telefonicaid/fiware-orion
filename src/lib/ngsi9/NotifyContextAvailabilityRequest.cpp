@@ -49,7 +49,6 @@ NotifyContextAvailabilityRequest::NotifyContextAvailabilityRequest()
 std::string NotifyContextAvailabilityRequest::render(const std::string& indent)
 {
   std::string out = "";
-  std::string tag = "notifyContextAvailabilityRequest";
 
   //
   // Note on JSON commas:
@@ -57,7 +56,7 @@ std::string NotifyContextAvailabilityRequest::render(const std::string& indent)
   //  Always comma for subscriptionId.
   //  With an empty contextRegistrationResponseVector there would be no notification
   //
-  out += startTag(indent, tag, false, false);
+  out += startTag(indent);
   out += subscriptionId.render(NotifyContextAvailability, indent + "  ", true);
   out += contextRegistrationResponseVector.render(indent  + "  ", false);
   out += endTag(indent);

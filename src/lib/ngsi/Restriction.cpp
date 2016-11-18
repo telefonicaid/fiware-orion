@@ -104,7 +104,7 @@ std::string Restriction::render(const std::string& indent, int restrictions, boo
     return "";
   }
 
-  out += startTag(indent, tag, false);
+  out += startTag(indent, tag);
   out += attributeExpression.render(indent + "  ", scopeVectorRendered);
   out += scopeVector.render(indent + "  ", false);
   out += endTag(indent, comma);

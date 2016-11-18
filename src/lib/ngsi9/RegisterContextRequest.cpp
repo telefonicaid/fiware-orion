@@ -51,7 +51,7 @@ std::string RegisterContextRequest::render(const std::string& indent)
   bool         commaAfterDuration                  = registrationIdRendered;
   bool         commaAfterContextRegistrationVector = registrationIdRendered || durationRendered;
 
-  out += startTag(indent, "", false, false);
+  out += startTag(indent);
 
   out += contextRegistrationVector.render(      indent + "  ", commaAfterContextRegistrationVector);
   out += duration.render(                       indent + "  ", commaAfterDuration);

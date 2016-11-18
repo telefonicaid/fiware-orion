@@ -228,10 +228,9 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 std::string Metadata::render(const std::string& indent, bool comma)
 {
   std::string out     = "";
-  std::string tag     = "contextMetadata";
   std::string xValue  = toStringValue();
 
-  out += startTag(indent, tag, false, false);
+  out += startTag(indent);
   out += valueTag1(indent + "  ", "name", name, true);
   out += valueTag1(indent + "  ", "type", type, true);
 

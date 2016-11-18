@@ -58,10 +58,9 @@ std::string UpdateContextElementResponse::render
   const std::string&  indent
 )
 {
-  std::string tag = "updateContextElementResponse";
   std::string out = "";
 
-  out += startTag(indent, tag, false, false);
+  out += startTag(indent);
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {

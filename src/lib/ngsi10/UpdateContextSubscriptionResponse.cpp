@@ -66,9 +66,8 @@ UpdateContextSubscriptionResponse::~UpdateContextSubscriptionResponse() {
 std::string UpdateContextSubscriptionResponse::render(const std::string& indent)
 {
   std::string out  = "";
-  std::string tag  = "updateContextSubscriptionResponse";
 
-  out += startTag(indent, tag, false, false);
+  out += startTag(indent);
 
   if (subscribeError.errorCode.code == SccNone)
   {

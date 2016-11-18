@@ -68,7 +68,7 @@ std::string RegisterProviderRequest::render(std::string indent)
   bool         commaAfterDuration             = commaAfterProvidingApplication || providingApplicationRendered;
   bool         commaAfterMetadataVector       = commaAfterDuration || durationRendered;
 
-  out += startTag(indent, "", false, false);
+  out += startTag(indent);
   out += metadataVector.render(      indent + "  ", commaAfterMetadataVector);
   out += duration.render(            indent + "  ", commaAfterDuration);
   out += providingApplication.render(indent + "  ", commaAfterProvidingApplication);

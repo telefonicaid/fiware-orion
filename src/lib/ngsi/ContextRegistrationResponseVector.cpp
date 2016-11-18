@@ -52,14 +52,13 @@ void ContextRegistrationResponseVector::push_back(ContextRegistrationResponse* i
 std::string ContextRegistrationResponseVector::render(const std::string& indent, bool comma)
 {
   std::string  out = "";
-  std::string  key = "contextRegistrationResponses";
 
   if (vec.size() == 0)
   {
     return "";
   }
 
-  out += startTag(indent, key, true, true);
+  out += startTag(indent, "contextRegistrationResponses", true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

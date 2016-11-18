@@ -79,7 +79,6 @@ std::string versionTreat
 )
 {
   std::string out     = "";
-  std::string tag     = "orion";
   std::string indent  = "";
 
 #ifdef UNIT_TEST
@@ -89,7 +88,7 @@ std::string versionTreat
 #endif
 
   out += "{\n";
-  out += startTag(indent, tag, false, true);
+  out += startTag(indent, "orion");
   out += valueTag1(indent + "  ", "version",       versionString,   true);
   out += valueTag1(indent + "  ", "uptime",        uptime,          true);
   out += valueTag1(indent + "  ", "git_hash",      GIT_HASH,        true);

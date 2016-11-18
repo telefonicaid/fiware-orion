@@ -69,29 +69,12 @@ extern std::string jsonInvalidCharsTransformation(const std::string& input);
 *
 * startTag -  
 *
-* FIXME P3: in the past, this entire family of functions was named just startTag().
-* However, changes in the function signature due to XML format removal have caused
-* that different startTag() instances end with the same (or conflicting, due to
-* optional parameters) signatures. Thus, we use startTag1() and startTag() to
-* distinguish. I know they are awful names :), we should find better ones, but given
-* this is NGSIv1 functionality that will be deprecated in the future, the priority
-* to do this is low.
 */
-#if 0
-extern std::string startTag1
-(
-  const std::string&  indent,
-  const std::string&  key,
-  bool                showKey    = true
-);
-#endif
-
 extern std::string startTag
 (
   const std::string&  indent,
-  const std::string&  key,
-  bool                isVector         = false,
-  bool                showKey          = true
+  const std::string&  key      = "",
+  bool                isVector = false
 );
 
 

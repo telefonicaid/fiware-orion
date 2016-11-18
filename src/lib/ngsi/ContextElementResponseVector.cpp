@@ -50,7 +50,6 @@ std::string ContextElementResponseVector::render
   bool                omitAttributeValues
 )
 {
-  std::string key = "contextResponses";
   std::string out = "";
 
   if (vec.size() == 0)
@@ -58,7 +57,7 @@ std::string ContextElementResponseVector::render
     return "";
   }
 
-  out += startTag(indent, key, true, true);
+  out += startTag(indent, "contextResponses", true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

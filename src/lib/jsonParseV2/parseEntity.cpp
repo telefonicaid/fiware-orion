@@ -140,7 +140,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
         {
           alarmMgr.badInput(clientIp, "invalid JSON type for entity id");
           ciP->httpStatusCode = SccBadRequest;;
-          OrionError oe(SccBadRequest, "invalid input, 'id' as attribute", "BadRequest");
+          OrionError oe(SccBadRequest, "invalid JSON type for entity id", "BadRequest");
           return oe.toJson();
         }
 

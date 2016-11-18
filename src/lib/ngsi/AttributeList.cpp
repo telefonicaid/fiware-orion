@@ -68,14 +68,13 @@ void AttributeList::fill(const std::string& commaSeparatedList)
 std::string AttributeList::render(const std::string& indent, bool comma)
 {
   std::string  out = "";
-  std::string  key = "attributes";
 
   if (attributeV.size() == 0)
   {
     return "";
   }
 
-  out += startTag(indent, key, true, true);
+  out += startTag(indent, "attributes", true);
 
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
   {

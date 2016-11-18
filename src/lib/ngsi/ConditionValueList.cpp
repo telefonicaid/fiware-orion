@@ -42,14 +42,13 @@
 std::string ConditionValueList::render(const std::string& indent, bool comma)
 {
   std::string  out = "";
-  std::string  tag = "condValueList";
 
   if (vec.size() == 0)
   {
     return "";
   }
 
-  out += startTag(indent, tag, true, true);
+  out += startTag(indent, "condValueList", true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

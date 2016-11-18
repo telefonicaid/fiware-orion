@@ -79,7 +79,6 @@ std::string EntityType::render
 )
 {
   std::string  out = "";
-  std::string  key = "type";
 
   if (typeNameBefore && asJsonOut)
   {
@@ -88,7 +87,7 @@ std::string EntityType::render
   }
   else
   {
-    out += startTag(indent, key, false, false);
+    out += startTag(indent);
 
     if (collapsed || contextAttributeVector.size() == 0)
     {     

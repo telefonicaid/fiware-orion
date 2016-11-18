@@ -300,7 +300,6 @@ std::string ContextAttributeVector::render
 )
 {
   std::string out = "";
-  std::string key = "attributes";
 
   if (vec.size() == 0)
   {
@@ -339,7 +338,7 @@ std::string ContextAttributeVector::render
     // 2. Now it's time to render
     // Note that in the case of attribute as name, we have to use a vector, thus using
     // attrsAsName variable as value for isVector parameter
-    out += startTag(indent, key, attrsAsName, true);
+    out += startTag(indent, "attributes", attrsAsName);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       if (attrsAsName)
@@ -355,7 +354,7 @@ std::string ContextAttributeVector::render
   }
   else
   {
-    out += startTag(indent, key, true, true);
+    out += startTag(indent, "attributes", true);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       if (attrsAsName)

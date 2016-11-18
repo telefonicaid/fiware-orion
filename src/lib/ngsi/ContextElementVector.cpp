@@ -59,14 +59,13 @@ std::string ContextElementVector::render
 )
 {
   std::string  out = "";
-  std::string  key = "contextElements";
 
   if (vec.size() == 0)
   {
     return "";
   }
 
-  out += startTag(indent, key, true, true);
+  out += startTag(indent, "contextElements", true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

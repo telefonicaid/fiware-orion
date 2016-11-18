@@ -52,7 +52,6 @@ UpdateContextAvailabilitySubscriptionRequest::UpdateContextAvailabilitySubscript
 std::string UpdateContextAvailabilitySubscriptionRequest::render(const std::string& indent)
 {  
   std::string   out                      = "";
-  std::string   tag                      = "updateContextAvailabilitySubscriptionRequest";
   bool          subscriptionRendered     = subscriptionId.rendered(UpdateContextAvailabilitySubscription);
   bool          restrictionRendered      = restrictions != 0;
   bool          durationRendered         = duration.get() != "";
@@ -63,7 +62,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::render(const std::stri
   bool          commaAfterAttributeList  = durationRendered || restrictionRendered || subscriptionRendered;
   bool          commaAfterEntityIdVector = attributeListRendered || durationRendered || restrictionRendered || subscriptionRendered;
 
-  out += startTag(indent, tag, false, false);
+  out += startTag(indent);
   out += entityIdVector.render(indent + "  ", commaAfterEntityIdVector);
   out += attributeList.render( indent + "  ", commaAfterAttributeList);
   out += duration.render(      indent + "  ", commaAfterDuration);

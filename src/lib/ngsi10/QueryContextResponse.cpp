@@ -97,7 +97,6 @@ QueryContextResponse::~QueryContextResponse()
 std::string QueryContextResponse::render(const std::string& apiVersion, bool asJsonObject, const std::string& indent)
 {
   std::string  out               = "";
-  std::string  tag               = "queryContextResponse";
   bool         errorCodeRendered = false;
   
   //
@@ -125,7 +124,7 @@ std::string QueryContextResponse::render(const std::string& apiVersion, bool asJ
   //
   // 02. render 
   //
-  out += startTag(indent, tag, false, false);
+  out += startTag(indent);
 
   if (contextElementResponseVector.size() > 0)
   {

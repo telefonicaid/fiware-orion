@@ -48,11 +48,10 @@ ContextRegistrationResponse::ContextRegistrationResponse()
 */
 std::string ContextRegistrationResponse::render(const std::string& indent, bool comma)
 {
-  std::string  key               = "contextRegistration";
   std::string  out               = "";
   bool         errorCodeRendered = errorCode.code != SccNone;
 
-  out += startTag(indent, key, false, false);
+  out += startTag(indent);
 
   out += contextRegistration.render(indent + "  ", errorCodeRendered, false);
 

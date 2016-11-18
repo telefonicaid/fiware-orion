@@ -208,39 +208,20 @@ std::string jsonInvalidCharsTransformation(const std::string& input)
 
 /* ****************************************************************************
 *
-* startTag1 -
-*/
-#if 0
-std::string startTag1
-(
-  const std::string&  indent,
-  const std::string&  key,
-  bool                showKey
-)
-{
-  if (showKey == false)
-  {
-    return indent + "{\n";
-  }
-
-  return indent + "\"" + key + "\" : {\n";
-}
-#endif
-
-
-
-/* ****************************************************************************
-*
 * startTag -
 */
 std::string startTag
 (
   const std::string&  indent,
   const std::string&  key,
-  bool                isVector,
-  bool                showKey
+  bool                isVector
 )
 {
+  // Empty key is legal JSON. However, doesn't use that kind of JSON in Orion,
+  // so we can this instead of a showkey boolean parameter, keeping the function
+  // signature simpler
+  bool showKey = (key != "");
+
   if (isVector && showKey)
   {
     return indent + "\"" + key + "\" : [\n";

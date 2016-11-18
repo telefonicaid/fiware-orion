@@ -66,7 +66,6 @@ NotifyCondition::NotifyCondition(NotifyCondition* ncP)
 std::string NotifyCondition::render(const std::string& indent, bool notLastInVector)
 {
   std::string out = "";
-  std::string tag = "notifyCondition";
 
   bool condValueListRendered   = condValueList.size() != 0;
   bool restrictionRendered     = restriction.get() != "";
@@ -74,7 +73,7 @@ std::string NotifyCondition::render(const std::string& indent, bool notLastInVec
   bool commaAfterCondValueList = restrictionRendered;
   bool commaAfterType          = condValueListRendered || restrictionRendered;
 
-  out += startTag(indent, tag, false, false);
+  out += startTag(indent);
   out += valueTag1(indent + "  ", "type", type, commaAfterType);
   out += condValueList.render(indent + "  ",   commaAfterCondValueList);
   out += restriction.render(  indent + "  ",   commaAfterRestriction);

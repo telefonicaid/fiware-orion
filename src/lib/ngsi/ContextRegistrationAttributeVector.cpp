@@ -41,8 +41,6 @@
 */
 std::string ContextRegistrationAttributeVector::render(const std::string& indent, bool comma)
 {
-
-  std::string key = "attributes";
   std::string out = "";
 
   if (vec.size() == 0)
@@ -50,7 +48,7 @@ std::string ContextRegistrationAttributeVector::render(const std::string& indent
     return "";
   }
 
-  out += startTag(indent, key, true, true);
+  out += startTag(indent, "attributes", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);

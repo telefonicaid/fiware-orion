@@ -63,11 +63,10 @@ std::string EntityTypeVector::render
 )
 {
   std::string out  = "";
-  std::string key  = "types";
 
   if (vec.size() > 0)
   {
-    out += startTag(indent, key, true, true);
+    out += startTag(indent, "types", true);
 
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {

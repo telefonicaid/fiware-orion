@@ -54,7 +54,6 @@ ContextRegistration::ContextRegistration()
 std::string ContextRegistration::render(const std::string& indent, bool comma, bool isInVector)
 {
   std::string out = "";
-  std::string tag = "contextRegistration";
 
   //
   // About JSON commas;
@@ -62,7 +61,8 @@ std::string ContextRegistration::render(const std::string& indent, bool comma, b
   // the problem with the JSON commas disappear. All fields will have 'comma set to true'.
   // All, except providingApplication of course :-)
   //
-  out += startTag(indent, tag, false, isInVector == false);
+
+  out += startTag(indent, !isInVector? "contextRegistration" : "");
   out += entityIdVector.render(indent + "  ", true);
   out += contextRegistrationAttributeVector.render(indent + "  ", true);
   out += registrationMetadataVector.render(indent + "  ", true);

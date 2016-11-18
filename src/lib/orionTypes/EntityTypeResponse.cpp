@@ -52,10 +52,9 @@ std::string EntityTypeResponse::render
   const std::string&  indent
 )
 {
-  std::string out                 = "";
-  std::string tag                 = "entityTypeAttributesResponse";
+  std::string out = "";
 
-  out += startTag(indent, tag, false, false);
+  out += startTag(indent);
 
   out += entityType.render(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", true, true);
   out += statusCode.render(indent + "  ");
