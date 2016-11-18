@@ -98,6 +98,8 @@ std::string postIndividualContextEntity
   std::string                   answer;
   std::string                   out;
 
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+
   //
   // 01. Check that total input in consistent and correct
   //
@@ -110,9 +112,7 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion,
-                                       ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
-                                       IndividualContextEntity, ""));
+    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
     return out;
   }  
   entityId = (entityIdFromPayload != "")? entityIdFromPayload : entityIdFromURL;
@@ -125,9 +125,7 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion,
-                                       ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
-                                       IndividualContextEntity, ""));
+    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
     return out;
   }
   entityType = (entityTypeFromPayload != "")? entityTypeFromPayload :entityTypeFromURL;
@@ -141,9 +139,7 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion,
-                                       ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
-                                       IndividualContextEntity, ""));
+    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
     return out;
   }
 
@@ -155,9 +151,7 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion,
-                                       ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
-                                       IndividualContextEntity, ""));
+    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
     return out;
   }
 
@@ -179,9 +173,7 @@ std::string postIndividualContextEntity
   response.fill(&parseDataP->upcrs.res);
 
   // 05. Cleanup and return result
-  TIMED_RENDER(answer = response.render(ciP->apiVersion,
-                                        ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
-                                        IndividualContextEntity, ""));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
 
   response.release();
   parseDataP->upcr.res.release();

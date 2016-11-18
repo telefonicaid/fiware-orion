@@ -287,6 +287,7 @@ std::string postQueryContext
   long long                   count = 0;
   long long*                  countP = NULL;
 
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
 
   //
   // 00. Count or not count? That is the question ...
@@ -356,10 +357,10 @@ std::string postQueryContext
   //
   // Now, the request is 'simple' if all providingApplicationLists of the ContextElements are empty and
   // no ContextAttribute has any providingApplication.
-  //
+  //  
   if (forwardsPending(qcrsP) == false)
   {
-    TIMED_RENDER(answer = qcrsP->render(ciP->apiVersion, ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON, ""));
+    TIMED_RENDER(answer = qcrsP->render(ciP->apiVersion, asJsonObject, ""));
 
     qcrP->release();
     return answer;
@@ -516,7 +517,7 @@ std::string postQueryContext
   std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
   bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
 
-  TIMED_RENDER(answer = responseV.render(ciP->apiVersion, ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON, details, qcrsP->errorCode.details));
+  TIMED_RENDER(answer = responseV.render(ciP->apiVersion, asJsonObject, details, qcrsP->errorCode.details));
 
 
   //

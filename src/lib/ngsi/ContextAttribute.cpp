@@ -892,7 +892,7 @@ std::string ContextAttribute::toJsonAsValue
           out = isodate2str(numberValue);
         }
         else // regular number
-        {          
+        {
           out = toString(numberValue);
         }
         break;

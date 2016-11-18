@@ -79,6 +79,8 @@ std::string getIndividualContextEntity
   EntityTypeInfo          typeInfo    = EntityTypeEmptyOrNotEmpty;
   ContextElementResponse  response;
 
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+
   // 0. Take care of URI params
   if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
   {
@@ -113,9 +115,7 @@ std::string getIndividualContextEntity
 
 
   // 5. Render the ContextElementResponse
-  TIMED_RENDER(answer = response.render(ciP->apiVersion,
-                                        ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
-                                        IndividualContextEntity, ""));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
 
 
   // 6. Cleanup and return result

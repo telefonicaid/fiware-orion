@@ -210,7 +210,7 @@ int Scope::fill
     }
 
     if (!str2double(coordV[0].c_str(), &latitude))
-    {      
+    {
       *errorStringP = "invalid coordinates";
       pointVectorRelease(pointV);
       pointV.clear();

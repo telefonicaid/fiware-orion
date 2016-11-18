@@ -164,7 +164,7 @@ void SubscribeContextRequest::toNgsiv2Subscription(Subscription* sub)
 
   // Convert duration
   if (duration.isEmpty())
-  {    
+  {
     sub->expires = DEFAULT_DURATION_IN_SECONDS + getCurrentTime();
   }
   else
