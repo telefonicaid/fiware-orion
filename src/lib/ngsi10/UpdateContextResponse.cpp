@@ -83,9 +83,8 @@ UpdateContextResponse::~UpdateContextResponse()
 std::string UpdateContextResponse::render(const std::string& apiVersion, bool asJsonObject, const std::string& indent)
 {
   std::string out = "";
-  std::string tag = "updateContextResponse";
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent);
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {

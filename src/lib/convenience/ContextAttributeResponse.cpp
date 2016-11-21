@@ -50,10 +50,9 @@ std::string ContextAttributeResponse::render
   const std::string&  indent
 )
 {
-  std::string tag = "contextAttributeResponse";
   std::string out = "";
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent);
   out += contextAttributeVector.render(apiVersion, asJsonObject, request, indent + "  ", true);
   out += statusCode.render(indent + "  ");
   out += endTag(indent);

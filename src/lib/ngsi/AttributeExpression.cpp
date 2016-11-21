@@ -117,7 +117,7 @@ std::string AttributeExpression::render(const std::string& indent, bool comma)
     return "";
   }
 
-  return valueTag1(indent, "attributeExpression", string, comma);
+  return valueTag(indent, "attributeExpression", string, comma);
 }
 
 

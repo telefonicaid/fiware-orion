@@ -50,13 +50,10 @@ std::string ContextAttributeResponseVector::render
 
   if (vec.size() == 0)
   {
-    if (request == IndividualContextEntityAttributes)
-      return indent + "<contextAttributeList></contextAttributeList>\n";
-
     return "";
   }
 
-  out += startTag2(indent, key, true);
+  out += startTag(indent, key, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     out += vec[ix]->render(apiVersion, asJsonObject, request, indent + "  ");

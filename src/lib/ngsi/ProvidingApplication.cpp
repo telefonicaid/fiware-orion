@@ -155,7 +155,7 @@ std::string ProvidingApplication::render(const std::string& indent, bool comma)
     return "";
   }
 
-  return valueTag1(indent, "providingApplication", string, comma);
+  return valueTag(indent, "providingApplication", string, comma);
 }
 
 

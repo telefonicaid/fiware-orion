@@ -77,7 +77,6 @@ ContextElement::ContextElement(const std::string& id, const std::string& type, c
 std::string ContextElement::render(const std::string& apiVersion, bool asJsonObject, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues)
 {
   std::string  out                              = "";
-  std::string  key                              = "contextElement";
   bool         attributeDomainNameRendered      = attributeDomainName.get() != "";
   bool         contextAttributeVectorRendered   = contextAttributeVector.size() != 0;
   bool         domainMetadataVectorRendered     = domainMetadataVector.size() != 0;
@@ -87,14 +86,7 @@ std::string ContextElement::render(const std::string& apiVersion, bool asJsonObj
   bool         commaAfterAttributeDomainName    = domainMetadataVectorRendered  || contextAttributeVectorRendered;
   bool         commaAfterEntityId               = commaAfterAttributeDomainName || attributeDomainNameRendered;
 
-  if (requestType == UpdateContext)
-  {
-    out += startTag2(indent, key, false, false);
-  }
-  else
-  {
-    out += startTag2(indent, key, false, true);
-  }
+  out += startTag(indent, requestType != UpdateContext? "contextElement" : "");
 
   out += entityId.render(indent + "  ", commaAfterEntityId, false);
   out += attributeDomainName.render(indent + "  ", commaAfterAttributeDomainName);

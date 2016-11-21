@@ -41,10 +41,9 @@
 */
 std::string UpdateContextElementRequest::render(const std::string& apiVersion, bool asJsonObject, RequestType requestType, std::string indent)
 {
-  std::string tag = "updateContextElementRequest";
   std::string out = "";
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent);
   out += attributeDomainName.render(indent + "  ", true);
   out += contextAttributeVector.render(apiVersion, asJsonObject, requestType, indent + "  ");
   out += endTag(indent);

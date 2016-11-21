@@ -75,11 +75,10 @@ UpdateContextAvailabilitySubscriptionResponse::~UpdateContextAvailabilitySubscri
 std::string UpdateContextAvailabilitySubscriptionResponse::render(const std::string& indent, int counter)
 {
   std::string  out                = "";
-  std::string  tag                = "updateContextAvailabilitySubscriptionResponse";
   bool         durationRendered   = !duration.isEmpty();
   bool         errorCodeRendered  = (errorCode.code != SccNone);
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent);
 
   out += subscriptionId.render(RtUpdateContextAvailabilitySubscriptionResponse, indent + "  ", errorCodeRendered || durationRendered);
   out += duration.render(      indent + "  ", errorCodeRendered);

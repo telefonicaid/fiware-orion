@@ -55,14 +55,13 @@ SubscribeContextAvailabilityRequest::SubscribeContextAvailabilityRequest()
 std::string SubscribeContextAvailabilityRequest::render(const std::string& indent)
 {
   std::string out                      = "";
-  std::string tag                      = "subscribeContextAvailabilityRequest";
   std::string indent2                  = indent + "  ";
   bool        commaAfterEntityIdVector = (restrictions > 0) || !duration.isEmpty() || !reference.isEmpty() || (attributeList.size() != 0);
   bool        commaAfterAttributeList  = (restrictions > 0) || !duration.isEmpty() || !reference.isEmpty();
   bool        commaAfterReference      = (restrictions > 0) || !duration.isEmpty();
   bool        commaAfterDuration       = restrictions > 0;
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent);
   out += entityIdVector.render(indent2, commaAfterEntityIdVector);
   out += attributeList.render(indent2, commaAfterAttributeList);
   out += reference.render(indent2, commaAfterReference);

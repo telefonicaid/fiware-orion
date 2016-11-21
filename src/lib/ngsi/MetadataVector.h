@@ -41,11 +41,8 @@ typedef struct MetadataVector
 public:
   std::vector<Metadata*>  vec;
 
-  std::string             keyName;        // Help variable for the 'render' method
+  MetadataVector(void);
 
-  MetadataVector(const std::string& _keyName = "registrationMetadata");
-
-  void            keyNameSet(const std::string& key);
   std::string     render(const std::string& indent, bool comma = false);
   std::string     toJson(bool                             isLastElement,
                          const std::vector<std::string>&  metadataFilter);

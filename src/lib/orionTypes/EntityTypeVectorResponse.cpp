@@ -51,10 +51,9 @@ std::string EntityTypeVectorResponse::render
   const std::string&  indent
 )
 {
-  std::string out                 = "";
-  std::string tag                 = "entityTypesResponse";
+  std::string out  = "";
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent);
 
   if (entityTypeVector.size() > 0)
   {

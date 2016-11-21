@@ -59,10 +59,9 @@ std::string AppendContextElementResponse::render
   RequestType         requestType,
   const std::string& indent)
 {
-  std::string tag = "appendContextElementResponse";
   std::string out = "";
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent);
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {

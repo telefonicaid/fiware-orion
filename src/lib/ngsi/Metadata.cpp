@@ -228,16 +228,15 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 std::string Metadata::render(const std::string& indent, bool comma)
 {
   std::string out     = "";
-  std::string tag     = "contextMetadata";
   std::string xValue  = toStringValue();
 
-  out += startTag2(indent, tag, false, false);
-  out += valueTag1(indent + "  ", "name", name, true);
-  out += valueTag1(indent + "  ", "type", type, true);
+  out += startTag(indent);
+  out += valueTag(indent + "  ", "name", name, true);
+  out += valueTag(indent + "  ", "type", type, true);
 
   if (valueType == orion::ValueTypeString)
   {
-    out += valueTag1(indent + "  ", "value", xValue, false);
+    out += valueTag(indent + "  ", "value", xValue, false);
   }
   else if (valueType == orion::ValueTypeNumber)
   {

@@ -43,7 +43,6 @@
 */
 UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 {
-  metadataVector.keyNameSet("metadata");
   compoundValueP = NULL;
   valueType = orion::ValueTypeNone;
 }
@@ -56,17 +55,16 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 */
 std::string UpdateContextAttributeRequest::render(const std::string& apiVersion, std::string indent)
 {
-  std::string tag = "updateContextAttributeRequest";
   std::string out = "";
   std::string indent2 = indent + "  ";
   bool        commaAfterContextValue = metadataVector.size() != 0;
 
-  out += startTag1(indent, tag, false);
-  out += valueTag1(indent2, "type", type, true);
+  out += startTag(indent);
+  out += valueTag(indent2, "type", type, true);
 
   if (compoundValueP == NULL)
   {
-    out += valueTag1(indent2, "contextValue", contextValue, true);
+    out += valueTag(indent2, "contextValue", contextValue, true);
   }
   else
   {
@@ -77,7 +75,7 @@ std::string UpdateContextAttributeRequest::render(const std::string& apiVersion,
       isCompoundVector = true;
     }
 
-    out += startTag2(indent + "  ", "value", isCompoundVector, true);
+    out += startTag(indent + "  ", "value", isCompoundVector);
     out += compoundValueP->render(apiVersion, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
