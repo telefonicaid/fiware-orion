@@ -60,7 +60,7 @@ using namespace mongo;
 *  -5:  Error parsing string filter
 *  -6:  Error parsing metadata string filter
 *
-* Note that the 'count' of the inserted subscription is set to ZERO.
+* Note that 'count' and 'timesFailed' of the inserted subscription is set to ZERO.
 *
 */
 int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
@@ -95,7 +95,9 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // 04. Extract data from subP
   //
-  std::string               renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";  // NGSIv1 JSON is 'default' (for old db-content)
+  // NOTE: NGSIv1 JSON is 'default' (for old db-content)
+  //
+  std::string               renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
   RenderFormat              renderFormat       = stringToRenderFormat(renderFormatString);
 
   cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);
@@ -108,7 +110,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS).c_str()            : "active";
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                   : false;
   cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(sub, CSUB_LASTFAILURE)      : -1;
-  cSubP->timesFailed           = sub.hasField(CSUB_TIMESFAILED)?      getIntOrLongFieldAsLongF(sub, CSUB_TIMESFAILED)      : 0;
+  cSubP->timesFailed           = 0;
   cSubP->count                 = 0;
   cSubP->next                  = NULL;
 
