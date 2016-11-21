@@ -1756,10 +1756,11 @@ A `notification` object contains the following subfields:
   See "Filtering out attributes and metadata" section for more detail.
 + `timesSent` (not editable, only present in GET operations): Number of notifications sent due to
    this subscription.
-+ `lastNotification` (not editable, only present in GET operations): Last notification date in ISO8601 format.
-+ `timesFailed` (not editable, only present in GET operations): Number of consecutive errors. Not present if subscription is OK.
-+ `lastFailure` (not editable, only present in GET operations): Last failure date in ISO8601 format.
-  Not present if subscription is OK.
++ `lastNotification` (not editable, only present in GET operations): Last notification timestamp in ISO8601 format.
++ `timesFailed` (not editable, only present in GET operations): Number of consecutive errors.
+  Not present if subscription is notifying correctly.
++ `lastFailure` (not editable, only present in GET operations): Last failure timestamp in ISO8601 format.
+  Not present if subscription has never has a problem with notifications.
 
 An `http` object contains the following subfields:
 
