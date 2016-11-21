@@ -51,10 +51,9 @@ AppendContextElementRequest::AppendContextElementRequest()
 */
 std::string AppendContextElementRequest::render(const std::string& apiVersion, bool asJsonObject, RequestType requestType, std::string indent)
 {
-  std::string tag = "appendContextElementRequest";
   std::string out = "";
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent);
 
   if (entity.id != "")
   {

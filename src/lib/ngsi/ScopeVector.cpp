@@ -44,14 +44,13 @@
 std::string ScopeVector::render(const std::string& indent, bool comma)
 {
   std::string out = "";
-  std::string tag = "scope";
 
   if (vec.size() == 0)
   {
     return "";
   }
 
-  out += startTag2(indent, tag, true, true);
+  out += startTag(indent, "scope", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
      out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);

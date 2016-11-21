@@ -69,10 +69,7 @@ ContextRegistrationAttribute::ContextRegistrationAttribute
 */
 std::string ContextRegistrationAttribute::render(const std::string& indent, bool comma)
 {
-  std::string key = "registrationAttribute";
   std::string out = "";
-
-  metadataVector.keyNameSet("metadata");
 
   //
   // About JSON commas:
@@ -81,10 +78,10 @@ std::string ContextRegistrationAttribute::render(const std::string& indent, bool
   // The only doubt here is whether isDomain should have the comma or not,
   // that depends on whether the metadataVector is empty or not.
   //
-  out += startTag2(indent, key, false, false);
-  out += valueTag1(indent + "  ", "name",     name, true);
-  out += valueTag1(indent + "  ", "type",     type, true);
-  out += valueTag1(indent + "  ", "isDomain", isDomain, metadataVector.size() != 0);
+  out += startTag(indent);
+  out += valueTag(indent + "  ", "name",     name, true);
+  out += valueTag(indent + "  ", "type",     type, true);
+  out += valueTag(indent + "  ", "isDomain", isDomain, metadataVector.size() != 0);
   out += metadataVector.render(indent + "  ");
   out += endTag(indent, comma);
 

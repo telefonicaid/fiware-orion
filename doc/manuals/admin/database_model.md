@@ -308,8 +308,9 @@ Fields:
 -   **method**: optional field to store the HTTP method for notification customization functionality in NGSIv2.
 -   **payload**: optional field to store the payload for notification customization functionality in NGSIv2.
 -   **lastFailure**: the time when last notification failure occurred.
+    Not present if the subscription has never failed.
 -   **timesFailed**: number of consecutive notification errors for the subscription.
-    Not present or present with a value of 0 if the subscription is OK.
+    Not present if the subscription has never failed.
 
 Example document:
 

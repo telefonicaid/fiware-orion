@@ -389,13 +389,12 @@ int Scope::fill
 std::string Scope::render(const std::string& indent, bool notLastInVector)
 {
   std::string out      = "";
-  std::string tag      = "operationScope";
   const char* tTag     = "type";
   const char* vTag     = "value";
 
-  out += startTag2(indent, tag, false, false);
-  out += valueTag1(indent + "  ", tTag, type, true);
-  out += valueTag1(indent + "  ", vTag, value);
+  out += startTag(indent);
+  out += valueTag(indent + "  ", tTag, type, true);
+  out += valueTag(indent + "  ", vTag, value);
   out += endTag(indent, notLastInVector);
 
   return out;

@@ -1719,8 +1719,8 @@ A subscription is represented by a JSON object with the following fields:
   If this field is not provided at subscription creation time, new subscriptions are created with
   the `active` status, which can be changed by clients afterwards. For expired subscriptions, this
   attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`).
-  Subscriptions having problems sending notifications have the status set to `failed`, which is set
-  back to `active` once a notification is successfully sent again.
+  Also, for subscriptions experiencing problems with notifications, the status is set to `failed`.
+  As soon as the notifications start working again, the status is changed back to `active`.
 + `throttling`: Minimal period of time in seconds which must elapse between two consecutive
   notifications. It is optional.
 
@@ -1762,7 +1762,7 @@ A `notification` object contains the following subfields:
 + `timesFailed` (not editable, only present in GET operations): Number of consecutive errors.
   Not present if subscription is notifying correctly.
 + `lastFailure` (not editable, only present in GET operations): Last failure timestamp in ISO8601 format.
-  Not present if subscription has never failed to notify.
+  Not present if subscription has never has a problem with notifications.
 
 An `http` object contains the following subfields:
 

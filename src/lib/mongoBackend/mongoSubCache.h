@@ -81,9 +81,9 @@ extern void mongoSubCacheRefresh(const std::string& database);
 
 /* ****************************************************************************
 *
-* mongoSubCacheUpdate - 
+* mongoSubCountersUpdate - 
 */
-extern void mongoSubCacheUpdate
+extern void mongoSubCountersUpdate
 (
   const std::string&  tenant,
   const std::string&  subId,

@@ -95,7 +95,9 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // 04. Extract data from subP
   //
-  std::string               renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";  // NGSIv1 JSON is 'default' (for old db-content)
+  // NOTE: NGSIv1 JSON is 'default' (for old db-content)
+  //
+  std::string               renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
   RenderFormat              renderFormat       = stringToRenderFormat(renderFormatString);
 
   cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);
@@ -478,9 +480,9 @@ void mongoSubCacheRefresh(const std::string& database)
 
 /* ****************************************************************************
 *
-* mongoSubCacheUpdate - update subscription in mongo with count and lastNotificationTime
+* mongoSubCountersUpdate - update subscription in mongo with count and lastNotificationTime
 */
-void mongoSubCacheUpdate
+void mongoSubCountersUpdate
 (
   const std::string& tenant,
   const std::string& subId,

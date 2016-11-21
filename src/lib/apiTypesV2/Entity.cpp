@@ -77,96 +77,96 @@ std::string Entity::render
   bool                                 comma
 )
 {
+  if ((oe.details != "") || ((oe.reasonPhrase != "OK") && (oe.reasonPhrase != "")))
+  {
+    return oe.toJson();
+  }
+
   RenderFormat  renderFormat = NGSI_V2_NORMALIZED;
 
   if      (uriParamOptions[OPT_KEY_VALUES]    == true)  { renderFormat = NGSI_V2_KEYVALUES;     }
   else if (uriParamOptions[OPT_VALUES]        == true)  { renderFormat = NGSI_V2_VALUES;        }
   else if (uriParamOptions[OPT_UNIQUE_VALUES] == true)  { renderFormat = NGSI_V2_UNIQUE_VALUES; }
 
-  if ((oe.details == "") && ((oe.reasonPhrase == "OK") || (oe.reasonPhrase == "")))
+  std::string out;
+  std::vector<std::string> metadataFilter;
+  std::vector<std::string> attrsFilter;
+
+  if (uriParam[URI_PARAM_METADATA] != "")
   {
-    std::string out;
-    std::vector<std::string> metadataFilter;
-    std::vector<std::string> attrsFilter;
-
-    if (uriParam[URI_PARAM_METADATA] != "")
-    {
-      stringSplit(uriParam[URI_PARAM_METADATA], ',', metadataFilter);
-    }
-
-    if (uriParam[URI_PARAM_ATTRIBUTES] != "")
-    {
-      stringSplit(uriParam[URI_PARAM_ATTRIBUTES], ',', attrsFilter);
-    }
-
-    // Add special attributes representing entity dates
-    if ((creDate != 0) && (uriParamOptions[DATE_CREATED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end())))
-    {
-      ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, creDate);
-      attributeVector.push_back(caP);
-    }
-    if ((modDate != 0) && (uriParamOptions[DATE_MODIFIED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_MODIFIED) != attrsFilter.end())))
-    {
-      ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, modDate);
-      attributeVector.push_back(caP);
-    }
-
-    if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
-    {
-      out = "[";
-      if (attributeVector.size() != 0)
-      {
-        out += attributeVector.toJson(renderFormat, attrsFilter, metadataFilter, false);
-      }
-      out += "]";        
-    }
-    else
-    {
-      out = "{";
-
-      if (renderId)
-      {
-        out += JSON_VALUE("id", id);
-        out += ",";
-
-        /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
-        out += JSON_STR("type") + ":" + ((type != "")? JSON_STR(type) : JSON_STR(DEFAULT_ENTITY_TYPE));
-      }
-
-      std::string attrsOut;
-      if (attributeVector.size() != 0)
-      {
-        attrsOut += attributeVector.toJson(renderFormat, attrsFilter, metadataFilter, false);
-      }
-
-      //
-      // Note that just attributeVector.size() != 0 (used in previous versions) cannot be used
-      // as ciP->uriParam["attrs"] filter could remove all the attributes
-      //
-      if (attrsOut != "")
-      {
-        if (renderId)
-        {
-          out +=  "," + attrsOut;
-        }
-        else
-        {
-          out += attrsOut;
-        }
-      }
-
-      out += "}";
-    }
-
-    if (comma)
-    {
-      out += ",";
-    }
-
-    return out;
+    stringSplit(uriParam[URI_PARAM_METADATA], ',', metadataFilter);
   }
 
-  return oe.toJson();
+  if (uriParam[URI_PARAM_ATTRIBUTES] != "")
+  {
+    stringSplit(uriParam[URI_PARAM_ATTRIBUTES], ',', attrsFilter);
+  }
+
+  // Add special attributes representing entity dates
+  if ((creDate != 0) && (uriParamOptions[DATE_CREATED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end())))
+  {
+    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, creDate);
+    attributeVector.push_back(caP);
+  }
+  if ((modDate != 0) && (uriParamOptions[DATE_MODIFIED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_MODIFIED) != attrsFilter.end())))
+  {
+    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, modDate);
+    attributeVector.push_back(caP);
+  }
+
+  if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
+  {
+    out = "[";
+    if (attributeVector.size() != 0)
+    {
+      out += attributeVector.toJson(renderFormat, attrsFilter, metadataFilter, false);
+    }
+    out += "]";
+  }
+  else
+  {
+    out = "{";
+
+    if (renderId)
+    {
+      out += JSON_VALUE("id", id);
+      out += ",";
+
+      /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
+      out += JSON_STR("type") + ":" + ((type != "")? JSON_STR(type) : JSON_STR(DEFAULT_ENTITY_TYPE));
+    }
+
+    std::string attrsOut;
+    if (attributeVector.size() != 0)
+    {
+      attrsOut += attributeVector.toJson(renderFormat, attrsFilter, metadataFilter, false);
+    }
+
+    //
+    // Note that just attributeVector.size() != 0 (used in previous versions) cannot be used
+    // as ciP->uriParam["attrs"] filter could remove all the attributes
+    //
+    if (attrsOut != "")
+    {
+      if (renderId)
+      {
+        out +=  "," + attrsOut;
+      }
+      else
+      {
+        out += attrsOut;
+      }
+    }
+
+    out += "}";
+  }
+
+  if (comma)
+  {
+    out += ",";
+  }
+
+  return out;
 }
 
 

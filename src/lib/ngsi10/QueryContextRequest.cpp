@@ -97,13 +97,12 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 std::string QueryContextRequest::render(const std::string& indent)
 {
   std::string   out                      = "";
-  std::string   tag                      = "queryContextRequest";
   bool          attributeListRendered    = attributeList.size() != 0;
   bool          restrictionRendered      = restrictions != 0;
   bool          commaAfterAttributeList  = restrictionRendered;
   bool          commaAfterEntityIdVector = attributeListRendered || restrictionRendered;
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent);
   out += entityIdVector.render(indent + "  ", commaAfterEntityIdVector);
   out += attributeList.render( indent + "  ", commaAfterAttributeList);
   out += restriction.render(   indent + "  ", restrictions, false);

@@ -494,12 +494,11 @@ std::string ContextAttribute::renderAsJsonObject
 )
 {
   std::string  out                    = "";
-  std::string  key                    = name;
   bool         commaAfterContextValue = metadataVector.size() != 0;
   bool         commaAfterType         = !omitValue || commaAfterContextValue;
 
-  out += startTag2(indent, key, false, true);
-  out += valueTag1(indent + "  ", "type",         type,  commaAfterType);
+  out += startTag(indent, name, false);
+  out += valueTag(indent + "  ", "type",         type,  commaAfterType);
 
   if (compoundValueP == NULL)
   {
@@ -545,7 +544,7 @@ std::string ContextAttribute::renderAsJsonObject
       // renderAsJsonObject is used in v1 only.
       // => we only need to care about stringValue (not boolValue, numberValue nor nullValue)
       //
-      out += valueTag1(indent + "  ", "value",
+      out += valueTag(indent + "  ", "value",
                             (request != RtUpdateContextResponse)? effectiveValue : "",
                             commaAfterContextValue, false, withoutQuotes);
     }
@@ -559,7 +558,7 @@ std::string ContextAttribute::renderAsJsonObject
       isCompoundVector = true;
     }
 
-    out += startTag2(indent + "  ", "value", isCompoundVector, true);
+    out += startTag(indent + "  ", "value", isCompoundVector);
     out += compoundValueP->render(apiVersion, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
@@ -610,21 +609,18 @@ std::string ContextAttribute::render
 )
 {
   std::string  out                    = "";
-  std::string  key                    = "attribute";
   bool         valueRendered          = (compoundValueP != NULL) || (omitValue == false) || (request == RtUpdateContextResponse);
   bool         commaAfterContextValue = metadataVector.size() != 0;
   bool         commaAfterType         = valueRendered;
-
-  metadataVector.keyNameSet("metadata");
 
   if (asJsonObject)
   {
     return renderAsJsonObject(apiVersion, request, indent, comma, omitValue);
   }
 
-  out += startTag2(indent, key, false, false);
-  out += valueTag1(indent + "  ", "name", name,  true);  // attribute.type is always rendered
-  out += valueTag1(indent + "  ", "type", type,  commaAfterType);
+  out += startTag(indent);
+  out += valueTag(indent + "  ", "name", name,  true);  // attribute.type is always rendered
+  out += valueTag(indent + "  ", "type", type,  commaAfterType);
 
   if (compoundValueP == NULL)
   {
@@ -665,14 +661,17 @@ std::string ContextAttribute::render
         LM_E(("Runtime Error (unknown value type: %d)", valueType));
       }
 
-      out += valueTag2(indent + "  ", "value",
-                              (request != RtUpdateContextResponse)? effectiveValue : "",
-                              commaAfterContextValue, withoutQuotes);
+      out += valueTag(indent + "  ",
+                      "value",
+                      (request != RtUpdateContextResponse)? effectiveValue : "",
+                      commaAfterContextValue,
+                      false,
+                      withoutQuotes);
 
     }
     else if (request == RtUpdateContextResponse)
     {
-      out += valueTag1(indent + "  ", "value", "", commaAfterContextValue);
+      out += valueTag(indent + "  ", "value", "", commaAfterContextValue);
     }
   }
   else
@@ -684,7 +683,7 @@ std::string ContextAttribute::render
       isCompoundVector = true;
     }
 
-    out += startTag2(indent + "  ", "value", isCompoundVector, true);
+    out += startTag(indent + "  ", "value", isCompoundVector);
     out += compoundValueP->render(apiVersion, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }

@@ -79,7 +79,6 @@ std::string versionTreat
 )
 {
   std::string out     = "";
-  std::string tag     = "orion";
   std::string indent  = "";
 
 #ifdef UNIT_TEST
@@ -88,14 +87,16 @@ std::string versionTreat
   std::string uptime = parsedUptime(getTimer()->getCurrentTime() - startTime);
 #endif
 
-  out += startTag1(indent, tag, true, true);
-  out += valueTag1(indent + "  ", "version",       versionString,   true);
-  out += valueTag1(indent + "  ", "uptime",        uptime,          true);
-  out += valueTag1(indent + "  ", "git_hash",      GIT_HASH,        true);
-  out += valueTag1(indent + "  ", "compile_time",  COMPILE_TIME,    true);
-  out += valueTag1(indent + "  ", "compiled_by",   COMPILED_BY,     true);
-  out += valueTag1(indent + "  ", "compiled_in",   COMPILED_IN,     false);
-  out += endTag(indent, false, false, true, true);
+  out += "{\n";
+  out += startTag(indent, "orion");
+  out += valueTag(indent + "  ", "version",       versionString,   true);
+  out += valueTag(indent + "  ", "uptime",        uptime,          true);
+  out += valueTag(indent + "  ", "git_hash",      GIT_HASH,        true);
+  out += valueTag(indent + "  ", "compile_time",  COMPILE_TIME,    true);
+  out += valueTag(indent + "  ", "compiled_by",   COMPILED_BY,     true);
+  out += valueTag(indent + "  ", "compiled_in",   COMPILED_IN,     false);
+  out += endTag(indent, false, false);
+  out += "}\n";
 
   ciP->httpStatusCode = SccOk;
   return out;

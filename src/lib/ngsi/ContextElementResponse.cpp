@@ -332,10 +332,9 @@ std::string ContextElementResponse::render
   bool                omitAttributeValues
 )
 {
-  std::string key = "contextElement";
   std::string out = "";
 
-  out += startTag2(indent, key, false, false);
+  out += startTag(indent);
   out += contextElement.render(apiVersion, asJsonObject, requestType, indent + "  ", true, omitAttributeValues);
   out += statusCode.render(indent + "  ", false);
   out += endTag(indent, comma, false);

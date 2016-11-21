@@ -79,24 +79,23 @@ std::string EntityType::render
 )
 {
   std::string  out = "";
-  std::string  key = "type";
 
   if (typeNameBefore && asJsonOut)
   {
-    out += valueTag1(indent  + "  ", "name", type, true);
+    out += valueTag(indent  + "  ", "name", type, true);
     out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, indent + "  ", true, true, true);
   }
   else
   {
-    out += startTag2(indent, key, false, false);
+    out += startTag(indent);
 
     if (collapsed || contextAttributeVector.size() == 0)
     {
-      out += valueTag1(indent  + "  ", "name", type, false);
+      out += valueTag(indent  + "  ", "name", type, false);
     }
     else
     {
-      out += valueTag1(indent  + "  ", "name", type, true);
+      out += valueTag(indent  + "  ", "name", type, true);
       out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, indent + "  ", false, true, true);
     }
 

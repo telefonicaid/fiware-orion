@@ -139,18 +139,17 @@ std::string OrionError::render(void)
 {
   std::string  out           = "{\n";
   std::string  indent        = "  ";
-  std::string  tag           = "orionError";
 
   //
   // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here
   //
-  out += startTag1(indent, tag);
+  out += startTag(indent, "orionError", false);
   out += valueTag(indent  + "  ", "code",          code,         true);
-  out += valueTag1(indent + "  ", "reasonPhrase",  reasonPhrase, details != "");
+  out += valueTag(indent + "  ", "reasonPhrase",  reasonPhrase, details != "");
 
   if (details != "")
   {
-    out += valueTag1(indent + "  ", "details",       details);
+    out += valueTag(indent + "  ", "details",       details);
   }
 
   out += endTag(indent);
