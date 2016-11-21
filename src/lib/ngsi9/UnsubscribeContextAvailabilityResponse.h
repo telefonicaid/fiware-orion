@@ -46,7 +46,7 @@ typedef struct UnsubscribeContextAvailabilityResponse
   UnsubscribeContextAvailabilityResponse(SubscriptionId _subscriptionId);
   ~UnsubscribeContextAvailabilityResponse();
 
-  std::string render(RequestType requestType, const std::string& indent);
+  std::string render(const std::string& indent);
 } UnsubscribeContextAvailabilityResponse;
 
 #endif

@@ -38,50 +38,46 @@
 TEST(ContextElement, check)
 {
   ContextElement ce;
-  ConnectionInfo               ci;
 
   utInit();
 
   ce.entityId.id = "";
-  EXPECT_EQ(ce.check(&ci, UpdateContext, "", "", 0), "empty entityId:id");
+  EXPECT_EQ(ce.check("v1", UpdateContext, "", "", 0), "empty entityId:id");
 
   ce.entityId.id = "id";
-  EXPECT_EQ(ce.check(&ci, UpdateContext, "", "", 0), "OK");
+  EXPECT_EQ(ce.check("v1", UpdateContext, "", "", 0), "OK");
 
   ContextAttribute a;
   a.name  = "";
   a.stringValue = "V";
   ce.contextAttributeVector.push_back(&a);
-  EXPECT_EQ(ce.check(&ci, UpdateContext, "", "", 0), "missing attribute name");
+  EXPECT_EQ(ce.check("v1", UpdateContext, "", "", 0), "missing attribute name");
   a.name = "name";
   
   Metadata m;
   m.name  = "";
   m.stringValue = "V";
   ce.domainMetadataVector.push_back(&m);
-  EXPECT_EQ(ce.check(&ci, UpdateContext, "", "", 0), "missing metadata name");
+  EXPECT_EQ(ce.check("v1", UpdateContext, "", "", 0), "missing metadata name");
   m.name = "NAME";
-  EXPECT_EQ(ce.check(&ci, UpdateContext, "", "", 0), "OK");
+  EXPECT_EQ(ce.check("v1", UpdateContext, "", "", 0), "OK");
 
   ContextElement ce2;
   ce2.entityId.id = "id";
 
   ContextElementVector ceVector;
 
-  EXPECT_EQ(ceVector.check(&ci, UpdateContext, "", "", 0), "No context elements");
+  EXPECT_EQ(ceVector.check("v1", UpdateContext, "", "", 0), "No context elements");
 
   ceVector.push_back(&ce);
   ceVector.push_back(&ce2);
-  EXPECT_EQ(ceVector.check(&ci, UpdateContext, "", "", 0), "OK");
+  EXPECT_EQ(ceVector.check("v1", UpdateContext, "", "", 0), "OK");
 
   // render
   const char*     outfile1 = "ngsi.contextelement.check.middle.json";
   std::string     out;
 
-  ci = ConnectionInfo(JSON);
-
-  ci.outMimeType = JSON;
-  out = ce2.render(&ci, UpdateContextElement, "", false);
+  out = ce2.render("v1", false, UpdateContextElement, "", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -90,7 +86,7 @@ TEST(ContextElement, check)
   ce2.present("", 1);
 
   m.name  = "";
-  EXPECT_EQ("missing metadata name", ceVector.check(&ci, UpdateContext, "", "", 0));
+  EXPECT_EQ("missing metadata name", ceVector.check("v1", UpdateContext, "", "", 0));
 
   utExit();
 }

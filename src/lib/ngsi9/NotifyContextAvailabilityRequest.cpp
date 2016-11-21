@@ -46,7 +46,7 @@ NotifyContextAvailabilityRequest::NotifyContextAvailabilityRequest()
 *
 * NotifyContextAvailabilityRequest::render -
 */
-std::string NotifyContextAvailabilityRequest::render(RequestType requestType, const std::string& indent)
+std::string NotifyContextAvailabilityRequest::render(const std::string& indent)
 {
   std::string out = "";
   std::string tag = "notifyContextAvailabilityRequest";
@@ -71,7 +71,7 @@ std::string NotifyContextAvailabilityRequest::render(RequestType requestType, co
 *
 * NotifyContextAvailabilityRequest::check - 
 */
-std::string NotifyContextAvailabilityRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string NotifyContextAvailabilityRequest::check(const std::string& apiVersion, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string                        res;
   NotifyContextAvailabilityResponse  response;
@@ -80,15 +80,17 @@ std::string NotifyContextAvailabilityRequest::check(ConnectionInfo* ciP, Request
   {
     response.responseCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = subscriptionId.check(QueryContext, indent, predetectedError, 0))                    != "OK") ||
-           ((res = contextRegistrationResponseVector.check(ciP, QueryContext, indent, predetectedError, 0)) != "OK"))
+  else if (((res = subscriptionId.check(QueryContext, indent, predetectedError, 0))                                != "OK") ||
+           ((res = contextRegistrationResponseVector.check(apiVersion, QueryContext, indent, predetectedError, 0)) != "OK"))
   {
     response.responseCode.fill(SccBadRequest, res);
   }
   else
+  {
     return "OK";
+  }
 
-  return response.render(NotifyContextAvailability, indent);
+  return response.render(indent);
 }
 
 

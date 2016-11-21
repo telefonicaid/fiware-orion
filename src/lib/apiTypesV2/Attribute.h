@@ -46,7 +46,16 @@ public:
   OrionError         oe;                    // Optional - mandatory if not 200-OK
 
   Attribute(): pcontextAttribute(0) {}
-  std::string  render(ConnectionInfo* ciP, RequestType requestType, bool comma = false);
+  std::string  render(const std::string&  apiVersion,
+                      bool                acceptedTextPlain,
+                      bool                acceptedJson,
+                      MimeType            outFormatSelection,
+                      MimeType*           outMimeTypeP,
+                      HttpStatusCode*     scP,
+                      bool                keyValues,
+                      const std::string&  metadataList,
+                      RequestType         requestType,
+                      bool                comma = false);
   void         fill(QueryContextResponse* qcrsP, std::string attrName);
 };
 

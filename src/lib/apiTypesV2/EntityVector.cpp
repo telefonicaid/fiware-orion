@@ -42,7 +42,11 @@
 *
 * EntityVector::render -
 */
-std::string EntityVector::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
+std::string EntityVector::render
+(
+  std::map<std::string, bool>&         uriParamOptions,
+  std::map<std::string, std::string>&  uriParam
+)
 {
   if (vec.size() == 0)
   {
@@ -55,7 +59,7 @@ std::string EntityVector::render(ConnectionInfo* ciP, RequestType requestType, b
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(ciP, requestType, ix != vec.size() - 1);
+    out += vec[ix]->render(uriParamOptions, uriParam, ix != vec.size() - 1);
   }
 
   out += "]";
@@ -69,17 +73,13 @@ std::string EntityVector::render(ConnectionInfo* ciP, RequestType requestType, b
 *
 * EntityVector::check -
 */
-std::string EntityVector::check
-(
-  ConnectionInfo*     ciP,
-  RequestType         requestType
-)
+std::string EntityVector::check(const std::string& apiVersion, RequestType requestType)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType)) != "OK")
     {
       alarmMgr.badInput(clientIp, "invalid vector of Entity");
       return res;

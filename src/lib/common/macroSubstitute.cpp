@@ -24,9 +24,12 @@
 */
 #include <string>
 
+#include "logMsg/logMsg.h"
+
 #include "common/string.h"
-#include "ngsi/ContextElement.h"
 #include "common/macroSubstitute.h"
+
+#include "ngsi/ContextElement.h"
 
 
 

@@ -61,6 +61,8 @@ std::string getEntityTypes
   unsigned int              totalTypes   = 0;
   unsigned int*             totalTypesP  = NULL;
 
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+
   response.statusCode.fill(SccOk);
 
   // NGSIv1 uses details=on to request count
@@ -78,7 +80,11 @@ std::string getEntityTypes
   TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP, true));
 
   std::string rendered;
-  TIMED_RENDER(rendered = response.render(ciP, ""));
+  TIMED_RENDER(rendered = response.render(ciP->apiVersion,
+                                          asJsonObject,
+                                          ciP->outMimeType == JSON,
+                                          ciP->uriParam[URI_PARAM_COLLAPSE] == "true",
+                                          ""));
 
   response.release();
 

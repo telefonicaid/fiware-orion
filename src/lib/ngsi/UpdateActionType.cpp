@@ -38,13 +38,7 @@
 *
 * UpdateActionType::check - 
 */
-std::string UpdateActionType::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string UpdateActionType::check(void)
 {
   if ((string == "update")        || (string == "UPDATE")        || (string == "Update")        ||
       (string == "append")        || (string == "APPEND")        || (string == "Append")        ||

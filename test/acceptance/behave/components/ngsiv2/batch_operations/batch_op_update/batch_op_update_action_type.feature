@@ -47,6 +47,7 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
   Setup: stop ContextBroker
 
   # --------------------- actionType -------------------------
+
   @action_type_append_normalized
   Scenario Outline:  append several entities with batch operations using NGSI v2 with APPEND and APPEND_STRICT in normalized format
     Given  a definition of headers
@@ -189,7 +190,37 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
     When update entities in a single batch operation "DELETE"
     Then verify that receive a "No Content" http code
 
-  @action_type_delete_key_values
+  @action_type_replace
+  Scenario:  delete several entities with batch operations using NGSIv2 in normalized format
+    Given  a definition of headers
+      | parameter          | value                      |
+      | Fiware-Service     | test_op_update_action_type |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
+    # These properties below are used in bach operation request
+    And define a entity properties to update in a single batch operation
+      | parameter          | value       |
+      | entities_number    | 5           |
+      | entities_prefix_id | true        |
+      | entities_type      | home        |
+      | entities_id        | room2       |
+      | attributes_name    | temperature |
+      | attributes_value   | 44          |
+      | attributes_type    | celsius     |
+    When update entities in a single batch operation "APPEND"
+    And verify that receive a "No Content" http code
+    And define a entity properties to update in a single batch operation
+      | parameter          | value |
+      | entities_number    | 5     |
+      | entities_prefix_id | true  |
+      | entities_type      | home  |
+      | entities_id        | room2 |
+    When update entities in a single batch operation "REPLACE"
+      | parameter | value     |
+      | options   | keyValues |
+    Then verify that receive a "No Content" http code
+
+  @action_type_replace_key_values
   Scenario:  delete several entities with batch operations using NGSIv2 in keyvalues format
     Given  a definition of headers
       | parameter          | value                      |
@@ -214,12 +245,10 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
       | entities_prefix_id | true  |
       | entities_type      | home  |
       | entities_id        | room2 |
-    When update entities in a single batch operation "DELETE"
-      | parameter | value     |
-      | options   | keyValues |
+    When update entities in a single batch operation "REPLACE"
     Then verify that receive a "No Content" http code
 
-  @action_type_empty @BUG_2653 @skip
+  @action_type_empty @BUG_2653
   Scenario:  try to append entities with batch operations using NGSI v2 with empty action
     Given  a definition of headers
       | parameter          | value                            |
@@ -238,11 +267,11 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
     When update entities in a single batch operation ""
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value      |
-      | error       | BadRequest |
-      | description | TBD        |
+      | parameter   | value                    |
+      | error       | BadRequest               |
+      | description | empty update action type |
 
-  @action_type_unknown @BUG_2653 @skip
+  @action_type_unknown @BUG_2653
   Scenario:  try to append entities with batch operations using NGSI v2 with unknown action
     Given  a definition of headers
       | parameter          | value                            |
@@ -261,9 +290,9 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
     When update entities in a single batch operation "dfgdf"
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value      |
-      | error       | BadRequest |
-      | description | TBD        |
+      | parameter   | value                               |
+      | error       | BadRequest                          |
+      | description | invalid update action type: /dfgdf/ |
 
   @action_type_without
   Scenario:  try to append entities with batch operations using NGSI v2 without actionType field
@@ -310,7 +339,7 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
       | parameter   | value      |
       | error       | BadRequest |
       | description | TBD        |
-    Examples:
+    Examples: # BUG_2653
       | action_type |
       | habitación  |
       | españa      |
@@ -335,10 +364,10 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
     When update entities in a single batch operation "<action_type>"
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value      |
-      | error       | BadRequest |
-      | description | TBD        |
-    Examples:
+      | parameter   | value                      |
+      | error       | BadRequest                 |
+      | description | invalid update action type |
+    Examples: # @BUG_2653
       | action_type |
       | house<flat> |
       | house=flat  |
@@ -375,3 +404,274 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
+
+  # ----------------------- APPEND_STRICT actionType -------------------------------------
+  @action_type_append_strict_existent
+  Scenario:  try update several entities with batch operations using NGSIv2 in normalized format with APPEND_STRICT actionType but the attribute already exist
+    Given  a definition of headers
+      | parameter          | value                      |
+      | Fiware-Service     | test_op_update_action_type |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
+    # These properties below are used in bach operation request
+    And define a entity properties to update in a single batch operation
+      | parameter          | value       |
+      | entities_number    | 5           |
+      | entities_prefix_id | true        |
+      | entities_type      | home        |
+      | entities_id        | room2       |
+      | attributes_name    | temperature |
+      | attributes_value   | 44          |
+      | attributes_type    | celsius     |
+    When update entities in a single batch operation "APPEND"
+    And verify that receive a "No Content" http code
+    And define a entity properties to update in a single batch operation
+      | parameter          | value       |
+      | entities_number    | 5           |
+      | entities_prefix_id | true        |
+      | entities_type      | home        |
+      | entities_id        | room2       |
+      | attributes_name    | temperature |
+      | attributes_value   | 45          |
+      | attributes_type    | kelvin      |
+    When update entities in a single batch operation "APPEND_STRICT"
+    Then verify that receive an "Unprocessable Entity" http code
+    And verify an error response
+      | parameter   | value                                                                       |
+      | error       | Unprocessable                                                               |
+      | description | one or more of the attributes in the request already exist: [ temperature ] |
+
+  @action_type_append_strict_no_existent
+  Scenario:  update several entities with batch operations using NGSIv2 in normalized format with APPEND_STRICT actionType but the attribute does not exist
+    Given  a definition of headers
+      | parameter          | value                      |
+      | Fiware-Service     | test_op_update_action_type |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
+    # These properties below are used in bach operation request
+    And define a entity properties to update in a single batch operation
+      | parameter          | value       |
+      | entities_number    | 5           |
+      | entities_prefix_id | true        |
+      | entities_type      | home        |
+      | entities_id        | room2       |
+      | attributes_name    | temperature |
+      | attributes_value   | 44          |
+      | attributes_type    | celsius     |
+    When update entities in a single batch operation "APPEND"
+    And verify that receive a "No Content" http code
+    And initialize entity groups recorder
+    And define a entity properties to update in a single batch operation
+      | parameter          | value    |
+      | entities_number    | 5        |
+      | entities_prefix_id | true     |
+      | entities_type      | home     |
+      | entities_id        | room2    |
+      | attributes_name    | pressure |
+      | attributes_value   | 456      |
+      | attributes_type    | bar      |
+    When update entities in a single batch operation "APPEND_STRICT"
+    Then verify that receive an "No Content" http code
+    And verify that entities are stored in mongo
+
+  # ----------------------- UPDATE actionType -------------------------------------
+  @action_type_update_id_unknown
+  Scenario:  try update several entities with batch operations using NGSIv2 in normalized format with id unknown with UPDATE actionType
+    Given  a definition of headers
+      | parameter          | value                      |
+      | Fiware-Service     | test_op_update_action_type |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
+    # These properties below are used in bach operation request
+    And define a entity properties to update in a single batch operation
+      | parameter          | value       |
+      | entities_number    | 5           |
+      | entities_prefix_id | true        |
+      | entities_type      | home        |
+      | entities_id        | room2       |
+      | attributes_name    | temperature |
+      | attributes_value   | 44          |
+      | attributes_type    | celsius     |
+    When update entities in a single batch operation "APPEND"
+    And verify that receive a "No Content" http code
+    And define a entity properties to update in a single batch operation
+      | parameter          | value       |
+      | entities_number    | 5           |
+      | entities_prefix_id | true        |
+      | entities_type      | home        |
+      | entities_id        | room3       |
+      | attributes_name    | temperature |
+      | attributes_value   | 45          |
+      | attributes_type    | kelvin      |
+    When update entities in a single batch operation "UPDATE"
+    Then verify that receive an "Not Found" http code
+    And verify an error response
+      | parameter   | value                                                      |
+      | error       | NotFound                                                   |
+      | description | The requested entity has not been found. Check type and id |
+
+  @action_type_update_attr_unknown
+  Scenario:  try to update several entities with batch operations using NGSIv2 in normalized format and the attribute is unknown with UPDATE actionType
+    Given  a definition of headers
+      | parameter          | value                      |
+      | Fiware-Service     | test_op_update_action_type |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
+  # These properties below are used in bach operation request
+    And define a entity properties to update in a single batch operation
+      | parameter          | value       |
+      | entities_number    | 5           |
+      | entities_prefix_id | true        |
+      | entities_type      | home        |
+      | entities_id        | room2       |
+      | attributes_name    | temperature |
+      | attributes_value   | 44          |
+      | attributes_type    | celsius     |
+    When update entities in a single batch operation "APPEND"
+    And verify that receive a "No Content" http code
+    And define a entity properties to update in a single batch operation
+      | parameter          | value    |
+      | entities_number    | 5        |
+      | entities_prefix_id | true     |
+      | entities_type      | home     |
+      | entities_id        | room2    |
+      | attributes_name    | pressure |
+      | attributes_value   | 456      |
+    When update entities in a single batch operation "UPDATE"
+    Then verify that receive an "Not Found" http code
+    And verify an error response
+      | parameter   | value                                      |
+      | error       | NotFound                                   |
+      | description | The entity does not have such an attribute |
+
+  # ----------------------- REPLACE actionType -------------------------------------
+  @action_type_replace_id_unknown
+  Scenario:  try update several entities with batch operations using NGSIv2 in normalized format with id unknown with REPLACE actionType
+    Given  a definition of headers
+      | parameter          | value                      |
+      | Fiware-Service     | test_op_update_action_type |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
+    # These properties below are used in bach operation request
+    And define a entity properties to update in a single batch operation
+      | parameter          | value       |
+      | entities_number    | 5           |
+      | entities_prefix_id | true        |
+      | entities_type      | home        |
+      | entities_id        | room2       |
+      | attributes_name    | temperature |
+      | attributes_value   | 44          |
+      | attributes_type    | celsius     |
+    When update entities in a single batch operation "APPEND"
+    And verify that receive a "No Content" http code
+    And define a entity properties to update in a single batch operation
+      | parameter          | value       |
+      | entities_number    | 5           |
+      | entities_prefix_id | true        |
+      | entities_type      | home        |
+      | entities_id        | room3       |
+      | attributes_name    | temperature |
+      | attributes_value   | 45          |
+      | attributes_type    | kelvin      |
+    When update entities in a single batch operation "REPLACE"
+    Then verify that receive an "Not Found" http code
+    And verify an error response
+      | parameter   | value                                                      |
+      | error       | NotFound                                                   |
+      | description | The requested entity has not been found. Check type and id |
+
+  @action_type_replace_attr_unknown
+  Scenario:  update several entities with batch operations using NGSIv2 in normalized format and the attribute is unknown with REPLACE actionType
+    Given  a definition of headers
+      | parameter          | value                      |
+      | Fiware-Service     | test_op_update_action_type |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
+  # These properties below are used in bach operation request
+    And define a entity properties to update in a single batch operation
+      | parameter          | value       |
+      | entities_number    | 5           |
+      | entities_prefix_id | true        |
+      | entities_type      | home        |
+      | entities_id        | room2       |
+      | attributes_name    | temperature |
+      | attributes_value   | 44          |
+      | attributes_type    | celsius     |
+    When update entities in a single batch operation "APPEND"
+    And verify that receive a "No Content" http code
+    And define a entity properties to update in a single batch operation
+      | parameter          | value    |
+      | entities_number    | 5        |
+      | entities_prefix_id | true     |
+      | entities_type      | home     |
+      | entities_id        | room2    |
+      | attributes_name    | pressure |
+      | attributes_value   | 456      |
+    When update entities in a single batch operation "REPLACE"
+    Then verify that receive an "No Content" http code
+    And verify that entities are stored in mongo
+
+  # ----------------------- DELETE actionType -------------------------------------
+  @action_type_delete_id_unknown
+  Scenario:  try update several entities with batch operations using NGSIv2 in normalized format with id unknown with DELETE actionType
+    Given  a definition of headers
+      | parameter          | value                      |
+      | Fiware-Service     | test_op_update_action_type |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
+    # These properties below are used in bach operation request
+    And define a entity properties to update in a single batch operation
+      | parameter          | value       |
+      | entities_number    | 5           |
+      | entities_prefix_id | true        |
+      | entities_type      | home        |
+      | entities_id        | room2       |
+      | attributes_name    | temperature |
+      | attributes_value   | 44          |
+      | attributes_type    | celsius     |
+    When update entities in a single batch operation "APPEND"
+    And verify that receive a "No Content" http code
+    And define a entity properties to update in a single batch operation
+      | parameter          | value |
+      | entities_number    | 5     |
+      | entities_prefix_id | true  |
+      | entities_type      | home  |
+      | entities_id        | room3 |
+    When update entities in a single batch operation "DELETE"
+    Then verify that receive an "Not Found" http code
+    And verify an error response
+      | parameter   | value                                                      |
+      | error       | NotFound                                                   |
+      | description | The requested entity has not been found. Check type and id |
+
+  @action_type_delete_attr_unknown
+  Scenario:  update several entities with batch operations using NGSIv2 in normalized format and the attribute is unknown with DELETE actionType
+    Given  a definition of headers
+      | parameter          | value                      |
+      | Fiware-Service     | test_op_update_action_type |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
+  # These properties below are used in bach operation request
+    And define a entity properties to update in a single batch operation
+      | parameter          | value       |
+      | entities_number    | 5           |
+      | entities_prefix_id | true        |
+      | entities_type      | home        |
+      | entities_id        | room2       |
+      | attributes_name    | temperature |
+      | attributes_value   | 44          |
+      | attributes_type    | celsius     |
+    When update entities in a single batch operation "APPEND"
+    And verify that receive a "No Content" http code
+    And define a entity properties to update in a single batch operation
+      | parameter          | value    |
+      | entities_number    | 5        |
+      | entities_prefix_id | true     |
+      | entities_type      | home     |
+      | entities_id        | room2    |
+      | attributes_name    | pressure |
+    When update entities in a single batch operation "DELETE"
+    And verify an error response
+      | parameter   | value               |
+      | error       | NotFound            |
+      | description | Attribute not found |

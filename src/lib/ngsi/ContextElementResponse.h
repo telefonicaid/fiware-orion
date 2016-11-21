@@ -31,7 +31,6 @@
 #include "ngsi/ContextElement.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/AttributeList.h"
-#include "rest/ConnectionInfo.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -65,7 +64,8 @@ typedef struct ContextElementResponse
                          const std::string&     apiVersion   = "v1");
   ContextElementResponse(ContextElement* ceP, bool useDefaultType = false);
 
-  std::string  render(ConnectionInfo*     ciP,
+  std::string  render(const std::string&  apiVersion,
+                      bool                asJsonObject,
                       RequestType         requestType,
                       const std::string&  indent,
                       bool                comma               = false,
@@ -77,7 +77,7 @@ typedef struct ContextElementResponse
   void         present(const std::string& indent, int ix);
   void         release(void);
 
-  std::string  check(ConnectionInfo*     ciP,
+  std::string  check(const std::string&  apiVersion,
                      RequestType         requestType,
                      const std::string&  indent,
                      const std::string&  predetectedError,

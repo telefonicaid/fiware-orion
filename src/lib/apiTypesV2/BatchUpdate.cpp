@@ -53,37 +53,6 @@ BatchUpdate::~BatchUpdate()
 
 /* ****************************************************************************
 *
-* BatchUpdate::check - 
-*/
-std::string BatchUpdate::check(ConnectionInfo* ciP, RequestType requestType)
-{
-  std::string res;
-  std::string err;
-
-  if (((res = entities.check(ciP, requestType))                      != "OK") ||
-      ((res = updateActionType.check(requestType, "", err, 0)) != "OK"))
-  {
-    std::string error = res;
-
-    if (err != "")
-    {
-      error += ": ";
-      error += err;
-    }
-
-    OrionError oe(SccBadRequest, res);
-
-    alarmMgr.badInput(clientIp, error);
-    return oe.render();
-  }
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * BatchUpdate::present - 
 */
 void BatchUpdate::present(const std::string& indent)

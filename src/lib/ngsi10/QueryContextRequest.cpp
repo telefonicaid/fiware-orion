@@ -34,7 +34,6 @@
 #include "ngsi/Restriction.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "ngsi10/QueryContextRequest.h"
-#include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
 #include "apiTypesV2/BatchQuery.h"
 
@@ -95,7 +94,7 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 *
 * QueryContextRequest::render - 
 */
-std::string QueryContextRequest::render(RequestType requestType, const std::string& indent)
+std::string QueryContextRequest::render(const std::string& indent)
 {
   std::string   out                      = "";
   std::string   tag                      = "queryContextRequest";
@@ -119,7 +118,7 @@ std::string QueryContextRequest::render(RequestType requestType, const std::stri
 *
 * QueryContextRequest::check - 
 */
-std::string QueryContextRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string QueryContextRequest::check(const std::string& apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError)
 {
   std::string           res;
   QueryContextResponse  response;
@@ -128,7 +127,7 @@ std::string QueryContextRequest::check(ConnectionInfo* ciP, RequestType requestT
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = entityIdVector.check(ciP, QueryContext, indent, predetectedError, 0))            != "OK") ||
+  else if (((res = entityIdVector.check(QueryContext, indent))                                 != "OK") ||
            ((res = attributeList.check(QueryContext,  indent, predetectedError, 0))            != "OK") ||
            ((res = restriction.check(QueryContext,    indent, predetectedError, restrictions)) != "OK"))
   {
@@ -140,7 +139,7 @@ std::string QueryContextRequest::check(ConnectionInfo* ciP, RequestType requestT
     return "OK";
   }
 
-  return response.render(ciP, QueryContext, indent);
+  return response.render(apiVersion, asJsonObject, indent);
 }
 
 

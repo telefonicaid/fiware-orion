@@ -26,7 +26,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ContextAttributeVector.h"
-#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 
@@ -40,13 +39,11 @@
 TEST(ContextAttributeVector, render)
 {
   ContextAttributeVector  cav;
-  ContextAttribute        ca("Name", "Type", "Value");
   std::string             out;
-  ConnectionInfo          ci(JSON);
 
   utInit();
 
-  out = cav.render(&ci, UpdateContextAttribute, "");
+  out = cav.render("v1", false, UpdateContextAttribute, "");
   EXPECT_STREQ("", out.c_str());
 
   // Just to exercise the code ...

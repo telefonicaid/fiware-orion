@@ -86,11 +86,11 @@ std::string RegisterProviderRequest::render(std::string indent)
 */
 std::string RegisterProviderRequest::check
 (
-  ConnectionInfo* ciP,
-  RequestType     requestType,  
-  std::string     indent,
-  std::string     predetectedError,
-  int             counter
+  const std::string&  apiVersion,
+  RequestType         requestType,
+  std::string         indent,
+  std::string         predetectedError,
+  int                 counter
 )
 {
   DiscoverContextAvailabilityResponse  response;
@@ -100,7 +100,7 @@ std::string RegisterProviderRequest::check
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = metadataVector.check(ciP, requestType, indent, "", counter))  != "OK") ||
+  else if (((res = metadataVector.check(apiVersion))                        != "OK") ||
            ((res = duration.check(requestType, indent, "", 0))              != "OK") ||
            ((res = providingApplication.check(requestType, indent, "", 0))  != "OK") ||
            ((res = registrationId.check(requestType, indent, "", 0))        != "OK"))
@@ -115,7 +115,7 @@ std::string RegisterProviderRequest::check
   std::string details = std::string("RegisterProviderRequest Error: '") + res + "'";
   alarmMgr.badInput(clientIp, details);
 
-  return response.render(DiscoverContextAvailability, indent);
+  return response.render(indent);
 }
 
 

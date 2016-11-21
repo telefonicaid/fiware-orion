@@ -68,7 +68,7 @@ std::string ContextRegistrationAttributeVector::render(const std::string& indent
 */
 std::string ContextRegistrationAttributeVector::check
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,
@@ -79,7 +79,7 @@ std::string ContextRegistrationAttributeVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, indent)) != "OK")
     {
       return res;
     }

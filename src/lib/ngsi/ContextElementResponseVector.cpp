@@ -33,7 +33,6 @@
 #include "common/tag.h"
 #include "common/RenderFormat.h"
 #include "ngsi/ContextElementResponseVector.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -43,7 +42,8 @@
 */
 std::string ContextElementResponseVector::render
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
+  bool                asJsonObject,
   RequestType         requestType,
   const std::string&  indent,
   bool                comma,
@@ -62,7 +62,7 @@ std::string ContextElementResponseVector::render
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(ciP, requestType, indent + "  ", ix < (vec.size() - 1), omitAttributeValues);
+    out += vec[ix]->render(apiVersion, asJsonObject, requestType, indent + "  ", ix < (vec.size() - 1), omitAttributeValues);
   }
 
   out += endTag(indent, comma, true);
@@ -109,7 +109,7 @@ std::string ContextElementResponseVector::toJson
 */
 std::string ContextElementResponseVector::check
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,
@@ -120,7 +120,7 @@ std::string ContextElementResponseVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType, indent, predetectedError, counter)) != "OK")
     {
       return res;
     }

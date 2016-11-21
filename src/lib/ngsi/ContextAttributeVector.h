@@ -30,7 +30,6 @@
 
 #include "common/RenderFormat.h"
 #include "ngsi/ContextAttribute.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -56,13 +55,10 @@ typedef struct ContextAttributeVector
   ContextAttribute*  operator[](unsigned int ix) const;
 
 
-  std::string        check(ConnectionInfo* ciP,
-                           RequestType          requestType,
-                           const std::string&   indent,
-                           const std::string&   predetectedError,
-                           int                  counter);
+  std::string        check(const std::string& apiVersion, RequestType requestType);
 
-  std::string        render(ConnectionInfo*     ciP,
+  std::string        render(const std::string&  apiVersion,
+                            bool                asJsonObject,
                             RequestType         requestType,
                             const std::string&  indent,
                             bool                comma       = false,

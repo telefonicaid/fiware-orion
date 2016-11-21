@@ -31,7 +31,6 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/ContextElementVector.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -52,7 +51,8 @@ void ContextElementVector::push_back(ContextElement* item)
 */
 std::string ContextElementVector::render
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
+  bool                asJsonObject,
   RequestType         requestType,
   const std::string&  indent,
   bool                comma
@@ -70,7 +70,7 @@ std::string ContextElementVector::render
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(ciP, requestType, indent + "  ", ix != vec.size() - 1);
+    out += vec[ix]->render(apiVersion, asJsonObject, requestType, indent + "  ", ix != vec.size() - 1);
   }
 
   out += endTag(indent, comma, true);
@@ -144,7 +144,7 @@ unsigned int ContextElementVector::size(void)
 */
 std::string ContextElementVector::check
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,
@@ -163,7 +163,7 @@ std::string ContextElementVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType, indent, predetectedError, counter)) != "OK")
     {
       return res;
     }

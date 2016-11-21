@@ -45,7 +45,6 @@ TEST(UpdateContextElementRequest, render_json)
   ContextAttribute                ca("caName", "caType", "caValue");
   std::string                     out;
   const char*                     outfile = "ngsi10.updateContextElementRequest.render.valid.json";
-  ConnectionInfo                  ci(JSON);
 
   utInit();
 
@@ -55,7 +54,7 @@ TEST(UpdateContextElementRequest, render_json)
   ucer.attributeDomainName.set("ADN");
   ucer.contextAttributeVector.push_back(&ca);
 
-  out = ucer.render(&ci, UpdateContext, "");
+  out = ucer.render("v1", false, UpdateContext, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -74,7 +73,6 @@ TEST(UpdateContextElementRequest, check_json)
   std::string                     out;
   const char*                     outfile1  = "ngsi10.updateContextElementRequest.check1.valid.json";
   const char*                     outfile2  = "ngsi10.updateContextElementRequest.check2.valid.json";
-  ConnectionInfo                  ci(JSON);
 
   utInit();
 
@@ -82,12 +80,12 @@ TEST(UpdateContextElementRequest, check_json)
 
   // 1. predetectedError
   ucer.contextAttributeVector.push_back(&ca);
-  out = ucer.check(&ci, UpdateContextElement, "", "PRE Error", 0);
+  out = ucer.check("v1", false, UpdateContextElement, "", "PRE Error", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // 2. ok
-  out = ucer.check(&ci, UpdateContextElement, "", "", 0);
+  out = ucer.check("v1", false, UpdateContextElement, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
   // 3. bad attributeDomainName
@@ -97,7 +95,7 @@ TEST(UpdateContextElementRequest, check_json)
   // 4. bad contextAttributeVector
   ContextAttribute                ca2("", "caType", "caValue");
   ucer.contextAttributeVector.push_back(&ca2);
-  out = ucer.check(&ci, UpdateContextElement, "", "", 0);
+  out = ucer.check("v1", false, UpdateContextElement, "", "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

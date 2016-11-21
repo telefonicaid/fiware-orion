@@ -409,7 +409,7 @@ TEST(compoundValue, updateTwoStructsJson)
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
   ci.outMimeType = JSON;
-  rendered = caP->render(&ci, UpdateContext, "");
+  rendered = caP->render("v1", false, UpdateContext, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
@@ -557,7 +557,7 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
   ci.outMimeType = JSON;
-  rendered = caP->render(&ci, UpdateContext, "");
+  rendered = caP->render("v1", false, UpdateContext, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
@@ -958,14 +958,13 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
 TEST(compoundValue, tenCompounds)
 {
   ParseData                  reqData;
-  ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
   UpdateContextRequest*      upcrP;
   std::string                rendered;
    
   utInit();
 
   upcrP = &reqData.upcr.res;
-  rendered = upcrP->render(&ci, UpdateContext, "");
+  rendered = upcrP->render("v1", false, "");
 
   utExit();
 }

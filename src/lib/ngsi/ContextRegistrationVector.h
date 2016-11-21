@@ -46,7 +46,7 @@ typedef struct ContextRegistrationVector
   void                  present(const std::string& indent);
   void                  release(void);
 
-  std::string           check(ConnectionInfo*     ciP,
+  std::string           check(const std::string&  apiVersion,
                               RequestType         requestType,
                               const std::string&  indent,
                               const std::string&  predetectedError,

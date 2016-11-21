@@ -40,7 +40,7 @@
 *
 * getEntityAllTypes -
 *
-* GET /v2/type
+* GET /v2/types
 *
 * Payload In:  None
 * Payload Out: EntityTypeVectorResponse
@@ -77,7 +77,7 @@ std::string getEntityAllTypes
   {
     TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP, noAttrDetail));
   }
-  TIMED_RENDER(answer = response.toJson(ciP));
+  TIMED_RENDER(answer = response.toJson(ciP->uriParamOptions[OPT_VALUES]));
 
   if (ciP->uriParamOptions[OPT_COUNT])
   {

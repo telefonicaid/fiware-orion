@@ -57,7 +57,7 @@ std::string postSubscribeContextAvailability
                                                                       ciP->uriParam,
                                                                       ciP->httpHeaders.correlator,
                                                                       ciP->tenant));
-  TIMED_RENDER(answer = scar.render(SubscribeContextAvailability, ""));
+  TIMED_RENDER(answer = scar.render(""));
 
   return answer;
 }

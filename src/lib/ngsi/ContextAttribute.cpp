@@ -37,8 +37,7 @@
 #include "orionTypes/OrionValueType.h"
 #include "parse/forbiddenChars.h"
 #include "ngsi/ContextAttribute.h"
-#include "rest/ConnectionInfo.h"
-#include "rest/uriParamNames.h"
+#include "rest/HttpStatusCode.h"
 #include "rest/OrionError.h"
 #include "parse/CompoundValueNode.h"
 
@@ -487,7 +486,7 @@ std::string ContextAttribute::getLocation(const std::string& apiVersion) const
 */
 std::string ContextAttribute::renderAsJsonObject
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
   RequestType         request,
   const std::string&  indent,
   bool                comma,
@@ -561,7 +560,7 @@ std::string ContextAttribute::renderAsJsonObject
     }
 
     out += startTag2(indent + "  ", "value", isCompoundVector, true);
-    out += compoundValueP->render(ciP, indent + "    ");
+    out += compoundValueP->render(apiVersion, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
 
@@ -579,15 +578,9 @@ std::string ContextAttribute::renderAsJsonObject
 *
 * renderAsNameString -
 */
-std::string ContextAttribute::renderAsNameString
-(
-  ConnectionInfo*     ciP,
-  RequestType         request,
-  const std::string&  indent,
-  bool                comma
-)
+std::string ContextAttribute::renderAsNameString(const std::string& indent, bool comma)
 {
-  std::string  out                    = "";
+  std::string  out = "";
 
   if (comma)
   {
@@ -608,7 +601,8 @@ std::string ContextAttribute::renderAsNameString
 */
 std::string ContextAttribute::render
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
+  bool                asJsonObject,
   RequestType         request,
   const std::string&  indent,
   bool                comma,
@@ -623,9 +617,9 @@ std::string ContextAttribute::render
 
   metadataVector.keyNameSet("metadata");
 
-  if ((ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (ciP->outMimeType == JSON))
+  if (asJsonObject)
   {
-    return renderAsJsonObject(ciP, request, indent, comma, omitValue);
+    return renderAsJsonObject(apiVersion, request, indent, comma, omitValue);
   }
 
   out += startTag2(indent, key, false, false);
@@ -691,7 +685,7 @@ std::string ContextAttribute::render
     }
 
     out += startTag2(indent + "  ", "value", isCompoundVector, true);
-    out += compoundValueP->render(ciP, indent + "    ");
+    out += compoundValueP->render(apiVersion, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
 
@@ -863,22 +857,30 @@ std::string ContextAttribute::toJson
 *
 * toJsonAsValue -
 */
-std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
+std::string ContextAttribute::toJsonAsValue
+(
+  const std::string&  apiVersion,          // in parameter
+  bool                acceptedTextPlain,   // in parameter
+  bool                acceptedJson,        // in parameter
+  MimeType            outFormatSelection,  // in parameter
+  MimeType*           outMimeTypeP,        // out parameter
+  HttpStatusCode*     scP                  // out parameter
+)
 {
   std::string  out;
 
   if (compoundValueP == NULL)  // Not a compound - text/plain must be accepted
   {
-    if (ciP->httpHeaders.accepted("text/plain"))
+    if (acceptedTextPlain)
     {
       char buf[64];
 
-      ciP->outMimeType = TEXT;
+      *outMimeTypeP = TEXT;
 
       switch (valueType)
       {
       case orion::ValueTypeString:
-        if (ciP->apiVersion == "v2")
+        if (apiVersion == "v2")
         { 
           out = '"' + stringValue + '"';
         }
@@ -894,7 +896,7 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
           out = isodate2str(numberValue);
         }
         else // regular number
-        {          
+        {
           out = toString(numberValue);
         }
         break;
@@ -917,23 +919,23 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
     else
     {
       OrionError oe(SccNotAcceptable, "accepted MIME types: text/plain", "NotAcceptable");
-      ciP->httpStatusCode = SccNotAcceptable;
+      *scP = SccNotAcceptable;
 
       out = oe.toJson();
     }
   }
-  else if (compoundValueP != NULL)  /// Compound: application/json OR text/plain must be accepted
+  else if (compoundValueP != NULL)  // Compound: application/json OR text/plain must be accepted
   {
-    if (!ciP->httpHeaders.accepted("application/json") && !ciP->httpHeaders.accepted("text/plain"))
+    if (!acceptedJson && !acceptedTextPlain)
     {
       OrionError oe(SccNotAcceptable, "accepted MIME types: application/json, text/plain", "NotAcceptable");
-      ciP->httpStatusCode = SccNotAcceptable;
+      *scP = SccNotAcceptable;
 
       out = oe.toJson();
     }
     else
     {
-      ciP->outMimeType = ciP->httpHeaders.outformatSelect();
+      *outMimeTypeP = outFormatSelection;
 
       if (compoundValueP->isVector())
       {
@@ -955,17 +957,17 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
 *
 * ContextAttribute::check - 
 */
-std::string ContextAttribute::check
-(
-  ConnectionInfo*     ciP,
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string ContextAttribute::check(const std::string& apiVersion, RequestType requestType)
 {
   size_t len;
   char errorMsg[128];
+
+  if (((apiVersion == "v2") && (len = strlen(name.c_str())) < MIN_ID_LEN) && (requestType != EntityAttributeValueRequest))
+  {
+    snprintf(errorMsg, sizeof errorMsg, "attribute name length: %zd, min length supported: %d", len, MIN_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
 
   if ((name == "") && (requestType != EntityAttributeValueRequest))
   {
@@ -979,7 +981,7 @@ std::string ContextAttribute::check
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdChars(ciP->apiVersion, name.c_str()))
+  if (forbiddenIdChars(apiVersion, name.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the name of an attribute");
     return "Invalid characters in attribute name";
@@ -993,14 +995,14 @@ std::string ContextAttribute::check
   }
 
 
-  if (ciP->apiVersion == "v2" && (requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  if (apiVersion == "v2" && (requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
-  if ((requestType != EntityAttributeValueRequest) && forbiddenIdChars(ciP->apiVersion, type.c_str()))
+  if ((requestType != EntityAttributeValueRequest) && forbiddenIdChars(apiVersion, type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute");
     return "Invalid characters in attribute type";
@@ -1020,7 +1022,7 @@ std::string ContextAttribute::check
     }
   }
 
-  return metadataVector.check(ciP, requestType, indent + "  ", predetectedError, counter);
+  return metadataVector.check(apiVersion);
 }
 
 

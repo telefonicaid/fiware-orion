@@ -138,7 +138,7 @@ unsigned int ContextRegistrationResponseVector::size(void)
 */
 std::string ContextRegistrationResponseVector::check
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,
@@ -149,7 +149,7 @@ std::string ContextRegistrationResponseVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType, indent, predetectedError, counter)) != "OK")
     {
       return res;
     }
