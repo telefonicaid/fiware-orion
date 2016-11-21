@@ -44,62 +44,58 @@ payload='{
     "type": "DateTime"
   },
   "D02": {
-    "value": "2016-10-01Z",
-    "type": "DateTime"
-  },
-  "D03": {
     "value": "2016-10-01T00",
     "type": "DateTime"
   },
-  "D04": {
+  "D03": {
     "value": "2016-10-01T00Z",
     "type": "DateTime"
   },
-  "D05": {
+  "D04": {
     "value": "2016-10-01T00:00",
     "type": "DateTime"
   },
-  "D06": {
+  "D05": {
     "value": "2016-10-01T00:00Z",
     "type": "DateTime"
   },
-  "D07": {
+  "D06": {
     "value": "2016-10-01T00:00:00",
     "type": "DateTime"
   },
-  "D08": {
+  "D07": {
     "value": "2016-10-01T00:00:00Z",
     "type": "DateTime"
   },
-  "D09": {
+  "D08": {
     "value": "2016-10-01T00:00:00.000",
     "type": "DateTime"
   },
-  "D10": {
+  "D09": {
     "value": "2016-10-01T00:00:00.000Z",
     "type": "DateTime"
   },
-  "D11": {
+  "D10": {
     "value": "2016-10-01T0000",
     "type": "DateTime"
   },
-  "D12": {
+  "D11": {
     "value": "2016-10-01T0000Z",
     "type": "DateTime"
   },
-  "D13": {
+  "D12": {
     "value": "2016-10-01T000000",
     "type": "DateTime"
   },
-  "D14": {
+  "D13": {
     "value": "2016-10-01T000000Z",
     "type": "DateTime"
   },
-  "D15": {
+  "D14": {
     "value": "2016-10-01T000000.000",
     "type": "DateTime"
   },
-  "D16": {
+  "D15": {
     "value": "2016-10-01T000000.000Z",
     "type": "DateTime"
   }
@@ -130,7 +126,7 @@ Date: REGEX(.*)
 02. Get entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 1205
+Content-Length: 1131
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -207,11 +203,6 @@ Date: REGEX(.*)
         "value": "2016-10-01T00:00:00.00Z"
     },
     "D15": {
-        "metadata": {},
-        "type": "DateTime",
-        "value": "2016-10-01T00:00:00.00Z"
-    },
-    "D16": {
         "metadata": {},
         "type": "DateTime",
         "value": "2016-10-01T00:00:00.00Z"

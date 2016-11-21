@@ -553,7 +553,7 @@ int64_t parse8601Time(const std::string& ss)
     m = 0;
     s = 0;
   }
-  else if (sscanf(ss.c_str(), "%4d-%2d-%2d%s", &y, &M, &d, tz) >= 3)                       // Trying just date
+  else if (sscanf(ss.c_str(), "%4d-%2d-%2d%s", &y, &M, &d, tz) == 3)                       // Trying just date (in this case tz is not allowed)
   {
     h = 0;
     m = 0;
