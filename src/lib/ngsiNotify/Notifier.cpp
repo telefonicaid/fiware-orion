@@ -41,7 +41,7 @@
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
 #include "ngsiNotify/Notifier.h"
-#include "cache/subCache.h"
+
 
 
 /* ****************************************************************************
