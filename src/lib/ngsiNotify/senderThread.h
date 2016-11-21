@@ -61,6 +61,7 @@ typedef struct SenderThreadParams
   std::string                        fiwareCorrelator;
   struct timespec                    timeStamp;
   std::map<std::string, std::string> extraHeaders;
+  std::string                        subscriptionId;
 } SenderThreadParams;
 
 

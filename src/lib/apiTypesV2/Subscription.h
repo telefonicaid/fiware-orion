@@ -75,12 +75,16 @@ struct Notification
   long long                lastNotification;
   HttpInfo                 httpInfo;
   std::string              toJson(const std::string& attrsFormat);
+  int                      lastFailure;
+  int                      timesFailed;
   Notification():
     attributes(),
     blacklist(false),
     timesSent(0),
     lastNotification(-1),
-    httpInfo()
+    httpInfo(),
+    lastFailure(-1),
+    timesFailed(0)
   {}
 };
 

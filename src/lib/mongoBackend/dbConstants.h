@@ -100,6 +100,8 @@
 #define CSUB_QS                    "qs"
 #define CSUB_PAYLOAD               "payload"
 #define CSUB_BLACKLIST             "blacklist"
+#define CSUB_LASTFAILURE           "lastFailure"
+#define CSUB_TIMESFAILED           "timesFailed"
 
 #define CASUB_EXPIRATION        "expiration"
 #define CASUB_REFERENCE         "reference"

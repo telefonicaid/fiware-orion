@@ -1,7 +1,6 @@
 #ifndef SRC_LIB_NGSINOTIFY_QUEUENOTIFIER_H
 #define SRC_LIB_NGSINOTIFY_QUEUENOTIFIER_H
 
-
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -60,7 +59,7 @@ public:
                                 RenderFormat                     renderFormat,
                                 const std::vector<std::string>&  attrsOrder,
                                 const std::vector<std::string>&  metadataFilter,
-                                bool                             blacklist = false);
+                                bool                             blacklist);
   int start();
 
 private:

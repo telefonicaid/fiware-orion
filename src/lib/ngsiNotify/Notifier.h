@@ -55,7 +55,7 @@ public:
                                         RenderFormat                               renderFormat,
                                         const std::vector<std::string>&            attrsOrder,
                                         const std::vector<std::string>&            metadataFilter,
-                                        bool                                       blackList = false);
+                                        bool                                       blackList);
 
   virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr,
                                                     const std::string&                url,

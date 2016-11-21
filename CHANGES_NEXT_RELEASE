@@ -7,3 +7,4 @@
 - Fix: PATCH attr wrongly adding metadata item instead of replacing (#1788)
 - Add: support ISO8601 timezones at DateTime attributes and metadata creation/update time and filters (#2632)
 - Add: support for partial representation format at DateTime attributes and metadata creation/update and filters (#2631)
+- Add: notification failure information included in subscriptions (#1960)

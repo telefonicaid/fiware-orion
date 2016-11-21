@@ -241,7 +241,7 @@ typedef struct SubCache
 *
 * subCache -
 */
-static SubCache  subCache            = { NULL, NULL, 0 };
+static SubCache  subCache            = { NULL, NULL, 0, 0, 0, 0 };
 bool             subCacheActive      = false;
 bool             subCacheMultitenant = false;
 
@@ -781,6 +781,8 @@ void subCacheItemInsert
   cSubP->expirationTime        = expirationTime;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
+  cSubP->lastFailure           = -1;
+  cSubP->timesFailed           = 0;
   cSubP->renderFormat          = renderFormat;
   cSubP->next                  = NULL;
   cSubP->count                 = (notificationDone == true)? 1 : 0;
@@ -1118,6 +1120,8 @@ typedef struct CachedSubSaved
 {
   int64_t  lastNotificationTime;
   int64_t  count;
+  int64_t  lastFailure;
+  int64_t  timesFailed;
 } CachedSubSaved;
 
 
@@ -1126,14 +1130,15 @@ typedef struct CachedSubSaved
 *
 * subCacheSync -
 *
-* 1. Save subscriptionId, lastNotificationTime, and count for all items in cache (savedSubV)
+* 1. Save subscriptionId, lastNotificationTime, count, lastFailure, and timesFailed for all items in cache (savedSubV)
 * 2. Refresh cache (count set to 0)
-* 3. Compare lastNotificationTime in savedSubV with the new cache-contents and:
+* 3. Compare lastNotificationTime/lastFailure in savedSubV with the new cache-contents and:
 *    3.1 Update cache-items where 'saved lastNotificationTime' > 'cached lastNotificationTime'
 *    3.2 Remember this more correct lastNotificationTime (must be flushed to mongo) -
 *        by clearing out (set to 0) those lastNotificationTimes that are newer in cache
-* 4. Update 'count' for each item in savedSubV where count != 0
-* 5. Update 'lastNotificationTime' foreach item in savedSubV where lastNotificationTime != 0
+*    Same same with lastFailure
+* 4. Update 'count/timesFailed' for each item in savedSubV where non-zero
+* 5. Update 'lastNotificationTime/lastFailure' foreach item in savedSubV where non-zero
 * 6. Free the vector created in step 1 - savedSubV
 *
 * NOTE
@@ -1157,7 +1162,7 @@ void subCacheSync(void)
 
 
   //
-  // 1. Save subscriptionId, lastNotificationTime, and count for all items in cache
+  // 1. Save subscriptionId, lastNotificationTime, count, lastFailure, and timesFailed for all items in cache
   //
   CachedSubscription* cSubP = subCache.head;
 
@@ -1177,6 +1182,8 @@ void subCacheSync(void)
 
     cssP->lastNotificationTime = cSubP->lastNotificationTime;
     cssP->count                = cSubP->count;
+    cssP->lastFailure          = cSubP->lastFailure;
+    cssP->timesFailed          = cSubP->timesFailed;
 
     savedSubV[cSubP->subscriptionId] = cssP;
     cSubP = cSubP->next;
@@ -1192,39 +1199,54 @@ void subCacheSync(void)
 
 
   //
-  // 3. Compare lastNotificationTime in savedSubV with the new cache-contents
+  // 3. Compare lastNotificationTime/lastFailure in savedSubV with the new cache-contents
   //
   cSubP = subCache.head;
   while (cSubP != NULL)
   {
     CachedSubSaved* cssP = savedSubV[cSubP->subscriptionId];
-    if ((cssP != NULL) && (cssP->lastNotificationTime <= cSubP->lastNotificationTime))
+
+    if (cssP != NULL)
     {
-      // cssP->lastNotificationTime older than what's currently in DB => throw away
-      cssP->lastNotificationTime = 0;
+      if (cssP->lastNotificationTime <= cSubP->lastNotificationTime)
+      {
+        // cssP->lastNotificationTime is older than what's currently in DB => throw away
+        cssP->lastNotificationTime = 0;
+      }
+
+      if (cssP->lastFailure < cSubP->lastFailure)
+      {
+        // cssP->lastFailure is older than what's currently in DB => throw away
+        cssP->lastFailure = 0;
+      }
     }
+
     cSubP = cSubP->next;
   }
 
 
   //
-  // 4. Update 'count' for each item in savedSubV where count != 0
-  // 5. Update 'lastNotificationTime' foreach item in savedSubV where lastNotificationTime != 0
+  // 4. Update 'count/timesFailed' for each item in savedSubV where non-zero
+  // 5. Update 'lastNotificationTime/lastFailure' for each item in savedSubV where non-zero
   //
   cSubP = subCache.head;
   while (cSubP != NULL)
   {
     CachedSubSaved* cssP = savedSubV[cSubP->subscriptionId];
 
-    if (cssP == NULL)
+    if (cssP != NULL)
     {
-      cSubP = cSubP->next;
-      continue;
+      std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
+
+      mongoSubCountersUpdate(tenant, cSubP->subscriptionId, cssP->count, cssP->lastNotificationTime, cssP->lastFailure, cssP->timesFailed);
+
+      // Keeping lastFailure in sub cache
+      cSubP->lastFailure = cssP->lastFailure;
+
+      // Setting timesFailed to zero, as DB already incremented
+      cSubP->timesFailed = 0;
     }
 
-    std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
-
-    mongoSubCacheUpdate(tenant, cSubP->subscriptionId, cssP->count, cssP->lastNotificationTime);
     cSubP = cSubP->next;
   }
 
@@ -1284,4 +1306,48 @@ void subCacheStart(void)
     return;
   }
   pthread_detach(tid);
+}
+
+
+
+extern bool noCache;
+/* ****************************************************************************
+*
+* subCacheItemNotificationErrorStatus - 
+*
+* This function marks a subscription to be erroneous, i.e. notifications are
+* not working.
+* A timestamp for this last failure is set for the sub-item in the sub-cache  and
+* the consecutive number of notification errors for the subscription is incremented.
+*
+* If 'errors' == 0, then the subscription is marked as non-erroneous.
+*/
+void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::string& subscriptionId, int errors)
+{
+  if (noCache)
+  {
+    mongoSubCountersUpdate(tenant, subscriptionId, 0, 0, time(NULL), errors);
+    return;
+  }
+
+  CachedSubscription* subP = subCacheItemLookup(tenant.c_str(), subscriptionId.c_str());
+
+  if (subP == NULL)
+  {
+    const char* errorString = "intent to update error status of non-existing subscription";
+
+    alarmMgr.badInput(clientIp, errorString);
+    return;
+  }
+
+  if (errors == 0)
+  {
+    subP->lastFailure  = -1;
+    subP->timesFailed  = 0;
+  }
+  else
+  {
+    subP->lastFailure  = time(NULL);
+    subP->timesFailed += errors;
+  }
 }

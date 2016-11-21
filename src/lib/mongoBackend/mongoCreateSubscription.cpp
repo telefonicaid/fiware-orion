@@ -48,7 +48,6 @@ using namespace ngsiv2;
 /* ****************************************************************************
 *
 * insertInCache -
-*
 */
 static void insertInCache
 (

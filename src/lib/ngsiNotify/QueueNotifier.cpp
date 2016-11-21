@@ -71,7 +71,7 @@ void QueueNotifier::sendNotifyContextRequest
     const std::vector<std::string>&  attrsOrder,
     const std::vector<std::string>&  metadataFilter,
     bool                             blacklist
-    )
+)
 {
   std::vector<SenderThreadParams*> *paramsV = Notifier::buildSenderParams(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blacklist);
 

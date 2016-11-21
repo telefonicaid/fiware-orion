@@ -73,7 +73,7 @@ void Notifier::sendNotifyContextRequest
     const std::vector<std::string>&  attrsOrder,
     const std::vector<std::string>&  metadataFilter,
     bool                             blackList
-    )
+)
 {
 
   pthread_t                         tid;
@@ -347,6 +347,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 }
 
 
+
 /* ****************************************************************************
 *
 * Notifier::buildSenderParams -
@@ -392,7 +393,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     //
     if (httpInfo.custom && !disableCusNotif)
     {
-
         return buildSenderParamsCustom(ncrP->subscriptionId,
                        ncrP->contextElementResponseVector,
                        httpInfo,
@@ -482,6 +482,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->mimeType         = JSON;
     params->renderFormat     = renderFormatToString(renderFormat);
     params->fiwareCorrelator = fiwareCorrelator;
+    params->subscriptionId   = ncrP->subscriptionId.get();
 
 
     paramsV->push_back(params);

@@ -299,6 +299,7 @@ void setCondsAndInitialNotify
 
   /* Conds vector (and maybe an initial notification) */
   *notificationDone = false;
+
   BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             sub.subject.entities,
                                             notifAttributesV,
@@ -338,12 +339,35 @@ void setLastNotification(long long lastNotification, BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setCount -
-*
 */
 void setCount(long long count, BSONObjBuilder* b)
 {
   b->append(CSUB_COUNT, count);
   LM_T(LmtMongo, ("Subscription count: %lu", count));
+}
+
+
+
+/* ****************************************************************************
+*
+* setLastFailure -
+*/
+void setLastFailure(long long lastFailure, BSONObjBuilder* b)
+{
+  b->append(CSUB_LASTFAILURE, lastFailure);
+  LM_T(LmtMongo, ("Subscription lastFailure: %lu", lastFailure));
+}
+
+
+
+/* ****************************************************************************
+*
+* setTimesFailed -
+*/
+void setTimesFailed(long long timesFailed, BSONObjBuilder* b)
+{
+  b->append(CSUB_TIMESFAILED, timesFailed);
+  LM_T(LmtMongo, ("Subscription timesFailed: %lu", timesFailed));
 }
 
 

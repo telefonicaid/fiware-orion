@@ -174,9 +174,10 @@ public:
                                          const std::string&               fiwareCorrelator,
                                          RenderFormat                     renderFormat,
                                          const std::vector<std::string>&  attrsFilter,
-                                         const std::vector<std::string>&  metadataFilter)
+                                         const std::vector<std::string>&  metadataFilter,
+                                         bool                             blacklist = false)
     {
-      Notifier::sendNotifyContextRequest(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsFilter, metadataFilter);
+      Notifier::sendNotifyContextRequest(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsFilter, metadataFilter, blacklist);
     }
     void parent_sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, const std::string& fiwareCorrelator, RenderFormat renderFormat)
     {

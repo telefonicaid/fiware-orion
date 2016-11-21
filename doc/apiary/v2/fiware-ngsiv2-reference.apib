@@ -1719,6 +1719,8 @@ A subscription is represented by a JSON object with the following fields:
   If this field is not provided at subscription creation time, new subscriptions are created with
   the `active` status, which can be changed by clients afterwards. For expired subscriptions, this
   attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`).
+  Also, for subscriptions experiencing problems with notifications, the status is set to `failed`.
+  As soon as the notifications start working again, the status is changed back to `active`.
 + `throttling`: Minimal period of time in seconds which must elapse between two consecutive
   notifications. It is optional.
 
@@ -1756,7 +1758,11 @@ A `notification` object contains the following subfields:
   See "Filtering out attributes and metadata" section for more detail.
 + `timesSent` (not editable, only present in GET operations): Number of notifications sent due to
    this subscription.
-+ `lastNotification` (not editable, only present in GET operations): Last notification date in ISO8601 format.
++ `lastNotification` (not editable, only present in GET operations): Last notification timestamp in ISO8601 format.
++ `timesFailed` (not editable, only present in GET operations): Number of consecutive errors.
+  Not present if subscription is notifying correctly.
++ `lastFailure` (not editable, only present in GET operations): Last failure timestamp in ISO8601 format.
+  Not present if subscription has never has a problem with notifications.
 
 An `http` object contains the following subfields:
 
@@ -1840,10 +1846,12 @@ Response:
               "attrsFormat": "keyValues",
               "attrs": ["temperature", "humidity"],
               "timesSent": 12,
-              "lastNotification": "2015-10-05T16:00:00.00Z"
+              "lastNotification": "2015-10-05T16:00:00.00Z",
+              "timesFailed": 4
+              "lastFailure": "2015-10-06T16:00:00.00Z"
             },
             "expires": "2016-04-05T14:00:00.00Z",
-            "status": "active",
+            "status": "failed",
             "throttling": 5
           }
         ]

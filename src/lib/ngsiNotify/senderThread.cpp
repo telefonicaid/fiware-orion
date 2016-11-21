@@ -28,6 +28,7 @@
 #include "alarmMgr/alarmMgr.h"
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
+#include "cache/subCache.h"
 
 
 
@@ -88,7 +89,10 @@ void* startSenderThread(void* p)
         statisticsUpdate(NotifyContextSent, params->mimeType);
         alarmMgr.notificationErrorReset(url);
       }
-
+      else
+      {
+        subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 1);
+      }
     }
     else
     {

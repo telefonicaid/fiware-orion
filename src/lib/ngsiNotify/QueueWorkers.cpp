@@ -32,6 +32,7 @@
 #include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 
+#include "cache/subCache.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/QueueStatistics.h"
@@ -158,6 +159,7 @@ static void* workerFunc(void* pSyncQ)
         {
           QueueStatistics::incSentError();
           alarmMgr.notificationError(url, "notification failure for queue worker");
+          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 1);
         }
       }
 

@@ -95,7 +95,6 @@ namespace ngsiv2
   *
   * FIXME P2: we should move 'attrsFormat' from Subject class to Notification
   * class, to avoid passing attrsFormat as argument
-  *
   */
   std::string Notification::toJson(const std::string& attrsFormat)
   {
@@ -105,6 +104,7 @@ namespace ngsiv2
     {
       jh.addNumber("timesSent", this->timesSent);
     }
+
     if (this->lastNotification > 0)
     {
       jh.addDate("lastNotification", this->lastNotification);
@@ -133,6 +133,16 @@ namespace ngsiv2
     if (this->metadata.size() > 0)
     {
       jh.addRaw("metadata", vectorToJson(this->metadata));
+    }
+
+    if (this->lastFailure > 0)
+    {
+      jh.addDate("lastFailure", this->lastFailure);
+    }
+
+    if (this->timesFailed != 0)
+    {
+      jh.addNumber("timesFailed", this->timesFailed);
     }
 
     return jh.str();

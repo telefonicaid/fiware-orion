@@ -56,6 +56,7 @@ extern int mongoSubCacheItemInsert
   const char*         subscriptionId,
   const char*         servicePath,
   int                 lastNotificationTime,
+  int                 lastFailure,
   long long           expirationTime,
   const std::string&  status,
   const std::string&  q,
@@ -80,14 +81,16 @@ extern void mongoSubCacheRefresh(const std::string& database);
 
 /* ****************************************************************************
 *
-* mongoSubCacheUpdate - 
+* mongoSubCountersUpdate - 
 */
-extern void mongoSubCacheUpdate
+extern void mongoSubCountersUpdate
 (
   const std::string&  tenant,
   const std::string&  subId,
   long long           count,
-  long long           lastNotificationTime
+  long long           lastNotificationTime,
+  long long           lastFailure,
+  long long           timesFailed
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOSUBCACHE_H_
