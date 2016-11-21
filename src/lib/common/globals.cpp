@@ -459,9 +459,10 @@ static int timezoneOffset(const char* tz)
     return -1;
   }
 
-  bool positive = (tz[0] == '+');
+  int sign   = (tz[0] == '+')? 1 : -1;
   int offset = -1;
-  int h, m;
+  int h;
+  int m;
 
   if (sscanf(tz + 1, "%2d:%2d", &h, &m) == 2)      // Trying the <time>±hh:mm format
   {
@@ -478,18 +479,11 @@ static int timezoneOffset(const char* tz)
 
   if (offset == -1)
   {
-    // wrong timezone
+    // invalid timezone
     return -1;
   }
 
-  if (positive)
-  {
-    return offset;
-  }
-  else
-  {
-    return -offset;
-  }
+  return sign * offset;
 }
 
 
@@ -505,11 +499,15 @@ static int timezoneOffset(const char* tz)
 */
 int64_t parse8601Time(const std::string& ss)
 {
-  int y, M, d, h, m;
-  char tz[10];
-  float s;
+  int    y = 0;
+  int    M = 0;
+  int    d = 0;
+  int    h = 0;
+  int    m = 0;
+  float  s = 0;
+  char   tz[10];
 
-  // Lenght check, to avoid buffer overflow in tz[]. Calculation is as follows:
+  // Length check, to avoid buffer overflow in tz[]. Calculation is as follows:
   //
   //  5 (year with "-") + 3 * 2 (day and month with "-" or "T")
   //  3 * 3 (hour/minute/second with ":" or ".") + 3 (miliseconds) + 6 (worst case timezone: "+01:00" = 29
@@ -532,34 +530,14 @@ int64_t parse8601Time(const std::string& ss)
   // Default timezone is Z, sscanf will override it if an explicit timezone is provided
   snprintf(tz, sizeof(tz), "%s", "Z");
 
-  if (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d:%2d:%f%s", &y, &M, &d, &h, &m, &s, tz) >= 6 )    // Trying hh:mm:ss.sss or hh:mm:ss
-  {
-    // All info filled, nothing to set
-  }
-  else if (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d%2d%f%s", &y, &M, &d, &h, &m, &s, tz) >= 6)  // Trying hhmmss.sss or hhmmss
-  {
-    // All info filled, nothing to set
-  }
-  else if (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d:%2d%s", &y, &M, &d, &h, &m, tz) >= 5)       // Trying hh:mm
-  {
-    s = 0;
-  }
-  else if (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d%2d%s", &y, &M, &d, &h, &m, tz) >= 5)        // Trying hhmm
-  {
-    s = 0;
-  }
-  else if (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d%s", &y, &M, &d, &h, tz) >= 4)               // Trying hh
-  {
-    m = 0;
-    s = 0;
-  }
-  else if (sscanf(ss.c_str(), "%4d-%2d-%2d%s", &y, &M, &d, tz) == 3)                       // Trying just date (in this case tz is not allowed)
-  {
-    h = 0;
-    m = 0;
-    s = 0;
-  }
-  else
+  bool validDate = ((sscanf(ss.c_str(), "%4d-%2d-%2dT%2d:%2d:%f%s", &y, &M, &d, &h, &m, &s, tz) >= 6)  ||  // Trying hh:mm:ss.sss or hh:mm:ss
+                    (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d%2d%f%s", &y, &M, &d, &h, &m, &s, tz) >= 6)    ||  // Trying hhmmss.sss or hhmmss
+                    (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d:%2d%s", &y, &M, &d, &h, &m, tz) >= 5)         ||  // Trying hh:mm
+                    (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d%2d%s", &y, &M, &d, &h, &m, tz) >= 5)          ||  // Trying hhmm
+                    (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d%s", &y, &M, &d, &h, tz) >= 4)                 ||  // Trying hh
+                    (sscanf(ss.c_str(), "%4d-%2d-%2d%s", &y, &M, &d, tz) == 3));                           // Trying just date (in this case tz is not allowed)
+
+  if (!validDate)
   {
     return -1;
   }
@@ -570,7 +548,7 @@ int64_t parse8601Time(const std::string& ss)
     return -1;
   }
 
-  // Note that at the present moment we are not doing anything with mileseconds, but
+  // Note that at the present moment we are not doing anything with milliseconds, but
   // in the future we could use that to increase time resolution (however, not as part
   // of the tm struct)
 
