@@ -1238,7 +1238,7 @@ void subCacheSync(void)
     {
       std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
 
-      mongoSubCacheUpdate(tenant, cSubP->subscriptionId, cssP->count, cssP->lastNotificationTime, cssP->lastFailure, cssP->timesFailed);
+      mongoSubCountersUpdate(tenant, cSubP->subscriptionId, cssP->count, cssP->lastNotificationTime, cssP->lastFailure, cssP->timesFailed);
 
       // Keeping lastFailure in sub cache
       cSubP->lastFailure = cssP->lastFailure;
@@ -1326,7 +1326,7 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
 {
   if (noCache)
   {
-    mongoSubCacheUpdate(tenant, subscriptionId, 0, 0, time(NULL), errors);
+    mongoSubCountersUpdate(tenant, subscriptionId, 0, 0, time(NULL), errors);
     return;
   }
 

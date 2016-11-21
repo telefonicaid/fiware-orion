@@ -478,9 +478,9 @@ void mongoSubCacheRefresh(const std::string& database)
 
 /* ****************************************************************************
 *
-* mongoSubCacheUpdate - update subscription in mongo with count and lastNotificationTime
+* mongoSubCountersUpdate - update subscription in mongo with count and lastNotificationTime
 */
-void mongoSubCacheUpdate
+void mongoSubCountersUpdate
 (
   const std::string& tenant,
   const std::string& subId,
