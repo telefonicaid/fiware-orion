@@ -95,7 +95,7 @@ typedef struct Metadata
   std::string  toStringValue(void) const;
   bool         compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
-  std::string  check(const std::string& apiVersion);
+  std::string  check(int apiVersion);
 } Metadata;
 
 #endif  // SRC_LIB_NGSI_METADATA_H_

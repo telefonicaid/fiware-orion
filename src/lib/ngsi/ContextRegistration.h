@@ -53,7 +53,7 @@ typedef struct ContextRegistration
   void         present(const std::string& indent, int ix);
   void         release();
 
-  std::string  check(const std::string&  apiVersion,
+  std::string  check(int                 apiVersion,
                      RequestType         requestType,
                      const std::string&  indent,
                      const std::string&  predetectedError,

@@ -58,13 +58,13 @@ TEST(badVerbAllFour, error)
 
   utInit();
 
-  ci1.apiVersion = "v1";
+  ci1.apiVersion = 1;
   out = restService(&ci1, rs);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci1.httpHeader[0]);
   EXPECT_EQ("POST, GET, PUT, DELETE", ci1.httpHeaderValue[0]);
 
-  ci2.apiVersion = "v1";
+  ci2.apiVersion = 1;
   out = restService(&ci2, rs);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci2.httpHeader[0]);

@@ -56,8 +56,8 @@ std::string postEntityByIdAttributeByName
   ParseData*                 parseDataP
 )
 {
-  std::string  entityId      = (compV[0] == "v1")? compV[3] : compV[2];
-  std::string  attributeName = (compV[0] == "v1")? compV[5] : compV[4];
+  std::string  entityId      = (ciP->apiVersion == 1)? compV[3] : compV[2];
+  std::string  attributeName = (ciP->apiVersion == 1)? compV[5] : compV[4];
   std::string  answer;
 
   parseDataP->rcr.res.fill(parseDataP->rpr.res, entityId, "", attributeName);

@@ -46,7 +46,7 @@ public:
   OrionError         oe;                    // Optional - mandatory if not 200-OK
 
   Attribute(): pcontextAttribute(0) {}
-  std::string  render(const std::string&  apiVersion,
+  std::string  render(int                 apiVersion,
                       bool                acceptedTextPlain,
                       bool                acceptedJson,
                       MimeType            outFormatSelection,

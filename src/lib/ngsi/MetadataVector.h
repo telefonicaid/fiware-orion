@@ -46,7 +46,7 @@ public:
   std::string     render(const std::string& indent, bool comma = false);
   std::string     toJson(bool                             isLastElement,
                          const std::vector<std::string>&  metadataFilter);
-  std::string     check(const std::string& apiVersion);
+  std::string     check(int apiVersion);
 
   void            present(const std::string& metadataType, const std::string& indent);
   void            push_back(Metadata* item);

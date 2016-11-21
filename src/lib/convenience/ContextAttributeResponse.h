@@ -51,18 +51,17 @@ typedef struct ContextAttributeResponse
   ContextAttributeVector     contextAttributeVector;     // Mandatory
   StatusCode                 statusCode;                 // Mandatory
 
-  std::string render(const std::string&  apiVersion,
+  std::string render(int                 apiVersion,
                      bool                asJsonObject,
                      RequestType         request,
                      const std::string&  indent);
   void        present(std::string indent);
   void        release(void);
-  std::string check(const std::string&  apiVersion,
+  std::string check(int                 apiVersion,
                     bool                asJsonObject,
                     RequestType         requestType,
                     std::string         indent,
-                    std::string         predetectedError,
-                    int                 counter);
+                    const std::string&  predetectedError);
   void        fill(ContextAttributeVector* _cavP, const StatusCode& _statusCode);
   void        fill(QueryContextResponse*  qcrP,
                    const std::string&     entityId,

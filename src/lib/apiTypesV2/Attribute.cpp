@@ -40,7 +40,7 @@
 */
 std::string Attribute::render
 (
-  const std::string&  apiVersion,          // in parameter (pass-through)
+  int                 apiVersion,          // in parameter (pass-through)
   bool                acceptedTextPlain,   // in parameter (pass-through)
   bool                acceptedJson,        // in parameter (pass-through)
   MimeType            outFormatSelection,  // in parameter (pass-through)

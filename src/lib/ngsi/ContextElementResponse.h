@@ -61,10 +61,10 @@ typedef struct ContextElementResponse
   ContextElementResponse(const mongo::BSONObj&  entityDoc,
                          const AttributeList&   attrL,
                          bool                   includeEmpty = true,
-                         const std::string&     apiVersion   = "v1");
+                         int                    apiVersion   = 1);
   ContextElementResponse(ContextElement* ceP, bool useDefaultType = false);
 
-  std::string  render(const std::string&  apiVersion,
+  std::string  render(int                 apiVersion,
                       bool                asJsonObject,
                       RequestType         requestType,
                       const std::string&  indent,
@@ -77,7 +77,7 @@ typedef struct ContextElementResponse
   void         present(const std::string& indent, int ix);
   void         release(void);
 
-  std::string  check(const std::string&  apiVersion,
+  std::string  check(int                 apiVersion,
                      RequestType         requestType,
                      const std::string&  indent,
                      const std::string&  predetectedError,

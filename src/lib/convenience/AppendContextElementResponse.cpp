@@ -54,10 +54,10 @@ AppendContextElementResponse::AppendContextElementResponse() : errorCode("errorC
 */
 std::string AppendContextElementResponse::render
 (
-  const std::string&  apiVersion,
+  int                 apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
-  const std::string& indent)
+  const std::string&  indent)
 {
   std::string out = "";
 
@@ -90,12 +90,11 @@ std::string AppendContextElementResponse::render
 */
 std::string AppendContextElementResponse::check
 (
-  const std::string&  apiVersion,
+  int                 apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
   std::string         indent,
-  std::string         predetectedError,
-  int                 counter
+  const std::string&  predetectedError
 )
 {
   std::string res;
@@ -104,7 +103,7 @@ std::string AppendContextElementResponse::check
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeResponseVector.check(apiVersion, asJsonObject, requestType, indent, "", counter)) != "OK")
+  else if ((res = contextAttributeResponseVector.check(apiVersion, asJsonObject, requestType, indent, "")) != "OK")
   {
     errorCode.fill(SccBadRequest, res);
   }

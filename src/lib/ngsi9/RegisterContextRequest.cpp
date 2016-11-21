@@ -68,7 +68,7 @@ std::string RegisterContextRequest::render(const std::string& indent)
 *
 * RegisterContextRequest::check - 
 */
-std::string RegisterContextRequest::check(const std::string& apiVersion, const std::string& indent, const std::string& predetectedError, int counter)
+std::string RegisterContextRequest::check(int apiVersion, const std::string& indent, const std::string& predetectedError, int counter)
 {
   RegisterContextResponse  response(this);
   std::string              res;

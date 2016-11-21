@@ -42,13 +42,13 @@ typedef struct ContextElementVector
 
   void             push_back(ContextElement* item);
   unsigned int     size(void);
-  std::string      render(const std::string&  apiVersion, bool asJsonObject, RequestType requestType, const std::string& indent, bool comma);
+  std::string      render(int apiVersion, bool asJsonObject, RequestType requestType, const std::string& indent, bool comma);
   void             present(const std::string& indent);
   void             release(void);
   ContextElement*  lookup(EntityId* eP);
   ContextElement*  operator[](unsigned int ix) const;
 
-  std::string      check(const std::string&  apiVersion,
+  std::string      check(int                 apiVersion,
                          RequestType         requestType,
                          const std::string&  indent,
                          const std::string&  predetectedError,

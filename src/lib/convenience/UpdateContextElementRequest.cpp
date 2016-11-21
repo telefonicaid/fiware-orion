@@ -39,7 +39,7 @@
 *
 * render - 
 */
-std::string UpdateContextElementRequest::render(const std::string& apiVersion, bool asJsonObject, RequestType requestType, std::string indent)
+std::string UpdateContextElementRequest::render(int apiVersion, bool asJsonObject, RequestType requestType, std::string indent)
 {
   std::string out = "";
 
@@ -69,12 +69,11 @@ std::string UpdateContextElementRequest::render(const std::string& apiVersion, b
 */
 std::string UpdateContextElementRequest::check
 (
-  const std::string&  apiVersion,
+  int                 apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
   std::string         indent,
-  std::string         predetectedError,     // Predetected Error, normally during parsing
-  int                 counter
+  const std::string&  predetectedError     // Predetected Error, normally during parsing
 )
 {
   UpdateContextElementResponse  response;

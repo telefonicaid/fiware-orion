@@ -86,11 +86,10 @@ std::string RegisterProviderRequest::render(std::string indent)
 */
 std::string RegisterProviderRequest::check
 (
-  const std::string&  apiVersion,
+  int                 apiVersion,
   RequestType         requestType,
   std::string         indent,
-  std::string         predetectedError,
-  int                 counter
+  const std::string&  predetectedError
 )
 {
   DiscoverContextAvailabilityResponse  response;

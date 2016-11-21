@@ -44,12 +44,12 @@ class EntityTypeVectorResponse
   EntityTypeVector  entityTypeVector;
   StatusCode        statusCode;
 
-  std::string       render(const std::string&  apiVersion,
+  std::string       render(int                 apiVersion,
                            bool                asJsonObject,
                            bool                asJsonOut,
                            bool                collapsed,
                            const std::string&  indent);
-  std::string       check(const std::string&  apiVersion,
+  std::string       check(int                 apiVersion,
                           bool                asJsonObject,
                           bool                asJsonOut,
                           bool                collapsed,

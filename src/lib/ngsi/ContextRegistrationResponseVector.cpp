@@ -137,7 +137,7 @@ unsigned int ContextRegistrationResponseVector::size(void)
 */
 std::string ContextRegistrationResponseVector::check
 (
-  const std::string&  apiVersion,
+  int                 apiVersion,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,

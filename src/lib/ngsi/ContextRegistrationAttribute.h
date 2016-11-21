@@ -50,8 +50,7 @@ typedef struct ContextRegistrationAttribute
   void            present(int ix, const std::string& indent);
   void            release(void);
 
-  std::string     check(const std::string&  apiVersion,
-                        const std::string&  indent);
+  std::string     check(int apiVersion);
 } ContextRegistrationAttribute;
 
 #endif  // SRC_LIB_NGSI_CONTEXTREGISTRATIONATTRIBUTE_H_

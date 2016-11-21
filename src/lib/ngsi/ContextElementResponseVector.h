@@ -41,7 +41,7 @@ typedef struct ContextElementResponseVector
 {
   std::vector<ContextElementResponse*>  vec;
 
-  std::string              render(const std::string&  apiVersion,
+  std::string              render(int                 apiVersion,
                                   bool                asJsonObject,
                                   RequestType         requestType,
                                   const std::string&  indent,
@@ -61,7 +61,7 @@ typedef struct ContextElementResponseVector
   ContextElementResponse*  operator[] (unsigned int ix) const;
   
 
-  std::string              check(const std::string&  apiVersion,
+  std::string              check(int                 apiVersion,
                                  RequestType         requestType,
                                  const std::string&  indent,
                                  const std::string&  predetectedError,

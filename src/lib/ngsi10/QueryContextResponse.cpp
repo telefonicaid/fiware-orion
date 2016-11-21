@@ -94,7 +94,7 @@ QueryContextResponse::~QueryContextResponse()
 *
 * QueryContextResponse::render - 
 */
-std::string QueryContextResponse::render(const std::string& apiVersion, bool asJsonObject, const std::string& indent)
+std::string QueryContextResponse::render(int apiVersion, bool asJsonObject, const std::string& indent)
 {
   std::string  out               = "";
   bool         errorCodeRendered = false;
@@ -161,7 +161,7 @@ std::string QueryContextResponse::render(const std::string& apiVersion, bool asJ
 *
 * QueryContextResponse::check -
 */
-std::string QueryContextResponse::check(const std::string& apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError)
+std::string QueryContextResponse::check(int apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError)
 {
   std::string  res;
 

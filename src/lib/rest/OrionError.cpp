@@ -88,13 +88,13 @@ void OrionError::fill(HttpStatusCode _code, const std::string& _details, const s
 *
 * OrionError::smartRender -
 */
-std::string OrionError::smartRender(const std::string& apiVersion)
+std::string OrionError::smartRender(int apiVersion)
 {
-  if (apiVersion == "v1")
+  if (apiVersion == 1 || apiVersion == -1)
   {
     return render();
   }
-  else // v2
+  else // admin or v2
   {
     shrinkReasonPhrase();
     return toJson();
@@ -107,9 +107,9 @@ std::string OrionError::smartRender(const std::string& apiVersion)
 *
 * OrionError::setStatusCodeAndSmartRender -
 */
-std::string OrionError::setStatusCodeAndSmartRender(const std::string& apiVersion, HttpStatusCode* scP)
+std::string OrionError::setStatusCodeAndSmartRender(int apiVersion, HttpStatusCode* scP)
 {
-  if (apiVersion == "v2")
+  if (apiVersion == 2)
   {
     *scP = code;
   }
@@ -144,7 +144,7 @@ std::string OrionError::render(void)
   // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here
   //
   out += startTag(indent, "orionError", false);
-  out += valueTag(indent  + "  ", "code",          code,         true);
+  out += valueTag(indent + "  ", "code",          code,         true);
   out += valueTag(indent + "  ", "reasonPhrase",  reasonPhrase, details != "");
 
   if (details != "")

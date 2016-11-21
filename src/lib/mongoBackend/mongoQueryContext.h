@@ -47,7 +47,7 @@ extern HttpStatusCode mongoQueryContext
   std::map<std::string, std::string>&   uriParams,
   std::map<std::string, bool>&          options,
   long long*                            countP        = NULL,
-  const std::string&                    apiVersion    = "v1"
+  int                                   apiVersion    = 1
 );
 
 #endif

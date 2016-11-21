@@ -163,7 +163,7 @@ std::string MetadataVector::toJson(bool isLastElement, const std::vector<std::st
 *
 * MetadataVector::check -
 */
-std::string MetadataVector::check(const std::string& apiVersion)
+std::string MetadataVector::check(int apiVersion)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

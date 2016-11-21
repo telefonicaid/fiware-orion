@@ -277,7 +277,7 @@ HttpStatusCode mongoEntityTypes
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
-  const std::string&                   apiVersion,
+  int                                  apiVersion,
   unsigned int*                        totalTypesP,
   bool                                 noAttrDetail
 )
@@ -447,7 +447,7 @@ HttpStatusCode mongoEntityTypes
             entityType->contextAttributeVector.push_back(ca);
 
             // For backward compability, NGSIv1 only accepts one element
-            if (apiVersion == "v1")
+            if (apiVersion == 1)
             {
               break;
             }
@@ -525,7 +525,7 @@ HttpStatusCode mongoAttributesForEntityType
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams,
   bool                                  noAttrDetail,
-  const std::string&                    apiVersion
+  int                                   apiVersion
 )
 {  
   unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
@@ -534,7 +534,7 @@ HttpStatusCode mongoAttributesForEntityType
   bool           count          = false;
 
   // Count only makes sense for this operation in the case of NGSIv1
-  if (apiVersion == "v1")
+  if (apiVersion == 1)
   {
     std::string    detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
     count = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
@@ -631,7 +631,7 @@ HttpStatusCode mongoAttributesForEntityType
         responseP->entityType.contextAttributeVector.push_back(ca);
 
         // For backward compability, NGSIv1 only accepts one element
-        if (apiVersion == "v1")
+        if (apiVersion == 1)
         {
           break;
         }

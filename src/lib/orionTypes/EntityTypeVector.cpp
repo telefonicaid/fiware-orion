@@ -54,7 +54,7 @@ EntityTypeVector::EntityTypeVector()
 */
 std::string EntityTypeVector::render
 (
-  const std::string&  apiVersion,
+  int                 apiVersion,
   bool                asJsonObject,
   bool                asJsonOut,
   bool                collapsed,
@@ -84,7 +84,7 @@ std::string EntityTypeVector::render
 *
 * EntityTypeVector::check -
 */
-std::string EntityTypeVector::check(const std::string&  apiVersion, const std::string&  predetectedError)
+std::string EntityTypeVector::check(int apiVersion, const std::string& predetectedError)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

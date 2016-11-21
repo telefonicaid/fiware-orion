@@ -447,9 +447,9 @@ std::string ContextAttribute::getId(void) const
 *
 * ContextAttribute::getLocation() -
 */
-std::string ContextAttribute::getLocation(const std::string& apiVersion) const
+std::string ContextAttribute::getLocation(int apiVersion) const
 {
-  if (apiVersion == "v1")
+  if (apiVersion == 1)
   {
     // Deprecated way, but still supported
     for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
@@ -486,7 +486,7 @@ std::string ContextAttribute::getLocation(const std::string& apiVersion) const
 */
 std::string ContextAttribute::renderAsJsonObject
 (
-  const std::string&  apiVersion,
+  int                 apiVersion,
   RequestType         request,
   const std::string&  indent,
   bool                comma,
@@ -600,7 +600,7 @@ std::string ContextAttribute::renderAsNameString(const std::string& indent, bool
 */
 std::string ContextAttribute::render
 (
-  const std::string&  apiVersion,
+  int                 apiVersion,
   bool                asJsonObject,
   RequestType         request,
   const std::string&  indent,
@@ -858,12 +858,12 @@ std::string ContextAttribute::toJson
 */
 std::string ContextAttribute::toJsonAsValue
 (
-  const std::string&  apiVersion,          // in parameter
-  bool                acceptedTextPlain,   // in parameter
-  bool                acceptedJson,        // in parameter
-  MimeType            outFormatSelection,  // in parameter
-  MimeType*           outMimeTypeP,        // out parameter
-  HttpStatusCode*     scP                  // out parameter
+  int              apiVersion,          // in parameter
+  bool             acceptedTextPlain,   // in parameter
+  bool             acceptedJson,        // in parameter
+  MimeType         outFormatSelection,  // in parameter
+  MimeType*        outMimeTypeP,        // out parameter
+  HttpStatusCode*  scP                  // out parameter
 )
 {
   std::string  out;
@@ -879,7 +879,7 @@ std::string ContextAttribute::toJsonAsValue
       switch (valueType)
       {
       case orion::ValueTypeString:
-        if (apiVersion == "v2")
+        if (apiVersion == 2)
         { 
           out = '"' + stringValue + '"';
         }
@@ -956,12 +956,12 @@ std::string ContextAttribute::toJsonAsValue
 *
 * ContextAttribute::check - 
 */
-std::string ContextAttribute::check(const std::string& apiVersion, RequestType requestType)
+std::string ContextAttribute::check(int apiVersion, RequestType requestType)
 {
   size_t len;
   char errorMsg[128];
 
-  if (((apiVersion == "v2") && (len = strlen(name.c_str())) < MIN_ID_LEN) && (requestType != EntityAttributeValueRequest))
+  if (((apiVersion == 2) && (len = strlen(name.c_str())) < MIN_ID_LEN) && (requestType != EntityAttributeValueRequest))
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute name length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
@@ -994,7 +994,7 @@ std::string ContextAttribute::check(const std::string& apiVersion, RequestType r
   }
 
 
-  if (apiVersion == "v2" && (requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  if (apiVersion == 2 && (requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);

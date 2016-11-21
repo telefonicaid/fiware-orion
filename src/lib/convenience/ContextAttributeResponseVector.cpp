@@ -40,7 +40,7 @@
 */
 std::string ContextAttributeResponseVector::render
 (
-  const std::string&  apiVersion,
+  int                 apiVersion,
   bool                asJsonObject,
   RequestType         request,
   const std::string&  indent)
@@ -71,19 +71,18 @@ std::string ContextAttributeResponseVector::render
 */
 std::string ContextAttributeResponseVector::check
 (
-  const std::string&  apiVersion,
+  int                 apiVersion,
   bool                asJsonObject,
   RequestType         request,
   std::string         indent,
-  std::string         predetectedError,
-  int                 counter
+  const std::string&  predetectedError
 )
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion, asJsonObject, request, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, asJsonObject, request, indent, predetectedError)) != "OK")
     {
       return res;
     }

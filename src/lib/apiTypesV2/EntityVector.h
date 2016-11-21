@@ -42,7 +42,7 @@ typedef struct EntityVector
 
   std::string   render(std::map<std::string, bool>&         uriParamOptions,
                        std::map<std::string, std::string>&  uriParam);
-  std::string   check(const std::string& apiVersion, RequestType requestType);
+  std::string   check(int apiVersion, RequestType requestType);
   void          present(const std::string& indent);
   void          push_back(Entity* item);
   unsigned int  size(void);

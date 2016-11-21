@@ -139,7 +139,7 @@ std::string parseScopeValueLocation(Value::ConstMemberIterator valueP, Scope* sc
   }
 
   std::string result;
-  scopeP->fill("v2", geometryS, coordsS, georelS, &result);
+  scopeP->fill(2, geometryS, coordsS, georelS, &result);
   return result;
 }
 

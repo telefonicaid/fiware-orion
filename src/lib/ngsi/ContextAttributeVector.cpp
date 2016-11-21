@@ -290,7 +290,7 @@ std::string ContextAttributeVector::toJson
 */
 std::string ContextAttributeVector::render
 (
-  const std::string&  apiVersion,
+  int                 apiVersion,
   bool                asJsonObject,
   RequestType         request,
   const std::string&  indent,
@@ -378,7 +378,7 @@ std::string ContextAttributeVector::render
 *
 * ContextAttributeVector::check - 
 */
-std::string ContextAttributeVector::check(const std::string& apiVersion, RequestType requestType)
+std::string ContextAttributeVector::check(int apiVersion, RequestType requestType)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

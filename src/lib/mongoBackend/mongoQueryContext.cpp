@@ -280,7 +280,7 @@ HttpStatusCode mongoQueryContext
   std::map<std::string, std::string>&  uriParams,
   std::map<std::string, bool>&         options,
   long long*                           countP,
-  const std::string&                   apiVersion
+  int                                  apiVersion
 )
 {
     int         offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());

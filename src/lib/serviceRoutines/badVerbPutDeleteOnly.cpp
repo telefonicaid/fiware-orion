@@ -57,5 +57,5 @@ std::string badVerbPutDeleteOnly
   ciP->httpHeaderValue.push_back("PUT, DELETE");
   ciP->httpStatusCode = SccBadVerb;
 
-  return (ciP->apiVersion == "v1")? "" :  oe.smartRender(ciP->apiVersion);
+  return (ciP->apiVersion == 1 || ciP->apiVersion == -1)? "" :  oe.smartRender(ciP->apiVersion);
 }

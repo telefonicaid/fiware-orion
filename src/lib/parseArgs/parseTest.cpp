@@ -104,7 +104,7 @@ PaArgument paArgs[] =
   { "-f1",      &f1,     "F",      PaFloat,  PaOpt, _i 3.1,   0,       100,     "float"               },
   { "-d1",      &d1,     "D",      PaDouble, PaOpt, _i 3.3,   0,       100,     "double"              },
   { "--lmTest", &lmTest, "",       PaBool,   PaOpt, FALSE,    FALSE,   TRUE,    "test logMsg"         },
-  { NULL,       &v2,     "V2",     PaInt,    PaOpt, 19,       PaNL,    1000,    "env var 2"           },
+  { NULL,       &v2,     2,     PaInt,    PaOpt, 19,       PaNL,    1000,    "env var 2"           },
 
   PA_END_OF_ARGS
 };

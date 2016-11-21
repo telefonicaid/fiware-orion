@@ -51,7 +51,7 @@ void ContextElementVector::push_back(ContextElement* item)
 */
 std::string ContextElementVector::render
 (
-  const std::string&  apiVersion,
+  int                 apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
   const std::string&  indent,
@@ -143,7 +143,7 @@ unsigned int ContextElementVector::size(void)
 */
 std::string ContextElementVector::check
 (
-  const std::string&  apiVersion,
+  int                 apiVersion,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,

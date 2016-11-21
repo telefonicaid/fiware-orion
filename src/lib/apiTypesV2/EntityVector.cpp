@@ -73,7 +73,7 @@ std::string EntityVector::render
 *
 * EntityVector::check -
 */
-std::string EntityVector::check(const std::string& apiVersion, RequestType requestType)
+std::string EntityVector::check(int apiVersion, RequestType requestType)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
