@@ -217,9 +217,9 @@ std::string startTag
   bool                isVector
 )
 {
-  // Empty key is legal JSON. However, doesn't use that kind of JSON in Orion,
-  // so we can this instead of a showkey boolean parameter, keeping the function
-  // signature simpler
+  // Empty key is legal JSON. However, Orion doesn't use that kind of keys,
+  // so we can use an empty key string as argument instead of a showkey boolean
+  // parameter, keeping the function signature simpler
   bool showKey = (key != "");
 
   if (isVector && showKey)

@@ -1,0 +1,190 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Support to timezones in DateTime attributes
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity with several timezones, all meaning the same date
+# 02. Get entity
+#
+
+echo "01. Create entity with several timezones, all meaning the same date"
+echo "==================================================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "D00": {
+    "value": "2016-10-01T01:23:45.000",
+    "type": "DateTime"
+  },
+  "D01": {
+    "value": "2016-10-01T01:23:45.000Z",
+    "type": "DateTime"
+  },
+  "D02": {
+    "value": "2016-10-01T02:23:45.000+01:00",
+    "type": "DateTime"
+  },
+  "D03": {
+    "value": "2016-10-01T02:53:45.000+01:30",
+    "type": "DateTime"
+  },
+  "D04": {
+    "value": "2016-10-01T02:23:45.000+0100",
+    "type": "DateTime"
+  },
+  "D05": {
+    "value": "2016-10-01T02:53:45.000+0130",
+    "type": "DateTime"
+  },
+  "D06": {
+    "value": "2016-10-01T02:23:45.000+01",
+    "type": "DateTime"
+  },
+  "D07": {
+    "value": "2016-10-01T00:23:45.000-01:00",
+    "type": "DateTime"
+  },
+  "D08": {
+    "value": "2016-09-30T23:53:45.000-01:30",
+    "type": "DateTime"
+  },
+  "D09": {
+    "value": "2016-10-01T00:23:45.000-0100",
+    "type": "DateTime"
+  },
+  "D10": {
+    "value": "2016-09-30T23:53:45.000-0130",
+    "type": "DateTime"
+  },
+  "D11": {
+    "value": "2016-10-01T00:23:45.000-01",
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Get entity"
+echo "=============="
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity with several timezones, all meaning the same date
+===================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Get entity
+==============
+HTTP/1.1 200 OK
+Content-Length: 909
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "D00": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T01:23:45.00Z"
+    },
+    "D01": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T01:23:45.00Z"
+    },
+    "D02": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T01:23:45.00Z"
+    },
+    "D03": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T01:23:45.00Z"
+    },
+    "D04": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T01:23:45.00Z"
+    },
+    "D05": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T01:23:45.00Z"
+    },
+    "D06": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T01:23:45.00Z"
+    },
+    "D07": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T01:23:45.00Z"
+    },
+    "D08": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T01:23:45.00Z"
+    },
+    "D09": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T01:23:45.00Z"
+    },
+    "D10": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T01:23:45.00Z"
+    },
+    "D11": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2016-10-01T01:23:45.00Z"
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
