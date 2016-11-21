@@ -34,7 +34,7 @@
 #include "ngsi/Request.h"
 #include "ngsi/ProvidingApplication.h"
 #include "parse/CompoundValueNode.h"
-#include "rest/ConnectionInfo.h"
+#include "rest/HttpStatusCode.h"
 
 
 
@@ -91,14 +91,24 @@ public:
   std::string  getId() const;
   std::string  getLocation(const std::string& apiValue ="v1") const;
 
-  std::string  render(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false, bool omitValue = false);
-  std::string  renderAsJsonObject(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma, bool omitValue = false);
-  std::string  renderAsNameString(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false);
+  std::string  render(const std::string&  apiVersion,
+                      bool                asJsonObject,
+                      RequestType         request,
+                      const std::string&  indent,
+                      bool                comma = false,
+                      bool                omitValue = false);
+  std::string  renderAsJsonObject(const std::string& apiVersion, RequestType request, const std::string& indent, bool comma, bool omitValue = false);
+  std::string  renderAsNameString(const std::string& indent, bool comma = false);
   std::string  toJson(bool                             isLastElement,
                       RenderFormat                     renderFormat,
                       const std::vector<std::string>&  metadataFilter,
                       RequestType                      requestType = NoRequest);
-  std::string  toJsonAsValue(ConnectionInfo* ciP);
+  std::string  toJsonAsValue(const std::string&  apiVersion,
+                             bool                acceptedTextPlain,
+                             bool                acceptedJson,
+                             MimeType            outFormatSelection,
+                             MimeType*           outMimeTypeP,
+                             HttpStatusCode*     scP);
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  getName(void);
@@ -109,11 +119,7 @@ public:
   /* Helper method to be use in some places wher '%s' is needed */
   std::string  getValue(void) const;
 
-  std::string  check(ConnectionInfo*     ciP,
-                     RequestType         requestType,
-                     const std::string&  indent,
-                     const std::string&  predetectedError,
-                     int                 counter);
+  std::string  check(const std::string& apiVersion, RequestType requestType);
   ContextAttribute* clone();
   bool              compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 

@@ -41,7 +41,8 @@
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
 #include "ngsiNotify/Notifier.h"
-#include "cache/subCache.h"
+#include "rest/uriParamNames.h"
+
 
 
 /* ****************************************************************************
@@ -115,7 +116,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
 )
 {
     /* Render NotifyContextAvailabilityRequest */
-    std::string payload = ncar->render(NotifyContextAvailability, "");
+    std::string payload = ncar->render("");
 
     /* Parse URL */
     std::string  host;
@@ -443,7 +444,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     std::string payloadString;
     if (renderFormat == NGSI_V1_LEGACY)
     {
-      payloadString = ncrP->render(&ci, NotifyContext, "");
+      payloadString = ncrP->render(ci.apiVersion, ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON, "");
     }
     else
     {

@@ -235,13 +235,13 @@ Date: REGEX(.*)
 07. POST /v2/entities without Attribute::name
 =============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 69
+Content-Length: 88
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "no 'name' for ContextAttribute", 
+    "description": "attribute name length: 0, min length supported: 1",
     "error": "BadRequest"
 }
 

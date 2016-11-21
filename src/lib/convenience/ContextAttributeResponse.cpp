@@ -42,13 +42,19 @@
 *
 * render - 
 */
-std::string ContextAttributeResponse::render(ConnectionInfo* ciP, RequestType request, std::string indent)
+std::string ContextAttributeResponse::render
+(
+  const std::string&  apiVersion,
+  bool                asJsonObject,
+  RequestType         request,
+  const std::string&  indent
+)
 {
   std::string tag = "contextAttributeResponse";
   std::string out = "";
 
   out += startTag1(indent, tag, false);
-  out += contextAttributeVector.render(ciP, request, indent + "  ", true);
+  out += contextAttributeVector.render(apiVersion, asJsonObject, request, indent + "  ", true);
   out += statusCode.render(indent + "  ");
   out += endTag(indent);
 
@@ -63,11 +69,12 @@ std::string ContextAttributeResponse::render(ConnectionInfo* ciP, RequestType re
 */
 std::string ContextAttributeResponse::check
 (
-  ConnectionInfo*  ciP,
-  RequestType      requestType,
-  std::string      indent,
-  std::string      predetectedError,
-  int              counter
+  const std::string&  apiVersion,
+  bool                asJsonObject,
+  RequestType         requestType,
+  std::string         indent,
+  std::string         predetectedError,
+  int                 counter
 )
 {
   std::string  res;
@@ -76,7 +83,7 @@ std::string ContextAttributeResponse::check
   {
     statusCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+  else if ((res = contextAttributeVector.check(apiVersion, requestType)) != "OK")
   {
     std::string details = std::string("contextAttributeVector: '") + res + "'";
     alarmMgr.badInput(clientIp, details);
@@ -96,7 +103,7 @@ std::string ContextAttributeResponse::check
     return "OK";
   }
 
-  return render(ciP, requestType, indent);
+  return render(apiVersion, asJsonObject, requestType, indent);
 }
 
 

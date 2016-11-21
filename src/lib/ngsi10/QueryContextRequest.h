@@ -31,7 +31,6 @@
 #include "ngsi/AttributeList.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Restriction.h"
-#include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
 
 
@@ -62,8 +61,8 @@ typedef struct QueryContextRequest
   QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName);
   QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const AttributeList& attributeList);
 
-  std::string   render(RequestType requestType, const std::string& indent);
-  std::string   check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
+  std::string   render(const std::string& indent);
+  std::string   check(const std::string& apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError);
   void          present(const std::string& indent);
   void          release(void);
   void          fill(const std::string& entityId, const std::string& entityType, const std::string& attributeName);

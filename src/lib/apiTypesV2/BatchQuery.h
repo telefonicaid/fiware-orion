@@ -32,7 +32,6 @@
 #include "ngsi/Request.h"
 #include "ngsi/ScopeVector.h"
 #include "apiTypesV2/Entities.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -51,7 +50,6 @@ public:
   BatchQuery();
   ~BatchQuery();
 
-  std::string    check(ConnectionInfo* ciP, RequestType requestType);
   void           present(const std::string& indent);
   void           release(void);
 };

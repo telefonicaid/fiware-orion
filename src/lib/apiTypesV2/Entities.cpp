@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "logMsg/traceLevels.h"
+#include "logMsg/logMsg.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "apiTypesV2/Entities.h"
 
@@ -58,9 +59,13 @@ Entities::~Entities()
 * Entities::render - 
 *
 */
-std::string Entities::render(ConnectionInfo* ciP, RequestType requestType)
+std::string Entities::render
+(
+  std::map<std::string, bool>&         uriParamOptions,
+  std::map<std::string, std::string>&  uriParam
+)
 {
-  return vec.render(ciP, requestType, false);
+  return vec.render(uriParamOptions, uriParam);
 } 
 
 
@@ -73,9 +78,9 @@ std::string Entities::render(ConnectionInfo* ciP, RequestType requestType)
 *   The 'check' method is normally only used to check that incoming payload is correct.
 *   For now (at least), the Entities type is only used as outgoing payload ...
 */
-std::string Entities::check(ConnectionInfo* ciP, RequestType requestType)
+std::string Entities::check(const std::string& apiVersion, RequestType requestType)
 {
-  return vec.check(ciP, requestType);
+  return vec.check(apiVersion, requestType);
 }
 
 

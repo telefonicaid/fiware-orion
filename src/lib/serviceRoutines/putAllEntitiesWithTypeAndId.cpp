@@ -79,6 +79,8 @@ extern std::string putAllEntitiesWithTypeAndId
   std::string                   answer;
   UpdateContextElementResponse  response;
 
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+
   // FIXME P1: AttributeDomainName skipped
   // FIXME P1: domainMetadataVector skipped
 
@@ -99,14 +101,14 @@ extern std::string putAllEntitiesWithTypeAndId
   {
     alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    TIMED_RENDER(answer = response.render(ciP, AllEntitiesWithTypeAndId, ""));
+    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, AllEntitiesWithTypeAndId, ""));
     return answer;
   }
   else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
   {
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
-    TIMED_RENDER(answer = response.render(ciP, AllEntitiesWithTypeAndId, ""));
+    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, AllEntitiesWithTypeAndId, ""));
     return answer;
   }
 
@@ -124,7 +126,7 @@ extern std::string putAllEntitiesWithTypeAndId
 
 
   // 06. Cleanup and return result
-  TIMED_RENDER(answer = response.render(ciP, IndividualContextEntity, ""));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
 
   parseDataP->upcr.res.release();
   response.release();

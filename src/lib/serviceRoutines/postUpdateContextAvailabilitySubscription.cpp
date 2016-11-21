@@ -58,7 +58,7 @@ std::string postUpdateContextAvailabilitySubscription
                                                                                ciP->httpHeaders.correlator,
                                                                                ciP->tenant));
 
-  TIMED_RENDER(answer = ucas.render(UpdateContextAvailabilitySubscription, "", 0));
+  TIMED_RENDER(answer = ucas.render("", 0));
 
   return answer;
 }

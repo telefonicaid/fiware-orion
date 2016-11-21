@@ -36,7 +36,7 @@
 #include "parse/nullTreat.h"
 #include "ngsi/Request.h"
 #include "rest/ConnectionInfo.h"
-
+#include "rest/uriParamNames.h"
 
 
 /* ****************************************************************************
@@ -329,7 +329,9 @@ void jsonAcerRelease(ParseData* reqData)
 */
 std::string jsonAcerCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->acer.res.check(ciP, AppendContextElement, "", reqData->errorString, 0);
+  return reqData->acer.res.check(ciP->apiVersion,
+                                 ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
+                                 AppendContextElement, "", reqData->errorString, 0);
 }
 
 

@@ -30,7 +30,6 @@
 
 #include "ngsi/ContextElementResponse.h"
 #include "common/RenderFormat.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -42,7 +41,8 @@ typedef struct ContextElementResponseVector
 {
   std::vector<ContextElementResponse*>  vec;
 
-  std::string              render(ConnectionInfo*     ciP,
+  std::string              render(const std::string&  apiVersion,
+                                  bool                asJsonObject,
                                   RequestType         requestType,
                                   const std::string&  indent,
                                   bool                comma               = false,
@@ -61,7 +61,7 @@ typedef struct ContextElementResponseVector
   ContextElementResponse*  operator[] (unsigned int ix) const;
   
 
-  std::string              check(ConnectionInfo*     ciP,
+  std::string              check(const std::string&  apiVersion,
                                  RequestType         requestType,
                                  const std::string&  indent,
                                  const std::string&  predetectedError,

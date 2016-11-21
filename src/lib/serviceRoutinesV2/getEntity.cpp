@@ -102,7 +102,7 @@ std::string getEntity
   entity.fill(&parseDataP->qcrs.res);
 
   std::string answer;
-  TIMED_RENDER(answer = entity.render(ciP, EntityResponse, false));
+  TIMED_RENDER(answer = entity.render(ciP->uriParamOptions, ciP->uriParam, false));
 
   if (parseDataP->qcrs.res.errorCode.code == SccOk && parseDataP->qcrs.res.contextElementResponseVector.size() > 1)
   {

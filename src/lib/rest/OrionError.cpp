@@ -107,14 +107,14 @@ std::string OrionError::smartRender(const std::string& apiVersion)
 *
 * OrionError::setStatusCodeAndSmartRender -
 */
-std::string OrionError::setStatusCodeAndSmartRender(ConnectionInfo* ciP)
+std::string OrionError::setStatusCodeAndSmartRender(const std::string& apiVersion, HttpStatusCode* scP)
 {
-  if (ciP->apiVersion == "v2")
+  if (apiVersion == "v2")
   {
-    ciP->httpStatusCode = code;
+    *scP = code;
   }
 
-  return smartRender(ciP->apiVersion);
+  return smartRender(apiVersion);
 }
 
 

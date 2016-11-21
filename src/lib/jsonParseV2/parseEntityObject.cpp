@@ -27,6 +27,7 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
+#include "parse/forbiddenChars.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseEntityObject.h"
 #include "jsonParseV2/parseContextAttribute.h"
@@ -139,5 +140,5 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
     }
   }
 
-  return "OK";
+  return eP->check(ciP->apiVersion, ciP->requestType);
 }

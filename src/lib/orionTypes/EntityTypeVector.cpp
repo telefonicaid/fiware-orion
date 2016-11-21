@@ -33,7 +33,6 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/Request.h"
-#include "rest/ConnectionInfo.h"
 #include "orionTypes/EntityType.h"
 #include "orionTypes/EntityTypeVector.h"
 
@@ -55,7 +54,10 @@ EntityTypeVector::EntityTypeVector()
 */
 std::string EntityTypeVector::render
 (
-  ConnectionInfo*     ciP,
+  const std::string&  apiVersion,
+  bool                asJsonObject,
+  bool                asJsonOut,
+  bool                collapsed,
   const std::string&  indent,
   bool                comma
 )
@@ -69,7 +71,7 @@ std::string EntityTypeVector::render
 
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
-      out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1);
+      out += vec[ix]->render(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", ix != vec.size() - 1);
     }
     out += endTag(indent, comma, true);
   }
@@ -83,18 +85,13 @@ std::string EntityTypeVector::render
 *
 * EntityTypeVector::check -
 */
-std::string EntityTypeVector::check
-(
-  ConnectionInfo*     ciP,
-  const std::string&  indent,
-  const std::string&  predetectedError
-)
+std::string EntityTypeVector::check(const std::string&  apiVersion, const std::string&  predetectedError)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, indent, predetectedError)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, predetectedError)) != "OK")
     {
      return res;
     }

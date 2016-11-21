@@ -114,6 +114,14 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
     else if (name == "actionType")
     {
       burP->updateActionType.set(iter->value.GetString());
+      std::string err = burP->updateActionType.check();
+      if (err != "OK")
+      {
+        alarmMgr.badInput(clientIp, err);
+        oe.fill(SccBadRequest, err, "BadRequest");
+        ciP->httpStatusCode = SccBadRequest;
+        return oe.toJson();
+      }     
     }
     else
     {

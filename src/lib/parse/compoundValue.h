@@ -27,7 +27,6 @@
 */
 #include <string>
 
-#include "rest/ConnectionInfo.h"
 #include "orionTypes/OrionValueType.h"
 #include "ngsi/ParseData.h"
 

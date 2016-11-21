@@ -51,7 +51,7 @@ echo "========================================="
 payload='{
   "id": "VERY_LONG",
   "type": "T1",
-  "España": {
+  "A": {
     "value": "06",
     "type":  "AT",
     "metadata": {
@@ -79,7 +79,7 @@ echo "======================================"
 payload='{
   "id": "E1",
   "type": "VERY_LONG",
-  "España": {
+  "A": {
     "value": "06",
     "type":  "AT",
     "metadata": {
