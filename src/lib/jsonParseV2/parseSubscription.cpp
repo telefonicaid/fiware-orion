@@ -29,6 +29,7 @@
 
 #include "alarmMgr/alarmMgr.h"
 #include "common/globals.h"
+#include "common/errorMessages.h"
 #include "common/RenderFormat.h"
 #include "common/string.h"
 #include "rest/ConnectionInfo.h"
@@ -70,7 +71,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
 
   if (document.HasParseError())
   {
-    OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
+    OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     alarmMgr.badInput(clientIp, "JSON parse error");
     ciP->httpStatusCode = SccBadRequest;
     return oe.toJson();
@@ -78,7 +79,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
 
   if (!document.IsObject())
   {
-    OrionError oe(SccBadRequest, "Error parsing incoming JSON buffer", ERROR_STRING_PARSERROR);
+    OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     alarmMgr.badInput(clientIp, "JSON parse error");
     ciP->httpStatusCode = SccBadRequest;
     return oe.toJson();
@@ -91,7 +92,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     // research was made and "ObjectEmpty" was found. As the broker stopped crashing and complaints
     // about crashes with small docs and "Empty()" were found on the internet, we opted to use ObjectEmpty
     //
-    return badInput(ciP, "empty payload");
+    return badInput(ciP, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD);
   }
 
 

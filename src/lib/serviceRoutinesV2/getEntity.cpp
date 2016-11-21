@@ -71,14 +71,14 @@ std::string getEntity
 
    if (entityId == "")
    {
-     OrionError oe(SccBadRequest, EMPTY_ENTITY_ID, "BadRequest");
+     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID, ERROR_BAD_REQUEST);
      ciP->httpStatusCode = oe.code;
      return oe.toJson();
    }
 
    if (forbiddenIdChars(ciP->apiVersion, entityId.c_str(), NULL))
    {
-     OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
+     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
      ciP->httpStatusCode = oe.code;
      return oe.toJson();
    }

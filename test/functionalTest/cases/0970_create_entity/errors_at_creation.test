@@ -151,13 +151,13 @@ echo
 01. POST /v2/entities without Entity::id
 ========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 61
+Content-Length: 83
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "no entity id specified", 
+    "description": "entity id length: 0, min length supported: 1", 
     "error": "BadRequest"
 }
 
@@ -165,13 +165,13 @@ Date: REGEX(.*)
 02. POST /v2/entities with empty Entity::id
 ===========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 54
+Content-Length: 83
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "empty entity id", 
+    "description": "entity id length: 0, min length supported: 1",
     "error": "BadRequest"
 }
 

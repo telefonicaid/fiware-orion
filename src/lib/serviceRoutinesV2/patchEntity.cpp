@@ -73,7 +73,7 @@ std::string patchEntity
 
   if (forbiddenIdChars(ciP->apiVersion, eP->id.c_str() , NULL))
   {
-    OrionError oe(SccBadRequest, "invalid character in URI", "BadRequest");
+    OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
     return oe.toJson();
   }

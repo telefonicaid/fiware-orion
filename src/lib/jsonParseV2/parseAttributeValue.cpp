@@ -24,6 +24,7 @@
 */
 #include "rapidjson/document.h"
 
+#include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
@@ -49,7 +50,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
   if (document.HasParseError())
   {
     alarmMgr.badInput(clientIp, "JSON parse error");
-    oe.fill(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
+    oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;;
     return oe.toJson();
   }
