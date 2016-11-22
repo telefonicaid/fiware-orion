@@ -290,9 +290,9 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
     When update entities in a single batch operation "dfgdf"
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                               |
-      | error       | BadRequest                          |
-      | description | invalid update action type: /dfgdf/ |
+      | parameter   | value                                                                                      |
+      | error       | BadRequest                                                                                 |
+      | description | invalid update action type: right ones are: APPEND, APPEND_STRICT, DELETE, REPLACE, UPDATE |
 
   @action_type_without
   Scenario:  try to append entities with batch operations using NGSI v2 without actionType field
@@ -317,7 +317,7 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
       | error       | BadRequest                                                   |
       | description | Invalid JSON payload, mandatory field /actionType/ not found |
 
-  @action_type_not_plain_ascii @BUG_2653 @skip
+  @action_type_not_plain_ascii @BUG_2653
   Scenario Outline:  try to append entities with batch operations using NGSI v2 with not plain ascii in actionType field
     Given  a definition of headers
       | parameter          | value                            |
@@ -336,16 +336,16 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
     When update entities in a single batch operation "<action_type>"
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value      |
-      | error       | BadRequest |
-      | description | TBD        |
+      | parameter   | value                                                                                      |
+      | error       | BadRequest                                                                                 |
+      | description | invalid update action type: right ones are: APPEND, APPEND_STRICT, DELETE, REPLACE, UPDATE |
     Examples: # BUG_2653
       | action_type |
       | habitación  |
       | españa      |
       | barça       |
 
-  @action_type_forbidden @BUG_2653 @skip
+  @action_type_forbidden @BUG_2653
   Scenario Outline:  try to append entities with batch operations using NGSI v2 with forbidden chars in actionType field
     Given  a definition of headers
       | parameter          | value                            |
@@ -364,21 +364,21 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
     When update entities in a single batch operation "<action_type>"
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                      |
-      | error       | BadRequest                 |
-      | description | invalid update action type |
+      | parameter   | value                                                                                      |
+      | error       | BadRequest                                                                                 |
+      | description | invalid update action type: right ones are: APPEND, APPEND_STRICT, DELETE, REPLACE, UPDATE |
     Examples: # @BUG_2653
-      | action_type |
-      | house<flat> |
-      | house=flat  |
-      | house"flat" |
-      | house'flat' |
-      | house;flat  |
-      | house(flat) |
-      | house_?     |
-      | house_&     |
-      | house_/     |
-      | house_#     |
+      | action_type   |
+      | house<flat>   |
+      | house=flat    |
+      | house\'flat\' |
+      | house'flat'   |
+      | house;flat    |
+      | house(flat)   |
+      | house_?       |
+      | house_&       |
+      | house_/       |
+      | house_#       |
 
   @action_type_malformed
   Scenario:  try to append an entity with batch operations using NGSI v2 but the actionType is malformed, without quotes
@@ -672,6 +672,6 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
       | attributes_name    | pressure |
     When update entities in a single batch operation "DELETE"
     And verify an error response
-      | parameter   | value               |
-      | error       | NotFound            |
-      | description | Attribute not found |
+      | parameter   | value                                      |
+      | error       | NotFound                                   |
+      | description | The entity does not have such an attribute |
