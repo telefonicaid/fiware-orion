@@ -53,8 +53,8 @@ std::string getEntityByIdAttributeByName
   ParseData*                 parseDataP
 )
 {
-  std::string                          entityId      = (ciP->apiVersion == V1)? compV[3] : compV[2];
-  std::string                          attributeName = (ciP->apiVersion == V1)? compV[5] : compV[4];
+  std::string                          entityId      = (compV.size() == 6)? compV[3] : compV[2];
+  std::string                          attributeName = (compV.size() == 6)? compV[5] : compV[4];
   std::string                          answer;
 
   //

@@ -41,7 +41,9 @@
 * postContextEntityTypes -
 *
 * POST /v1/registry/contextEntityTypes/{entityType}
+* POST /v1/registry/contextEntityTypes/{entityType}/attributes
 * POST /ngsi9/contextEntityTypes/{entityType}
+* POST /ngsi9/contextEntityTypes/{entityType}/attributes
 *
 * Payload In:  RegisterProviderRequest
 * Payload Out: RegisterContextResponse
@@ -57,7 +59,9 @@ std::string postContextEntityTypes
   ParseData*                 parseDataP
 )
 {
-  std::string  entityType    = (ciP->apiVersion == V1)? compV[3] : compV[2];
+  // Other similar functions use a condition based on compV.size(), but in this
+  // case is ambiguous so we use compV[0]
+  std::string  entityType    = (compV[0] == "v1")? compV[3] : compV[2];
   std::string  answer;
 
   parseDataP->rcr.res.fill(parseDataP->rpr.res, "", entityType, "");
