@@ -488,19 +488,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     }
   }
 
-
-  //
-  // Detect API version
-  // FIXME PR: we have a method for this...
-  //
-  int apiVersion = 1;
-
-  if ((compV.size() != 0) && strcasecmp(compV[0].c_str(), "v2") == 0)
-  {
-    apiVersion = 2;
-  }
-
-
   //
   // Lookup the requested service
   //
@@ -525,7 +512,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
         continue;
       }
 
-      if (apiVersion == 1)
+      if (ciP->apiVersion == 1)
       {
         if (strcasecmp(serviceV[ix].compV[compNo].c_str(), compV[compNo].c_str()) != 0)
         {

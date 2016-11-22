@@ -116,8 +116,6 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       ciP->httpStatusCode = error.code;
       ciP->answer         = error.smartRender(ciP->apiVersion);
     }
-    // FIXME PR
-    //else if (ciP->apiVersion == "admin")
     else if (ciP->apiVersion == 0)   // admin
     {
       ciP->httpStatusCode = SccBadRequest;
@@ -913,7 +911,7 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
 * /v1    -> 1
 * /admin -> 0
 *
-* Otherwise, -1 is returned, corresponding to wrong path cases.
+* Otherwise, -1 is returned, corresponding to invalid path cases.
 *
 */
 static int apiVersionGet(const char* path)
@@ -923,7 +921,8 @@ static int apiVersionGet(const char* path)
     return 2;
   }
 
-  if ((path[1] == 'v') && (path[2] == '1'))
+  // Different from v2, v1 is case-insensitive (see case/2057 test)
+  if (((path[1] == 'v') || (path[1] == 'V')) && (path[2] == '1'))
   {
     return 1;
   }
@@ -934,16 +933,6 @@ static int apiVersionGet(const char* path)
   }
 
   return -1;
-
-#if 0
-  // FIXME PR
-  if (strcmp(path, "/admin/log") == 0)
-  {
-    return 0;
-  }
-
-  return 1;
-#endif
 }
 
 
