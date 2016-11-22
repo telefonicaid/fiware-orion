@@ -905,13 +905,12 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
 * apiVersionGet - 
 *
 * This function returns the version of the API for the incoming message,
-* based on the URL.
+* based on the URL according to:
 *
-* /v2    -> 2
-* /v1    -> 1
-* /admin -> 0
-*
-* Otherwise, -1 is returned, corresponding to invalid path cases.
+*  2: for URLs in the /v2 path
+*  1: for URLs in the /v1 or with an equivalence (e.g. /ngi10, /log, etc.)
+*  0: admin operations without /v1 alias
+* -1: others (invalid paths)
 *
 */
 static int apiVersionGet(const char* path)
@@ -926,8 +925,17 @@ static int apiVersionGet(const char* path)
   {
     return 1;
   }
+  if ((strncasecmp("/ngsi9",      path, strlen("/ngsi9"))      == 0)  ||
+      (strncasecmp("/ngsi10",     path, strlen("/ngsi10"))     == 0)  ||
+      (strncasecmp("/log",        path, strlen("/log"))        == 0)  ||
+      (strncasecmp("/cache",      path, strlen("/cache"))      == 0)  ||
+      (strncasecmp("/statistics", path, strlen("/statistics")) == 0))
+  {
+    return 1;
+  }
 
-  if (strncmp("/admin", path, strlen("/admin")) == 0)
+  if ((strncmp("/admin",   path, strlen("/admin"))   == 0) ||
+      (strncmp("/version", path, strlen("/version")) == 0))
   {
     return 0;
   }
