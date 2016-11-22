@@ -78,8 +78,8 @@ TEST(Entities, check)
   Entities ens2;
   ens2.vec.push_back(enP);
 
-  EXPECT_EQ("OK", ens1.check(1, EntitiesRequest));
-  EXPECT_EQ("No Entity ID", ens2.check(1, EntitiesRequest));
+  EXPECT_EQ("OK", ens1.check(V1, EntitiesRequest));
+  EXPECT_EQ("No Entity ID", ens2.check(V1, EntitiesRequest));
 
   utExit();
 }

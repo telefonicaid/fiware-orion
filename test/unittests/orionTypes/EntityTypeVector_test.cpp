@@ -62,11 +62,11 @@ TEST(EntityTypeVector, check)
   EntityTypeVector etV2;
   etV2.push_back(&et2);
 
-  EXPECT_EQ("OK", etV1.check(1, ""));
+  EXPECT_EQ("OK", etV1.check(V1, ""));
 
-  EXPECT_EQ("foo", etV1.check(1, "foo"));
+  EXPECT_EQ("foo", etV1.check(V1, "foo"));
 
-  EXPECT_EQ("Empty Type", etV2.check(1, ""));
+  EXPECT_EQ("Empty Type", etV2.check(V1, ""));
 
   utExit();
 }

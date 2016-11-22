@@ -51,20 +51,18 @@ static RestService rs[] =
 TEST(badVerbAllFour, error)
 {
   ConnectionInfo ci1("/ngsi10/contextEntities/123",  "PUST", "1.1");
-  ConnectionInfo ci2("/ngsi10/contextEntities",      "PUST", "1.1");
-  ConnectionInfo ci3("/ngsi10/",                     "PUST", "1.1");
-  ConnectionInfo ci4("/ngsi10/1/2/3/4",              "PUST", "1.1");
+  ConnectionInfo ci2("/ngsi10/contextEntities",      "PUST", "1.1");  
   std::string    out;
 
   utInit();
 
-  ci1.apiVersion = 1;
+  ci1.apiVersion = V1;
   out = restService(&ci1, rs);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci1.httpHeader[0]);
   EXPECT_EQ("POST, GET, PUT, DELETE", ci1.httpHeaderValue[0]);
 
-  ci2.apiVersion = 1;
+  ci2.apiVersion = V1;
   out = restService(&ci2, rs);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci2.httpHeader[0]);

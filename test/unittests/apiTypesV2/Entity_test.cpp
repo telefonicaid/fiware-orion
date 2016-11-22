@@ -65,21 +65,21 @@ TEST(Entity, check)
   ContextAttribute* caP = new ContextAttribute("A", "T", "val");
   enP->attributeVector.push_back(caP);
 
-  EXPECT_EQ("OK", enP->check(1, EntitiesRequest));
+  EXPECT_EQ("OK", enP->check(V1, EntitiesRequest));
 
   enP->id = "";
-  EXPECT_EQ("No Entity ID", enP->check(1, EntitiesRequest));
+  EXPECT_EQ("No Entity ID", enP->check(V1, EntitiesRequest));
 
   enP->id = "E<1>";
-  EXPECT_EQ("Invalid characters in entity id", enP->check(1, EntitiesRequest));
+  EXPECT_EQ("Invalid characters in entity id", enP->check(V1, EntitiesRequest));
   enP->id = "E";
 
   enP->type = "T<1>";
-  EXPECT_EQ("Invalid characters in entity type", enP->check(1, EntitiesRequest));
+  EXPECT_EQ("Invalid characters in entity type", enP->check(V1, EntitiesRequest));
   enP->type = "T";
 
   enP->isPattern = "<false>";
-  EXPECT_EQ("Invalid characters in entity isPattern", enP->check(1, EntitiesRequest));
+  EXPECT_EQ("Invalid characters in entity isPattern", enP->check(V1, EntitiesRequest));
 
   utExit();
 }

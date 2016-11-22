@@ -43,17 +43,17 @@ TEST(ContextAttribute, checkOne)
   utInit();
 
   ca.name = "";
-  res     = ca.check(1, RegisterContext);
+  res     = ca.check(V1, RegisterContext);
   EXPECT_TRUE(res == "missing attribute name");
 
   ca.name  = "Algo, lo que sea!";
   ca.stringValue = ""; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
 
-  res     = ca.check(1, RegisterContext);
+  res     = ca.check(V1, RegisterContext);
   EXPECT_TRUE(res == "OK");
   
   ca.stringValue = "Algun valor cualquiera"; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
-  res     = ca.check(1, RegisterContext);
+  res     = ca.check(V1, RegisterContext);
   EXPECT_TRUE(res == "OK");
 
   utExit();
@@ -82,7 +82,7 @@ TEST(ContextAttribute, checkVector)
   caVector.push_back(&ca0);
   caVector.push_back(&ca1);
 
-  res     = caVector.check(1, RegisterContext);
+  res     = caVector.check(V1, RegisterContext);
   EXPECT_TRUE(res == "OK");
 
   utExit();
@@ -102,7 +102,7 @@ TEST(ContextAttribute, render)
 
   utInit();
 
-  out = ca.render(1, false, UpdateContext, "");
+  out = ca.render(V1, false, UpdateContext, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

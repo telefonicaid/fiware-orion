@@ -73,14 +73,14 @@ TEST(RegisterProviderRequest, json_ok)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
 
   reqData.rpr.res.metadataVector[0]->name = "";
-  checked = reqData.rpr.res.check(1, DiscoverContextAvailability, "", "");
+  checked = reqData.rpr.res.check(V1, DiscoverContextAvailability, "", "");
   EXPECT_STREQ(expectedBuf, checked.c_str());
 
 
   // 3. sending a 'predetected error' to the check function
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile3)) << "Error getting test data from '" << outFile3 << "'";
 
-  checked   = reqData.rpr.res.check(1, DiscoverContextAvailability, "", "forced predetectedError");
+  checked   = reqData.rpr.res.check(V1, DiscoverContextAvailability, "", "forced predetectedError");
   EXPECT_STREQ(expectedBuf, checked.c_str());
 
   // Just for coverage

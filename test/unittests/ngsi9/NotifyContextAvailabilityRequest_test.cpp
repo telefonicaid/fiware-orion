@@ -83,7 +83,7 @@ TEST(NotifyContextAvailabilityRequest, check)
 
   utInit();
 
-  out = ncr.check(1, "", "", 0);
+  out = ncr.check(V1, "", "", 0);
   EXPECT_EQ("OK", out);
    
   utExit();
