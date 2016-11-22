@@ -116,7 +116,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       ciP->httpStatusCode = error.code;
       ciP->answer         = error.smartRender(ciP->apiVersion);
     }
-    else if (ciP->apiVersion == 0)   // admin
+    else if (ciP->apiVersion == ADMIN_API)
     {
       ciP->httpStatusCode = SccBadRequest;
       ciP->answer         = "{" + JSON_STR("error") + ":" + JSON_STR(errorString) + "}";
