@@ -439,15 +439,6 @@ static bool compErrorDetect
 *
 * restService - 
 *
-* NGSIv1 uses a case-insensitive URI PATH, while NGSIv2 is case-sensitive, so
-* before we can start to compare the URI PATH with the vector of supported services,
-* we need to know if it's v1 or v2.
-*
-* This is very easy, we just look at the first component of the URI PATH, and
-* if it is 2 or 2, then case-sensitive checks are used.
-*
-* Note that for NGSIv2 to be 'turned on', the URI PATH must start with exactly /v2.
-* If it starts with /V2, the request will not be considered a NGSIv2 request.
 */
 std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 {
