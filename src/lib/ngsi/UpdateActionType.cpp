@@ -54,7 +54,7 @@ std::string UpdateActionType::check(void)
     return "empty update action type";
   }
 
-  return std::string("invalid update action type: /") + string + "/";
+  return "invalid update action type: right ones are: APPEND, APPEND_STRICT, DELETE, REPLACE, UPDATE";
 }
 
 
