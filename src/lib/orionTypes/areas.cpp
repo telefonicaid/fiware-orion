@@ -585,7 +585,7 @@ Geometry::Geometry(): areaType(""), radius(-1), external(false)
 *
 * Geometry::parse - 
 */
-int Geometry::parse(int apiVersion, const char* in, std::string* errorString)
+int Geometry::parse(ApiVersion apiVersion, const char* in, std::string* errorString)
 {
   std::vector<std::string> items;
 
@@ -597,7 +597,7 @@ int Geometry::parse(int apiVersion, const char* in, std::string* errorString)
 
   for (unsigned int ix = 0; ix < items.size(); ++ix)
   {
-    if ((apiVersion == 1) && ((items[ix] == "polygon") || (items[ix] == "circle")))
+    if ((apiVersion == V1) && ((items[ix] == "polygon") || (items[ix] == "circle")))
     {
       if (areaType != "")
       {
@@ -606,7 +606,7 @@ int Geometry::parse(int apiVersion, const char* in, std::string* errorString)
       }
       areaType = items[ix];
     }
-    else if ((apiVersion == 2) && ((items[ix] == "point") || (items[ix] == "line") || (items[ix] == "box") || (items[ix] == "polygon")))
+    else if ((apiVersion == V2) && ((items[ix] == "point") || (items[ix] == "line") || (items[ix] == "box") || (items[ix] == "polygon")))
     {
       if (areaType != "")
       {

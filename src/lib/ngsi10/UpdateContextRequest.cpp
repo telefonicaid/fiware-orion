@@ -66,7 +66,7 @@ UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, 
 *
 * UpdateContextRequest::render - 
 */
-std::string UpdateContextRequest::render(int apiVersion, bool asJsonObject, const std::string& indent)
+std::string UpdateContextRequest::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
 {
   std::string  out = "";
 
@@ -87,7 +87,7 @@ std::string UpdateContextRequest::render(int apiVersion, bool asJsonObject, cons
 *
 * UpdateContextRequest::check - 
 */
-std::string UpdateContextRequest::check(int apiVersion, bool asJsonObject,  const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject,  const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string            res;
   UpdateContextResponse  response;

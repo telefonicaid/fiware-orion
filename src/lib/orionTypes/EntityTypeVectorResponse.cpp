@@ -44,7 +44,7 @@
 */
 std::string EntityTypeVectorResponse::render
 (
-  int                 apiVersion,
+  ApiVersion          apiVersion,
   bool                asJsonObject,
   bool                asJsonOut,
   bool                collapsed,
@@ -75,7 +75,7 @@ std::string EntityTypeVectorResponse::render
 */
 std::string EntityTypeVectorResponse::check
 (
-  int                 apiVersion,
+  ApiVersion          apiVersion,
   bool                asJsonObject,
   bool                asJsonOut,
   bool                collapsed,

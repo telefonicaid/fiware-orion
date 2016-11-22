@@ -851,7 +851,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
     {
       Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
       std::string  err;
-      if (scopeP->fill(2, subExpr.geometry, subExpr.coords, subExpr.georel, &err) != 0)
+      if (scopeP->fill(V2, subExpr.geometry, subExpr.coords, subExpr.georel, &err) != 0)
       {
         delete scopeP;
         return badInput(ciP, "error parsing geo-query fields: " + err);

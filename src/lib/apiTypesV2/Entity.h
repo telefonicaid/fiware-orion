@@ -60,7 +60,7 @@ public:
   std::string  render(std::map<std::string, bool>&         uriParamOptions,
                       std::map<std::string, std::string>&  uriParam,
                       bool                                 comma = false);
-  std::string  check(int apiVersion, RequestType requestType);
+  std::string  check(ApiVersion apiVersion, RequestType requestType);
   void         present(const std::string& indent);
   void         release(void);
   void         fill(const std::string&       id,

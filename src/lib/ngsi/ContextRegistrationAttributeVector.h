@@ -46,7 +46,7 @@ typedef struct ContextRegistrationAttributeVector
   unsigned int                     size(void);
   void                             release();
 
-  std::string                      check(int apiVersion);
+  std::string                      check(ApiVersion apiVersion);
 
   ContextRegistrationAttribute*  operator[](unsigned int ix) const;
 

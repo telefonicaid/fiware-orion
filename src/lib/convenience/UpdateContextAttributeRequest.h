@@ -49,8 +49,8 @@ typedef struct UpdateContextAttributeRequest
   orion::CompoundValueNode*  compoundValueP;
 
   UpdateContextAttributeRequest();
-  std::string  render(int apiVersion, std::string indent);
-  std::string  check(int apiVersion, std::string indent, const std::string& preError);
+  std::string  render(ApiVersion apiVersion, std::string indent);
+  std::string  check(ApiVersion apiVersion, std::string indent, const std::string& preError);
   void         present(std::string indent);
   void         release();
 } UpdateContextAttributeRequest;

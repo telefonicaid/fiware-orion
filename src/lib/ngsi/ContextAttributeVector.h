@@ -55,9 +55,9 @@ typedef struct ContextAttributeVector
   ContextAttribute*  operator[](unsigned int ix) const;
 
 
-  std::string        check(int apiVersion, RequestType requestType);
+  std::string        check(ApiVersion apiVersion, RequestType requestType);
 
-  std::string        render(int                 apiVersion,
+  std::string        render(ApiVersion          apiVersion,
                             bool                asJsonObject,
                             RequestType         requestType,
                             const std::string&  indent,

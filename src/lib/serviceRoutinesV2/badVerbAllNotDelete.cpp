@@ -60,6 +60,6 @@ std::string badVerbAllNotDelete
 
   alarmMgr.badInput(clientIp, details);
 
-  return (ciP->apiVersion == 1 || ciP->apiVersion == -1)? "" :  oe.smartRender(ciP->apiVersion);
+  return (ciP->apiVersion == V1 || ciP->apiVersion == -1)? "" :  oe.smartRender(ciP->apiVersion);
 }
 

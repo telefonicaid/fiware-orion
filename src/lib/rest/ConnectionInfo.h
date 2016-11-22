@@ -65,7 +65,7 @@ public:
     parseDataP             (NULL),
     port                   (0),
     ip                     (""),
-    apiVersion             (1),
+    apiVersion             (V1),
     inCompoundValue        (false),
     compoundValueP         (NULL),
     compoundValueRoot      (NULL),
@@ -87,7 +87,7 @@ public:
     parseDataP             (NULL),
     port                   (0),
     ip                     (""),
-    apiVersion             (1),
+    apiVersion             (V1),
     inCompoundValue        (false),
     compoundValueP         (NULL),
     compoundValueRoot      (NULL),
@@ -112,7 +112,7 @@ public:
     parseDataP             (NULL),
     port                   (0),
     ip                     (""),
-    apiVersion             (1),
+    apiVersion             (V1),
     inCompoundValue        (false),
     compoundValueP         (NULL),
     compoundValueRoot      (NULL),
@@ -159,7 +159,7 @@ public:
   ParseData*                 parseDataP;
   unsigned short             port;
   std::string                ip;
-  int                        apiVersion;
+  ApiVersion                 apiVersion;
   RequestType                requestType;
   std::string                acceptHeaderError;
 

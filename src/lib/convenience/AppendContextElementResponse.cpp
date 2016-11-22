@@ -54,7 +54,7 @@ AppendContextElementResponse::AppendContextElementResponse() : errorCode("errorC
 */
 std::string AppendContextElementResponse::render
 (
-  int                 apiVersion,
+  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
   const std::string&  indent)
@@ -90,7 +90,7 @@ std::string AppendContextElementResponse::render
 */
 std::string AppendContextElementResponse::check
 (
-  int                 apiVersion,
+  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
   std::string         indent,

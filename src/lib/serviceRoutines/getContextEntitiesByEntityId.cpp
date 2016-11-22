@@ -64,7 +64,7 @@ std::string getContextEntitiesByEntityId
   ParseData*                 parseDataP
 )
 {
-  std::string  entityId = (ciP->apiVersion == 1)? compV[3] : compV[2];
+  std::string  entityId = (ciP->apiVersion == V1)? compV[3] : compV[2];
   std::string  answer;
 
   //

@@ -53,7 +53,7 @@ std::string deleteAvailabilitySubscriptionConvOp
   ParseData*                 parseDataP
 )
 {
-  std::string  subscriptionId = (ciP->apiVersion == 1)? compV[3] : compV[2];
+  std::string  subscriptionId = (ciP->apiVersion == V1)? compV[3] : compV[2];
 
   parseDataP->ucar.res.fill(subscriptionId);
 

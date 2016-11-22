@@ -86,7 +86,7 @@ std::string RegisterProviderRequest::render(std::string indent)
 */
 std::string RegisterProviderRequest::check
 (
-  int                 apiVersion,
+  ApiVersion          apiVersion,
   RequestType         requestType,
   std::string         indent,
   const std::string&  predetectedError

@@ -29,7 +29,7 @@
 #include <string>
 #include <vector>
 
-
+#include "common/globals.h"
 
 namespace orion
 {
@@ -189,7 +189,7 @@ class Geometry
 {
 public:
   Geometry();
-  int          parse(int apiVersion, const char* in, std::string* errorString);
+  int          parse(ApiVersion apiVersion, const char* in, std::string* errorString);
 
   std::string  areaType;
   float        radius;

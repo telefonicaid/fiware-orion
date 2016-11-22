@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/globals.h"
+
 #include "ngsi/Metadata.h"
 
 
@@ -46,7 +48,7 @@ public:
   std::string     render(const std::string& indent, bool comma = false);
   std::string     toJson(bool                             isLastElement,
                          const std::vector<std::string>&  metadataFilter);
-  std::string     check(int apiVersion);
+  std::string     check(ApiVersion apiVersion);
 
   void            present(const std::string& metadataType, const std::string& indent);
   void            push_back(Metadata* item);

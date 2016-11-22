@@ -41,7 +41,7 @@ typedef struct ContextAttributeResponseVector
 {
   std::vector<ContextAttributeResponse*>  vec;
 
-  std::string                render(int                 apiVersion,
+  std::string                render(ApiVersion          apiVersion,
                                     bool                asJsonObject,
                                     RequestType         request,
                                     const std::string&  indent);
@@ -49,7 +49,7 @@ typedef struct ContextAttributeResponseVector
   void                       push_back(ContextAttributeResponse* item);
   unsigned int               size(void);
   void                       release(void);
-  std::string                check(int                 apiVersion,
+  std::string                check(ApiVersion          apiVersion,
                                    bool                asJsonObject,
                                    RequestType         requestType,
                                    std::string         indent,

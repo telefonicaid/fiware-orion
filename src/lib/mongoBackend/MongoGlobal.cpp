@@ -1075,7 +1075,7 @@ bool entitiesQuery
   long long*                       countP,
   bool*                            badInputP,
   const std::string&               sortOrderList,
-  int                              apiVersion
+  ApiVersion                       apiVersion
 )
 {
   /* Query structure is as follows

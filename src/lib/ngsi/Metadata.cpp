@@ -289,12 +289,12 @@ std::string Metadata::render(const std::string& indent, bool comma)
 *
 * Metadata::check -
 */
-std::string Metadata::check(int apiVersion)
+std::string Metadata::check(ApiVersion apiVersion)
 {
   size_t len;
   char   errorMsg[128];
 
-  if (apiVersion == 2 && (len = strlen(name.c_str())) < MIN_ID_LEN)
+  if (apiVersion == V2 && (len = strlen(name.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata name length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
@@ -328,7 +328,7 @@ std::string Metadata::check(int apiVersion)
   }
 
 
-  if (apiVersion == 2 && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  if (apiVersion == V2 && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);

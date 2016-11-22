@@ -134,7 +134,7 @@ ContextElementResponse::ContextElementResponse
   const mongo::BSONObj&  entityDoc,
   const AttributeList&   attrL,
   bool                   includeEmpty,
-  int                    apiVersion
+  ApiVersion             apiVersion
 )
 {
   prune = false;
@@ -250,7 +250,7 @@ ContextElementResponse::ContextElementResponse
       caP->metadataVector.push_back(md);
     }
 
-    if (apiVersion == 1)
+    if (apiVersion == V1)
     {
       /* Setting location metadata (if found) */
       if ((locAttr == ca.name) && (ca.type != GEO_POINT))
@@ -324,7 +324,7 @@ ContextElementResponse::ContextElementResponse(ContextElement* ceP, bool useDefa
 */
 std::string ContextElementResponse::render
 (
-  int                 apiVersion,
+  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
   const std::string&  indent,
@@ -383,7 +383,7 @@ void ContextElementResponse::release(void)
 */
 std::string ContextElementResponse::check
 (
-  int                 apiVersion,
+  ApiVersion          apiVersion,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,

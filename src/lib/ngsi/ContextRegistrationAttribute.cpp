@@ -94,7 +94,7 @@ std::string ContextRegistrationAttribute::render(const std::string& indent, bool
 *
 * ContextRegistrationAttribute::check -
 */
-std::string ContextRegistrationAttribute::check(int apiVersion)
+std::string ContextRegistrationAttribute::check(ApiVersion apiVersion)
 {
 
   if (name == "")

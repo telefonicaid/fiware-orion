@@ -117,7 +117,7 @@ std::string QueryContextRequest::render(const std::string& indent)
 *
 * QueryContextRequest::check - 
 */
-std::string QueryContextRequest::check(int apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError)
+std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError)
 {
   std::string           res;
   QueryContextResponse  response;

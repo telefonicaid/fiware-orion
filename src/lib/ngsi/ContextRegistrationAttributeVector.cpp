@@ -64,7 +64,7 @@ std::string ContextRegistrationAttributeVector::render(const std::string& indent
 *
 * ContextRegistrationAttributeVector::check -
 */
-std::string ContextRegistrationAttributeVector::check(int apiVersion)
+std::string ContextRegistrationAttributeVector::check(ApiVersion apiVersion)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

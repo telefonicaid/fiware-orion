@@ -110,7 +110,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     std::string  errorString = std::string("Empty right-hand-side for URI param /") + ckey + "/";
 
-    if (ciP->apiVersion == 2)
+    if (ciP->apiVersion == V2)
     {
       OrionError error(SccBadRequest, errorString);
       ciP->httpStatusCode = error.code;
@@ -843,7 +843,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   }
 
   // Case 3
-  if ((ciP->apiVersion == 1) && (ciP->httpHeaders.contentType != "application/json"))
+  if ((ciP->apiVersion == V1) && (ciP->httpHeaders.contentType != "application/json"))
   {
     std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
     ciP->httpStatusCode = SccUnsupportedMediaType;
@@ -854,7 +854,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 
   // Case 4
-  if ((ciP->apiVersion == 2) && (ciP->httpHeaders.contentType != "application/json") && (ciP->httpHeaders.contentType != "text/plain"))
+  if ((ciP->apiVersion == V2) && (ciP->httpHeaders.contentType != "application/json") && (ciP->httpHeaders.contentType != "text/plain"))
   {
     std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
     ciP->httpStatusCode = SccUnsupportedMediaType;
@@ -907,23 +907,23 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
 * This function returns the version of the API for the incoming message,
 * based on the URL according to:
 *
-*  2: for URLs in the /v2 path
-*  1: for URLs in the /v1 or with an equivalence (e.g. /ngi10, /log, etc.)
-*  0: admin operations without /v1 alias
-* -1: others (invalid paths)
+*  V2:         for URLs in the /v2 path
+*  V1:         for URLs in the /v1 or with an equivalence (e.g. /ngi10, /log, etc.)
+*  ADMIN_API:  admin operations without /v1 alias
+*  NO_VERSION: others (invalid paths)
 *
 */
-static int apiVersionGet(const char* path)
+static ApiVersion apiVersionGet(const char* path)
 {
   if ((path[1] == 'v') && (path[2] == '2'))
   {
-    return 2;
+    return V2;
   }
 
   // Different from v2, v1 is case-insensitive (see case/2057 test)
   if (((path[1] == 'v') || (path[1] == 'V')) && (path[2] == '1'))
   {
-    return 1;
+    return V1;
   }
   if ((strncasecmp("/ngsi9",      path, strlen("/ngsi9"))      == 0)  ||
       (strncasecmp("/ngsi10",     path, strlen("/ngsi10"))     == 0)  ||
@@ -931,16 +931,16 @@ static int apiVersionGet(const char* path)
       (strncasecmp("/cache",      path, strlen("/cache"))      == 0)  ||
       (strncasecmp("/statistics", path, strlen("/statistics")) == 0))
   {
-    return 1;
+    return V1;
   }
 
   if ((strncmp("/admin",   path, strlen("/admin"))   == 0) ||
       (strncmp("/version", path, strlen("/version")) == 0))
   {
-    return 0;
+    return ADMIN_API;
   }
 
-  return -1;
+  return NO_VERSION;
 }
 
 

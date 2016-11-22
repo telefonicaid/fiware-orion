@@ -100,7 +100,7 @@ static void pointVectorRelease(const std::vector<orion::Point*>& pointV)
 */
 int Scope::fill
 (
-  int                 apiVersion,
+  ApiVersion          apiVersion,
   const std::string&  geometryString,
   const std::string&  coordsString,
   const std::string&  georelString,
@@ -112,7 +112,7 @@ int Scope::fill
   int                         points;
   std::vector<orion::Point*>  pointV;
 
-  type = (apiVersion == 1)? FIWARE_LOCATION : FIWARE_LOCATION_V2;
+  type = (apiVersion == V1)? FIWARE_LOCATION : FIWARE_LOCATION_V2;
 
   //
   // parse geometry
@@ -232,7 +232,7 @@ int Scope::fill
 
   if (geometry.areaType == "circle")
   {
-    if (apiVersion == 2)
+    if (apiVersion == V2)
     {
       *errorStringP = "circle geometry is not supported by Orion API v2";
       pointVectorRelease(pointV);
@@ -263,14 +263,14 @@ int Scope::fill
   {
     areaType = orion::PolygonType;
     
-    if ((apiVersion == 1) && (pointV.size() < 3))
+    if ((apiVersion == V1) && (pointV.size() < 3))
     {
       *errorStringP = "Too few coordinates for polygon";
       pointVectorRelease(pointV);
       pointV.clear();
       return -1;
     }
-    else if ((apiVersion == 2) && (pointV.size() < 4))
+    else if ((apiVersion == V2) && (pointV.size() < 4))
     {
       *errorStringP = "Too few coordinates for polygon";
       pointVectorRelease(pointV);
@@ -281,7 +281,7 @@ int Scope::fill
     //
     // If v2, first and last point must be identical
     //
-    if ((apiVersion == 2) && (pointV[0]->equals(pointV[pointV.size() - 1]) == false))
+    if ((apiVersion == V2) && (pointV[0]->equals(pointV[pointV.size() - 1]) == false))
     {
       *errorStringP = "First and last point in polygon not the same";
       pointVectorRelease(pointV);

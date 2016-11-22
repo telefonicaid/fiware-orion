@@ -44,7 +44,7 @@
 */
 std::string ContextAttributeResponse::render
 (
-  int                 apiVersion,
+  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         request,
   const std::string&  indent
@@ -68,7 +68,7 @@ std::string ContextAttributeResponse::render
 */
 std::string ContextAttributeResponse::check
 (
-  int                 apiVersion,
+  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
   std::string         indent,

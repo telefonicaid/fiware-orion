@@ -49,7 +49,7 @@ AppendContextElementRequest::AppendContextElementRequest()
 *
 * render - 
 */
-std::string AppendContextElementRequest::render(int apiVersion, bool asJsonObject, RequestType requestType, std::string indent)
+std::string AppendContextElementRequest::render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, std::string indent)
 {
   std::string out = "";
 
@@ -85,7 +85,7 @@ std::string AppendContextElementRequest::render(int apiVersion, bool asJsonObjec
 */
 std::string AppendContextElementRequest::check
 (
-  int                 apiVersion,
+  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
   std::string         indent,

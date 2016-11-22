@@ -123,7 +123,7 @@ void QueryContextResponseVector::present(void)
 *
 * QueryContextResponseVector::render - 
 */
-std::string QueryContextResponseVector::render(int apiVersion, bool asJsonObject, bool details, const std::string& detailsString)
+std::string QueryContextResponseVector::render(ApiVersion apiVersion, bool asJsonObject, bool details, const std::string& detailsString)
 {
   QueryContextResponse* responseP = new QueryContextResponse();
   std::string           answer;

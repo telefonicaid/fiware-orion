@@ -88,9 +88,9 @@ void OrionError::fill(HttpStatusCode _code, const std::string& _details, const s
 *
 * OrionError::smartRender -
 */
-std::string OrionError::smartRender(int apiVersion)
+std::string OrionError::smartRender(ApiVersion apiVersion)
 {
-  if (apiVersion == 1 || apiVersion == -1)
+  if (apiVersion == V1 || apiVersion == -1)
   {
     return render();
   }
@@ -107,9 +107,9 @@ std::string OrionError::smartRender(int apiVersion)
 *
 * OrionError::setStatusCodeAndSmartRender -
 */
-std::string OrionError::setStatusCodeAndSmartRender(int apiVersion, HttpStatusCode* scP)
+std::string OrionError::setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpStatusCode* scP)
 {
-  if (apiVersion == 2)
+  if (apiVersion == V2)
   {
     *scP = code;
   }

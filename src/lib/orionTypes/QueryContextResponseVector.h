@@ -44,7 +44,7 @@ typedef struct QueryContextResponseVector
   void                   push_back(QueryContextResponse* item);
   void                   release(void);
   void                   present(void);
-  std::string            render(int apiVersion, bool asJsonObject, bool details, const std::string& detailsString);
+  std::string            render(ApiVersion apiVersion, bool asJsonObject, bool details, const std::string& detailsString);
   void                   populate(QueryContextResponse* responseP);
 
   QueryContextResponse*  operator[](unsigned int ix) const;

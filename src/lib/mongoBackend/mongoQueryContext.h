@@ -28,6 +28,7 @@
 #include <string>
 #include <map>
 
+#include "common/globals.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "rest/StringFilter.h"
@@ -47,7 +48,7 @@ extern HttpStatusCode mongoQueryContext
   std::map<std::string, std::string>&   uriParams,
   std::map<std::string, bool>&          options,
   long long*                            countP        = NULL,
-  int                                   apiVersion    = 1
+  ApiVersion                            apiVersion    = V1
 );
 
 #endif

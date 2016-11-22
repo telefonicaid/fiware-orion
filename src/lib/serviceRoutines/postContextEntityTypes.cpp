@@ -57,7 +57,7 @@ std::string postContextEntityTypes
   ParseData*                 parseDataP
 )
 {
-  std::string  entityType    = (ciP->apiVersion == 1)? compV[3] : compV[2];
+  std::string  entityType    = (ciP->apiVersion == V1)? compV[3] : compV[2];
   std::string  answer;
 
   parseDataP->rcr.res.fill(parseDataP->rpr.res, "", entityType, "");

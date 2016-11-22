@@ -56,8 +56,8 @@ std::string getContextEntityTypeAttribute
   ParseData*                 parseDataP
 )
 {
-  std::string  entityType     = (ciP->apiVersion == 1)? compV[3] : compV[2];
-  std::string  attributeName  = (ciP->apiVersion == 1)? compV[5] : compV[4];
+  std::string  entityType     = (ciP->apiVersion == V1)? compV[3] : compV[2];
+  std::string  attributeName  = (ciP->apiVersion == V1)? compV[5] : compV[4];
   std::string  answer;
 
   LM_T(LmtConvenience,

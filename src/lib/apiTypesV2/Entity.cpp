@@ -175,12 +175,12 @@ std::string Entity::render
 *
 * Entity::check - 
 */
-std::string Entity::check(int apiVersion, RequestType requestType)
+std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
 {
   ssize_t len;
   char errorMsg[128];
 
-  if (((apiVersion == 2) && (len = strlen(id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
+  if (((apiVersion == V2) && (len = strlen(id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
   {
     snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
@@ -212,7 +212,7 @@ std::string Entity::check(int apiVersion, RequestType requestType)
     return std::string(errorMsg);
   }
 
-  if ((apiVersion == 2) && ((len = strlen(type.c_str())) < MIN_ID_LEN) && (requestType != BatchQueryRequest))
+  if ((apiVersion == V2) && ((len = strlen(type.c_str())) < MIN_ID_LEN) && (requestType != BatchQueryRequest))
   {
     snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);

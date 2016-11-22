@@ -285,10 +285,10 @@ static bool equalMetadata(BSONObj& md1, BSONObj& md2)
 * Check that the attribute doesn't have any value
 *
 */
-bool attributeValueAbsent(ContextAttribute* caP, int apiVersion)
+bool attributeValueAbsent(ContextAttribute* caP, ApiVersion apiVersion)
 {
   /* In v2, absent attribute means "null", which has diferent semantics */
-  return ((caP->valueType == ValueTypeNone) && (apiVersion == 1));
+  return ((caP->valueType == ValueTypeNone) && (apiVersion == V1));
 }
 
 /* ****************************************************************************
@@ -311,7 +311,7 @@ bool attributeTypeAbsent(ContextAttribute* caP)
 *
 * changedAttr -
 */
-bool attrValueChanges(BSONObj& attr, ContextAttribute* caP, int apiVersion)
+bool attrValueChanges(BSONObj& attr, ContextAttribute* caP, ApiVersion apiVersion)
 {
   /* Not finding the attribute field at MongoDB is considered as an implicit "" */
   if (!attr.hasField(ENT_ATTRS_VALUE))
@@ -321,7 +321,7 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP, int apiVersion)
 
   /* No value in the request means that the value stays as it was before, so it is not
    * a change */
-  if (caP->valueType == ValueTypeNone && apiVersion !=2)
+  if (caP->valueType == ValueTypeNone && apiVersion != V2)
   {
     return false;
   }
@@ -470,7 +470,7 @@ void appendMetadata(BSONObjBuilder* mdBuilder, BSONArrayBuilder* mdNamesBuilder,
 * request (caP), and merged them producing the mergedAttr output. The function returns
 * true if it was an actual update, false otherwise.
 */
-static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedAttr, int apiVersion)
+static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedAttr, ApiVersion apiVersion)
 {
   BSONObjBuilder ab;
 
@@ -543,7 +543,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
       continue;
     }
 
-    appendMetadata(&mdBuilder, &mdNamesBuilder, mdP, apiVersion == 2);
+    appendMetadata(&mdBuilder, &mdNamesBuilder, mdP, apiVersion == V2);
   }
 
 
@@ -566,7 +566,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 
       mdSize++;
 
-      if (apiVersion != 2 || caP->onlyValue)
+      if (apiVersion != V2 || caP->onlyValue)
       {
         if (!hasMetadata(dbDotDecode(md.name), md.type, caP))
         {
@@ -708,7 +708,7 @@ static bool updateAttribute
   ContextAttribute*   caP,
   bool&               actualUpdate,
   bool                isReplace,
-  int                 apiVersion
+  ApiVersion          apiVersion
 )
 {
   actualUpdate = false;
@@ -727,7 +727,7 @@ static bool updateAttribute
 
     int now = getCurrentTime();
 
-    if (!caP->typeGiven && (apiVersion == 2))
+    if (!caP->typeGiven && (apiVersion == V2))
     {
       std::string attrType;
 
@@ -754,7 +754,7 @@ static bool updateAttribute
     /* Custom metadata */
     BSONObj    md;
     BSONArray  mdNames;
-    if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == 2));
+    if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2));
     {
       newAttr.append(ENT_ATTRS_MD, md);
     }
@@ -806,7 +806,7 @@ static bool appendAttribute
   BSONArrayBuilder*   toPush,
   ContextAttribute*   caP,
   bool&               actualUpdate,
-  int                 apiVersion
+  ApiVersion          apiVersion
 )
 {
   std::string effectiveName = dbDotEncode(caP->name);
@@ -830,7 +830,7 @@ static bool appendAttribute
   caP->valueBson(ab);
 
   /* 2. Type */
-  if ((apiVersion == 2) && !caP->typeGiven)
+  if ((apiVersion == V2) && !caP->typeGiven)
   {
     std::string attrType;
 
@@ -854,7 +854,7 @@ static bool appendAttribute
   BSONObj   md;
   BSONArray mdNames;
 
-  if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == 2))
+  if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2))
   {
       ab.append(ENT_ATTRS_MD, md);
   }
@@ -1968,7 +1968,7 @@ static bool processSubscriptions
       Scope        geoScope;
       std::string  filterErr;
 
-      if (geoScope.fill(2, tSubP->expression.geometry, tSubP->expression.coords, tSubP->expression.georel, &filterErr) != 0)
+      if (geoScope.fill(V2, tSubP->expression.geometry, tSubP->expression.coords, tSubP->expression.georel, &filterErr) != 0)
       {
         // This has been already checked at subscription creation/update parsing time. Thus, the code cannot reach
         // this part.
@@ -2404,7 +2404,7 @@ static bool updateContextAttributeItem
   std::string*              currentLocAttrName,
   BSONObjBuilder*           geoJson,
   bool                      isReplace,
-  int                       apiVersion,
+  ApiVersion                apiVersion,
   OrionError*               oe
 )
 {
@@ -2451,7 +2451,7 @@ static bool updateContextAttributeItem
     return false;
   }
 
-  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == 2, NGSI_MD_ACTIONTYPE_UPDATE);
+  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == V2, NGSI_MD_ACTIONTYPE_UPDATE);
 
   return true;
 }
@@ -2476,7 +2476,7 @@ static bool appendContextAttributeItem
   bool&                     entityModified,
   std::string*              currentLocAttrName,
   BSONObjBuilder*           geoJson,
-  int                       apiVersion,
+  ApiVersion                apiVersion,
   OrionError*               oe
 )
 {
@@ -2521,7 +2521,7 @@ static bool appendContextAttributeItem
   // to be called after the location processing logic (as this logic may need the compoundValueP
 
   std::string actionType = (actualAppend == true)? NGSI_MD_ACTIONTYPE_APPEND : NGSI_MD_ACTIONTYPE_UPDATE;
-  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == 2, actionType);
+  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == V2, actionType);
 
   return true;
 }
@@ -2543,7 +2543,7 @@ static bool deleteContextAttributeItem
   bool&                                 entityModified,
   std::string*                          currentLocAttrName,
   std::map<std::string, unsigned int>*  deletedAttributesCounter,
-  int                                   apiVersion,
+  ApiVersion                            apiVersion,
   OrionError*                           oe
 )
 {
@@ -2620,7 +2620,7 @@ static bool processContextAttributeVector
   BSONObjBuilder*                            geoJson,
   std::string                                tenant,
   const std::vector<std::string>&            servicePathV,
-  int                                        apiVersion,
+  ApiVersion                                 apiVersion,
   OrionError*                                oe
 )
 {
@@ -2796,7 +2796,7 @@ static bool createEntity
   std::string*                     errDetail,
   std::string                      tenant,
   const std::vector<std::string>&  servicePathV,
-  int                              apiVersion,
+  ApiVersion                       apiVersion,
   OrionError*                      oe
 )
 {
@@ -2835,7 +2835,7 @@ static bool createEntity
     std::string     attrId = attrsV[ix]->getId();
     BSONObjBuilder  bsonAttr;
 
-    if (!attrsV[ix]->typeGiven && (apiVersion == 2))
+    if (!attrsV[ix]->typeGiven && (apiVersion == V2))
     {
       std::string attrType;
 
@@ -2874,7 +2874,7 @@ static bool createEntity
     /* Custom metadata */
     BSONObj   md;
     BSONArray mdNames;
-    if (contextAttributeCustomMetadataToBson(&md, &mdNames, attrsV[ix], apiVersion == 2))
+    if (contextAttributeCustomMetadataToBson(&md, &mdNames, attrsV[ix], apiVersion == V2))
     {
       bsonAttr.append(ENT_ATTRS_MD, md);
     }
@@ -2890,7 +2890,7 @@ static bool createEntity
 
   if (eP->type == "")
   {
-    if (apiVersion == 2)
+    if (apiVersion == V2)
     {
       // NGSIv2 uses default entity type
       bsonId.append(ENT_ENTITY_TYPE, DEFAULT_ENTITY_TYPE);
@@ -3091,7 +3091,7 @@ static void updateEntity
   UpdateContextResponse*          responseP,
   bool*                           attributeAlreadyExistsError,
   std::string*                    attributeAlreadyExistsList,
-  int                             apiVersion,
+  ApiVersion                      apiVersion,
   const std::string&              fiwareCorrelator
 )
 {
@@ -3381,7 +3381,7 @@ static bool contextElementPreconditionsCheck
   ContextElement*         ceP,
   UpdateContextResponse*  responseP,
   const std::string&      action,
-  int                     apiVersion
+  ApiVersion              apiVersion
 )
 {
   /* Getting the entity in the request (helpful in other places) */
@@ -3420,7 +3420,7 @@ static bool contextElementPreconditionsCheck
   if (((strcasecmp(action.c_str(), "update") == 0) ||
       (strcasecmp(action.c_str(), "append") == 0) ||
       (strcasecmp(action.c_str(), "append_strict") == 0) ||
-       (strcasecmp(action.c_str(), "replace") == 0)) && (apiVersion == 1))
+       (strcasecmp(action.c_str(), "replace") == 0)) && (apiVersion == V1))
   {
 
     // FIXME: Careful, in V2, this check is not wanted ...
@@ -3486,7 +3486,7 @@ void processContextElement
   std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                   xauthToken,
   const std::string&                   fiwareCorrelator,
-  int                                  apiVersion,
+  ApiVersion                           apiVersion,
   Ngsiv2Flavour                        ngsiv2Flavour
 )
 {
@@ -3531,7 +3531,7 @@ void processContextElement
   auto_ptr<DBClientCursor> cursor;
 
   // Several checkings related with NGSIv2
-  if (apiVersion == 2)
+  if (apiVersion == V2)
   {
     unsigned long long entitiesNumber;
     std::string        err;
@@ -3696,7 +3696,7 @@ void processContextElement
       {
         cerP->statusCode.fill(SccContextElementNotFound);
 
-        if (apiVersion == 1)
+        if (apiVersion == V1)
         {
           responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_CONTEXT_ELEMENT, ERROR_NOT_FOUND);
         }
@@ -3757,7 +3757,7 @@ void processContextElement
         // Build CER used for notifying (if needed). Service Path vector shouldn't have more than
         // one item, so it should be safe to get item 0
         //
-        ContextElementResponse* notifyCerP = new ContextElementResponse(ceP, apiVersion == 2);
+        ContextElementResponse* notifyCerP = new ContextElementResponse(ceP, apiVersion == V2);
 
         // Set action type
         setActionType(notifyCerP, NGSI_MD_ACTIONTYPE_APPEND);

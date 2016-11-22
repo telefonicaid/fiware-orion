@@ -256,7 +256,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     }
 
     // Attribute has a regular structure, in which 'value' is mandatory (except in v2)
-    if (iter->value.HasMember("value") || ciP->apiVersion == 2)
+    if (iter->value.HasMember("value") || ciP->apiVersion == V2)
     {
       std::string r = parseContextAttributeObject(iter->value, caP, &compoundVector);
       if (r != "OK")

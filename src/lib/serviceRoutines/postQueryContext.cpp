@@ -298,11 +298,11 @@ std::string postQueryContext
   // In API version 2, this has changed completely. Here, the total count of local entities is returned
   // if the URI parameter 'count' is set to 'true', and it is returned in the HTTP header Fiware-Total-Count.
   //
-  if ((ciP->apiVersion == 2) && (ciP->uriParamOptions["count"]))
+  if ((ciP->apiVersion == V2) && (ciP->uriParamOptions["count"]))
   {
     countP = &count;
   }
-  else if ((ciP->apiVersion == 1) && (ciP->uriParam["details"] == "on"))
+  else if ((ciP->apiVersion == V1) && (ciP->uriParam["details"] == "on"))
   {
     countP = &count;
   }
@@ -337,7 +337,7 @@ std::string postQueryContext
   //
   // If API version 2, add count, if asked for, in HTTP header Fiware-Total-Count
   //
-  if ((ciP->apiVersion == 2) && (countP != NULL))
+  if ((ciP->apiVersion == V2) && (countP != NULL))
   {
     char cV[32];
 

@@ -112,7 +112,7 @@ std::string payloadParse
 
   if (ciP->inMimeType == JSON)
   {
-    if (ciP->apiVersion == 2)
+    if (ciP->apiVersion == V2)
     {
       result = jsonRequestTreat(ciP, parseDataP, service->request, jsonReleaseP, compV);
     }
@@ -375,7 +375,7 @@ static bool compCheck(int components, const std::vector<std::string>& compV)
 */
 static bool compErrorDetect
 (
-  int                              apiVersion,
+  ApiVersion                       apiVersion,
   int                              components,
   const std::vector<std::string>&  compV,
   OrionError*                      oeP
@@ -383,7 +383,7 @@ static bool compErrorDetect
 {
   std::string  details; 
 
-  if ((apiVersion == 2) && (compV[1] == "entities"))
+  if ((apiVersion == V2) && (compV[1] == "entities"))
   {
     if ((components == 4) && (compV[3] == "attrs"))  // URL: /v2/entities/<entity-id>/attrs
     {
@@ -503,7 +503,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
         continue;
       }
 
-      if (ciP->apiVersion == 1)
+      if (ciP->apiVersion == V1)
       {
         if (strcasecmp(serviceV[ix].compV[compNo].c_str(), compV[compNo].c_str()) != 0)
         {
@@ -546,7 +546,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
           jsonReqP->release(&parseData);
         }
 
-        if (ciP->apiVersion == 2)
+        if (ciP->apiVersion == V2)
         {
           delayedRelease(&jsonRelease);
         }
@@ -587,7 +587,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
         jsonReqP->release(&parseData);
       }
 
-      if (ciP->apiVersion == 2)
+      if (ciP->apiVersion == V2)
       {
         delayedRelease(&jsonRelease);
       }
@@ -622,7 +622,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       jsonReqP->release(&parseData);
     }
 
-    if (ciP->apiVersion == 2)
+    if (ciP->apiVersion == V2)
     {
       delayedRelease(&jsonRelease);
     }
