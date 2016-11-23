@@ -30,7 +30,7 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Update using empty entity type and see error
+# 01. Update using empty entity type
 # 02. Check entity has been created
 #
 
