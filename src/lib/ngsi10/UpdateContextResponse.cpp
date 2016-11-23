@@ -80,7 +80,7 @@ UpdateContextResponse::~UpdateContextResponse()
 *
 * UpdateContextResponse::render - 
 */
-std::string UpdateContextResponse::render(const std::string& apiVersion, bool asJsonObject, const std::string& indent)
+std::string UpdateContextResponse::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
 {
   std::string out = "";
 
@@ -116,7 +116,7 @@ std::string UpdateContextResponse::render(const std::string& apiVersion, bool as
 */
 std::string UpdateContextResponse::check
 (
-  const std::string&  apiVersion,
+  ApiVersion          apiVersion,
   bool                asJsonObject,
   const std::string&  indent,
   const std::string&  predetectedError

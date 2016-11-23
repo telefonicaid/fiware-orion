@@ -128,7 +128,7 @@ TEST(CompoundValueNode, vectorInvalidAndOk)
   std::string rendered;
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
-  rendered = tree->render("v1", "");
+  rendered = tree->render(V1, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   tree->shortShow("");
@@ -174,7 +174,7 @@ TEST(CompoundValueNode, structInvalidAndOk)
   std::string rendered;
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
-  rendered = tree->render("v1", "");
+  rendered = tree->render(V1, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   tree->shortShow("");

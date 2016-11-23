@@ -50,8 +50,8 @@ typedef struct UpdateContextResponse
   UpdateContextResponse(StatusCode& _errorCode);
   ~UpdateContextResponse();
 
-  std::string   render(const std::string& apiVersion, bool asJsonObject, const std::string& indent);
-  std::string   check(const std::string& apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError);
+  std::string   render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent);
+  std::string   check(ApiVersion apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError);
   void          present(const std::string& indent);
   void          release(void);
   void          fill(UpdateContextResponse* upcrsP);

@@ -409,7 +409,7 @@ TEST(compoundValue, updateTwoStructsJson)
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
   ci.outMimeType = JSON;
-  rendered = caP->render("v1", false, UpdateContext, "");
+  rendered = caP->render(V1, false, UpdateContext, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
@@ -557,7 +557,7 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
   ci.outMimeType = JSON;
-  rendered = caP->render("v1", false, UpdateContext, "");
+  rendered = caP->render(V1, false, UpdateContext, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
@@ -964,7 +964,7 @@ TEST(compoundValue, tenCompounds)
   utInit();
 
   upcrP = &reqData.upcr.res;
-  rendered = upcrP->render("v1", false, "");
+  rendered = upcrP->render(V1, false, "");
 
   utExit();
 }

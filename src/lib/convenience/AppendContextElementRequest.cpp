@@ -49,7 +49,7 @@ AppendContextElementRequest::AppendContextElementRequest()
 *
 * render - 
 */
-std::string AppendContextElementRequest::render(const std::string& apiVersion, bool asJsonObject, RequestType requestType, std::string indent)
+std::string AppendContextElementRequest::render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, std::string indent)
 {
   std::string out = "";
 
@@ -85,12 +85,11 @@ std::string AppendContextElementRequest::render(const std::string& apiVersion, b
 */
 std::string AppendContextElementRequest::check
 (
-  const std::string& apiVersion,
-  bool               asJsonObject,
-  RequestType        requestType,
-  std::string        indent,
-  std::string        predetectedError,     // Predetected Error, normally during parsing
-  int                counter
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
+  RequestType         requestType,
+  std::string         indent,
+  const std::string&  predetectedError     // Predetected Error, normally during parsing
 )
 {
   AppendContextElementResponse  response;

@@ -64,20 +64,13 @@ std::string ContextRegistrationAttributeVector::render(const std::string& indent
 *
 * ContextRegistrationAttributeVector::check -
 */
-std::string ContextRegistrationAttributeVector::check
-(
-  const std::string&  apiVersion,
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string ContextRegistrationAttributeVector::check(ApiVersion apiVersion)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion, indent)) != "OK")
+    if ((res = vec[ix]->check(apiVersion)) != "OK")
     {
       return res;
     }

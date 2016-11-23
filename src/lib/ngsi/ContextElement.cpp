@@ -74,7 +74,7 @@ ContextElement::ContextElement(const std::string& id, const std::string& type, c
 *
 * ContextElement::render - 
 */
-std::string ContextElement::render(const std::string& apiVersion, bool asJsonObject, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues)
+std::string ContextElement::render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues)
 {
   std::string  out                              = "";
   bool         attributeDomainNameRendered      = attributeDomainName.get() != "";
@@ -160,7 +160,7 @@ ContextAttribute* ContextElement::getAttribute(const std::string& attrName)
 */
 std::string ContextElement::check
 (
-  const std::string&  apiVersion,
+  ApiVersion          apiVersion,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,

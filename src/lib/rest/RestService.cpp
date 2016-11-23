@@ -112,7 +112,7 @@ std::string payloadParse
 
   if (ciP->inMimeType == JSON)
   {
-    if (compV[0] == "v2")
+    if (ciP->apiVersion == V2)
     {
       result = jsonRequestTreat(ciP, parseDataP, service->request, jsonReleaseP, compV);
     }
@@ -375,6 +375,7 @@ static bool compCheck(int components, const std::vector<std::string>& compV)
 */
 static bool compErrorDetect
 (
+  ApiVersion                       apiVersion,
   int                              components,
   const std::vector<std::string>&  compV,
   OrionError*                      oeP
@@ -382,7 +383,7 @@ static bool compErrorDetect
 {
   std::string  details; 
 
-  if ((compV[0] == "v2") && (compV[1] == "entities"))
+  if ((apiVersion == V2) && (compV[1] == "entities"))
   {
     if ((components == 4) && (compV[3] == "attrs"))  // URL: /v2/entities/<entity-id>/attrs
     {
@@ -438,15 +439,6 @@ static bool compErrorDetect
 *
 * restService - 
 *
-* NGSIv1 uses a case-insensitive URI PATH, while NGSIv2 is case-sensitive, so
-* before we can start to compare the URI PATH with the vector of supported services,
-* we need to know if it's v1 or v2.
-*
-* This is very easy, we just look at the first component of the URI PATH, and
-* if it is "v2" or "V2", then case-sensitive checks are used.
-*
-* Note that for NGSIv2 to be 'turned on', the URI PATH must start with exactly /v2.
-* If it starts with /V2, the request will not be considered a NGSIv2 request.
 */
 std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 {
@@ -478,7 +470,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   {
     OrionError oe;
 
-    if (compErrorDetect(components, compV, &oe))
+    if (compErrorDetect(ciP->apiVersion, components, compV, &oe))
     {
       alarmMgr.badInput(clientIp, oe.details);
       ciP->httpStatusCode = SccBadRequest;
@@ -486,18 +478,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       return "URL PATH component error";
     }
   }
-
-
-  //
-  // Detect API version
-  //
-  std::string apiVersion = "v1";
-
-  if ((compV.size() != 0) && strcasecmp(compV[0].c_str(), "v2") == 0)
-  {
-    apiVersion = "v2";
-  }
-
 
   //
   // Lookup the requested service
@@ -523,7 +503,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
         continue;
       }
 
-      if (apiVersion == "v1")
+      if (ciP->apiVersion == V1)
       {
         if (strcasecmp(serviceV[ix].compV[compNo].c_str(), compV[compNo].c_str()) != 0)
         {
@@ -566,7 +546,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
           jsonReqP->release(&parseData);
         }
 
-        if (ciP->apiVersion == "v2")
+        if (ciP->apiVersion == V2)
         {
           delayedRelease(&jsonRelease);
         }
@@ -607,7 +587,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
         jsonReqP->release(&parseData);
       }
 
-      if (ciP->apiVersion == "v2")
+      if (ciP->apiVersion == V2)
       {
         delayedRelease(&jsonRelease);
       }
@@ -642,7 +622,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       jsonReqP->release(&parseData);
     }
 
-    if (ciP->apiVersion == "v2")
+    if (ciP->apiVersion == V2)
     {
       delayedRelease(&jsonRelease);
     }

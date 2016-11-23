@@ -9095,7 +9095,7 @@ TEST(mongoUpdateContextRequest, updateNativeTypes)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "no correlator", "v2");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "no correlator", V2);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -9963,8 +9963,8 @@ TEST(mongoUpdateContextRequest, tooManyEntitiesNGSIv2)
   req.contextElementVector.push_back(&ce);
   req.updateActionType.set("UPDATE");
 
-  /* Invoke the function in mongoBackend library (note the "v2" to activate NGSIv2 special behaviours) */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "no correlator", "v2");
+  /* Invoke the function in mongoBackend library (note the 2 to activate NGSIv2 special behaviours) */
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "no correlator", V2);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -10113,8 +10113,8 @@ TEST(mongoUpdateContextRequest, onlyOneEntityNGSIv2)
   req.contextElementVector.push_back(&ce);
   req.updateActionType.set("UPDATE");
 
-  /* Invoke the function in mongoBackend library (note the "v2" to activate NGSIv2 special behaviours) */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "no correlator", "v2");
+  /* Invoke the function in mongoBackend library (note the 2 to activate NGSIv2 special behaviours) */
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "no correlator", V2);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);

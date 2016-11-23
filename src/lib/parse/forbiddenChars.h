@@ -38,7 +38,7 @@ extern bool forbiddenChars(const char* s, const char* exceptions = NULL);
 *
 * forbiddenIdChars -
 */
-extern bool forbiddenIdChars(const std::string& api, const char* s, const char* exceptions = NULL);
+extern bool forbiddenIdChars(int api, const char* s, const char* exceptions = NULL);
 
 /* ****************************************************************************
 *

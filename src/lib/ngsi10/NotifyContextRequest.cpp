@@ -38,7 +38,7 @@
 *
 * NotifyContextRequest::render -
 */
-std::string NotifyContextRequest::render(const std::string& apiVersion, bool asJsonObject, const std::string& indent)
+std::string NotifyContextRequest::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
 {
   std::string  out                                  = "";
   bool         contextElementResponseVectorRendered = contextElementResponseVector.size() != 0;
@@ -101,7 +101,7 @@ std::string NotifyContextRequest::toJson
 *
 * NotifyContextRequest::check
 */
-std::string NotifyContextRequest::check(const std::string& apiVersion, const std::string& indent, const std::string& predetectedError)
+std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string& indent, const std::string& predetectedError)
 {
   std::string            res;
   NotifyContextResponse  response;

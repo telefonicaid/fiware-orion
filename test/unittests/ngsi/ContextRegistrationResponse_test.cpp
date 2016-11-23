@@ -71,7 +71,7 @@ TEST(ContextRegistrationResponse, check)
 
   utInit();
 
-  checked = crr.check("v1", RegisterContext, "", "", 0);
+  checked = crr.check(V1, RegisterContext, "", "", 0);
   EXPECT_STREQ(expected.c_str(), checked.c_str());
 
   utExit();

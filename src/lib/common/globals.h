@@ -151,6 +151,20 @@ typedef enum Ngsiv2Flavour
 
 
 /* ****************************************************************************
+*
+*  NGSI API version -
+*/
+typedef enum ApiVersion
+{
+  NO_VERSION  = -1,
+  ADMIN_API   = 0,
+  V1          = 1,
+  V2          = 2
+} ApiVersion;
+
+
+
+/* ****************************************************************************
  * Future date to represent permanent subscriptions.
  * High enough to make the subscription "permanent" but leaving room for
  * some (sloppy) increments, without causing overflow and accidental subscription

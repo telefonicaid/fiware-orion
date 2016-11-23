@@ -58,18 +58,17 @@ typedef struct UpdateContextElementResponse
 
   UpdateContextElementResponse();
 
-  std::string  render(const std::string&  apiVersion,
+  std::string  render(ApiVersion          apiVersion,
                       bool                asJsonObject,
                       RequestType         requestType,
-                      const std::string&   indent);
-  void         present(const std::string& indent);
+                      const std::string&  indent);
+  void         present(const std::string&  indent);
   void         release();
-  std::string  check(const std::string&  apiVersion,
+  std::string  check(ApiVersion          apiVersion,
                      bool                asJsonObject,
                      RequestType         requestType,
                      const std::string&  indent,
-                     const std::string&  predetectedError,
-                     int                 counter);
+                     const std::string&  predetectedError);
   void         fill(UpdateContextResponse* ucrsP);
 } UpdateContextElementResponse;
 

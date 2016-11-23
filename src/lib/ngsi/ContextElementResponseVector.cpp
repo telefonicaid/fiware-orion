@@ -42,7 +42,7 @@
 */
 std::string ContextElementResponseVector::render
 (
-  const std::string&  apiVersion,
+  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
   const std::string&  indent,
@@ -108,7 +108,7 @@ std::string ContextElementResponseVector::toJson
 */
 std::string ContextElementResponseVector::check
 (
-  const std::string&  apiVersion,
+  ApiVersion          apiVersion,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,

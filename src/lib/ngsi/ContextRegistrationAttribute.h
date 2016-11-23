@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/globals.h"
+
 #include "ngsi/MetadataVector.h"
 #include "ngsi/Request.h"
 
@@ -50,8 +52,7 @@ typedef struct ContextRegistrationAttribute
   void            present(int ix, const std::string& indent);
   void            release(void);
 
-  std::string     check(const std::string&  apiVersion,
-                        const std::string&  indent);
+  std::string     check(ApiVersion apiVersion);
 } ContextRegistrationAttribute;
 
 #endif  // SRC_LIB_NGSI_CONTEXTREGISTRATIONATTRIBUTE_H_
