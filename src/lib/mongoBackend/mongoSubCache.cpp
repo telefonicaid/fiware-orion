@@ -593,12 +593,6 @@ static void mongoSubCountersUpdateLastSuccess
 *
 * mongoSubCountersUpdate - update subscription counters and timestamps in mongo
 *
-* FIXME P4:
-*   This function the way it is implemented right now might perform FIVE consecutive
-*   updates in mongo.
-*   There must be some faster way to do this:
-*     1. Read first, update only what's necessary OR
-*     2. Do a 'mega update' with all five fields (have the functions concatenate to final mongo 'query')
 */
 void mongoSubCountersUpdate
 (
