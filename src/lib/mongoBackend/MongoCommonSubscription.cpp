@@ -298,7 +298,7 @@ void setCondsAndInitialNotify
   // the original subscription has to be taken; the caller deal with that)
 
   /* Conds vector (and maybe an initial notification) */
-  *notificationDone    = false;
+  *notificationDone = false;
 
   BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             sub.subject.entities,
