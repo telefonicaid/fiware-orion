@@ -1759,8 +1759,6 @@ A `notification` object contains the following subfields:
 + `timesSent` (not editable, only present in GET operations): Number of notifications sent due to
    this subscription.
 + `lastNotification` (not editable, only present in GET operations): Last notification timestamp in ISO8601 format.
-+ `timesFailed` (not editable, only present in GET operations): Number of consecutive errors.
-  Not present if subscription is notifying correctly.
 + `lastFailure` (not editable, only present in GET operations): Last failure timestamp in ISO8601 format.
   Not present if subscription has never has a problem with notifications.
 
@@ -1847,7 +1845,6 @@ Response:
               "attrs": ["temperature", "humidity"],
               "timesSent": 12,
               "lastNotification": "2015-10-05T16:00:00.00Z",
-              "timesFailed": 4
               "lastFailure": "2015-10-06T16:00:00.00Z"
             },
             "expires": "2016-04-05T14:00:00.00Z",

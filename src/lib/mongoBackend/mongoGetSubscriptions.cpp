@@ -147,7 +147,7 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
   subP->notification.timesSent        = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : -1;
   subP->notification.blacklist        = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(r, CSUB_BLACKLIST)                   : false;
   subP->notification.lastFailure      = r.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(r, CSUB_LASTFAILURE)      : -1;
-  subP->notification.timesFailed      = r.hasField(CSUB_TIMESFAILED)?      getIntOrLongFieldAsLongF(r, CSUB_TIMESFAILED)      : 0;
+  subP->notification.lastSuccess      = r.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongF(r, CSUB_LASTSUCCESS)      : -1;
 
   // Attributes format
   subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(r, CSUB_FORMAT)) : NGSI_V1_LEGACY;
@@ -185,9 +185,9 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
       subP->notification.lastFailure = cSubP->lastFailure;
     }
 
-    if (cSubP->timesFailed > 0)
+    if (cSubP->lastSuccess > subP->notification.lastSuccess)
     {
-      subP->notification.timesFailed += cSubP->timesFailed;
+      subP->notification.lastSuccess = cSubP->lastSuccess;
     }
   }
   cacheSemGive(__FUNCTION__, "get lastNotification and count");

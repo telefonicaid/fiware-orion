@@ -277,8 +277,7 @@ Fields:
     guide](../user/duration.md)). For permanent subscriptions (allowed in NGSIv2)
     an absurdly high value is used (see PERMANENT_SUBS_DATETIME in the source code).
 -   **lastNotification**: the time when last notification was sent. This
-    is updated each time a notification is sent, to avoid
-    violating throttling.
+    is updated each time a notification is sent, to avoid violating throttling.
 -   **throttling**: minimum interval between notifications. 0 or -1 means no throttling.
 -   **reference**: the URL for notifications
 -   **entities**: an array of entities (mandatory). The JSON for each
@@ -309,8 +308,8 @@ Fields:
 -   **payload**: optional field to store the payload for notification customization functionality in NGSIv2.
 -   **lastFailure**: the time when last notification failure occurred.
     Not present if the subscription has never failed.
--   **timesFailed**: number of consecutive notification errors for the subscription.
-    Not present if the subscription has never failed.
+-   **lastSuccess**: the time when last successful notification occurred.
+    Not present if the subscription has never provoked a notification.
 
 Example document:
 

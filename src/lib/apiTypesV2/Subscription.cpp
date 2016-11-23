@@ -67,15 +67,26 @@ namespace ngsiv2
     JsonHelper jh;
 
     jh.addString("id", this->id);
+
     if (this->description != "")
     {
       jh.addString("description", this->description);
     }
+
     if (this->expires != PERMANENT_SUBS_DATETIME)
     {
       jh.addDate("expires", this->expires);
     }
-    jh.addString("status", this->status);
+
+    if ((this->notification.lastFailure > 0) && (this->notification.lastFailure > this->notification.lastSuccess))
+    {
+      jh.addString("status", "failed");
+    }
+    else
+    {
+      jh.addString("status", this->status);
+    }
+
     jh.addRaw("subject", this->subject.toJson());
     jh.addRaw("notification", this->notification.toJson(renderFormatToString(this->attrsFormat, true, true)));
 
@@ -140,9 +151,9 @@ namespace ngsiv2
       jh.addDate("lastFailure", this->lastFailure);
     }
 
-    if (this->timesFailed != 0)
+    if (this->lastSuccess > 0)
     {
-      jh.addNumber("timesFailed", this->timesFailed);
+      jh.addDate("lastSuccess", this->lastSuccess);
     }
 
     return jh.str();

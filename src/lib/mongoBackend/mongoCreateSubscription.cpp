@@ -56,7 +56,9 @@ static void insertInCache
   const std::string&   tenant,
   const std::string&   servicePath,
   bool                 notificationDone,
-  long long            lastNotification
+  long long            lastNotification,
+  long long            lastFailure,
+  long long            lastSuccess
 )
 {
   // Insert in csub cache
@@ -97,6 +99,8 @@ static void insertInCache
                      sub.attrsFormat,
                      notificationDone,
                      lastNotification,
+                     lastFailure,
+                     lastSuccess,
                      stringFilterP,
                      mdStringFilterP,
                      sub.status,
@@ -138,6 +142,8 @@ std::string mongoCreateSubscription
   std::string    servicePath = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
   bool           notificationDone = false;
   long long      lastNotification = 0;
+  long long      lastFailure      = 0;
+  long long      lastSuccess      = 0;
 
   const std::string subId = setNewSubscriptionId(&b);
   setExpiration(sub, &b);
@@ -178,7 +184,7 @@ std::string mongoCreateSubscription
 
   if (!noCache)
   {
-    insertInCache(sub, subId, tenant, servicePath, false, lastNotification);
+    insertInCache(sub, subId, tenant, servicePath, false, lastNotification, lastFailure, lastSuccess);
   }
 
   reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);

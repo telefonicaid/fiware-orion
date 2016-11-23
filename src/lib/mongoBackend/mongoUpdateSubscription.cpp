@@ -488,20 +488,28 @@ static long long setLastFailure(const BSONObj& subOrig, CachedSubscription* subC
 
 /* ****************************************************************************
 *
-* setTimesFailed - 
+* setLastSuccess -
 */
-static void setTimesFailed(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
+static long long setLastSuccess(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
-  if ((subCacheP == NULL) || (subCacheP->timesFailed <= 0))
+  if (subCacheP == NULL)
   {
-    return;
+    return -1;
   }
 
-  long long timesFailed = getIntOrLongFieldAsLongF(subOrig, CSUB_TIMESFAILED);
+  long long lastSuccess = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESS);
 
-  timesFailed += subCacheP->timesFailed;
+  //
+  // Compare with 'lastSuccess' from the sub-cache.
+  // If the cached value of lastSuccess is higher, then use it.
+  //
+  if (subCacheP->lastSuccess > lastSuccess)
+  {
+    lastSuccess = subCacheP->lastSuccess;
+    setLastSuccess(lastSuccess, b);
+  }
 
-  setTimesFailed(timesFailed, b);
+  return lastSuccess;
 }
 
 
@@ -609,7 +617,8 @@ void updateInCache
   const SubscriptionUpdate&  subUp,
   const std::string&         tenant,
   long long                  lastNotification,
-  long long                  lastFailure
+  long long                  lastFailure,
+  long long                  lastSuccess
 )
 {
   // StringFilter in Scope?
@@ -691,6 +700,7 @@ void updateInCache
                                           servicePathCache,
                                           lastNotification,
                                           lastFailure,
+                                          lastSuccess,
                                           doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
                                           doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_STATUS) : STATUS_ACTIVE,
                                           q, mq, geom, coords, georel,
@@ -782,6 +792,7 @@ std::string mongoUpdateSubscription
   bool                notificationDone = false;
   long long           lastNotification = 0;
   long long           lastFailure      = 0;
+  long long           lastSuccess      = 0;
 
   CachedSubscription* subCacheP = NULL;
   if (!noCache)
@@ -830,7 +841,7 @@ std::string mongoUpdateSubscription
   }
 
   lastFailure = setLastFailure(subOrig, subCacheP, &b);
-  setTimesFailed(subOrig, subCacheP, &b);
+  lastSuccess = setLastSuccess(subOrig, subCacheP, &b);
 
   setExpression(subUp, subOrig, &b);
   setFormat(subUp, subOrig, &b);
@@ -848,7 +859,7 @@ std::string mongoUpdateSubscription
   // Update in cache
   if (!noCache)
   {
-    updateInCache(doc, subUp, tenant, lastNotification, lastFailure);
+    updateInCache(doc, subUp, tenant, lastNotification, lastFailure, lastSuccess);
   }
 
 

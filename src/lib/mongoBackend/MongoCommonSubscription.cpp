@@ -298,7 +298,7 @@ void setCondsAndInitialNotify
   // the original subscription has to be taken; the caller deal with that)
 
   /* Conds vector (and maybe an initial notification) */
-  *notificationDone = false;
+  *notificationDone    = false;
 
   BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             sub.subject.entities,
@@ -362,12 +362,12 @@ void setLastFailure(long long lastFailure, BSONObjBuilder* b)
 
 /* ****************************************************************************
 *
-* setTimesFailed -
+* setLastSuccess -
 */
-void setTimesFailed(long long timesFailed, BSONObjBuilder* b)
+void setLastSuccess(long long lastSuccess, BSONObjBuilder* b)
 {
-  b->append(CSUB_TIMESFAILED, timesFailed);
-  LM_T(LmtMongo, ("Subscription timesFailed: %lu", timesFailed));
+  b->append(CSUB_LASTSUCCESS, lastSuccess);
+  LM_T(LmtMongo, ("Subscription lastSuccess: %lu", lastSuccess));
 }
 
 
