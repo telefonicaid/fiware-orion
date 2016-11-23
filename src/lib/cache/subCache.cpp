@@ -1337,15 +1337,17 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
 {
   if (noCache)
   {
+    // The field 'count' has already been taken care of. Set to 0 in the calls to mongoSubCountersUpdate()
+
     time_t now = time(NULL);
 
     if (errors == 0)
     {
-      mongoSubCountersUpdate(tenant, subscriptionId, 1, now, -1, now);  // lastFailure == -1
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, -1, now);  // lastFailure == -1
     }
     else
     {
-      mongoSubCountersUpdate(tenant, subscriptionId, 1, now, now, -1);  // lastSuccess == -1
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, now, -1);  // lastSuccess == -1, count == 0
     }
 
     return;

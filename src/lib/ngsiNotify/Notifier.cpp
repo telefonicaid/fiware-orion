@@ -75,11 +75,10 @@ void Notifier::sendNotifyContextRequest
     bool                             blackList
 )
 {
-
   pthread_t                         tid;
-  std::vector<SenderThreadParams*>  *paramsV = Notifier::buildSenderParams(ncrP, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blackList);
+  std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncrP, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blackList);
 
-  if (!paramsV->empty()) // al least one param, an empty vector means an error happened
+  if (!paramsV->empty()) // al least one param, an empty vector means an error occurred
   {
     int ret = pthread_create(&tid, NULL, startSenderThread, paramsV);
     if (ret != 0)

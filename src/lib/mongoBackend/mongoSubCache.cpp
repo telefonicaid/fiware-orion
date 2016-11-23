@@ -622,12 +622,12 @@ void mongoSubCountersUpdate
     mongoSubCountersUpdateLastNotificationTime(collection, subId, lastNotificationTime);
   }
 
-  if (lastFailure > lastSuccess)
+  if (lastFailure > 0)
   {
     mongoSubCountersUpdateLastFailure(collection, subId, lastFailure);
   }
 
-  if (lastSuccess > lastFailure)
+  if (lastSuccess > 0)
   {
     mongoSubCountersUpdateLastSuccess(collection, subId, lastSuccess);
   }
