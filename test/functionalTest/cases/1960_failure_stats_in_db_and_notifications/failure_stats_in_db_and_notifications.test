@@ -260,7 +260,7 @@ Date: REGEX(.*)
 05. GET subscription, see NO error stats in notification field
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 315
+Content-Length: 355
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -274,6 +274,7 @@ Date: REGEX(.*)
             "http": {
                 "url": "http://localhost:REGEX(\d+)/notify"
             },
+            "lastFailure": "REGEX(.*)",
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
             "timesSent": 2
@@ -305,7 +306,7 @@ Date: REGEX(.*)
 07. GET subscription, see NO error stats in notification field
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 315
+Content-Length: 355
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -319,6 +320,7 @@ Date: REGEX(.*)
             "http": {
                 "url": "http://localhost:REGEX(\d+)/notify"
             },
+            "lastFailure": "REGEX(.*)",
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
             "timesSent": 3
@@ -402,7 +404,7 @@ Date: REGEX(.*)
 10. GET subscription, see error stats in notification field
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 312
+Content-Length: 352
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -418,6 +420,7 @@ Date: REGEX(.*)
             },
             "lastFailure": "REGEX(.*)",
             "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
             "timesSent": 4
         },
         "status": "failed",

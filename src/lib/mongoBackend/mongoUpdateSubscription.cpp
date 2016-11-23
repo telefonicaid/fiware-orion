@@ -464,22 +464,18 @@ static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subC
 */
 static long long setLastFailure(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
-  if (subCacheP == NULL)
-  {
-    return -1;
-  }
-
   long long lastFailure = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTFAILURE);
 
   //
   // Compare with 'lastFailure' from the sub-cache.
   // If the cached value of lastFailure is higher, then use it.
   //
-  if (subCacheP->lastFailure > lastFailure)
+  if ((subCacheP != NULL) && (subCacheP->lastFailure > lastFailure))
   {
     lastFailure = subCacheP->lastFailure;
-    setLastFailure(lastFailure, b);
   }
+
+  setLastFailure(lastFailure, b);
 
   return lastFailure;
 }
@@ -492,22 +488,18 @@ static long long setLastFailure(const BSONObj& subOrig, CachedSubscription* subC
 */
 static long long setLastSuccess(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
-  if (subCacheP == NULL)
-  {
-    return -1;
-  }
-
   long long lastSuccess = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESS);
 
   //
   // Compare with 'lastSuccess' from the sub-cache.
   // If the cached value of lastSuccess is higher, then use it.
   //
-  if (subCacheP->lastSuccess > lastSuccess)
+  if ((subCacheP != NULL) && (subCacheP->lastSuccess > lastSuccess))
   {
     lastSuccess = subCacheP->lastSuccess;
-    setLastSuccess(lastSuccess, b);
   }
+
+  setLastSuccess(lastSuccess, b);
 
   return lastSuccess;
 }
