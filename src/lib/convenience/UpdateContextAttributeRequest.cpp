@@ -53,7 +53,7 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 *
 * render - 
 */
-std::string UpdateContextAttributeRequest::render(const std::string& apiVersion, std::string indent)
+std::string UpdateContextAttributeRequest::render(ApiVersion apiVersion, std::string indent)
 {
   std::string out = "";
   std::string indent2 = indent + "  ";
@@ -94,11 +94,9 @@ std::string UpdateContextAttributeRequest::render(const std::string& apiVersion,
 */
 std::string UpdateContextAttributeRequest::check
 (
-  const std::string&  apiVersion,
-  RequestType         requestType,
+  ApiVersion          apiVersion,
   std::string         indent,
-  std::string         predetectedError,
-  int                 counter
+  const std::string&  predetectedError
 )
 {
   StatusCode       response;

@@ -43,27 +43,6 @@ using namespace mongo;
 
 
 
-// FIXME PR: Temporary debug function
-const char* opName(StringFilterOp op)
-{
-  switch (op)
-  {
-  case SfopExists:              return "Exists";
-  case SfopNotExists:           return "NotExists";
-  case SfopEquals:              return "Equals";
-  case SfopDiffers:             return "Differs";
-  case SfopGreaterThan:         return "GreaterThan";
-  case SfopGreaterThanOrEqual:  return "GreaterThanOrEqual";
-  case SfopLessThan:            return "LessThan";
-  case SfopLessThanOrEqual:     return "LessThanOrEqual";
-  case SfopMatchPattern:        return "MatchPattern";
-  }
-
-  return "InvalidOperator";
-}
-
-
-
 /* ****************************************************************************
 *
 * StringFilterItem::StringFilterItem -

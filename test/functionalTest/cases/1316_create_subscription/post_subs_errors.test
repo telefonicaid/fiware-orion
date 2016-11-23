@@ -289,13 +289,13 @@ Date: REGEX(.*)
 04. POST /v2/subscriptions (not an object)
 ==========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
+Content-Length: 75
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Error parsing incoming JSON buffer",
+    "description": "Errors found in incoming JSON buffer",
     "error": "ParseError"
 }
 

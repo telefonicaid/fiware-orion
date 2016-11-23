@@ -654,13 +654,13 @@ std::string CompoundValueNode::check(void)
 *
 * render -
 */
-std::string CompoundValueNode::render(const std::string& apiVersion, const std::string& indent)
+std::string CompoundValueNode::render(ApiVersion apiVersion, const std::string& indent)
 {
   std::string  out       = "";
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
   std::string  key       = (container->valueType == orion::ValueTypeVector)? "item" : name;
 
-  if (apiVersion == "v2")
+  if (apiVersion == V2)
   {
     return toJson(true); // FIXME P8: The info on comma-after-or-not is not available here ...
   }

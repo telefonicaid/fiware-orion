@@ -28,6 +28,7 @@
 #include <string>
 
 #include "common/RenderFormat.h"
+#include "common/globals.h"
 #include "ngsi/ContextElement.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/AttributeList.h"
@@ -61,10 +62,10 @@ typedef struct ContextElementResponse
   ContextElementResponse(const mongo::BSONObj&  entityDoc,
                          const AttributeList&   attrL,
                          bool                   includeEmpty = true,
-                         const std::string&     apiVersion   = "v1");
+                         ApiVersion             apiVersion   = V1);
   ContextElementResponse(ContextElement* ceP, bool useDefaultType = false);
 
-  std::string  render(const std::string&  apiVersion,
+  std::string  render(ApiVersion          apiVersion,
                       bool                asJsonObject,
                       RequestType         requestType,
                       const std::string&  indent,
@@ -77,7 +78,7 @@ typedef struct ContextElementResponse
   void         present(const std::string& indent, int ix);
   void         release(void);
 
-  std::string  check(const std::string&  apiVersion,
+  std::string  check(ApiVersion          apiVersion,
                      RequestType         requestType,
                      const std::string&  indent,
                      const std::string&  predetectedError,

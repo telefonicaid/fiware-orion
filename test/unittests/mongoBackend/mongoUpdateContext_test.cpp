@@ -9095,7 +9095,7 @@ TEST(mongoUpdateContextRequest, updateNativeTypes)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "no correlator", "v2");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "no correlator", V2);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -9963,8 +9963,8 @@ TEST(mongoUpdateContextRequest, tooManyEntitiesNGSIv2)
   req.contextElementVector.push_back(&ce);
   req.updateActionType.set("UPDATE");
 
-  /* Invoke the function in mongoBackend library (note the "v2" to activate NGSIv2 special behaviours) */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "no correlator", "v2");
+  /* Invoke the function in mongoBackend library (note the 2 to activate NGSIv2 special behaviours) */
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "no correlator", V2);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -9981,7 +9981,7 @@ TEST(mongoUpdateContextRequest, tooManyEntitiesNGSIv2)
   ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
   EXPECT_EQ(SccConflict, RES_CER_STATUS(0).code);
   EXPECT_EQ("Too Many Results", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(MORE_MATCHING_ENT, RES_CER_STATUS(0).details);
+  EXPECT_EQ(ERROR_DESC_TOO_MANY_ENTITIES, RES_CER_STATUS(0).details);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -10113,8 +10113,8 @@ TEST(mongoUpdateContextRequest, onlyOneEntityNGSIv2)
   req.contextElementVector.push_back(&ce);
   req.updateActionType.set("UPDATE");
 
-  /* Invoke the function in mongoBackend library (note the "v2" to activate NGSIv2 special behaviours) */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "no correlator", "v2");
+  /* Invoke the function in mongoBackend library (note the 2 to activate NGSIv2 special behaviours) */
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "no correlator", V2);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);

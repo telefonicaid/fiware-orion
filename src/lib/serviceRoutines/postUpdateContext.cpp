@@ -31,6 +31,7 @@
 #include "common/string.h"
 #include "common/defaultValues.h"
 #include "common/globals.h"
+#include "common/errorMessages.h"
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "alarmMgr/alarmMgr.h"
@@ -657,7 +658,7 @@ std::string postUpdateContext
   // Note this is a slight break in the separation of concerns among the different layers (i.e.
   // serviceRoutine/ logic should work in a "NGSIv1 isolated context"). However, it seems to be
   // a smart way of dealing with partial update situations
-  if (ciP->apiVersion == "v2")
+  if (ciP->apiVersion == V2)
   {
     // Adjust OrionError response in the case of partial updates. This may happen in CPr forwarding
     // scenarios. Note that mongoBackend logic "splits" successfull updates and failing updates in
@@ -694,13 +695,13 @@ std::string postUpdateContext
     if (fails == response.contextElementResponseVector.size())
     {
       // If all CER result in error, then it isn't a partial update, but a regular NotFound
-      if (ciP->apiVersion == "v1")
+      if (ciP->apiVersion == V1)
       {
-        parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "No context element found", "NotFound");
+        parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_CONTEXT_ELEMENT, ERROR_NOT_FOUND);
       }
       else
       {
-        parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "The requested entity has not been found. Check type and id", "NotFound");
+        parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
       }
     }
     else if (fails > 0)

@@ -1075,7 +1075,7 @@ bool entitiesQuery
   long long*                       countP,
   bool*                            badInputP,
   const std::string&               sortOrderList,
-  const std::string&               apiVersion
+  ApiVersion                       apiVersion
 )
 {
   /* Query structure is as follows
@@ -1138,7 +1138,7 @@ bool entitiesQuery
 
     if (scopeP->type.find(SCOPE_FILTER) == 0)
     {
-      // FIXME P5: NGSI "v1" filter, probably to be removed in the future
+      // FIXME P5: NGSIv1 filter, probably to be removed in the future
       addFilterScope(scopeP, filters);
     }
     else if (scopeP->type == FIWARE_LOCATION || scopeP->type == FIWARE_LOCATION_DEPRECATED || scopeP->type == FIWARE_LOCATION_V2)

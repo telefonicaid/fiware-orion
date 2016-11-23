@@ -69,7 +69,7 @@ EntityType::EntityType(std::string _type): type(_type), count(0)
 */
 std::string EntityType::render
 (
-  const std::string&  apiVersion,
+  ApiVersion          apiVersion,
   bool                asJsonObject,
   bool                asJsonOut,
   bool                collapsed,
@@ -111,7 +111,7 @@ std::string EntityType::render
 *
 * EntityType::check -
 */
-std::string EntityType::check(const std::string& apiVersion, const std::string&  predetectedError)
+std::string EntityType::check(ApiVersion apiVersion, const std::string&  predetectedError)
 {
   if (predetectedError != "")
   {

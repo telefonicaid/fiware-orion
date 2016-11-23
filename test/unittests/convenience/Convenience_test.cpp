@@ -91,19 +91,19 @@ TEST(Convenience, shortPath)
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  ci1.apiVersion = "v1";
+  ci1.apiVersion = V1;
   out = restService(&ci1, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  ci2.apiVersion = "v1";
+  ci2.apiVersion = V1;
   out = restService(&ci2, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  ci3.apiVersion = "v1";
+  ci3.apiVersion = V1;
   out = restService(&ci3, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  ci4.apiVersion = "v1";
+  ci4.apiVersion = V1;
   out = restService(&ci4, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -127,7 +127,7 @@ TEST(Convenience, badPathNgsi9)
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  ci.apiVersion = "v1";
+  ci.apiVersion = V1;
   out = restService(&ci, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -150,7 +150,7 @@ TEST(Convenience, badPathNgsi10)
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  ci.apiVersion = "v1";
+  ci.apiVersion = V1;
   out = restService(&ci, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
 

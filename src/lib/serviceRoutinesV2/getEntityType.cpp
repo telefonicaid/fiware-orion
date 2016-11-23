@@ -66,7 +66,7 @@ std::string getEntityType
 
   if (entityTypeName == "")
   {
-    OrionError oe(SccBadRequest, EMPTY_ENTITY_TYPE, "BadRequest");
+    OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_TYPE, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
     return oe.toJson();
   }
@@ -75,7 +75,7 @@ std::string getEntityType
 
   if (response.entityType.count == 0)
   {
-    OrionError oe(SccContextElementNotFound, "Entity type not found", "NotFound");
+    OrionError oe(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY_TYPE, ERROR_NOT_FOUND);
     TIMED_RENDER(answer = oe.toJson());
     ciP->httpStatusCode = oe.code;
   }

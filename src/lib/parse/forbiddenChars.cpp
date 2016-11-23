@@ -91,9 +91,9 @@ bool forbiddenChars(const char* s, const char* exceptions)
 *
 * forbiddenIdChars -
 */
-bool forbiddenIdChars(const std::string& api, const char* s, const char* exceptions)
+bool forbiddenIdChars(int api, const char* s, const char* exceptions)
 {
-  if (api == "v1" && !checkIdv1)
+  if (api == 1 && !checkIdv1)
   {
     return forbiddenChars(s, exceptions);  // old behavior
   }

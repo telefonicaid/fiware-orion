@@ -57,7 +57,7 @@ std::string putAvailabilitySubscriptionConvOp
   ParseData*                 parseDataP
 )
 {
-  std::string                                    subscriptionId  = (compV[0] == "v1")? compV[3] : compV[2];
+  std::string                                    subscriptionId  = (compV.size() == 4)? compV[3] : compV[2];
   UpdateContextAvailabilitySubscriptionRequest*  ucasP           = &parseDataP->ucas.res;
 
   if (subscriptionId != ucasP->subscriptionId.get())

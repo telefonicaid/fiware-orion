@@ -39,6 +39,7 @@
 #include "common/string.h"
 #include "common/wsStrip.h"
 #include "common/globals.h"
+#include "common/errorMessages.h"
 #include "common/defaultValues.h"
 #include "common/clockFunctions.h"
 #include "common/statistics.h"
@@ -109,13 +110,13 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     std::string  errorString = std::string("Empty right-hand-side for URI param /") + ckey + "/";
 
-    if (ciP->apiVersion == "v2")
+    if (ciP->apiVersion == V2)
     {
       OrionError error(SccBadRequest, errorString);
       ciP->httpStatusCode = error.code;
       ciP->answer         = error.smartRender(ciP->apiVersion);
     }
-    else if (ciP->apiVersion == "admin")
+    else if (ciP->apiVersion == ADMIN_API)
     {
       ciP->httpStatusCode = SccBadRequest;
       ciP->answer         = "{" + JSON_STR("error") + ":" + JSON_STR(errorString) + "}";
@@ -842,7 +843,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   }
 
   // Case 3
-  if ((ciP->apiVersion == "v1") && (ciP->httpHeaders.contentType != "application/json"))
+  if ((ciP->apiVersion == V1) && (ciP->httpHeaders.contentType != "application/json"))
   {
     std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
     ciP->httpStatusCode = SccUnsupportedMediaType;
@@ -853,7 +854,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 
   // Case 4
-  if ((ciP->apiVersion == "v2") && (ciP->httpHeaders.contentType != "application/json") && (ciP->httpHeaders.contentType != "text/plain"))
+  if ((ciP->apiVersion == V2) && (ciP->httpHeaders.contentType != "application/json") && (ciP->httpHeaders.contentType != "text/plain"))
   {
     std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
     ciP->httpStatusCode = SccUnsupportedMediaType;
@@ -879,7 +880,7 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
 {
   if (forbiddenChars(url.c_str()) == true)
   {
-    OrionError error(SccBadRequest, "invalid character in URI");
+    OrionError error(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI);
     ciP->httpStatusCode = error.code;
     ciP->answer         = error.smartRender(ciP->apiVersion);
     return false;
@@ -904,33 +905,42 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
 * apiVersionGet - 
 *
 * This function returns the version of the API for the incoming message,
-* based on the URL.
-* If the URL starts with "/v2" then the request is considered API version 2.
+* based on the URL according to:
 *
-* Otherwise, API version 1.
+*  V2:         for URLs in the /v2 path
+*  V1:         for URLs in the /v1 or with an equivalence (e.g. /ngi10, /log, etc.)
+*  ADMIN_API:  admin operations without /v1 alias
+*  NO_VERSION: others (invalid paths)
 *
-* Except ...
-* The new request to change the log level (not trace level), uses the
-* URL /admin/log, which DOES NOT start with '/v2', but as some render methods
-* depend on the apiVersion and we prefer the 'new render' from v2 for this
-* operation (see OrionError::render), we consider internally /admin/log to be part of v2.
-*
-* FIXME P2: instead of looking at apiVersion for rendering, perhaps we need
-*           some other algorithm, considering 'admin' requests as well ...
 */
-static std::string apiVersionGet(const char* path)
+static ApiVersion apiVersionGet(const char* path)
 {
   if ((path[1] == 'v') && (path[2] == '2'))
   {
-    return "v2";
+    return V2;
   }
 
-  if (strcmp(path, "/admin/log") == 0)
+  // Different from v2, v1 is case-insensitive (see case/2057 test)
+  if (((path[1] == 'v') || (path[1] == 'V')) && (path[2] == '1'))
   {
-    return "admin";
+    return V1;
+  }
+  if ((strncasecmp("/ngsi9",      path, strlen("/ngsi9"))      == 0)  ||
+      (strncasecmp("/ngsi10",     path, strlen("/ngsi10"))     == 0)  ||
+      (strncasecmp("/log",        path, strlen("/log"))        == 0)  ||
+      (strncasecmp("/cache",      path, strlen("/cache"))      == 0)  ||
+      (strncasecmp("/statistics", path, strlen("/statistics")) == 0))
+  {
+    return V1;
   }
 
-  return "v1";
+  if ((strncmp("/admin",   path, strlen("/admin"))   == 0) ||
+      (strncmp("/version", path, strlen("/version")) == 0))
+  {
+    return ADMIN_API;
+  }
+
+  return NO_VERSION;
 }
 
 

@@ -26,6 +26,7 @@
 
 #include "logMsg/logMsg.h"
 
+#include "common/errorMessages.h"
 #include "ngsi/ContextAttribute.h"
 #include "parse/CompoundValueNode.h"
 #include "parse/forbiddenChars.h"
@@ -255,7 +256,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     }
 
     // Attribute has a regular structure, in which 'value' is mandatory (except in v2)
-    if (iter->value.HasMember("value") || ciP->apiVersion == "v2")
+    if (iter->value.HasMember("value") || ciP->apiVersion == V2)
     {
       std::string r = parseContextAttributeObject(iter->value, caP, &compoundVector);
       if (r != "OK")
@@ -303,7 +304,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
 
   if (document.HasParseError())
   {
-    OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
+    OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
     alarmMgr.badInput(clientIp, "JSON parse error");
     ciP->httpStatusCode = SccBadRequest;
@@ -314,7 +315,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
 
   if (!document.IsObject())
   {
-    OrionError oe(SccBadRequest, "Error parsing incoming JSON buffer", ERROR_STRING_PARSERROR);
+    OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
     alarmMgr.badInput(clientIp, "JSON Parse Error");
     ciP->httpStatusCode = SccBadRequest;

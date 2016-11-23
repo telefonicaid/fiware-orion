@@ -212,7 +212,8 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, co
    else if (tag == "queryContextResponse")
    {
       QueryContextResponse qcr(errorCode);
-      reply =  qcr.render(ciP->apiVersion, ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON, indent);
+      bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+      reply =  qcr.render(ciP->apiVersion, asJsonObject, indent);
    }
    else if (tag == "subscribeContextResponse")
    {
@@ -232,7 +233,8 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, co
    else if (tag == "updateContextResponse")
    {
       UpdateContextResponse ucr(errorCode);
-      reply = ucr.render(ciP->apiVersion, ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON, indent);
+      bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+      reply = ucr.render(ciP->apiVersion, asJsonObject, indent);
    }
    else if (tag == "notifyContextResponse")
    {

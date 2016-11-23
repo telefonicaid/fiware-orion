@@ -80,7 +80,7 @@ std::string ContextRegistration::render(const std::string& indent, bool comma, b
 */
 std::string ContextRegistration::check
 (
-  const std::string&  apiVersion,
+  ApiVersion          apiVersion,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,
@@ -94,7 +94,7 @@ std::string ContextRegistration::check
     return res;
   }
 
-  if ((res = contextRegistrationAttributeVector.check(apiVersion, requestType, indent, predetectedError, counter)) != "OK")
+  if ((res = contextRegistrationAttributeVector.check(apiVersion)) != "OK")
   {
     return res;
   }

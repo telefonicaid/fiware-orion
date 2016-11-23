@@ -73,7 +73,7 @@ std::string ContextRegistrationResponse::render(const std::string& indent, bool 
 */
 std::string ContextRegistrationResponse::check
 (
-  const std::string&  apiVersion,
+  ApiVersion          apiVersion,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,

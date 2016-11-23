@@ -70,7 +70,7 @@ std::string NotifyContextAvailabilityRequest::render(const std::string& indent)
 *
 * NotifyContextAvailabilityRequest::check - 
 */
-std::string NotifyContextAvailabilityRequest::check(const std::string& apiVersion, const std::string& indent, const std::string& predetectedError, int counter)
+std::string NotifyContextAvailabilityRequest::check(ApiVersion apiVersion, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string                        res;
   NotifyContextAvailabilityResponse  response;

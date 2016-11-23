@@ -49,7 +49,7 @@ typedef struct ContextRegistrationResponseVector
   ContextRegistrationResponse*  operator[](unsigned int ix) const;
 
 
-  std::string                   check(const std::string&  apiVersion,
+  std::string                   check(ApiVersion          apiVersion,
                                       RequestType         requestType,
                                       const std::string&  indent,
                                       const std::string&  predetectedError,

@@ -63,7 +63,7 @@ TEST(UpdateActionType, check)
   std::string        checked;
   std::string        expected1 = "OK";
   std::string        expected2 = "OK";
-  std::string        expected3 = "invalid update action type: /APPEND2/";
+  std::string        expected3 = "invalid update action type: right ones are: APPEND, APPEND_STRICT, DELETE, REPLACE, UPDATE";
   std::string        expected4 = "empty update action type";
 
   utInit();

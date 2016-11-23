@@ -52,7 +52,7 @@ UpdateContextElementResponse::UpdateContextElementResponse()
 */
 std::string UpdateContextElementResponse::render
 (
-  const std::string&  apiVersion,
+  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
   const std::string&  indent
@@ -84,12 +84,11 @@ std::string UpdateContextElementResponse::render
 */
 std::string UpdateContextElementResponse::check
 (
-  const std::string&  apiVersion,
+  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
   const std::string&  indent,
-  const std::string&  predetectedError,  // Predetected Error, normally during parsing
-  int                 counter
+  const std::string&  predetectedError  // Predetected Error, normally during parsing
 )
 {
   std::string res;
@@ -98,7 +97,7 @@ std::string UpdateContextElementResponse::check
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeResponseVector.check(apiVersion, asJsonObject, requestType, indent, "", counter)) != "OK")
+  else if ((res = contextAttributeResponseVector.check(apiVersion, asJsonObject, requestType, indent, "")) != "OK")
   {
     errorCode.fill(SccBadRequest, res);
   }

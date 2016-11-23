@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/globals.h"
+
 #include "mongo/client/dbclient.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -95,7 +97,7 @@ typedef struct Metadata
   std::string  toStringValue(void) const;
   bool         compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
-  std::string  check(const std::string& apiVersion);
+  std::string  check(ApiVersion apiVersion);
 } Metadata;
 
 #endif  // SRC_LIB_NGSI_METADATA_H_

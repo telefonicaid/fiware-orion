@@ -216,9 +216,8 @@ void jsonUcerRelease(ParseData* reqData)
 */
 std::string jsonUcerCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->ucer.res.check(ciP->apiVersion,
-                                 ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON,
-                                 UpdateContextElement, "", reqData->errorString, 0);
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+  return reqData->ucer.res.check(ciP->apiVersion, asJsonObject, UpdateContextElement, "", reqData->errorString);
 }
 
 
