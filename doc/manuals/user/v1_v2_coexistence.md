@@ -10,7 +10,7 @@ This document explains some consideration to take into account regarding such co
 
 * [Native JSON types](#native-json-types)
 * [Filtering](#filtering)
-* [`DateTime` support](#datetime-support)
+* [Differences in the support to `DateTime` attribute type](#differences-in-the-support-to-datetime-attribute-type)
 * [Checking ID fields](#checking-id-fields)
 * [`orderBy` parameter](#orderby-parameter)
 * [NGSIv1 notification with NGSIv2 subscriptions](#ngsiv1-notification-with-ngsiv2-subscriptions)
@@ -44,7 +44,7 @@ In addition, note that NGSIv2 geo-query filters can be used also in NGSIv1. See
 
 [Top](#top)
 
-## `DateTime` support
+## Differences in the support to `DateTime` attribute type
 
 NGSIv2 supports the `DateTime` attribute type to identify dates. These attributes can be used with the query operators
 greater-than, less-than, greater-or-equal, less-or-equal and range. See "Special Attribute Types" section at
