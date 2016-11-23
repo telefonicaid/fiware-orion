@@ -1,4 +1,4 @@
-# Considerations on NGSIv1 and NGSIv2 coexistence
+#<a name="top"></a>Considerations on NGSIv1 and NGSIv2 coexistence
 
 NGSIv1 is the API offered by Orion Context Broker from its very first version. 
 [NGSIv2](http://telefonicaid.github.io/fiware-orion/api/v2/stable) development started 
@@ -7,6 +7,14 @@ removed from the code in some future Orion version (so only NGSIv2 will remain)
 this is a big work and both API versions will be coexisting during some time. 
 
 This document explains some consideration to take into account regarding such coexistence.
+
+* [Native JSON types](#native-json-types)
+* [Filtering](#filtering)
+* [Differences in the support to `DateTime` attribute type](#differences-in-the-support-to-datetime-attribute-type)
+* [Checking ID fields](#checking-id-fields)
+* [`orderBy` parameter](#orderby-parameter)
+* [NGSIv1 notification with NGSIv2 subscriptions](#ngsiv1-notification-with-ngsiv2-subscriptions)
+* [NGSIv2 query update forwarding to Context Providers](#ngsiv2-query-update-forwarding-to-context-providers)
 
 ## Native JSON types
 
@@ -18,6 +26,8 @@ setting `A=2` using NGSIv1 will actually store `A="2"` in the Orion database.
 However, NGSIv1 rendering is able to correctly retrieve attribute values stored using 
 non-string JSON native types. Thus, if you set `A=2` using NGSIv2 and retrieve that 
 attribute using NGSIv1, you will get `A=2`.
+
+[Top](#top)
 
 ## Filtering
 
@@ -32,6 +42,26 @@ for numeric values. Thus, in order to work properly, these filters (although usi
 In addition, note that NGSIv2 geo-query filters can be used also in NGSIv1. See
 [the following section](geolocation.md#geo-located-queries-ngsiv2) for details
 
+[Top](#top)
+
+## Differences in the support to `DateTime` attribute type
+
+NGSIv2 supports the `DateTime` attribute type to identify dates. These attributes can be used with the query operators
+greater-than, less-than, greater-or-equal, less-or-equal and range. See "Special Attribute Types" section at
+[NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable)) and ["DateTime support"  section
+in the NGSIv2 implementation notes](ngsiv2_implementation_notes.md#datetime-support).
+
+However, note that `DateTime` attribute type has *not* any special interpretation in the NGSIv1 API, i.e. the
+attribute value is treated as any other string without any special meaning. That has two implications:
+
+* Attributes created/updated using the NGSIv1 with type `DateTime` are treated as normal strings.
+* Attributes created using NGSIv2 (or which last update has been using NGSIv2) with type `DateTime`, then
+  updated using NGSIv1 will "lose" their date nature and they are treated as normal string.
+* Attributes created using NGSIv1 (or which last update has been using NGSIv1) with type `DateTime`, then
+  updated using NGSIv2 will "gain" their date nature so they can be used in date filters, etc.
+
+[Top](#top)
+
 ## Checking ID fields
 
 NGSIv2 introduces syntax restrictions for ID fields (such as entity id/type, attribute name/type
@@ -45,11 +75,15 @@ and with types equal to the empty string (`""`). However, NGSIv2 ID fields (incl
 a minimum length of 1 character. Thus, entities created with NGSIv1 but rendered using NGSIv2 operation
 will automatically replace these cases with the string value `none` (which is the default type in NGSIv2).
 
+[Top](#top)
+
 ## `orderBy` parameter
 
 The `orderBy` parameter defined for NGSIv2 can be used also in NGSIv1 queryContext operation (see
 details in the [pagination documentation](pagination.md). However, note that the "geo:distance"
 order can be used only in NGSIv2.
+
+[Top](#top)
 
 ## NGSIv1 notification with NGSIv2 subscriptions
 
@@ -58,6 +92,8 @@ subscription. Apart from the values described in the NGSIv2 specification, Orion
 `legacy` value in order to send notifications in NGSIv1 format. This way, users can have the
 enhancements of NGSIv2 subscriptions (e.g. filtering or system/builtin metadata in notifications) with
 NGSIv1 legacy notifications receivers.
+
+[Top](#top)
 
 ## NGSIv2 query update forwarding to Context Providers
 
@@ -79,4 +115,6 @@ However, the following considerations have to be taken into account:
   other entities/attributes not being updated due to failing or missing CPrs), 404 Not Found is returned to the client.
   The `error` field in this case is `PartialUpdate` and the `description` field contains information about which entity
   attributes failed to update.
+
+[Top](#top)
 

@@ -300,7 +300,6 @@ HttpStatusCode mongoQueryContext
     std::string err;
     bool        ok;
     bool        limitReached = false;
-    bool        badInput     = false;
     bool        reqSemTaken;
 
     ContextElementResponseVector rawCerV;
@@ -341,17 +340,8 @@ HttpStatusCode mongoQueryContext
                        limit,
                        &limitReached,
                        countP,
-                       &badInput,
                        sortOrderList,
                        apiVersion);
-
-    if (badInput)
-    {
-      responseP->errorCode.fill(SccBadRequest, err);
-      rawCerV.release();
-      reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
-      return SccOk;      
-    }
 
     if (!ok)
     {

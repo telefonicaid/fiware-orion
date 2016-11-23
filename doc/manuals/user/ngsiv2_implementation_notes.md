@@ -84,28 +84,28 @@ From "Special Attribute Types" section at NGSIv2 specification:
 The following considerations have to be taken into account at attribute creation/update time or when used in `q` and `mq` filters:
 
 * Datetimes are composed of date, time and timezone designator, in one of the following patterns:
-  * `<date>`
-  * `<date>T<time>`
-  * `<date>T<time><timezone>`
-  * Note that the format `<date><timezone>` is not allowed. According to ISO8601: *"If a time zone designator is required,
-    it follows the combined date and time".*
+    * `<date>`
+    * `<date>T<time>`
+    * `<date>T<time><timezone>`
+    * Note that the format `<date><timezone>` is not allowed. According to ISO8601: *"If a time zone designator is required,
+      it follows the combined date and time".*
 * Regarding `<date>` it must follow the pattern: `YYYY-MM-DD`
-  * `YYYY`: year (four digits)
-  * `MM`: month (two digits)
-  * `DD`: day (two digits)
+    * `YYYY`: year (four digits)
+    * `MM`: month (two digits)
+    * `DD`: day (two digits)
 * Regarding `<time>` it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Times):
-  * `hh:mm:ss.sss` or `Thhmmss.sss`. At the present moment, Orion is able to process times including microseconds (or even
-    smaller resolutions) although internally they are stored as `.00`. However, this may change in the future
-    (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2670)).
-  * `hh:mm:ss` or `Thhmmss`.
-  * `hh:mm` or `Thhmm`. Seconds are set to `00` in this case.
-  * `hh`. Minutes and seconds are set to `00` in this case.
-  * If `<time>` is ommited, then hours, minutes and seconds are set to `00`.
+    * `hh:mm:ss.sss` or `Thhmmss.sss`. At the present moment, Orion is able to process times including microseconds (or even
+      smaller resolutions) although internally they are stored as `.00`. However, this may change in the future
+      (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2670)).
+    * `hh:mm:ss` or `Thhmmss`.
+    * `hh:mm` or `Thhmm`. Seconds are set to `00` in this case.
+    * `hh`. Minutes and seconds are set to `00` in this case.
+    * If `<time>` is ommited, then hours, minutes and seconds are set to `00`.
 * Regarding `<timezones>` it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators):
-  * `Z`
-  * `±hh:mm`
-  * `±hhmm`
-  * `±hh`
+    * `Z`
+    * `±hh:mm`
+    * `±hhmm`
+    * `±hh`
 * ISO8601 specifies that *"if no UTC relation information is given with a time representation, the time is assumed to be in local time"*.
   However, this is ambiguous when client and server are in different zones. Thus, in order to solve this ambiguety, Orion will always
   assume timezone `Z` when timezone designator is ommited.
