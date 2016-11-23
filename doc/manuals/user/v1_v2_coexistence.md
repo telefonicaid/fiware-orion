@@ -49,7 +49,7 @@ In addition, note that NGSIv2 geo-query filters can be used also in NGSIv1. See
 NGSIv2 supports the `DateTime` attribute type to identify dates. These attributes can be used with the query operators
 greater-than, less-than, greater-or-equal, less-or-equal and range. See "Special Attribute Types" section at
 [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable)) and ["DateTime support"  section
-in the NGSIv2 implementation notes](ngsiv2_implementation.md#datetime-support).
+in the NGSIv2 implementation notes](ngsiv2_implementation_notes.md#datetime-support).
 
 However, note that `DateTime` attribute type has *not* any special interpretation in the NGSIv1 API, i.e. the
 attribute value is treated as any other string without any special meaning. That has two implications:
