@@ -30,7 +30,8 @@ brokerStart CB
 --SHELL--
 
 # 01. Create and query compound with empty keys and vector values
-# 02. Get entity
+# 02. Get entity (NGSIv2)
+# 03. Get entity (NGSIv1)
 
 echo "01. Create and query compound with empty keys and vector values"
 echo "==============================================================="
@@ -50,9 +51,16 @@ echo
 echo
 
 
-echo "02. Get entity"
-echo "=============="
+echo "02. Get entity (NGSIv2)"
+echo "======================="
 orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo "03. Get entity (NGSIv1)"
+echo "======================="
+orionCurl --url /v1/contextEntities/E
 echo
 echo
 
@@ -68,8 +76,8 @@ Date: REGEX(.*)
 
 
 
-02. Get entity
-==============
+02. Get entity (NGSIv2)
+=======================
 HTTP/1.1 200 OK
 Content-Length: 96
 Content-Type: application/json
@@ -91,6 +99,41 @@ Date: REGEX(.*)
     },
     "id": "E",
     "type": "T"
+}
+
+
+03. Get entity (NGSIv1)
+=======================
+HTTP/1.1 200 OK
+Content-Length: 388
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "A",
+                "type": "compound",
+                "value": {
+                    "": "foo",
+                    "v": [
+                        "",
+                        "bar",
+                        ""
+                    ]
+                }
+            }
+        ],
+        "id": "E",
+        "isPattern": "false",
+        "type": "T"
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
 }
 
 

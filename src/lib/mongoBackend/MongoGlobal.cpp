@@ -1073,7 +1073,6 @@ bool entitiesQuery
   int                              limit,
   bool*                            limitReached,
   long long*                       countP,
-  bool*                            badInputP,
   const std::string&               sortOrderList,
   ApiVersion                       apiVersion
 )
