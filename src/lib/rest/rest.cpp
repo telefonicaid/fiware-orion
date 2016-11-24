@@ -463,6 +463,15 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
         ++cP;
       }
 
+      //
+      // HOTFIX for release 1.4.0
+      // If that comma is the LAST char in the string - ACCEPT
+      // 
+      if (*cP == 0)
+      {
+        return;
+      }
+
       acceptItemParse(ciP, itemStart);
       itemStart = cP;
     }
