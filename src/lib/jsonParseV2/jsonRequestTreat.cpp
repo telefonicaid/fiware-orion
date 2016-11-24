@@ -42,6 +42,7 @@
 #include "apiTypesV2/SubscriptionUpdate.h"
 
 
+
 /* ****************************************************************************
 *
 * jsonRequestTreat - 
@@ -147,6 +148,7 @@ std::string jsonRequestTreat
 
   case BatchUpdateRequest:
     LM_W(("KZ: --- parsing a BatchUpdateRequest"));
+    releaseP->batchUpdateP = &parseDataP->bu.res;
     answer = parseBatchUpdate(ciP, &parseDataP->bu.res);
     LM_W(("KZ: --- parsed a BatchUpdateRequest"));
     if (answer != "OK")

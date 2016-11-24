@@ -107,11 +107,15 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
 
       if (r != "OK")
       {
+        std::string r;
+
         LM_W(("KZ: parseEntityVector failed: %s", r.c_str()));
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
-        return oe.toJson();
+        r = oe.toJson();
+        LM_W(("KZ: parseEntityVector returns: %s", r.c_str()));
+        return r;
       }
     }
     else if (name == "actionType")

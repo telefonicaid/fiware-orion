@@ -49,6 +49,7 @@ BatchUpdate::BatchUpdate()
 */
 BatchUpdate::~BatchUpdate()
 {
+  release();
 }
 
 
@@ -71,6 +72,5 @@ void BatchUpdate::present(const std::string& indent)
 */
 void BatchUpdate::release(void)
 {
-  LM_W(("KZ: In BatchUpdate::release"));
   entities.release();
 }

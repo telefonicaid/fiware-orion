@@ -56,6 +56,7 @@
 */
 static void delayedRelease(JsonDelayedRelease* releaseP)
 {
+  LM_W(("KZ: In delayedRelease"));
   if (releaseP->entity != NULL)
   {
     releaseP->entity->release();
@@ -85,6 +86,15 @@ static void delayedRelease(JsonDelayedRelease* releaseP)
     delete releaseP->subsP;
     releaseP->subsP = NULL;
   }
+
+  if (releaseP->batchUpdateP != NULL)
+  {
+    LM_W(("KZ: delayedRelease deleting batchUpdateP"));
+    delete releaseP->batchUpdateP;
+    releaseP->batchUpdateP = NULL;
+  }
+  else
+    LM_W(("KZ: delayedRelease NOT deleting batchUpdateP"));
 }
 
 
@@ -536,6 +546,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       response = payloadParse(ciP, &parseData, &serviceV[ix], &jsonReqP, &jsonRelease, compV);
       LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
 
+      LM_W(("KZ: payloadParse responds with '%s'", response.c_str()));
       if (response != "OK")
       {
         alarmMgr.badInput(clientIp, response);
