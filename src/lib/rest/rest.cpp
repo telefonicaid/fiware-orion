@@ -469,6 +469,7 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
       // 
       if (*cP == 0)
       {
+        LM_W(("Invalid Accept Header: ending in comma"));
         return;
       }
 
