@@ -333,7 +333,7 @@ bool            disableCusNotif;
 * paArgs - option vector for the Parse CLI arguments library
 *
 * NOTE
-*   A note about 'FD_SETSIZE - 4', the default and max value for '-maxConnections':
+*   A note about '10240', the default value for '-maxConnections':
 *   [ taken from https://www.gnu.org/software/libmicrohttpd/manual/libmicrohttpd.html ]
 *
 *   MHD_OPTION_CONNECTION_LIMIT
@@ -342,6 +342,10 @@ bool            disableCusNotif;
 *     select minus four for stdin, stdout, stderr and the server socket). In other words,
 *    the default is as large as possible.
 *
+* However, as the max number of FDs is a soft limit and can be set to 10240, the definition
+* FD_SETSIZE of 1024 seems old.
+* The broker will use 10240 as default value for '-maxConnections', and remove the upper limit.
+* Like this, the broker depends on the soft limits instead (ulimit).
 */
 PaArgument paArgs[] =
 {
@@ -378,7 +382,7 @@ PaArgument paArgs[] =
   { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 60,             0,     3600,     SUB_CACHE_IVAL_DESC    },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
   { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     1024,     CONN_MEMORY_DESC       },  
-  { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, FD_SETSIZE - 4, 0,     FD_SETSIZE - 4, MAX_CONN_DESC    },
+  { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, 10240,          1,     PaNL,     MAX_CONN_DESC          },
   { "-reqPoolSize",      &reqPoolSize,      "TRQ_POOL_SIZE",     PaUInt,   PaOpt, 0,              0,     1024,     REQ_POOL_SIZE          },
 
   { "-notificationMode",      &notificationMode,      "NOTIF_MODE", PaString, PaOpt, _i "transient", PaNL,  PaNL, NOTIFICATION_MODE_DESC },
