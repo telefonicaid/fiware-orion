@@ -463,15 +463,20 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
         ++cP;
       }
 
+#if 0
       //
       // HOTFIX for release 1.4.0
       // If that comma is the LAST char in the string - ACCEPT
+      //
+      // NOTE: If ever included - use break (but avoid last call to acceptItemParse),
+      //       to get the error handling at the end of the function
       // 
       if (*cP == 0)
       {
         LM_W(("Invalid Accept Header: ending in comma"));
         return;
       }
+#endif
 
       acceptItemParse(ciP, itemStart);
       itemStart = cP;
