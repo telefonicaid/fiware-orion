@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
+
 #include "alarmMgr/alarmMgr.h"
 #include "rest/OrionError.h"
 #include "apiTypesV2/BatchUpdate.h"
@@ -69,5 +71,6 @@ void BatchUpdate::present(const std::string& indent)
 */
 void BatchUpdate::release(void)
 {
+  LM_W(("KZ: In BatchUpdate::release"));
   entities.release();
 }

@@ -105,6 +105,7 @@ void Entities::present(const std::string& indent)
 */
 void Entities::release(void)
 {
+  LM_W(("KZ: In Entities::release"));
   vec.release();
 }
 

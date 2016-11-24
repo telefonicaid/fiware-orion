@@ -165,6 +165,7 @@ std::string MetadataVector::toJson(bool isLastElement, const std::vector<std::st
 */
 std::string MetadataVector::check(ApiVersion apiVersion)
 {
+  LM_W(("KZ: In MetadataVector::check"));
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
@@ -241,10 +242,12 @@ unsigned int MetadataVector::size(void) const
 */
 void MetadataVector::release(void)
 {
+  LM_W(("KZ: In MetadataVector::release"));
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     if (vec[ix] != NULL)
     {
+      LM_W(("KZ: MetadataVector::release calling Metadata::release for metadata at %p", vec[ix]));
       vec[ix]->release();
       delete vec[ix];
       vec[ix] = NULL;

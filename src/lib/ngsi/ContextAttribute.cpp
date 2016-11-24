@@ -1106,12 +1106,14 @@ void ContextAttribute::present(const std::string& indent, int ix)
 */
 void ContextAttribute::release(void)
 {
+  LM_W(("KZ: In ContextAttribute::release (at at %p)", this));
   if (compoundValueP != NULL)
   {
     delete compoundValueP;
     compoundValueP = NULL;
   }
 
+  LM_W(("KZ: ContextAttribute::release calling metadataVector.release (CA at %p)", this));
   metadataVector.release();
   if (previousValue != NULL)
   {

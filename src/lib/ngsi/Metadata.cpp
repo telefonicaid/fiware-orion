@@ -294,6 +294,8 @@ std::string Metadata::check(ApiVersion apiVersion)
   size_t len;
   char   errorMsg[128];
 
+  LM_W(("KZ: In Metadata::check"));
+
   if (apiVersion == V2 && (len = strlen(name.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata name length: %zd, min length supported: %d", len, MIN_ID_LEN);
@@ -316,6 +318,7 @@ std::string Metadata::check(ApiVersion apiVersion)
 
   if (forbiddenIdChars(apiVersion , name.c_str()))
   {
+    LM_W(("KZ: Invalid characters in metadata name"));
     alarmMgr.badInput(clientIp, "found a forbidden character in the name of a Metadata");
     return "Invalid characters in metadata name";
   }

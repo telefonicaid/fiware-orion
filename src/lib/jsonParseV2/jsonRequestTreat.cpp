@@ -146,9 +146,12 @@ std::string jsonRequestTreat
     break;
 
   case BatchUpdateRequest:
+    LM_W(("KZ: --- parsing a BatchUpdateRequest"));
     answer = parseBatchUpdate(ciP, &parseDataP->bu.res);
+    LM_W(("KZ: --- parsed a BatchUpdateRequest"));
     if (answer != "OK")
     {
+      parseDataP->bu.res.release();
       return answer;
     }
 

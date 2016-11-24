@@ -102,10 +102,12 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
 
     if (name == "entities")
     {
+      LM_W(("KZ: Calling parseEntityVector"));
       std::string r = parseEntityVector(ciP, iter, &burP->entities, true); // param 4: attributes are allowed in payload
 
       if (r != "OK")
       {
+        LM_W(("KZ: parseEntityVector failed: %s", r.c_str()));
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;

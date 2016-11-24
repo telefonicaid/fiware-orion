@@ -174,9 +174,11 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       
       eP->attributeVector.push_back(caP);
 
+      LM_W(("KZ: parseEntity Calling parseContextAttribute"));
       std::string r = parseContextAttribute(ciP, iter, caP);
       if (r != "OK")
       {
+        LM_W(("KZ: parseContextAttribute failed: %s", r.c_str()));
         alarmMgr.badInput(clientIp, "parse error in context attribute");
         ciP->httpStatusCode = SccBadRequest;
         OrionError oe(SccBadRequest, r, "BadRequest");

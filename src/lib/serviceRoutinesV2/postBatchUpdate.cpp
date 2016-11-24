@@ -24,6 +24,8 @@
 */
 #include <string>
 
+#include "logMsg/logMsg.h"
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -63,11 +65,14 @@ std::string postBatchUpdate
   UpdateContextRequest*  upcrP  = &parseDataP->upcr.res;
   Entities               entities;
 
+  LM_W(("KZ: In postBatchUpdate ************************************************************************"));
   upcrP->fill(&buP->entities, buP->updateActionType.get());
   buP->release();  // upcrP just 'took over' the data from buP, buP is no longer needed
   parseDataP->upcr.res.present("");
 
+  LM_W(("KZ: --------------------- Calling postUpdateContext"));
   postUpdateContext(ciP, components, compV, parseDataP);
+  LM_W(("KZ: ---------------------- postUpdateContext is DONE"));
 
   // Check potential error
   std::string  answer = "";
