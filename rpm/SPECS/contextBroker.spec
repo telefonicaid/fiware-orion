@@ -164,6 +164,9 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Thu Nov 24 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.4.3-1
+- Hotfix about being less strict on Accept header
+
 * Fri Nov 04 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.4.2-1
 - Fix: over-logging of Runtime Error traces not representing actual error (#2597)
 - Fix: support attributes with double underscore as part of the name (#2453)
