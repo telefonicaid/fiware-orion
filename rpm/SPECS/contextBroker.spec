@@ -164,6 +164,10 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Thu Nov 24 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.4.4-1
+- Hotfix: type wrongly interpreted as pattern in NGSIv1 query requests
+- Rollback 1.4.3 hotfix about being less strict on Accept header
+
 * Thu Nov 24 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.4.3-1
 - Hotfix about being less strict on Accept header
 
