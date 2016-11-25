@@ -42,7 +42,6 @@
 #include "apiTypesV2/SubscriptionUpdate.h"
 
 
-
 /* ****************************************************************************
 *
 * jsonRequestTreat - 
@@ -150,7 +149,6 @@ std::string jsonRequestTreat
     answer = parseBatchUpdate(ciP, &parseDataP->bu.res);
     if (answer != "OK")
     {
-      parseDataP->bu.res.release();
       return answer;
     }
 
