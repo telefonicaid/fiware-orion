@@ -212,11 +212,16 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
     return std::string(errorMsg);
   }
 
-  if ((apiVersion == V2) && ((len = strlen(type.c_str())) < MIN_ID_LEN) && (requestType != BatchQueryRequest))
+
+  if (!((requestType == BatchQueryRequest) || (requestType == BatchUpdateRequest && !typeGiven)))
+
   {
-    snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
-    return std::string(errorMsg);
+    if ((apiVersion == V2) && ((len = strlen(type.c_str())) < MIN_ID_LEN))
+    {
+      snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
+      alarmMgr.badInput(clientIp, errorMsg);
+      return std::string(errorMsg);
+    }
   }
 
   if (forbiddenIdChars(apiVersion, type.c_str()))
