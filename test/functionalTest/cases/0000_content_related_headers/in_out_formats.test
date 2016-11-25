@@ -29,6 +29,19 @@ brokerStart CB
 
 --SHELL--
 
+#
+# 0.0: Add an Entity with UpdateContext:APPEND
+# 0.1: Query the Entity just to make sure it is there
+# 1.1: Unrecognized Content-Type, Accepts ONLY JSON: 415, response in JSON
+# 1.2: Unrecognized Content-Type, Accepts BOTH JSON and XML: 415, response in JSON
+# 1.3: Unrecognized Content-Type, Accepts text/plain: 415, response in text/plain
+# 1.4: Unrecognized Content-Type, Accepts NOTHING: 415, response in JSON
+# 2.1: Content-Type OK, Accepts ONLY JSON: 200, response in JSON
+# 2.2: Content-Type OK, Accepts BOTH JSON and XML: 200, response in JSON
+# 2.3: Content-Type OK, Accepts text/plain: 406, Response in text/plain
+# 3.1: Accept with empty items including empty accept-items and trailing commas - see it work
+#
+
 echo "0.0: Add an Entity with UpdateContext:APPEND"
 echo "============================================"
 url="/v1/updateContext"
@@ -106,6 +119,13 @@ echo
 echo "2.3: Content-Type OK, Accepts text/plain: 406, Response in text/plain"
 echo '====================================================================='
 orionCurl --url "$url" --payload "${payload}" --in "application/json" --out "text/plain" --payloadCheck json
+echo
+echo
+
+
+echo "3.1: Accept with empty items including empty accept-items and trailing commas - see it work"
+echo "==========================================================================================="
+orionCurl --url "$url" --payload "${payload}" --in "application/json" --out "text/plain,,,application/json,,,," --payloadCheck json
 echo
 echo
 
@@ -317,6 +337,38 @@ Date: REGEX(.*)
         "details": "acceptable MIME types: application/json",
         "reasonPhrase": "Not Acceptable"
     }
+}
+
+
+3.1: Accept with empty items including empty accept-items and trailing commas - see it work
+===========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 402
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
 }
 
 
