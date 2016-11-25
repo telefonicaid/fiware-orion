@@ -333,19 +333,23 @@ bool            disableCusNotif;
 * paArgs - option vector for the Parse CLI arguments library
 *
 * NOTE
-*   A note about '10240', the default value for '-maxConnections':
-*   [ taken from https://www.gnu.org/software/libmicrohttpd/manual/libmicrohttpd.html ]
+*   A note about the limits and default value for '-maxConnections':
 *
+*   [ taken from https://www.gnu.org/software/libmicrohttpd/manual/libmicrohttpd.html ]
 *   MHD_OPTION_CONNECTION_LIMIT
 *     Maximum number of concurrent connections to accept.
 *     The default is FD_SETSIZE - 4 (the maximum number of file descriptors supported by 
 *     select minus four for stdin, stdout, stderr and the server socket). In other words,
 *    the default is as large as possible.
 *
-* However, as the max number of FDs is a soft limit and can be set to 10240, the definition
-* FD_SETSIZE of 1024 seems old.
-* The broker will use 10240 as default value for '-maxConnections', and remove the upper limit.
-* Like this, the broker depends on the soft limits instead (ulimit).
+* As long as we use select, the upper limit is 1024, we need to use poll or epoll to support more
+* simultaneous incoming connections.
+* We don't know how to do this as of right now, but we0ve decided to prepare '-maxConnections'
+* anyway.
+* The broker will use 1020 as default value for '-maxConnections', and remove the upper limit.
+* Like this, once we get poll working, the broker depends on the soft limits instead (ulimit).
+*
+* Also, we need to read about the value of ZERO for maxConnectrions. It seems to have a special meaning.
 */
 PaArgument paArgs[] =
 {
@@ -382,7 +386,7 @@ PaArgument paArgs[] =
   { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 60,             0,     3600,     SUB_CACHE_IVAL_DESC    },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
   { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     1024,     CONN_MEMORY_DESC       },  
-  { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, 10240,          1,     PaNL,     MAX_CONN_DESC          },
+  { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, 1020,           0,     PaNL,     MAX_CONN_DESC          },
   { "-reqPoolSize",      &reqPoolSize,      "TRQ_POOL_SIZE",     PaUInt,   PaOpt, 0,              0,     1024,     REQ_POOL_SIZE          },
 
   { "-notificationMode",      &notificationMode,      "NOTIF_MODE", PaString, PaOpt, _i "transient", PaNL,  PaNL, NOTIFICATION_MODE_DESC },
