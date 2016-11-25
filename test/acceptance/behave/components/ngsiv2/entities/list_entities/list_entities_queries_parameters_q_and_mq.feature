@@ -1215,3 +1215,221 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | speed!=79..80     | 0      | 8     | vehicle | mo(\w)       | 1        |
       | temperature==high | 0      | 2     | home    | .*           | 2        |
       | temperature!=low  | 9      | 9     | home    | \a*          | 0        |
+
+  @only_q_attribute_datetime  @ISSUE_2632
+  Scenario Outline:  list entities using NGSI v2 with only q query parameter using datetime processing
+    Given  a definition of headers
+      | parameter          | value            |
+      | Fiware-Service     | test_list_only_q |
+      | Fiware-ServicePath | /test            |
+      | Content-Type       | application/json |
+    And initialize entity groups recorder
+    And properties to entities
+      | parameter        | value                   |
+      | entities_id      | room1                   |
+      | attributes_name  | timestamp               |
+      | attributes_value | 2016-11-01T19:00:00.00Z |
+      | attributes_type  | DateTime                |
+      | metadatas_name   | too_late                |
+      | metadatas_type   | alarm                   |
+      | metadatas_value  | night                   |
+    And create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value                        |
+      | entities_type    | house                        |
+      | entities_id      | room2                        |
+      | attributes_name  | timestamp                    |
+      | attributes_value | 2016-11-02T19:00:00.00+01:00 |
+      | attributes_type  | DateTime                     |
+    And create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value                        |
+      | entities_type    | home                         |
+      | entities_id      | room3                        |
+      | attributes_name  | timestamp                    |
+      | attributes_value | 2016-11-02T19:00:00.00-02:00 |
+      | attributes_type  | DateTime                     |
+    And create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value                       |
+      | entities_type    | home                        |
+      | entities_id      | room4                       |
+      | attributes_name  | timestamp                   |
+      | attributes_value | 2017-11-02T01:00:00.00+0100 |
+      | attributes_type  | DateTime                    |
+    And create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value                       |
+      | entities_type    | home                        |
+      | entities_id      | room5                       |
+      | attributes_name  | timestamp                   |
+      | attributes_value | 2017-11-02T19:00:00.00-0200 |
+      | attributes_type  | DateTime                    |
+    And create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value                       |
+      | entities_type    | home                        |
+      | entities_id      | room6                       |
+      | attributes_name  | timestamp                   |
+      | attributes_value | 2017-11-02T19:34:00.00-0200 |
+      | attributes_type  | DateTime                    |
+    And create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value                       |
+      | entities_type    | home                        |
+      | entities_id      | room7                       |
+      | attributes_name  | timestamp                   |
+      | attributes_value | 2017-11-02T19:34:45.00-0200 |
+      | attributes_type  | DateTime                    |
+    And create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value            |
+      | Fiware-Service     | test_list_only_q |
+      | Fiware-ServicePath | /test            |
+    When get all entities
+      | parameter | value          |
+      | q         | <q_expression> |
+      | options   | count          |
+    Then verify that receive an "OK" http code
+    And verify that "<returned>" entities are returned
+    Examples:
+      | q_expression                   | returned |
+      | timestamp>2015-11-02           | 7        |
+      | timestamp<2017-10-02           | 3        |
+      | timestamp:2017-11-02           | 1        |
+      | timestamp:2017-11-02T21        | 1        |
+      | timestamp:2017-11-02T21:34     | 1        |
+      | timestamp>2017-11-02T21:34:44  | 1        |
+      | timestamp:2017-11-02T2134      | 1        |
+      | timestamp>2017-11-02T213444    | 1        |
+      | timestamp>2017-11-02T21:34:44Z | 1        |
+
+  # --- mq = <expression> ---
+
+  @only_mq_attribute_datetime  @ISSUE_2632
+  Scenario Outline:  list entities using NGSI v2 with only mq query parameter using datetime processing
+    Given  a definition of headers
+      | parameter          | value             |
+      | Fiware-Service     | test_list_only_mq |
+      | Fiware-ServicePath | /test             |
+      | Content-Type       | application/json  |
+    And initialize entity groups recorder
+    And properties to entities
+      | parameter        | value                   |
+      | entities_id      | room1                   |
+      | attributes_name  | temperature             |
+      | attributes_value | 14                      |
+      | attributes_type  | celsius                 |
+      | metadatas_name   | timestamp               |
+      | metadatas_value  | 2016-11-01T19:00:00.00Z |
+      | metadatas_type   | DateTime                |
+    And create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value                        |
+      | entities_id      | room2                        |
+      | attributes_name  | temperature                  |
+      | attributes_value | 24                           |
+      | attributes_type  | celsius                      |
+      | metadatas_name   | timestamp                    |
+      | metadatas_value  | 2016-11-02T19:00:00.00+01:00 |
+      | metadatas_type   | DateTime                     |
+    And create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value                        |
+      | entities_id      | room3                        |
+      | attributes_name  | temperature                  |
+      | attributes_value | 34                           |
+      | attributes_type  | celsius                      |
+      | metadatas_name   | timestamp                    |
+      | metadatas_value  | 2016-11-02T19:00:00.00-02:00 |
+      | metadatas_type   | DateTime                     |
+    And create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value                       |
+      | entities_id      | room4                       |
+      | attributes_name  | temperature                 |
+      | attributes_value | 44                          |
+      | attributes_type  | celsius                     |
+      | metadatas_name   | timestamp                   |
+      | metadatas_value  | 2017-11-02T01:00:00.00+0100 |
+      | metadatas_type   | DateTime                    |
+    And create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value                       |
+      | entities_id      | room5                       |
+      | attributes_name  | temperature                 |
+      | attributes_value | 54                          |
+      | attributes_type  | celsius                     |
+      | metadatas_name   | timestamp                   |
+      | metadatas_value  | 2017-11-02T19:00:00.00-0200 |
+      | metadatas_type   | DateTime                    |
+    And create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value                       |
+      | entities_id      | room6                       |
+      | attributes_name  | temperature                 |
+      | attributes_value | 64                          |
+      | attributes_type  | celsius                     |
+      | metadatas_name   | timestamp                   |
+      | metadatas_value  | 2017-11-02T19:34:00.00-0200 |
+      | metadatas_type   | DateTime                    |
+    And create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value                       |
+      | entities_id      | room7                       |
+      | attributes_name  | temperature                 |
+      | attributes_value | 74                          |
+      | attributes_type  | celsius                     |
+      | metadatas_name   | timestamp                   |
+      | metadatas_value  | 2017-11-02T19:34:45.00-0200 |
+      | metadatas_type   | DateTime                    |
+    And create entity group with "1" entities in "normalized" mode
+    And verify that receive several "Created" http code
+    And record entity group
+    And modify headers and keep previous values "false"
+      | parameter          | value             |
+      | Fiware-Service     | test_list_only_mq |
+      | Fiware-ServicePath | /test             |
+    When get all entities
+      | parameter | value           |
+      | mq        | <mq_expression> |
+      | options   | count           |
+    Then verify that receive an "OK" http code
+    And verify that "<returned>" entities are returned
+    Examples:
+      | mq_expression                              | returned |
+      | temperature.timestamp>2015-11-02           | 7        |
+      | temperature.timestamp<2017-10-02           | 3        |
+      | temperature.timestamp:2017-11-02           | 1        |
+      | temperature.timestamp:2017-11-02T21        | 1        |
+      | temperature.timestamp:2017-11-02T21:34     | 1        |
+      | temperature.timestamp>2017-11-02T21:34:44  | 1        |
+      | temperature.timestamp:2017-11-02T2134      | 1        |
+      | temperature.timestamp>2017-11-02T213444    | 1        |
+      | temperature.timestamp>2017-11-02T21:34:44Z | 1        |
