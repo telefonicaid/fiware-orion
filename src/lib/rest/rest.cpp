@@ -319,7 +319,7 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
     //   items in the comma list of Accepot are allowed, so we simply return OK (true) here 
     //   and skip to the next item.
     //
-    return false;
+    return true;
   }
 
   if ((delimiter = strchr(cP, ';')) != NULL)
