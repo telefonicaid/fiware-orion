@@ -94,11 +94,11 @@ The following considerations have to be taken into account at attribute creation
     * `MM`: month (two digits)
     * `DD`: day (two digits)
 * Regarding `<time>` it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Times):
-    * `hh:mm:ss.sss` or `Thhmmss.sss`. At the present moment, Orion is able to process times including microseconds (or even
+    * `hh:mm:ss.sss` or `hhmmss.sss`. At the present moment, Orion is able to process times including microseconds (or even
       smaller resolutions) although internally they are stored as `.00`. However, this may change in the future
       (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2670)).
-    * `hh:mm:ss` or `Thhmmss`.
-    * `hh:mm` or `Thhmm`. Seconds are set to `00` in this case.
+    * `hh:mm:ss` or `hhmmss`.
+    * `hh:mm` or `hhmm`. Seconds are set to `00` in this case.
     * `hh`. Minutes and seconds are set to `00` in this case.
     * If `<time>` is ommited, then hours, minutes and seconds are set to `00`.
 * Regarding `<timezones>` it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators):
