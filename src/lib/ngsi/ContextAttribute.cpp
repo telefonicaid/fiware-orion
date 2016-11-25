@@ -141,10 +141,16 @@ void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr) const
 /* ****************************************************************************
 *
 * ContextAttribute::~ContextAttribute - 
+*
+* NOTE
+*   release() cannot be called here as unit tests (possibly in thousands of places)
+*   create ContextAttributes on the stack and then send a reference to a ContextAttributeVector.
+*   When that ContextAttributeVector is released, the ContextAttribute is released and if 
+*   the destructor of ContextAttribute calls release, then when ending the function, the C++ compiler
+*   makes sure the destructor is called (again) and we have a serious problem ...
 */
 ContextAttribute::~ContextAttribute()
 {
-  release();
 }
 
 
