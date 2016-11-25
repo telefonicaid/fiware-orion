@@ -69,37 +69,36 @@ EntityType::EntityType(std::string _type): type(_type), count(0)
 */
 std::string EntityType::render
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  bool                asJsonOut,
-  bool                collapsed,
-  const std::string&  indent,
-  bool                comma,
-  bool                typeNameBefore
+  ApiVersion  apiVersion,
+  bool        asJsonObject,
+  bool        asJsonOut,
+  bool        collapsed,
+  bool        comma,
+  bool        typeNameBefore
 )
 {
   std::string  out = "";
 
   if (typeNameBefore && asJsonOut)
   {
-    out += valueTag(indent  + "  ", "name", type, true);
-    out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, indent + "  ", true, true, true);
+    out += valueTag("name", type, true);
+    out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, true, true, true);
   }
   else
   {
-    out += startTag(indent);
+    out += startTag();
 
     if (collapsed || contextAttributeVector.size() == 0)
     {
-      out += valueTag(indent  + "  ", "name", type, false);
+      out += valueTag("name", type, false);
     }
     else
     {
-      out += valueTag(indent  + "  ", "name", type, true);
-      out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, indent + "  ", false, true, true);
+      out += valueTag("name", type, true);
+      out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, false, true, true);
     }
 
-    out += endTag(indent, comma, false);
+    out += endTag(comma, false);
   }
 
   return out;

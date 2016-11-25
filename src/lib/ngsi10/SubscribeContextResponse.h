@@ -46,7 +46,7 @@ typedef struct SubscribeContextResponse
   SubscribeContextResponse(StatusCode& errorCode);
   ~SubscribeContextResponse();
 
-  std::string render(const std::string& indent);
+  std::string render(void);
 } SubscribeContextResponse;
 
 #endif

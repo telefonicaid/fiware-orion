@@ -54,7 +54,6 @@ std::string ContextElementVector::render
   ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
-  const std::string&  indent,
   bool                comma
 )
 {
@@ -65,14 +64,14 @@ std::string ContextElementVector::render
     return "";
   }
 
-  out += startTag(indent, "contextElements", true);
+  out += startTag("contextElements", true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(apiVersion, asJsonObject, requestType, indent + "  ", ix != vec.size() - 1);
+    out += vec[ix]->render(apiVersion, asJsonObject, requestType, ix != vec.size() - 1);
   }
 
-  out += endTag(indent, comma, true);
+  out += endTag(comma, true);
 
   return out;
 }
@@ -141,14 +140,7 @@ unsigned int ContextElementVector::size(void)
 *
 * ContextElementVector::check -
 */
-std::string ContextElementVector::check
-(
-  ApiVersion          apiVersion,
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string ContextElementVector::check(ApiVersion apiVersion, RequestType requestType)
 {
   if (requestType == UpdateContext)
   {
@@ -162,7 +154,7 @@ std::string ContextElementVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion, requestType, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType)) != "OK")
     {
       return res;
     }

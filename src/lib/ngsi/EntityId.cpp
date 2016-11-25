@@ -80,30 +80,17 @@ EntityId::EntityId
 * EntityId::render -
 *
 */
-std::string EntityId::render
-(
-  const std::string&  indent,
-  bool                comma,
-  bool                isInVector
-)
+std::string EntityId::render(bool comma, bool isInVector)
 {
   std::string  out              = "";
   char*        isPatternEscaped = htmlEscape(isPattern.c_str());
   char*        typeEscaped      = htmlEscape(type.c_str());
   char*        idEscaped        = htmlEscape(id.c_str());
 
-
-  std::string indent2 = indent;
-
-  if (isInVector)
-  {
-    indent2 += "  ";
-  }
-
-  out += (isInVector? indent + "{\n" : "");
-  out += indent2 + "\"type\" : \""      + typeEscaped      + "\","  + "\n";
-  out += indent2 + "\"isPattern\" : \"" + isPatternEscaped + "\","  + "\n";
-  out += indent2 + "\"id\" : \""        + idEscaped        + "\"";
+  out += (isInVector? "{\n" : "");
+  out = out + "\"type\" : \""      + typeEscaped      + "\","  + "\n";
+  out = out + "\"isPattern\" : \"" + isPatternEscaped + "\","  + "\n";
+  out = out + "\"id\" : \""        + idEscaped        + "\"";
 
   if ((comma == true) && (isInVector == false))
   {
@@ -112,7 +99,7 @@ std::string EntityId::render
   else
   {
     out += "\n";
-    out += (isInVector? indent + "}" : "");
+    out += (isInVector? "}" : "");
     out += (comma == true)? ",\n" : (isInVector? "\n" : "");
   }
 
@@ -151,11 +138,7 @@ std::string EntityId::toJson(void) const
 *
 * EntityId::check -
 */
-std::string EntityId::check
-(
-  RequestType         requestType,
-  const std::string&  indent
-)
+std::string EntityId::check(RequestType requestType)
 {
   if (id == "")
   {

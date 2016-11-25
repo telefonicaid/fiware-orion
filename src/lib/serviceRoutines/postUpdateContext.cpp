@@ -137,7 +137,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   ciP->outMimeType  = JSON;
 
-  TIMED_RENDER(payload = upcrP->render(ciP->apiVersion, asJsonObject, ""));
+  TIMED_RENDER(payload = upcrP->render(ciP->apiVersion, asJsonObject));
 
   ciP->outMimeType  = outMimeType;
   cleanPayload      = (char*) payload.c_str();
@@ -459,7 +459,7 @@ std::string postUpdateContext
     upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
     alarmMgr.badInput(clientIp, "more than one service path for an update request");
 
-    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject, ""));
+    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject));
 
     return answer;
   }
@@ -473,7 +473,7 @@ std::string postUpdateContext
   {
     upcrsP->errorCode.fill(SccBadRequest, res);
 
-    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject, ""));
+    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject));
 
     return answer;
   }
@@ -505,7 +505,7 @@ std::string postUpdateContext
   bool forwarding = forwardsPending(upcrsP);
   if (forwarding == false)
   {
-    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject, ""));
+    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject));
 
     upcrP->release();
     return answer;
@@ -718,7 +718,7 @@ std::string postUpdateContext
   {
     // Note that v2 case doesn't use an actual response (so no need to waste time rendering it).
     // We render in the v1 case only
-    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, ""));
+    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject));
   }
 
   //

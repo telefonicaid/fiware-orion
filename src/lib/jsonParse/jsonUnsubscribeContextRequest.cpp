@@ -88,7 +88,7 @@ void jsonUncrRelease(ParseData* parseDataP)
 */
 std::string jsonUncrCheck(ParseData* parseData, ConnectionInfo* ciP)
 {
-  return parseData->uncr.res.check("", parseData->errorString, 0);
+  return parseData->uncr.res.check();
 }
 
 

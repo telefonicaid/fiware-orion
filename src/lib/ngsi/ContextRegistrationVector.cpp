@@ -49,7 +49,7 @@ void ContextRegistrationVector::push_back(ContextRegistration* item)
 *
 * ContextRegistrationVector::render -
 */
-std::string ContextRegistrationVector::render(const std::string& indent, bool comma)
+std::string ContextRegistrationVector::render(bool comma)
 {
   std::string  out = "";
 
@@ -58,14 +58,14 @@ std::string ContextRegistrationVector::render(const std::string& indent, bool co
     return "";
   }
 
-  out += startTag(indent, "contextRegistrations", true);
+  out += startTag("contextRegistrations", true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(indent + "  ", ix != vec.size() - 1, true);
+    out += vec[ix]->render(ix != vec.size() - 1, true);
   }
 
-  out += endTag(indent, comma, comma);
+  out += endTag(comma, comma);
 
   return out;
 }
@@ -140,7 +140,6 @@ std::string ContextRegistrationVector::check
 (
   ApiVersion          apiVersion,
   RequestType         requestType, 
-  const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
 )
@@ -149,7 +148,7 @@ std::string ContextRegistrationVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion, requestType, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType, predetectedError, counter)) != "OK")
     {
       return res;
     }

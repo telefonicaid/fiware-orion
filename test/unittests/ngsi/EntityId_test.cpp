@@ -40,7 +40,7 @@ TEST(EntityId, render)
 
   utInit();
 
-  out = eId.render("");
+  out = eId.render(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

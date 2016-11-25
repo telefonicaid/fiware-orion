@@ -48,12 +48,11 @@ class EntityTypeVector
   unsigned int  size(void);
   void          release(void);
   std::string   check(ApiVersion apiVersion, const std::string& predetectedError);
-  std::string   render(ApiVersion          apiVersion,
-                       bool                asJsonObject,
-                       bool                asJsonOut,
-                       bool                collapsed,
-                       const std::string&  indent,
-                       bool comma = false);
+  std::string   render(ApiVersion  apiVersion,
+                       bool        asJsonObject,
+                       bool        asJsonOut,
+                       bool        collapsed,
+                       bool        comma = false);
 
   EntityType*   operator[] (unsigned int ix) const;
 

@@ -48,18 +48,17 @@ std::string EntityTypeResponse::render
   ApiVersion          apiVersion,
   bool                asJsonObject,
   bool                asJsonOut,
-  bool                collapsed,
-  const std::string&  indent
+  bool                collapsed
 )
 {
   std::string out = "";
 
-  out += startTag(indent);
+  out += startTag();
 
-  out += entityType.render(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", true, true);
-  out += statusCode.render(indent + "  ");
+  out += entityType.render(apiVersion, asJsonObject, asJsonOut, collapsed, true, true);
+  out += statusCode.render(false);
 
-  out += endTag(indent);
+  out += endTag();
 
   return out;
 }
@@ -93,7 +92,7 @@ std::string EntityTypeResponse::check
   else
     return "OK";
 
-  return render(apiVersion, asJsonObject, asJsonOut, collapsed, "");
+  return render(apiVersion, asJsonObject, asJsonOut, collapsed);
 }
 
 

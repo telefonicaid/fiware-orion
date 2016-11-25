@@ -55,7 +55,7 @@ TEST(UnsubscribeContextAvailabilityRequest, constructorAndCheck)
 
   std::string   out;  
 
-  out = ucar2.check("", "", 0);
+  out = ucar2.check("");
   EXPECT_EQ("OK", out);
 
   utExit();

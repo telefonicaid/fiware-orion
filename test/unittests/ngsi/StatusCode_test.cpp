@@ -44,7 +44,7 @@ TEST(StatusCode, render)
 
   utInit();
 
-  out = sc2.render("");
+  out = sc2.render(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -99,15 +99,15 @@ TEST(StatusCode, check)
 
   utInit();
 
-  out = sc.check(RegisterContext, "", "", 0);
+  out = sc.check();
   EXPECT_STREQ("OK", out.c_str());
 
   sc.fill(SccNone, "YYY");
-  out = sc.check(RegisterContext, "", "", 0);
+  out = sc.check();
   EXPECT_STREQ("no code", out.c_str());
 
   sc.fill(SccOk, "YYY");
-  out = sc.check(RegisterContext, "", "", 0);
+  out = sc.check();
   EXPECT_STREQ("OK", out.c_str());
 
   utExit();

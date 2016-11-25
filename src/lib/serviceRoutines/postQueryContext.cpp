@@ -104,7 +104,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   // 2. Render the string of the request we want to forward
   //
   std::string  payload;
-  TIMED_RENDER(payload = qcrP->render(""));
+  TIMED_RENDER(payload = qcrP->render());
 
   char* cleanPayload = (char*) payload.c_str();;
 
@@ -360,7 +360,7 @@ std::string postQueryContext
   //  
   if (forwardsPending(qcrsP) == false)
   {
-    TIMED_RENDER(answer = qcrsP->render(ciP->apiVersion, asJsonObject, ""));
+    TIMED_RENDER(answer = qcrsP->render(ciP->apiVersion, asJsonObject));
 
     qcrP->release();
     return answer;

@@ -80,30 +80,30 @@ UpdateContextResponse::~UpdateContextResponse()
 *
 * UpdateContextResponse::render - 
 */
-std::string UpdateContextResponse::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
+std::string UpdateContextResponse::render(ApiVersion apiVersion, bool asJsonObject)
 {
   std::string out = "";
 
-  out += startTag(indent);
+  out += startTag();
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(indent + "  ");
+    out += errorCode.render(false);
   }
   else
   {
     if (contextElementResponseVector.size() == 0)
     {
       errorCode.fill(SccContextElementNotFound, errorCode.details);
-      out += errorCode.render(indent + "  ");
+      out += errorCode.render(false);
     }
     else
     {
-      out += contextElementResponseVector.render(apiVersion, asJsonObject, RtUpdateContextResponse, indent + "  ", false);
+      out += contextElementResponseVector.render(apiVersion, asJsonObject, RtUpdateContextResponse, false);
     }
   }
   
-  out += endTag(indent);
+  out += endTag();
 
   return out;
 }
@@ -118,7 +118,6 @@ std::string UpdateContextResponse::check
 (
   ApiVersion          apiVersion,
   bool                asJsonObject,
-  const std::string&  indent,
   const std::string&  predetectedError
 )
 {
@@ -128,7 +127,7 @@ std::string UpdateContextResponse::check
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }  
-  else if (contextElementResponseVector.check(apiVersion, UpdateContext, indent, predetectedError, 0) != "OK")
+  else if (contextElementResponseVector.check(apiVersion, UpdateContext, predetectedError, 0) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     errorCode.fill(SccBadRequest, res);
@@ -138,7 +137,7 @@ std::string UpdateContextResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, indent);
+  return render(apiVersion, asJsonObject);
 }
 
 

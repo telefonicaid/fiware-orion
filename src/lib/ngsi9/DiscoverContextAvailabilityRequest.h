@@ -52,8 +52,7 @@ typedef struct DiscoverContextAvailabilityRequest
   void                 release(void);
   void                 present(const std::string& indent);
 
-  std::string          check(const std::string&  indent,
-                             const std::string&  predetectedError);
+  std::string          check(const std::string&  predetectedError);
 
   void                 fill(EntityId&                        eid,
                             const std::vector<std::string>&  attributeV,

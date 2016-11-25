@@ -43,7 +43,7 @@ TEST(ContextElementResponseVector, check)
 
   utInit();
 
-  out = cerv.check(V1, UpdateContext, "", "", 0);
+  out = cerv.check(V1, UpdateContext, "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
   cer.contextElement.entityId.id         = "ID";
@@ -52,7 +52,7 @@ TEST(ContextElementResponseVector, check)
   cer.statusCode.fill(SccOk, "details");
 
   cerv.push_back(&cer);
-  out = cerv.check(V1, UpdateContext, "", "", 0);
+  out = cerv.check(V1, UpdateContext, "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
   utExit();

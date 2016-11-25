@@ -39,8 +39,8 @@ typedef struct UnsubscribeContextRequest
 {
   SubscriptionId  subscriptionId;    // Mandatory
 
-  std::string     render(const std::string& indent);
-  std::string     check(const std::string& indent, const std::string& predetectedError, int counter);
+  std::string     render(void);
+  std::string     check(void);
   void            present(const std::string& indent);
   void            release(void);
 } UnsubscribeContextRequest;

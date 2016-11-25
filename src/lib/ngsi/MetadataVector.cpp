@@ -50,7 +50,7 @@ MetadataVector::MetadataVector(void)
 *
 * MetadataVector::render -
 */
-std::string MetadataVector::render(const std::string& indent, bool comma)
+std::string MetadataVector::render(bool comma)
 {
   std::string out = "";
 
@@ -59,12 +59,12 @@ std::string MetadataVector::render(const std::string& indent, bool comma)
     return "";
   }
 
-  out += startTag(indent, "metadatas", true);
+  out += startTag("metadatas", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);
+    out += vec[ix]->render(ix != vec.size() - 1);
   }
-  out += endTag(indent, comma, true);
+  out += endTag(comma, true);
 
 
   return out;

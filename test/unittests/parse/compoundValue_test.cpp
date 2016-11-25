@@ -964,7 +964,7 @@ TEST(compoundValue, tenCompounds)
   utInit();
 
   upcrP = &reqData.upcr.res;
-  rendered = upcrP->render(V1, false, "");
+  rendered = upcrP->render(V1, false);
 
   utExit();
 }
