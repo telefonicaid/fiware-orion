@@ -50,11 +50,11 @@ typedef struct JsonDelayedRelease
 
   JsonDelayedRelease()
   {
-    entity       = NULL;
-    attribute    = NULL;
-    scrP         = NULL;
-    ucsrP        = NULL;
-    subsP        = NULL;
+    entity     = NULL;
+    attribute  = NULL;
+    scrP       = NULL;
+    ucsrP      = NULL;
+    subsP      = NULL;
   }
 } JsonDelayedRelease;
 
