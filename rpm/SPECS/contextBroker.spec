@@ -164,6 +164,10 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Fri Nov 25 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.4.5-1
+- Hotfix: Make -maxConnections parameter wider, as pass through to the MHD layer
+- Hotfix: re-implementing the Accept header hotfix in 1.4.3 in a better way
+
 * Thu Nov 24 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.4.4-1
 - Hotfix: type wrongly interpreted as pattern in NGSIv1 query requests
 - Rollback 1.4.3 hotfix about being less strict on Accept header
