@@ -313,10 +313,13 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
 
   if (value[0] == 0)
   {
-    ciP->httpStatusCode    = SccBadRequest;
-    ciP->acceptHeaderError = "empty item in accept header";
-    ciP->outMimeType       = mimeTypeSelect(ciP, "Error");
-    return false;
+    //
+    // NOTE
+    //   According to https://www.w3.org/Protocols/rfc2616/rfc2616-sec2.html#sec2, empty
+    //   items in the comma list of Accepot are allowed, so we simply return OK (true) here 
+    //   and skip to the next item.
+    //
+    return true;
   }
 
   if ((delimiter = strchr(cP, ';')) != NULL)
@@ -461,16 +464,6 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
       while ((*cP == ' ') || (*cP == '\t'))
       {
         ++cP;
-      }
-
-      //
-      // HOTFIX for release 1.4.0
-      // If that comma is the LAST char in the string - ACCEPT
-      // 
-      if (*cP == 0)
-      {
-        LM_W(("Invalid Accept Header: ending in comma"));
-        return;
       }
 
       acceptItemParse(ciP, itemStart);

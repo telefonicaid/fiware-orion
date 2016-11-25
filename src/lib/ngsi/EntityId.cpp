@@ -40,6 +40,7 @@
 */
 EntityId::EntityId()
 {
+  isTypePattern = false;
 }
 
 
