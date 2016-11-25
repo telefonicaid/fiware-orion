@@ -27,6 +27,7 @@ import os
 import sys
 import re
 import tempfile
+from operator import add
 
 __author__ = 'fermin'
 
@@ -90,7 +91,12 @@ def patch_content_lengths(file_name, cl):
 
     It is assumed that cl is ok before invoking this function, i.e. check_same_lines() has been
     previously named.
+
+    :param file_name: the .test file to patch
+    :param cl: the list of pair to be used for patching
     """
+
+    msg('  - patching file %s' % file_name)
 
     n = 0
     file_temp = tempfile.NamedTemporaryFile(delete=False)
@@ -98,7 +104,7 @@ def patch_content_lengths(file_name, cl):
         m = re.match('^Content-Length: \d+', line)
         if m is not None:
             file_temp.write('Content-Length: %d\n' % cl[n][1])
-            msg ('  - patching "Content-Length: %d"' % cl[n][1])
+            msg ('    - patching "Content-Length: %d"' % cl[n][1])
             n += 1
         else:
             file_temp.write(line)
@@ -126,7 +132,7 @@ def content_length_extract(file_name):
         m = re.match('^Content-Length: (\d+)', line)
         if m is not None:
             cl = int(m.group(1))
-            msg('  - push [%d, %d]' % (l, cl))
+            msg('    - push [%d, %d]' % (l, cl))
             r.append([l, cl])
     return r
 
@@ -138,19 +144,30 @@ def check_same_lines(r1, r2):
 
     :param r1: first list of pairs to compare
     :param r2: second list of pairs to compare
-    :return: True if list check is ok, False otherwise
+    :return: a list with the following items:
+       * True if list check is ok, False otherwise
+       * number of not equal content-length lines (i.e. number of lines that need a change) (only makes sense
+         if first item is True)
+       * accumulated difference in lengths between r1 and r2 (only makes sense if first item is True)
     """
+
+    not_equal = 0
+    changes = 0
 
     if len(r1) != len (r2):
         msg ('  - number of content-length entries does no match, skipping!')
-        return False
+        return [False, 0, 0]
 
     for i in range(0, len(r1)):
-        if (r1[i][0] != r2[i][0]):
+        if r1[i][0] != r2[i][0]:
             msg('  - item #%d does not match: .test line %d vs .out line %d, skipping!' % (i, r1[i][0], r2[i][0]))
-            return False
+            return [False, 0, 0]
+        else:
+            if r2[i][1] != r1[i][1]:
+                not_equal += 1
+                changes += r2[i][1] - r1[i][1]
 
-    return True
+    return [True, not_equal, changes]
 
 
 def process_dir(dir_name, dry_run):
@@ -159,21 +176,30 @@ def process_dir(dir_name, dry_run):
 
     :param dir_name: directory to be processed
     :param dry_run: if True, then no actual modification in files is done.
+    :return: a list with the following items:
+       * True if the process was ok, False otherwise
+       * number of not equal content-length lines (i.e. number of lines that were changed) (only makes sense
+         if first item is True)
+       * accumulated difference in lengths between .out and .test (only makes sense if first item is True)
     """
 
     # To be sure directory hasn't a trailing slash
     dir_name_clean = dir_name.rstrip('/')
+
+    accum = [0, 0, 0]
 
     for file in os.listdir(dir_name_clean):
 
         file_name = dir_name_clean + '/' + file
 
         if os.path.isdir(file_name):
-            process_dir(file_name, dry_run)
+            accum = map(add, accum, process_dir(file_name, dry_run))
         else:
             extension = os.path.splitext(os.path.basename(file_name))[1]
             if extension == '.out':
-                process_file(file_name, dry_run)
+                accum = map(add, accum, process_file(file_name, dry_run))
+
+    return accum
 
 
 def process_file(file_name, dry_run):
@@ -190,9 +216,13 @@ def process_file(file_name, dry_run):
 
     :param file_name: file to be processed
     :param dry_run: if True, then no actual modification in files is done (i.e. step 7 is skipped)
-    :return: True if the process was ok, False otherwise
-
+    :return: a list with the following items:
+       * True if the process was ok, False otherwise
+       * number of not equal content-length lines (i.e. number of lines that were changed) (only makes sense
+         if first item is True)
+       * accumulated difference in lengths between .out and .test (only makes sense if first item is True)
     """
+
     msg('* processing file %s' % file_name)
 
     # Step 1 to 3
@@ -201,36 +231,33 @@ def process_file(file_name, dry_run):
 
     file_test = '%s/%s.test' % (path, basename)
     file_out = '%s/%s.out' % (path, basename)
+    file_exp = '%s/%s.regexpect' % (path, basename)
 
-    if not os.path.isfile(file_test):
-        msg('  - cannot find %s, skipping!' % file_test)
-        return False
-    else:
-        msg('  - found %s' % file_test)
-
-    if not os.path.isfile(file_out):
-        msg('  - cannot find %s, skipping! ' % file_out)
-        return False
-    else:
-        msg('  - found %s' % file_out)
+    for f in [file_test, file_out, file_exp]:
+        if not os.path.isfile(f):
+            msg('  - cannot find %s, skipping!' % f)
+            return [False, 0, 0]
 
     # Step 4 and 5
-    msg ('  - extracting content length in .test file')
-    cl_test = content_length_extract(file_test)
+    msg ('  - extracting content length in .regexpect file')
+    cl_exp = content_length_extract(file_exp)
     msg ('  - extracting content length in .out file')
     cl_out = content_length_extract(file_out)
 
     # Step 6
-    if not check_same_lines(cl_test, cl_out):
-        return False
+    [result, not_equal, changed] = check_same_lines(cl_exp, cl_out)
+    if not result:
+        return [False, 0, 0]
 
     # Step 7
     if dry_run:
-        msg ('  - dry run mode: not touching file')
+        msg('  - dry run mode: not touching file')
     else:
         patch_content_lengths(file_test, cl_out)
 
-    return True
+    msg('  - length difference %d in %d changes' % (changed, not_equal))
+
+    return [True, not_equal, changed]
 
 
 ################
@@ -265,6 +292,8 @@ if file == '':
     usage_and_exit('missing -f parameter')
 
 if os.path.isdir(file):
-    process_dir(file, dry_run)
+    result = process_dir(file, dry_run)
 else:
-    process_file(file, dry_run)
+    result = process_file(file, dry_run)
+
+msg('TOTAL: content-length difference is %d in %d changes' % (result[2], result[1]))
