@@ -430,6 +430,13 @@ static void setCount(long long inc, const BSONObj& subOrig, BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setLastNotification -
+*
+* NOTE
+*   Unlike setLastFailure() and setLastSucces(), this function doesn't return any value.
+*   This is due to the fact that lastNotification is added to before sending the notification
+*   while the other two (lastSuccess/lastFailure) need to wait until after - to know the status
+*   of the notification and the resulting values are stored in the sub-cache only,
+*   to be added to mongo when a sub cache refresh is performed.
 */
 static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
