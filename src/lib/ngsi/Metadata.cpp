@@ -316,7 +316,6 @@ std::string Metadata::check(ApiVersion apiVersion)
 
   if (forbiddenIdChars(apiVersion , name.c_str()))
   {
-    LM_W(("KZ: Invalid characters in metadata name"));
     alarmMgr.badInput(clientIp, "found a forbidden character in the name of a Metadata");
     return "Invalid characters in metadata name";
   }
