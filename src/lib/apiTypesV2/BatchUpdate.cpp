@@ -49,7 +49,6 @@ BatchUpdate::BatchUpdate()
 */
 BatchUpdate::~BatchUpdate()
 {
-  release();
 }
 
 
