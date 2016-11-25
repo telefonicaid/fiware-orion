@@ -279,11 +279,9 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     caP->type = (compoundVector)? defaultType(orion::ValueTypeVector) : defaultType(caP->valueType);
   }
 
-  LM_W(("KZ: Calling caP->check"));
   std::string r = caP->check(ciP->apiVersion, ciP->requestType);
   if (r != "OK")
   {
-    LM_W(("KZ: caP->check returned '%s'", r.c_str()));
     alarmMgr.badInput(clientIp, r);
     ciP->httpStatusCode = SccBadRequest;
     return r;

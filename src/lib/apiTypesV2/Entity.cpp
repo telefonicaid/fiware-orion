@@ -316,7 +316,6 @@ void Entity::fill(QueryContextResponse* qcrsP)
 */
 void Entity::release(void)
 {
-  LM_W(("KZ: In Entity::release. Calling attributeVector.release"));
   attributeVector.release();
 }
 

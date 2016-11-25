@@ -144,6 +144,8 @@ void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr) const
 */
 ContextAttribute::~ContextAttribute()
 {
+  LM_W(("KZ: In ContextAttribute destructor"));
+  release();
 }
 
 
@@ -1106,15 +1108,16 @@ void ContextAttribute::present(const std::string& indent, int ix)
 */
 void ContextAttribute::release(void)
 {
-  LM_W(("KZ: In ContextAttribute::release (at at %p)", this));
+  LM_W(("KZ: ContextAttribute::release calling metadataVector.release (CA at %p, metadataVector at %p)", this, &metadataVector));
+
   if (compoundValueP != NULL)
   {
     delete compoundValueP;
     compoundValueP = NULL;
   }
 
-  LM_W(("KZ: ContextAttribute::release calling metadataVector.release (CA at %p)", this));
   metadataVector.release();
+
   if (previousValue != NULL)
   {
     previousValue->release();

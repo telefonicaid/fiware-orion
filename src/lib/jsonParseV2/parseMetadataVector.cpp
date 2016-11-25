@@ -56,14 +56,12 @@ std::string parseMetadataVector(const Value::ConstMemberIterator& node, ContextA
 
     mP->name = iter->name.GetString();
     caP->metadataVector.push_back(mP);
-    LM_W(("KZ: Adding Metadata %p to metadataVector %p of ContextAttribute %p", mP, &caP->metadataVector, caP));
+    LM_W(("KZ: LEAK: Added Metadata %p to metadataVector %p of ContextAttribute %p", mP, &caP->metadataVector, caP));
     r = parseMetadata(iter->value, mP);
     if (r != "OK")
     {
-      LM_W(("KZ: parseMetadata failed"));
       return r;
     }
-    LM_W(("KZ: parseMetadata OK"));
   }
 
   return "OK";

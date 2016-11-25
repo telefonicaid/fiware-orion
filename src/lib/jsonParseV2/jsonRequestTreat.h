@@ -47,7 +47,6 @@ typedef struct JsonDelayedRelease
   SubscribeContextRequest*           scrP;
   UpdateContextSubscriptionRequest*  ucsrP;
   ngsiv2::Subscription*              subsP;
-  BatchUpdate*                       batchUpdateP;
 
   JsonDelayedRelease()
   {
@@ -56,7 +55,6 @@ typedef struct JsonDelayedRelease
     scrP         = NULL;
     ucsrP        = NULL;
     subsP        = NULL;
-    batchUpdateP = NULL;
   }
 } JsonDelayedRelease;
 

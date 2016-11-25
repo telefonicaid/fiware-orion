@@ -150,7 +150,6 @@ unsigned int EntityVector::size(void)
 */
 void EntityVector::release(void)
 {
-  LM_W(("KZ: In EntityVector::release"));
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     vec[ix]->release();

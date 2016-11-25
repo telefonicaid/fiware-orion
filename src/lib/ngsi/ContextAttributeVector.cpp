@@ -465,10 +465,8 @@ ContextAttribute*  ContextAttributeVector::operator[](unsigned int ix) const
 */
 void ContextAttributeVector::release(void)
 {
-  LM_W(("KZ: In ContextAttributeVector::release: %d items in vector", vec.size()));
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    LM_W(("KZ: ContextAttributeVector::release calling ContextAttribute::release on CA at %p", vec[ix]));
     vec[ix]->release();
     delete vec[ix];
   }
