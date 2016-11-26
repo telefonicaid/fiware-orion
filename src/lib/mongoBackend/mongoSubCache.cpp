@@ -110,7 +110,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS).c_str()            : "active";
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                   : false;
   cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(sub, CSUB_LASTFAILURE)      : -1;
-  cSubP->timesFailed           = sub.hasField(CSUB_TIMESFAILED)?      getIntOrLongFieldAsLongF(sub, CSUB_TIMESFAILED)      : 0;
+  cSubP->timesFailed           = 0;
   cSubP->count                 = 0;
   cSubP->next                  = NULL;
 

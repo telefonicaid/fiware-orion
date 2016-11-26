@@ -257,7 +257,7 @@ Date: REGEX(.*)
             "timesFailed": 1,
             "timesSent": 1
         },
-        "status": "active",
+        "status": "failed",
         "subject": {
             "condition": {
                 "attrs": []
@@ -443,7 +443,7 @@ Date: REGEX(.*)
             "timesFailed": 1,
             "timesSent": 4
         },
-        "status": "active",
+        "status": "failed",
         "subject": {
             "condition": {
                 "attrs": []
@@ -489,7 +489,7 @@ Date: REGEX(.*)
             "timesFailed": 2,
             "timesSent": 5
         },
-        "status": "active",
+        "status": "failed",
         "subject": {
             "condition": {
                 "attrs": []
