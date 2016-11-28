@@ -53,7 +53,8 @@
 
 #include "logMsg/traceLevels.h"
 
-
+#include "rapidjson/document.h"
+#include "rapidjson/prettywriter.h"
 
 static int replyIx = 0;
 
@@ -61,9 +62,32 @@ static int replyIx = 0;
 *
 * restReply - 
 */
-void restReply(ConnectionInfo* ciP, const std::string& answer)
+void restReply(ConnectionInfo* ciP, const std::string& _answer)
 {
   MHD_Response*  response;
+
+  std::string answer;
+#if 0
+  // FIXME PR: maybe we could use this code (branch haderding/remove_ngsiv1_indent)
+  if ((ciP->outMimeType == JSON) && (ciP->apiVersion != V2))
+  {
+    rapidjson::Document doc;
+    doc.Parse(_answer.c_str());
+
+    rapidjson::StringBuffer s;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+    writer.SetIndent(' ', 2);
+    doc.Accept(writer);
+
+    answer = s.GetString();
+  }
+  else
+  {
+    answer = _answer;
+  }
+#elif
+  answer = _answer;
+#endif
 
   ++replyIx;
   LM_T(LmtServiceOutPayload, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answer.length(), ciP->httpStatusCode));
