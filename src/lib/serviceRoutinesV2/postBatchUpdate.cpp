@@ -68,21 +68,21 @@ std::string postBatchUpdate
   UpdateContextRequest*  upcrP  = &parseDataP->upcr.res;
   Entities               entities;
 
+  upcrP->fill(&buP->entities, buP->updateActionType.get());
+  buP->release();  // upcrP just 'took over' the data from buP, buP is no longer needed
+  parseDataP->upcr.res.present("");
+
   std::string  answer = "";
   if (parseDataP->upcr.res.contextElementVector.size() == 0)
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITIES_VECTOR);
     alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITIES_VECTOR);
 
-    TIMED_RENDER(answer = oe.toJson());
-
+    TIMED_RENDER(answer = oe.smartRender(V2););
     ciP->httpStatusCode = SccBadRequest;
+
     return answer;
   }
-
-  upcrP->fill(&buP->entities, buP->updateActionType.get());
-  buP->release();  // upcrP just 'took over' the data from buP, buP is no longer needed
-  parseDataP->upcr.res.present("");
 
   postUpdateContext(ciP, components, compV, parseDataP);
 
