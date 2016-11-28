@@ -56,14 +56,14 @@ echo
 01. Update with empty entities list
 ===================================
 HTTP/1.1 400 Bad Request
-Content-Length: 61
+Content-Length: 60
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "empty entities vector",
-    "error": "Bad Request"
+    "error": "BadRequest"
 }
 
 
