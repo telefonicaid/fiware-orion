@@ -106,8 +106,6 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
 
       if (r != "OK")
       {
-        std::string r;
-
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
