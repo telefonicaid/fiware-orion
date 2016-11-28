@@ -24,6 +24,8 @@
 */
 #include <string>
 
+#include "logMsg/logMsg.h"
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 

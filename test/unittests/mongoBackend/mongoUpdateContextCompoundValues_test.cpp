@@ -282,13 +282,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1)
     utInit();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E3", "T3", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND1(cv)
-    ContextAttribute ca("A1", "TA1", cv);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", cv);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -365,13 +365,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2)
     utInit();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E3", "T3", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND2(cv)
-    ContextAttribute ca("A1", "TA1", cv);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", cv);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -446,15 +446,15 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
     utInit();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E3", "T3", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND1(cv)
-    ContextAttribute ca1("A1", "TA1", cv);
-    ContextAttribute ca2("A2", "TA2", "simple2");
-    ce.contextAttributeVector.push_back(&ca1);
-    ce.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce);
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", cv);
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "simple2");
+    ceP->contextAttributeVector.push_back(ca1P);
+    ceP->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -541,15 +541,15 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValu
     utInit();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E3", "T3", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND2(cv)
-    ContextAttribute ca1("A1", "TA1", cv);
-    ContextAttribute ca2("A2", "TA2", "simple2");
-    ce.contextAttributeVector.push_back(&ca1);
-    ce.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce);
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", cv);
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "simple2");
+    ceP->contextAttributeVector.push_back(ca1P);
+    ceP->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -634,13 +634,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1Native)
     utInit();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E3", "T3", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND1_NATIVE(cv)
-    ContextAttribute ca("A1", "TA1", cv);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", cv);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -719,13 +719,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2Native)
     utInit();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E3", "T3", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND2_NATIVE(cv)
-    ContextAttribute ca("A1", "TA1", cv);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", cv);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -801,15 +801,15 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
     utInit();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E3", "T3", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND1_NATIVE(cv)
-    ContextAttribute ca1("A1", "TA1", cv);
-    ContextAttribute ca2("A2", "TA2", "simple2");
-    ce.contextAttributeVector.push_back(&ca1);
-    ce.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce);
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", cv);
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "simple2");
+    ceP->contextAttributeVector.push_back(ca1P);
+    ceP->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -898,15 +898,15 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValu
     utInit();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E3", "T3", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND2_NATIVE(cv)
-    ContextAttribute ca1("A1", "TA1", cv);
-    ContextAttribute ca2("A2", "TA2", "simple2");
-    ce.contextAttributeVector.push_back(&ca1);
-    ce.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce);
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", cv);
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "simple2");
+    ceP->contextAttributeVector.push_back(ca1P);
+    ceP->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -993,13 +993,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1)
     prepareDatabaseSimple();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND1(cv)
-    ContextAttribute ca("A1", "TA1", cv);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", cv);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -1083,13 +1083,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2)
     prepareDatabaseSimple();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND2(cv)
-    ContextAttribute ca("A1", "TA1", cv);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", cv);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -1171,15 +1171,15 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1PlusSimpleValu
     prepareDatabaseSimple();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND1(cv)
-    ContextAttribute ca1("A1", "TA1", cv);
-    ContextAttribute ca2("A2", "TA2", "simple2");
-    ce.contextAttributeVector.push_back(&ca1);
-    ce.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce);
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", cv);
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "simple2");
+    ceP->contextAttributeVector.push_back(ca1P);
+    ceP->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -1273,15 +1273,15 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2PlusSimpleValu
     prepareDatabaseSimple();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND2(cv)
-    ContextAttribute ca1("A1", "TA1", cv);
-    ContextAttribute ca2("A2", "TA2", "simple2");
-    ce.contextAttributeVector.push_back(&ca1);
-    ce.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce);
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", cv);
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "simple2");
+    ceP->contextAttributeVector.push_back(ca1P);
+    ceP->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -1373,13 +1373,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundObject)
     prepareDatabaseSimple();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND2(cv)
-    ContextAttribute ca("AX", "TAX", cv);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextAttribute* caP = new ContextAttribute("AX", "TAX", cv);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -1455,11 +1455,11 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundObjectToSimple)
     prepareDatabaseCompoundObject();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("AX", "TAX", "new_value");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("AX", "TAX", "new_value");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -1532,13 +1532,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundObje
     prepareDatabaseSimple();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND2(cv)
-    ContextAttribute ca("AX", "TAX", cv);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextAttribute* caP = new ContextAttribute("AX", "TAX", cv);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -1614,11 +1614,11 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundObjectToSimp
     prepareDatabaseCompoundObject();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("AX", "TAX", "new_value");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("AX", "TAX", "new_value");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -1692,13 +1692,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundVector)
     prepareDatabaseSimple();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND1(cv)
-    ContextAttribute ca("AX", "TAX", cv);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextAttribute* caP = new ContextAttribute("AX", "TAX", cv);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -1776,11 +1776,11 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundVectorToSimple)
     prepareDatabaseCompoundVector();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("AX", "TAX", "new_value");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("AX", "TAX", "new_value");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -1853,13 +1853,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundVect
     prepareDatabaseSimple();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND1(cv)
-    ContextAttribute ca("AX", "TAX", cv);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextAttribute* caP = new ContextAttribute("AX", "TAX", cv);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -1937,11 +1937,11 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundVectorToSimp
     prepareDatabaseCompoundObject();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("AX", "TAX", "new_value");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("AX", "TAX", "new_value");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
