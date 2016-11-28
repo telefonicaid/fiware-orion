@@ -40,6 +40,7 @@
 */
 EntityId::EntityId(): creDate(0), modDate(0)
 {
+  isTypePattern = false;
 }
 
 
