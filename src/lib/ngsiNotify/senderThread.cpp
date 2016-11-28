@@ -88,6 +88,7 @@ void* startSenderThread(void* p)
       {
         statisticsUpdate(NotifyContextSent, params->mimeType);
         alarmMgr.notificationErrorReset(url);
+        subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0);
       }
       else
       {

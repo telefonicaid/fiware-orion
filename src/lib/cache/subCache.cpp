@@ -754,6 +754,8 @@ void subCacheItemInsert
   RenderFormat                       renderFormat,
   bool                               notificationDone,
   int64_t                            lastNotificationTime,
+  int64_t                            lastNotificationSuccessTime,
+  int64_t                            lastNotificationFailureTime,
   StringFilter*                      stringFilterP,
   StringFilter*                      mdStringFilterP,
   const std::string&                 status,
@@ -781,8 +783,8 @@ void subCacheItemInsert
   cSubP->expirationTime        = expirationTime;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
-  cSubP->lastFailure           = -1;
-  cSubP->timesFailed           = 0;
+  cSubP->lastFailure           = lastNotificationFailureTime;
+  cSubP->lastSuccess           = lastNotificationSuccessTime;
   cSubP->renderFormat          = renderFormat;
   cSubP->next                  = NULL;
   cSubP->count                 = (notificationDone == true)? 1 : 0;
@@ -1121,7 +1123,7 @@ typedef struct CachedSubSaved
   int64_t  lastNotificationTime;
   int64_t  count;
   int64_t  lastFailure;
-  int64_t  timesFailed;
+  int64_t  lastSuccess;
 } CachedSubSaved;
 
 
@@ -1130,15 +1132,15 @@ typedef struct CachedSubSaved
 *
 * subCacheSync -
 *
-* 1. Save subscriptionId, lastNotificationTime, count, lastFailure, and timesFailed for all items in cache (savedSubV)
+* 1. Save subscriptionId, lastNotificationTime, count, lastFailure, and lastSuccess for all items in cache (savedSubV)
 * 2. Refresh cache (count set to 0)
-* 3. Compare lastNotificationTime/lastFailure in savedSubV with the new cache-contents and:
+* 3. Compare lastNotificationTime/lastFailure/lastSuccess in savedSubV with the new cache-contents and:
 *    3.1 Update cache-items where 'saved lastNotificationTime' > 'cached lastNotificationTime'
 *    3.2 Remember this more correct lastNotificationTime (must be flushed to mongo) -
 *        by clearing out (set to 0) those lastNotificationTimes that are newer in cache
-*    Same same with lastFailure
-* 4. Update 'count/timesFailed' for each item in savedSubV where non-zero
-* 5. Update 'lastNotificationTime/lastFailure' foreach item in savedSubV where non-zero
+*    Same same with lastFailure and lastSuccess.
+* 4. Update 'count' for each item in savedSubV where non-zero
+* 5. Update 'lastNotificationTime/lastFailure/lastSuccess' for each item in savedSubV where non-zero
 * 6. Free the vector created in step 1 - savedSubV
 *
 * NOTE
@@ -1151,7 +1153,7 @@ typedef struct CachedSubSaved
 *   To fix this little problem, we have created a variable 'subCacheState' that is set to ScsSynchronizing while
 *   the sub-cache synchronization is working.
 *   In serviceRoutines/exitTreat.cpp this variable is checked and if iot is set to ScsSynchronizing, then a
-*   sleep for a few seconds is performed beofre the broker exits (this is only for DEBUG compilations).
+*   sleep for a few seconds is performed before the broker exits (this is only for DEBUG compilations).
 */
 void subCacheSync(void)
 {
@@ -1162,7 +1164,7 @@ void subCacheSync(void)
 
 
   //
-  // 1. Save subscriptionId, lastNotificationTime, count, lastFailure, and timesFailed for all items in cache
+  // 1. Save subscriptionId, lastNotificationTime, count, lastFailure, and lastSuccess for all items in cache
   //
   CachedSubscription* cSubP = subCache.head;
 
@@ -1183,7 +1185,7 @@ void subCacheSync(void)
     cssP->lastNotificationTime = cSubP->lastNotificationTime;
     cssP->count                = cSubP->count;
     cssP->lastFailure          = cSubP->lastFailure;
-    cssP->timesFailed          = cSubP->timesFailed;
+    cssP->lastSuccess          = cSubP->lastSuccess;
 
     savedSubV[cSubP->subscriptionId] = cssP;
     cSubP = cSubP->next;
@@ -1199,7 +1201,7 @@ void subCacheSync(void)
 
 
   //
-  // 3. Compare lastNotificationTime/lastFailure in savedSubV with the new cache-contents
+  // 3. Compare lastNotificationTime/lastFailure/lastSuccess in savedSubV with the new cache-contents
   //
   cSubP = subCache.head;
   while (cSubP != NULL)
@@ -1219,6 +1221,12 @@ void subCacheSync(void)
         // cssP->lastFailure is older than what's currently in DB => throw away
         cssP->lastFailure = 0;
       }
+
+      if (cssP->lastSuccess < cSubP->lastSuccess)
+      {
+        // cssP->lastSuccess is older than what's currently in DB => throw away
+        cssP->lastSuccess = 0;
+      }
     }
 
     cSubP = cSubP->next;
@@ -1226,8 +1234,8 @@ void subCacheSync(void)
 
 
   //
-  // 4. Update 'count/timesFailed' for each item in savedSubV where non-zero
-  // 5. Update 'lastNotificationTime/lastFailure' for each item in savedSubV where non-zero
+  // 4. Update 'count' for each item in savedSubV where non-zero
+  // 5. Update 'lastNotificationTime/lastFailure/lastSuccess' for each item in savedSubV where non-zero
   //
   cSubP = subCache.head;
   while (cSubP != NULL)
@@ -1238,13 +1246,16 @@ void subCacheSync(void)
     {
       std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
 
-      mongoSubCountersUpdate(tenant, cSubP->subscriptionId, cssP->count, cssP->lastNotificationTime, cssP->lastFailure, cssP->timesFailed);
+      mongoSubCountersUpdate(tenant,
+                             cSubP->subscriptionId,
+                             cssP->count,
+                             cssP->lastNotificationTime,
+                             cssP->lastFailure,
+                             cssP->lastSuccess);
 
-      // Keeping lastFailure in sub cache
+      // Keeping lastFailure and lastSuccess in sub cache
       cSubP->lastFailure = cssP->lastFailure;
-
-      // Setting timesFailed to zero, as DB already incremented
-      cSubP->timesFailed = 0;
+      cSubP->lastSuccess = cssP->lastSuccess;
     }
 
     cSubP = cSubP->next;
@@ -1326,7 +1337,19 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
 {
   if (noCache)
   {
-    mongoSubCountersUpdate(tenant, subscriptionId, 0, 0, time(NULL), errors);
+    // The field 'count' has already been taken care of. Set to 0 in the calls to mongoSubCountersUpdate()
+
+    time_t now = time(NULL);
+
+    if (errors == 0)
+    {
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, -1, now);  // lastFailure == -1
+    }
+    else
+    {
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, now, -1);  // lastSuccess == -1, count == 0
+    }
+
     return;
   }
 
@@ -1340,14 +1363,14 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
     return;
   }
 
+  time_t now = time(NULL);
+
   if (errors == 0)
   {
-    subP->lastFailure  = -1;
-    subP->timesFailed  = 0;
+    subP->lastSuccess  = now;
   }
   else
   {
-    subP->lastFailure  = time(NULL);
-    subP->timesFailed += errors;
+    subP->lastFailure  = now;
   }
 }

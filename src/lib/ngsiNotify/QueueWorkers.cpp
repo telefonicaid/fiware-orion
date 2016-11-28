@@ -88,7 +88,8 @@ static void* workerFunc(void* pSyncQ)
   {
     std::vector<SenderThreadParams*>* paramsV = queue->pop();
 
-    for (unsigned ix = 0; ix < paramsV->size(); ix++) {
+    for (unsigned ix = 0; ix < paramsV->size(); ix++)
+    {
       struct timespec     now;
       struct timespec     howlong;
       size_t              estimatedQSize;
@@ -154,6 +155,7 @@ static void* workerFunc(void* pSyncQ)
           statisticsUpdate(NotifyContextSent, params->mimeType);
           QueueStatistics::incSentOK();
           alarmMgr.notificationErrorReset(url);
+          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0);
         }
         else
         {
