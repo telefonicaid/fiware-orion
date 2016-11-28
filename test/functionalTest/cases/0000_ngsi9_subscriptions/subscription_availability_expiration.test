@@ -25,12 +25,21 @@ Subscription availability expiration check
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 0-255
 accumulatorStart
 
 --SHELL--
-url="/v1/registry/subscribeContextAvailability"
-payload='{
+
+#
+# 01. Create a subscription on ngsi9 registrations
+# 02. Register a context immediatelly after the subscription: notification is generated
+# 03. Do a register context after subscription expiration: notification is not generated
+# 04. Dump accumulater - see ONE notification
+#
+
+echo "01. Create a subscription on ngsi9 registrations"
+echo "================================================"
+payload1='{
   "entities": [
     {
       "type": "Room",
@@ -49,12 +58,14 @@ payload='{
   "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
   "duration": "PT5S"
 }'
-orionCurl --url "$url" --payload "${payload}"
+orionCurl --url /v1/registry/subscribeContextAvailability --payload "${payload1}"
+echo
+echo
 
-echo "1: ++++++++++++++++++++"
-#Do an register context inmediatelly after the subscription: notification is generated
-url="/v1/registry/registerContext"
-payload='{
+
+echo "02. Register a context immediatelly after the subscription: notification is generated"
+echo "====================================================================================="
+payload2='{
   "contextRegistrations": [
     {
       "entities": [
@@ -76,13 +87,15 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url "$url" --payload "${payload}"
+orionCurl --url /v1/registry/registerContext --payload "${payload2}"
+echo
+echo
 
-echo "2: ++++++++++++++++++++"
-#Do an register context after subscription expiration: notification is not generated
+
+echo "03. Do a register context after subscription expiration: notification is not generated"
+echo "======================================================================================"
 sleep 6s
-url="/v1/registry/registerContext"
-payload='{
+payload3='{
   "contextRegistrations": [
     {
       "entities": [
@@ -104,14 +117,21 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --url "$url" --payload "${payload}"
+orionCurl --url /v1/registry/registerContext --payload "${payload3}"
+echo
+echo
 
-echo "3: ++++++++++++++++++++"
-#Get accumulated data
+
+echo "04. Dump accumulater - see ONE notification"
+echo "==========================================="
 accumulatorDump
+echo
+echo
 
 
 --REGEXPECT--
+01. Create a subscription on ngsi9 registrations
+================================================
 HTTP/1.1 200 OK
 Content-Length: 75
 Content-Type: application/json
@@ -122,7 +142,10 @@ Date: REGEX(.*)
     "duration": "PT5S",
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
-1: ++++++++++++++++++++
+
+
+02. Register a context immediatelly after the subscription: notification is generated
+=====================================================================================
 HTTP/1.1 200 OK
 Content-Length: 75
 Content-Type: application/json
@@ -133,7 +156,10 @@ Date: REGEX(.*)
     "duration": "PT1H",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
-2: ++++++++++++++++++++
+
+
+03. Do a register context after subscription expiration: notification is not generated
+======================================================================================
 HTTP/1.1 200 OK
 Content-Length: 75
 Content-Type: application/json
@@ -144,7 +170,10 @@ Date: REGEX(.*)
     "duration": "PT1H",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
-3: ++++++++++++++++++++
+
+
+04. Dump accumulater - see ONE notification
+===========================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 521
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -178,6 +207,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
   ]
 }
 =======================================
+
+
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
