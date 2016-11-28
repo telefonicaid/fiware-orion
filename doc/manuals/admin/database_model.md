@@ -309,7 +309,7 @@ Fields:
 -   **lastFailure**: the time when last notification failure occurred.
     Not present if the subscription has never failed.
 -   **lastSuccess**: the time when last successful notification occurred.
-    Not present if the subscription has never provoked a notification.
+    Not present if the subscription has never provoked a successful notification.
 
 Example document:
 
