@@ -608,7 +608,7 @@ void mongoSubCountersUpdate
 
   if (subId == "")
   {
-    // LM_E(("Runtime Error (no subscription id)"));
+    LM_E(("Runtime Error (empty subscription id)"));
     return;
   }
 
