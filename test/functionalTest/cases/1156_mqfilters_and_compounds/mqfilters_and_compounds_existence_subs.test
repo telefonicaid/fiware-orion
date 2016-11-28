@@ -633,7 +633,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 16. Check sub counts in order to see sub1, sub4 and sub6 has been triggered twice
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 347
+Content-Length: 387
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -648,6 +648,7 @@ Date: REGEX(.*)
             "url": "http://localhost:REGEX(\d+)/notify"
         },
         "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
         "timesSent": 2
     },
     "status": "active",
@@ -668,7 +669,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 349
+Content-Length: 389
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -683,6 +684,7 @@ Date: REGEX(.*)
             "url": "http://localhost:REGEX(\d+)/notify"
         },
         "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
         "timesSent": 2
     },
     "status": "active",
@@ -703,7 +705,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 348
+Content-Length: 388
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -718,6 +720,7 @@ Date: REGEX(.*)
             "url": "http://localhost:REGEX(\d+)/notify"
         },
         "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
         "timesSent": 2
     },
     "status": "active",

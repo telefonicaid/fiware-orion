@@ -110,7 +110,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS).c_str()            : "active";
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                   : false;
   cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(sub, CSUB_LASTFAILURE)      : -1;
-  cSubP->timesFailed           = sub.hasField(CSUB_TIMESFAILED)?      getIntOrLongFieldAsLongF(sub, CSUB_TIMESFAILED)      : 0;
+  cSubP->lastSuccess           = sub.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongF(sub, CSUB_LASTSUCCESS)      : -1;
   cSubP->count                 = 0;
   cSubP->next                  = NULL;
 
@@ -244,7 +244,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 *  -4: Subscription not valid for sub-cache (no entity ids)
 *
 *
-* Note that the 'count' and 'timesFailed' of the inserted subscription is set to ZERO.
+* Note that the 'count' of the inserted subscription is set to ZERO.
 * This is because the sub cache only counts the increments in these accumulating counters,
 * so that other CBs, operating on the same DB will not overwrite the value of these accumulators
 */
@@ -256,6 +256,7 @@ int mongoSubCacheItemInsert
   const char*         servicePath,
   int                 lastNotificationTime,
   int                 lastFailure,
+  int                 lastSuccess,
   long long           expirationTime,
   const std::string&  status,
   const std::string&  q,
@@ -480,7 +481,118 @@ void mongoSubCacheRefresh(const std::string& database)
 
 /* ****************************************************************************
 *
-* mongoSubCountersUpdate - update subscription in mongo with count and lastNotificationTime
+* mongoSubCountersUpdateCount - 
+*/
+static void mongoSubCountersUpdateCount
+(
+  const std::string&  collection,
+  const std::string&  subId,
+  long long           count
+)
+{
+  BSONObj      condition;
+  BSONObj      update;
+  std::string  err;
+
+  condition = BSON("_id"  << OID(subId));
+  update    = BSON("$inc" << BSON(CSUB_COUNT << count));
+
+  if (collectionUpdate(collection, condition, update, false, &err) != true)
+  {
+    LM_E(("Internal Error (error updating 'count' for a subscription)"));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCountersUpdateLastNotificationTime - 
+*/
+static void mongoSubCountersUpdateLastNotificationTime
+(
+  const std::string&  collection,
+  const std::string&  subId,
+  long long           lastNotificationTime
+)
+{
+  BSONObj      condition;
+  BSONObj      update;
+  std::string  err;
+
+  condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
+                     BSON(CSUB_LASTNOTIFICATION << BSON("$lt" << lastNotificationTime)) <<
+                     BSON(CSUB_LASTNOTIFICATION << BSON("$exists" << false))));
+  update    = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << lastNotificationTime));
+
+  if (collectionUpdate(collection, condition, update, false, &err) != true)
+  {
+    LM_E(("Internal Error (error updating 'lastNotification' for a subscription)"));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCountersUpdateLastFailure - 
+*/
+static void mongoSubCountersUpdateLastFailure
+(
+  const std::string&  collection,
+  const std::string&  subId,
+  long long           lastFailure
+)
+{
+  BSONObj      condition;
+  BSONObj      update;
+  std::string  err;
+
+  condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
+                     BSON(CSUB_LASTFAILURE << BSON("$lt" << lastFailure)) <<
+                     BSON(CSUB_LASTFAILURE << BSON("$exists" << false))));
+  update    = BSON("$set" << BSON(CSUB_LASTFAILURE << lastFailure));
+
+  if (collectionUpdate(collection, condition, update, false, &err) != true)
+  {
+    LM_E(("Internal Error (error updating 'lastFailure' for a subscription)"));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCountersUpdateLastSuccess - 
+*/
+static void mongoSubCountersUpdateLastSuccess
+(
+  const std::string&  collection,
+  const std::string&  subId,
+  long long           lastSuccess
+)
+{
+  BSONObj      condition;
+  BSONObj      update;
+  std::string  err;
+
+  condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
+                     BSON(CSUB_LASTSUCCESS << BSON("$lt" << lastSuccess)) <<
+                     BSON(CSUB_LASTSUCCESS << BSON("$exists" << false))));
+  update    = BSON("$set" << BSON(CSUB_LASTSUCCESS << lastSuccess));
+
+  if (collectionUpdate(collection, condition, update, false, &err) != true)
+  {
+    LM_E(("Internal Error (error updating 'lastSuccess' for a subscription)"));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCountersUpdate - update subscription counters and timestamps in mongo
+*
 */
 void mongoSubCountersUpdate
 (
@@ -489,79 +601,28 @@ void mongoSubCountersUpdate
   long long          count,
   long long          lastNotificationTime,
   long long          lastFailure,
-  long long          timesFailed
+  long long          lastSuccess
 )
 {
-  std::string  collection  = getSubscribeContextCollectionName(tenant);
-  BSONObj      condition;
-  BSONObj      update;
-  std::string  err;
+  std::string  collection = getSubscribeContextCollectionName(tenant);
 
   if (count > 0)
   {
-    // Update count
-    condition = BSON("_id"  << OID(subId));
-    update    = BSON("$inc" << BSON(CSUB_COUNT << count));
-
-    if (collectionUpdate(collection, condition, update, false, &err) != true)
-    {
-      LM_E(("Internal Error (error updating 'count' for a subscription)"));
-    }
+    mongoSubCountersUpdateCount(collection, subId, count);
   }
-
 
   if (lastNotificationTime > 0)
   {
-    // Update lastNotificationTime    
-    condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
-                       BSON(CSUB_LASTNOTIFICATION << BSON("$lt" << lastNotificationTime)) <<
-                       BSON(CSUB_LASTNOTIFICATION << BSON("$exists" << false)))
-                    );
-    update    = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << lastNotificationTime));
-
-    if (collectionUpdate(collection, condition, update, false, &err) != true)
-    {
-      LM_E(("Internal Error (error updating 'lastNotification' for a subscription)"));
-    }
+    mongoSubCountersUpdateLastNotificationTime(collection, subId, lastNotificationTime);
   }
-
 
   if (lastFailure > 0)
   {
-    // Update lastFailure    
-    condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
-                       BSON(CSUB_LASTFAILURE << BSON("$lt" << lastFailure)) <<
-                       BSON(CSUB_LASTFAILURE << BSON("$exists" << false)))
-                    );
-    update    = BSON("$set" << BSON(CSUB_LASTFAILURE << lastFailure));
-
-    if (collectionUpdate(collection, condition, update, false, &err) != true)
-    {
-      LM_E(("Internal Error (error updating 'lastFailure' for a subscription)"));
-    }
-  }
-  else
-  {
-    // Set lastFailure to -1
-    condition = BSON("_id" << OID(subId));
-    update    = BSON("$set" << BSON(CSUB_LASTFAILURE << (long long) -1));
-
-    if (collectionUpdate(collection, condition, update, false, &err) != true)
-    {
-      LM_E(("Internal Error (error updating 'lastFailure' for a subscription)"));
-    }
+    mongoSubCountersUpdateLastFailure(collection, subId, lastFailure);
   }
 
-
-  if (timesFailed > 0)
+  if (lastSuccess > 0)
   {
-    // Update timesFailed
-    condition = BSON("_id"  << OID(subId));
-    update    = BSON("$inc" << BSON(CSUB_TIMESFAILED << timesFailed));
-
-    if (collectionUpdate(collection, condition, update, false, &err) != true)
-    {
-      LM_E(("Internal Error (error updating 'timesFailed' for a subscription)"));
-    }
+    mongoSubCountersUpdateLastSuccess(collection, subId, lastSuccess);
   }
 }

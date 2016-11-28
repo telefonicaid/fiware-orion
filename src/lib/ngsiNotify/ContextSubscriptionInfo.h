@@ -25,21 +25,27 @@
 *
 * Author: Fermin Galan
 */
-
 #include "common/MimeType.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/AttributeList.h"
 
-typedef struct ContextSubscriptionInfo {
-    EntityIdVector         entityIdVector;
-    AttributeList          attributeList;
-    std::string            url;
-    MimeType               mimeType;
-    int                    lastNotification;
-    long long              expiration;
-    long long              throttling;
 
-    void         release(void);
+
+/* ****************************************************************************
+*
+* ContextSubscriptionInfo - 
+*/
+typedef struct ContextSubscriptionInfo
+{
+  EntityIdVector  entityIdVector;
+  AttributeList   attributeList;
+  std::string     url;
+  MimeType        mimeType;
+  int             lastNotification;
+  long long       expiration;
+  long long       throttling;
+
+  void            release(void);
 } ContextSubscriptionInfo;
 
 #endif
