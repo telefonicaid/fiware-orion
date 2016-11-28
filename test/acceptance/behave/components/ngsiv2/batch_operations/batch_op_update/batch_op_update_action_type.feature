@@ -692,7 +692,7 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
       | description | TBD      |
 
   @action_type_append_without_entities
-  Scenario:  try to update entities with batch operations using NGSIv2 with entities empty
+  Scenario:  try to update entities with batch operations using NGSIv2 without entities field
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_op_update_action_type |
