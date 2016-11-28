@@ -685,11 +685,11 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
       | Fiware-ServicePath | /test                      |
       | Content-Type       | application/json           |
     When update entities in a single batch operation "APPEND"
-    Then verify that receive an "Not Found" http code
+    Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value    |
-      | error       | NotFound |
-      | description | TBD      |
+      | parameter   | value      |
+      | error       | BadRequest |
+      | description | TBD        |
 
   @action_type_append_without_entities
   Scenario:  try to update entities with batch operations using NGSIv2 without entities field
