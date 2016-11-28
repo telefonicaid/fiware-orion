@@ -26,6 +26,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/errorMessages.h"
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
@@ -34,6 +35,8 @@
 #include "serviceRoutinesV2/postBatchUpdate.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "serviceRoutines/postUpdateContext.h"
+
+#include "alarmMgr/alarmMgr.h"
 
 
 
@@ -63,6 +66,17 @@ std::string postBatchUpdate
   UpdateContextRequest*  upcrP  = &parseDataP->upcr.res;
   Entities               entities;
 
+  std::string  answer = "";
+  if (parseDataP->upcr.res.contextElementVector.size() == 0)
+  {
+    OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITIES_VECTOR);
+    alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITIES_VECTOR);
+
+    TIMED_RENDER(answer = oe.toJson());
+
+    return answer;
+  }
+
   upcrP->fill(&buP->entities, buP->updateActionType.get());
   buP->release();  // upcrP just 'took over' the data from buP, buP is no longer needed
   parseDataP->upcr.res.present("");
@@ -70,7 +84,6 @@ std::string postBatchUpdate
   postUpdateContext(ciP, components, compV, parseDataP);
 
   // Check potential error
-  std::string  answer = "";
   if (parseDataP->upcrs.res.oe.code != SccNone )
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());

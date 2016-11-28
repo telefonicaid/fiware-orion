@@ -1,0 +1,1 @@
+- Fix: POST /v2/op/update with empty entities vector makes the broker to crash (#2720)

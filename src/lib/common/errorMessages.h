@@ -37,13 +37,13 @@
 #define STR2(x) #x
 #define STR(x)  STR2(x)
 
-
-
 #define MORE_MATCHING_ENT   "More than one matching entity. Please refine your query"
 #define INVAL_CHAR_URI      "invalid character in URI"
 #define EMPTY_ENTITY_ID     "entity id length: 0, min length supported: "      STR(MIN_ID_LEN)
 #define EMPTY_ATTR_NAME     "attribute name length: 0, min length supported: " STR(MIN_ID_LEN)
 #define EMPTY_ENTITY_TYPE   "entity type length: 0, min length supported: "    STR(MIN_ID_LEN)
 #define BAD_VERB            "method not allowed"
+
+#define ERROR_DESC_BAD_REQUEST_EMPTY_ENTITIES_VECTOR  "empty entities vector"
 
 #endif // SRC_LIB_COMMON_ERRORMESSAGES_H
