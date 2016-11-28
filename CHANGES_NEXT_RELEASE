@@ -11,3 +11,4 @@
 - Fix: POST /v2/op/update with empty entities vector makes the broker to crash (#2720)
 - Fix: allow empty elements in Accept header (useless, but allowed by HTTP RFC) (#2722)
 - Fix: NGSIv1 queries are wrongly interpreting entity type as a pattern (#2723)
+- Fix: improving performance avoiding unneeded calls to gettid in log library (#2716)
