@@ -1734,15 +1734,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");    
-    ContextAttribute ca2("A2", "TA2", "Z");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");    
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -1828,15 +1828,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1_JSON)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A2", "TA2", "Z");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -1921,13 +1921,13 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");    
-    ContextAttribute ca2("A2", "TA2", "Z");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");    
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -2013,13 +2013,14 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1_disjoint)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A2", "TA2", "Z");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -2106,27 +2107,29 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1, cer2, cer3;
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    ContextElementResponse* cer2P = new ContextElementResponse();
+    ContextElementResponse* cer3P = new ContextElementResponse();
 
-    cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");    
-    ContextAttribute ca2("A2", "TA2", "Z");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);
+    cer1P->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");    
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    cer1P->contextElement.contextAttributeVector.push_back(ca1P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca2P);
 
-    cer2.contextElement.entityId.fill("E1", "T1bis", "false");
-    ContextAttribute ca3("A1", "TA1", "T");
-    cer2.contextElement.contextAttributeVector.push_back(&ca3);
+    cer2P->contextElement.entityId.fill("E1", "T1bis", "false");
+    ContextAttribute* ca3P = new ContextAttribute("A1", "TA1", "T");
+    cer2P->contextElement.contextAttributeVector.push_back(ca3P);
 
-    cer3.contextElement.entityId.fill("E1", "", "false");
-    ContextAttribute ca4("A1", "TA1", "P");
-    ContextAttribute ca5("A2", "TA2", "Q");
-    cer3.contextElement.contextAttributeVector.push_back(&ca4);
-    cer3.contextElement.contextAttributeVector.push_back(&ca5);
+    cer3P->contextElement.entityId.fill("E1", "", "false");
+    ContextAttribute* ca4P = new ContextAttribute("A1", "TA1", "P");
+    ContextAttribute* ca5P = new ContextAttribute("A2", "TA2", "Q");
+    cer3P->contextElement.contextAttributeVector.push_back(ca4P);
+    cer3P->contextElement.contextAttributeVector.push_back(ca5P);
 
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
-    expectedNcr.contextElementResponseVector.push_back(&cer2);
-    expectedNcr.contextElementResponseVector.push_back(&cer3);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
+    expectedNcr.contextElementResponseVector.push_back(cer2P);
+    expectedNcr.contextElementResponseVector.push_back(cer3P);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -2212,27 +2215,29 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1_disjoint)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1, cer2, cer3;
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    ContextElementResponse* cer2P = new ContextElementResponse();
+    ContextElementResponse* cer3P = new ContextElementResponse();
 
-    cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");   
-    ContextAttribute ca2("A2", "TA2", "Z");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);
+    cer1P->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");   
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    cer1P->contextElement.contextAttributeVector.push_back(ca1P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca2P);
 
-    cer2.contextElement.entityId.fill("E1", "T1bis", "false");
-    ContextAttribute ca3("A1", "TA1", "T");
-    cer2.contextElement.contextAttributeVector.push_back(&ca3);
+    cer2P->contextElement.entityId.fill("E1", "T1bis", "false");
+    ContextAttribute* ca3P = new ContextAttribute("A1", "TA1", "T");
+    cer2P->contextElement.contextAttributeVector.push_back(ca3P);
 
-    cer3.contextElement.entityId.fill("E1", "", "false");
-    ContextAttribute ca4("A1", "TA1", "P");
-    ContextAttribute ca5("A2", "TA2", "Q");
-    cer3.contextElement.contextAttributeVector.push_back(&ca4);
-    cer3.contextElement.contextAttributeVector.push_back(&ca5);
+    cer3P->contextElement.entityId.fill("E1", "", "false");
+    ContextAttribute* ca4P = new ContextAttribute("A1", "TA1", "P");
+    ContextAttribute* ca5P = new ContextAttribute("A2", "TA2", "Q");
+    cer3P->contextElement.contextAttributeVector.push_back(ca4P);
+    cer3P->contextElement.contextAttributeVector.push_back(ca5P);
 
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
-    expectedNcr.contextElementResponseVector.push_back(&cer2);
-    expectedNcr.contextElementResponseVector.push_back(&cer3);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
+    expectedNcr.contextElementResponseVector.push_back(cer2P);
+    expectedNcr.contextElementResponseVector.push_back(cer3P);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -2319,20 +2324,21 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1, cer2;
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    ContextElementResponse* cer2P = new ContextElementResponse();
 
-    cer1.contextElement.entityId.fill("E1", "T", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A2", "TA2", "Z");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);
+    cer1P->contextElement.entityId.fill("E1", "T", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    cer1P->contextElement.contextAttributeVector.push_back(ca1P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca2P);
 
-    cer2.contextElement.entityId.fill("E2", "T", "false");
-    ContextAttribute ca3("A2", "TA2", "R");
-    cer2.contextElement.contextAttributeVector.push_back(&ca3);
+    cer2P->contextElement.entityId.fill("E2", "T", "false");
+    ContextAttribute* ca3P = new ContextAttribute("A2", "TA2", "R");
+    cer2P->contextElement.contextAttributeVector.push_back(ca3P);
 
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
-    expectedNcr.contextElementResponseVector.push_back(&cer2);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
+    expectedNcr.contextElementResponseVector.push_back(cer2P);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -2419,20 +2425,21 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1_disjoint)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1, cer2;
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    ContextElementResponse* cer2P = new ContextElementResponse();
 
-    cer1.contextElement.entityId.fill("E1", "T", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A2", "TA2", "Z");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);
+    cer1P->contextElement.entityId.fill("E1", "T", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    cer1P->contextElement.contextAttributeVector.push_back(ca1P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca2P);
 
-    cer2.contextElement.entityId.fill("E2", "T", "false");
-    ContextAttribute ca3("A2", "TA2", "R");
-    cer2.contextElement.contextAttributeVector.push_back(&ca3);
+    cer2P->contextElement.entityId.fill("E2", "T", "false");
+    ContextAttribute* ca3P = new ContextAttribute("A2", "TA2", "R");
+    cer2P->contextElement.contextAttributeVector.push_back(ca3P);
 
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
-    expectedNcr.contextElementResponseVector.push_back(&cer2);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
+    expectedNcr.contextElementResponseVector.push_back(cer2P);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -2519,32 +2526,35 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1, cer2, cer3, cer4;
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    ContextElementResponse* cer2P = new ContextElementResponse();
+    ContextElementResponse* cer3P = new ContextElementResponse();
+    ContextElementResponse* cer4P = new ContextElementResponse();
 
-    cer1.contextElement.entityId.fill("E1", "T", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A2", "TA2", "Z");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);
+    cer1P->contextElement.entityId.fill("E1", "T", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    cer1P->contextElement.contextAttributeVector.push_back(ca1P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca2P);
 
-    cer2.contextElement.entityId.fill("E2", "T", "false");
-    ContextAttribute ca3("A2", "TA2", "R");
-    cer2.contextElement.contextAttributeVector.push_back(&ca3);
+    cer2P->contextElement.entityId.fill("E2", "T", "false");
+    ContextAttribute* ca3P = new ContextAttribute("A2", "TA2", "R");
+    cer2P->contextElement.contextAttributeVector.push_back(ca3P);
 
-    cer3.contextElement.entityId.fill("E2", "Tbis", "false");
-    ContextAttribute ca4("A1", "TA1", "T");
-    cer3.contextElement.contextAttributeVector.push_back(&ca4);
+    cer3P->contextElement.entityId.fill("E2", "Tbis", "false");
+    ContextAttribute* ca4P = new ContextAttribute("A1", "TA1", "T");
+    cer3P->contextElement.contextAttributeVector.push_back(ca4P);
 
-    cer4.contextElement.entityId.fill("E1", "", "false");
-    ContextAttribute ca5("A1", "TA1", "P");
-    ContextAttribute ca6("A2", "TA2", "Q");
-    cer4.contextElement.contextAttributeVector.push_back(&ca5);
-    cer4.contextElement.contextAttributeVector.push_back(&ca6);
+    cer4P->contextElement.entityId.fill("E1", "", "false");
+    ContextAttribute* ca5P = new ContextAttribute("A1", "TA1", "P");
+    ContextAttribute* ca6P = new ContextAttribute("A2", "TA2", "Q");
+    cer4P->contextElement.contextAttributeVector.push_back(ca5P);
+    cer4P->contextElement.contextAttributeVector.push_back(ca6P);
 
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
-    expectedNcr.contextElementResponseVector.push_back(&cer2);
-    expectedNcr.contextElementResponseVector.push_back(&cer3);
-    expectedNcr.contextElementResponseVector.push_back(&cer4);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
+    expectedNcr.contextElementResponseVector.push_back(cer2P);
+    expectedNcr.contextElementResponseVector.push_back(cer3P);
+    expectedNcr.contextElementResponseVector.push_back(cer4P);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -2631,32 +2641,35 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1_disjoint)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1, cer2, cer3, cer4;
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    ContextElementResponse* cer2P = new ContextElementResponse();
+    ContextElementResponse* cer3P = new ContextElementResponse();
+    ContextElementResponse* cer4P = new ContextElementResponse();
 
-    cer1.contextElement.entityId.fill("E1", "T", "false");
-    ContextAttribute ca1("A1", "TA1", "X");    
-    ContextAttribute ca2("A2", "TA2", "Z");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);    
+    cer1P->contextElement.entityId.fill("E1", "T", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");    
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    cer1P->contextElement.contextAttributeVector.push_back(ca1P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca2P);    
 
-    cer2.contextElement.entityId.fill("E2", "T", "false");
-    ContextAttribute ca3("A2", "TA2", "R");
-    cer2.contextElement.contextAttributeVector.push_back(&ca3);
+    cer2P->contextElement.entityId.fill("E2", "T", "false");
+    ContextAttribute* ca3P = new ContextAttribute("A2", "TA2", "R");
+    cer2P->contextElement.contextAttributeVector.push_back(ca3P);
 
-    cer3.contextElement.entityId.fill("E2", "Tbis", "false");
-    ContextAttribute ca4("A1", "TA1", "T");
-    cer3.contextElement.contextAttributeVector.push_back(&ca4);
+    cer3P->contextElement.entityId.fill("E2", "Tbis", "false");
+    ContextAttribute* ca4P = new ContextAttribute("A1", "TA1", "T");
+    cer3P->contextElement.contextAttributeVector.push_back(ca4P);
 
-    cer4.contextElement.entityId.fill("E1", "", "false");
-    ContextAttribute ca5("A1", "TA1", "P");
-    ContextAttribute ca6("A2", "TA2", "Q");
-    cer4.contextElement.contextAttributeVector.push_back(&ca5);
-    cer4.contextElement.contextAttributeVector.push_back(&ca6);
+    cer4P->contextElement.entityId.fill("E1", "", "false");
+    ContextAttribute* ca5P = new ContextAttribute("A1", "TA1", "P");
+    ContextAttribute* ca6P = new ContextAttribute("A2", "TA2", "Q");
+    cer4P->contextElement.contextAttributeVector.push_back(ca5P);
+    cer4P->contextElement.contextAttributeVector.push_back(ca6P);
 
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
-    expectedNcr.contextElementResponseVector.push_back(&cer2);
-    expectedNcr.contextElementResponseVector.push_back(&cer3);
-    expectedNcr.contextElementResponseVector.push_back(&cer4);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
+    expectedNcr.contextElementResponseVector.push_back(cer2P);
+    expectedNcr.contextElementResponseVector.push_back(cer3P);
+    expectedNcr.contextElementResponseVector.push_back(cer4P);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -2743,15 +2756,16 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A2", "TA2", "Z");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -2840,15 +2854,16 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");    
-    ContextAttribute ca2("A2", "TA2", "Z");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");    
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -2938,15 +2953,16 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CNbis)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A2", "TA2", "Z");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);    
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);    
+    expectedNcr.contextElementResponseVector.push_back(cerP);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -3033,13 +3049,14 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_disjoint)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A2", "TA2", "Z");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -3130,13 +3147,14 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A2", "TA2", "Z");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -3227,13 +3245,14 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial_disjoint)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A2", "TA2", "Z");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -3324,13 +3343,14 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CNbis)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A2", "TA2", "Z");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -3421,13 +3441,14 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A2", "TA2", "Z");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -3523,23 +3544,25 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_C1)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1, cer2;
-    cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");    
-    ContextAttribute ca2("A2", "TA2", "Z");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.contextElement.contextAttributeVector.push_back(&ca3);    
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
-    cer2.contextElement.entityId.id = "E2";
-    cer2.contextElement.entityId.type = "T2";
-    cer2.contextElement.entityId.isPattern = "false";
-    ContextAttribute ca4("A2", "TA2", "R");
-    ContextAttribute ca5("A3", "TA3", "S");
-    cer2.contextElement.contextAttributeVector.push_back(&ca4);
-    cer2.contextElement.contextAttributeVector.push_back(&ca5);
-    expectedNcr.contextElementResponseVector.push_back(&cer2);
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    ContextElementResponse* cer2P = new ContextElementResponse();
+
+    cer1P->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");    
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cer1P->contextElement.contextAttributeVector.push_back(ca1P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca2P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca3P);    
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
+    cer2P->contextElement.entityId.id = "E2";
+    cer2P->contextElement.entityId.type = "T2";
+    cer2P->contextElement.entityId.isPattern = "false";
+    ContextAttribute* ca4P = new ContextAttribute("A2", "TA2", "R");
+    ContextAttribute* ca5P = new ContextAttribute("A3", "TA3", "S");
+    cer2P->contextElement.contextAttributeVector.push_back(ca4P);
+    cer2P->contextElement.contextAttributeVector.push_back(ca5P);
+    expectedNcr.contextElementResponseVector.push_back(cer2P);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -3628,19 +3651,21 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_C1)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1, cer2;
-    cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A2", "TA2", "Z");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
-    cer2.contextElement.entityId.id = "E2";
-    cer2.contextElement.entityId.type = "T2";
-    cer2.contextElement.entityId.isPattern = "false";
-    ContextAttribute ca3("A2", "TA2", "R");
-    cer2.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer2);
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    ContextElementResponse* cer2P = new ContextElementResponse();
+
+    cer1P->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    cer1P->contextElement.contextAttributeVector.push_back(ca1P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca2P);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
+    cer2P->contextElement.entityId.id = "E2";
+    cer2P->contextElement.entityId.type = "T2";
+    cer2P->contextElement.entityId.isPattern = "false";
+    ContextAttribute* ca3P = new ContextAttribute("A2", "TA2", "R");
+    cer2P->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cer2P);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -3731,23 +3756,25 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CN)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1, cer2;
-    cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A2", "TA2", "Z");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
-    cer2.contextElement.entityId.id = "E2";
-    cer2.contextElement.entityId.type = "T2";
-    cer2.contextElement.entityId.isPattern = "false";
-    ContextAttribute ca4("A2", "TA2", "R");
-    ContextAttribute ca5("A3", "TA3", "S");
-    cer2.contextElement.contextAttributeVector.push_back(&ca4);
-    cer2.contextElement.contextAttributeVector.push_back(&ca5);
-    expectedNcr.contextElementResponseVector.push_back(&cer2);
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    ContextElementResponse* cer2P = new ContextElementResponse();
+
+    cer1P->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cer1P->contextElement.contextAttributeVector.push_back(ca1P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca2P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
+    cer2P->contextElement.entityId.id = "E2";
+    cer2P->contextElement.entityId.type = "T2";
+    cer2P->contextElement.entityId.isPattern = "false";
+    ContextAttribute* ca4P = new ContextAttribute("A2", "TA2", "R");
+    ContextAttribute* ca5P = new ContextAttribute("A3", "TA3", "S");
+    cer2P->contextElement.contextAttributeVector.push_back(ca4P);
+    cer2P->contextElement.contextAttributeVector.push_back(ca5P);
+    expectedNcr.contextElementResponseVector.push_back(cer2P);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -3840,23 +3867,25 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CNbis)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1, cer2;
-    cer1.contextElement.entityId.fill ("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A2", "TA2", "Z");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
-    cer2.contextElement.entityId.id = "E2";
-    cer2.contextElement.entityId.type = "T2";
-    cer2.contextElement.entityId.isPattern = "false";
-    ContextAttribute ca4("A2", "TA2", "R");
-    ContextAttribute ca5("A3", "TA3", "S");
-    cer2.contextElement.contextAttributeVector.push_back(&ca4);
-    cer2.contextElement.contextAttributeVector.push_back(&ca5);
-    expectedNcr.contextElementResponseVector.push_back(&cer2);
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    ContextElementResponse* cer2P = new ContextElementResponse();
+
+    cer1P->contextElement.entityId.fill ("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cer1P->contextElement.contextAttributeVector.push_back(ca1P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca2P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
+    cer2P->contextElement.entityId.id = "E2";
+    cer2P->contextElement.entityId.type = "T2";
+    cer2P->contextElement.entityId.isPattern = "false";
+    ContextAttribute* ca4P = new ContextAttribute("A2", "TA2", "R");
+    ContextAttribute* ca5P = new ContextAttribute("A3", "TA3", "S");
+    cer2P->contextElement.contextAttributeVector.push_back(ca4P);
+    cer2P->contextElement.contextAttributeVector.push_back(ca5P);
+    expectedNcr.contextElementResponseVector.push_back(cer2P);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -3947,19 +3976,21 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1, cer2;
-    cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");    
-    ContextAttribute ca2("A2", "TA2", "Z");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
-    cer2.contextElement.entityId.id = "E2";
-    cer2.contextElement.entityId.type = "T2";
-    cer2.contextElement.entityId.isPattern = "false";
-    ContextAttribute ca3("A2", "TA2", "R");
-    cer2.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer2);
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    ContextElementResponse* cer2P = new ContextElementResponse();
+
+    cer1P->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");    
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    cer1P->contextElement.contextAttributeVector.push_back(ca1P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca2P);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
+    cer2P->contextElement.entityId.id = "E2";
+    cer2P->contextElement.entityId.type = "T2";
+    cer2P->contextElement.entityId.isPattern = "false";
+    ContextAttribute* ca3P = new ContextAttribute("A2", "TA2", "R");
+    cer2P->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cer2P);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
@@ -4054,17 +4085,19 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CNbis)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1, cer2;
-    cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A2", "TA2", "Z");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
-    cer2.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca3("A2", "TA2", "R");
-    cer2.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer2);
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    ContextElementResponse* cer2P = new ContextElementResponse();
+
+    cer1P->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
+    cer1P->contextElement.contextAttributeVector.push_back(ca1P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca2P);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
+    cer2P->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca3P = new ContextAttribute("A2", "TA2", "R");
+    cer2P->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cer2P);
 
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;

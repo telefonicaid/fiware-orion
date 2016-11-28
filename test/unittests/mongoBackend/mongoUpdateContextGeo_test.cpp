@@ -137,13 +137,14 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
-    ContextAttribute ca("A3", "TA3", "4, -5");
-    Metadata md("location", "string", "WGS84");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement*   ceP = new ContextElement();
+    ContextAttribute* caP = new ContextAttribute("A3", "TA3", "4, -5");
+    Metadata*         mdP = new Metadata("location", "string", "WGS84");
+
+    ceP->entityId.fill("E3", "T3", "false");
+    caP->metadataVector.push_back(mdP);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -267,13 +268,13 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A5", "TA5", "8, -9");
-    Metadata md("location", "string", "WGS84");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A5", "TA5", "8, -9");
+    Metadata* mdP = new Metadata("location", "string", "WGS84");
+    caP->metadataVector.push_back(mdP);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -386,11 +387,11 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "2, -4");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "2, -4");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -491,11 +492,11 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
@@ -587,19 +588,20 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ContextAttribute ca1, ca2;
-    Metadata md1, md2;
-    ce.entityId.fill("E3", "T3", "false");
-    ca1 = ContextAttribute("A1", "TA1", "2, -4");
-    md1 = Metadata("location", "string", "WGS84");
-    ca1.metadataVector.push_back(&md1);
-    ce.contextAttributeVector.push_back(&ca1);
-    ca2 = ContextAttribute("A2", "TA2", "5, -6");
-    md2 = Metadata("location", "string", "WGS84");
-    ca2.metadataVector.push_back(&md2);
-    ce.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "2, -4");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "5, -6");
+    Metadata*         md1P = new Metadata("location", "string", "WGS84");
+    Metadata*         md2P = new Metadata("location", "string", "WGS84");
+
+    ceP->entityId.fill("E3", "T3", "false");
+
+    ca1P->metadataVector.push_back(md1P);
+    ceP->contextAttributeVector.push_back(ca1P);
+
+    ca2P->metadataVector.push_back(md2P);
+    ceP->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -710,13 +712,13 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
-    ContextAttribute ca("A1", "TA1", "invalid");
-    Metadata md("location", "string", "WGS84");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E3", "T3", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "invalid");
+    Metadata* mdP = new Metadata("location", "string", "WGS84");
+    caP->metadataVector.push_back(mdP);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -820,13 +822,13 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
-    ContextAttribute ca("A1", "TA1", "2, 4");
-    Metadata md("location", "string", "gurugu");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E3", "T3", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "2, 4");
+    Metadata* mdP = new Metadata("location", "string", "gurugu");
+    caP->metadataVector.push_back(mdP);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -931,13 +933,13 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A5", "TA5", "2, 4");
-    Metadata md("location", "string", "WGS84");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A5", "TA5", "2, 4");
+    Metadata* mdP = new Metadata("location", "string", "WGS84");
+    caP->metadataVector.push_back(mdP);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -1041,13 +1043,13 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A5", "TA5", "erroneous");
-    Metadata md("location", "string", "WGS84");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A5", "TA5", "erroneous");
+    Metadata* mdP = new Metadata("location", "string", "WGS84");
+    caP->metadataVector.push_back(mdP);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -1151,13 +1153,13 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A5", "TA5", "8, -9");
-    Metadata md("location", "string", "gurugu");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A5", "TA5", "8, -9");
+    Metadata* mdP = new Metadata("location", "string", "gurugu");
+    caP->metadataVector.push_back(mdP);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -1261,11 +1263,11 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "invalid");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "invalid");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -1366,13 +1368,13 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A2", "TA2", "2, -4");
-    Metadata md("location", "string", "WGS84");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A2", "TA2", "2, -4");
+    Metadata* mdP = new Metadata("location", "string", "WGS84");
+    caP->metadataVector.push_back(mdP);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -1477,13 +1479,13 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "");
-    Metadata md("location", "string", "WGS84");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
+    Metadata* mdP = new Metadata("location", "string", "WGS84");
+    caP->metadataVector.push_back(mdP);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */

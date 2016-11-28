@@ -151,6 +151,7 @@ void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr) const
 */
 ContextAttribute::~ContextAttribute()
 {
+  release();
 }
 
 
