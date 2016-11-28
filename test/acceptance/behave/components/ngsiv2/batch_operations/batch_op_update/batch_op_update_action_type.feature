@@ -671,7 +671,36 @@ Feature: actionType in update batch operation using NGSI v2. "POST" - /v2/op/upd
       | entities_id        | room2    |
       | attributes_name    | pressure |
     When update entities in a single batch operation "DELETE"
+    Then verify that receive an "Not Found" http code
     And verify an error response
       | parameter   | value                                      |
       | error       | NotFound                                   |
       | description | The entity does not have such an attribute |
+
+  @action_type_append_with_entities_empty @BUG_2720 @skip
+  Scenario:  try to update entities with batch operations using NGSIv2 with entities empty
+    Given  a definition of headers
+      | parameter          | value                      |
+      | Fiware-Service     | test_op_update_action_type |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
+    When update entities in a single batch operation "APPEND"
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value      |
+      | error       | BadRequest |
+      | description | TBD        |
+
+  @action_type_append_without_entities
+  Scenario:  try to update entities with batch operations using NGSIv2 without entities field
+    Given  a definition of headers
+      | parameter          | value                      |
+      | Fiware-Service     | test_op_update_action_type |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
+    When update entities in a single batch operation "APPEND without entities"
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                      |
+      | error       | BadRequest                                                 |
+      | description | Invalid JSON payload, mandatory field /entities/ not found |

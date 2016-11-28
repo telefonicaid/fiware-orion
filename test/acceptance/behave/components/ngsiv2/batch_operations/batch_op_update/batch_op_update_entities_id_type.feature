@@ -118,7 +118,7 @@ Feature: entities id and entities type in update batch operation using NGSI v2. 
       | 1000     |
       | 5000     |
 
-  @entities_id_duplicated @BUG_2685 @skip
+  @entities_id_duplicated @BUG_2685
   Scenario:  append entities with batch operations using NGSI v2 with duplicated entities id
     Given  a definition of headers
       | parameter          | value                      |
@@ -352,7 +352,7 @@ Feature: entities id and entities type in update batch operation using NGSI v2. 
       | null            |
 
   # --------------------- entities type -------------------------
-  @entities_type_without @BUG_2685 @skip
+  @entities_type_without @BUG_2685
   Scenario:  append entities with batch operations using NGSI v2 without entities type
     Given  a definition of headers
       | parameter          | value                        |
