@@ -76,6 +76,7 @@ std::string postBatchUpdate
 
     TIMED_RENDER(answer = oe.toJson());
 
+    ciP->httpStatusCode = SccBadRequest;
     return answer;
   }
 
