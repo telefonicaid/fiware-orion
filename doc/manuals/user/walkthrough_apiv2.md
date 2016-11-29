@@ -120,8 +120,8 @@ application able to receive notifications. To that end, please download the
 accumulator script, available [in
 GitHub](https://github.com/telefonicaid/fiware-orion/blob/master/scripts/accumulator-server.py).
 It is a very simple "dummy" application that simply listens to a given URL
-(the example below uses localhost:1028/accumulate, but you can specify a different
-host and/or port) and prints whatever it gets in the
+(the example below uses localhost:1028/accumulate, but a different
+host and/or port can be specified) and echoes whatever it receives in the
 terminal window where it is executed. Run it using the following
 command:
 
