@@ -112,7 +112,7 @@ bool collectionQuery
 * connection cannot be released before the cursor has been used.
 *
 */
-extern bool collectionRangedQuery
+bool collectionRangedQuery
 (
   DBClientBase*                   connection,
   const std::string&              col,

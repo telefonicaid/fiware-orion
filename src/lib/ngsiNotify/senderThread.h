@@ -62,6 +62,7 @@ typedef struct SenderThreadParams
   struct timespec                    timeStamp;
   std::map<std::string, std::string> extraHeaders;
   std::string                        subscriptionId;
+  bool                               registration;
 } SenderThreadParams;
 
 

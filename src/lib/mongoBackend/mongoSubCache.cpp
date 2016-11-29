@@ -606,6 +606,12 @@ void mongoSubCountersUpdate
 {
   std::string  collection = getSubscribeContextCollectionName(tenant);
 
+  if (subId == "")
+  {
+    LM_E(("Runtime Error (empty subscription id)"));
+    return;
+  }
+
   if (count > 0)
   {
     mongoSubCountersUpdateCount(collection, subId, count);
