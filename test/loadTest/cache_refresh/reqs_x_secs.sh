@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,33 +21,65 @@
 # iot_support at tid dot es
 # author: 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
-if [  "$1" == ""  ]
-  then
-    echo "ERROR - No url defined (Mandatory)"
-    echo "usage:"
-    echo "    ./reqs_x_secs.sh <url> [-reset]"
-    echo "    example: ./reqs_x_secs.sh localhost:4567 "
-    echo ""
-    echo " the -reset parameter is used to reset the listener previously."
-    echo ""
-    echo "           ( use [ Ctrl+C ] to stop )"
-    exit
-fi
 
-if [  "$2" == "-reset"  ]
-  then
-     curl -s $1/reset > /dev/null
+# variables
+LISTENER=localhost:8090
+CB=None
+RESET=false
+
+
+# ========================================================
+#
+# usage - show the script usage
+#
+function usage(){
+     echo " "
+     echo "Usage: "$(basename $0)
+     echo "   -u (usage) [OPTIONAL]"
+     echo "   -reset (this parameter is used to reset the listener previously) [OPTIONAL]"
+     echo "   --listener <listener endpoint> (listener endpoint host:port)[OPTIONAL] (default: localhost:8090)"
+     echo "   --cb <CB endpoint> (listener endpoint host:port) [OPTIONAL] (default: None)"
+     echo " "
+     echo " Example:"
+     echo "     "$(basename $0)" --listener localhost:8090 --cb localhost:8090 -reset"
+     echo " "
+     echo " Note: "
+     echo "     - if cb parameter is not used the queue size is not displayed..."
      echo ""
-     echo " WARN - The listener has been reset... "
+     echo "                      ( use [ Ctrl+C ] to stop )"
+     echo " "
+     exit 0
+}
+
+# BEGIN
+while [ "$#" != 0 ]
+do
+  if   [ "$1" == "-u" ];          then usage;
+  elif [ "$1" == "--listener" ];  then LISTENER="$2"; shift;
+  elif [ "$1" == "--cb" ];        then CB="$2"; shift;
+  elif [ "$1" == "-reset" ];      then RESET="true"; shift;
+  else
+      echo $0: bad parameter/option: "'"${1}"'";
+      usage
+  fi
+  shift
+done
+
+
+if [  "RESET" == "true"  ]
+  then
+     curl -s $LISTENER/reset > /dev/null
+     echo ""
+     echo " WARN - The listener has been reseted... "
      echo ""
 fi
 
 
 echo "Show requests x seconds (TPS)... [CTRL+C] to stop!"
-echo "--------------------------------------------------------------"
-echo "                  reqs       requests      tps from first"
-echo "     seconds    each sec      total        to last request"
-echo "---------------------------------------------------------------"
+echo "----------------------------------------------------------------------------"
+echo "                  reqs       requests      tps from first     notifQueue"
+echo "     seconds    each sec      total        to last request       size"
+echo "-----------------------------------------------------------------------------"
 sec=0
 req=0
 
@@ -56,16 +88,28 @@ while true
 do
   sleep 1s
   sec=$(($sec+1))
-  resp=`curl -s $1/receive 2>&1`
+
+  # requests received in the listener
+  resp=`curl -s $LISTENER/receive 2>&1`
   total=`echo $resp | sed 's/^{"requests": "\(.*\)","tps":\(.*\)"}/\1/'`
   tps=`echo $resp | sed 's/^{"requests": "\(.*\)","tps": "\(.*\)"}/\2/'`
+
+  # notifQueue size
+  if [ "$CB" != "None" ]
+    then
+      stat=`curl -s $CB/statistics  2>&1`
+      stat1=`echo $stat | grep -Eo 'size":[[:digit:]]+'`
+    else
+      stat1="     :N/A" 
+  fi
+
+  # report per second
   if [[  "$total" != ""  && "$tps" != "" ]]
      then
-        echo " --- [" $sec "] ----- [" $(($total-$req)) "] ----- [" $total "] ----- [" $tps "]"
+         echo " --- [" $sec "] ----- [" $(($total-$req)) "] ----- [" $total "] ----- [" $tps "] ------ [" ${stat1:6} "]"
         req=$total
      else
        echo "Error - The listener ("$1") does not respond..."
        exit
   fi
 done
-
