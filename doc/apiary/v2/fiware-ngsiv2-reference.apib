@@ -2178,9 +2178,22 @@ This operation allows to create, update and/or delete several entities in a sing
 The payload is an object with two properties:
 
 + `actionType`, to specify the kind of update action to do: either APPEND, APPEND_STRICT, UPDATE,
-  DELETE.
-+ `entities`, an array of entities, each one specified using the JSON entity representation format
+  DELETE, or REPLACE.
++ `entities`, an array of entities, each entity specified using the JSON entity representation format
   (described in the section "JSON Entity Representation").
+
+This operation is split in as many individual operations as entities in the `entities` vector, so
+the `actionType` is executed for each one of them. Depending on the `actionType`, a mapping with
+regular non-batch operations can be done:
+
+* APPEND: maps to `POST /v2/entities` (if the entity does not already exist) or `POST /v2/entities/<id>/attrs`
+  (if the entity already exists).
+* APPEND_STRICT: maps to `POST /v2/entities` (if the entity does not already exist) or
+  `POST /v2/entities/<id>/attrs?options=append` (if the entity already exists).
+* UPDATE: maps to `PATCH /v2/entities/<id>/attrs`.
+* DELETE: maps to `DELETE /v2/entities/<id>/attrs/<attrName>` on every attribute included in the entity or
+  to `DELETE /v2/entities/<id>` if no attribute were included in the entity.
+* REPLACE: maps to `PUT /v2/entities/<id>/attrs`.
 
 Response:
 
