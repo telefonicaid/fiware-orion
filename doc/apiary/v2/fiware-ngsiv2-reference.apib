@@ -2191,8 +2191,8 @@ regular non-batch operations can be done:
 * APPEND_STRICT: maps to `POST /v2/entities` (if the entity does not already exist) or
   `POST /v2/entities/<id>/attrs?options=append` (if the entity already exists).
 * UPDATE: maps to `PATCH /v2/entities/<id>/attrs`.
-* DELETE: it does not have a direct mapping, but it would be like `DELETE /v2/entities/<id>/attrs/<attrName>` on every
-  attribute included in the entity.
+* DELETE: maps to `DELETE /v2/entities/<id>/attrs/<attrName>` on every attribute included in the entity or
+  to `DELETE /v2/entities/<id>` if no attribute were included in the entity.
 * REPLACE: maps to `PUT /v2/entities/<id>/attrs`.
 
 Response:
