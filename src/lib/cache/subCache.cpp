@@ -1050,9 +1050,23 @@ int subCacheItemRemove(CachedSubscription* cSubP)
   {
     if (current == cSubP)
     {
-      if (cSubP == subCache.head)  { subCache.head = cSubP->next; }
-      if (cSubP == subCache.tail)  { subCache.tail = prev;        }
-      if (prev != NULL)                 { prev->next         = cSubP->next; }
+      // Removing first item ?
+      if (cSubP == subCache.head)
+      {
+        subCache.head = cSubP->next;
+      }
+
+      // Removing last item?
+      if (cSubP == subCache.tail)
+      {
+        subCache.tail = prev;
+      }
+
+      // Removing middle item?
+      if (prev != NULL)
+      {
+        prev->next = cSubP->next;
+      }
 
       LM_T(LmtSubCache, ("in subCacheItemRemove, REMOVING '%s'", cSubP->subscriptionId));
       ++subCache.noOfRemoves;
@@ -1353,17 +1367,20 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
     return;
   }
 
+  time_t now = time(NULL);
+
+  cacheSemTake(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
+
   CachedSubscription* subP = subCacheItemLookup(tenant.c_str(), subscriptionId.c_str());
 
   if (subP == NULL)
   {
+    cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
     const char* errorString = "intent to update error status of non-existing subscription";
 
     alarmMgr.badInput(clientIp, errorString);
     return;
   }
-
-  time_t now = time(NULL);
 
   if (errors == 0)
   {
@@ -1373,4 +1390,6 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
   {
     subP->lastFailure  = now;
   }
+
+  cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
 }
