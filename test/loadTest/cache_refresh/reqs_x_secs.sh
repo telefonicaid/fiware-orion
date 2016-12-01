@@ -26,7 +26,7 @@
 LISTENER=localhost:8090
 CB=None
 RESET=false
-
+notifQueueSize=N/A
 
 # ========================================================
 #
@@ -74,6 +74,12 @@ if [  "RESET" == "true"  ]
      echo ""
 fi
 
+if [ "$CB" != "None" ]
+    then
+        echo " The notifQueue size will be monitorized from ContextBroker..."
+    else
+        echo " The notifQueue size won't be monitorized "
+fi
 
 echo "Show requests x seconds (TPS)... [CTRL+C] to stop!"
 echo "----------------------------------------------------------------------------"
@@ -98,18 +104,27 @@ do
   if [ "$CB" != "None" ]
     then
       stat=`curl -s $CB/statistics  2>&1`
-      stat1=`echo $stat | grep -Eo 'size":[[:digit:]]+'`
-    else
-      stat1="     :N/A" 
+      if [  "$total" == "" ]
+           then
+              echo "ERROR - The CB ("$CB") does not respond..."
+              exit
+      fi
+      # jq is a lightweight and flexible command-line JSON processor.
+      # steps to install jq:
+      #---------------------
+      #     wget http://stedolan.github.io/jq/download/linux64/jq
+      #     chmod +x ./jq
+      #     cp jq /usr/bin
+      notifQueueSize=`echo $stat | jq '.notifQueue.size'`
   fi
 
   # report per second
   if [[  "$total" != ""  && "$tps" != "" ]]
      then
-         echo " --- [" $sec "] ----- [" $(($total-$req)) "] ----- [" $total "] ----- [" $tps "] ------ [" ${stat1:6} "]"
+         echo " --- [" $sec "] ----- [" $(($total-$req)) "] ----- [" $total "] ----- [" $tps "] ------ [" $notifQueueSize "]"
         req=$total
      else
-       echo "Error - The listener ("$1") does not respond..."
+       echo "ERROR - The listener ("$1") does not respond..."
        exit
   fi
 done
