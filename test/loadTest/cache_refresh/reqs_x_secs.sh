@@ -121,7 +121,7 @@ do
   # report per second
   if [[  "$total" != ""  && "$tps" != "" ]]
      then
-         echo " --- [" $sec "] ----- [" $(($total-$req)) "] ----- [" $total "] ----- [" $tps "] ------ [" $notifQueueSize "]"
+        echo " --- [" $sec "] ----- [" $(($total-$req)) "] ----- [" $total "] ----- [" $tps "] ------ [" $notifQueueSize "]"
         req=$total
      else
        echo "ERROR - The listener ("$1") does not respond..."
