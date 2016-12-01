@@ -81,7 +81,7 @@ These tests are used to verify the cache refresh in a balanced system.
       ---------------------
            wget http://stedolan.github.io/jq/download/linux64/jq
            chmod +x ./jq
-           cp jq /usr/bin
+           sudo cp jq /usr/local/bin
   ```
   
   Example:

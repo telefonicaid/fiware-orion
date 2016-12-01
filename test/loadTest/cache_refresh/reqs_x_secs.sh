@@ -109,12 +109,7 @@ do
               echo "ERROR - The CB ("$CB") does not respond..."
               exit
       fi
-      # jq is a lightweight and flexible command-line JSON processor.
-      # steps to install jq:
-      #---------------------
-      #     wget http://stedolan.github.io/jq/download/linux64/jq
-      #     chmod +x ./jq
-      #     cp jq /usr/bin
+      # jq is a lightweight and flexible command-line JSON processor. See Dependency in README.md
       notifQueueSize=`echo $stat | jq '.notifQueue.size'`
   fi
 
