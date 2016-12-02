@@ -32,6 +32,8 @@
 /* ****************************************************************************
 *
 * metricManagerTest -
+*
+* FIXME PR: remove the whole file (and its reference in CMakeList.txt at the end)
 */
 TEST(metricManagerTest, metricManagerTest)
 {

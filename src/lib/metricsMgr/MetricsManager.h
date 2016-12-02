@@ -32,6 +32,23 @@
 /* ****************************************************************************
 *
 * MetricsManager -
+*
+* FIXME PR: summary of things to improve
+*
+* 1. Check alternatives to "triple std::map" from the point of view of performance
+*    (probably difficult to beat) and syntax (current one is a bit awkward)
+* 2. In order to be homogeneous, probably 'metrics' should be a pointer (and the
+*    initial map created at constructor time)
+* 3. Destroy method, releasing all the maps in cascade (probably never used, as the
+*    singleton object in CB using this class will be destroyed at the end, but do it
+*    for class compleness)
+* 4. reset() method implementation (not delete maps, only set metrics to 0)
+* 5. toJson() to be splitted into 3 methods (2 of them private)
+* 6. Multi-thread safeness. Probably the same sem-based strategy used in AlarmManager
+*    could be used.
+* 6. (Usure) We could need maps for metrics different for int. In that case, implement
+*    it (and the accum method) using templates, to avoid repeat the same implementation
+*    N times
 */
 class MetricsManager
 {

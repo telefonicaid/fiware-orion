@@ -58,7 +58,7 @@ void MetricsManager::accum(const std::string& srv, const std::string& subServ, c
   {
     // not found: create it
     // FIXME PR: this syntax should be simpler, closer to
-    // intMetrics[srv][subServ] = new std::map<std::string, int>;
+    // metrics[srv][subServ] = new std::map<std::string, int>;
 
     metrics[srv]->insert(std::pair<std::string, std::map<std::string, int>*>(subServ, new std::map<std::string, int>));
   }
@@ -68,7 +68,7 @@ void MetricsManager::accum(const std::string& srv, const std::string& subServ, c
   {
     // not found: create it
     // FIXME PR: I don't like the at() and pair() syntax, I'd prefer a syntax closer to:
-    // intMetrics[srv][subServ][metric] = 0;
+    // metrics[srv][subServ][metric] = 0;
     metrics[srv]->at(subServ)->insert(std::pair<std::string, int>(metric, 0));
   }
 
@@ -81,7 +81,7 @@ void MetricsManager::accum(const std::string& srv, const std::string& subServ, c
 */
 void MetricsManager::reset(void)
 {
-  // TBD
+  // FIXME PR (see .h)
 }
 
 /* ****************************************************************************
@@ -90,6 +90,8 @@ void MetricsManager::reset(void)
 */
 std::string MetricsManager::toJson(void)
 {
+  // FIXME PR: needs a refactor (see .h)
+
   // For all services...
   JsonHelper jhServ;
 
