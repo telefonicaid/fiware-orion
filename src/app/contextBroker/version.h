@@ -28,6 +28,6 @@
 
 
 
-#define ORION_VERSION "1.4.5"
+#define ORION_VERSION "1.4.6"
 
 #endif  // SRC_APP_CONTEXTBROKER_VERSION_H_
