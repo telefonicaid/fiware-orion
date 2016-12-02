@@ -95,6 +95,8 @@ SET (SOURCES
     common/commonSem_test.cpp
     common/commonStatistics_test.cpp
     common/commonWsStrip_test.cpp
+    # FIXME PR: remove next one
+    common/commondebug_test.cpp
 
     ngsi9/RegisterContextRequest_test.cpp
     ngsi9/RegisterContextResponse_test.cpp
