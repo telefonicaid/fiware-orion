@@ -55,9 +55,9 @@ function usage(){
 while [ "$#" != 0 ]
 do
   if   [ "$1" == "-u" ];          then usage;
+  elif [ "$1" == "-reset" ];      then RESET="true";
   elif [ "$1" == "--listener" ];  then LISTENER="$2"; shift;
   elif [ "$1" == "--cb" ];        then CB="$2"; shift;
-  elif [ "$1" == "-reset" ];      then RESET="true"; shift;
   else
       echo $0: bad parameter/option: "'"${1}"'";
       usage
@@ -68,14 +68,14 @@ done
 if [ "$RESET" == "true" ]
   then
      curl -s $LISTENER/reset > /dev/null
-     echo " WARN - The listener has been reseted... "
+     echo " WARN - The listener has been reseted. "
 fi
 
 if [ "$CB" != "None" ]
     then
-        echo " INFO - the notifQueue size will be monitorized from ContextBroker..."
+        echo " INFO - the notifQueue size will be monitorized from ContextBroker."
     else
-        echo " INFO - the notifQueue size won't be monitorized "
+        echo " INFO - the notifQueue size won't be monitorized. "
 fi
 
 echo " INFO - Show requests x seconds (TPS)... [CTRL+C] to stop!"
