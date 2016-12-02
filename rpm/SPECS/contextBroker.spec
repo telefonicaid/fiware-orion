@@ -164,6 +164,9 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Fri Dec 02 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.4.6-1
+- Fix: POST /v2/op/update with empty entities vector makes the broker to crash (#2720)
+
 * Fri Nov 25 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.4.5-1
 - Hotfix: Make -maxConnections parameter wider, as pass through to the MHD layer
 - Hotfix: re-implementing the Accept header hotfix in 1.4.3 in a better way
