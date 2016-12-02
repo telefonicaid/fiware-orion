@@ -65,7 +65,7 @@ do
   shift
 done
 
-if [  "$RESET" == "true"  ]
+if [ "$RESET" == "true" ]
   then
      curl -s $LISTENER/reset > /dev/null
      echo " WARN - The listener has been reseted... "
@@ -117,4 +117,5 @@ do
 
   # report per second
   echo " --- [" $sec "] ----- [" $(($total-$req)) "] ----- [" $total "] ----- [" $tps "] ------ [" $notifQueueSize "]"
+  req=$total
 done
