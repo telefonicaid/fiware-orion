@@ -65,23 +65,20 @@ do
   shift
 done
 
-
-if [  "RESET" == "true"  ]
+if [  "$RESET" == "true"  ]
   then
      curl -s $LISTENER/reset > /dev/null
-     echo ""
      echo " WARN - The listener has been reseted... "
-     echo ""
 fi
 
 if [ "$CB" != "None" ]
     then
-        echo " The notifQueue size will be monitorized from ContextBroker..."
+        echo " INFO - the notifQueue size will be monitorized from ContextBroker..."
     else
-        echo " The notifQueue size won't be monitorized "
+        echo " INFO - the notifQueue size won't be monitorized "
 fi
 
-echo "Show requests x seconds (TPS)... [CTRL+C] to stop!"
+echo " INFO - Show requests x seconds (TPS)... [CTRL+C] to stop!"
 echo "----------------------------------------------------------------------------"
 echo "                  reqs       requests      tps from first     notifQueue"
 echo "     seconds    each sec      total        to last request       size"
@@ -97,14 +94,19 @@ do
 
   # requests received in the listener
   resp=`curl -s $LISTENER/receive 2>&1`
-  total=`echo $resp | sed 's/^{"requests": "\(.*\)","tps":\(.*\)"}/\1/'`
-  tps=`echo $resp | sed 's/^{"requests": "\(.*\)","tps": "\(.*\)"}/\2/'`
+  if [  "$resp" == "" ]
+       then
+          echo "ERROR - The listener ("$LISTENER") does not respond..."
+          exit
+  fi
+  total=`echo $resp | jq '.requests' | tr -d \"`
+  tps=`echo $resp | jq '.tps' | tr -d \"`
 
   # notifQueue size
   if [ "$CB" != "None" ]
     then
       stat=`curl -s $CB/statistics  2>&1`
-      if [  "$total" == "" ]
+      if [  "$stat" == "" ]
            then
               echo "ERROR - The CB ("$CB") does not respond..."
               exit
@@ -114,12 +116,5 @@ do
   fi
 
   # report per second
-  if [[  "$total" != ""  && "$tps" != "" ]]
-     then
-        echo " --- [" $sec "] ----- [" $(($total-$req)) "] ----- [" $total "] ----- [" $tps "] ------ [" $notifQueueSize "]"
-        req=$total
-     else
-       echo "ERROR - The listener ("$1") does not respond..."
-       exit
-  fi
+  echo " --- [" $sec "] ----- [" $(($total-$req)) "] ----- [" $total "] ----- [" $tps "] ------ [" $notifQueueSize "]"
 done
