@@ -46,7 +46,8 @@
 * 5. toJson() to be splitted into 3 methods (2 of them private)
 * 6. Multi-thread safeness. Probably the same sem-based strategy used in AlarmManager
 *    could be used.
-* 6. (Usure) We could need maps for metrics different for int. In that case, implement
+* 7. Use 'long long' instead of 'int'
+* 8. (Usure) We could need maps for metrics different for int. In that case, implement
 *    it (and the accum method) using templates, to avoid repeat the same implementation
 *    N times
 */
