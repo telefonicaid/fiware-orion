@@ -93,6 +93,7 @@ do
   sec=$(($sec+1))
 
   # requests received in the listener
+  # jq is a lightweight and flexible command-line JSON processor. See Dependency in README.md
   resp=`curl -s $LISTENER/receive 2>&1`
   if [  "$resp" == "" ]
        then
@@ -102,7 +103,7 @@ do
   total=`echo $resp | jq '.requests' | tr -d \"`
   tps=`echo $resp | jq '.tps' | tr -d \"`
 
-  # notifQueue size
+  # notifQueue size from contextBroker
   if [ "$CB" != "None" ]
     then
       stat=`curl -s $CB/statistics  2>&1`
@@ -111,7 +112,6 @@ do
               echo "ERROR - The CB ("$CB") does not respond..."
               exit
       fi
-      # jq is a lightweight and flexible command-line JSON processor. See Dependency in README.md
       notifQueueSize=`echo $stat | jq '.notifQueue.size'`
   fi
 
