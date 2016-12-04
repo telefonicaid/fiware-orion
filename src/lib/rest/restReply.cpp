@@ -85,7 +85,7 @@ void restReply(ConnectionInfo* ciP, const std::string& _answer)
   {
     answer = _answer;
   }
-#elif
+#else
   answer = _answer;
 #endif
 
