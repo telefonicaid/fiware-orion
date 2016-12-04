@@ -1960,7 +1960,7 @@ static bool processOnChangeConditionForSubscription
   rawCerV.release();
 
 #if 0
-  // FIXME #920: disabled by the moment, maybe removed at the end
+  // FIXME #920: disabled for the moment, maybe to be removed in the end
   /* Append notification metadata */
   if (metadataFlags)
   {

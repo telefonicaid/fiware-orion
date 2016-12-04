@@ -372,13 +372,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;      
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -395,11 +395,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
@@ -437,15 +437,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;    
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    ContextAttribute ca4("A4", "TA4", "new_val");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    cerP->contextElement.contextAttributeVector.push_back(ca4P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -462,11 +462,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A4", "TA4", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
@@ -503,11 +503,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca2("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca2P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -524,11 +524,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
@@ -567,14 +567,14 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
     NotifyContextRequest expectedNcr1, expectedNcr2;
     expectedNcr1.originator.set("localhost");
     expectedNcr2.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr1.contextElementResponseVector.push_back(&cer);
-    expectedNcr2.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr1.contextElementResponseVector.push_back(cerP);
+    expectedNcr2.contextElementResponseVector.push_back(cerP);
     expectedNcr1.subscriptionId.set("51307b66f481db11bf860001");
     expectedNcr2.subscriptionId.set("51307b66f481db11bf860004");
 
@@ -595,11 +595,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
@@ -644,16 +644,16 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
     NotifyContextRequest expectedNcr1, expectedNcr2;
     expectedNcr1.originator.set("localhost");
     expectedNcr2.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    ContextAttribute ca4("A4", "TA4", "new_val");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
-    expectedNcr1.contextElementResponseVector.push_back(&cer);
-    expectedNcr2.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    cerP->contextElement.contextAttributeVector.push_back(ca4P);
+    expectedNcr1.contextElementResponseVector.push_back(cerP);
+    expectedNcr2.contextElementResponseVector.push_back(cerP);
     expectedNcr1.subscriptionId.set("51307b66f481db11bf860001");
     expectedNcr2.subscriptionId.set("51307b66f481db11bf860004");
 
@@ -674,11 +674,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A4", "TA4", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
@@ -723,12 +723,12 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
     NotifyContextRequest expectedNcr1, expectedNcr2;
     expectedNcr1.originator.set("localhost");
     expectedNcr2.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca2("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    expectedNcr1.contextElementResponseVector.push_back(&cer);
-    expectedNcr2.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca2P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    expectedNcr1.contextElementResponseVector.push_back(cerP);
+    expectedNcr2.contextElementResponseVector.push_back(cerP);
     expectedNcr1.subscriptionId.set("51307b66f481db11bf860001");
     expectedNcr2.subscriptionId.set("51307b66f481db11bf860004");
 
@@ -750,11 +750,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
@@ -797,13 +797,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1;
-    cer1.contextElement.entityId.fill("E1", "T", "false");
-    ContextAttribute ca11("A1", "TA1", "new_val");
-    ContextAttribute ca13("A3", "TA3", "W");
-    cer1.contextElement.contextAttributeVector.push_back(&ca11);
-    cer1.contextElement.contextAttributeVector.push_back(&ca13);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    cer1P->contextElement.entityId.fill("E1", "T", "false");
+    ContextAttribute* ca11P = new ContextAttribute("A1", "TA1", "new_val");
+    ContextAttribute* ca13P = new ContextAttribute("A3", "TA3", "W");
+    cer1P->contextElement.contextAttributeVector.push_back(ca11P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca13P);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -821,11 +821,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
@@ -865,15 +865,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1;
-    cer1.contextElement.entityId.fill("E1", "T", "false");
-    ContextAttribute ca11("A1", "TA1", "X");
-    ContextAttribute ca13("A3", "TA3", "W");
-    ContextAttribute ca14("A4", "TA4", "new_val");
-    cer1.contextElement.contextAttributeVector.push_back(&ca11);
-    cer1.contextElement.contextAttributeVector.push_back(&ca13);
-    cer1.contextElement.contextAttributeVector.push_back(&ca14);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    cer1P->contextElement.entityId.fill("E1", "T", "false");
+    ContextAttribute* ca11P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca13P = new ContextAttribute("A3", "TA3", "W");
+    ContextAttribute* ca14P = new ContextAttribute("A4", "TA4", "new_val");
+    cer1P->contextElement.contextAttributeVector.push_back(ca11P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca13P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca14P);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -890,11 +890,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T", "false");
-    ContextAttribute ca("A4", "TA4", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T", "false");
+    ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
@@ -933,11 +933,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1;
-    cer1.contextElement.entityId.fill("E1", "T", "false");
-    ContextAttribute ca12("A3", "TA3", "W");
-    cer1.contextElement.contextAttributeVector.push_back(&ca12);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    cer1P->contextElement.entityId.fill("E1", "T", "false");
+    ContextAttribute* ca12P = new ContextAttribute("A3", "TA3", "W");
+    cer1P->contextElement.contextAttributeVector.push_back(ca12P);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -954,11 +954,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T", "false");
-    ContextAttribute ca("A1", "TA1", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
@@ -997,13 +997,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1;
-    cer1.contextElement.entityId.fill("E3", "T3", "false");
-    ContextAttribute ca11("A1", "TA1", "new_val");
-    ContextAttribute ca13("A3", "TA3", "W");
-    cer1.contextElement.contextAttributeVector.push_back(&ca11);
-    cer1.contextElement.contextAttributeVector.push_back(&ca13);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    cer1P->contextElement.entityId.fill("E3", "T3", "false");
+    ContextAttribute* ca11P = new ContextAttribute("A1", "TA1", "new_val");
+    ContextAttribute* ca13P = new ContextAttribute("A3", "TA3", "W");
+    cer1P->contextElement.contextAttributeVector.push_back(ca11P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca13P);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860005");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -1020,11 +1020,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E3", "T3", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
@@ -1063,15 +1063,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1;
-    cer1.contextElement.entityId.fill("E3", "T3", "false");
-    ContextAttribute ca11("A1", "TA1", "X");
-    ContextAttribute ca13("A3", "TA3", "W");
-    ContextAttribute ca14("A4", "TA4", "new_val");
-    cer1.contextElement.contextAttributeVector.push_back(&ca11);
-    cer1.contextElement.contextAttributeVector.push_back(&ca13);
-    cer1.contextElement.contextAttributeVector.push_back(&ca14);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    cer1P->contextElement.entityId.fill("E3", "T3", "false");
+    ContextAttribute* ca11P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca13P = new ContextAttribute("A3", "TA3", "W");
+    ContextAttribute* ca14P = new ContextAttribute("A4", "TA4", "new_val");
+    cer1P->contextElement.contextAttributeVector.push_back(ca11P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca13P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca14P);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860005");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -1088,11 +1088,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
-    ContextAttribute ca("A4", "TA4", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E3", "T3", "false");
+    ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
@@ -1131,11 +1131,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1;
-    cer1.contextElement.entityId.fill("E3", "T3", "false");
-    ContextAttribute ca12("A3", "TA3", "W");
-    cer1.contextElement.contextAttributeVector.push_back(&ca12);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    cer1P->contextElement.entityId.fill("E3", "T3", "false");
+    ContextAttribute* ca12P = new ContextAttribute("A3", "TA3", "W");
+    cer1P->contextElement.contextAttributeVector.push_back(ca12P);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860005");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -1152,11 +1152,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
-    ContextAttribute ca("A1", "TA1", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E3", "T3", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
@@ -1195,13 +1195,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchDisjoint)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -1218,11 +1218,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchDisjoint)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A2", "TA2", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A2", "TA2", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
@@ -1261,13 +1261,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatchDisjoint)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -1284,11 +1284,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatchDisjoint)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A5", "TA5", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A5", "TA5", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
@@ -1327,13 +1327,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -1350,11 +1350,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A2", "TA2", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A2", "TA2", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
@@ -1401,11 +1401,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateNoMatch)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A3", "TA3", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A3", "TA3", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
@@ -1452,11 +1452,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendNoMatch)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A6", "TA6", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A6", "TA6", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
@@ -1502,11 +1502,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */    
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A3", "TA3", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A3", "TA3", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
@@ -1552,11 +1552,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchWithoutChang
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "X");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "X");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
@@ -1594,13 +1594,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val1");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val1");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -1617,13 +1617,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute caa1("A1", "TA1", "new_val1");   // match
-    ContextAttribute caa2("A7", "TA7", "new_val7");   // no match
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A1", "TA1", "new_val1");   // match
+    ContextAttribute* caa2P = new ContextAttribute("A7", "TA7", "new_val7");   // no match
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
@@ -1662,15 +1662,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMixMatchNoMatch)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;    
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    ContextAttribute ca4("A4", "TA4", "new_val4");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val4");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    cerP->contextElement.contextAttributeVector.push_back(ca4P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -1687,13 +1687,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMixMatchNoMatch)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */    
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute caa1("A4", "TA4", "new_val4");   // match
-    ContextAttribute caa2("A6", "TA6", "new_val6");   // no match
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A4", "TA4", "new_val4");   // match
+    ContextAttribute* caa2P = new ContextAttribute("A6", "TA6", "new_val6");   // no match
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
@@ -1732,11 +1732,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -1753,13 +1753,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute caa1("A3", "TA3", "");    // no match
-    ContextAttribute caa2("A2", "TA2", "");    // match
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A3", "TA3", "");    // no match
+    ContextAttribute* caa2P = new ContextAttribute("A2", "TA2", "");    // match
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
@@ -1799,13 +1799,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notifica
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val1");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val1");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -1822,13 +1822,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notifica
     setNotifier(notifierMock);  
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute caa1("A1", "TA1", "new_val1");
-    ContextAttribute caa2("A2", "TA2", "new_val2");
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A1", "TA1", "new_val1");
+    ContextAttribute* caa2P = new ContextAttribute("A2", "TA2", "new_val2");
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
@@ -1869,15 +1869,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notifica
     /* Prepare mock */
     NotifyContextRequest expectedNcr;   
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    ContextAttribute ca4("A4", "TA4", "new_val4");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val4");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    cerP->contextElement.contextAttributeVector.push_back(ca4P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -1894,13 +1894,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notifica
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */    
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute caa1("A4", "TA4", "new_val4");
-    ContextAttribute caa2("A5", "TA5", "new_val5");
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A4", "TA4", "new_val4");
+    ContextAttribute* caa2P = new ContextAttribute("A5", "TA5", "new_val5");
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
@@ -1940,11 +1940,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notifica
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(caP);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -1961,11 +1961,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notifica
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute caa1("A1", "TA1", "");
-    ce.contextAttributeVector.push_back(&caa1);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A1", "TA1", "");
+    ceP->contextAttributeVector.push_back(caa1P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
@@ -2004,13 +2004,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatch)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -2027,12 +2027,12 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatch)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */    
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
 
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
@@ -2071,15 +2071,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatch)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;    
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    ContextAttribute ca4("A4", "TA4", "new_val");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    cerP->contextElement.contextAttributeVector.push_back(ca4P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -2096,11 +2096,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatch)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A4", "TA4", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
@@ -2139,11 +2139,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca2("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca2P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -2160,11 +2160,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */    
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A1", "TA1", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
@@ -2203,13 +2203,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchDisjoint)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;    
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -2226,11 +2226,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchDisjoint)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A2", "TA2", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A2", "TA2", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
@@ -2270,13 +2270,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatchDisjoint)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;    
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -2293,11 +2293,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatchDisjoint)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A5", "TA5", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A5", "TA5", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
@@ -2336,13 +2336,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;    
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -2359,11 +2359,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A2", "TA2", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A2", "TA2", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
@@ -2410,11 +2410,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateNoMatch)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A3", "TA3", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A3", "TA3", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
@@ -2460,11 +2460,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendNoMatch)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A6", "TA6", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A6", "TA6", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
@@ -2510,11 +2510,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */    
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A3", "TA3", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A3", "TA3", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
@@ -2560,11 +2560,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchWithoutChang
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A1", "TA1", "X");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "X");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
@@ -2602,13 +2602,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMixMatchNoMatch)
     /* Prepare mock */
     NotifyContextRequest expectedNcr; 
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val1");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val1");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -2625,13 +2625,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMixMatchNoMatch)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */    
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute caa1("A1", "TA1", "new_val1");   // match
-    ContextAttribute caa2("A7", "TA7", "new_val7");   // no match
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A1", "TA1", "new_val1");   // match
+    ContextAttribute* caa2P = new ContextAttribute("A7", "TA7", "new_val7");   // no match
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
@@ -2670,15 +2670,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMixMatchNoMatch)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;   
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    ContextAttribute ca4("A4", "TA4", "new_val4");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val4");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    cerP->contextElement.contextAttributeVector.push_back(ca4P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -2695,13 +2695,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMixMatchNoMatch)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */    
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute caa1("A4", "TA4", "new_val4");   // match
-    ContextAttribute caa2("A6", "TA6", "new_val6");    // no match
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A4", "TA4", "new_val4");   // match
+    ContextAttribute* caa2P = new ContextAttribute("A6", "TA6", "new_val6");    // no match
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
@@ -2740,11 +2740,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -2761,13 +2761,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute caa1("A3", "TA3", "");   // no match
-    ContextAttribute caa2("A2", "TA2", "");   // match
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A3", "TA3", "");   // no match
+    ContextAttribute* caa2P = new ContextAttribute("A2", "TA2", "");   // match
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
@@ -2806,13 +2806,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notifica
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val1");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val1");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -2829,13 +2829,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notifica
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute caa1("A1", "TA1", "new_val1");
-    ContextAttribute caa2("A2", "TA2", "new_val2");
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A1", "TA1", "new_val1");
+    ContextAttribute* caa2P = new ContextAttribute("A2", "TA2", "new_val2");
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
@@ -2875,15 +2875,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notifica
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    ContextAttribute ca4("A4", "TA4", "new_val4");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val4");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    cerP->contextElement.contextAttributeVector.push_back(ca4P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -2900,13 +2900,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notifica
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */    
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute caa1("A4", "TA4", "new_val4");
-    ContextAttribute caa2("A5", "TA5", "new_val5");
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A4", "TA4", "new_val4");
+    ContextAttribute* caa2P = new ContextAttribute("A5", "TA5", "new_val5");
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
@@ -2946,11 +2946,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(caP);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -2967,11 +2967,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute caa1("A1", "TA1", "");
-    ce.contextAttributeVector.push_back(&caa1);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A1", "TA1", "");
+    ceP->contextAttributeVector.push_back(caa1P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
@@ -3032,11 +3032,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbQueryFail)
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */

@@ -62,29 +62,39 @@ int QueueNotifier::start()
 */
 void QueueNotifier::sendNotifyContextRequest
 (
-    NotifyContextRequest*            ncr,
-    const ngsiv2::HttpInfo&          httpInfo,
-    const std::string&               tenant,
-    const std::string&               xauthToken,
-    const std::string&               fiwareCorrelator,
-    RenderFormat                     renderFormat,
-    const std::vector<std::string>&  attrsOrder,
-    const std::vector<std::string>&  metadataFilter,
-    bool                             blacklist
+  NotifyContextRequest*            ncr,
+  const ngsiv2::HttpInfo&          httpInfo,
+  const std::string&               tenant,
+  const std::string&               xauthToken,
+  const std::string&               fiwareCorrelator,
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsOrder,
+  const std::vector<std::string>&  metadataFilter,
+  bool                             blacklist
 )
 {
-  std::vector<SenderThreadParams*> *paramsV = Notifier::buildSenderParams(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blacklist);
+  std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncr,
+                                                                          httpInfo,
+                                                                          tenant,
+                                                                          xauthToken,
+                                                                          fiwareCorrelator,
+                                                                          renderFormat,
+                                                                          attrsOrder,
+                                                                          metadataFilter,
+                                                                          blacklist);
 
-  for (unsigned ix = 0; ix < paramsV->size(); ix++) {
+  for (unsigned ix = 0; ix < paramsV->size(); ix++)
+  {
     clock_gettime(CLOCK_REALTIME, &(((*paramsV)[ix])->timeStamp));
   }
+
   bool enqueued = queue.try_push(paramsV);
   if (!enqueued)
   {
     QueueStatistics::incReject(paramsV->size());
-
     LM_E(("Runtime Error (notification queue is full)"));
-    for (unsigned ix = 0; ix < paramsV->size(); ix++) {
+    for (unsigned ix = 0; ix < paramsV->size(); ix++)
+    {
       delete (*paramsV)[ix];
     }
     delete paramsV;
@@ -93,5 +103,4 @@ void QueueNotifier::sendNotifyContextRequest
   }
 
   QueueStatistics::incIn(paramsV->size());
-
 }

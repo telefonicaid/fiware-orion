@@ -401,7 +401,7 @@ Date: REGEX(.*)
 05b. GET subscription to see 'mq' correctly rendered
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 352
+Content-Length: 392
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -416,6 +416,7 @@ Date: REGEX(.*)
             "url": "http://localhost:REGEX(\d+)/notify"
         },
         "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
         "timesSent": 1
     },
     "status": "active",

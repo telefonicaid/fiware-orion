@@ -451,12 +451,12 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
 
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -604,12 +604,12 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "", "new_val");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "", "new_val");
 
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -757,12 +757,12 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
 
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -936,12 +936,12 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "", "false");
-    ContextAttribute ca("A1", "", "new_val");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "", "new_val");
 
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -1116,15 +1116,16 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce1, ce2;
-    ce1.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val1");
-    ce2.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca2("A3", "TA3", "new_val3");
-    ce1.contextAttributeVector.push_back(&ca1);
-    ce2.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce1);
-    req.contextElementVector.push_back(&ce2);
+    ContextElement* ce1P = new ContextElement();
+    ContextElement* ce2P = new ContextElement();
+    ce1P->entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val1");
+    ce2P->entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca2P = new ContextAttribute("A3", "TA3", "new_val3");
+    ce1P->contextAttributeVector.push_back(ca1P);
+    ce2P->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ce1P);
+    req.contextElementVector.push_back(ce2P);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -1285,13 +1286,13 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val1");
-    ContextAttribute ca2("A2", "TA2", "new_val2");
-    ce.contextAttributeVector.push_back(&ca1);
-    ce.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val1");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val2");
+    ceP->contextAttributeVector.push_back(ca1P);
+    ceP->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -1444,19 +1445,20 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce1, ce2;
-    ce1.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val1");
-    ContextAttribute ca2("A2", "TA2", "new_val2");
-    ce2.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca3("A3", "TA3", "new_val3");
-    ContextAttribute ca4("A4", "TA4", "new_val4");
-    ce1.contextAttributeVector.push_back(&ca1);
-    ce1.contextAttributeVector.push_back(&ca2);
-    ce2.contextAttributeVector.push_back(&ca3);
-    ce2.contextAttributeVector.push_back(&ca4);
-    req.contextElementVector.push_back(&ce1);
-    req.contextElementVector.push_back(&ce2);
+    ContextElement* ce1P = new ContextElement();
+    ContextElement* ce2P = new ContextElement();
+    ce1P->entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val1");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val2");
+    ce2P->entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "new_val3");
+    ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val4");
+    ce1P->contextAttributeVector.push_back(ca1P);
+    ce1P->contextAttributeVector.push_back(ca2P);
+    ce2P->contextAttributeVector.push_back(ca3P);
+    ce2P->contextAttributeVector.push_back(ca4P);
+    req.contextElementVector.push_back(ce1P);
+    req.contextElementVector.push_back(ce2P);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -1625,11 +1627,11 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A8", "TA8", "val8");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A8", "TA8", "val8");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -1782,11 +1784,11 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A8", "", "val8");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A8", "", "val8");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -1939,11 +1941,11 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "", "false");
-    ContextAttribute ca("A8", "TA8", "val8");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "", "false");
+    ContextAttribute* caP = new ContextAttribute("A8", "TA8", "val8");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -2132,11 +2134,11 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "", "false");
-    ContextAttribute ca("A8", "", "val8");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "", "false");
+    ContextAttribute* caP = new ContextAttribute("A8", "", "val8");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -2325,15 +2327,16 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce1, ce2;
-    ce1.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A8", "TA8", "val8");
-    ce2.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca2("A9", "TA9", "val9");
-    ce1.contextAttributeVector.push_back(&ca1);
-    ce2.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce1);
-    req.contextElementVector.push_back(&ce2);
+    ContextElement* ce1P = new ContextElement();
+    ContextElement* ce2P = new ContextElement();
+    ce1P->entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A8", "TA8", "val8");
+    ce2P->entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca2P = new ContextAttribute("A9", "TA9", "val9");
+    ce1P->contextAttributeVector.push_back(ca1P);
+    ce2P->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ce1P);
+    req.contextElementVector.push_back(ce2P);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -2504,13 +2507,13 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A8", "TA8", "val8");
-    ContextAttribute ca2("A9", "TA9", "val9");
-    ce.contextAttributeVector.push_back(&ca1);
-    ce.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A8", "TA8", "val8");
+    ContextAttribute* ca2P = new ContextAttribute("A9", "TA9", "val9");
+    ceP->contextAttributeVector.push_back(ca1P);
+    ceP->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -2672,19 +2675,20 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce1, ce2;
-    ce1.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A8", "TA8", "val8");
-    ContextAttribute ca2("A9", "TA9", "val9");
-    ce2.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca3("A10", "TA10", "val10");
-    ContextAttribute ca4("A11", "TA11", "val11");
-    ce1.contextAttributeVector.push_back(&ca1);
-    ce1.contextAttributeVector.push_back(&ca2);
-    ce2.contextAttributeVector.push_back(&ca3);
-    ce2.contextAttributeVector.push_back(&ca4);
-    req.contextElementVector.push_back(&ce1);
-    req.contextElementVector.push_back(&ce2);
+    ContextElement* ce1P = new ContextElement();
+    ContextElement* ce2P = new ContextElement();
+    ce1P->entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A8", "TA8", "val8");
+    ContextAttribute* ca2P = new ContextAttribute("A9", "TA9", "val9");
+    ce2P->entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca3P = new ContextAttribute("A10", "TA10", "val10");
+    ContextAttribute* ca4P = new ContextAttribute("A11", "TA11", "val11");
+    ce1P->contextAttributeVector.push_back(ca1P);
+    ce1P->contextAttributeVector.push_back(ca2P);
+    ce2P->contextAttributeVector.push_back(ca3P);
+    ce2P->contextAttributeVector.push_back(ca4P);
+    req.contextElementVector.push_back(ce1P);
+    req.contextElementVector.push_back(ce2P);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -2874,9 +2878,9 @@ TEST(mongoUpdateContextRequest, delete1Ent0Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
@@ -3000,11 +3004,11 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A2", "TA2", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A2", "TA2", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
@@ -3146,11 +3150,11 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A2", "", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A2", "", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
@@ -3293,9 +3297,9 @@ TEST(mongoUpdateContextRequest, delete1EntNoType0Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "", "false");
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "", "false");
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
@@ -3404,11 +3408,11 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "", "false");
-    ContextAttribute ca("A2", "TA2", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "", "false");
+    ContextAttribute* caP = new ContextAttribute("A2", "TA2", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
@@ -3572,11 +3576,11 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "", "false");
-    ContextAttribute ca("A2", "", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "", "false");
+    ContextAttribute* caP = new ContextAttribute("A2", "", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
@@ -3740,15 +3744,16 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce1, ce2;
-    ce1.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A2", "TA2", "");
-    ce2.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca2("A4", "TA4", "");
-    ce1.contextAttributeVector.push_back(&ca1);
-    ce2.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce1);
-    req.contextElementVector.push_back(&ce2);
+    ContextElement* ce1P = new ContextElement();
+    ContextElement* ce2P = new ContextElement();
+    ce1P->entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A2", "TA2", "");
+    ce2P->entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca2P = new ContextAttribute("A4", "TA4", "");
+    ce1P->contextAttributeVector.push_back(ca1P);
+    ce2P->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ce1P);
+    req.contextElementVector.push_back(ce2P);
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
@@ -3898,13 +3903,13 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "");
-    ContextAttribute ca2("A2", "TA2", "");
-    ce.contextAttributeVector.push_back(&ca1);
-    ce.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "");
+    ceP->contextAttributeVector.push_back(ca1P);
+    ceP->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
@@ -4046,19 +4051,20 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce1, ce2;
-    ce1.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "");
-    ContextAttribute ca2("A2", "TA2", "");
-    ce2.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca3("A3", "TA3", "");
-    ContextAttribute ca4("A4", "TA4", "");
-    ce1.contextAttributeVector.push_back(&ca1);
-    ce1.contextAttributeVector.push_back(&ca2);
-    ce2.contextAttributeVector.push_back(&ca3);
-    ce2.contextAttributeVector.push_back(&ca4);
-    req.contextElementVector.push_back(&ce1);
-    req.contextElementVector.push_back(&ce2);
+    ContextElement* ce1P = new ContextElement();
+    ContextElement* ce2P = new ContextElement();
+    ce1P->entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "");
+    ce2P->entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "");
+    ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "");
+    ce1P->contextAttributeVector.push_back(ca1P);
+    ce1P->contextAttributeVector.push_back(ca2P);
+    ce2P->contextAttributeVector.push_back(ca3P);
+    ce2P->contextAttributeVector.push_back(ca4P);
+    req.contextElementVector.push_back(ce1P);
+    req.contextElementVector.push_back(ce2P);
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
@@ -4208,11 +4214,11 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E4", "T4", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E4", "T4", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -4366,11 +4372,11 @@ TEST(mongoUpdateContextRequest, createEntity)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E4", "T4", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E4", "T4", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -4534,13 +4540,13 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E4", "T4", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E4", "T4", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
     Metadata md("ID", "string", "ID1");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    caP->metadataVector.push_back(&md);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -4707,15 +4713,15 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E4", "T4", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E4", "T4", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
     Metadata md("ID", "string", "ID1");
-    ca1.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca1);
-    ContextAttribute ca2("A1", "TA1", "new_val2");
-    ce.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce);
+    ca1P->metadataVector.push_back(&md);
+    ceP->contextAttributeVector.push_back(ca1P);
+    ContextAttribute* ca2P = new ContextAttribute("A1", "TA1", "new_val2");
+    ceP->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -4870,15 +4876,15 @@ TEST(mongoUpdateContextRequest, createEntityMd)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E4", "T4", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E4", "T4", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
     Metadata md1("MD1", "TMD1", "MD1val");
     Metadata md2("MD2", "TMD2", "MD2val");
-    ca.metadataVector.push_back(&md1);
-    ca.metadataVector.push_back(&md2);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    caP->metadataVector.push_back(&md1);
+    caP->metadataVector.push_back(&md2);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -5061,11 +5067,11 @@ TEST(mongoUpdateContextRequest, updateEmptyValueOk)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -5213,11 +5219,11 @@ TEST(mongoUpdateContextRequest, appendEmptyValueOk)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A8", "TA8", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A8", "TA8", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -5371,11 +5377,11 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A8", "TA8", "new_val8");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A8", "TA8", "new_val8");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -5528,11 +5534,11 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A8", "TA8", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A8", "TA8", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
@@ -5680,15 +5686,16 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce1, ce2;
-    ce1.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val1");
-    ce2.entityId.fill("E5", "T5", "false");
-    ContextAttribute ca2("A3", "TA3", "new_val13");
-    ce1.contextAttributeVector.push_back(&ca1);
-    ce2.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce1);
-    req.contextElementVector.push_back(&ce2);
+    ContextElement* ce1P = new ContextElement();
+    ContextElement* ce2P = new ContextElement();
+    ce1P->entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val1");
+    ce2P->entityId.fill("E5", "T5", "false");
+    ContextAttribute* ca2P = new ContextAttribute("A3", "TA3", "new_val13");
+    ce1P->contextAttributeVector.push_back(ca1P);
+    ce2P->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ce1P);
+    req.contextElementVector.push_back(ce2P);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -5865,11 +5872,11 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -6017,13 +6024,13 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     prepareDatabaseWithAttributeIds();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E10", "T10", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E10", "T10", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
     Metadata md("ID", "string", "ID1");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    caP->metadataVector.push_back(&md);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -6197,15 +6204,15 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     prepareDatabaseWithAttributeIds();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E10", "T10", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E10", "T10", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
     Metadata md("ID", "string", "ID1");
-    ca1.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca1);
-    ContextAttribute ca2("A2", "TA2", "new_val2");
-    ce.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce);
+    ca1P->metadataVector.push_back(&md);
+    ceP->contextAttributeVector.push_back(ca1P);
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val2");
+    ceP->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -6383,13 +6390,13 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     prepareDatabaseWithAttributeIds();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E10", "T10", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E10", "T10", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
     Metadata md("ID", "string", "ID3");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    caP->metadataVector.push_back(&md);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -6567,15 +6574,15 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     prepareDatabaseWithAttributeIds();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E10", "T10", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E10", "T10", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
     Metadata md("ID", "string", "ID3");
-    ca1.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca1);
-    ContextAttribute ca2("A3", "TA3", "new_val3");
-    ce.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce);
+    ca1P->metadataVector.push_back(&md);
+    ceP->contextAttributeVector.push_back(ca1P);
+    ContextAttribute* ca2P = new ContextAttribute("A3", "TA3", "new_val3");
+    ceP->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -6762,13 +6769,13 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     prepareDatabaseWithAttributeIds();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E10", "T10", "false");
-    ContextAttribute ca("A2", "TA2", "new_val");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E10", "T10", "false");
+    ContextAttribute* caP = new ContextAttribute("A2", "TA2", "new_val");
     Metadata md("ID", "string", "IDX");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    caP->metadataVector.push_back(&md);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -6942,11 +6949,11 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     prepareDatabaseWithAttributeIds();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E10", "T10", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E10", "T10", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -7117,13 +7124,13 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     prepareDatabaseWithAttributeIds();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E10", "T10", "false");
-    ContextAttribute ca("A1", "TA1", "");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E10", "T10", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
     Metadata md("ID", "string", "ID1");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    caP->metadataVector.push_back(&md);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
@@ -7292,15 +7299,15 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     prepareDatabaseWithAttributeIds();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E10", "T10", "false");
-    ContextAttribute ca1("A1", "TA1", "");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E10", "T10", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "");
     Metadata md("ID", "string", "ID1");
-    ca1.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca1);
-    ContextAttribute ca2("A2", "TA2", "");
-    ce.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce);
+    ca1P->metadataVector.push_back(&md);
+    ceP->contextAttributeVector.push_back(ca1P);
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "");
+    ceP->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
@@ -7469,15 +7476,15 @@ TEST(mongoUpdateContextRequest, appendCreateEntWithMd)
     setupDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "val1");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "val1");
     Metadata md1("MD1", "TMD1", "MD1val");
     Metadata md2("MD2", "TMD2", "MD2val");
-    ca.metadataVector.push_back(&md1);
-    ca.metadataVector.push_back(&md2);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    caP->metadataVector.push_back(&md1);
+    caP->metadataVector.push_back(&md2);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -7570,13 +7577,13 @@ TEST(mongoUpdateContextRequest, appendMdAllExisting)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "val1");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "val1");
     Metadata md("MD1", "TMD1", "new_val");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    caP->metadataVector.push_back(&md);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -7665,13 +7672,13 @@ TEST(mongoUpdateContextRequest, updateMdAllExisting)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "val1");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "val1");
     Metadata md("MD1", "TMD1", "new_val");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    caP->metadataVector.push_back(&md);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -7760,13 +7767,13 @@ TEST(mongoUpdateContextRequest, appendMdAllNew)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "val1");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "val1");
     Metadata md("MD3", "TMD3", "new_val3");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    caP->metadataVector.push_back(&md);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -7859,13 +7866,13 @@ TEST(mongoUpdateContextRequest, updateMdAllNew)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "val1");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "val1");
     Metadata md("MD3", "TMD3", "new_val3");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    caP->metadataVector.push_back(&md);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -7958,15 +7965,15 @@ TEST(mongoUpdateContextRequest, appendMdSomeNew)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "val1");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "val1");
     Metadata md1("MD2", "TMD2", "new_val2");
     Metadata md2("MD3", "TMD3", "new_val3");
-    ca.metadataVector.push_back(&md1);
-    ca.metadataVector.push_back(&md2);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    caP->metadataVector.push_back(&md1);
+    caP->metadataVector.push_back(&md2);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -8062,15 +8069,15 @@ TEST(mongoUpdateContextRequest, updateMdSomeNew)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "val1");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "val1");
     Metadata md1("MD2", "TMD2", "new_val2");
     Metadata md2("MD3", "TMD3", "new_val3");
-    ca.metadataVector.push_back(&md1);
-    ca.metadataVector.push_back(&md2);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    caP->metadataVector.push_back(&md1);
+    caP->metadataVector.push_back(&md2);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -8166,13 +8173,13 @@ TEST(mongoUpdateContextRequest, appendValueAndMd)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "attr_new_val");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "attr_new_val");
     Metadata md("MD1", "TMD1", "new_val");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    caP->metadataVector.push_back(&md);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -8261,13 +8268,13 @@ TEST(mongoUpdateContextRequest, updateValueAndMd)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "attr_new_val");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "attr_new_val");
     Metadata md("MD1", "TMD1", "new_val");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    caP->metadataVector.push_back(&md);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -8357,13 +8364,13 @@ TEST(mongoUpdateContextRequest, appendMdNoActualChanges)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "val1");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "val1");
     Metadata md("MD1", "TMD1", "MD1val");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    caP->metadataVector.push_back(&md);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -8452,13 +8459,13 @@ TEST(mongoUpdateContextRequest, updateMdNoActualChanges)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "val1");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "val1");
     Metadata md("MD1", "TMD1", "MD1val");
-    ca.metadataVector.push_back(&md);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    caP->metadataVector.push_back(&md);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -8547,16 +8554,17 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce1, ce2;
-    ce1.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val1");
-    ce2.entityId.fill("E[2-3]", "T", "true");
-    ContextAttribute ca2("AX", "TAX", "X");
+    ContextElement* ce1P = new ContextElement();
+    ContextElement* ce2P = new ContextElement();
+    ce1P->entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val1");
+    ce2P->entityId.fill("E[2-3]", "T", "true");
+    ContextAttribute* ca2P = new ContextAttribute("AX", "TAX", "X");
 
-    ce1.contextAttributeVector.push_back(&ca1);
-    ce2.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce1);
-    req.contextElementVector.push_back(&ce2);
+    ce1P->contextAttributeVector.push_back(ca1P);
+    ce2P->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ce1P);
+    req.contextElementVector.push_back(ce2P);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -8714,12 +8722,12 @@ TEST(mongoUpdateContextRequest, notExistFilter)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
 
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Set filter */
@@ -8871,18 +8879,18 @@ TEST(mongoUpdateContextRequest, createNativeTypes)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E4", "T4", "false");
-    ContextAttribute ca1("A1", "T", "myVal");
-    ContextAttribute ca2("A2", "T", 42.5);
-    ContextAttribute ca3("A3", "T", false);
-    ContextAttribute ca4("A4", "T", "");
-    ca4.valueType = orion::ValueTypeNone;
-    ce.contextAttributeVector.push_back(&ca1);
-    ce.contextAttributeVector.push_back(&ca2);
-    ce.contextAttributeVector.push_back(&ca3);
-    ce.contextAttributeVector.push_back(&ca4);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E4", "T4", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "T", "myVal");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "T", 42.5);
+    ContextAttribute* ca3P = new ContextAttribute("A3", "T", false);
+    ContextAttribute* ca4P = new ContextAttribute("A4", "T", "");
+    ca4P->valueType = orion::ValueTypeNone;
+    ceP->contextAttributeVector.push_back(ca1P);
+    ceP->contextAttributeVector.push_back(ca2P);
+    ceP->contextAttributeVector.push_back(ca3P);
+    ceP->contextAttributeVector.push_back(ca4P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -9077,20 +9085,20 @@ TEST(mongoUpdateContextRequest, updateNativeTypes)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce1;
-    ce1.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "T", 42.5);
-    ContextAttribute ca2("A2", "T", false);
-    ce1.contextAttributeVector.push_back(&ca1);
-    ce1.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce1);
+    ContextElement* ce1P = new ContextElement();
+    ce1P->entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "T", 42.5);
+    ContextAttribute* ca2P = new ContextAttribute("A2", "T", false);
+    ce1P->contextAttributeVector.push_back(ca1P);
+    ce1P->contextAttributeVector.push_back(ca2P);
+    req.contextElementVector.push_back(ce1P);
 
-    ContextElement ce2;
-    ce2.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca3("A3", "T", "");
-    ca3.valueType = orion::ValueTypeNone;
-    ce2.contextAttributeVector.push_back(&ca3);
-    req.contextElementVector.push_back(&ce2);
+    ContextElement* ce2P = new ContextElement();
+    ce2P->entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "T", "");
+    ca3P->valueType = orion::ValueTypeNone;
+    ce2P->contextAttributeVector.push_back(ca3P);
+    req.contextElementVector.push_back(ce2P);
 
     req.updateActionType.set("UPDATE");
 
@@ -9260,11 +9268,11 @@ TEST(mongoUpdateContextRequest, preservingNativeTypes)
     prepareDatabaseDifferentNativeTypes();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "T", "new_s");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "T", "new_s");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -9361,20 +9369,20 @@ TEST(mongoUpdateContextRequest, createMdNativeTypes)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E4", "T4", "false");
-    ContextAttribute ca("A1", "T", "new_val");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E4", "T4", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "T", "new_val");
     Metadata md1("MD1", "T", "s");
     Metadata md2("MD2", "T", 55.5);
     Metadata md3("MD3", "T", false);
     Metadata md4("MD4", "T", "");
     md4.valueType = orion::ValueTypeNone;
-    ca.metadataVector.push_back(&md1);
-    ca.metadataVector.push_back(&md2);
-    ca.metadataVector.push_back(&md3);
-    ca.metadataVector.push_back(&md4);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    caP->metadataVector.push_back(&md1);
+    caP->metadataVector.push_back(&md2);
+    caP->metadataVector.push_back(&md3);
+    caP->metadataVector.push_back(&md4);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
@@ -9574,17 +9582,17 @@ TEST(mongoUpdateContextRequest, updateMdNativeTypes)
     prepareDatabaseDifferentMdNativeTypes();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "T", "new_val");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "T", "new_val");
     Metadata md1("MD1", "T", "ss");
     Metadata md2("MD2", "T", 44.4);
     Metadata md3("MD3", "T", true);
-    ca.metadataVector.push_back(&md1);
-    ca.metadataVector.push_back(&md2);
-    ca.metadataVector.push_back(&md3);    
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    caP->metadataVector.push_back(&md1);
+    caP->metadataVector.push_back(&md2);
+    caP->metadataVector.push_back(&md3);    
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -9690,11 +9698,11 @@ TEST(mongoUpdateContextRequest, preservingMdNativeTypes)
     prepareDatabaseDifferentMdNativeTypes();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "T", "new_s");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "T", "new_s");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -9786,17 +9794,18 @@ TEST(mongoUpdateContextRequest, replace)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce1, ce2;
-    ce1.entityId.fill("E1", "T1", "false");
-    ce2.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("B1", "T", "1");
-    ContextAttribute ca2("B2", "T", "2");
-    ContextAttribute ca3("B3", "T", "3");
-    ce1.contextAttributeVector.push_back(&ca1);
-    ce1.contextAttributeVector.push_back(&ca2);
-    ce2.contextAttributeVector.push_back(&ca3);
-    req.contextElementVector.push_back(&ce1);
-    req.contextElementVector.push_back(&ce2);
+    ContextElement* ce1P = new ContextElement();
+    ContextElement* ce2P = new ContextElement();
+    ce1P->entityId.fill("E1", "T1", "false");
+    ce2P->entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("B1", "T", "1");
+    ContextAttribute* ca2P = new ContextAttribute("B2", "T", "2");
+    ContextAttribute* ca3P = new ContextAttribute("B3", "T", "3");
+    ce1P->contextAttributeVector.push_back(ca1P);
+    ce1P->contextAttributeVector.push_back(ca2P);
+    ce2P->contextAttributeVector.push_back(ca3P);
+    req.contextElementVector.push_back(ce1P);
+    req.contextElementVector.push_back(ce2P);
     req.updateActionType.set("REPLACE");
 
     /* Invoke the function in mongoBackend library */
@@ -9956,11 +9965,11 @@ TEST(mongoUpdateContextRequest, tooManyEntitiesNGSIv2)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E1", "", "false");
-  ContextAttribute ca("A1", "TA1", "new_val1");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("E1", "", "false");
+  ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val1");
+  ceP->contextAttributeVector.push_back(caP);
+  req.contextElementVector.push_back(ceP);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library (note the 2 to activate NGSIv2 special behaviours) */
@@ -10106,11 +10115,11 @@ TEST(mongoUpdateContextRequest, onlyOneEntityNGSIv2)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E1", "T1", "false");
-  ContextAttribute ca("A1", "TA1", "new_val1");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("E1", "T1", "false");
+  ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val1");
+  ceP->contextAttributeVector.push_back(caP);
+  req.contextElementVector.push_back(ceP);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library (note the 2 to activate NGSIv2 special behaviours) */
@@ -10307,11 +10316,11 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -10375,11 +10384,11 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
@@ -10431,11 +10440,11 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_3levels)
   prepareDatabaseWithServicePaths();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement         ce;
-  ce.entityId.fill("E1", "T1", "false");
-  ContextAttribute ca("A1", "TA1", "kz01-modified");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("E1", "T1", "false");
+  ContextAttribute* caP = new ContextAttribute("A1", "TA1", "kz01-modified");
+  ceP->contextAttributeVector.push_back(caP);
+  req.contextElementVector.push_back(ceP);
   req.updateActionType.set("UPDATE");
   servicePathVector.clear();
   servicePathVector.push_back("/home/kz/01");
@@ -10523,11 +10532,11 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_3levels)
   prepareDatabaseWithServicePaths();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement         ce;
-  ce.entityId.fill("E1", "T1", "false");
-  ContextAttribute ca("A2", "TA2", "new");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("E1", "T1", "false");
+  ContextAttribute* caP = new ContextAttribute("A2", "TA2", "new");
+  ceP->contextAttributeVector.push_back(caP);
+  req.contextElementVector.push_back(ceP);
   req.updateActionType.set("APPEND");
   servicePathVector.clear();
   servicePathVector.push_back("/home/kz/01");
@@ -10621,11 +10630,11 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_2levels)
     prepareDatabaseWithServicePaths();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement         ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "fg");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "fg");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
     servicePathVector.clear();
     servicePathVector.push_back("/home/fg");
@@ -10729,11 +10738,11 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_3levels)
     prepareDatabaseWithServicePaths();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement         ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "fg");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "fg");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
     servicePathVector.clear();
     servicePathVector.push_back("/home/fg/01");
@@ -10837,9 +10846,9 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion_3levels)
     prepareDatabaseWithServicePaths();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement         ce;
-    ce.entityId.fill("E1", "T1", "false");
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
     servicePathVector.clear();
     servicePathVector.push_back("/home/kz/01");
@@ -10909,11 +10918,11 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E1", "T1", "false");
-  ContextAttribute  ca("A1", "TA1", "kz01");
-  ce.contextAttributeVector.push_back(&ca);
-  ucReq.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("E1", "T1", "false");
+  ContextAttribute* caP = new ContextAttribute("A1", "TA1", "kz01");
+  ceP->contextAttributeVector.push_back(caP);
+  ucReq.contextElementVector.push_back(ceP);
   ucReq.updateActionType.set("APPEND");
   servicePathVector.clear();
   servicePathVector.push_back("/home/kz");

@@ -167,9 +167,9 @@ extern void setLastFailure(long long lastFailure, BSONObjBuilder* b);
 
 /* ****************************************************************************
 *
-* setTimesFailed -
+* setLastSuccess -
 */
-extern void setTimesFailed(long long timesFailed, BSONObjBuilder* b);
+extern void setLastSuccess(long long lastSuccess, BSONObjBuilder* b);
 
 
 

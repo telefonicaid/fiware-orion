@@ -56,15 +56,19 @@ int QueueWorkers::start()
 {
   for (int i = 0; i < numberOfThreads; ++i)
   {
-    pthread_t tid;
-    int rc = pthread_create(&tid, NULL, workerFunc, pQueue);
+    pthread_t  tid;
+    int        rc = pthread_create(&tid, NULL, workerFunc, pQueue);
+
     if (rc != 0)
     {
       return rc;
     }
   }
+
   return 0;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -73,7 +77,7 @@ int QueueWorkers::start()
 static void* workerFunc(void* pSyncQ)
 {
   SyncQOverflow<std::vector<SenderThreadParams*>*>*  queue = (SyncQOverflow<std::vector<SenderThreadParams*>*> *) pSyncQ;
-  CURL*                                curl;
+  CURL*                                              curl;
 
   // Initialize curl context
   curl = curl_easy_init();
@@ -88,7 +92,8 @@ static void* workerFunc(void* pSyncQ)
   {
     std::vector<SenderThreadParams*>* paramsV = queue->pop();
 
-    for (unsigned ix = 0; ix < paramsV->size(); ix++) {
+    for (unsigned ix = 0; ix < paramsV->size(); ix++)
+    {
       struct timespec     now;
       struct timespec     howlong;
       size_t              estimatedQSize;
@@ -154,12 +159,21 @@ static void* workerFunc(void* pSyncQ)
           statisticsUpdate(NotifyContextSent, params->mimeType);
           QueueStatistics::incSentOK();
           alarmMgr.notificationErrorReset(url);
+
+          if (params->registration == false)
+          {
+            subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0);
+          }
         }
         else
         {
           QueueStatistics::incSentError();
           alarmMgr.notificationError(url, "notification failure for queue worker");
-          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 1);
+
+          if (params->registration == false)
+          {
+            subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 1);
+          }
         }
       }
 

@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
+
 #include "alarmMgr/alarmMgr.h"
 #include "rest/OrionError.h"
 #include "apiTypesV2/BatchUpdate.h"

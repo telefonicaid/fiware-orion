@@ -1,0 +1,243 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity type wrongly interpreted as pattern in NGSIv1
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E1, type JuridicaParams
+# 02. Create entity E2, type Juridica
+# 03. Create entity E3, type JuridicaParams
+# 04. Create entity E4, type Juridica
+# 05. Create entity E5, type JuridicaParams
+# 06. Create entity E6, type XXX
+# 07. GET entities of type Juridica - see 2 results
+#
+
+echo "01. Create entity E1, type JuridicaParams"
+echo "========================================="
+payload='{
+  "id": "E1",
+  "type": "JuridicaParams",
+  "A1": 1
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E2, type Juridica"
+echo "==================================="
+payload='{
+  "id": "E2",
+  "type": "Juridica",
+  "A1": 1
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity E3, type JuridicaParams"
+echo "========================================="
+payload='{
+  "id": "E3",
+  "type": "JuridicaParams",
+  "A1": 1
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "04. Create entity E4, type Juridica"
+echo "==================================="
+payload='{
+  "id": "E4",
+  "type": "Juridica",
+  "A1": 1
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "05. Create entity E5, type JuridicaParams"
+echo "========================================="
+payload='{
+  "id": "E5",
+  "type": "JuridicaParams",
+  "A1": 1
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "06. Create entity E6, type XXX"
+echo "=============================="
+payload='{
+  "id": "E6",
+  "type": "XXX",
+  "A1": 1
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "07. GET entities of type Juridica - see 2 results"
+echo "================================================="
+payload='{
+  "entities": [
+    {
+      "isPattern": "true",
+      "id": ".*",
+      "type" : "Juridica"
+    }
+  ]
+}'
+orionCurl --url '/v1/queryContext' --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1, type JuridicaParams
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=JuridicaParams
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity E2, type Juridica
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=Juridica
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create entity E3, type JuridicaParams
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=JuridicaParams
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create entity E4, type Juridica
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=Juridica
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create entity E5, type JuridicaParams
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E5?type=JuridicaParams
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Create entity E6, type XXX
+==============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E6?type=XXX
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. GET entities of type Juridica - see 2 results
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 744
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "Number",
+                        "value": 1
+                    }
+                ],
+                "id": "E2",
+                "isPattern": "false",
+                "type": "Juridica"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "Number",
+                        "value": 1
+                    }
+                ],
+                "id": "E4",
+                "isPattern": "false",
+                "type": "Juridica"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

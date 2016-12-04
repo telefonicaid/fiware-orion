@@ -144,6 +144,7 @@ void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr) const
 */
 ContextAttribute::~ContextAttribute()
 {
+  release();
 }
 
 
@@ -1110,6 +1111,7 @@ void ContextAttribute::release(void)
   }
 
   metadataVector.release();
+
   if (previousValue != NULL)
   {
     previousValue->release();
