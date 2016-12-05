@@ -79,6 +79,7 @@ __thread char                    clientIp[IP_LENGTH_MAX + 1];
 static unsigned int              connMemory;
 static unsigned int              maxConns;
 static unsigned int              threadPoolSize;
+bool                             metrics;
 
 
 
@@ -1591,6 +1592,7 @@ void restInit
   const std::string&  _rushHost,
   unsigned short      _rushPort,
   const char*         _allowedOrigin,
+  bool                _metrics,
   const char*         _httpsKey,
   const char*         _httpsCertificate,
   RestServeFunction   _serveFunction
@@ -1609,6 +1611,7 @@ void restInit
   threadPoolSize   = _mhdThreadPoolSize;
   rushHost         = _rushHost;
   rushPort         = _rushPort;
+  metrics          = _metrics;
 
   strncpy(restAllowedOrigin, _allowedOrigin, sizeof(restAllowedOrigin));
 

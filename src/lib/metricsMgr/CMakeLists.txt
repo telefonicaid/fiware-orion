@@ -22,10 +22,12 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
     MetricsManager.cpp
+    metricsMgr.cpp
 )
 
 SET (HEADERS
     MetricsManager.h
+    metricsMgr.h
 )
 
 

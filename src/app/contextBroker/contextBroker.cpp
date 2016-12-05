@@ -200,6 +200,8 @@
 #include "serviceRoutinesV2/postBatchUpdate.h"
 #include "serviceRoutinesV2/logLevelTreat.h"
 #include "serviceRoutinesV2/semStateTreat.h"
+#include "serviceRoutinesV2/getMetrics.h"
+#include "serviceRoutinesV2/deleteMetrics.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
@@ -272,6 +274,7 @@ bool            relogAlarms;
 bool            strictIdv1;
 bool            disableCusNotif;
 bool            logForHumans;
+bool            metricsOn;
 
 
 
@@ -326,6 +329,7 @@ bool            logForHumans;
 #define DISABLE_CUSTOM_NOTIF   "disable NGSIv2 custom notifications"
 #define LOG_TO_SCREEN_DESC     "log to screen"
 #define LOG_FOR_HUMANS_DESC    "human readible log to screen"
+#define METRICS_DESC           "turn of the 'metrics' feature - to gain efficiency"
 
 
 
@@ -391,6 +395,7 @@ PaArgument paArgs[] =
   { "-disableCustomNotifications",  &disableCusNotif, "DISABLE_CUSTOM_NOTIF",  PaBool, PaOpt, false, false, true, DISABLE_CUSTOM_NOTIF  },
 
   { "-logForHumans",  &logForHumans,    "LOG_FOR_HUMANS",     PaBool, PaOpt, false, false, true,             LOG_FOR_HUMANS_DESC },
+  { "-metrics",       &metricsOn,       "METRICS",            PaBool, PaOpt, true,  false, true,             METRICS_DESC        },
 
   PA_END_OF_ARGS
 };
@@ -720,11 +725,20 @@ static const char* validLogLevels[] =
 #define LOGLEVEL_COMPS_V2  2, { "admin", "log"                           }
 
 
+
 //
 // Semaphore state
 //
 #define SEM_STATE          SemStateRequest
 #define SEM_STATE_COMPS    2, { "admin", "sem"                         }
+
+
+
+//
+// Metrics
+//
+#define METRICS            MetricsRequest
+#define METRICS_COMPS      2, { "admin", "metrics"                       }
 
 
 //
@@ -1131,6 +1145,11 @@ static const char* validLogLevels[] =
   { "GET",   SEM_STATE, SEM_STATE_COMPS,   "", semStateTreat                      }, \
   { "*",     SEM_STATE, SEM_STATE_COMPS,   "", badVerbGetOnly                     }
 
+#define METRICS_REQUESTS                                                             \
+  { "GET",    METRICS, METRICS_COMPS,   "", getMetrics                            }, \
+  { "DELETE", METRICS, METRICS_COMPS,   "", deleteMetrics                         }, \
+  { "*",      METRICS, METRICS_COMPS,   "", badVerbGetDeleteOnly                  }
+
 
 
 /* ****************************************************************************
@@ -1169,6 +1188,7 @@ RestService restServiceV[] =
   VERSION_REQUESTS,
   LOGLEVEL_REQUESTS_V2,
   SEM_STATE_REQUESTS,
+  METRICS_REQUESTS,
 
 #ifdef DEBUG
   EXIT_REQUESTS,
@@ -1759,14 +1779,14 @@ int main(int argC, char* argV[])
     LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
 
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin, httpsPrivateServerKey, httpsCertificate);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin, metricsOn, httpsPrivateServerKey, httpsCertificate);
 
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
   else
   {
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin, metricsOn);
   }
 
   LM_I(("Startup completed"));

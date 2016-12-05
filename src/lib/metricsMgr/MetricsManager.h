@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_METRICSMGR_METRICMANAGER_H_
-#define SRC_LIB_METRICSMGR_METRICMANAGER_H_
+#ifndef SRC_LIB_METRICSMGR_METRICSMANAGER_H_
+#define SRC_LIB_METRICSMGR_METRICSMANAGER_H_
 
 /*
 *
@@ -41,28 +41,27 @@
 *    initial map created at constructor time)
 * 3. Destroy method, releasing all the maps in cascade (probably never used, as the
 *    singleton object in CB using this class will be destroyed at the end, but do it
-*    for class compleness)
+*    for class completeness)
 * 4. reset() method implementation (not delete maps, only set metrics to 0)
-* 5. toJson() to be splitted into 3 methods (2 of them private)
+* 5. toJson() to be split into 3 methods (2 of them private)
 * 6. Multi-thread safeness. Probably the same sem-based strategy used in AlarmManager
 *    could be used.
 * 7. Use 'long long' instead of 'int'
 * 8. (Usure) We could need maps for metrics different for int. In that case, implement
-*    it (and the accum method) using templates, to avoid repeat the same implementation
+*    it (and the accumulate method) using templates, to avoid repeating the same implementation
 *    N times
 */
 class MetricsManager
 {
  private:
-  std::map<std::string, std::map<std::string, std::map<std::string, int>*>* >  metrics;
+  std::map<std::string, std::map<std::string, std::map<std::string, int>*>*>  metrics;
 
  public:
   MetricsManager();
 
-  void accum(const std::string& srv, const std::string& subServ, const std::string& metric, int value);
-  void reset(void);
+  void        accumulate(const std::string& srv, const std::string& subServ, const std::string& metric, int value);
+  void        reset(void);
   std::string toJson(void);
-
 };
 
-#endif  // SRC_LIB_METRICSMGR_METRICMANAGER_H_
+#endif  // SRC_LIB_METRICSMGR_METRICSMANAGER_H_

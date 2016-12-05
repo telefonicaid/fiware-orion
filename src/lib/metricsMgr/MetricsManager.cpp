@@ -22,13 +22,13 @@
 *
 * Author: Ken Zangelin
 */
-
 #include <string>
 #include <map>
 
-#include "MetricsManager.h"
-
+#include "metricsMgr/MetricsManager.h"
 #include "common/JsonHelper.h"
+
+
 
 /* ****************************************************************************
 *
@@ -36,15 +36,16 @@
 */
 MetricsManager::MetricsManager()
 {
-  // Nothing to do so far
 }
+
+
 
 /* ****************************************************************************
 *
-* MetricsManager::accum -
+* MetricsManager::accumulate -
 *
 */
-void MetricsManager::accum(const std::string& srv, const std::string& subServ, const std::string& metric, int value)
+void MetricsManager::accumulate(const std::string& srv, const std::string& subServ, const std::string& metric, int value)
 {
   // Do we have the service in the map?
   if (metrics.find(srv) == metrics.end())
@@ -75,6 +76,8 @@ void MetricsManager::accum(const std::string& srv, const std::string& subServ, c
   metrics[srv]->at(subServ)->at(metric) += value;
 }
 
+
+
 /* ****************************************************************************
 *
 * MetricsManager::reset -
@@ -84,56 +87,52 @@ void MetricsManager::reset(void)
   // FIXME PR (see .h)
 }
 
+
+
 /* ****************************************************************************
 *
 * MetricsManager::toJson -
+*
+* FIXME PR: needs a refactor (see .h)
 */
 std::string MetricsManager::toJson(void)
 {
-  // FIXME PR: needs a refactor (see .h)
+  //
+  // Three iterators needed to iterate over the 'triple-map' metrics:
+  //   serviceIter      to iterate over all services
+  //   subServiceIter   to iterate over all sub-services of a service
+  //   metricIter       to iterate over all metrics of a sub-service
+  //
+  std::map<std::string, std::map<std::string, std::map<std::string, int>*>*>::iterator  serviceIter;
+  std::map<std::string, std::map<std::string, int>*>::iterator                          subServiceIter;
+  std::map<std::string, int>::iterator                                                  metricIter;
+  JsonHelper                                                                            jh;
 
-  // For all services...
-  JsonHelper jhServ;
-
-  for(std::map<std::string, std::map<std::string, std::map<std::string, int>*>* >::iterator ix = metrics.begin();
-      ix != metrics.end();
-      ++ix)
+  for (serviceIter = metrics.begin(); serviceIter != metrics.end(); ++serviceIter)
   {
-    // For all subservices ...
-    JsonHelper jhSubserv;
+    JsonHelper                                          jhSubService;
+    std::string                                         service        = serviceIter->first;
+    std::map<std::string, std::map<std::string, int>*>* servMap        = serviceIter->second;
 
-    std::string service                                         = ix->first;
-    std::map<std::string, std::map<std::string, int>*>* servMap = ix->second;
-
-    for(std::map<std::string, std::map<std::string, int>*>::iterator jx = servMap->begin();
-        jx != servMap->end();
-        ++jx)
+    for (subServiceIter = servMap->begin(); subServiceIter != servMap->end(); ++subServiceIter)
     {
-      // For all metrics...
-      JsonHelper jhMetrics;
+      JsonHelper                  jhMetrics;
+      std::string                 subServ    = subServiceIter->first;
+      std::map<std::string, int>* metricMap  = subServiceIter->second;
 
-      std::string subServ                   = jx->first;
-      std::map<std::string, int>* metricMap = jx->second;
-
-      for(std::map<std::string, int>::iterator kx = metricMap->begin();
-          kx != metricMap->end();
-          ++kx)
+      for (metricIter = metricMap->begin(); metricIter != metricMap->end(); ++metricIter)
       {
-        // ... print it!
-        std::string metric = kx->first;
-        int value          = kx->second;
+        std::string  metric = metricIter->first;
+        int          value  = metricIter->second;
 
         jhMetrics.addNumber(metric, value);
-
       }
 
-      jhSubserv.addRaw(subServ, jhMetrics.str());
+      jhSubService.addRaw(subServ, jhMetrics.str());
     }
 
-    jhServ.addRaw(service, jhSubserv.str());
+    jh.addRaw(service, jhSubService.str());
   }
 
-  return jhServ.str();
+  return jh.str();
 }
-
-
