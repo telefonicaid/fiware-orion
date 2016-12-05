@@ -107,16 +107,6 @@
 
 /* ****************************************************************************
 *
-* CONSTANTS RESTINIT - 
-*/ 
-#define   DEFAULT_CONNECTION_MEM        64
-#define   DEFAULT_MAX_CONNECTIONS       128
-#define   DEFAULT_MHD_THREAD_POOLSIZE   128
-
-
-
-/* ****************************************************************************
-*
 * HTTP header maximum lengths
 */
 #define CURL_VERSION_MAX_LENGTH             128
