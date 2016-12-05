@@ -333,6 +333,10 @@ bool            logForHumans;
 *
 * paArgs - option vector for the Parse CLI arguments library
 *
+* A note about the default value of -maxConnections.
+* In older implementations of the broker, select was used in MHD and not poll/epoll.
+* The old default value (1024 - 4), that was a recommendation by MHD, has been kept.
+* More info about this can be found in the documentation of MHD.
 */
 PaArgument paArgs[] =
 {
