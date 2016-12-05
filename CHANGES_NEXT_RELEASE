@@ -1,1 +1,2 @@
 - Fix:  libmicrohttpd now uses poll() and not select() (#2724)
+- Fix:  modified the upper limit for CLI '-maxConnections', from 1020 to UNLIMITED
