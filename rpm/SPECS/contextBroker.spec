@@ -164,6 +164,22 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Mon Dec 05 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.6.0-1
+- Add: notification failure/recovery information included in subscriptions (#1960)
+- Add: support ISO8601 timezones at DateTime attributes and metadata creation/update time and filters (#2632)
+- Add: support for partial representation format at DateTime attributes and metadata creation/update and filters (#2631)
+- Add: New CLI option: '-logForHumans', to make the screen log output readable for humans (#2609)
+- Fix: threadpool mode not actually used for custom notifications, even if -notificationMode is set so (#2622)
+- Fix: -logAppend as default in configuration for RPM package (#2637)
+- Fix: Default log output for stdout is now the same format as in the log file. Use new CLI option '-logForHumans' to modify this. (#2609)
+- Fix: several bugs related with field validation in POST /v2/op/update operation (#2653, #2658, #2659, #2661, #2664, #2665, #2666, #2673, #2674, #2675, #2676, #2681, #2682, #2685)
+- Fix: subscription PATCH not working for notification.attrs and notification.exceptAttrs subfields (#2647)
+- Fix: PATCH attr wrongly adding metadata item instead of replacing (#1788)
+- Fix: POST /v2/op/update with empty entities vector makes the broker to crash (#2720)
+- Fix: allow empty elements in Accept header (useless, but allowed by HTTP RFC) (#2722)
+- Fix: NGSIv1 queries are wrongly interpreting entity type as a pattern (#2723)
+- Fix: improving performance avoiding unneeded calls to gettid in log library (#2716)
+
 * Mon Oct 31 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.5.0-1
 - Add: Added URI parameter metadata=metadata-name-list for NGSIv2 retrieve requests (#2544)
 - Add: Added 'metadata' as part of the payload for POST /v2/op/query (#2544)
