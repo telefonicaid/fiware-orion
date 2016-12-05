@@ -333,16 +333,10 @@ bool            logForHumans;
 *
 * paArgs - option vector for the Parse CLI arguments library
 *
-* NOTE
-*   A note about 'FD_SETSIZE - 4', the default and max value for '-maxConnections':
-*   [ taken from https://www.gnu.org/software/libmicrohttpd/manual/libmicrohttpd.html ]
-*
-*   MHD_OPTION_CONNECTION_LIMIT
-*     Maximum number of concurrent connections to accept.
-*     The default is FD_SETSIZE - 4 (the maximum number of file descriptors supported by 
-*     select minus four for stdin, stdout, stderr and the server socket). In other words,
-*    the default is as large as possible.
-*
+* A note about the default value of -maxConnections.
+* In older implementations of the broker, select was used in MHD and not poll/epoll.
+* The old default value (1024 - 4), that was a recommendation by MHD, has been kept.
+* More info about this can be found in the documentation of MHD.
 */
 PaArgument paArgs[] =
 {
@@ -379,7 +373,7 @@ PaArgument paArgs[] =
   { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 60,             0,     3600,     SUB_CACHE_IVAL_DESC    },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
   { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     1024,     CONN_MEMORY_DESC       },  
-  { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, FD_SETSIZE - 4, 0,     FD_SETSIZE - 4, MAX_CONN_DESC    },
+  { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, 1020,           1,     PaNL,     MAX_CONN_DESC          },
   { "-reqPoolSize",      &reqPoolSize,      "TRQ_POOL_SIZE",     PaUInt,   PaOpt, 0,              0,     1024,     REQ_POOL_SIZE          },
 
   { "-notificationMode",      &notificationMode,      "NOTIF_MODE", PaString, PaOpt, _i "transient", PaNL,  PaNL, NOTIFICATION_MODE_DESC },
