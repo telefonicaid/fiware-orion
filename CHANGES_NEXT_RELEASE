@@ -1,0 +1,1 @@
+- Fix:  libmicrohttpd now uses poll() and not select() (#2724)
