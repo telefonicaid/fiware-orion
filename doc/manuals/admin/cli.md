@@ -138,8 +138,8 @@ The list of available options is the following:
     internal logic point of view.
 -   **-connectionMemory**. Sets the size of the connection memory buffer (in kB) per connection used internally
     by the HTTP server library. Default value is 64 kB.
--   **-maxConnections**. Maximum number of simultaneous connections. Default value is "unlimited" (limited by 
-    max file descriptors of operating system).
+-   **-maxConnections**. Maximum number of simultaneous connections. Default value is 1020, for legacy reasons,
+    while the lower limit is 1 and there is no upper limit (limited by max file descriptors of the operating system).
 -   **-reqPoolSize**. Size of thread pool for incoming connections. Default value is 0, meaning *no thread pool*.
 -   **-statCounters**, **-statSemWait**, **-statTiming** and **-statNotifQueue**. Enable statistics
     generation. See [statistics documentation](statistics.md).
