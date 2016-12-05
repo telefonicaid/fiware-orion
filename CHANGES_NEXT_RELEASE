@@ -1,2 +1,2 @@
-- Fix:  libmicrohttpd now uses poll() and not select() (#2724)
+- Fix:  libmicrohttpd now uses poll()/epoll() and not select() so fds greater than 1023 can be used for incoming connections (#2724, #2166)
 - Fix:  modified the upper limit for CLI '-maxConnections', from 1020 to UNLIMITED
