@@ -1432,7 +1432,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 {
   bool      mhdStartError  = true;
   size_t    memoryLimit    = connMemory * 1024; // Connection memory is expressed in kilobytes
-  int       serverMode     = MHD_USE_THREAD_PER_CONNECTION | MHD_USE_POLL | MHD_USE_DEBUG;
+  int       serverMode     = MHD_USE_THREAD_PER_CONNECTION | MHD_USE_POLL;
 
   if (port == 0)
   {
@@ -1447,9 +1447,9 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     // So, to support both names, we need a ifdef/else cpp directive here.
     //
 #ifdef MHD_USE_EPOLL
-    serverMode = MHD_USE_SELECT_INTERNALLY | MHD_USE_EPOLL | MHD_USE_DEBUG;
+    serverMode = MHD_USE_SELECT_INTERNALLY | MHD_USE_EPOLL;
 #else
-    serverMode = MHD_USE_SELECT_INTERNALLY | MHD_USE_EPOLL_LINUX_ONLY | MHD_USE_DEBUG;
+    serverMode = MHD_USE_SELECT_INTERNALLY | MHD_USE_EPOLL_LINUX_ONLY;
 #endif
   }
 
