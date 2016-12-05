@@ -64,6 +64,7 @@
 #include <vector>
 #include <limits.h>
 
+#include "rapidjson/rapidjson.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "cache/subCache.h"
 
@@ -1551,6 +1552,42 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
   free(mode);
 }
 
+
+
+/* ****************************************************************************
+*
+* libVersions - 
+*
+* NOTE
+*   No way has been found to get the versions of the mongo driver and libuuid :-(
+*/
+std::string libVersions(void)
+{
+  std::string  total  = "Library dependencies:\n";
+  std::string  mhd    = "  libmicrohttpd: ";
+  std::string  curl   = "  libcurl:       ";
+  std::string  boost  = "  boost:         ";
+  std::string  rjson  = "  rapidjson:     ";
+  std::string  mongo  = "  mongo driver:  ";
+  std::string  uuid   = "  libuuid:       ";
+
+  char         mhdVersion[64];
+  char*        curlVersion = curl_version();
+
+  snprintf(mhdVersion, sizeof(mhdVersion), "0x%08x", MHD_VERSION);
+
+  total += mhd     + mhdVersion                + "\n";
+  total += curl    + curlVersion               + "\n";
+  total += boost   + BOOST_LIB_VERSION         + "\n";
+  total += rjson   + RAPIDJSON_VERSION_STRING  + "\n";
+  total += mongo   + "unknown"                 + "\n";
+  total += uuid    + "unknown"                 + "\n";
+
+  return total;
+}
+
+
+
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
 /* ****************************************************************************
 *
@@ -1594,7 +1631,7 @@ int main(int argC, char* argV[])
 
   paConfig("man exitstatus", (void*) "The orion broker is a daemon. If it exits, something is wrong ...");
 
-  std::string versionString = std::string(ORION_VERSION) + " (git version: " + GIT_HASH + ")";
+  std::string versionString = std::string(ORION_VERSION) + " (git version: " + GIT_HASH + ")" + "\n\n" + libVersions();
 
   paConfig("man synopsis",                  (void*) "[options]");
   paConfig("man shortdescription",          (void*) "Options:");
