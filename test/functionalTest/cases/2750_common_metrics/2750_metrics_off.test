@@ -25,7 +25,7 @@ Incoming Transactions and Common Metrics
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPv4 -metrics
+brokerStart CB 0-255 IPv4 -disableMetrics
 
 --SHELL--
 
