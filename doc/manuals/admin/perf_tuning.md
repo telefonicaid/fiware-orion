@@ -183,7 +183,7 @@ Using both parameters, in any situation (either idle or busy) Orion consumes a f
 * `c` listening threaftestd for the IPv6 server (if `-ipv4` is used then these threads are not created)
 * `n` threads corresponding to the workers in the notification thread pool.
 
-Apart from avoiding the thread exahustion problem, there is a tradeoff between using thread pools and
+Apart from avoiding the thread exhaustion problem, there is a trade-off between using thread pools and
 not. On the one side, using thread pools is beneficial as it saves thread creation/destruction time.
 On the other hand, setting thread pools is a way of "capping" throughput. If the thread workers are busy
 all the time, at the end the queue saturates and you will end up losing incoming request or ongoing
