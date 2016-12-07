@@ -214,18 +214,18 @@ where
 * **extra** an amount of file descriptors used by log files, listening sockets and file descriptors used by libraries.
   There isn't any general rule for this value, but one in the range of 100 to 200 must suffice most of the cases.
 
-If the above inequity doesn't hold, you may have *file descriptors exahustion problems* and Orion Context Broker
+If the above inequity doesn't hold, you may have *file descriptors exhaustion problem* and Orion Context Broker
 will not work properly. In particular, it may happen that Orion is unable to accept new incoming connections and/or
 send notifications due to lack of file descriptors.
 
 Note that having a large number of client connections at Orion in CLOSE_WAIT status is not a problem. This
-is part of the libcurl connection cache strategy, in order to reuse connections.
+is part of the libcurl connection cache strategy, in order to save time by reusing connections.
 From [libcurl email discussion about this topic](https://curl.haxx.se/mail/tracker-2011-05/0006.html):
 
 > The CLOSE_WAIT sockets are probably the ones that libcurl has in its connection cache but that have been
 > "closed" (a FIN was sent) by the server already but not yet by libcurl. They are not there "indefinitely"
 > (and they really can't be) since the connection cache has a limited size so eventually the old connections
-> should get closed.
+> will be closed.
 
 [Top](#top)
 
