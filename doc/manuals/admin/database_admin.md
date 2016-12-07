@@ -223,7 +223,7 @@ GET  /v1/contextEntities?offset=54882
       "statusCode" : {
         "code" : "500",
         "reasonPhrase" : "Internal Server Error",
-        "details" : "Sort operation used more than the maximum RAM. You should create an index. Check Database Administration section at Orion documentation."
+        "details" : "Sort operation used more than the maximum RAM. You should create an index. Check the Database Administration section in Orion documentation."
       }
     }
   ]
@@ -236,7 +236,7 @@ or this other (NGSIv2):
 GET /v2/entities?offset=54882
 
 {
-    "description": "Sort operation used more than the maximum RAM. You should create an index. Check Database Administration section at Orion documentation.",
+    "description": "Sort operation used more than the maximum RAM. You should create an index. Check the Database Administration section in Orion documentation.",
     "error": "InternalServerError"
 }
 ```
