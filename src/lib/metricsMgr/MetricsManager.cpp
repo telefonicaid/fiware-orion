@@ -63,9 +63,6 @@ bool MetricsManager::init(bool _on)
     return false;
   }
 
-  totalTimeInTransaction.tv_sec  = 0;
-  totalTimeInTransaction.tv_usec = 0;
-
   return true;
 }
 
@@ -196,44 +193,6 @@ std::string MetricsManager::toJson(void)
   top.addRaw("services", services.str());
   sem_post(&sem);
   return top.str();
-}
-
-
-
-/* ****************************************************************************
-*
-* totalTimeInTransactionAdd - 
-*/
-void MetricsManager::totalTimeInTransactionAdd(struct timeval& start, struct timeval& end)
-{
-  if (on == false)
-  {
-    return;
-  }
-
-  struct timeval diff;
-
-  diff.tv_sec  = end.tv_sec  - start.tv_sec;
-  diff.tv_usec = end.tv_usec - start.tv_usec;
-
-  if (diff.tv_usec < 0)
-  {
-    diff.tv_sec  -= 1;
-    diff.tv_usec += 1000000;
-  }
-
-  sem_wait(&sem);
-
-  totalTimeInTransaction.tv_sec  += diff.tv_sec;
-  totalTimeInTransaction.tv_usec += diff.tv_usec;
-
-  if (totalTimeInTransaction.tv_usec > 1000000)
-  {
-    totalTimeInTransaction.tv_sec  += 1;
-    totalTimeInTransaction.tv_usec -= 1000000;
-  }
-
-  sem_post(&sem);
 }
 
 

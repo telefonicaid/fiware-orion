@@ -153,5 +153,5 @@ The list of available options is the following:
     * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
     * No `${...}` macro substitution is performed.
 -   **-logForHumans**. To make the traces to standard out formated for humans (note that the traces in the log file are not affected)
--   **-metrics**. To turn off the 'metrics' feature. Gathering of metrics is a bit costly, as systems calls and semaphores are involved.
-    Use this parameter to start the broker without metrics.
+-   **-disableMetrics**. To turn off the 'metrics' feature. Gathering of metrics is a bit costly, as system calls and semaphores are involved.
+    Use this parameter to start the broker without metrics overhead.

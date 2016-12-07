@@ -920,25 +920,21 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
 static ApiVersion apiVersionGet(const char* path, const std::string& service, const std::string& subService)
 {
   metricsMgr.add(service, subService, METRIC_TRANS_IN, 1);
-  metricsMgr.add(service, subService, METRIC_TRANSACTIONS, 1);
 
   if ((path[1] == 'v') && (path[2] == '2'))
   {
-    metricsMgr.add(service, subService, METRIC_NGSIV2_TRANSACTIONS, 1);
     return V2;
   }
 
   // Unlike v2, v1 is case-insensitive (see case/2057 test)
   if (((path[1] == 'v') || (path[1] == 'V')) && (path[2] == '1'))
   {
-    metricsMgr.add(service, subService, METRIC_NGSIV1_TRANSACTIONS, 1);
     return V1;
   }
 
   if ((strncasecmp("/ngsi9",      path, strlen("/ngsi9"))      == 0)  ||
       (strncasecmp("/ngsi10",     path, strlen("/ngsi10"))     == 0))
   {
-    metricsMgr.add(service, subService, METRIC_NGSIV1_TRANSACTIONS, 1);
     return V1;
   }
 

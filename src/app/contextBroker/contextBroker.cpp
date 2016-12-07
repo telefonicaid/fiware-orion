@@ -330,7 +330,7 @@ bool            noMetrics;
 #define DISABLE_CUSTOM_NOTIF   "disable NGSIv2 custom notifications"
 #define LOG_TO_SCREEN_DESC     "log to screen"
 #define LOG_FOR_HUMANS_DESC    "human readible log to screen"
-#define METRICS_DESC           "turn off the 'metrics' feature - to gain efficiency"
+#define METRICS_DESC           "turn off the 'metrics' feature"
 
 
 
@@ -395,8 +395,8 @@ PaArgument paArgs[] =
   { "-strictNgsiv1Ids",             &strictIdv1,      "CHECK_ID_V1",           PaBool, PaOpt, false, false, true, CHECK_v1_ID_DESC      },
   { "-disableCustomNotifications",  &disableCusNotif, "DISABLE_CUSTOM_NOTIF",  PaBool, PaOpt, false, false, true, DISABLE_CUSTOM_NOTIF  },
 
-  { "-logForHumans",  &logForHumans,    "LOG_FOR_HUMANS",     PaBool, PaOpt, false, false, true,             LOG_FOR_HUMANS_DESC },
-  { "-metrics",       &noMetrics,       "METRICS",            PaBool, PaOpt, false, false, true,             METRICS_DESC        },
+  { "-logForHumans",   &logForHumans,    "LOG_FOR_HUMANS",     PaBool, PaOpt, false, false, true,             LOG_FOR_HUMANS_DESC },
+  { "-disableMetrics", &noMetrics,       "DISABLE_METRICS",    PaBool, PaOpt, false, false, true,             METRICS_DESC        },
 
   PA_END_OF_ARGS
 };
