@@ -1736,7 +1736,6 @@ int main(int argC, char* argV[])
   curl_global_init(CURL_GLOBAL_NOTHING);
   alarmMgr.init(relogAlarms);
 
-  LM_W(("KZ: calling metricsMgr.init with %s", (!noMetrics)? "true" : "false"));
   metricsMgr.init(!noMetrics);
   logSummaryInit(&lsPeriod);
 
