@@ -223,7 +223,7 @@ is part of the libcurl connection cache strategy, in order to save time by reusi
 From [libcurl email discussion about this topic](https://curl.haxx.se/mail/tracker-2011-05/0006.html):
 
 > The CLOSE_WAIT sockets are probably the ones that libcurl has in its connection cache but that have been
-> "closed" (a FIN was sent) by the server already but not yet by libcurl. They are not there "indefinitely"
+> closed (a FIN was sent) by the other end-point already but not yet by libcurl. They are not there "indefinitely"
 > (and they really can't be) since the connection cache has a limited size so eventually the old connections
 > will be closed.
 
