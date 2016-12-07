@@ -100,8 +100,8 @@
 * 6. Multi-thread safeness. Probably the same sem-based strategy used in AlarmManager
 *    could be used.
 * 7. Use 'long long' instead of 'int'
-* 8. (Usure) We could need maps for metrics different for int. In that case, implement
-*    it (and the accumulate method) using templates, to avoid repeating the same implementation
+* 8. (Unsure) We could need maps for metrics different for int. In that case, implement
+*    it (and the add method) using templates, to avoid repeating the same implementation
 *    N times
 */
 class MetricsManager
