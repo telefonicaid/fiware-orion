@@ -75,5 +75,6 @@ Usage:                [option '-U' (extended usage)]
                       [option '-strictNgsiv1Ids' (additional checks for id fields in the NGSIv1 API)]
                       [option '-disableCustomNotifications' (disable NGSIv2 custom notifications)]
                       [option '-logForHumans' (human readible log to screen)]
+                      [option '-metrics' (turn off the 'metrics' feature - to gain efficiency)]
 
 --TEARDOWN--

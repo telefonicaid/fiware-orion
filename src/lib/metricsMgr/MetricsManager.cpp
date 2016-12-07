@@ -22,8 +22,12 @@
 *
 * Author: Ken Zangelin
 */
+#include <sys/time.h>
 #include <string>
 #include <map>
+
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "metricsMgr/MetricsManager.h"
 #include "common/JsonHelper.h"
@@ -34,7 +38,7 @@
 *
 * MetricsManager::MetricsManager -
 */
-MetricsManager::MetricsManager()
+MetricsManager::MetricsManager(): on(false)
 {
 }
 
@@ -42,11 +46,39 @@ MetricsManager::MetricsManager()
 
 /* ****************************************************************************
 *
-* MetricsManager::accumulate -
-*
+* MetricsManager::init -
 */
-void MetricsManager::accumulate(const std::string& srv, const std::string& subServ, const std::string& metric, int value)
+bool MetricsManager::init(bool _on)
 {
+  on = true;
+
+  if (sem_init(&sem, 0, 1) == -1)
+  {
+    LM_E(("Runtime Error (error initializing 'metrics mgr' semaphore: %s)", strerror(errno)));
+    return false;
+  }
+
+  totalTimeInTransaction.tv_sec  = 0;
+  totalTimeInTransaction.tv_usec = 0;
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* MetricsManager::add -
+*/
+void MetricsManager::add(const std::string& srv, const std::string& subServ, const std::string& metric, int value)
+{
+  if (on == false)
+  {
+    return;
+  }
+
+  sem_wait(&sem);
+
   // Do we have the service in the map?
   if (metrics.find(srv) == metrics.end())
   {
@@ -57,23 +89,28 @@ void MetricsManager::accumulate(const std::string& srv, const std::string& subSe
   // Do we have the subservice in the map?
   if (metrics[srv]->find(subServ) == metrics[srv]->end())
   {
+    //
     // not found: create it
     // FIXME PR: this syntax should be simpler, closer to
     // metrics[srv][subServ] = new std::map<std::string, int>;
-
+    //
     metrics[srv]->insert(std::pair<std::string, std::map<std::string, int>*>(subServ, new std::map<std::string, int>));
   }
 
   // Do we have the metric in the map?
   if (metrics[srv]->at(subServ)->find(metric) == metrics[srv]->at(subServ)->end())
   {
+    //
     // not found: create it
     // FIXME PR: I don't like the at() and pair() syntax, I'd prefer a syntax closer to:
     // metrics[srv][subServ][metric] = 0;
+    //
     metrics[srv]->at(subServ)->insert(std::pair<std::string, int>(metric, 0));
   }
 
   metrics[srv]->at(subServ)->at(metric) += value;
+
+  sem_post(&sem);
 }
 
 
@@ -84,7 +121,14 @@ void MetricsManager::accumulate(const std::string& srv, const std::string& subSe
 */
 void MetricsManager::reset(void)
 {
+  if (on == false)
+  {
+    return;
+  }
+
+  sem_wait(&sem);
   // FIXME PR (see .h)
+  sem_post(&sem);
 }
 
 
@@ -97,6 +141,13 @@ void MetricsManager::reset(void)
 */
 std::string MetricsManager::toJson(void)
 {
+  if (on == false)
+  {
+    return "";
+  }
+
+  sem_wait(&sem);
+
   //
   // Three iterators needed to iterate over the 'triple-map' metrics:
   //   serviceIter      to iterate over all services
@@ -106,10 +157,12 @@ std::string MetricsManager::toJson(void)
   std::map<std::string, std::map<std::string, std::map<std::string, int>*>*>::iterator  serviceIter;
   std::map<std::string, std::map<std::string, int>*>::iterator                          subServiceIter;
   std::map<std::string, int>::iterator                                                  metricIter;
-  JsonHelper                                                                            jh;
+  JsonHelper                                                                            top;
+  JsonHelper                                                                            services;
 
   for (serviceIter = metrics.begin(); serviceIter != metrics.end(); ++serviceIter)
   {
+    JsonHelper                                          subServiceTop;
     JsonHelper                                          jhSubService;
     std::string                                         service        = serviceIter->first;
     std::map<std::string, std::map<std::string, int>*>* servMap        = serviceIter->second;
@@ -131,8 +184,49 @@ std::string MetricsManager::toJson(void)
       jhSubService.addRaw(subServ, jhMetrics.str());
     }
 
-    jh.addRaw(service, jhSubService.str());
+    subServiceTop.addRaw("subservs", jhSubService.str());
+    services.addRaw(service, subServiceTop.str());
   }
 
-  return jh.str();
+  top.addRaw("services", services.str());
+  sem_post(&sem);
+  return top.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* totalTimeInTransactionAdd - 
+*/
+void MetricsManager::totalTimeInTransactionAdd(struct timeval& start, struct timeval& end)
+{
+  if (on == false)
+  {
+    return;
+  }
+
+  struct timeval diff;
+
+  diff.tv_sec  = end.tv_sec  - start.tv_sec;
+  diff.tv_usec = end.tv_usec - start.tv_usec;
+
+  if (diff.tv_usec < 0)
+  {
+    diff.tv_sec  -= 1;
+    diff.tv_usec += 1000000;
+  }
+
+  sem_wait(&sem);
+
+  totalTimeInTransaction.tv_sec  += diff.tv_sec;
+  totalTimeInTransaction.tv_usec += diff.tv_usec;
+
+  if (totalTimeInTransaction.tv_usec > 1000000)
+  {
+    totalTimeInTransaction.tv_sec  += 1;
+    totalTimeInTransaction.tv_usec -= 1000000;
+  }
+
+  sem_post(&sem);
 }

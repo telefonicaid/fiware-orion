@@ -25,9 +25,62 @@
 *
 * Author: Fermín Galán
 */
-
+#include <sys/time.h>
 #include <string>
 #include <map>
+#include <semaphore.h>
+
+
+
+/* ****************************************************************************
+*
+* Metrics - 
+*/
+#define METRIC_TRANS_IN                            "incomingTransactions"
+#define METRIC_TRANS_IN_REQ_SIZE                   "incomingTransactionRequestSize"
+#define METRIC_TRANS_IN_RESP_SIZE                  "incomingTransactionResponseSize"
+#define METRIC_TRANS_IN_ERRORS                     "incomingTransactionErrors"
+#define METRIC_SERVICE_TIME                        "serviceTime"
+
+#define METRIC_TRANS_OUT                           "outgoingTransactions"
+#define METRIC_TRANS_OUT_REQ_SIZE                  "outgoingTransactionRequestSize"
+#define METRIC_TRANS_OUT_RESP_SIZE                 "outgoingTransactionResponseSize"
+#define METRIC_TRANS_OUT_ERRORS                    "outgoingTransactionErrors"
+
+#define METRIC_TRANSACTIONS                        "transactions"
+#define METRIC_NGSIV1_TRANSACTIONS                 "ngsiv1Transactions"
+#define METRIC_NGSIV2_TRANSACTIONS                 "ngsiv2Transactions"
+#define METRIC_AVERAGE_TRANSACTION_TIME            "averageTransactionTime"
+#define METRIC_OK_TRANSACTIONS                     "okTransactions"
+#define METRIC_BAD_REQUEST                         "badRequestTransactions"
+#define METRIC_NOT_FOUND                           "notFoundTransactions"
+#define METRIC_INTERNAL_ERROR                      "internalErrorTransactions"
+
+#define METRIC_CREATED_ENTITIES                    "createdEntities"
+#define METRIC_UPDATED_ENTITIES                    "updatedEntities"
+#define METRIC_DELETED_ENTITIES                    "deletedEntities"
+#define METRIC_CREATED_SUBSCRIPTIONS               "createdSubscriptions"
+#define METRIC_UPDATED_SUBSCRIPTIONS               "updatedSubscriptions"
+#define METRIC_DELETED_SUBSCRIPTIONS               "deletedSubscriptions"
+#define METRIC_NOTIFICATIONS_SENT                  "notificationSentOk"
+#define METRIC_NOTIFICATIONS_FAILED                "notificationSentFailed"
+#define METRIC_CUSTOM_NOTIFICATIONS_SENT           "customNotificationsSentOk"
+#define METRIC_CUSTOM_NOTIFICATIONS_FAILED         "customNotificationsSentFailed"
+
+#define METRIC_DB_QUERIES                          "dbQueries"
+#define METRIC_DB_REGEXQUERIES                     "dbRegexQueries"
+#define METRIC_DB_AGGREGATIONQUERIES               "dbAggregationQueries"
+#define METRIC_DB_INSERTS                          "dbInserts"
+#define METRIC_DB_UPDATES                          "dbUpdates"
+#define METRIC_DB_DELETES                          "dbDeletes"
+#define METRIC_DB_QUERY_AVERAGE_TIME               "dbQueryAverageTime"
+#define METRIC_DB_REGEX_QUERY_AVERAGE_TIME         "dbRegexQueryAverageTime"
+#define METRIC_DB_AGGREGATION_QUERY_AVERAGE_TIME   "dbAggregationQueryAverageTime"
+#define METRIC_DB_INSERT_AVERAGE_TIME              "dbInsertAverageTime"
+#define METRIC_DB_UPDATE_AVERAGE_TIME              "dbUpdateAverageTime"
+#define METRIC_DB_DELETE_AVERAGE_TIME              "dbDeleteAverageTime"
+
+
 
 /* ****************************************************************************
 *
@@ -55,13 +108,18 @@ class MetricsManager
 {
  private:
   std::map<std::string, std::map<std::string, std::map<std::string, int>*>*>  metrics;
+  sem_t           sem;
+  bool            on;
+  struct timeval  totalTimeInTransaction;
 
  public:
   MetricsManager();
 
-  void        accumulate(const std::string& srv, const std::string& subServ, const std::string& metric, int value);
-  void        reset(void);
-  std::string toJson(void);
+  bool         init(bool _on);
+  void         add(const std::string& srv, const std::string& subServ, const std::string& metric, int value);
+  void         reset(void);
+  void         totalTimeInTransactionAdd(struct timeval& start, struct timeval& end);
+  std::string  toJson(void);
 };
 
 #endif  // SRC_LIB_METRICSMGR_METRICSMANAGER_H_

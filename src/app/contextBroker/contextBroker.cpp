@@ -206,6 +206,7 @@
 #include "contextBroker/version.h"
 #include "common/string.h"
 #include "alarmMgr/alarmMgr.h"
+#include "metricsMgr/metricsMgr.h"
 #include "logSummary/logSummary.h"
 
 using namespace orion;
@@ -329,7 +330,7 @@ bool            metricsOn;
 #define DISABLE_CUSTOM_NOTIF   "disable NGSIv2 custom notifications"
 #define LOG_TO_SCREEN_DESC     "log to screen"
 #define LOG_FOR_HUMANS_DESC    "human readible log to screen"
-#define METRICS_DESC           "turn of the 'metrics' feature - to gain efficiency"
+#define METRICS_DESC           "turn off the 'metrics' feature - to gain efficiency"
 
 
 
@@ -1734,6 +1735,7 @@ int main(int argC, char* argV[])
   contextBrokerInit(dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
   alarmMgr.init(relogAlarms);
+  metricsMgr.init(metrics);
   logSummaryInit(&lsPeriod);
 
   if (rush[0] != 0)

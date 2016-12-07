@@ -44,7 +44,9 @@
 #include "common/clockFunctions.h"
 #include "common/statistics.h"
 #include "common/tag.h"
+
 #include "alarmMgr/alarmMgr.h"
+#include "metricsMgr/metricsMgr.h"
 
 #include "parse/forbiddenChars.h"
 #include "rest/RestService.h"
@@ -916,21 +918,32 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
 *  NO_VERSION: others (invalid paths)
 *
 */
-static ApiVersion apiVersionGet(const char* path)
+static ApiVersion apiVersionGet(const char* path, const std::string& service, const std::string& subService)
 {
+  metricsMgr.add(service, subService, METRIC_TRANS_IN, 1);
+  metricsMgr.add(service, subService, METRIC_TRANSACTIONS, 1);
+
   if ((path[1] == 'v') && (path[2] == '2'))
   {
+    metricsMgr.add(service, subService, METRIC_NGSIV2_TRANSACTIONS, 1);
     return V2;
   }
 
-  // Different from v2, v1 is case-insensitive (see case/2057 test)
+  // Unlike v2, v1 is case-insensitive (see case/2057 test)
   if (((path[1] == 'v') || (path[1] == 'V')) && (path[2] == '1'))
   {
+    metricsMgr.add(service, subService, METRIC_NGSIV1_TRANSACTIONS, 1);
     return V1;
   }
+
   if ((strncasecmp("/ngsi9",      path, strlen("/ngsi9"))      == 0)  ||
-      (strncasecmp("/ngsi10",     path, strlen("/ngsi10"))     == 0)  ||
-      (strncasecmp("/log",        path, strlen("/log"))        == 0)  ||
+      (strncasecmp("/ngsi10",     path, strlen("/ngsi10"))     == 0))
+  {
+    metricsMgr.add(service, subService, METRIC_NGSIV1_TRANSACTIONS, 1);
+    return V1;
+  }
+
+  if ((strncasecmp("/log",        path, strlen("/log"))        == 0)  ||
       (strncasecmp("/cache",      path, strlen("/cache"))      == 0)  ||
       (strncasecmp("/statistics", path, strlen("/statistics")) == 0))
   {
@@ -1113,6 +1126,7 @@ static int connectionTreat
     if ((ciP = new ConnectionInfo(url, method, version, connection)) == NULL)
     {
       LM_E(("Runtime Error (error allocating ConnectionInfo)"));
+      // No METRICS here ... Without ConnectionInfo we hav eno service/subService ...
       return MHD_NO;
     }
 
@@ -1120,8 +1134,6 @@ static int connectionTreat
     {
       clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);
     }
-
-    ciP->apiVersion = apiVersionGet(ciP->url.c_str());
 
     LM_T(LmtRequest, (""));
     // WARNING: This log message below is crucial for the correct function of the Behave tests - CANNOT BE REMOVED
@@ -1145,11 +1157,14 @@ static int connectionTreat
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
     
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
+
     if (ciP->httpHeaders.accept == "")  // No Accept: given, treated as */*
     {
       ciP->httpHeaders.accept = "*/*";
       acceptParse(ciP, "*/*");
     }
+
+    ciP->apiVersion = apiVersionGet(ciP->url.c_str(), ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath);
 
     char correlator[CORRELATOR_ID_SIZE + 1];
     if (ciP->httpHeaders.correlator == "")
