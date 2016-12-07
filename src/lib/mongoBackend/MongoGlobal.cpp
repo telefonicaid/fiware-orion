@@ -1285,7 +1285,7 @@ bool entitiesQuery
       }
       else if (strncmp(exErr.c_str(), sortError, strlen(sortError)) == 0)
       {
-        exErr = "Sort operation used more than the maximum RAM. You should create an index. Check Database Administration section at Orion documentation.";
+        exErr = "Sort operation used more than the maximum RAM. You should create an index. Check the Database Administration section in Orion documentation.";
       }
       else
       {
