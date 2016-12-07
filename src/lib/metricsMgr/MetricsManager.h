@@ -112,17 +112,23 @@ class MetricsManager
 {
  private:
   std::map<std::string, std::map<std::string, std::map<std::string, int>*>*>  metrics;
-  sem_t           sem;
   bool            on;
+  sem_t           sem;
+  bool            semWaitStatistics;
+  long long       semWaitTime;        // measured in microseconds
+
+  void            semTake(void);
+  void            semGive(void);
 
  public:
   MetricsManager();
 
-  bool         init(bool _on);
+  bool         init(bool _on, bool _semWaitStatistics);
   void         add(const std::string& srv, const std::string& subServ, const std::string& metric, int value);
   void         reset(void);
   std::string  toJson(void);
   bool         isOn(void);
+  long long    semWaitTimeGet(void);
 };
 
 #endif  // SRC_LIB_METRICSMGR_METRICSMANAGER_H_

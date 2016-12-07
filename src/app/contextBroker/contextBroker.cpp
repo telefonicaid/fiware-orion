@@ -1736,7 +1736,7 @@ int main(int argC, char* argV[])
   curl_global_init(CURL_GLOBAL_NOTHING);
   alarmMgr.init(relogAlarms);
 
-  metricsMgr.init(!noMetrics);
+  metricsMgr.init(!noMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
 
   if (rush[0] != 0)
