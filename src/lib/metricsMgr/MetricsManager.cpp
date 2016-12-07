@@ -132,7 +132,32 @@ void MetricsManager::reset(void)
   }
 
   sem_wait(&sem);
-  // FIXME PR (see .h)
+
+  //
+  // Three iterators needed to iterate over the 'triple-map' metrics:
+  //   serviceIter      to iterate over all services
+  //   subServiceIter   to iterate over all sub-services of a service
+  //   metricIter       to iterate over all metrics of a sub-service
+  //
+  std::map<std::string, std::map<std::string, std::map<std::string, int>*>*>::iterator  serviceIter;
+  std::map<std::string, std::map<std::string, int>*>::iterator                          subServiceIter;
+  std::map<std::string, int>::iterator                                                  metricIter;
+
+  for (serviceIter = metrics.begin(); serviceIter != metrics.end(); ++serviceIter)
+  {
+    std::map<std::string, std::map<std::string, int>*>* servMap        = serviceIter->second;
+
+    for (subServiceIter = servMap->begin(); subServiceIter != servMap->end(); ++subServiceIter)
+    {
+      std::map<std::string, int>* metricMap  = subServiceIter->second;
+
+      for (metricIter = metricMap->begin(); metricIter != metricMap->end(); ++metricIter)
+      {
+        metricIter->second = 0;
+      }
+    }
+  }
+
   sem_post(&sem);
 }
 

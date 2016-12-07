@@ -1735,7 +1735,6 @@ int main(int argC, char* argV[])
   contextBrokerInit(dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
   alarmMgr.init(relogAlarms);
-
   metricsMgr.init(!noMetrics);
   logSummaryInit(&lsPeriod);
 
