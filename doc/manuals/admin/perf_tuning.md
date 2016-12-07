@@ -225,7 +225,7 @@ From [libcurl email discussion about this topic](https://curl.haxx.se/mail/track
 > The CLOSE_WAIT sockets are probably the ones that libcurl has in its connection cache but that have been
 > closed (a FIN was sent) by the other end-point already but not yet by libcurl. They are not there "indefinitely"
 > (and they really can't be) since the connection cache has a limited size so eventually the old connections
-> will be closed.
+> should get closed.
 
 [Top](#top)
 
