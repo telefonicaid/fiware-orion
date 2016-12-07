@@ -58,8 +58,6 @@ class Epoll:
         """
         print " *****************************************************************************************************************"
         print " * This script verify the epoll() instead of select():                                                           *"
-        print " *    - create, update and delete.                                                                               *"
-        print " *  usage: python use_epoll.py <host> [optional params] [-u]                                                     *"
         print " *                                                                                                               *"
         print " *  Parameters:                                                                                                  *"
         print " *     -host=<host>         : CB host (OPTIONAL) (default: localhost).                                           *"
@@ -71,7 +69,7 @@ class Epoll:
         print " *     -duration=<value>    : test duration, value is in minutes (OPTIONAL) (default: 60 minutes)                *"
         print " *                                                                                                               *"
         print " *  Examples:                                                                                                    *"
-        print " *    python subscription_manager.py -host=10.10.10.10 -notif_url=http://10.0.0.1:1234/notify                    *"
+        print " *    python use_epoll.py -host=10.10.10.10 -notif_url=http://10.0.0.1:1234/notify duration=100 -v               *"
         print " *                                                                                                               *"
         print " *  Note:                                                                                                        *"
         print " *    - the update delay is 3 minutes                                                                            *"
@@ -177,7 +175,6 @@ class Epoll:
                 print("payload: %s" % (payload % random_value))
                 resp = requests.post("%s/v2/op/update" % self.cb_endpoint, headers=self.headers, data=payload % random_value)
                 assert resp.status_code == 204, " ERROR - the update batch op request is failed: \n - status code: %s \n - response: %s" % (str(resp.status_code), resp.text)
-
                 self.__print_by_console(resp)
                 update_time = time.time()
             # version request
