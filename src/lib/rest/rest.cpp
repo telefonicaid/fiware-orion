@@ -1415,7 +1415,20 @@ static int connectionTreat
   }
   else
   {
-    serveFunction(ciP);
+    if (metricsMgr.isOn())
+    {
+      struct timeval  start;
+      struct timeval  end;
+
+      gettimeofday(&start);
+      serveFunction(ciP);
+      gettimeofday(&end);
+      metricsMgr.totalTimeInTransactionAdd(ciP->headers.tenant, ciP->headers.servicePath, start, end);
+    }
+    else
+    {
+      serveFunction(ciP);
+    }
   }
 
   return MHD_YES;

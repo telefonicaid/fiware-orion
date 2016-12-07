@@ -184,11 +184,11 @@ std::string MetricsManager::toJson(void)
   //   subServiceIter   to iterate over all sub-services of a service
   //   metricIter       to iterate over all metrics of a sub-service
   //
-  std::map<std::string, std::map<std::string, std::map<std::string, int>*>*>::iterator  serviceIter;
-  std::map<std::string, std::map<std::string, int>*>::iterator                          subServiceIter;
-  std::map<std::string, int>::iterator                                                  metricIter;
-  JsonHelper                                                                            top;
-  JsonHelper                                                                            services;
+  std::map<std::string, std::map<std::string, std::map<std::string, unsigned long long>*>*>::iterator  serviceIter;
+  std::map<std::string, std::map<std::string, int>*>::iterator                                         subServiceIter;
+  std::map<std::string, int>::iterator                                                                 metricIter;
+  JsonHelper                                                                                           top;
+  JsonHelper                                                                                           services;
 
   for (serviceIter = metrics.begin(); serviceIter != metrics.end(); ++serviceIter)
   {
