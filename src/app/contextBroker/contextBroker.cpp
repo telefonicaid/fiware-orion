@@ -275,7 +275,7 @@ bool            relogAlarms;
 bool            strictIdv1;
 bool            disableCusNotif;
 bool            logForHumans;
-bool            metricsOn;
+bool            noMetrics;
 
 
 
@@ -396,7 +396,7 @@ PaArgument paArgs[] =
   { "-disableCustomNotifications",  &disableCusNotif, "DISABLE_CUSTOM_NOTIF",  PaBool, PaOpt, false, false, true, DISABLE_CUSTOM_NOTIF  },
 
   { "-logForHumans",  &logForHumans,    "LOG_FOR_HUMANS",     PaBool, PaOpt, false, false, true,             LOG_FOR_HUMANS_DESC },
-  { "-metrics",       &metricsOn,       "METRICS",            PaBool, PaOpt, true,  false, true,             METRICS_DESC        },
+  { "-metrics",       &noMetrics,       "METRICS",            PaBool, PaOpt, false, false, true,             METRICS_DESC        },
 
   PA_END_OF_ARGS
 };
@@ -1735,7 +1735,9 @@ int main(int argC, char* argV[])
   contextBrokerInit(dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
   alarmMgr.init(relogAlarms);
-  metricsMgr.init(metrics);
+
+  LM_W(("KZ: calling metricsMgr.init with %s", (!noMetrics)? "true" : "false"));
+  metricsMgr.init(!noMetrics);
   logSummaryInit(&lsPeriod);
 
   if (rush[0] != 0)
@@ -1781,14 +1783,14 @@ int main(int argC, char* argV[])
     LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
 
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin, metricsOn, httpsPrivateServerKey, httpsCertificate);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin, httpsPrivateServerKey, httpsCertificate);
 
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
   else
   {
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin, metricsOn);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin);
   }
 
   LM_I(("Startup completed"));

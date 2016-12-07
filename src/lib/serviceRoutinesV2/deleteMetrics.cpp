@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "alarmMgr/alarmMgr.h"
+#include "metricsMgr/metricsMgr.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
@@ -49,7 +50,7 @@ std::string deleteMetrics
   ParseData*                 parseDataP
 )
 {
-  if (!metrics)
+  if (!metricsMgr.isOn())
   {
     OrionError oe(SccBadRequest, "metrics desactivated");
 

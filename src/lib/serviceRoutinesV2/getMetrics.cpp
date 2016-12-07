@@ -50,7 +50,7 @@ std::string getMetrics
   ParseData*                 parseDataP
 )
 {
-  if (!metrics)
+  if (!metricsMgr.isOn())
   {
     OrionError oe(SccBadRequest, "metrics desactivated");
 

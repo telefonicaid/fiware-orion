@@ -118,8 +118,9 @@ class MetricsManager
   bool         init(bool _on);
   void         add(const std::string& srv, const std::string& subServ, const std::string& metric, int value);
   void         reset(void);
-  void         totalTimeInTransactionAdd(struct timeval& start, struct timeval& end);
   std::string  toJson(void);
+  void         totalTimeInTransactionAdd(struct timeval& start, struct timeval& end);
+  bool         isOn(void);
 };
 
 #endif  // SRC_LIB_METRICSMGR_METRICSMANAGER_H_

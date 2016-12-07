@@ -47,10 +47,15 @@ MetricsManager::MetricsManager(): on(false)
 /* ****************************************************************************
 *
 * MetricsManager::init -
+*
+* NOTE
+*   The semaphore is created even though the metrics manager is not turned on.
+*   It's only one sys-call, and this way, the broker is prepared to receive 'on/off'
+*   via REST.
 */
 bool MetricsManager::init(bool _on)
 {
-  on = true;
+  on = _on;
 
   if (sem_init(&sem, 0, 1) == -1)
   {
@@ -229,4 +234,15 @@ void MetricsManager::totalTimeInTransactionAdd(struct timeval& start, struct tim
   }
 
   sem_post(&sem);
+}
+
+
+
+/* ****************************************************************************
+*
+* isOn - 
+*/
+bool MetricsManager::isOn(void)
+{
+  return on;
 }
