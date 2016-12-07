@@ -10,6 +10,7 @@
 * [Database management scripts](#database-management-scripts)
     * [Deleting expired documents](#deleting-expired-documents)
     * [Latest updated document](#latest-updated-document)
+* [Orion Errors due to Database](#orion-errors-due-to-database)
 	  
 ## Introduction
 
@@ -204,3 +205,55 @@ Ej:
 
 [Top](#top)
 
+## Orion Errors due to Database
+
+If you are getting entities using a large offset value and get this error (NGSIv1):
+
+```
+GET  /v1/contextEntities?offset=54882
+
+{
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "",
+        "isPattern" : "true",
+        "id" : ".*"
+      },
+      "statusCode" : {
+        "code" : "500",
+        "reasonPhrase" : "Internal Server Error",
+        "details" : "Sort operation used more than the maximum RAM. You should create an index. Check Database Administration section at Orion documentation."
+      }
+    }
+  ]
+}
+```
+
+or this other (NGSIv2):
+
+```
+GET /v2/entities?offset=54882
+
+{
+    "description": "Sort operation used more than the maximum RAM. You should create an index. Check Database Administration section at Orion documentation.",
+    "error": "InternalServerError"
+}
+```
+
+then the DB has raised an error related with sorting operation fail due to lack of resources. You can
+check that Orion log contain an ERROR trace similar to this one:
+
+```
+Raising alarm DatabaseError: nextSafe(): { $err: "Executor error: OperationFailed Sort operation used more than the maximum 33554432 bytes of RAM. Add an index, or specify a smaller limit.", code: 17144 }
+```
+
+The typical solution to this is to create an index in the field used for sorting. In particular,
+if you are using the default entities ordering (based on creation date) you can create the
+index with the following command at mongo shell:
+
+```
+db.entities.createIndex({creDate: 1})
+```
+
+[Top](#top)
