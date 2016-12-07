@@ -30,9 +30,9 @@ import datetime
 import pymongo
 
 
-class Epoll:
+class Stablish_Connections:
     """
-    Verify the epoll() instead of select(). See https://jirapdi.tid.es/browse/DM-2375 issue
+    Verify that ContextBroker works properly with a large number of stablish connections
     Tests procedure:
     - drop the db in mongo
     - create 5000 subscription with subject.entities.idPattern:. *
@@ -43,7 +43,7 @@ class Epoll:
     """
     # variables
     max_subscription_created = 5000
-    service = u'epoll'
+    service = u'stablish_connections'
     service_path = u'/test'
     port = u'1026'
     cb_endpoint = u'http://localhost:%s' % port
@@ -61,7 +61,7 @@ class Epoll:
         usage message
         """
         print " *****************************************************************************************************************"
-        print " * This script verify the epoll() instead of select():                                                           *"
+        print " * This script Verify that CB works properly with a large number of stablish connections:                        *"
         print " *                                                                                                               *"
         print " *  Parameters:                                                                                                  *"
         print " *     -host=<host>         : CB host (OPTIONAL) (default: localhost).                                           *"
@@ -74,7 +74,7 @@ class Epoll:
         print " *     -duration=<value>    : test duration, value is in minutes (OPTIONAL) (default: 60 minutes)                *"
         print " *                                                                                                               *"
         print " *  Examples:                                                                                                    *"
-        print " *    python use_epoll.py -host=10.10.10.10 -notif_url=http://10.0.0.1:1234/notify duration=100 -v               *"
+        print " *    python stablish_connections.py -host=10.10.10.10 -notif_url=http://10.0.0.1:1234/notify duration=100 -v    *"
         print " *                                                                                                               *"
         print " *  Note:                                                                                                        *"
         print " *    - the update delay is 3 minutes                                                                            *"
@@ -198,14 +198,14 @@ class Epoll:
 
 
 if __name__ == '__main__':
-    epoll = Epoll(sys.argv)
+    conn = Stablish_Connections(sys.argv)
 
     # drop database in mongo
-    epoll.drop_database()
+    conn.drop_database()
 
     # create 5000 subscription with subject.entities.idPattern: .*
-    epoll.create_subscriptions()
+    conn.create_subscriptions()
 
     # modify a entity each N minutes, that it triggers all subscriptions and
     # launch indefinitely a "/version" request and verify that its response is correct.
-    epoll.update_and_version()
+    conn.update_and_version()
