@@ -129,6 +129,7 @@ class MetricsManager
   std::string  toJson(void);
   bool         isOn(void);
   long long    semWaitTimeGet(void);
+  const char*  semStateGet(void);
 };
 
 #endif  // SRC_LIB_METRICSMGR_METRICSMANAGER_H_

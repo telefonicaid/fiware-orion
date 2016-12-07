@@ -254,3 +254,26 @@ bool MetricsManager::isOn(void)
 {
   return on;
 }
+
+
+
+/* ****************************************************************************
+*
+* MetricsManager::semStateGet - 
+*/
+const char* MetricsManager::semStateGet(void)
+{
+  int value;
+
+  if (sem_getvalue(&sem, &value) == -1)
+  {
+    return "error";
+  }
+
+  if (value == 0)
+  {
+    return "taken";
+  }
+
+  return "free";  
+}
