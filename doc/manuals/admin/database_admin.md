@@ -207,7 +207,7 @@ Ej:
 
 ## Orion Errors due to Database
 
-If you are getting entities using a large offset value and get this error (NGSIv1):
+If you are retreiving entities using a large offset value and get this error (NGSIv1):
 
 ```
 GET  /v1/contextEntities?offset=54882
@@ -241,8 +241,8 @@ GET /v2/entities?offset=54882
 }
 ```
 
-then the DB has raised an error related with sorting operation fail due to lack of resources. You can
-check that Orion log contain an ERROR trace similar to this one:
+then the DB has raised an error related to sorting operation failure due to lack of resources. You can
+check that the Orion log file contains an ERROR trace similar to this one:
 
 ```
 Raising alarm DatabaseError: nextSafe(): { $err: "Executor error: OperationFailed Sort operation used more than the maximum 33554432 bytes of RAM. Add an index, or specify a smaller limit.", code: 17144 }
