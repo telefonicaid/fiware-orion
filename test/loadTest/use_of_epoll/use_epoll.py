@@ -27,12 +27,14 @@ import requests
 import random
 import time
 import datetime
+import pymongo
 
 
 class Epoll:
     """
     Verify the epoll() instead of select(). See https://jirapdi.tid.es/browse/DM-2375 issue
     Tests procedure:
+    - drop the db in mongo
     - create 5000 subscription with subject.entities.idPattern:. *
     - verify/modify the notification listener with a delay of 10 minutes before answering.
     - modify the ContextBroker config with: -httpTimeout 600000 and restart it.
@@ -46,10 +48,12 @@ class Epoll:
     port = u'1026'
     cb_endpoint = u'http://localhost:%s' % port
     notif_url = 'http://localhost:9999/notify'
+    mongo_host = "localhost"
+    mongo_port = u'27017'
     verbose = False
-    duration = 60  # time in minutes
-    update_delay = 180 # time in seconds
-    version_delay = 1 # time in seconds
+    duration = 60       # time in minutes
+    update_delay = 180  # time in seconds
+    version_delay = 1   # time in seconds
 
     @staticmethod
     def __usage():
@@ -66,6 +70,7 @@ class Epoll:
         print " *     -service=<value>     : service header (OPTIONAL) (default: epoll).                                        *"
         print " *     -service_path=<value>: service path header (OPTIONAL) (default: /test)                                    *"
         print " *     -notif_url=<value>   : url used to notifications (OPTIONAL) (default: http://localhost:9999/notify)       *"
+        print " *     -mongo=<value>       : mongo host used to clean de bd (OPTIONAL) (default: localhost)                     *"
         print " *     -duration=<value>    : test duration, value is in minutes (OPTIONAL) (default: 60 minutes)                *"
         print " *                                                                                                               *"
         print " *  Examples:                                                                                                    *"
@@ -77,6 +82,15 @@ class Epoll:
         print " *                                                                                                               *"
         print " *****************************************************************************************************************"
         exit(0)
+
+    @staticmethod
+    def __convert_timestamp_to_zulu(value):
+        """
+        convert a timestamp to a zulu date
+        :param value: timestamp to convert
+        :return: string (zulu date)
+        """
+        return str(datetime.datetime.fromtimestamp(value).strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
 
     def __print_by_console(self, resp):
         """
@@ -105,6 +119,8 @@ class Epoll:
                 self.service_path = str(arguments[i]).split("=")[1]
             if arguments[i].find('-notif_url') >= 0:
                 self.notif_url = str(arguments[i]).split("=")[1]
+            if arguments[i].find('-mongo') >= 0:
+                self.mongo_host = str(arguments[i]).split("=")[1]
             if arguments[i].find('-duration') >= 0:
                 self.duration = float(arguments[i].split("=")[1])
 
@@ -117,45 +133,40 @@ class Epoll:
         print(" INFO  - servicePath: %s" % self.service_path)
         print(" INFO  - CB endpoint: %s" % self.cb_endpoint)
         print(" INFO  - notification URL: %s" % self.notif_url)
+        print(" INFO  - mongo host: %s" % self.mongo_host)
         print(" INFO  - test duration: %s minutes (%s seconds)" % (str(self.duration), str(self.duration * 60)))
         print(" INFO  - updates requests delay: %d seconds" % self.update_delay)
         print(" INFO  - version requests delay: %d seconds" % self.version_delay)
-        print(" INFO  - max subcription: %d" %  self.max_subscription_created)
+        print(" INFO  - max subcription: %d" % self.max_subscription_created)
         print(" ***************************************************************************************")
         print(" * WARN  - verify if the listener has a delay in the response (10 minutes recommended) *")
         print(" * WARN  - verify if -httpTimeout 600000 parameter is used in CB config                *")
         print(" ***************************************************************************************")
 
-    def __get_number_of_subscriptions(self):
+    def drop_database(self):
         """
-        return the number of subscriptions
-        :return: int
+        drop database in mongo
         """
-        resp = requests.get("%s/v2/subscriptions?options=count" % self.cb_endpoint, headers=self.headers)
-        self.__print_by_console(resp)
-        assert resp.status_code == 200, " ERROR - the get number of subcriptions request is failed: \n - status code: %s \n - response: %s" % (str(resp.status_code), resp.text)
-        return int(resp.headers["Fiware-Total-Count"])
+        mongo_database = "orion-%s" % self.service
+        mongo_uri = "mongodb://%s:%s/%s" % (self.mongo_host, self.mongo_port, mongo_database)
+        try:
+            client = pymongo.MongoClient(mongo_uri)
+            client.drop_database(mongo_database)
+            print(" INFO - The database %s has been erased" % mongo_database)
+        except Exception, e:
+            raise Exception(" ERROR - Deleting a database %s in MongoDB...\n %s" % (mongo_database, str(e)))
 
     def create_subscriptions(self):
         """
         create N subscription until de max subscription created
         """
         payload = u'{"description": "subscription used to epoll test",  "subject": {"entities": [{"idPattern": ".*"}], "condition": {"attrs": ["temperature"]}}, "notification": {"http": {"url": "%s"}, "attrs": ["temperature"]}}' % self.notif_url
-        subsc = self.__get_number_of_subscriptions()
         self.headers["Content-Type"] = u'application/json'
-        for i in range(self.max_subscription_created-subsc):
+        for i in range(self.max_subscription_created):
             resp = requests.post("%s/v2/subscriptions" % self.cb_endpoint, headers=self.headers, data=payload)
             self.__print_by_console(resp)
             assert resp.status_code == 201, " ERROR - the subcriptions request is failed: \n - status code: %s \n - response: %s" % (str(resp.status_code), resp.text)
-        print("%d subscriptions have been created (max created: %d)" % (self.max_subscription_created-subsc, self.max_subscription_created))
-
-    def __convert_timestamp_to_zulu(self, value):
-        """
-        convert a timestamp to a zulu date
-        :param value: timestamp to convert
-        :return: string (zulu date)
-        """
-        return str(datetime.datetime.fromtimestamp(value).strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
+        print(" INFO - %d subscriptions have been created" % self.max_subscription_created)
 
     def update_and_version(self):
         """
@@ -171,7 +182,7 @@ class Epoll:
                 # update request
                 self.headers["Content-Type"] = u'application/json'
                 payload = u'{"actionType": "APPEND", "entities": [{"id": "Bcn-Welt", "temperature": {"value": %s}}]}'
-                random_value = random.randint(1, 100) # random value between 1..100 for attribute value. See the payload above.
+                random_value = random.randint(1, 100)  # random value between 1..100 for attribute value. See the payload above.
                 print("payload: %s" % (payload % random_value))
                 resp = requests.post("%s/v2/op/update" % self.cb_endpoint, headers=self.headers, data=payload % random_value)
                 assert resp.status_code == 204, " ERROR - the update batch op request is failed: \n - status code: %s \n - response: %s" % (str(resp.status_code), resp.text)
@@ -185,10 +196,16 @@ class Epoll:
         print(" INFO - ALL \"/version\" requests responded correctly...Bye.")
         print("Test end: %s" % self.__convert_timestamp_to_zulu(time.time()))
 
+
 if __name__ == '__main__':
     epoll = Epoll(sys.argv)
+
+    # drop database in mongo
+    epoll.drop_database()
+
     # create 5000 subscription with subject.entities.idPattern: .*
     epoll.create_subscriptions()
+
     # modify a entity each N minutes, that it triggers all subscriptions and
     # launch indefinitely a "/version" request and verify that its response is correct.
     epoll.update_and_version()
