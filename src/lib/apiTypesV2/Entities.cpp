@@ -149,9 +149,10 @@ void Entities::fill(QueryContextResponse* qcrsP)
 
     if (scP->code == SccReceiverInternalError)
     {
-      // Do we need to release the memory allocated in 'vec' before returning? I don't
+      // FIXME P4: Do we need to release the memory allocated in 'vec' before returning? I don't
       // think so, as the releasing logic in the upper layer will deal with that but
-      // let's do anyway just in case...
+      // let's do anyway just in case... (we don't have a ft covering this, so valgrind suite
+      // cannot help here and it is better to ensure)
       oe.fill(SccReceiverInternalError, scP->details, "InternalServerError");
       vec.release();
       return;
