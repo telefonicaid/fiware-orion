@@ -119,11 +119,12 @@ following CLI parameters (see details in the corresponding document):
   internally by the HTTP server library. Default value is 64 kB.
 
 * **maxConnections**. Maximum number of simultaneous connections. Default value is 1020, for legacy reasons,
-  while the lower limit is 1 and there is no upper limit (limited by max file descriptors of the operating system).
+  while the lower limit is 1 and there is no upper limit (limited by max number of file descriptors of the
+  operating system).
 
 * **reqPoolSize**. Size of thread pool for incoming connections. Default value is 0, meaning no thread pool at all,
   i.e., a new thread is created to manage each new incoming HTTP request and destroyed after its use. Thread pool
-  mode use internally the `epoll()` system call, which is more efficient that the one used when no
+  mode uses internally the `epoll()` system call, which is more efficient than the one used when no
   thread pool is used (`poll()`). Some performance information regarding this can be found in [the documentation of the
   HTTP server library itself](https://www.gnu.org/software/libmicrohttpd/manual/libmicrohttpd.html#Thread-modes-and-event-loops).
 
@@ -136,7 +137,7 @@ high load scenarios. The other two parameters usually work well with their defau
 
 ## Orion thread model and its implications
 
-Orion is a multithread process. With default starting parameters and in idle status (i.e. no load)
+Orion is a multithread process. With default starting parameters and in idle state (i.e. no load),
 Orion consumes 4 threads:
 
 * Main thread (the one that starts the broker, then sleeps forever)
@@ -144,13 +145,13 @@ Orion consumes 4 threads:
 * Listening thread for the IPv4 server (if `-ipv6` is used then this thread is not created)
 * Listening thread for the IPv6 server (if `-ipv4` is used then this thread is not created)
 
-In busy status, the number of threads will be higher. With default configuration, Orion creates a new thread
-for each incoming request and for each outgoing notification. These threads are destroyed once they end
-their work.
+In busy state, the number of threads will be higher. With default configuration, Orion creates a new thread
+for each incoming request and for each outgoing notification. These threads are destroyed once their
+work finalizes.
 
-The default configuration is fine for low to mid load scenarios. In high load scenarios you could have
-a large number of simultenous requests and notifications so the number of threads may reach the per process
-operating system level. This is known as the *thread exhaustion problem* and will cause that Orion will
+The default configuration is fine for low to medium load scenarios. In high load scenarios you may have
+a large number of simultaneous requests and notifications so the number of threads may reach the per process
+operating system level. This is known as the *thread exhaustion problem* and will cause Orion to
 not work properly, being unable to deal with new incoming request and outgoing notifications. You can detect
 that situation by two symptoms.
 
@@ -162,8 +163,8 @@ that situation by two symptoms.
   ```
 
 In order to avoid this problem, Orion supports thread pools. Using thread pools you can statically set
-the number of threads that Orion process will use. Removing the dynamics of thread creation/destruction
-you will avoid the thread exhaustion problem. In other words, pools make the behavior of Orion more
+the number of threads that the Orion process uses, removing the dynamics of thread creation/destruction
+the thread exhaustion problem is avoided. In other words, pools make the behavior of Orion more
 predictable, as a way of guaranteeing that the Orion process doesn't go beyond the per process
 operating system thread limit.
 
