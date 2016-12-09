@@ -104,9 +104,17 @@
 * 4. reset() method implementation (not delete maps, only set metrics to 0)
 * 5. toJson() to be split into 3 methods (2 of them private)
 * 6. Use 'long long' instead of 'int'
-* 7. (Unsure) We could need maps for metrics different for int. In that case, implement
+* 7. (Unsure) We could need maps for metrics different from int. If so, implement
 *    it (and the add method) using templates, to avoid repeating the same implementation
 *    N times
+* 8. Empty services (no tenant given) to receive some default service name.
+* 9. What to do with default SP ("/")?
+*    When applying the rule "remove the inicial /", the default SP ends up as "".
+*    Not sure that we want that...
+* 10. Forgotten: initial slash should be skipped for service paths
+*     Fix in MetricsManager::add, simply.
+*     Is a Service Path of "//sp1" accepted by the broker?
+*     If so, only the first '/' is removed ... ?
 */
 class MetricsManager
 {
