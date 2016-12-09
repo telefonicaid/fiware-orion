@@ -179,8 +179,8 @@ Using both parameters, in any situation (either idle or busy) Orion consumes a f
 
 * Main thread (the one that starts the broker, then sleeps forever)
 * Subscription cache synchronization thread (if `-noCache` is used then this thread is not created)
-* `c` listening thread for the IPv4 server (if `-ipv6` is used then these threads are not created)
-* `c` listening threaftestd for the IPv6 server (if `-ipv4` is used then these threads are not created)
+* `c` listening threads for the IPv4 server (if `-ipv6` is used then these threads are not created)
+* `c` listening threads for the IPv6 server (if `-ipv4` is used then these threads are not created)
 * `n` threads corresponding to the workers in the notification thread pool.
 
 Apart from avoiding the thread exhaustion problem, there is a trade-off between using thread pools and
