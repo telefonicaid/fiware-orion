@@ -275,7 +275,7 @@ bool            relogAlarms;
 bool            strictIdv1;
 bool            disableCusNotif;
 bool            logForHumans;
-bool            noMetrics;
+bool            disableMetrics;
 
 
 
@@ -396,7 +396,7 @@ PaArgument paArgs[] =
   { "-disableCustomNotifications",  &disableCusNotif, "DISABLE_CUSTOM_NOTIF",  PaBool, PaOpt, false, false, true, DISABLE_CUSTOM_NOTIF  },
 
   { "-logForHumans",   &logForHumans,    "LOG_FOR_HUMANS",     PaBool, PaOpt, false, false, true,             LOG_FOR_HUMANS_DESC },
-  { "-disableMetrics", &noMetrics,       "DISABLE_METRICS",    PaBool, PaOpt, false, false, true,             METRICS_DESC        },
+  { "-disableMetrics", &disableMetrics,  "DISABLE_METRICS",    PaBool, PaOpt, false, false, true,             METRICS_DESC        },
 
   PA_END_OF_ARGS
 };
@@ -1736,7 +1736,7 @@ int main(int argC, char* argV[])
   curl_global_init(CURL_GLOBAL_NOTHING);
   alarmMgr.init(relogAlarms);
 
-  metricsMgr.init(!noMetrics, statSemWait);
+  metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
 
   if (rush[0] != 0)
