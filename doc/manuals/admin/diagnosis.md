@@ -95,7 +95,7 @@ lsof -p <pid> | wc -l
 ```
 
 The solution to the problem is to ensure that Orion is properly configured in order
-for the inequity described in [threadpool considerations](perf_tuning.md#thread-pool-considerations)
+for the inequity described in the [file descriptor sizing section](perf_tuning.md#file-descriptors-sizing)
 to hold. Alternatively, the operating system limit could be raised with
 `ulimit -n <new limit>`.
 
@@ -115,11 +115,11 @@ echo "$(date +%H:%M:%S) $(/usr/sbin/lsof | grep contextBr |grep IPv4 | wc -l)
 
 The symptoms of this problem are:
 
-- An unexpectedly high number of threads associated to the contextBroker
+- An unexpectedly high number of threads associated to the contextBroker, very close to the per process operating system limit
 - Error messages like this appearing in the logs: `Runtime Error (error creating thread: ...)`
 
 In order to solve this problem, have a look at the following section in [the
-performance tuning documentation](perf_tuning.md#thread-pool-considerations).
+performance tuning documentation](perf_tuning.md#orion-thread-model-and-its-implications).
 
 [Top](#top)
 

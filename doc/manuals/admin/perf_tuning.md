@@ -5,7 +5,8 @@
 * [Write concern](#write-concern)
 * [Notification modes and performance](#notification-modes-and-performance)
 * [HTTP server tuning](#http-server-tuning)
-* [Thread pool considerations](#thread-pool-considerations)
+* [Orion thread model and its implications](#orion-thread-model-and-its-implications)
+* [File descriptors sizing](#file-descriptors-sizing)
 * [Identifying bootlenecks looking at semWait statistics](#identifying-bootlenecks-looking-at-semwait-statistics)
 * [Log impact in performance](#log-impact-in-performance)
 * [Mutex policy impact in performance](#mutex-policy-impact-in-performance)
@@ -82,7 +83,7 @@ Orion can use different notification modes, depending on the value of [`-notific
 Default mode is 'transient'. In this mode, each time a notification is sent, a new thread is created to deal
 with the notification. Once the notification is sent and the response is received, the thread with its connection context
 is destroyed. This is the recommended mode for low load scenarios. In high level cases, it might lead to
-a [thread exhaustion problem](#thread-pool-considerations).
+a [thread exhaustion problem](#orion-thread-model-and-its-implications).
 
 Permanent mode is similar, except that the connection context is not destroyed at the end. Thus,
 new notifications associated to the same connection context (i.e. the same destination URL) can
@@ -117,11 +118,15 @@ following CLI parameters (see details in the corresponding document):
 * **connectionMemory**. Sets the size of the connection memory buffer (in kB) per connection used
   internally by the HTTP server library. Default value is 64 kB.
 
-* **maxConnections**. Maximum number of simultaneous connections. Default value is "unlimited" (limited
-   by max file descriptors of the operating system).
+* **maxConnections**. Maximum number of simultaneous connections. Default value is 1020, for legacy reasons,
+  while the lower limit is 1 and there is no upper limit (limited by max number of file descriptors of the
+  operating system).
 
 * **reqPoolSize**. Size of thread pool for incoming connections. Default value is 0, meaning no thread pool at all,
-  i.e., a new thread is created to manage each new incoming HTTP request and destroyed after its use.
+  i.e., a new thread is created to manage each new incoming HTTP request and destroyed after its use. Thread pool
+  mode uses internally the `epoll()` system call, which is more efficient than the one used when no
+  thread pool is used (`poll()`). Some performance information regarding this can be found in [the documentation of the
+  HTTP server library itself](https://www.gnu.org/software/libmicrohttpd/manual/libmicrohttpd.html#Thread-modes-and-event-loops).
 
 Given that thread creation and destruction are costly operations, it is recommend to use `-reqPoolSize` in
 high load scenarios. The other two parameters usually work well with their default values.
@@ -130,32 +135,65 @@ high load scenarios. The other two parameters usually work well with their defau
 
 [Top](#top)
 
-## Thread pool considerations
+## Orion thread model and its implications
 
-Orion can use thread pools in two different points: to process incoming HTTP requests at the API endpoint
-(managed by `-reqPoolSize`) and to process outgoing notifications (using the threadpool notification mode).
+Orion is a multithread process. With default starting parameters and in idle state (i.e. no load),
+Orion consumes 4 threads:
 
-There is a tradeoff between using thread pools and not. On the one side, using thread pools is
-beneficial as it saves thread creation/destruction time. In addition, they make the behavior of Orion more
-predictable, taking into account that the operating system establishes a thread limit per process and
-thread pools is a way of guaranteeing that the Orion process doesn't go beyond that limit (typically, you
-can change the limit with the 'ulimit' command).
+* Main thread (the one that starts the broker, then sleeps forever)
+* Subscription cache synchronization thread (if `-noCache` is used then this thread is not created)
+* Listening thread for the IPv4 server (if `-ipv6` is used then this thread is not created)
+* Listening thread for the IPv6 server (if `-ipv4` is used then this thread is not created)
 
+In busy state, the number of threads will be higher. With default configuration, Orion creates a new thread
+for each incoming request and for each outgoing notification. These threads are destroyed once their
+work finalizes.
+
+The default configuration is fine for low to medium load scenarios. In high load scenarios you may have
+a large number of simultaneous requests and notifications so the number of threads may reach the per process
+operating system level. This is known as the *thread exhaustion problem* and will cause Orion to
+not work properly, being unable to deal with new incoming request and outgoing notifications. You can detect
+that situation by two symptoms.
+
+* First, a number of threads associated to the process very close to the per process operating system limit.
+* Second, error messages like this appearing in the logs:
+
+  ```
+  Runtime Error (error creating thread: ...)
+  ```
+
+In order to avoid this problem, Orion supports thread pools. Using thread pools you can statically set
+the number of threads that the Orion process uses, removing the dynamics of thread creation/destruction
+the thread exhaustion problem is avoided. In other words, pools make the behavior of Orion more
+predictable, as a way of guaranteeing that the Orion process doesn't go beyond the per process
+operating system thread limit.
+
+There are two pools that can be configured independently:
+
+* Incoming requests pool. Set by the `-reqPoolSize c` parameter, being `c` the number of threads
+  in this pool. See [HTTP server tuning section](#http-server-tuning) in this page for more information.
+* Notifications pool. Set by `-notificationMode threadpool:q:n`, being `n` the number of threads in this pool.
+  See [notification modes and performance section](#notification-modes-and-performance) in this page.
+
+Using both parameters, in any situation (either idle or busy) Orion consumes a fixed number of threads:
+
+* Main thread (the one that starts the broker, then sleeps forever)
+* Subscription cache synchronization thread (if `-noCache` is used then this thread is not created)
+* `c` listening threads for the IPv4 server (if `-ipv6` is used then these threads are not created)
+* `c` listening threads for the IPv6 server (if `-ipv4` is used then these threads are not created)
+* `n` threads corresponding to the workers in the notification thread pool.
+
+Apart from avoiding the thread exhaustion problem, there is a trade-off between using thread pools and
+not. On the one side, using thread pools is beneficial as it saves thread creation/destruction time.
 On the other hand, setting thread pools is a way of "capping" throughput. If the thread workers are busy
 all the time, at the end the queue saturates and you will end up losing incoming request or ongoing
 notifications.
 
-Finally, you may have *thread exhaustion problems* if you don't use thread pools. You can detect that
-situation by two symptoms. First, an unexpectedly high number of threads associated to the process.
-Second, error messages like this appearing in the logs:
+[Top](#top)
 
-```
-Runtime Error (error creating thread: ...)
-```
+## File descriptors sizing
 
-On the other hand, you may have *file descriptors exahustion problems* if your pools are not correctly
-dimensioned. In particular, the following inequity ensures the number of file descriptors used by Orion
-is below the operating system limit:
+The following inequity ensures the number of file descriptors used by Orion is below the operating system limit:
 
 ```
 max fds > 5 * n + max cons + db pool size + extra
@@ -166,7 +204,7 @@ where
 * **max fds** is the per process file descriptors limit, i.e. the output of the `ulimit -n` command. It can
   be changed with `ulimit -n <new limit>`.
 * **n**, number of threads in the notification thread pool. The factor 5 is due to that each thread can
-  hold up to 5 connections (libcurl pool).
+  hold up to 5 connections ([libcurl pool](https://curl.haxx.se/libcurl/c/CURLOPT_MAXCONNECTS.html)).
 * **max cons** is the size of the thread pool for incoming connections, configured with `-reqPoolSize`
   [CLI parameter](cli.md). Note that if you don't use this parameter, default is not using any pool for incoming
   connections. Thus, a burst of incoming connections large enough could exhaust in theory all 
@@ -176,9 +214,18 @@ where
 * **extra** an amount of file descriptors used by log files, listening sockets and file descriptors used by libraries.
   There isn't any general rule for this value, but one in the range of 100 to 200 must suffice most of the cases.
 
-If the above inequity doesn't hold, Orion Context Broker will not work properly. In particular, it
-may happen that Orion is unable to accept new incoming connections and/or send notifications due to lack
-of file descriptors.
+If the above inequity doesn't hold, you may have *file descriptors exhaustion problem* and Orion Context Broker
+will not work properly. In particular, it may happen that Orion is unable to accept new incoming connections and/or
+send notifications due to lack of file descriptors.
+
+Note that having a large number of client connections at Orion in CLOSE_WAIT status is not a problem. This
+is part of the libcurl connection cache strategy, in order to save time by reusing connections.
+From [libcurl email discussion about this topic](https://curl.haxx.se/mail/tracker-2011-05/0006.html):
+
+> The CLOSE_WAIT sockets are probably the ones that libcurl has in its connection cache but that have been
+> "closed" (a FIN was sent) by the server already but not yet by libcurl. They are not there "indefinitely"
+> (and they really can't be) since the connection cache has a limited size so eventually the old connections
+> should get closed.
 
 [Top](#top)
 
@@ -283,7 +330,7 @@ As a final note, you can disable cache completely using the `-noCache` CLI optio
 
 [Top](#top)
 
-# [Geo-subscription performance considerations]
+## Geo-subscription performance considerations
 
 Current support of georel, geometry and coords expression fields in NGSIv2 subscriptions (aka geo-subscriptions)
 relies on MongoDB geo-query capabilities. While all other conditions associated to subscriptions (e.g. query filter,
