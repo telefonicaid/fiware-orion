@@ -251,10 +251,11 @@ std::string MetricsManager::toJson(void)
     for (subServiceIter = servMap->begin(); subServiceIter != servMap->end(); ++subServiceIter)
     {
       JsonHelper                                  jhMetrics;
-      std::string                                 subServ    = subServiceIter->first;
-      std::map<std::string, unsigned long long>*  metricMap  = subServiceIter->second;
+      std::string                                 subServ              = subServiceIter->first;
+      std::map<std::string, unsigned long long>*  metricMap            = subServiceIter->second;
       unsigned long long                          incomingTransactions = 0;
       unsigned long long                          totalServiceTime     = 0;
+
       for (metricIter = metricMap->begin(); metricIter != metricMap->end(); ++metricIter)
       {
         std::string  metric = metricIter->first;
@@ -269,18 +270,17 @@ std::string MetricsManager::toJson(void)
           incomingTransactions = value;
         }
 
+        if (metric != METRIC_TOTAL_SERVICE_TIME)
+        {
+          jhMetrics.addNumber(metric, value);
+        }
+
         if ((totalServiceTime != 0) && (incomingTransactions != 0))
         {
           float mValue = (float) totalServiceTime / (float) (incomingTransactions * 1000000);
           jhMetrics.addFloat(METRIC_SERVICE_TIME, mValue);
-
-          // FIXME PR: Remove METRIC_TOTAL_SERVICE_TIME from jSON output before merging!!!
-          // jhMetrics.addNumber(METRIC_TOTAL_SERVICE_TIME, totalServiceTime);
-        }
-
-        if (metric != METRIC_TOTAL_SERVICE_TIME)
-        {
-          jhMetrics.addNumber(metric, value);
+          totalServiceTime     = 0;
+          incomingTransactions = 0;
         }
       }
 
@@ -293,6 +293,7 @@ std::string MetricsManager::toJson(void)
 
   top.addRaw("services", services.str());
   semGive();
+
   return top.str();
 }
 
@@ -328,4 +329,48 @@ const char* MetricsManager::semStateGet(void)
   }
 
   return "free";  
+}
+
+
+
+/* ****************************************************************************
+*
+* MetricsManager::release -
+*/
+void MetricsManager::release(void)
+{
+  if (on == false)
+  {
+    return;
+  }
+
+  semTake();
+
+  //
+  // Two iterators needed to iterate over metrics, clearing all maps:
+  //   serviceIter      to iterate over all services
+  //   subServiceIter   to iterate over all sub-services of a service
+  //
+  std::map<std::string, std::map<std::string, std::map<std::string, unsigned long long>*>*>::iterator  serviceIter;
+  std::map<std::string, std::map<std::string, unsigned long long>*>::iterator                          subServiceIter;
+
+  for (serviceIter = metrics.begin(); serviceIter != metrics.end(); ++serviceIter)
+  {
+    std::string                                                        service        = serviceIter->first;
+    std::map<std::string, std::map<std::string, unsigned long long>*>* servMap        = serviceIter->second;
+
+    for (subServiceIter = servMap->begin(); subServiceIter != servMap->end(); ++subServiceIter)
+    {
+      std::string                                 subServ    = subServiceIter->first;
+      std::map<std::string, unsigned long long>*  metricMap  = subServiceIter->second;
+
+      metricMap->clear();
+      delete metricMap;
+    }
+    servMap->clear();
+    delete servMap;
+  }
+  metrics.clear();
+
+  semGive();
 }

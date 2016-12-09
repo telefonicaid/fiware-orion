@@ -105,9 +105,6 @@
 *     (probably difficult to beat) and syntax (current one is a bit awkward)
 * 02. In order to be homogeneous, probably 'metrics' should be a pointer (and the
 *     initial map created at constructor time)
-* 03. Destroy method, releasing all the maps in cascade (probably never used, as the
-*     singleton object in CB using this class will be destroyed at the end, but do it
-*     for class completeness)
 * 05. toJson() to be split into 3 methods (2 of them private)
 * 07. (Unsure) We could need maps for metrics different from int. If so, implement
 *     it (and the add method) using templates, to avoid repeating the same implementation
@@ -143,6 +140,7 @@ class MetricsManager
   bool         isOn(void);
   long long    semWaitTimeGet(void);
   const char*  semStateGet(void);
+  void         release(void);
 };
 
 #endif  // SRC_LIB_METRICSMGR_METRICSMANAGER_H_

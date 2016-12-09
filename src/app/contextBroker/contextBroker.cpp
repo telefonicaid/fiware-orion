@@ -1345,6 +1345,8 @@ void exitFunc(void)
   subCacheDestroy();
 #endif
 
+  metricsMgr.release();
+
   curl_context_cleanup();
   curl_global_cleanup();
 
