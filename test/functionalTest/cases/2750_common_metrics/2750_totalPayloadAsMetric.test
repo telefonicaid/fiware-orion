@@ -1,0 +1,219 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Incoming Transactions and Common Metrics
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Send a GET /version
+# 02. Ask for Metrics, see 2 Incoming Transactions, but nothing about incomingTransactionRequestSize
+# 03. Create an entity (with payload of exactly 50 bytes)
+# 04. Ask for Metrics, see 4 Incoming Transactions, and 50 bytes in incomingTransactionRequestSize
+# 05. Create an entity (with payload of exactly 100 bytes)
+# 06. Ask for Metrics, see 6 Incoming Transactions, and 150 bytes in incomingTransactionRequestSize
+#
+
+echo "01. Send a GET /version"
+echo "======================="
+orionCurl --url /version --tenant S1 --servicePath /SP1
+echo
+echo
+
+
+echo "02. Ask for Metrics, see 2 Incoming Transactions, but nothing about incomingTransactionRequestSize"
+echo "=================================================================================================="
+orionCurl --url /admin/metrics
+echo
+echo
+
+
+echo "03. Create an entity (with payload of exactly 50 bytes)"
+echo "======================================================="
+payload='{"id": "E1", "type": "T1", "A1": "78901234567890"}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "04. Ask for Metrics, see 4 Incoming Transactions, and 50 bytes in incomingTransactionRequestSize"
+echo "================================================================================================"
+orionCurl --url /admin/metrics
+echo
+echo
+
+
+echo "05. Create an entity (with payload of exactly 100 bytes)"
+echo "========================================================"
+payload='{"id": "E2", "type": "T2", "A1": "7890123456789012345678901234567890123456789012345678901234567890"}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "06. Ask for Metrics, see 6 Incoming Transactions, and 150 bytes in incomingTransactionRequestSize"
+echo "================================================================================================="
+orionCurl --url /admin/metrics
+echo
+echo
+
+
+--REGEXPECT--
+01. Send a GET /version
+=======================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "orion": {
+        "compile_time": "REGEX(.*)",
+        "compiled_by": "REGEX(.*)",
+        "compiled_in": "REGEX(.*)",
+        "git_hash": "REGEX(.*)",
+        "uptime": "REGEX(.*)",
+        "version": "REGEX(.*)"
+    }
+}
+
+
+02. Ask for Metrics, see 2 Incoming Transactions, but nothing about incomingTransactionRequestSize
+==================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "services": {
+        "": {
+            "subservs": {
+                "": {
+                    "incomingTransactions": 1
+                }
+            }
+        },
+        "S1": {
+            "subservs": {
+                "SP1": {
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                }
+            }
+        }
+    }
+}
+
+
+03. Create an entity (with payload of exactly 50 bytes)
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Ask for Metrics, see 4 Incoming Transactions, and 50 bytes in incomingTransactionRequestSize
+================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 203
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "services": {
+        "": {
+            "subservs": {
+                "": {
+                    "incomingTransactionRequestSize": 50,
+                    "incomingTransactions": 3,
+                    "serviceTime": REGEX(.*)
+                }
+            }
+        },
+        "S1": {
+            "subservs": {
+                "SP1": {
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                }
+            }
+        }
+    }
+}
+
+
+05. Create an entity (with payload of exactly 100 bytes)
+========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T2
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Ask for Metrics, see 6 Incoming Transactions, and 150 bytes in incomingTransactionRequestSize
+=================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 204
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "services": {
+        "": {
+            "subservs": {
+                "": {
+                    "incomingTransactionRequestSize": 150,
+                    "incomingTransactions": 5,
+                    "serviceTime": REGEX(.*)
+                }
+            }
+        },
+        "S1": {
+            "subservs": {
+                "SP1": {
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                }
+            }
+        }
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
