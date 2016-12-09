@@ -145,15 +145,30 @@ void Entities::fill(QueryContextResponse* qcrsP)
   for (unsigned int ix = 0; ix < qcrsP->contextElementResponseVector.size(); ++ix)
   {
     ContextElement* ceP = &qcrsP->contextElementResponseVector[ix]->contextElement;
-    Entity*         eP  = new Entity();
+    StatusCode* scP = &qcrsP->contextElementResponseVector[ix]->statusCode;
 
-    eP->id        = ceP->entityId.id;
-    eP->type      = ceP->entityId.type;
-    eP->isPattern = ceP->entityId.isPattern;
-    eP->creDate   = ceP->entityId.creDate;
-    eP->modDate   = ceP->entityId.modDate;
+    if (scP->code == SccReceiverInternalError)
+    {
+      // FIXME P4: Do we need to release the memory allocated in 'vec' before returning? I don't
+      // think so, as the releasing logic in the upper layer will deal with that but
+      // let's do anyway just in case... (we don't have a ft covering this, so valgrind suite
+      // cannot help here and it is better to ensure)
+      oe.fill(SccReceiverInternalError, scP->details, "InternalServerError");
+      vec.release();
+      return;
+    }
+    else
+    {
+      Entity*         eP  = new Entity();
 
-    eP->attributeVector.fill(&ceP->contextAttributeVector);
-    vec.push_back(eP);
+      eP->id        = ceP->entityId.id;
+      eP->type      = ceP->entityId.type;
+      eP->isPattern = ceP->entityId.isPattern;
+      eP->creDate   = ceP->entityId.creDate;
+      eP->modDate   = ceP->entityId.modDate;
+
+      eP->attributeVector.fill(&ceP->contextAttributeVector);
+      vec.push_back(eP);
+    }
   }
 }

@@ -1274,6 +1274,7 @@ bool entitiesQuery
       // So, we can just match the error and send a less descriptive text.
       //
       const char* invalidPolygon      = "Exterior shell of polygon is invalid";
+      const char* sortError           = "nextSafe(): { $err: \"Executor error: OperationFailed Sort operation used more than the maximum";
       const char* defaultErrorString  = "Error at querying MongoDB";
 
       alarmMgr.dbError(exErr);
@@ -1281,6 +1282,10 @@ bool entitiesQuery
       if (strncmp(exErr.c_str(), invalidPolygon, strlen(invalidPolygon)) == 0)
       {
         exErr = invalidPolygon;
+      }
+      else if (strncmp(exErr.c_str(), sortError, strlen(sortError)) == 0)
+      {
+        exErr = "Sort operation used more than the maximum RAM. You should create an index. Check the Database Administration section in Orion documentation.";
       }
       else
       {

@@ -47,6 +47,10 @@
 #define METRIC_TRANS_OUT_RESP_SIZE                 "outgoingTransactionResponseSize"
 #define METRIC_TRANS_OUT_ERRORS                    "outgoingTransactionErrors"
 
+#if 0
+//
+// The following counters are still under discussion
+//
 #define METRIC_TRANSACTIONS                        "transactions"
 #define METRIC_NGSIV1_TRANSACTIONS                 "ngsiv1Transactions"
 #define METRIC_NGSIV2_TRANSACTIONS                 "ngsiv2Transactions"
@@ -80,6 +84,8 @@
 #define METRIC_DB_UPDATE_AVERAGE_TIME              "dbUpdateAverageTime"
 #define METRIC_DB_DELETE_AVERAGE_TIME              "dbDeleteAverageTime"
 
+#endif
+
 
 
 /* ****************************************************************************
@@ -97,10 +103,8 @@
 *    for class completeness)
 * 4. reset() method implementation (not delete maps, only set metrics to 0)
 * 5. toJson() to be split into 3 methods (2 of them private)
-* 6. Multi-thread safeness. Probably the same sem-based strategy used in AlarmManager
-*    could be used.
-* 7. Use 'long long' instead of 'int'
-* 8. (Unsure) We could need maps for metrics different for int. In that case, implement
+* 6. Use 'long long' instead of 'int'
+* 7. (Unsure) We could need maps for metrics different for int. In that case, implement
 *    it (and the add method) using templates, to avoid repeating the same implementation
 *    N times
 */
@@ -108,19 +112,24 @@ class MetricsManager
 {
  private:
   std::map<std::string, std::map<std::string, std::map<std::string, int>*>*>  metrics;
-  sem_t           sem;
   bool            on;
-  struct timeval  totalTimeInTransaction;
+  sem_t           sem;
+  bool            semWaitStatistics;
+  long long       semWaitTime;        // measured in microseconds
+
+  void            semTake(void);
+  void            semGive(void);
 
  public:
   MetricsManager();
 
-  bool         init(bool _on);
+  bool         init(bool _on, bool _semWaitStatistics);
   void         add(const std::string& srv, const std::string& subServ, const std::string& metric, int value);
   void         reset(void);
   std::string  toJson(void);
-  void         totalTimeInTransactionAdd(struct timeval& start, struct timeval& end);
   bool         isOn(void);
+  long long    semWaitTimeGet(void);
+  const char*  semStateGet(void);
 };
 
 #endif  // SRC_LIB_METRICSMGR_METRICSMANAGER_H_

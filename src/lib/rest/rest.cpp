@@ -917,28 +917,22 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
 *  NO_VERSION: others (invalid paths)
 *
 */
-static ApiVersion apiVersionGet(const char* path, const std::string& service, const std::string& subService)
+static ApiVersion apiVersionGet(const char* path)
 {
-  metricsMgr.add(service, subService, METRIC_TRANS_IN, 1);
-  metricsMgr.add(service, subService, METRIC_TRANSACTIONS, 1);
-
   if ((path[1] == 'v') && (path[2] == '2'))
   {
-    metricsMgr.add(service, subService, METRIC_NGSIV2_TRANSACTIONS, 1);
     return V2;
   }
 
   // Unlike v2, v1 is case-insensitive (see case/2057 test)
   if (((path[1] == 'v') || (path[1] == 'V')) && (path[2] == '1'))
   {
-    metricsMgr.add(service, subService, METRIC_NGSIV1_TRANSACTIONS, 1);
     return V1;
   }
 
   if ((strncasecmp("/ngsi9",      path, strlen("/ngsi9"))      == 0)  ||
       (strncasecmp("/ngsi10",     path, strlen("/ngsi10"))     == 0))
   {
-    metricsMgr.add(service, subService, METRIC_NGSIV1_TRANSACTIONS, 1);
     return V1;
   }
 
@@ -1125,7 +1119,7 @@ static int connectionTreat
     if ((ciP = new ConnectionInfo(url, method, version, connection)) == NULL)
     {
       LM_E(("Runtime Error (error allocating ConnectionInfo)"));
-      // No METRICS here ... Without ConnectionInfo we hav eno service/subService ...
+      // No METRICS here ... Without ConnectionInfo we have no service/subService ...
       return MHD_NO;
     }
 
@@ -1156,6 +1150,7 @@ static int connectionTreat
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
     
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
+    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN, 1);
 
     if (ciP->httpHeaders.accept == "")  // No Accept: given, treated as */*
     {
@@ -1163,7 +1158,7 @@ static int connectionTreat
       acceptParse(ciP, "*/*");
     }
 
-    ciP->apiVersion = apiVersionGet(ciP->url.c_str(), ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath);
+    ciP->apiVersion = apiVersionGet(ciP->url.c_str());
 
     char correlator[CORRELATOR_ID_SIZE + 1];
     if (ciP->httpHeaders.correlator == "")
@@ -1423,7 +1418,9 @@ static int connectionTreat
       gettimeofday(&start);
       serveFunction(ciP);
       gettimeofday(&end);
-      metricsMgr.totalTimeInTransactionAdd(ciP->headers.tenant, ciP->headers.servicePath, start, end);
+      
+      unsigned long long elapsed = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);
+      metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TOTAL_SERVICE_TIME);
     }
     else
     {

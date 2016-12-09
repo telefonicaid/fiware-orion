@@ -38,7 +38,7 @@
 *
 * MetricsManager::MetricsManager -
 */
-MetricsManager::MetricsManager(): on(false)
+MetricsManager::MetricsManager(): on(false), semWaitStatistics(false), semWaitTime(0)
 {
 }
 
@@ -53,9 +53,10 @@ MetricsManager::MetricsManager(): on(false)
 *   It's only one sys-call, and this way, the broker is prepared to receive 'on/off'
 *   via REST.
 */
-bool MetricsManager::init(bool _on)
+bool MetricsManager::init(bool _on, bool _semWaitStatistics)
 {
-  on = _on;
+  on                 = _on;
+  semWaitStatistics  = _semWaitStatistics;
 
   if (sem_init(&sem, 0, 1) == -1)
   {
@@ -63,10 +64,55 @@ bool MetricsManager::init(bool _on)
     return false;
   }
 
-  totalTimeInTransaction.tv_sec  = 0;
-  totalTimeInTransaction.tv_usec = 0;
-
   return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* MetricsManager::semTake - 
+*/
+void MetricsManager::semTake(void)
+{
+  if (semWaitStatistics)
+  {
+    struct timeval start;
+    struct timeval end;
+
+    gettimeofday(&start, NULL);
+    sem_wait(&sem);
+    gettimeofday(&end, NULL);
+
+    // Add semaphore waiting time to the accumulator (semWaitTime is in microseconds)
+    semWaitTime += (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);
+  }
+  else
+  {
+    sem_wait(&sem);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* MetricsManager::semGive - 
+*/
+void MetricsManager::semGive(void)
+{
+  sem_post(&sem);
+}
+
+
+
+/* ****************************************************************************
+*
+* MetricsManager::semWaitTimeGet - 
+*/
+long long MetricsManager::semWaitTimeGet(void)
+{
+  return semWaitTime;
 }
 
 
@@ -82,7 +128,7 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
     return;
   }
 
-  sem_wait(&sem);
+  semTake();
 
   // Do we have the service in the map?
   if (metrics.find(srv) == metrics.end())
@@ -115,7 +161,7 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
 
   metrics[srv]->at(subServ)->at(metric) += value;
 
-  sem_post(&sem);
+  semGive();
 }
 
 
@@ -131,7 +177,7 @@ void MetricsManager::reset(void)
     return;
   }
 
-  sem_wait(&sem);
+  semTake();
 
   //
   // Three iterators needed to iterate over the 'triple-map' metrics:
@@ -158,7 +204,7 @@ void MetricsManager::reset(void)
     }
   }
 
-  sem_post(&sem);
+  semGive();
 }
 
 
@@ -176,7 +222,7 @@ std::string MetricsManager::toJson(void)
     return "";
   }
 
-  sem_wait(&sem);
+  semTake();
 
   //
   // Three iterators needed to iterate over the 'triple-map' metrics:
@@ -219,46 +265,8 @@ std::string MetricsManager::toJson(void)
   }
 
   top.addRaw("services", services.str());
-  sem_post(&sem);
+  semGive();
   return top.str();
-}
-
-
-
-/* ****************************************************************************
-*
-* totalTimeInTransactionAdd - 
-*/
-void MetricsManager::totalTimeInTransactionAdd(struct timeval& start, struct timeval& end)
-{
-  if (on == false)
-  {
-    return;
-  }
-
-  struct timeval diff;
-
-  diff.tv_sec  = end.tv_sec  - start.tv_sec;
-  diff.tv_usec = end.tv_usec - start.tv_usec;
-
-  if (diff.tv_usec < 0)
-  {
-    diff.tv_sec  -= 1;
-    diff.tv_usec += 1000000;
-  }
-
-  sem_wait(&sem);
-
-  totalTimeInTransaction.tv_sec  += diff.tv_sec;
-  totalTimeInTransaction.tv_usec += diff.tv_usec;
-
-  if (totalTimeInTransaction.tv_usec > 1000000)
-  {
-    totalTimeInTransaction.tv_sec  += 1;
-    totalTimeInTransaction.tv_usec -= 1000000;
-  }
-
-  sem_post(&sem);
 }
 
 
@@ -270,4 +278,27 @@ void MetricsManager::totalTimeInTransactionAdd(struct timeval& start, struct tim
 bool MetricsManager::isOn(void)
 {
   return on;
+}
+
+
+
+/* ****************************************************************************
+*
+* MetricsManager::semStateGet - 
+*/
+const char* MetricsManager::semStateGet(void)
+{
+  int value;
+
+  if (sem_getvalue(&sem, &value) == -1)
+  {
+    return "error";
+  }
+
+  if (value == 0)
+  {
+    return "taken";
+  }
+
+  return "free";  
 }
