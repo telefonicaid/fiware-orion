@@ -131,7 +131,7 @@ The list of available options is the following:
       URL path will reuse the connection, saving HTTP connection time.
     * In threadpool mode, notifications are enqueued into a queue of size `q` and `n` threads take the notifications
       from the queue and perform the outgoing requests asynchronously. Please have a look at the
-      [threadpool considerations](perf_tuning.md#thread-pool-considerations) section if you want to use this mode.
+      [thread model](perf_tuning.md#orion-thread-model-and-its-implications) section if you want to use this mode.
 -   **-simulatedNotification**. Notifications are not sent, but recorded internally and shown in the 
     [statistics](statistics.md) operation (`simulatedNotifications` counter). This is not aimed for production
     usage, but it is useful for debugging to calculate a maximum upper limit in notification rate from a CB
