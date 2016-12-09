@@ -25,7 +25,6 @@
 *
 * Author: Fermín Galán
 */
-#include <sys/time.h>
 #include <string>
 #include <map>
 #include <semaphore.h>
