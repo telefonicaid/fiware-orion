@@ -101,7 +101,7 @@ Short explanation of the semaphores:
 * **dbConnectionPool**, protects mongo connection pool
 * **dbConnection**, protects the set of connections of the mongo connection pool
 * **logMsg**, makes sure that not two messages are written simultaneously to the log-file
-* **metrics**. protects internal data of the Metrics Manager
+* **metrics**, protects internal data of the Metrics Manager
 * **request**, makes sure there are not two simultaneous requests to mongodb 
 * **subCache**, protects the Subscription Cache
 * **timeStat**, protects the data for timing statistics
