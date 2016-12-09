@@ -245,16 +245,38 @@ std::string MetricsManager::toJson(void)
 
     for (subServiceIter = servMap->begin(); subServiceIter != servMap->end(); ++subServiceIter)
     {
-      JsonHelper                                jhMetrics;
-      std::string                                subServ    = subServiceIter->first;
-      std::map<std::string, unsigned long long>* metricMap  = subServiceIter->second;
-
+      JsonHelper                                  jhMetrics;
+      std::string                                 subServ    = subServiceIter->first;
+      std::map<std::string, unsigned long long>*  metricMap  = subServiceIter->second;
+      unsigned long long                          incomingTransactions = 0;
+      unsigned long long                          totalServiceTime     = 0;
       for (metricIter = metricMap->begin(); metricIter != metricMap->end(); ++metricIter)
       {
         std::string  metric = metricIter->first;
         int          value  = metricIter->second;
 
-        jhMetrics.addNumber(metric, value);
+        if (metric == METRIC_TOTAL_SERVICE_TIME)
+        {
+          totalServiceTime = value;
+        }
+        else if (metric == METRIC_TRANS_IN)
+        {
+          incomingTransactions = value;
+        }
+
+        if ((totalServiceTime != 0) && (incomingTransactions != 0))
+        {
+          float mValue = (float) totalServiceTime / (float) (incomingTransactions * 1000000);
+          jhMetrics.addFloat(METRIC_SERVICE_TIME, mValue);
+
+          // FIXME PR: Remove METRIC_TOTAL_SERVICE_TIME from jSON output before merging!!!
+          // jhMetrics.addNumber(METRIC_TOTAL_SERVICE_TIME, totalServiceTime);
+        }
+
+        if (metric != METRIC_TOTAL_SERVICE_TIME)
+        {
+          jhMetrics.addNumber(metric, value);
+        }
       }
 
       jhSubService.addRaw(subServ, jhMetrics.str());
