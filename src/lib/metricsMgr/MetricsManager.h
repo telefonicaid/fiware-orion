@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_METRICSMGR_METRICMANAGER_H_
-#define SRC_LIB_METRICSMGR_METRICMANAGER_H_
+#ifndef SRC_LIB_METRICSMGR_METRICSMANAGER_H_
+#define SRC_LIB_METRICSMGR_METRICSMANAGER_H_
 
 /*
 *
@@ -25,9 +25,67 @@
 *
 * Author: Fermín Galán
 */
-
 #include <string>
 #include <map>
+#include <semaphore.h>
+
+
+
+/* ****************************************************************************
+*
+* Metrics - 
+*/
+#define METRIC_TRANS_IN                            "incomingTransactions"
+#define METRIC_TRANS_IN_REQ_SIZE                   "incomingTransactionRequestSize"
+#define METRIC_TRANS_IN_RESP_SIZE                  "incomingTransactionResponseSize"
+#define METRIC_TRANS_IN_ERRORS                     "incomingTransactionErrors"
+#define METRIC_SERVICE_TIME                        "serviceTime"
+
+#define METRIC_TRANS_OUT                           "outgoingTransactions"
+#define METRIC_TRANS_OUT_REQ_SIZE                  "outgoingTransactionRequestSize"
+#define METRIC_TRANS_OUT_RESP_SIZE                 "outgoingTransactionResponseSize"
+#define METRIC_TRANS_OUT_ERRORS                    "outgoingTransactionErrors"
+
+#if 0
+//
+// The following counters are still under discussion
+//
+#define METRIC_TRANSACTIONS                        "transactions"
+#define METRIC_NGSIV1_TRANSACTIONS                 "ngsiv1Transactions"
+#define METRIC_NGSIV2_TRANSACTIONS                 "ngsiv2Transactions"
+#define METRIC_AVERAGE_TRANSACTION_TIME            "averageTransactionTime"
+#define METRIC_OK_TRANSACTIONS                     "okTransactions"
+#define METRIC_BAD_REQUEST                         "badRequestTransactions"
+#define METRIC_NOT_FOUND                           "notFoundTransactions"
+#define METRIC_INTERNAL_ERROR                      "internalErrorTransactions"
+
+#define METRIC_CREATED_ENTITIES                    "createdEntities"
+#define METRIC_UPDATED_ENTITIES                    "updatedEntities"
+#define METRIC_DELETED_ENTITIES                    "deletedEntities"
+#define METRIC_CREATED_SUBSCRIPTIONS               "createdSubscriptions"
+#define METRIC_UPDATED_SUBSCRIPTIONS               "updatedSubscriptions"
+#define METRIC_DELETED_SUBSCRIPTIONS               "deletedSubscriptions"
+#define METRIC_NOTIFICATIONS_SENT                  "notificationSentOk"
+#define METRIC_NOTIFICATIONS_FAILED                "notificationSentFailed"
+#define METRIC_CUSTOM_NOTIFICATIONS_SENT           "customNotificationsSentOk"
+#define METRIC_CUSTOM_NOTIFICATIONS_FAILED         "customNotificationsSentFailed"
+
+#define METRIC_DB_QUERIES                          "dbQueries"
+#define METRIC_DB_REGEXQUERIES                     "dbRegexQueries"
+#define METRIC_DB_AGGREGATIONQUERIES               "dbAggregationQueries"
+#define METRIC_DB_INSERTS                          "dbInserts"
+#define METRIC_DB_UPDATES                          "dbUpdates"
+#define METRIC_DB_DELETES                          "dbDeletes"
+#define METRIC_DB_QUERY_AVERAGE_TIME               "dbQueryAverageTime"
+#define METRIC_DB_REGEX_QUERY_AVERAGE_TIME         "dbRegexQueryAverageTime"
+#define METRIC_DB_AGGREGATION_QUERY_AVERAGE_TIME   "dbAggregationQueryAverageTime"
+#define METRIC_DB_INSERT_AVERAGE_TIME              "dbInsertAverageTime"
+#define METRIC_DB_UPDATE_AVERAGE_TIME              "dbUpdateAverageTime"
+#define METRIC_DB_DELETE_AVERAGE_TIME              "dbDeleteAverageTime"
+
+#endif
+
+
 
 /* ****************************************************************************
 *
@@ -41,28 +99,44 @@
 *    initial map created at constructor time)
 * 3. Destroy method, releasing all the maps in cascade (probably never used, as the
 *    singleton object in CB using this class will be destroyed at the end, but do it
-*    for class compleness)
+*    for class completeness)
 * 4. reset() method implementation (not delete maps, only set metrics to 0)
-* 5. toJson() to be splitted into 3 methods (2 of them private)
-* 6. Multi-thread safeness. Probably the same sem-based strategy used in AlarmManager
-*    could be used.
-* 7. Use 'long long' instead of 'int'
-* 8. (Usure) We could need maps for metrics different for int. In that case, implement
-*    it (and the accum method) using templates, to avoid repeat the same implementation
+* 5. toJson() to be split into 3 methods (2 of them private)
+* 6. Use 'long long' instead of 'int'
+* 7. (Unsure) We could need maps for metrics different from int. If so, implement
+*    it (and the add method) using templates, to avoid repeating the same implementation
 *    N times
+* 8. Empty services (no tenant given) to receive some default service name.
+* 9. What to do with default SP ("/")?
+*    When applying the rule "remove the inicial /", the default SP ends up as "".
+*    Not sure that we want that...
+* 10. Forgotten: initial slash should be skipped for service paths
+*     Fix in MetricsManager::add, simply.
+*     Is a Service Path of "//sp1" accepted by the broker?
+*     If so, only the first '/' is removed ... ?
 */
 class MetricsManager
 {
  private:
-  std::map<std::string, std::map<std::string, std::map<std::string, int>*>* >  metrics;
+  std::map<std::string, std::map<std::string, std::map<std::string, int>*>*>  metrics;
+  bool            on;
+  sem_t           sem;
+  bool            semWaitStatistics;
+  long long       semWaitTime;        // measured in microseconds
+
+  void            semTake(void);
+  void            semGive(void);
 
  public:
   MetricsManager();
 
-  void accum(const std::string& srv, const std::string& subServ, const std::string& metric, int value);
-  void reset(void);
-  std::string toJson(void);
-
+  bool         init(bool _on, bool _semWaitStatistics);
+  void         add(const std::string& srv, const std::string& subServ, const std::string& metric, int value);
+  void         reset(void);
+  std::string  toJson(void);
+  bool         isOn(void);
+  long long    semWaitTimeGet(void);
+  const char*  semStateGet(void);
 };
 
-#endif  // SRC_LIB_METRICSMGR_METRICMANAGER_H_
+#endif  // SRC_LIB_METRICSMGR_METRICSMANAGER_H_

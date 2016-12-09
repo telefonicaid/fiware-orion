@@ -33,17 +33,16 @@
 #include "common/tag.h"
 #include "common/statistics.h"
 #include "common/sem.h"
-
+#include "metricsMgr/metricsMgr.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/rest.h"
 #include "serviceRoutines/statisticsTreat.h"
 #include "mongoBackend/mongoConnectionPool.h"
 #include "cache/subCache.h"
-
 #include "ngsiNotify/QueueStatistics.h"
-
 #include "common/JsonHelper.h"
+
 
 
 /* ****************************************************************************
@@ -55,6 +54,11 @@
 #define TAG_ADD_INTEGER(tag, value, comma)  valueTag(indent2, tag, value, ciP->outMimeType, comma)
 
 
+
+/* ****************************************************************************
+*
+* resetStatistics - 
+*/
 static void resetStatistics(void)
 {
   noOfJsonRequests                                = -1;
@@ -139,9 +143,11 @@ static void resetStatistics(void)
   timingStatisticsReset();
 }
 
+
+
 /* ****************************************************************************
 *
-*  - addUserCounter
+* renderUsedCounter -
 */
 inline void renderUsedCounter(JsonHelper* js, const std::string& field, int counter)
 {
@@ -151,9 +157,11 @@ inline void renderUsedCounter(JsonHelper* js, const std::string& field, int coun
   }
 }
 
+
+
 /* ****************************************************************************
 *
-*  - renderCounterStats
+* renderCounterStats -
 */
 std::string renderCounterStats(void)
 {
@@ -226,9 +234,11 @@ std::string renderCounterStats(void)
   return js.str();
 }
 
+
+
 /* ****************************************************************************
 *
-*  - renderSemWaitStats
+* renderSemWaitStats - 
 */
 std::string renderSemWaitStats(void)
 {
@@ -240,13 +250,16 @@ std::string renderSemWaitStats(void)
   jh.addFloat("subCache",          semTimeCacheGet());
   jh.addFloat("connectionContext", mutexTimeCCGet());
   jh.addFloat("timeStat",          semTimeTimeStatGet());
+  jh.addFloat("metrics",           ((float) metricsMgr.semWaitTimeGet()) / 1000000);
 
   return jh.str();
 }
 
+
+
 /* ****************************************************************************
 *
-*  - renderNotifQueueStats
+* renderNotifQueueStats -
 */
 std::string renderNotifQueueStats(void)
 {
@@ -265,6 +278,7 @@ std::string renderNotifQueueStats(void)
 
   return jh.str();
 }
+
 
 
 /* ****************************************************************************

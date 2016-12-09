@@ -9,6 +9,7 @@
 * [File descriptors sizing](#file-descriptors-sizing)
 * [Identifying bootlenecks looking at semWait statistics](#identifying-bootlenecks-looking-at-semwait-statistics)
 * [Log impact in performance](#log-impact-in-performance)
+* [Metrics impact in performance](#metrics-impact-in-performance)
 * [Mutex policy impact in performance](#mutex-policy-impact-in-performance)
 * [Outgoing HTTP connections timeout](#outgoing-http-connections-timeout)
 * [Subscription cache](#subscription-cache)
@@ -259,6 +260,13 @@ are mainly for Orion developers, to help to identify bugs in the code. Their val
 [Logs](logs.md) can have a severe impact on performance. Thus, in high level scenarios, it is recommended to use `-logLevel`
 ERROR or WARN. We have found in some situations that the saving between `-logLevel WARN` and `-logLevel INFO`
 can be around 50% in performance.
+
+[Top](#top)
+
+## Metrics impact in performance
+
+Metrics measurement may have an impact in performance, as system calls and semaphores are involved. You can disable
+this feature (thus improving performance) using the `-disableMetrics` [CLI parameter](cli.md).
 
 [Top](#top)
 

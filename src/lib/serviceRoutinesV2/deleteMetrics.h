@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_SERVICEROUTINESV2_DELETEMETRICS_H_
+#define SRC_LIB_SERVICEROUTINESV2_DELETEMETRICS_H_
+
 /*
 *
 * Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
@@ -22,30 +25,24 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+#include <vector>
 
-#include <iostream>
+#include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
 
-#include "gtest/gtest.h"
-#include "metricsMgr/MetricsManager.h"
 
 
 /* ****************************************************************************
 *
-* metricManagerTest -
-*
-* FIXME PR: remove the whole file (and its reference in CMakeList.txt at the end)
+* deleteMetrics -
 */
-TEST(metricManagerTest, metricManagerTest)
-{
-  // Create manager
-  MetricsManager mm;
+extern std::string deleteMetrics
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-  // Feed w"ith some metrics, just for fun
-  mm.accum("valencia", "traffic", "incomingTransactions", 3);
-  mm.accum("valencia", "gardens", "incomingTransactions", 1);
-  mm.accum("toledo", "police", "incomingTransactions", 8);
-  mm.accum("valencia", "traffic", "incomingTransactions", 4);
-
-  // Get output JSON
-  std::cout << mm.toJson() << std::endl;
-}
+#endif  // SRC_LIB_SERVICEROUTINESV2_DELETEMETRICS_H_

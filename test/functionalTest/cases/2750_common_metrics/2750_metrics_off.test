@@ -1,4 +1,4 @@
- Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,68 +21,37 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET /admin/sem
+Incoming Transactions and Common Metrics
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 0-255 IPv4 -disableMetrics
 
 --SHELL--
 
 #
-# 01. Ask for the list of semaphores, using GET /admin/sem
+# 01. Ask for Metrics, see 'error', as broker is started without metrics
 #
 
-echo "01. Ask for the list of semaphores, using GET /admin/sem"
-echo "========================================================"
-orionCurl --url /admin/sem
+echo "01. Ask for Metrics, see 'error', as broker is started without metrics"
+echo "======================================================================"
+orionCurl --url /admin/metrics
 echo
 echo
 
 
 --REGEXPECT--
-01. Ask for the list of semaphores, using GET /admin/sem
-========================================================
-HTTP/1.1 200 OK
-Content-Length: 354
+01. Ask for Metrics, see 'error', as broker is started without metrics
+======================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 60
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "alarmMgr": {
-        "status": "free"
-    },
-    "connectionContext": {
-        "status": "free"
-    },
-    "connectionEndpoints": {
-        "status": "free"
-    },
-    "dbConnection": {
-        "status": "free"
-    },
-    "dbConnectionPool": {
-        "status": "free"
-    },
-    "logMsg": {
-        "status": "free"
-    },
-    "metricsMgr": {
-        "status": "free"
-    },
-    "request": {
-        "status": "free"
-    },
-    "subCache": {
-        "status": "free"
-    },
-    "timeStat": {
-        "status": "free"
-    },
-    "transaction": {
-        "status": "free"
-    }
+    "description": "metrics desactivated",
+    "error": "Bad Request"
 }
 
 

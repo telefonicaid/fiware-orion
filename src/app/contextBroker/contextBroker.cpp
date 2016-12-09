@@ -200,10 +200,13 @@
 #include "serviceRoutinesV2/postBatchUpdate.h"
 #include "serviceRoutinesV2/logLevelTreat.h"
 #include "serviceRoutinesV2/semStateTreat.h"
+#include "serviceRoutinesV2/getMetrics.h"
+#include "serviceRoutinesV2/deleteMetrics.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
 #include "alarmMgr/alarmMgr.h"
+#include "metricsMgr/metricsMgr.h"
 #include "logSummary/logSummary.h"
 
 using namespace orion;
@@ -272,6 +275,7 @@ bool            relogAlarms;
 bool            strictIdv1;
 bool            disableCusNotif;
 bool            logForHumans;
+bool            disableMetrics;
 
 
 
@@ -326,6 +330,7 @@ bool            logForHumans;
 #define DISABLE_CUSTOM_NOTIF   "disable NGSIv2 custom notifications"
 #define LOG_TO_SCREEN_DESC     "log to screen"
 #define LOG_FOR_HUMANS_DESC    "human readible log to screen"
+#define METRICS_DESC           "turn off the 'metrics' feature"
 
 
 
@@ -390,7 +395,8 @@ PaArgument paArgs[] =
   { "-strictNgsiv1Ids",             &strictIdv1,      "CHECK_ID_V1",           PaBool, PaOpt, false, false, true, CHECK_v1_ID_DESC      },
   { "-disableCustomNotifications",  &disableCusNotif, "DISABLE_CUSTOM_NOTIF",  PaBool, PaOpt, false, false, true, DISABLE_CUSTOM_NOTIF  },
 
-  { "-logForHumans",  &logForHumans,    "LOG_FOR_HUMANS",     PaBool, PaOpt, false, false, true,             LOG_FOR_HUMANS_DESC },
+  { "-logForHumans",   &logForHumans,    "LOG_FOR_HUMANS",     PaBool, PaOpt, false, false, true,             LOG_FOR_HUMANS_DESC },
+  { "-disableMetrics", &disableMetrics,  "DISABLE_METRICS",    PaBool, PaOpt, false, false, true,             METRICS_DESC        },
 
   PA_END_OF_ARGS
 };
@@ -720,11 +726,20 @@ static const char* validLogLevels[] =
 #define LOGLEVEL_COMPS_V2  2, { "admin", "log"                           }
 
 
+
 //
 // Semaphore state
 //
 #define SEM_STATE          SemStateRequest
 #define SEM_STATE_COMPS    2, { "admin", "sem"                         }
+
+
+
+//
+// Metrics
+//
+#define METRICS            MetricsRequest
+#define METRICS_COMPS      2, { "admin", "metrics"                       }
 
 
 //
@@ -1131,6 +1146,11 @@ static const char* validLogLevels[] =
   { "GET",   SEM_STATE, SEM_STATE_COMPS,   "", semStateTreat                      }, \
   { "*",     SEM_STATE, SEM_STATE_COMPS,   "", badVerbGetOnly                     }
 
+#define METRICS_REQUESTS                                                             \
+  { "GET",    METRICS, METRICS_COMPS,   "", getMetrics                            }, \
+  { "DELETE", METRICS, METRICS_COMPS,   "", deleteMetrics                         }, \
+  { "*",      METRICS, METRICS_COMPS,   "", badVerbGetDeleteOnly                  }
+
 
 
 /* ****************************************************************************
@@ -1169,6 +1189,7 @@ RestService restServiceV[] =
   VERSION_REQUESTS,
   LOGLEVEL_REQUESTS_V2,
   SEM_STATE_REQUESTS,
+  METRICS_REQUESTS,
 
 #ifdef DEBUG
   EXIT_REQUESTS,
@@ -1714,6 +1735,8 @@ int main(int argC, char* argV[])
   contextBrokerInit(dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
   alarmMgr.init(relogAlarms);
+
+  metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
 
   if (rush[0] != 0)

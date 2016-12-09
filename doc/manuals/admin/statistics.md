@@ -86,6 +86,7 @@ if your DB is too slow or your DB pool is undersized, then `dbConnectionPool` ti
     "dbConnectionPool" : 2.917002794,
     "transaction" : 0.567478849,
     "subCache" : 0.784979145,
+    "metrics": 0.000000000,
     "connectionContext" : 0.000000000,
     "timeStat" : 0.124000605
   },

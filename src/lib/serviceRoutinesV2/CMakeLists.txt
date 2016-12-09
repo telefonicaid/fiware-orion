@@ -47,6 +47,8 @@ postBatchUpdate.cpp
 logLevelTreat.cpp
 badVerbAllNotDelete.cpp
 semStateTreat.cpp
+getMetrics.cpp
+deleteMetrics.cpp
 )
 
 SET (HEADERS
@@ -76,6 +78,8 @@ postBatchUpdate.h
 logLevelTreat.h
 badVerbAllNotDelete.h
 semStateTreat.h
+getMetrics.h
+deleteMetrics.h
 )
 
 

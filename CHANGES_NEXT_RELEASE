@@ -1,3 +1,6 @@
 - Fix: libmicrohttpd now uses poll()/epoll() and not select() so fds greater than 1023 can be used for incoming connections (#2724, #2166)
 - Fix: modified the upper limit for CLI '-maxConnections', from 1020 to UNLIMITED
 - Fix: proper 500 Internal Server Error response with descriptive text when "sort fail" at DB occur (#2752)
+- Add: metrics REST API (#2750)
+- Add: new CLI '-disableMetrics' to disable metrics (#2750)
+- Add: one more semaphore (the metrics semaphore) to the semWait block in GET /statistics and to the list in GET /admin/sem (#2750)

@@ -77,6 +77,7 @@ const char* requestType(RequestType rt)
   case LogTraceRequest:                             return "LogTrace";
   case LogLevelRequest:                             return "LogLevel";
   case SemStateRequest:                             return "SemState";
+  case MetricsRequest:                              return "Metrics";
   case VersionRequest:                              return "Version";
   case StatisticsRequest:                           return "Statistics";
   case ExitRequest:                                 return "Exit";
