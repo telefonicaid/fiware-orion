@@ -1415,12 +1415,12 @@ static int connectionTreat
       struct timeval  start;
       struct timeval  end;
 
-      gettimeofday(&start);
+      gettimeofday(&start, NULL);
       serveFunction(ciP);
-      gettimeofday(&end);
+      gettimeofday(&end, NULL);
       
       unsigned long long elapsed = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);
-      metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TOTAL_SERVICE_TIME);
+      metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TOTAL_SERVICE_TIME, elapsed);
     }
     else
     {

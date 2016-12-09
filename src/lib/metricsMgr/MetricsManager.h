@@ -39,7 +39,8 @@
 #define METRIC_TRANS_IN_REQ_SIZE                   "incomingTransactionRequestSize"
 #define METRIC_TRANS_IN_RESP_SIZE                  "incomingTransactionResponseSize"
 #define METRIC_TRANS_IN_ERRORS                     "incomingTransactionErrors"
-#define METRIC_SERVICE_TIME                        "serviceTime"
+#define METRIC_SERVICE_TIME                        "serviceTime"       // Average time
+#define METRIC_TOTAL_SERVICE_TIME                  "totalServiceTime"  // Accumulated service time
 
 #define METRIC_TRANS_OUT                           "outgoingTransactions"
 #define METRIC_TRANS_OUT_REQ_SIZE                  "outgoingTransactionRequestSize"
@@ -110,7 +111,7 @@
 class MetricsManager
 {
  private:
-  std::map<std::string, std::map<std::string, std::map<std::string, int>*>*>  metrics;
+  std::map<std::string, std::map<std::string, std::map<std::string, unsigned long long>*>*>  metrics;
   bool            on;
   sem_t           sem;
   bool            semWaitStatistics;
@@ -123,7 +124,7 @@ class MetricsManager
   MetricsManager();
 
   bool         init(bool _on, bool _semWaitStatistics);
-  void         add(const std::string& srv, const std::string& subServ, const std::string& metric, int value);
+  void         add(const std::string& srv, const std::string& subServ, const std::string& metric, unsigned long long value);
   void         reset(void);
   std::string  toJson(void);
   bool         isOn(void);
