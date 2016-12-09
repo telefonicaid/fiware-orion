@@ -75,11 +75,10 @@ void Notifier::sendNotifyContextRequest
     bool                             blackList
 )
 {
-
   pthread_t                         tid;
-  std::vector<SenderThreadParams*>  *paramsV = Notifier::buildSenderParams(ncrP, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blackList);
+  std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncrP, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataFilter, blackList);
 
-  if (!paramsV->empty()) // al least one param, an empty vector means an error happened
+  if (!paramsV->empty()) // al least one param, an empty vector means an error occurred
   {
     int ret = pthread_create(&tid, NULL, startSenderThread, paramsV);
     if (ret != 0)
@@ -149,6 +148,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
     params->mimeType         = JSON;
     params->fiwareCorrelator = fiwareCorrelator;
     params->renderFormat     = renderFormatToString(renderFormat);
+    params->registration     = true;
 
     strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
@@ -183,11 +183,9 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     RenderFormat                         renderFormat,
     const std::vector<std::string>&      attrsOrder,
     const std::vector<std::string>&      metadataFilter
-    )
+)
 {
-
-  std::vector<SenderThreadParams*>*   paramsV;
-
+  std::vector<SenderThreadParams*>*  paramsV;
 
   paramsV = new std::vector<SenderThreadParams*>;
 
@@ -323,7 +321,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     }
 
 
-    SenderThreadParams *params = new SenderThreadParams();
+    SenderThreadParams*  params = new SenderThreadParams();
 
     params->ip               = host;
     params->port             = port;
@@ -339,6 +337,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     params->renderFormat     = renderFormatToString(renderFormat);
     params->fiwareCorrelator = fiwareCorrelator;
     params->extraHeaders     = headers;
+    params->registration     = false;
 
     paramsV->push_back(params);
   }
@@ -484,10 +483,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->renderFormat     = renderFormatToString(renderFormat);
     params->fiwareCorrelator = fiwareCorrelator;
     params->subscriptionId   = ncrP->subscriptionId.get();
-
+    params->registration     = false;
 
     paramsV->push_back(params);
     return paramsV;
-
 }
-

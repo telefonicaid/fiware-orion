@@ -362,12 +362,12 @@ void setLastFailure(long long lastFailure, BSONObjBuilder* b)
 
 /* ****************************************************************************
 *
-* setTimesFailed -
+* setLastSuccess -
 */
-void setTimesFailed(long long timesFailed, BSONObjBuilder* b)
+void setLastSuccess(long long lastSuccess, BSONObjBuilder* b)
 {
-  b->append(CSUB_TIMESFAILED, timesFailed);
-  LM_T(LmtMongo, ("Subscription timesFailed: %lu", timesFailed));
+  b->append(CSUB_LASTSUCCESS, lastSuccess);
+  LM_T(LmtMongo, ("Subscription lastSuccess: %lu", lastSuccess));
 }
 
 

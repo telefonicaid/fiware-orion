@@ -50,7 +50,7 @@ def msg(m):
 
 def usage_and_exit(m):
     """
-    Print usage message and exit"
+    Print usage message and exit
 
     :param m: optional error message to print
     """
@@ -99,21 +99,25 @@ def patch_content_lengths(file_name, cl):
     msg('  - patching file %s' % file_name)
 
     n = 0
-    file_temp = tempfile.NamedTemporaryFile(delete=False)
-    for line in open(file_name):
-        m = re.match('^Content-Length: \d+', line)
-        if m is not None:
-            file_temp.write('Content-Length: %d\n' % cl[n][1])
-            msg ('    - patching "Content-Length: %d"' % cl[n][1])
-            n += 1
-        else:
-            file_temp.write(line)
 
-    file_temp.close()
+    try:
+        file_temp = tempfile.NamedTemporaryFile(delete=False)
+        for line in open(file_name):
+            m = re.match('^Content-Length: \d+', line)
+            if m is not None:
+                file_temp.write('Content-Length: %d\n' % cl[n][1])
+                msg ('    - patching "Content-Length: %d"' % cl[n][1])
+                n += 1
+            else:
+                file_temp.write(line)
 
-    # Remove old file, replacing by the edited one
-    os.remove(file_name)
-    os.rename(file_temp.name, file_name)
+        file_temp.close()
+
+        # Remove old file, replacing by the edited one
+        os.remove(file_name)
+        os.rename(file_temp.name, file_name)
+    except Exception as err:
+        print ('* error processing file %s: %s' % (file_name, str(err)))
 
 
 def content_length_extract(file_name):
@@ -127,13 +131,18 @@ def content_length_extract(file_name):
 
     r = []
     l = 0
-    for line in open(file_name):
-        l += 1
-        m = re.match('^Content-Length: (\d+)', line)
-        if m is not None:
-            cl = int(m.group(1))
-            msg('    - push [%d, %d]' % (l, cl))
-            r.append([l, cl])
+
+    try:
+        for line in open(file_name):
+            l += 1
+            m = re.match('^Content-Length: (\d+)', line)
+            if m is not None:
+                cl = int(m.group(1))
+                msg('    - push [%d, %d]' % (l, cl))
+                r.append([l, cl])
+    except Exception as err:
+       print ('* error processing file %s: %s' % (file_name, str(err)))
+
     return r
 
 
@@ -188,7 +197,13 @@ def process_dir(dir_name, dry_run):
 
     accum = [0, 0, 0]
 
-    for file in os.listdir(dir_name_clean):
+    try:
+        files = os.listdir(dir_name_clean)
+    except Exception as err:
+        print ('* error processing directory %s: %s' % (dir_name_clean, str(err)))
+        return accum
+
+    for file in files:
 
         file_name = dir_name_clean + '/' + file
 

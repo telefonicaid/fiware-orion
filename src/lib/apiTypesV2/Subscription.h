@@ -53,6 +53,7 @@ struct EntID
     type(typeA),
     typePattern(typePatternA)
   {}
+
   EntID()
   {}
 
@@ -60,7 +61,7 @@ struct EntID
 
 inline bool operator==(const EntID& lhs, const EntID& rhs)
 {
-  return (lhs.id == rhs.id) && (lhs.idPattern == rhs.idPattern)
+  return (lhs.id   == rhs.id)   && (lhs.idPattern   == rhs.idPattern)
       && (lhs.type == rhs.type) && (lhs.typePattern == rhs.typePattern);
 }
 
@@ -76,7 +77,7 @@ struct Notification
   HttpInfo                 httpInfo;
   std::string              toJson(const std::string& attrsFormat);
   int                      lastFailure;
-  int                      timesFailed;
+  int                      lastSuccess;
   Notification():
     attributes(),
     blacklist(false),
@@ -84,7 +85,7 @@ struct Notification
     lastNotification(-1),
     httpInfo(),
     lastFailure(-1),
-    timesFailed(0)
+    lastSuccess(-1)
   {}
 };
 

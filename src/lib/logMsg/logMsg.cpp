@@ -1119,9 +1119,6 @@ static char* lmLineFix
   fLen = strlen(format);
   while (fi < fLen)
   {
-    pid_t tid;
-
-    tid = syscall(SYS_gettid);
     if (strncmp(&format[fi], "TYPE", 4) == 0)
     {
       STRING_ADD(longTypeName(type), 4);
@@ -1140,6 +1137,8 @@ static char* lmLineFix
     }
     else if (strncmp(&format[fi], "TID", 3) == 0)
     {
+      pid_t tid;
+      tid = syscall(SYS_gettid);
       INT_ADD((int) tid, 3);
     }
     else if (strncmp(&format[fi], "TRANS_ID", 8) == 0)

@@ -70,10 +70,18 @@ or metadata name/type) which are described in the "Field syntax restrictions" se
 keep backward compatibility, these restrictions are not used in the NGSIv1 API by default, but
 you can enable them using the `-strictNgsiv1Ids` [CLI parameter](../admin/cli.md).
 
-Related with this topic, note that NGSIv1 allows entities/attributes/metadatas without types
-and with types equal to the empty string (`""`). However, NGSIv2 ID fields (including types) have
-a minimum length of 1 character. Thus, entities created with NGSIv1 but rendered using NGSIv2 operation
-will automatically replace these cases with the string value `none` (which is the default type in NGSIv2).
+Note that even when `-strictNgsiv1Ids` is used the Orion DB may contain entities/attributes/medatada
+that don't conform with NGSIv2 ID rules. This may happen if such entities/attributes/metadata have
+been created by Orion in moments in which it has run without `-strictNgsiv1Ids` enabled (maybe an old
+version previous to the implementation of this feature). In that case, getting such
+entities/attributes/metadata using NGSIv2 API may result in inconstent results (e.g. to use `GET /v2/entities`
+and get entities with whitespaces in some entity ids).
+
+The following [issue at github](https://github.com/telefonicaid/fiware-orion/issues/1733) has been created
+to cope with this situation in the future. However, in general it is as good practise to follow always the
+"Field sysntax restrictions" for IDs even if you are not forced to do so in NGSIv1. Doing so you would avoid
+any problem when managing context information, no matter which version of the API (either NGSIv1 or NGSIv2)
+you use.
 
 [Top](#top)
 

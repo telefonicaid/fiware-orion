@@ -39,7 +39,8 @@
 void* startSenderThread(void* p)
 {
   std::vector<SenderThreadParams*>* paramsV = (std::vector<SenderThreadParams*>*) p;
-  for(unsigned ix = 0; ix < paramsV->size(); ix++)
+
+  for (unsigned ix = 0; ix < paramsV->size(); ix++)
   {
     SenderThreadParams* params = (SenderThreadParams*) (*paramsV)[ix];
     char                portV[STRING_SIZE_FOR_INT];
@@ -88,10 +89,18 @@ void* startSenderThread(void* p)
       {
         statisticsUpdate(NotifyContextSent, params->mimeType);
         alarmMgr.notificationErrorReset(url);
+
+        if (params->registration == false)
+        {
+          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0);
+        }
       }
       else
       {
-        subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 1);
+        if (params->registration == false)
+        {
+          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 1);
+        }
       }
     }
     else

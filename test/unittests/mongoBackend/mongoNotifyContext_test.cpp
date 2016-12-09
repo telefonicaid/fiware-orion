@@ -184,14 +184,14 @@ TEST(mongoNotifyContextRequest, Ent1Attr1)
     prepareDatabase();
 
     /* Forge the request */
-    ContextElementResponse cer;
+    ContextElementResponse* cerP = new ContextElementResponse();
     req.subscriptionId.set("51307b66f481db11bf860001");
     req.originator.set("localhost");
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    cer.contextElement.contextAttributeVector.push_back(&ca);
-    cer.statusCode.fill(SccOk, "");
-    req.contextElementResponseVector.push_back(&cer);
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    cerP->contextElement.contextAttributeVector.push_back(caP);
+    cerP->statusCode.fill(SccOk, "");
+    req.contextElementResponseVector.push_back(cerP);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoNotifyContext(&req, &res, "", "", servicePathVector);
@@ -324,16 +324,16 @@ TEST(mongoNotifyContextRequest, Ent1AttrN)
     prepareDatabase();
 
     /* Forge the request */
-    ContextElementResponse cer;
+    ContextElementResponse* cerP = new ContextElementResponse();
     req.subscriptionId.set("51307b66f481db11bf860001");
     req.originator.set("localhost");
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val");
-    ContextAttribute ca2("A2", "TA2", "new_val2");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    cer.statusCode.fill(SccOk);
-    req.contextElementResponseVector.push_back(&cer);
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val2");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    cerP->statusCode.fill(SccOk);
+    req.contextElementResponseVector.push_back(cerP);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoNotifyContext(&req, &res, "", "", servicePathVector);
@@ -466,19 +466,21 @@ TEST(mongoNotifyContextRequest, EntNAttr1)
     prepareDatabase();
 
     /* Forge the request */
-    ContextElementResponse cer1, cer2;
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    ContextElementResponse* cer2P = new ContextElementResponse();
+
     req.subscriptionId.set("51307b66f481db11bf860001");
     req.originator.set("localhost");
-    cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.statusCode.fill(SccOk);
-    req.contextElementResponseVector.push_back(&cer1);
-    cer2.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca2("A3", "TA3", "new_val2");
-    cer2.contextElement.contextAttributeVector.push_back(&ca2);
-    cer2.statusCode.fill(SccOk);
-    req.contextElementResponseVector.push_back(&cer2);
+    cer1P->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
+    cer1P->contextElement.contextAttributeVector.push_back(ca1P);
+    cer1P->statusCode.fill(SccOk);
+    req.contextElementResponseVector.push_back(cer1P);
+    cer2P->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca2P = new ContextAttribute("A3", "TA3", "new_val2");
+    cer2P->contextElement.contextAttributeVector.push_back(ca2P);
+    cer2P->statusCode.fill(SccOk);
+    req.contextElementResponseVector.push_back(cer2P);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoNotifyContext(&req, &res, "", "", servicePathVector);
@@ -611,23 +613,25 @@ TEST(mongoNotifyContextRequest, EntNAttrN)
     prepareDatabase();
 
     /* Forge the request */
-    ContextElementResponse cer1, cer2;
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    ContextElementResponse* cer2P = new ContextElementResponse();
+
     req.subscriptionId.set("51307b66f481db11bf860001");
     req.originator.set("localhost");
-    cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val");
-    ContextAttribute ca2("A2", "TA2", "new_val2");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.statusCode.fill(SccOk);
-    req.contextElementResponseVector.push_back(&cer1);
-    cer2.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca3("A3", "TA3", "new_val3");
-    ContextAttribute ca4("A4", "TA4", "new_val4");
-    cer2.contextElement.contextAttributeVector.push_back(&ca3);
-    cer2.contextElement.contextAttributeVector.push_back(&ca4);
-    cer2.statusCode.fill(SccOk);
-    req.contextElementResponseVector.push_back(&cer2);
+    cer1P->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val2");
+    cer1P->contextElement.contextAttributeVector.push_back(ca1P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca2P);
+    cer1P->statusCode.fill(SccOk);
+    req.contextElementResponseVector.push_back(cer1P);
+    cer2P->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "new_val3");
+    ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val4");
+    cer2P->contextElement.contextAttributeVector.push_back(ca3P);
+    cer2P->contextElement.contextAttributeVector.push_back(ca4P);
+    cer2P->statusCode.fill(SccOk);
+    req.contextElementResponseVector.push_back(cer2P);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoNotifyContext(&req, &res, "", "", servicePathVector);
@@ -760,14 +764,14 @@ TEST(mongoNotifyContextRequest, createEntity)
     prepareDatabase();
 
     /* Forge the request */
-    ContextElementResponse cer;
+    ContextElementResponse* cerP = new ContextElementResponse();
     req.subscriptionId.set("51307b66f481db11bf860001");
     req.originator.set("localhost");
-    cer.contextElement.entityId.fill("E10", "T10", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    cer.contextElement.contextAttributeVector.push_back(&ca);
-    cer.statusCode.fill(SccOk);
-    req.contextElementResponseVector.push_back(&cer);
+    cerP->contextElement.entityId.fill("E10", "T10", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    cerP->contextElement.contextAttributeVector.push_back(caP);
+    cerP->statusCode.fill(SccOk);
+    req.contextElementResponseVector.push_back(cerP);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoNotifyContext(&req, &res, "", "", servicePathVector);

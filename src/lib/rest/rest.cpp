@@ -44,7 +44,9 @@
 #include "common/clockFunctions.h"
 #include "common/statistics.h"
 #include "common/tag.h"
+
 #include "alarmMgr/alarmMgr.h"
+#include "metricsMgr/metricsMgr.h"
 
 #include "parse/forbiddenChars.h"
 #include "rest/RestService.h"
@@ -314,10 +316,12 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
 
   if (value[0] == 0)
   {
-    ciP->httpStatusCode    = SccBadRequest;
-    ciP->acceptHeaderError = "empty item in accept header";
-    ciP->outMimeType       = mimeTypeSelect(ciP, "Error");
-    return false;
+    // NOTE
+    //   According to https://www.w3.org/Protocols/rfc2616/rfc2616-sec2.html#sec2, empty
+    //   items in the comma list of Accepot are allowed, so we simply return OK (true) here
+    //   and skip to the next item.
+    //
+    return true;
   }
 
   if ((delimiter = strchr(cP, ';')) != NULL)
@@ -920,14 +924,19 @@ static ApiVersion apiVersionGet(const char* path)
     return V2;
   }
 
-  // Different from v2, v1 is case-insensitive (see case/2057 test)
+  // Unlike v2, v1 is case-insensitive (see case/2057 test)
   if (((path[1] == 'v') || (path[1] == 'V')) && (path[2] == '1'))
   {
     return V1;
   }
+
   if ((strncasecmp("/ngsi9",      path, strlen("/ngsi9"))      == 0)  ||
-      (strncasecmp("/ngsi10",     path, strlen("/ngsi10"))     == 0)  ||
-      (strncasecmp("/log",        path, strlen("/log"))        == 0)  ||
+      (strncasecmp("/ngsi10",     path, strlen("/ngsi10"))     == 0))
+  {
+    return V1;
+  }
+
+  if ((strncasecmp("/log",        path, strlen("/log"))        == 0)  ||
       (strncasecmp("/cache",      path, strlen("/cache"))      == 0)  ||
       (strncasecmp("/statistics", path, strlen("/statistics")) == 0))
   {
@@ -1110,6 +1119,7 @@ static int connectionTreat
     if ((ciP = new ConnectionInfo(url, method, version, connection)) == NULL)
     {
       LM_E(("Runtime Error (error allocating ConnectionInfo)"));
+      // No METRICS here ... Without ConnectionInfo we have no service/subService ...
       return MHD_NO;
     }
 
@@ -1117,8 +1127,6 @@ static int connectionTreat
     {
       clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);
     }
-
-    ciP->apiVersion = apiVersionGet(ciP->url.c_str());
 
     LM_T(LmtRequest, (""));
     // WARNING: This log message below is crucial for the correct function of the Behave tests - CANNOT BE REMOVED
@@ -1142,11 +1150,15 @@ static int connectionTreat
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
     
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
+    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN, 1);
+
     if (ciP->httpHeaders.accept == "")  // No Accept: given, treated as */*
     {
       ciP->httpHeaders.accept = "*/*";
       acceptParse(ciP, "*/*");
     }
+
+    ciP->apiVersion = apiVersionGet(ciP->url.c_str());
 
     char correlator[CORRELATOR_ID_SIZE + 1];
     if (ciP->httpHeaders.correlator == "")
@@ -1419,12 +1431,18 @@ static int connectionTreat
 *   Number (unsigned int) of threads in thread pool. Enable thread pooling by setting this value to to something greater than 1.
 *   Currently, thread model must be MHD_USE_SELECT_INTERNALLY if thread pooling is enabled (MHD_start_daemon returns NULL for
 *   an unsupported thread model).
+*
+* MHD_USE_EPOLL:
+*   Use `epoll()` instead of `select()` or `poll()` for the event loop.
+*   This option is only available on some systems; using the option on
+*   systems without epoll will cause #MHD_start_daemon to fail.  Using
+*   this option is not supported with #MHD_USE_THREAD_PER_CONNECTION.
 */
 static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const char* httpsCertificate = NULL)
 {
   bool      mhdStartError  = true;
   size_t    memoryLimit    = connMemory * 1024; // Connection memory is expressed in kilobytes
-  MHD_FLAG  serverMode     = MHD_USE_THREAD_PER_CONNECTION;
+  int       serverMode     = MHD_USE_THREAD_PER_CONNECTION | MHD_USE_POLL;
 
   if (port == 0)
   {
@@ -1433,7 +1451,16 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
   if (threadPoolSize != 0)
   {
-    serverMode = MHD_USE_SELECT_INTERNALLY;
+    //
+    // To use poll() instead of select(), MHD 0.9.48 has the define MHD_USE_EPOLL_LINUX_ONLY,
+    // while in MHD 0.9.51, the name of the define has changed to MHD_USE_EPOLL.
+    // So, to support both names, we need a ifdef/else cpp directive here.
+    //
+#ifdef MHD_USE_EPOLL
+    serverMode = MHD_USE_SELECT_INTERNALLY | MHD_USE_EPOLL;
+#else
+    serverMode = MHD_USE_SELECT_INTERNALLY | MHD_USE_EPOLL_LINUX_ONLY;
+#endif
   }
 
 
@@ -1450,8 +1477,9 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
-      LM_T(LmtMhd, ("Starting HTTPS daemon on IPv4 %s port %d", bindIp, port));
-      mhdDaemon = MHD_start_daemon(serverMode | MHD_USE_SSL,
+      serverMode |= MHD_USE_SSL;
+      LM_T(LmtMhd, ("Starting HTTPS daemon on IPv4 %s port %d, serverMode: 0x%x", bindIp, port, serverMode));
+      mhdDaemon = MHD_start_daemon(serverMode,
                                    htons(port),
                                    NULL,
                                    NULL,
@@ -1468,7 +1496,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     }
     else
     {
-      LM_T(LmtMhd, ("Starting HTTP daemon on IPv4 %s port %d", bindIp, port));
+      LM_T(LmtMhd, ("Starting HTTP daemon on IPv4 %s port %d, serverMode: 0x%x", bindIp, port, serverMode));
       mhdDaemon = MHD_start_daemon(serverMode,
                                    htons(port),
                                    NULL,
@@ -1500,10 +1528,13 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     sad_v6.sin6_family = AF_INET6;
     sad_v6.sin6_port = htons(port);
 
+    serverMode |= MHD_USE_IPv6;
+
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
-      LM_T(LmtMhd, ("Starting HTTPS daemon on IPv6 %s port %d", bindIPv6, port));
-      mhdDaemon_v6 = MHD_start_daemon(serverMode | MHD_USE_IPv6 | MHD_USE_SSL,
+      serverMode |= MHD_USE_SSL;
+      LM_T(LmtMhd, ("Starting HTTPS daemon on IPv6 %s port %d, serverMode: 0x%x", bindIPv6, port, serverMode));
+      mhdDaemon_v6 = MHD_start_daemon(serverMode,
                                       htons(port),
                                       NULL,
                                       NULL,
@@ -1519,8 +1550,8 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     }
     else
     {
-      LM_T(LmtMhd, ("Starting HTTP daemon on IPv6 %s port %d", bindIPv6, port));
-      mhdDaemon_v6 = MHD_start_daemon(serverMode | MHD_USE_IPv6,
+      LM_T(LmtMhd, ("Starting HTTP daemon on IPv6 %s port %d, serverMode: 0x%x", bindIPv6, port, serverMode));
+      mhdDaemon_v6 = MHD_start_daemon(serverMode,
                                       htons(port),
                                       NULL,
                                       NULL,

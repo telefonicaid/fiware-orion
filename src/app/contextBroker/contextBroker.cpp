@@ -200,10 +200,13 @@
 #include "serviceRoutinesV2/postBatchUpdate.h"
 #include "serviceRoutinesV2/logLevelTreat.h"
 #include "serviceRoutinesV2/semStateTreat.h"
+#include "serviceRoutinesV2/getMetrics.h"
+#include "serviceRoutinesV2/deleteMetrics.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
 #include "alarmMgr/alarmMgr.h"
+#include "metricsMgr/metricsMgr.h"
 #include "logSummary/logSummary.h"
 
 using namespace orion;
@@ -272,6 +275,7 @@ bool            relogAlarms;
 bool            strictIdv1;
 bool            disableCusNotif;
 bool            logForHumans;
+bool            disableMetrics;
 
 
 
@@ -326,6 +330,7 @@ bool            logForHumans;
 #define DISABLE_CUSTOM_NOTIF   "disable NGSIv2 custom notifications"
 #define LOG_TO_SCREEN_DESC     "log to screen"
 #define LOG_FOR_HUMANS_DESC    "human readible log to screen"
+#define METRICS_DESC           "turn off the 'metrics' feature"
 
 
 
@@ -333,16 +338,10 @@ bool            logForHumans;
 *
 * paArgs - option vector for the Parse CLI arguments library
 *
-* NOTE
-*   A note about 'FD_SETSIZE - 4', the default and max value for '-maxConnections':
-*   [ taken from https://www.gnu.org/software/libmicrohttpd/manual/libmicrohttpd.html ]
-*
-*   MHD_OPTION_CONNECTION_LIMIT
-*     Maximum number of concurrent connections to accept.
-*     The default is FD_SETSIZE - 4 (the maximum number of file descriptors supported by 
-*     select minus four for stdin, stdout, stderr and the server socket). In other words,
-*    the default is as large as possible.
-*
+* A note about the default value of -maxConnections.
+* In older implementations of the broker, select was used in MHD and not poll/epoll.
+* The old default value (1024 - 4), that was a recommendation by MHD, has been kept.
+* More info about this can be found in the documentation of MHD.
 */
 PaArgument paArgs[] =
 {
@@ -379,7 +378,7 @@ PaArgument paArgs[] =
   { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 60,             0,     3600,     SUB_CACHE_IVAL_DESC    },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
   { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     1024,     CONN_MEMORY_DESC       },  
-  { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, FD_SETSIZE - 4, 0,     FD_SETSIZE - 4, MAX_CONN_DESC    },
+  { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, 1020,           1,     PaNL,     MAX_CONN_DESC          },
   { "-reqPoolSize",      &reqPoolSize,      "TRQ_POOL_SIZE",     PaUInt,   PaOpt, 0,              0,     1024,     REQ_POOL_SIZE          },
 
   { "-notificationMode",      &notificationMode,      "NOTIF_MODE", PaString, PaOpt, _i "transient", PaNL,  PaNL, NOTIFICATION_MODE_DESC },
@@ -396,7 +395,8 @@ PaArgument paArgs[] =
   { "-strictNgsiv1Ids",             &strictIdv1,      "CHECK_ID_V1",           PaBool, PaOpt, false, false, true, CHECK_v1_ID_DESC      },
   { "-disableCustomNotifications",  &disableCusNotif, "DISABLE_CUSTOM_NOTIF",  PaBool, PaOpt, false, false, true, DISABLE_CUSTOM_NOTIF  },
 
-  { "-logForHumans",  &logForHumans,    "LOG_FOR_HUMANS",     PaBool, PaOpt, false, false, true,             LOG_FOR_HUMANS_DESC },
+  { "-logForHumans",   &logForHumans,    "LOG_FOR_HUMANS",     PaBool, PaOpt, false, false, true,             LOG_FOR_HUMANS_DESC },
+  { "-disableMetrics", &disableMetrics,  "DISABLE_METRICS",    PaBool, PaOpt, false, false, true,             METRICS_DESC        },
 
   PA_END_OF_ARGS
 };
@@ -726,11 +726,20 @@ static const char* validLogLevels[] =
 #define LOGLEVEL_COMPS_V2  2, { "admin", "log"                           }
 
 
+
 //
 // Semaphore state
 //
 #define SEM_STATE          SemStateRequest
 #define SEM_STATE_COMPS    2, { "admin", "sem"                         }
+
+
+
+//
+// Metrics
+//
+#define METRICS            MetricsRequest
+#define METRICS_COMPS      2, { "admin", "metrics"                       }
 
 
 //
@@ -1137,6 +1146,11 @@ static const char* validLogLevels[] =
   { "GET",   SEM_STATE, SEM_STATE_COMPS,   "", semStateTreat                      }, \
   { "*",     SEM_STATE, SEM_STATE_COMPS,   "", badVerbGetOnly                     }
 
+#define METRICS_REQUESTS                                                             \
+  { "GET",    METRICS, METRICS_COMPS,   "", getMetrics                            }, \
+  { "DELETE", METRICS, METRICS_COMPS,   "", deleteMetrics                         }, \
+  { "*",      METRICS, METRICS_COMPS,   "", badVerbGetDeleteOnly                  }
+
 
 
 /* ****************************************************************************
@@ -1175,6 +1189,7 @@ RestService restServiceV[] =
   VERSION_REQUESTS,
   LOGLEVEL_REQUESTS_V2,
   SEM_STATE_REQUESTS,
+  METRICS_REQUESTS,
 
 #ifdef DEBUG
   EXIT_REQUESTS,
@@ -1720,6 +1735,8 @@ int main(int argC, char* argV[])
   contextBrokerInit(dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
   alarmMgr.init(relogAlarms);
+
+  metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
 
   if (rush[0] != 0)

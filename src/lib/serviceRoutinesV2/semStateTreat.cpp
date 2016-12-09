@@ -38,6 +38,7 @@
 #include "rest/uriParamNames.h"
 #include "serviceRoutinesV2/semStateTreat.h"
 #include "alarmMgr/alarmMgr.h"
+#include "metricsMgr/metricsMgr.h"
 #include "mongoBackend/mongoConnectionPool.h"
 
 
@@ -103,6 +104,7 @@ std::string semStateTreat
   const char* alarmMgrState              = alarmMgr.semGet();
   const char* connectionContextState     = connectionContextSemGet();
   const char* connectionSubContextState  = connectionSubContextSemGet();
+  const char* metricsMgrState            = metricsMgr.semStateGet();
 
   std::string out = "{";
 
@@ -114,6 +116,7 @@ std::string semStateTreat
   out += semRender("timeStat",             false, timeStatState)             + ",";
   out += semRender("logMsg",               false, logMsgState)               + ",";
   out += semRender("alarmMgr",             false, alarmMgrState)             + ",";
+  out += semRender("metricsMgr",           false, metricsMgrState)           + ",";
   out += semRender("connectionContext",    false, connectionContextState)    + ",";
   out += semRender("connectionEndpoints",  false, connectionSubContextState);
 

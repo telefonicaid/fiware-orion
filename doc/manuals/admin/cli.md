@@ -131,15 +131,15 @@ The list of available options is the following:
       URL path will reuse the connection, saving HTTP connection time.
     * In threadpool mode, notifications are enqueued into a queue of size `q` and `n` threads take the notifications
       from the queue and perform the outgoing requests asynchronously. Please have a look at the
-      [threadpool considerations](perf_tuning.md#thread-pool-considerations) section if you want to use this mode.
+      [thread model](perf_tuning.md#orion-thread-model-and-its-implications) section if you want to use this mode.
 -   **-simulatedNotification**. Notifications are not sent, but recorded internally and shown in the 
     [statistics](statistics.md) operation (`simulatedNotifications` counter). This is not aimed for production
     usage, but it is useful for debugging to calculate a maximum upper limit in notification rate from a CB
     internal logic point of view.
 -   **-connectionMemory**. Sets the size of the connection memory buffer (in kB) per connection used internally
     by the HTTP server library. Default value is 64 kB.
--   **-maxConnections**. Maximum number of simultaneous connections. Default value is "unlimited" (limited by 
-    max file descriptors of operating system).
+-   **-maxConnections**. Maximum number of simultaneous connections. Default value is 1020, for legacy reasons,
+    while the lower limit is 1 and there is no upper limit (limited by max file descriptors of the operating system).
 -   **-reqPoolSize**. Size of thread pool for incoming connections. Default value is 0, meaning *no thread pool*.
 -   **-statCounters**, **-statSemWait**, **-statTiming** and **-statNotifQueue**. Enable statistics
     generation. See [statistics documentation](statistics.md).
@@ -153,3 +153,5 @@ The list of available options is the following:
     * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
     * No `${...}` macro substitution is performed.
 -   **-logForHumans**. To make the traces to standard out formated for humans (note that the traces in the log file are not affected)
+-   **-disableMetrics**. To turn off the 'metrics' feature. Gathering of metrics is a bit costly, as system calls and semaphores are involved.
+    Use this parameter to start the broker without metrics overhead.

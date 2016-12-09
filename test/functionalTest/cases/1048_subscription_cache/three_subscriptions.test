@@ -271,6 +271,7 @@ Date: REGEX(.*)
     "semWait": {
         "connectionContext": REGEX(.*.A*),
         "dbConnectionPool": REGEX(.*.A*),
+        "metrics": REGEX(.*.A*),
         "request": REGEX(.*.A*),
         "subCache": REGEX(.*.A*),
         "timeStat": REGEX(.*.A*),
@@ -326,6 +327,7 @@ Date: REGEX(.*)
     "semWait": {
         "connectionContext": REGEX(.*.A*),
         "dbConnectionPool": REGEX(.*.A*),
+        "metrics": REGEX(.*.A*),
         "request": REGEX(.*.A*),
         "subCache": REGEX(.*.A*),
         "timeStat": REGEX(.*.A*),
@@ -381,6 +383,7 @@ Date: REGEX(.*)
     "semWait": {
         "connectionContext": REGEX(.*.A*),
         "dbConnectionPool": REGEX(.*.A*),
+        "metrics": REGEX(.*.A*),
         "request": REGEX(.*.A*),
         "subCache": REGEX(.*.A*),
         "timeStat": REGEX(.*.A*),
