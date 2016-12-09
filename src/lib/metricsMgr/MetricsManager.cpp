@@ -128,6 +128,11 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
     return;
   }
 
+  //
+  // Exclude the first '/' from the Sub Service
+  //
+  const char* subService = &subServ.c_str()[1];
+
   semTake();
 
   // Do we have the service in the map?
@@ -138,28 +143,28 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
   }
 
   // Do we have the subservice in the map?
-  if (metrics[srv]->find(subServ) == metrics[srv]->end())
+  if (metrics[srv]->find(subService) == metrics[srv]->end())
   {
     //
     // not found: create it
     // FIXME PR: this syntax should be simpler, closer to
-    // metrics[srv][subServ] = new std::map<std::string, unsigned long long>;
+    // metrics[srv][subService] = new std::map<std::string, unsigned long long>;
     //
-    metrics[srv]->insert(std::pair<std::string, std::map<std::string, unsigned long long>*>(subServ, new std::map<std::string, unsigned long long>));
+    metrics[srv]->insert(std::pair<std::string, std::map<std::string, unsigned long long>*>(subService, new std::map<std::string, unsigned long long>));
   }
 
   // Do we have the metric in the map?
-  if (metrics[srv]->at(subServ)->find(metric) == metrics[srv]->at(subServ)->end())
+  if (metrics[srv]->at(subService)->find(metric) == metrics[srv]->at(subService)->end())
   {
     //
     // not found: create it
     // FIXME PR: I don't like the at() and pair() syntax, I'd prefer a syntax closer to:
-    // metrics[srv][subServ][metric] = 0;
+    // metrics[srv][subService][metric] = 0;
     //
-    metrics[srv]->at(subServ)->insert(std::pair<std::string, unsigned long long>(metric, 0));
+    metrics[srv]->at(subService)->insert(std::pair<std::string, unsigned long long>(metric, 0));
   }
 
-  metrics[srv]->at(subServ)->at(metric) += value;
+  metrics[srv]->at(subService)->at(metric) += value;
 
   semGive();
 }

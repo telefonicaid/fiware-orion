@@ -116,8 +116,7 @@
 * 09. What to do with default SP ("/")?
 *     When applying the rule "remove the inicial /", the default SP ends up as "".
 *     Not sure that we want that...
-* 10. Forgotten: initial slash should be skipped for service paths
-*     Fix in MetricsManager::add, simply.
+* 10. About initial slash of service path:
 *     Is a Service Path of "//sp1" accepted by the broker?
 *     If so, only the first '/' is removed ... ?
 */
