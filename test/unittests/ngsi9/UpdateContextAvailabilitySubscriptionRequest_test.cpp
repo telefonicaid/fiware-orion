@@ -125,7 +125,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, response)
 
   ucas.subscriptionId.set("012345678901234567890123");
 
-  out = ucas.check(0);
+  out = ucas.check("");
   EXPECT_EQ("OK", out);
   
   utExit();
