@@ -1280,6 +1280,7 @@ static int connectionTreat
   {
     alarmMgr.badInput(clientIp, "error in URI path");
     restReply(ciP, ciP->answer);
+    return MHD_YES;
   }
 
   ciP->servicePath = ciP->httpHeaders.servicePath;
@@ -1289,12 +1290,14 @@ static int connectionTreat
   {
     alarmMgr.badInput(clientIp, "error in ServicePath http-header");
     restReply(ciP, ciP->answer);
+    return MHD_YES;
   }
 
   if (contentTypeCheck(ciP) != 0)
   {
     alarmMgr.badInput(clientIp, "invalid mime-type in Content-Type http-header");
     restReply(ciP, ciP->answer);
+    return MHD_YES;
   }
   else
   {
@@ -1438,10 +1441,6 @@ static int connectionTreat
 
         metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TOTAL_SERVICE_TIME, elapsed);
       }
-    }
-    else
-    {
-      serveFunction(ciP);
     }
   }
 
