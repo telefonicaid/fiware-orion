@@ -252,7 +252,7 @@ class Stablished_Connections:
         logging.info(" Reports each second:")
         logging.info(" counter       version      queue   established")
         logging.info("               request      size    connections")
-        logging.info(" ----------------------------------------------")
+        logging.info(" --------------------------------------------------------")
         while (init_date+duration_in_secs) > time.time():
             # version request
             resp = requests.get("%s/version" % self.cb_endpoint)

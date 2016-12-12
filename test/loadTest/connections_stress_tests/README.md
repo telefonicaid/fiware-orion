@@ -5,12 +5,12 @@ Verify that ContextBroker works properly with a large number of stablished conne
 #### Tests procedure:
 - drop the database in mongo
 - create 5000 subscriptions with subject.entities.idPattern: .*
-- verify/modify the notification listener with a delay of 10 minutes before answering.
+- verify/modify the notification listener with a delay of 10 minutes before answering (recomend to use `notif_listener_with_delay_in_response` script).
 - modify the ContextBroker config with: `"-httpTimeout 600000 -notificationMode threadpool:60000:5000"` and restart it.
 - launch an entity update, that it triggers all subscriptions.
 - launch indefinitely a "/version" request per second and:
      - report that its response is correct.
-     - report the number of estbilished connections (if `-noEstablished` param is used this column is ignored)
+     - report the number of established connections (if `-noEstablished` param is used this column is ignored)
      - report the queue size into ContextBroker (if `-noQueueSize` param is used this column is ignored)
      
 #### Mehod of use:
@@ -19,7 +19,7 @@ Verify that ContextBroker works properly with a large number of stablished conne
         - install the dependencies: `pip install rpyc psutil`
         - unzip and execute `python bin/rpyc_classic.py`
         Note: if you have problem with `psutil` installation, use `yum install python-devel python-psutil` to install it on your CentOS system.
-   - after, launch the notifications listener with delay in the response.
+   - after, launch the notifications listener `./notif_listener_with_delay_in_response`.
    - ContextBroker configuration recommended:
    ```
         BROKER_EXTRA_OPS="-reqMutexPolicy none -writeConcern 0 -httpTimeout 600000 -notificationMode threadpool:60000:5000 -statTiming -statSemWait -statCounters -statNotifQueue -multiservice -subCacheIval 5"
@@ -45,6 +45,10 @@ Verify that ContextBroker works properly with a large number of stablished conne
        Note:                                                                                                        
          - the version delay is a second                                                                            
          - the number of subscriptions is 5000     
+
+#### notif_listener_with_delay_in_response script
+It is a server to receive all notifications sent from CB, the port used is `8090` and any path is allowed. 
+The delay is the 10 minutes.
 
 #### Logging
 All the information is logged in `connections_stress_tests.log` in the same path.
