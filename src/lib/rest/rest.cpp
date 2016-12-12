@@ -591,8 +591,6 @@ static void requestCompleted
     clock_difftime(&reqEndTime, &ciP->reqStartTime, &threadLastTimeStat.reqTime);
   }  
 
-  delete(ciP);
-
   //
   // Statistics
   //
@@ -625,6 +623,27 @@ static void requestCompleted
 
     timeStatSemGive(__FUNCTION__, "updating statistics");
   }
+
+  //
+  // Metrics
+  //
+  metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN, 1);
+
+  if (metricsMgr.isOn() && (ciP->transactionStart.tv_sec != 0))
+  {
+    struct timeval  end;
+
+    if (gettimeofday(&end, NULL) == 0)
+    {
+      unsigned long long elapsed = 
+        (end.tv_sec  - ciP->transactionStart.tv_sec) * 1000000 + 
+        (end.tv_usec - ciP->transactionStart.tv_usec);
+
+      metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, _METRIC_TOTAL_SERVICE_TIME, elapsed);
+    }
+  }
+
+  delete(ciP);
 }
 
 
@@ -1165,7 +1184,6 @@ static int connectionTreat
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
     
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
-    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN, 1);
 
     if (ciP->httpHeaders.accept == "")  // No Accept: given, treated as */*
     {
@@ -1426,19 +1444,6 @@ static int connectionTreat
   else
   {
     serveFunction(ciP);
-    if (metricsMgr.isOn() && (ciP->transactionStart.tv_sec != 0))
-    {
-      struct timeval  end;
-
-      if (gettimeofday(&end, NULL) == 0)
-      {
-        unsigned long long elapsed = 
-          (end.tv_sec  - ciP->transactionStart.tv_sec) * 1000000 + 
-          (end.tv_usec - ciP->transactionStart.tv_usec);
-
-        metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, _METRIC_TOTAL_SERVICE_TIME, elapsed);
-      }
-    }
   }
 
   return MHD_YES;

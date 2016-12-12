@@ -255,6 +255,7 @@ std::string MetricsManager::toJson(void)
       std::map<std::string, unsigned long long>*  metricMap            = subServiceIter->second;
       unsigned long long                          incomingTransactions = 0;
       unsigned long long                          totalServiceTime     = 0;
+      int                                         metricsAdded         = 0;
 
       for (metricIter = metricMap->begin(); metricIter != metricMap->end(); ++metricIter)
       {
@@ -272,7 +273,11 @@ std::string MetricsManager::toJson(void)
 
         if (metric != _METRIC_TOTAL_SERVICE_TIME)
         {
-          jhMetrics.addNumber(metric, value);
+          if (value != 0)
+          {
+            jhMetrics.addNumber(metric, value);
+            ++metricsAdded;
+          }
         }
 
         if ((totalServiceTime != 0) && (incomingTransactions != 0))
@@ -281,10 +286,14 @@ std::string MetricsManager::toJson(void)
           jhMetrics.addFloat(METRIC_SERVICE_TIME, mValue);
           totalServiceTime     = 0;
           incomingTransactions = 0;
+          ++metricsAdded;
         }
       }
 
-      jhSubService.addRaw(subServ, jhMetrics.str());
+      if (metricsAdded > 0)
+      {
+        jhSubService.addRaw(subServ, jhMetrics.str());
+      }
     }
 
     subServiceTop.addRaw("subservs", jhSubService.str());

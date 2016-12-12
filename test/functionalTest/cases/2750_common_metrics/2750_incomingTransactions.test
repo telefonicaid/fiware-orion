@@ -31,7 +31,7 @@ brokerStart CB
 
 #
 # 01. Send five GET /version
-# 02. Ask for Metrics, see 6 Incoming Transactions (the GET metrics request also counts)
+# 02. Ask for Metrics, see 5 Incoming Transactions
 #
 
 echo "01. Send five GET /version"
@@ -49,8 +49,8 @@ echo
 echo
 
 
-echo "02. Ask for Metrics, see 6 Incoming Transactions (the GET metrics request also counts)"
-echo "======================================================================================"
+echo "02. Ask for Metrics, see 5 Incoming Transactions"
+echo "================================================"
 orionCurl --url /admin/metrics
 echo
 echo
@@ -145,23 +145,16 @@ Date: REGEX(.*)
 }
 
 
-02. Ask for Metrics, see 6 Incoming Transactions (the GET metrics request also counts)
-======================================================================================
+02. Ask for Metrics, see 5 Incoming Transactions
+================================================
 HTTP/1.1 200 OK
-Content-Length: 358
+Content-Length: 310
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "services": {
-        "": {
-            "subservs": {
-                "": {
-                    "incomingTransactions": 1
-                }
-            }
-        },
         "S1": {
             "subservs": {
                 "SP1": {
