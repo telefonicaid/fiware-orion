@@ -1,10 +1,10 @@
 ## Connections Stress Test
 
 Verify that ContextBroker works properly with a large number of stablished connections.
-S
+
 #### Tests procedure:
 - drop the database in mongo
-- create 5000 subscription with subject.entities.idPattern: .*
+- create 5000 subscriptions with subject.entities.idPattern: .*
 - verify/modify the notification listener with a delay of 10 minutes before answering.
 - modify the ContextBroker config with: `"-httpTimeout 600000 -notificationMode threadpool:60000:5000"` and restart it.
 - launch an entity update, that it triggers all subscriptions.
