@@ -31,7 +31,7 @@ brokerStart CB
 
 #
 # 01. Send a GET /version
-# 02. Ask for Metrics, see 2 Incoming Transactions, but nothing about incomingTransactionRequestSize
+# 02. Ask for Metrics, see 1 Incoming Transaction, but nothing about incomingTransactionRequestSize
 # 03. Create an entity (with payload of exactly 50 bytes)
 # 04. Ask for Metrics, see 4 Incoming Transactions, and 50 bytes in incomingTransactionRequestSize
 # 05. Create an entity (with payload of exactly 100 bytes)
@@ -45,8 +45,8 @@ echo
 echo
 
 
-echo "02. Ask for Metrics, see 2 Incoming Transactions, but nothing about incomingTransactionRequestSize"
-echo "=================================================================================================="
+echo "02. Ask for Metrics, see 1 Incoming Transaction, but nothing about incomingTransactionRequestSize"
+echo "================================================================================================="
 orionCurl --url /admin/metrics
 echo
 echo
@@ -60,7 +60,7 @@ echo
 echo
 
 
-echo "04. Ask for Metrics, see 4 Incoming Transactions, and 50 bytes in incomingTransactionRequestSize"
+echo "04. Ask for Metrics, see 3 Incoming Transactions, and 50 bytes in incomingTransactionRequestSize"
 echo "================================================================================================"
 orionCurl --url /admin/metrics
 echo
@@ -75,7 +75,7 @@ echo
 echo
 
 
-echo "06. Ask for Metrics, see 6 Incoming Transactions, and 150 bytes in incomingTransactionRequestSize"
+echo "06. Ask for Metrics, see 5 Incoming Transactions, and 150 bytes in incomingTransactionRequestSize"
 echo "================================================================================================="
 orionCurl --url /admin/metrics
 echo
@@ -103,23 +103,16 @@ Date: REGEX(.*)
 }
 
 
-02. Ask for Metrics, see 2 Incoming Transactions, but nothing about incomingTransactionRequestSize
-==================================================================================================
+02. Ask for Metrics, see 1 Incoming Transaction, but nothing about incomingTransactionRequestSize
+=================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 141
+Content-Length: 93
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "services": {
-        "": {
-            "subservs": {
-                "": {
-                    "incomingTransactions": 1
-                }
-            }
-        },
         "S1": {
             "subservs": {
                 "SP1": {
@@ -142,7 +135,7 @@ Date: REGEX(.*)
 
 
 
-04. Ask for Metrics, see 4 Incoming Transactions, and 50 bytes in incomingTransactionRequestSize
+04. Ask for Metrics, see 3 Incoming Transactions, and 50 bytes in incomingTransactionRequestSize
 ================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 203
@@ -156,7 +149,7 @@ Date: REGEX(.*)
             "subservs": {
                 "": {
                     "incomingTransactionRequestSize": 50,
-                    "incomingTransactions": 3,
+                    "incomingTransactions": 2,
                     "serviceTime": REGEX(.*)
                 }
             }
@@ -183,7 +176,7 @@ Date: REGEX(.*)
 
 
 
-06. Ask for Metrics, see 6 Incoming Transactions, and 150 bytes in incomingTransactionRequestSize
+06. Ask for Metrics, see 5 Incoming Transactions, and 150 bytes in incomingTransactionRequestSize
 =================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 204
@@ -197,7 +190,7 @@ Date: REGEX(.*)
             "subservs": {
                 "": {
                     "incomingTransactionRequestSize": 150,
-                    "incomingTransactions": 5,
+                    "incomingTransactions": 4,
                     "serviceTime": REGEX(.*)
                 }
             }

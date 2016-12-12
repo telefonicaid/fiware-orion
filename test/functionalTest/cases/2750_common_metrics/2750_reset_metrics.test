@@ -31,35 +31,35 @@ brokerStart CB
 
 #
 # 01. Send a GET /version
-# 02. Ask for Metrics, see 2 Incoming Transactions (the GET metrics request also counts)
+# 02. Ask for Metrics, see 1 Incoming Transaction
 # 03. Reset metrics
-# 04. Ask for Metrics, see 1 Incoming Transaction (the GET metrics request)
+# 04. Ask for Metrics, see 1 Incoming Transaction (the reset-request in step 03 :-)
 #
 
 echo "01. Send a GET /version"
 echo "======================="
-orionCurl --url /version
+orionCurl --url /version  --servicePath /get/version
 echo
 echo
 
 
-echo "02. Ask for Metrics, see 2 Incoming Transactions (the GET metrics request also counts)"
-echo "======================================================================================"
-orionCurl --url /admin/metrics
+echo "02. Ask for Metrics, see 1 Incoming Transaction"
+echo "==============================================="
+orionCurl --url /admin/metrics --servicePath /get/metrics
 echo
 echo
 
 
 echo "03. Reset metrics"
 echo "================="
-orionCurl --url /admin/metrics -X DELETE
+orionCurl --url /admin/metrics -X DELETE --servicePath /delete/metrics
 echo
 echo
 
 
-echo "04. Ask for Metrics, see 1 Incoming Transaction (the GET metrics request)"
-echo "========================================================================="
-orionCurl --url /admin/metrics
+echo "04. Ask for Metrics, see 1 Incoming Transaction (the reset-request in step 03 :-)"
+echo "================================================================================="
+orionCurl --url /admin/metrics --servicePath /get/metrics
 echo
 echo
 
@@ -85,10 +85,10 @@ Date: REGEX(.*)
 }
 
 
-02. Ask for Metrics, see 2 Incoming Transactions (the GET metrics request also counts)
-======================================================================================
+02. Ask for Metrics, see 1 Incoming Transaction
+===============================================
 HTTP/1.1 200 OK
-Content-Length: 88
+Content-Length: 99
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -97,8 +97,8 @@ Date: REGEX(.*)
     "services": {
         "": {
             "subservs": {
-                "": {
-                    "incomingTransactions": 2,
+                "get/version": {
+                    "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
             }
@@ -116,10 +116,10 @@ Date: REGEX(.*)
 
 
 
-04. Ask for Metrics, see 1 Incoming Transaction (the GET metrics request)
-=========================================================================
+04. Ask for Metrics, see 1 Incoming Transaction (the reset-request in step 03 :-)
+=================================================================================
 HTTP/1.1 200 OK
-Content-Length: 88
+Content-Length: 102
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -128,7 +128,7 @@ Date: REGEX(.*)
     "services": {
         "": {
             "subservs": {
-                "": {
+                "delete/metrics": {
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }

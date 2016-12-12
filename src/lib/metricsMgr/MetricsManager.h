@@ -36,18 +36,21 @@
 * Metrics - 
 *
 * NOTE
-*   METRIC_TOTAL_SERVICE_TIME is in the metrics map but excluded from
+*   _METRIC_TOTAL_SERVICE_TIME is in the metrics map but excluded from
 *   the metric response, while METRIC_SERVICE_TIME is NOT in the metrics map, but
 *   include in the metric response.
-*   METRIC_SERVICE_TIME == METRIC_TOTAL_SERVICE_TIME / METRIC_TRANS_IN
+*   METRIC_SERVICE_TIME == _METRIC_TOTAL_SERVICE_TIME / METRIC_TRANS_IN
 *
+*   All 'help-counters' in the set, like _METRIC_TOTAL_SERVICE_TIME will have the
+*   prefix '_', to help remember it's a help measure.
+*   A prefix'_' in both macro name and in its string translation
 */
 #define METRIC_TRANS_IN                            "incomingTransactions"
 #define METRIC_TRANS_IN_REQ_SIZE                   "incomingTransactionRequestSize"
 #define METRIC_TRANS_IN_RESP_SIZE                  "incomingTransactionResponseSize"
 #define METRIC_TRANS_IN_ERRORS                     "incomingTransactionErrors"
 #define METRIC_SERVICE_TIME                        "serviceTime"
-#define METRIC_TOTAL_SERVICE_TIME                  "totalServiceTime"
+#define _METRIC_TOTAL_SERVICE_TIME                 "_totalServiceTime"
 
 #define METRIC_TRANS_OUT                           "outgoingTransactions"
 #define METRIC_TRANS_OUT_REQ_SIZE                  "outgoingTransactionRequestSize"
