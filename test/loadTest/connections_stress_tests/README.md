@@ -14,17 +14,17 @@ Verify that ContextBroker works properly with a large number of stablished conne
      - report the queue size into ContextBroker (if `-noQueueSize` param is used this column is ignored)
      
 #### Mehod of use:
-   - firstly, launch established connections listener (rpyc_classic.py) in CB machine. 
-        - download from `https://pypi.python.org/pypi/rpyc`
-        - install the dependencies: `pip install rpyc psutil`
-        - unzip and execute `python bin/rpyc_classic.py`
-        Note: if you have problem with `psutil` installation, use `yum install python-devel python-psutil` to install it on your CentOS system.
-   - after, launch the notifications listener `./notif_listener_with_delay_in_response`.
-   - ContextBroker configuration recommended:
-   ```
-        BROKER_EXTRA_OPS="-reqMutexPolicy none -writeConcern 0 -httpTimeout 600000 -notificationMode threadpool:60000:5000 -statTiming -statSemWait -statCounters -statNotifQueue -multiservice -subCacheIval 5"
-   ```   
-   - finally, execute in local the `connections_stress_test.py` script
+- firstly, launch established connections listener (rpyc_classic.py) in CB machine. 
+    - download from `https://pypi.python.org/pypi/rpyc`
+    - install the dependencies: `pip install rpyc psutil`
+    - unzip and execute `python bin/rpyc_classic.py`
+    Note: if you have problem with `psutil` installation, use `yum install python-devel python-psutil` to install it on your CentOS system.
+- after, launch the notifications listener `./notif_listener_with_delay_in_response`.
+- ContextBroker configuration recommended:
+```
+    BROKER_EXTRA_OPS="-reqMutexPolicy none -writeConcern 0 -httpTimeout 600000 -notificationMode threadpool:60000:5000 -statTiming -statSemWait -statCounters -statNotifQueue -multiservice -subCacheIval 5"
+```   
+- finally, execute in local the `connections_stress_test.py` script
    
 #### Usage
        Parameters:                                                                                                  
