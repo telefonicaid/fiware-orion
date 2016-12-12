@@ -261,7 +261,7 @@ std::string MetricsManager::toJson(void)
         std::string  metric = metricIter->first;
         int          value  = metricIter->second;
 
-        if (metric == METRIC_TOTAL_SERVICE_TIME)
+        if (metric == _METRIC_TOTAL_SERVICE_TIME)
         {
           totalServiceTime = value;
         }
@@ -270,7 +270,7 @@ std::string MetricsManager::toJson(void)
           incomingTransactions = value;
         }
 
-        if (metric != METRIC_TOTAL_SERVICE_TIME)
+        if (metric != _METRIC_TOTAL_SERVICE_TIME)
         {
           jhMetrics.addNumber(metric, value);
         }

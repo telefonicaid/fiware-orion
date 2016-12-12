@@ -1436,7 +1436,7 @@ static int connectionTreat
           (end.tv_sec  - ciP->transactionStart.tv_sec) * 1000000 + 
           (end.tv_usec - ciP->transactionStart.tv_usec);
 
-        metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TOTAL_SERVICE_TIME, elapsed);
+        metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, _METRIC_TOTAL_SERVICE_TIME, elapsed);
       }
     }
   }
