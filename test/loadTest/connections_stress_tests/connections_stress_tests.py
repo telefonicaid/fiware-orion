@@ -28,6 +28,16 @@ import random
 import time
 import datetime
 import pymongo
+import rpyc
+import json
+import logging
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s | %(levelname)s | %(message)s',
+                    filename='connections_stress_tests.log',
+                    filemode='w')
+# disable log messages from the Requests library
+logging.getLogger("requests").setLevel(logging.WARNING)
 
 
 class Stablished_Connections:
@@ -37,20 +47,26 @@ class Stablished_Connections:
     - drop the db in mongo
     - create 5000 subscription with subject.entities.idPattern: .*
     - verify/modify the notification listener with a delay of 10 minutes before answering.
-    - modify the ContextBroker config with: -httpTimeout 600000 and restart it.
+    - modify the ContextBroker config with: -httpTimeout 600000 -notificationMode threadpool:60000:5000 and restart it.
     - launch an entity update, that it triggers all subscriptions.
-    - launch indefinitely a "/version" request per second and verify that its response is correct.
+    - launch indefinitely a "/version" request per second and:
+         - report that its response is correct.
+         - report the number of established connections (if `-noEstablished` param is not used this column is ignored)
+         - report the notification queue size into ContextBroker (if `-noQueueSize` param is used this column is ignored)
     """
     # variables
     max_subscription_created = 5000
-    service = u'stablish_connections'
+    service = u'stablished_connections'
     service_path = u'/test'
+    host = u'localhost'
     port = u'1026'
-    cb_endpoint = u'http://localhost:%s' % port
+    cb_endpoint = u'http://%s:%s' % (host, port)
     notif_url = 'http://localhost:9999/notify'
     mongo_host = "localhost"
     mongo_port = u'27017'
     verbose = False
+    no_established_connections_flag = False
+    no_queue_size_flag = False
     duration = 60       # time in minutes
     version_delay = 1   # time in seconds
 
@@ -66,6 +82,8 @@ class Stablished_Connections:
         print " *     -host=<host>         : CB host (OPTIONAL) (default: localhost).                                           *"
         print " *     -u                   : show this usage (OPTIONAL).                                                        *"
         print " *     -v                   : verbose with all responses (OPTIONAL) (default: False).                            *"
+        print " *     -noEstablished       : is used to ignore the established connections (OPTIONAL) (default: False).         *"
+        print " *     -noQueueSize         : is used to ignore the Notification Queue Size (OPTIONAL) (default: False).         *"
         print " *     -service=<value>     : service header (OPTIONAL) (default: epoll).                                        *"
         print " *     -service_path=<value>: service path header (OPTIONAL) (default: /test)                                    *"
         print " *     -notif_url=<value>   : url used to notifications (OPTIONAL) (default: http://localhost:9999/notify)       *"
@@ -97,22 +115,64 @@ class Stablished_Connections:
         resp: http response
         """
         if self.verbose:
-            print("HTTP Code: %s" % str(resp.status_code))
-            print("Headers:\n %s" % str(resp.headers))
-            print("Body:\n %s" % resp.text)
+            logging.debug("HTTP Code: %s" % str(resp.status_code))
+            logging.debug("Headers:\n %s" % str(resp.headers))
+            logging.debug("Body:\n %s" % resp.text)
+
+    def __get_queue_size(self):
+        """
+        return the notification queue size
+        :return: string (size)
+        """
+        resp = requests.get("%s/statistics" % self.cb_endpoint)
+        self.__print_by_console(resp)
+        assert resp.status_code == 200, " ERROR - the statistics request is failed: \n - status code: %s \n - response: %s" % (str(resp.status_code), resp.text)
+        resp_dict = json.loads(resp.text)
+        return str(resp_dict["notifQueue"]["size"])
+
+    def __get_established_connections(self):
+        """
+        return the number of established connections per ContextBroker
+        using "prpyc" and "psutil" libraries.
+        :return string (connections)
+        """
+        connections = """def get_number_established_conn():
+               import psutil
+               process_name = "contextBroker"
+               pid = 0
+               e_c = 0
+               for proc in psutil.process_iter():
+                      if proc.name == process_name:
+                             pid = proc.pid
+                             break
+               p = psutil.Process(pid)
+               connections = p.get_connections()
+               for c in connections:
+                      if c.status == "ESTABLISHED":
+                             e_c += 1
+               return e_c"""
+
+        conn = rpyc.classic.connect(self.host)
+        conn.execute(connections)
+        remote_exec = conn.namespace['get_number_established_conn']
+        return str(remote_exec())
 
     def __init__(self, arguments):
         """
         Contructor
         """
-        print("Test init: %s " % self.__convert_timestamp_to_zulu(time.time()))
         for i in range(len(arguments)):
             if arguments[i].find('-u') >= 0:
                 self.__usage()
             if arguments[i].find('-v') >= 0:
                 self.verbose = True
+            if arguments[i].find('-noQueueSize') >= 0:
+                self.no_queue_size_flag = True
+            if arguments[i].find('-noEstablished') >= 0:
+                self.no_established_connections_flag = True
             if arguments[i].find('-host') >= 0:
-                self.cb_endpoint = "http://%s:%s" % (str(arguments[i]).split("=")[1], self.port)
+                self.host = str(arguments[i]).split("=")[1]
+                self.cb_endpoint = "http://%s:%s" % (self.host, self.port)
             if arguments[i].find('-service') >= 0:
                 self.service = str(arguments[i]).split("=")[1]
             if arguments[i].find('-service_path') >= 0:
@@ -129,20 +189,22 @@ class Stablished_Connections:
                         u'Fiware-Service': self.service,
                         u'Fiware-ServicePath': self.service_path}
 
-        print("Test configuration:")
-        print(" INFO  - service: %s" % self.service)
-        print(" INFO  - servicePath: %s" % self.service_path)
-        print(" INFO  - CB endpoint: %s" % self.cb_endpoint)
-        print(" INFO  - notification URL: %s" % self.notif_url)
-        print(" INFO  - mongo host: %s" % self.mongo_host)
-        print(" INFO  - test duration: %s minutes (%s seconds)" % (str(self.duration), str(self.duration * 60)))
-        print(" INFO  - version requests delay: %d seconds" % self.version_delay)
-        print(" INFO  - max subcription: %d" % self.max_subscription_created)
-        print(" ***************************************************************************************")
-        print(" * WARN  - verify if the listener has a delay in the response (10 minutes recommended) *")
-        print(" * WARN  - verify if these parameters are used in CB config:                           *")
-        print("            -httpTimeout 600000 -notificationMode threadpool:60000:5000                *")
-        print(" ***************************************************************************************")
+        logging.info("Test configuration:")
+        logging.info("   service: %s" % self.service)
+        logging.info("   servicePath: %s" % self.service_path)
+        logging.info("   CB endpoint: %s" % self.cb_endpoint)
+        logging.info("   notification URL: %s" % self.notif_url)
+        logging.info("   mongo host: %s" % self.mongo_host)
+        logging.info("   test duration: %s minutes (%s seconds)" % (str(self.duration), str(self.duration * 60)))
+        logging.info("   version requests delay: %d seconds" % self.version_delay)
+        logging.info("   max subcription: %d" % self.max_subscription_created)
+        logging.info("   noEstablished flag: %s" % str(self.no_established_connections_flag))
+        logging.info("   noQueueSize flag: %s" % str(self.no_queue_size_flag))
+        logging.warn(" ***************************************************************************************")
+        logging.warn(" *  verify if the listener has a delay in the response (10 minutes recommended)        *")
+        logging.warn(" *  verify if these parameters are used in CB config:                                  *")
+        logging.warn(" *           -httpTimeout 600000 -notificationMode threadpool:60000:5000               *")
+        logging.warn(" ***************************************************************************************")
 
     def drop_database(self):
         """
@@ -153,7 +215,7 @@ class Stablished_Connections:
         try:
             client = pymongo.MongoClient(mongo_uri)
             client.drop_database(mongo_database)
-            print(" INFO - The database %s has been erased" % mongo_database)
+            logging.info(" The database %s has been erased" % mongo_database)
         except Exception, e:
             raise Exception(" ERROR - Deleting a database %s in MongoDB...\n %s" % (mongo_database, str(e)))
 
@@ -162,11 +224,12 @@ class Stablished_Connections:
         create N subscription until de max subscription created
         """
         payload = u'{"description": "subscription used to epoll test",  "subject": {"entities": [{"idPattern": ".*"}], "condition": {"attrs": ["temperature"]}}, "notification": {"http": {"url": "%s"}, "attrs": ["temperature"]}}' % self.notif_url
+        logging.info(" creating %d subscriptions..." % self.max_subscription_created)
         for i in range(self.max_subscription_created):
             resp = requests.post("%s/v2/subscriptions" % self.cb_endpoint, headers=self.headers, data=payload)
             self.__print_by_console(resp)
             assert resp.status_code == 201, " ERROR - the subcriptions request is failed: \n - status code: %s \n - response: %s" % (str(resp.status_code), resp.text)
-        print(" INFO - %d subscriptions have been created" % self.max_subscription_created)
+        logging.info(" %d subscriptions have been created" % self.max_subscription_created)
 
     def update_and_version(self):
         """
@@ -177,20 +240,34 @@ class Stablished_Connections:
         duration_in_secs = self.duration * 60
 
         # update request
+        logging.info("Test init: %s " % self.__convert_timestamp_to_zulu(init_date))
         random_value = random.randint(1, 100)  # random value between 1..100 for attribute value. See the payload below.
         payload = u'{"actionType": "APPEND", "entities": [{"id": "Bcn-Welt", "temperature": {"value": %s}}]}' % random_value
         resp = requests.post("%s/v2/op/update" % self.cb_endpoint, headers=self.headers, data=payload)
         assert resp.status_code == 204, " ERROR - the update batch op request is failed: \n - status code: %s \n - response: %s" % (str(resp.status_code), resp.text)
         self.__print_by_console(resp)
-
+        queue_size = u'N/A'
+        established_connections = u'N/A'
+        counter = 1
+        logging.info(" Reports each second:")
+        logging.info(" counter       version      queue   established")
+        logging.info("               request      size    connections")
+        logging.info(" ----------------------------------------------")
         while (init_date+duration_in_secs) > time.time():
             # version request
             resp = requests.get("%s/version" % self.cb_endpoint)
             self.__print_by_console(resp)
             assert resp.status_code == 200, " ERROR - the version http code is not 200 - OK\n     - http code received: %s - %s" % (str(resp.status_code), resp. reason)
+            # report
+            if not self.no_queue_size_flag:
+                queue_size = self.__get_queue_size()
+            if not self.no_established_connections_flag:
+                established_connections = self.__get_established_connections()
+            logging.info(" -------- %d -------- %s -------- %s -------- %s ----------" % (counter, resp.reason, queue_size, established_connections))
             time.sleep(self.version_delay)
-        print(" INFO - ALL \"/version\" requests responded correctly...Bye.")
-        print("Test end: %s" % self.__convert_timestamp_to_zulu(time.time()))
+            counter += 1
+        logging.info(" ALL (%d) \"/version\" requests responded correctly...Bye." % counter)
+        logging.info("Test end: %s" % self.__convert_timestamp_to_zulu(time.time()))
 
 
 if __name__ == '__main__':
@@ -199,9 +276,9 @@ if __name__ == '__main__':
     # drop database in mongo
     conn.drop_database()
 
-    # create 5000 subscription with subject.entities.idPattern: .*
+    # create N subscription with subject.entities.idPattern: .*
     conn.create_subscriptions()
 
-    # modify a entity each N minutes, that it triggers all subscriptions and
-    # launch indefinitely a "/version" request and verify that its response is correct.
+    # modify a entity that it triggers all subscriptions and...
+    # ...launch indefinitely a "/version" request and verify that its response is correct.
     conn.update_and_version()

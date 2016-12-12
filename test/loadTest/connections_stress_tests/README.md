@@ -1,0 +1,50 @@
+## Connections Stress Test
+
+Verify that ContextBroker works properly with a large number of stablished connections.
+S
+#### Tests procedure:
+- drop the database in mongo
+- create 5000 subscription with subject.entities.idPattern: .*
+- verify/modify the notification listener with a delay of 10 minutes before answering.
+- modify the ContextBroker config with: `"-httpTimeout 600000 -notificationMode threadpool:60000:5000"` and restart it.
+- launch an entity update, that it triggers all subscriptions.
+- launch indefinitely a "/version" request per second and:
+     - report that its response is correct.
+     - report the number of estbilished connections (if `-noEstablished` param is used this column is ignored)
+     - report the queue size into ContextBroker (if `-noQueueSize` param is used this column is ignored)
+     
+#### Mehod of use:
+   - firstly, launch established connections listener (rpyc_classic.py) in CB machine. 
+        - download from `https://pypi.python.org/pypi/rpyc`
+        - install the dependencies: `pip install rpyc psutil`
+        - unzip and execute `python bin/rpyc_classic.py`
+        Note: if you have problem with `psutil` installation, use `yum install python-devel python-psutil` to install it on your CentOS system.
+   - after, launch the notifications listener with delay in the response.
+   - ContextBroker configuration recommended:
+   ```
+        BROKER_EXTRA_OPS="-reqMutexPolicy none -writeConcern 0 -httpTimeout 600000 -notificationMode threadpool:60000:5000 -statTiming -statSemWait -statCounters -statNotifQueue -multiservice -subCacheIval 5"
+   ```   
+   - finally, execute in local the `connections_stress_test.py` script
+   
+#### Usage
+       Parameters:                                                                                                  
+          -host=<host>         : CB host (OPTIONAL) (default: localhost).                                           
+          -u                   : show this usage (OPTIONAL).                                                        
+          -v                   : verbose with all responses (OPTIONAL) (default: False). 
+          -noEstablished       : is used to ignore the established connections (OPTIONAL) (default: False).                         
+          -noQueueSize         : is used to ignore the Queue size (OPTIONAL) (default: False).                         
+          -service=<value>     : service header (OPTIONAL) (default: epoll).                                        
+          -service_path=<value>: service path header (OPTIONAL) (default: /test)                                    
+          -notif_url=<value>   : url used to notifications (OPTIONAL) (default: http://localhost:9999/notify)       
+          -mongo=<value>       : mongo host used to clean de bd (OPTIONAL) (default: localhost)                     
+          -duration=<value>    : test duration, value is in minutes (OPTIONAL) (default: 60 minutes)                
+                                                                                                                    
+       Examples:                                                                                                    
+        python connections_stress_tests.py -host=10.10.10.10 -notif_url=http://10.0.0.1:1234/notify duration=100 -v 
+                                                                                                                    
+       Note:                                                                                                        
+         - the version delay is a second                                                                            
+         - the number of subscriptions is 5000     
+
+#### Logging
+All the information is logged in `connections_stress_tests.log` in the same path.
