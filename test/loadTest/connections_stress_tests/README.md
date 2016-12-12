@@ -34,12 +34,12 @@ Verify that ContextBroker works properly with a large number of stablished conne
           -noQueueSize         : is used to ignore the Queue size (OPTIONAL) (default: False).                         
           -service=<value>     : service header (OPTIONAL) (default: stablished_connections).                                        
           -service_path=<value>: service path header (OPTIONAL) (default: /test)                                    
-          -notif_url=<value>   : url used to notifications (OPTIONAL) (default: http://localhost:9999/notify)       
+          -notif_url=<value>   : url used to notifications (OPTIONAL) (default: http://localhost:8090/notify)       
           -mongo=<value>       : mongo host used to clean de bd (OPTIONAL) (default: localhost)                     
           -duration=<value>    : test duration, value is in minutes (OPTIONAL) (default: 60 minutes)                
                                                                                                                     
        Examples:                                                                                                    
-        python connections_stress_tests.py -host=10.10.10.10 -notif_url=http://10.0.0.1:1234/notify duration=100 -v 
+        python connections_stress_tests.py -host=10.10.10.10 -notif_url=http://10.0.0.1:8090/notify duration=100 -v 
                                                                                                                     
        Note:                                                                                                        
          - the version delay is a second                                                                            

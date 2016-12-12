@@ -61,7 +61,7 @@ class Stablished_Connections:
     host = u'localhost'
     port = u'1026'
     cb_endpoint = u'http://%s:%s' % (host, port)
-    notif_url = 'http://localhost:9999/notify'
+    notif_url = 'http://localhost:8090/notify'
     mongo_host = "localhost"
     mongo_port = u'27017'
     verbose = False
@@ -86,12 +86,12 @@ class Stablished_Connections:
         print " *     -noQueueSize         : is used to ignore the Notification Queue Size (OPTIONAL) (default: False).         *"
         print " *     -service=<value>     : service header (OPTIONAL) (default: stablished_connections).                       *"
         print " *     -service_path=<value>: service path header (OPTIONAL) (default: /test)                                    *"
-        print " *     -notif_url=<value>   : url used to notifications (OPTIONAL) (default: http://localhost:9999/notify)       *"
+        print " *     -notif_url=<value>   : url used to notifications (OPTIONAL) (default: http://localhost:8090/notify)       *"
         print " *     -mongo=<value>       : mongo host used to clean de bd (OPTIONAL) (default: localhost)                     *"
         print " *     -duration=<value>    : test duration, value is in minutes (OPTIONAL) (default: 60 minutes)                *"
         print " *                                                                                                               *"
         print " *  Examples:                                                                                                    *"
-        print " *   python connections_stress_tests.py -host=10.10.10.10 -notif_url=http://10.0.0.1:1234/notify duration=100 -v *"
+        print " *   python connections_stress_tests.py -host=10.10.10.10 -notif_url=http://10.0.0.1:8090/notify duration=100 -v *"
         print " *                                                                                                               *"
         print " *  Note:                                                                                                        *"
         print " *    - the version delay is a second                                                                            *"
@@ -248,13 +248,14 @@ class Stablished_Connections:
         self.__print_by_console(resp)
         queue_size = u'N/A'
         established_connections = u'N/A'
-        counter = 1
+        counter = 0
         logging.info(" Reports each second:")
         logging.info(" counter       version      queue   established")
         logging.info("               request      size    connections")
         logging.info(" --------------------------------------------------------")
         while (init_date+duration_in_secs) > time.time():
             # version request
+            counter += 1
             resp = requests.get("%s/version" % self.cb_endpoint)
             self.__print_by_console(resp)
             assert resp.status_code == 200, " ERROR - the version http code is not 200 - OK\n     - http code received: %s - %s" % (str(resp.status_code), resp. reason)
@@ -265,7 +266,7 @@ class Stablished_Connections:
                 established_connections = self.__get_established_connections()
             logging.info(" -------- %d -------- %s -------- %s -------- %s ----------" % (counter, resp.reason, queue_size, established_connections))
             time.sleep(self.version_delay)
-            counter += 1
+
         logging.info(" ALL (%d) \"/version\" requests responded correctly...Bye." % counter)
         logging.info("Test end: %s" % self.__convert_timestamp_to_zulu(time.time()))
 
