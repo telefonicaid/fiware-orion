@@ -99,6 +99,7 @@ extern void restInit
    const std::string&  _rushHost,
    unsigned short      _rushPort,
    const char*         _allowedOrigin,
+   int                 _mhdTimeoutInSeconds,
    const char*         _httpsKey          = NULL,
    const char*         _httpsCert         = NULL,
    RestServeFunction   _serveFunction     = NULL

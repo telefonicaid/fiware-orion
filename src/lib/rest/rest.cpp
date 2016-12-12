@@ -81,6 +81,7 @@ __thread char                    clientIp[IP_LENGTH_MAX + 1];
 static unsigned int              connMemory;
 static unsigned int              maxConns;
 static unsigned int              threadPoolSize;
+static unsigned int              mhdConnectionTimeout  = 0;
 
 
 
@@ -549,6 +550,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 
   return MHD_YES;
 }
+
 
 
 /* ****************************************************************************
@@ -1146,6 +1148,7 @@ static int connectionTreat
     LM_T(LmtRequest, (""));
     // WARNING: This log message below is crucial for the correct function of the Behave tests - CANNOT BE REMOVED
     LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", method, url));
+    LM_W(("KZ: --------------------- Serving request %s %s -----------------", method, url));
     *con_cls     = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
     ciP->port    = port;
     ciP->ip      = ip;
@@ -1231,8 +1234,17 @@ static int connectionTreat
     //
     if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
     {
+      OrionError error(SccBadRequest, "too large payload");
+
       *upload_data_size = 0;
-      return MHD_YES;
+      alarmMgr.badInput(clientIp, error.details);
+      metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
+      return MHD_NO;
+#if 0
+      ciP->httpStatusCode  = SccBadRequest;
+      ciP->answer          = error.smartRender(ciP->apiVersion);
+      restReply(ciP, ciP->answer);
+#endif
     }
 
     //
@@ -1269,7 +1281,6 @@ static int connectionTreat
     return MHD_YES;
   }
 
-
   //
   // 3. Finally, serve the request (unless an error has occurred)
   // 
@@ -1280,6 +1291,7 @@ static int connectionTreat
   {
     alarmMgr.badInput(clientIp, "error in URI path");
     restReply(ciP, ciP->answer);
+    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
     return MHD_YES;
   }
 
@@ -1290,6 +1302,7 @@ static int connectionTreat
   {
     alarmMgr.badInput(clientIp, "error in ServicePath http-header");
     restReply(ciP, ciP->answer);
+    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
     return MHD_YES;
   }
 
@@ -1297,6 +1310,7 @@ static int connectionTreat
   {
     alarmMgr.badInput(clientIp, "invalid mime-type in Content-Type http-header");
     restReply(ciP, ciP->answer);
+    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
     return MHD_YES;
   }
   else
@@ -1308,6 +1322,7 @@ static int connectionTreat
   {
     alarmMgr.badInput(clientIp, "error in URI parameters");
     restReply(ciP, ciP->answer);
+    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
     return MHD_YES;
   }  
 
@@ -1323,6 +1338,8 @@ static int connectionTreat
 
     ciP->answer         = restErrorReplyGet(ciP, "", ciP->url, SccRequestEntityTooLarge, details);
     ciP->httpStatusCode = SccRequestEntityTooLarge;
+    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
+    // FIXME PR: Why not call restReply and return right here ... ?
   }
 
 
@@ -1336,6 +1353,7 @@ static int connectionTreat
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, ciP->acceptHeaderError);
     restReply(ciP, oe.smartRender(ciP->apiVersion));
+    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
     return MHD_YES;
   }
 
@@ -1360,6 +1378,7 @@ static int connectionTreat
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, oe.details);
     restReply(ciP, oe.smartRender(ciP->apiVersion));
+    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
     return MHD_YES;
   }
 
@@ -1386,6 +1405,7 @@ static int connectionTreat
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, oe.details);
     restReply(ciP, oe.smartRender(ciP->apiVersion));
+    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
     return MHD_YES;
   }
 
@@ -1401,6 +1421,7 @@ static int connectionTreat
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, details);
     restReply(ciP, oe.smartRender(ciP->apiVersion));
+    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
     return MHD_YES;
   }
 
@@ -1420,15 +1441,26 @@ static int connectionTreat
     ciP->httpStatusCode  = SccContentLengthRequired;
     restReply(ciP, errorMsg);
     alarmMgr.badInput(clientIp, errorMsg);
+    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
   }
   else if (ciP->answer != "")
   {
     alarmMgr.badInput(clientIp, ciP->answer);
     restReply(ciP, ciP->answer);
+    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
   }
   else
   {
     serveFunction(ciP);
+
+    //
+    // If a service functions sets the httpStatusCode to something above the set os 200s, an error has occurred
+    //
+    if (ciP->httpStatusCode >= 300)
+    {
+      metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
+    }
+
     if (metricsMgr.isOn() && (ciP->transactionStart.tv_sec != 0))
     {
       struct timeval  end;
@@ -1522,6 +1554,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                   MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
                                    MHD_OPTION_END);
 
     }
@@ -1538,6 +1571,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                   MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
                                    MHD_OPTION_END);
 
     }
@@ -1577,6 +1611,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                       MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
                                       MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                      MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
                                       MHD_OPTION_END);
     }
     else
@@ -1592,6 +1627,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                       MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
                                       MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                      MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
                                       MHD_OPTION_END);
     }
 
@@ -1632,6 +1668,7 @@ void restInit
   const std::string&  _rushHost,
   unsigned short      _rushPort,
   const char*         _allowedOrigin,
+  int                 _mhdTimeoutInSeconds,
   const char*         _httpsKey,
   const char*         _httpsCertificate,
   RestServeFunction   _serveFunction
@@ -1650,6 +1687,8 @@ void restInit
   threadPoolSize   = _mhdThreadPoolSize;
   rushHost         = _rushHost;
   rushPort         = _rushPort;
+
+  mhdConnectionTimeout = _mhdTimeoutInSeconds;
 
   strncpy(restAllowedOrigin, _allowedOrigin, sizeof(restAllowedOrigin));
 

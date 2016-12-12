@@ -130,8 +130,13 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
 
   //
   // Exclude the first '/' from the Sub Service
-  //
-  const char* subService = &subServ.c_str()[1];
+  // But, only if if starts with a '/'
+  const char* subService = subServ.c_str();
+
+  if (subService[0] == '/')
+  {
+    subService = &subService[1];
+  }
 
   semTake();
 
