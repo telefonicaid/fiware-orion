@@ -84,7 +84,7 @@ class Stablished_Connections:
         print " *     -v                   : verbose with all responses (OPTIONAL) (default: False).                            *"
         print " *     -noEstablished       : is used to ignore the established connections (OPTIONAL) (default: False).         *"
         print " *     -noQueueSize         : is used to ignore the Notification Queue Size (OPTIONAL) (default: False).         *"
-        print " *     -service=<value>     : service header (OPTIONAL) (default: epoll).                                        *"
+        print " *     -service=<value>     : service header (OPTIONAL) (default: stablished_connections).                       *"
         print " *     -service_path=<value>: service path header (OPTIONAL) (default: /test)                                    *"
         print " *     -notif_url=<value>   : url used to notifications (OPTIONAL) (default: http://localhost:9999/notify)       *"
         print " *     -mongo=<value>       : mongo host used to clean de bd (OPTIONAL) (default: localhost)                     *"

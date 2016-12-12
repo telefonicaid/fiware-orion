@@ -16,14 +16,14 @@ Verify that ContextBroker works properly with a large number of stablished conne
 #### Mehod of use:
 - firstly, launch established connections listener (rpyc_classic.py) in CB machine. 
     - download from `https://pypi.python.org/pypi/rpyc`
-    - install the dependencies: `pip install rpyc psutil`. If you have problem with `psutil` installation, use `yum install python-devel python-psutil` to install it on your CentOS system.
+    - install the dependencies: `pip install rpyc psutil`. If you have problem with the `psutil` installation, use `yum install python-devel python-psutil` to install it on your CentOS system.
     - unzip and execute `python bin/rpyc_classic.py`.
 - after, launch the notifications listener `./notif_listener_with_delay_in_response`.
 - ContextBroker configuration recommended:
 ```
     BROKER_EXTRA_OPS="-reqMutexPolicy none -writeConcern 0 -httpTimeout 600000 -notificationMode threadpool:60000:5000 -statTiming -statSemWait -statCounters -statNotifQueue -multiservice -subCacheIval 5"
 ```   
-- finally, execute in local the `connections_stress_test.py` script
+- finally, execute in local the `connections_stress_test.py` script.
    
 #### Usage
        Parameters:                                                                                                  
@@ -32,7 +32,7 @@ Verify that ContextBroker works properly with a large number of stablished conne
           -v                   : verbose with all responses (OPTIONAL) (default: False). 
           -noEstablished       : is used to ignore the established connections (OPTIONAL) (default: False).                         
           -noQueueSize         : is used to ignore the Queue size (OPTIONAL) (default: False).                         
-          -service=<value>     : service header (OPTIONAL) (default: epoll).                                        
+          -service=<value>     : service header (OPTIONAL) (default: stablished_connections).                                        
           -service_path=<value>: service path header (OPTIONAL) (default: /test)                                    
           -notif_url=<value>   : url used to notifications (OPTIONAL) (default: http://localhost:9999/notify)       
           -mongo=<value>       : mongo host used to clean de bd (OPTIONAL) (default: localhost)                     
