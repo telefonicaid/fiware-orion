@@ -1439,10 +1439,6 @@ static int connectionTreat
         metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TOTAL_SERVICE_TIME, elapsed);
       }
     }
-    else
-    {
-      serveFunction(ciP);
-    }
   }
 
   return MHD_YES;
