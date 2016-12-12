@@ -16,9 +16,8 @@ Verify that ContextBroker works properly with a large number of stablished conne
 #### Mehod of use:
 - firstly, launch established connections listener (rpyc_classic.py) in CB machine. 
     - download from `https://pypi.python.org/pypi/rpyc`
-    - install the dependencies: `pip install rpyc psutil`
-    - unzip and execute `python bin/rpyc_classic.py`
-    Note: if you have problem with `psutil` installation, use `yum install python-devel python-psutil` to install it on your CentOS system.
+    - install the dependencies: `pip install rpyc psutil`. If you have problem with `psutil` installation, use `yum install python-devel python-psutil` to install it on your CentOS system.
+    - unzip and execute `python bin/rpyc_classic.py`.
 - after, launch the notifications listener `./notif_listener_with_delay_in_response`.
 - ContextBroker configuration recommended:
 ```
