@@ -1062,6 +1062,18 @@ static int connectionTreat
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (ciP == NULL)
   {
+    struct timeval transactionStart;
+
+    // Create point in time for transaction metrics
+    if (metricsMgr.isOn())
+    {
+      if (gettimeofday(&transactionStart, NULL) == -1)
+      {
+        transactionStart.tv_sec  = 0;
+        transactionStart.tv_usec = 0;
+      }
+    }
+
     //
     // First thing to do on a new connection, set correlator to N/A.
     // After reading HTTP headers, the correlator id either changes due to encountering a 
@@ -1122,6 +1134,9 @@ static int connectionTreat
       // No METRICS here ... Without ConnectionInfo we have no service/subService ...
       return MHD_NO;
     }
+
+    ciP->transactionStart.tv_sec  = transactionStart.tv_sec;
+    ciP->transactionStart.tv_usec = transactionStart.tv_usec;
 
     if (timingStatistics)
     {
@@ -1410,17 +1425,19 @@ static int connectionTreat
   }
   else
   {
-    if (metricsMgr.isOn())
+    serveFunction(ciP);
+    if (metricsMgr.isOn() && (ciP->transactionStart.tv_sec != 0))
     {
-      struct timeval  start;
       struct timeval  end;
 
-      gettimeofday(&start, NULL);
-      serveFunction(ciP);
-      gettimeofday(&end, NULL);
-      
-      unsigned long long elapsed = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);
-      metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TOTAL_SERVICE_TIME, elapsed);
+      if (gettimeofday(&end, NULL) == 0)
+      {
+        unsigned long long elapsed = 
+          (end.tv_sec  - ciP->transactionStart.tv_sec) * 1000000 + 
+          (end.tv_usec - ciP->transactionStart.tv_usec);
+
+        metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TOTAL_SERVICE_TIME, elapsed);
+      }
     }
     else
     {
