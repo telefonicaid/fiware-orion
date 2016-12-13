@@ -238,6 +238,9 @@ class Stablished_Connections:
         """
         init_date = time.time()
         duration_in_secs = self.duration * 60
+        queue_size = u'N/A'
+        established_connections = u'N/A'
+        counter = 0
 
         # update request
         logging.info("Test init: %s " % self.__convert_timestamp_to_zulu(init_date))
@@ -246,9 +249,7 @@ class Stablished_Connections:
         resp = requests.post("%s/v2/op/update" % self.cb_endpoint, headers=self.headers, data=payload)
         assert resp.status_code == 204, " ERROR - the update batch op request is failed: \n - status code: %s \n - response: %s" % (str(resp.status_code), resp.text)
         self.__print_by_console(resp)
-        queue_size = u'N/A'
-        established_connections = u'N/A'
-        counter = 0
+
         logging.info(" Reports each second:")
         logging.info(" counter       version      queue   established")
         logging.info("               request      size    connections")

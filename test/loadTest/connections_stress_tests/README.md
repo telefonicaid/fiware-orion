@@ -12,6 +12,8 @@ Verify that ContextBroker works properly with a large number of stablished conne
      - report that its response is correct.
      - report the number of established connections (if `-noEstablished` param is used this column is ignored)
      - report the queue size into ContextBroker (if `-noQueueSize` param is used this column is ignored)
+
+**Note**: the contextBroker should be started by command (`/usr/bin/contextBtoker ...`) instead of service (service contextBroker start), because the VMs are limited the number of threads/fps(1024) in all users except in `root`.
      
 #### Mehod of use:
 - firstly, launch established connections listener (rpyc_classic.py) in CB machine. 
