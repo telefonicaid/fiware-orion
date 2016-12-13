@@ -1345,6 +1345,8 @@ void exitFunc(void)
   subCacheDestroy();
 #endif
 
+  metricsMgr.release();
+
   curl_context_cleanup();
   curl_global_cleanup();
 
@@ -1735,7 +1737,6 @@ int main(int argC, char* argV[])
   contextBrokerInit(dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
   alarmMgr.init(relogAlarms);
-
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
 

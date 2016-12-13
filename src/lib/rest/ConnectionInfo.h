@@ -30,6 +30,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <sys/time.h>
 
 #include "logMsg/logMsg.h"
 
@@ -162,6 +163,7 @@ public:
   ApiVersion                 apiVersion;
   RequestType                requestType;
   std::string                acceptHeaderError;
+  struct timeval             transactionStart;  // For metrics
 
   std::map<std::string, std::string>   uriParam;
   std::map<std::string, bool>          uriParamOptions;
