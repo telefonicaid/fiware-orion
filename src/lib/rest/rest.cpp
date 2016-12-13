@@ -1246,23 +1246,13 @@ static int connectionTreat
   //
   if (dataLen != 0)
   {
-    //
-    // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
-    // just silently "eat" the entire message
-    //
     if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
     {
-      OrionError error(SccBadRequest, "too large payload");
-
+      //
+      // Errors can't be returned yet, postpone ...
+      //
       *upload_data_size = 0;
-      alarmMgr.badInput(clientIp, error.details);
-      metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
-      return MHD_NO;
-#if 0
-      ciP->httpStatusCode  = SccBadRequest;
-      ciP->answer          = error.smartRender(ciP->apiVersion);
-      restReply(ciP, ciP->answer);
-#endif
+      return MHD_YES;
     }
 
     //

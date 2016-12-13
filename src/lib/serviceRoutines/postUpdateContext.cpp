@@ -460,7 +460,6 @@ std::string postUpdateContext
     alarmMgr.badInput(clientIp, "more than one service path for an update request");
 
     TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject, ""));
-
     return answer;
   }
   else if (ciP->servicePathV[0] == "")

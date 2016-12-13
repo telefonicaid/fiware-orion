@@ -82,13 +82,14 @@ brokerStart CB
 #  
 
 #
+# 00. GET /version
 # 01. Ask for metrics and see no errors
 # 02. Send a request with an invalid JSON payload
 # 03. Ask for metrics and see one error
 # 04. Send a request with an Invalid URL
 # 05. Send a request with an Invalid Service Path
 # 06. Send a request with an Invalid Content-Type
-# 07. Send a request without accept-header (empty value)
+# 07. Send a request with invalid value for URI param /options/
 # 08. Send a request with Content-Length > PAYLOAD_MAX_SIZE
 # 09. Send a request with no acceptable mime-type in accept header
 # 10. Send a request with more than one service path
@@ -98,9 +99,16 @@ brokerStart CB
 #
 
 
+echo "00. GET /version"
+echo "================"
+orionCurl --url /version --servicePath /get/version
+echo
+echo
+
+
 echo "01. Ask for metrics and see no errors"
 echo "====================================="
-orionCurl --url /admin/metrics
+orionCurl --url /admin/metrics --servicePath /get/metrics
 echo
 echo
 
@@ -108,21 +116,21 @@ echo
 echo "02. Send a request with an invalid JSON payload"
 echo "==============================================="
 payload='[ "error": "in vector" ]'
-orionCurl --url /v2/entities --payload "$payload"
+orionCurl --url /v2/entities --payload "$payload" --servicePath /error
 echo
 echo
 
 
 echo "03. Ask for metrics and see one error"
 echo "====================================="
-orionCurl --url /admin/metrics
+orionCurl --url /admin/metrics --servicePath /get/metrics
 echo
 echo
 
 
 echo "04. Send a request with an Invalid URL"
 echo "======================================"
-orionCurl --url /admin/invalid/url
+orionCurl --url /admin/invalid/url --servicePath /error
 echo
 echo
 
@@ -137,15 +145,15 @@ echo
 echo "06. Send a request with an Invalid Content-Type"
 echo "==============================================="
 payload='{ "id": "E1", "type": "T1" }'
-orionCurl --url /v2/entities --payload "$payload" --in "Invalid-Content-Type"
+orionCurl --url /v2/entities --payload "$payload" --in "Invalid-Content-Type" --servicePath /error
 echo
 echo
 
 
-echo "07. Send a request without accept-header (empty value)"
-echo "======================================================"
+echo "07. Send a request with invalid value for URI param /options/"
+echo "============================================================="
 payload='{ "id": "E1", "type": "T1" }'
-orionCurl --url /v2/entities --payload "$payload" --out ""
+orionCurl --url '/v2/entities?options=notValid' --payload "$payload" --servicePath /error
 echo
 echo
 
@@ -158,7 +166,7 @@ echo "========================================================="
 #
 #
 payload='{ "id": "E1", "type": "T1" }'
-orionCurl --url /v2/entities --payload "$payload" -H "Content-Length: 6000000" --noPayloadCheck
+orionCurl --url /v2/entities --payload "$payload" -H "Content-Length: 6000000" --noPayloadCheck  --servicePath /error
 echo
 echo
 
@@ -166,7 +174,7 @@ echo
 echo "09. Send a request with no acceptable mime-type in accept header"
 echo "================================================================"
 payload='"a string"'
-orionCurl --url /v2/entities --payload "$payload" --out "bad-mime-type"
+orionCurl --url /v2/entities --payload "$payload" --out "bad-mime-type"  --servicePath /error
 echo
 echo
 
@@ -190,23 +198,43 @@ echo
 echo "12. Send a PUT /v2/entities/<id>/attrs/<attrName>/value for an non-existing entity E_NOPE"
 echo "========================================================================================="
 payload='{ "value": 12 }'
-orionCurl --url /v2/entities/E_NOPE/attrs/A1/value --payload "$payload" -X PUT
+orionCurl --url /v2/entities/E_NOPE/attrs/A1/value --payload "$payload" -X PUT --servicePath /error
 echo
 echo
 
 
 echo "13. Ask for metrics and see 10 errors"
 echo "====================================="
-orionCurl --url /admin/metrics
+orionCurl --url /admin/metrics --servicePath /get/metrics
 echo
 echo
 
 
 --REGEXPECT--
+00. GET /version
+================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "orion": {
+        "compile_time": "REGEX(.*)",
+        "compiled_by": "REGEX(.*)",
+        "compiled_in": "REGEX(.*)",
+        "git_hash": "REGEX(.*)",
+        "uptime": "REGEX(.*)",
+        "version": "REGEX(.*)"
+    }
+}
+
+
 01. Ask for metrics and see no errors
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 62
+Content-Length: 99
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -215,8 +243,9 @@ Date: REGEX(.*)
     "services": {
         "": {
             "subservs": {
-                "": {
-                    "incomingTransactions": 1
+                "get/version": {
+                    "incomingTransactions": 1,
+                    "serviceTime": 0.004428
                 }
             }
         }
@@ -250,10 +279,18 @@ Date: REGEX(.*)
     "services": {
         "": {
             "subservs": {
-                "": {
+                "error": {
                     "incomingTransactionErrors": 1,
                     "incomingTransactionRequestSize": 24,
-                    "incomingTransactions": 3,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                },
+                "get/metrics": {
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                },
+                "get/version": {
+                    "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
             }
@@ -304,14 +341,16 @@ Date: REGEX(.*)
 }
 
 
-07. Send a request without accept-header (empty value)
-======================================================
+07. Send a request with invalid value for URI param /options/
+=============================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+{
+}
 
 
 08. Send a request with Content-Length > PAYLOAD_MAX_SIZE
