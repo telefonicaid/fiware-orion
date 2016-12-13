@@ -1245,6 +1245,16 @@ static int connectionTreat
   //
   if (dataLen != 0)
   {
+    //
+    // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
+    // just silently "eat" the entire message.
+    // 
+    // The problem occurs qhen the broker is lied to and there aren't ciP->httpHeaders.contentLength
+    // bytes to read.
+    // When this happens, MHD blocks until it times out (MHD_OPTION_CONNECTION_TIMEOUT defaults to 5 seconds),
+    // and the broker isn't able to respond. MHD just closes the connection.
+    // Question asked in mhd mailing list.
+    //
     if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
     {
       //
@@ -1346,7 +1356,6 @@ static int connectionTreat
     ciP->answer         = restErrorReplyGet(ciP, "", ciP->url, SccRequestEntityTooLarge, details);
     ciP->httpStatusCode = SccRequestEntityTooLarge;
     metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
-    // FIXME PR: Why not call restReply and return right here ... ?
   }
 
 
@@ -1463,7 +1472,7 @@ static int connectionTreat
     //
     // If a service function sets the httpStatusCode to something above the set of 200s, an error has occurred
     //
-    if (ciP->httpStatusCode >= 300)
+    if (ciP->httpStatusCode >= SccBadRequest)
     {
       metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
     }
