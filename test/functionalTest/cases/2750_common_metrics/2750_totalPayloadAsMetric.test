@@ -37,7 +37,7 @@ brokerStart CB
 # 05. Create an entity (with payload of exactly 100 bytes)
 # 06. Ask for Metrics, see 6 Incoming Transactions, and 150 bytes in incomingTransactionRequestSize
 # 07. GET /v2/entities - to provoke payload in response
-# 08. Ask for Metrics, see 8, and XXX bytes as incomingTransactionResponseSize
+# 08. Ask for Metrics, see 8, and see incomingTransactionResponseSize
 #
 
 echo "01. Send a GET /v2/entities"
@@ -91,8 +91,8 @@ echo
 echo
 
 
-echo "08. Ask for Metrics, see 8, and XXX bytes as incomingTransactionResponseSize"
-echo "============================================================================"
+echo "08. Ask for Metrics, see 8, and see incomingTransactionResponseSize"
+echo "==================================================================="
 orionCurl --url /admin/metrics
 echo
 echo
@@ -274,8 +274,8 @@ Date: REGEX(.*)
 []
 
 
-08. Ask for Metrics, see 8, and XXX bytes as incomingTransactionResponseSize
-============================================================================
+08. Ask for Metrics, see 8, and see incomingTransactionResponseSize
+===================================================================
 HTTP/1.1 200 OK
 Content-Length: 748
 Content-Type: application/json
