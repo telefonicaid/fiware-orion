@@ -222,6 +222,57 @@ void MetricsManager::reset(void)
 
 /* ****************************************************************************
 *
+* metricsRender - 
+*/
+static std::string metricsRender(std::map<std::string, unsigned long long>& metricsMap)
+{
+  std::map<std::string, unsigned long long>::iterator  it;
+  unsigned long long                                   incomingTransactions = 0;
+  unsigned long long                                   totalServiceTime     = 0;
+  int                                                  metricsAdded         = 0;
+  JsonHelper                                           jh;
+
+  for (it = metricsMap.begin();  it != metricsMap.end(); ++it)
+  {
+    std::string        metric = it->first;
+    long long          value  = it->second;
+
+    if (metric == _METRIC_TOTAL_SERVICE_TIME)
+    {
+      totalServiceTime = value;
+    }
+    else if (metric == METRIC_TRANS_IN)
+    {
+      incomingTransactions = value;
+    }
+
+    if ((totalServiceTime != 0) && (incomingTransactions != 0))
+    {
+      float mValue = (float) totalServiceTime / (float) (incomingTransactions * 1000000);
+
+      jh.addFloat(METRIC_SERVICE_TIME, mValue);
+      totalServiceTime     = 0;
+      incomingTransactions = 0;
+      ++metricsAdded;
+    }
+
+    if (metric != _METRIC_TOTAL_SERVICE_TIME)
+    {
+      if (value != 0)
+      {
+        jh.addNumber(metric, value);
+        ++metricsAdded;
+      }
+    }
+  }
+
+  return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
 * MetricsManager::toJson -
 *
 * FIXME PR: needs a refactor (see .h)
@@ -252,7 +303,6 @@ std::string MetricsManager::toJson(void)
   {
     JsonHelper                                                          subServiceTop;
     JsonHelper                                                          jhSubService;
-    JsonHelper                                                          jhServiceSum;
     std::string                                                         service        = serviceIter->first;
     std::map<std::string, std::map<std::string, unsigned long long>*>*  servMap        = serviceIter->second;
     std::map<std::string, unsigned long long>                           serviceSum;
@@ -262,159 +312,44 @@ std::string MetricsManager::toJson(void)
       JsonHelper                                  jhMetrics;
       std::string                                 subService           = subServiceIter->first;
       std::map<std::string, unsigned long long>*  metricMap            = subServiceIter->second;
-      unsigned long long                          incomingTransactions = 0;
-      unsigned long long                          totalServiceTime     = 0;
-      int                                         metricsAdded         = 0;
 
       for (metricIter = metricMap->begin(); metricIter != metricMap->end(); ++metricIter)
       {
         std::string  metric = metricIter->first;
         long long    value  = metricIter->second;
 
-        //
-        // Adding to 'sum-maps'
-        //
+        // Add to 'sum-maps'
         if (value != 0)
         {
           serviceSum[metric] += value;
           sum[metric]        += value;
         }
-
-        if (metric == _METRIC_TOTAL_SERVICE_TIME)
-        {
-          totalServiceTime = value;
-        }
-        else if (metric == METRIC_TRANS_IN)
-        {
-          incomingTransactions = value;
-        }
-
-        if (metric != _METRIC_TOTAL_SERVICE_TIME)
-        {
-          if (value != 0)
-          {
-            jhMetrics.addNumber(metric, value);
-            ++metricsAdded;
-          }
-        }
-
-        if ((totalServiceTime != 0) && (incomingTransactions != 0))
-        {
-          float mValue = (float) totalServiceTime / (float) (incomingTransactions * 1000000);
-
-          jhMetrics.addFloat(METRIC_SERVICE_TIME, mValue);
-          totalServiceTime     = 0;
-          incomingTransactions = 0;
-          ++metricsAdded;
-        }
       }
 
-      if (metricsAdded > 0)
+      std::string subServiceString = metricsRender(*metricMap);
+
+      if (subServiceString != "{}")
       {
-        jhSubService.addRaw(subService, jhMetrics.str());
+        jhSubService.addRaw(subService, subServiceString);
       }
     }
 
     subServiceTop.addRaw("subservs", jhSubService.str());
 
+    std::string serviceSumString = metricsRender(serviceSum);
 
-    //
-    // Sum for service
-    //
-    std::map<std::string, unsigned long long>::iterator  sumIter;
-    unsigned long long                                   incomingTransactions = 0;
-    unsigned long long                                   totalServiceTime     = 0;
-    int                                                  metricsAdded         = 0;
-
-    for (sumIter = serviceSum.begin(); sumIter != serviceSum.end(); ++sumIter)
-    {
-      std::string        metric = sumIter->first;
-      long long          value  = sumIter->second;
-
-      if (metric == _METRIC_TOTAL_SERVICE_TIME)
-      {
-        totalServiceTime = value;
-      }
-      else if (metric == METRIC_TRANS_IN)
-      {
-        incomingTransactions = value;
-      }
-
-      if ((totalServiceTime != 0) && (incomingTransactions != 0))
-      {
-        float mValue = (float) totalServiceTime / (float) (incomingTransactions * 1000000);
-
-        jhServiceSum.addFloat(METRIC_SERVICE_TIME, mValue);
-        totalServiceTime     = 0;
-        incomingTransactions = 0;
-        ++metricsAdded;
-      }
-
-      if (metric != _METRIC_TOTAL_SERVICE_TIME)
-      {
-        if (value != 0)
-        {
-          jhServiceSum.addNumber(metric, value);
-          ++metricsAdded;
-        }
-      }
-    }
-
-    if (metricsAdded > 0)
-    {
-      subServiceTop.addRaw("sum", jhServiceSum.str());
-    }
-
+    subServiceTop.addRaw("sum", serviceSumString);
     services.addRaw(service, subServiceTop.str());
   }
 
   //
   // Sum for grand total
   //
-  JsonHelper          jhSum;
-  unsigned long long  incomingTransactions = 0;
-  unsigned long long  totalServiceTime     = 0;
-  int                 metricsAdded         = 0;
+  std::string sumString = metricsRender(sum);
 
-  for (metricIter = sum.begin(); metricIter != sum.end(); ++metricIter)
-  {
-    std::string  metric = metricIter->first;
-    long long    value  = metricIter->second;
-      
-    if (metric == _METRIC_TOTAL_SERVICE_TIME)
-    {
-      totalServiceTime = value;
-    }
-    else if (metric == METRIC_TRANS_IN)
-    {
-      incomingTransactions = value;
-    }
-    if ((totalServiceTime != 0) && (incomingTransactions != 0))
-    {
-      float mValue = (float) totalServiceTime / (float) (incomingTransactions * 1000000);
-
-      jhSum.addFloat(METRIC_SERVICE_TIME, mValue);
-      totalServiceTime     = 0;
-      incomingTransactions = 0;
-      ++metricsAdded;
-    }
-
-    if (metric != _METRIC_TOTAL_SERVICE_TIME)
-    {
-      if (value != 0)
-      {
-        jhSum.addNumber(metric, value);
-        ++metricsAdded;
-      }
-    }
-  }
-
-  if (metricsAdded > 0)
-  {
-    services.addRaw("sum", jhSum.str());
-  }
-
+  services.addRaw("sum", sumString);
   top.addRaw("services", services.str());
+
   semGive();
 
   return top.str();
