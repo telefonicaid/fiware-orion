@@ -631,6 +631,15 @@ static void requestCompleted
   //
   metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN, 1);
 
+
+  //
+  // If the httpStatusCode is above the set of 200s, an error has occurred
+  //
+  if (ciP->httpStatusCode >= SccBadRequest)
+  {
+    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
+  }
+
   if (metricsMgr.isOn() && (ciP->transactionStart.tv_sec != 0))
   {
     struct timeval  end;
@@ -1308,7 +1317,6 @@ static int connectionTreat
   {
     alarmMgr.badInput(clientIp, "error in URI path");
     restReply(ciP, ciP->answer);
-    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
     return MHD_YES;
   }
 
@@ -1319,7 +1327,6 @@ static int connectionTreat
   {
     alarmMgr.badInput(clientIp, "error in ServicePath http-header");
     restReply(ciP, ciP->answer);
-    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
     return MHD_YES;
   }
 
@@ -1327,7 +1334,6 @@ static int connectionTreat
   {
     alarmMgr.badInput(clientIp, "invalid mime-type in Content-Type http-header");
     restReply(ciP, ciP->answer);
-    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
     return MHD_YES;
   }
   else
@@ -1339,7 +1345,6 @@ static int connectionTreat
   {
     alarmMgr.badInput(clientIp, "error in URI parameters");
     restReply(ciP, ciP->answer);
-    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
     return MHD_YES;
   }  
 
@@ -1355,7 +1360,6 @@ static int connectionTreat
 
     ciP->answer         = restErrorReplyGet(ciP, "", ciP->url, SccRequestEntityTooLarge, details);
     ciP->httpStatusCode = SccRequestEntityTooLarge;
-    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
   }
 
 
@@ -1369,7 +1373,6 @@ static int connectionTreat
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, ciP->acceptHeaderError);
     restReply(ciP, oe.smartRender(ciP->apiVersion));
-    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
     return MHD_YES;
   }
 
@@ -1394,7 +1397,6 @@ static int connectionTreat
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, oe.details);
     restReply(ciP, oe.smartRender(ciP->apiVersion));
-    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
     return MHD_YES;
   }
 
@@ -1421,7 +1423,6 @@ static int connectionTreat
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, oe.details);
     restReply(ciP, oe.smartRender(ciP->apiVersion));
-    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
     return MHD_YES;
   }
 
@@ -1437,7 +1438,6 @@ static int connectionTreat
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, details);
     restReply(ciP, oe.smartRender(ciP->apiVersion));
-    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
     return MHD_YES;
   }
 
@@ -1457,25 +1457,15 @@ static int connectionTreat
     ciP->httpStatusCode  = SccContentLengthRequired;
     restReply(ciP, errorMsg);
     alarmMgr.badInput(clientIp, errorMsg);
-    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
   }
   else if (ciP->answer != "")
   {
     alarmMgr.badInput(clientIp, ciP->answer);
     restReply(ciP, ciP->answer);
-    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
   }
   else
   {
     serveFunction(ciP);
-
-    //
-    // If a service function sets the httpStatusCode to something above the set of 200s, an error has occurred
-    //
-    if (ciP->httpStatusCode >= SccBadRequest)
-    {
-      metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
-    }
   }
 
   return MHD_YES;
