@@ -1783,16 +1783,16 @@ int main(int argC, char* argV[])
     LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
 
-    // FIXME P5: option 12 (mhd timeout) is hardcoded to 5 seconds (See github issue #2762)
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin, 5, httpsPrivateServerKey, httpsCertificate);
+    // FIXME P5: option 12 (mhd timeout) is hardcoded to 6 seconds (See github issue #2762)
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin, 6, httpsPrivateServerKey, httpsCertificate);
 
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
   else
   {
-    // FIXME P5: last option (mhd timeout) is hardcoded to 5 (See github issue #2762)
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin, 5);
+    // FIXME P5: last option (mhd timeout) is hardcoded to 6 (See github issue #2762)
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin, 6);
   }
 
   LM_I(("Startup completed"));
