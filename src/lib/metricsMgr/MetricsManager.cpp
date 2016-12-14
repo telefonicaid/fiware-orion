@@ -279,8 +279,6 @@ static std::string metricsRender(std::map<std::string, uint64_t>& metricsMap)
 /* ****************************************************************************
 *
 * MetricsManager::toJson -
-*
-* FIXME PR: needs a refactor (see .h)
 */
 std::string MetricsManager::toJson(void)
 {
