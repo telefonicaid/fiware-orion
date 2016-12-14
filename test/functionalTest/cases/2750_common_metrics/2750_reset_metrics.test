@@ -88,7 +88,7 @@ Date: REGEX(.*)
 02. Ask for Metrics, see 1 Incoming Transaction
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 99
+Content-Length: 217
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -101,7 +101,15 @@ Date: REGEX(.*)
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
+            },
+            "sum": {
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
             }
+        },
+        "sum": {
+            "incomingTransactions": 1,
+            "serviceTime": REGEX(.*)
         }
     }
 }
@@ -119,7 +127,7 @@ Date: REGEX(.*)
 04. Ask for Metrics, see 1 Incoming Transaction (the reset-request in step 03 :-)
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 102
+Content-Length: 220
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -132,7 +140,15 @@ Date: REGEX(.*)
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
+            },
+            "sum": {
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
             }
+        },
+        "sum": {
+            "incomingTransactions": 1,
+            "serviceTime": REGEX(.*)
         }
     }
 }
