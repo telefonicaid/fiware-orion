@@ -30,15 +30,15 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Send a GET /version
+# 01. Send a GET /v2/entities
 # 02. Ask for Metrics, see 1 Incoming Transaction
 # 03. Reset metrics
 # 04. Ask for Metrics, see 1 Incoming Transaction (the reset-request in step 03 :-)
 #
 
-echo "01. Send a GET /version"
-echo "======================="
-orionCurl --url /version  --servicePath /get/version
+echo "01. Send a GET /v2/entities"
+echo "==========================="
+orionCurl --url /v2/entities  --servicePath /get/entities
 echo
 echo
 
@@ -65,30 +65,21 @@ echo
 
 
 --REGEXPECT--
-01. Send a GET /version
-=======================
+01. Send a GET /v2/entities
+===========================
 HTTP/1.1 200 OK
-Content-Length: REGEX(.*)
+Content-Length: 2
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "orion": {
-        "compile_time": "REGEX(.*)",
-        "compiled_by": "REGEX(.*)",
-        "compiled_in": "REGEX(.*)",
-        "git_hash": "REGEX(.*)",
-        "uptime": "REGEX(.*)",
-        "version": "REGEX(.*)"
-    }
-}
+[]
 
 
 02. Ask for Metrics, see 1 Incoming Transaction
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 331
+Content-Length: 326
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -97,20 +88,20 @@ Date: REGEX(.*)
     "services": {
         "": {
             "subservs": {
-                "get/version": {
-                    "incomingTransactionResponseSize": 219,
+                "get/entities": {
+                    "incomingTransactionResponseSize": 2,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
-                "incomingTransactionResponseSize": 219,
+                "incomingTransactionResponseSize": 2,
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
         },
         "sum": {
-            "incomingTransactionResponseSize": 219,
+            "incomingTransactionResponseSize": 2,
             "incomingTransactions": 1,
             "serviceTime": REGEX(.*)
         }

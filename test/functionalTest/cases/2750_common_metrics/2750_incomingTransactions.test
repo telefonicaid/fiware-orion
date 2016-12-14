@@ -30,21 +30,21 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Send five GET /version
+# 01. Send five GET /v2/entities
 # 02. Ask for Metrics, see 5 Incoming Transactions
 #
 
-echo "01. Send five GET /version"
-echo "=========================="
-orionCurl --url /version --tenant S1 --servicePath /SP1
+echo "01. Send five GET /v2/entities"
+echo "=============================="
+orionCurl --url /v2/entities --tenant S1 --servicePath /entities1
 echo
-orionCurl --url /version --tenant S1 --servicePath /SP1
+orionCurl --url /v2/entities --tenant S1 --servicePath /entities1
 echo
-orionCurl --url /version --tenant S1 --servicePath /SP2
+orionCurl --url /v2/entities --tenant S1 --servicePath /entities2
 echo
-orionCurl --url /version --tenant S2 --servicePath /SP3
+orionCurl --url /v2/entities --tenant S2 --servicePath /entities3
 echo
-orionCurl --url /version --tenant S3 --servicePath /SP4
+orionCurl --url /v2/entities --tenant S3 --servicePath /entities4
 echo
 echo
 
@@ -57,98 +57,53 @@ echo
 
 
 --REGEXPECT--
-01. Send five GET /version
-==========================
+01. Send five GET /v2/entities
+==============================
 HTTP/1.1 200 OK
-Content-Length: REGEX(.*)
+Content-Length: 2
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "orion": {
-        "compile_time": "REGEX(.*)",
-        "compiled_by": "REGEX(.*)",
-        "compiled_in": "REGEX(.*)",
-        "git_hash": "REGEX(.*)",
-        "uptime": "REGEX(.*)",
-        "version": "REGEX(.*)"
-    }
-}
+[]
 
 HTTP/1.1 200 OK
-Content-Length: REGEX(.*)
+Content-Length: 2
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "orion": {
-        "compile_time": "REGEX(.*)",
-        "compiled_by": "REGEX(.*)",
-        "compiled_in": "REGEX(.*)",
-        "git_hash": "REGEX(.*)",
-        "uptime": "REGEX(.*)",
-        "version": "REGEX(.*)"
-    }
-}
+[]
 
 HTTP/1.1 200 OK
-Content-Length: REGEX(.*)
+Content-Length: 2
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "orion": {
-        "compile_time": "REGEX(.*)",
-        "compiled_by": "REGEX(.*)",
-        "compiled_in": "REGEX(.*)",
-        "git_hash": "REGEX(.*)",
-        "uptime": "REGEX(.*)",
-        "version": "REGEX(.*)"
-    }
-}
+[]
 
 HTTP/1.1 200 OK
-Content-Length: REGEX(.*)
+Content-Length: 2
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "orion": {
-        "compile_time": "REGEX(.*)",
-        "compiled_by": "REGEX(.*)",
-        "compiled_in": "REGEX(.*)",
-        "git_hash": "REGEX(.*)",
-        "uptime": "REGEX(.*)",
-        "version": "REGEX(.*)"
-    }
-}
+[]
 
 HTTP/1.1 200 OK
-Content-Length: REGEX(.*)
+Content-Length: 2
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "orion": {
-        "compile_time": "REGEX(.*)",
-        "compiled_by": "REGEX(.*)",
-        "compiled_in": "REGEX(.*)",
-        "git_hash": "REGEX(.*)",
-        "uptime": "REGEX(.*)",
-        "version": "REGEX(.*)"
-    }
-}
+[]
 
 
 02. Ask for Metrics, see 5 Incoming Transactions
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 851
+Content-Length: 859
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -157,53 +112,53 @@ Date: REGEX(.*)
     "services": {
         "S1": {
             "subservs": {
-                "SP1": {
-                    "incomingTransactionResponseSize": 438,
+                "entities1": {
+                    "incomingTransactionResponseSize": 4,
                     "incomingTransactions": 2,
                     "serviceTime": REGEX(.*)
                 },
-                "SP2": {
-                    "incomingTransactionResponseSize": 219,
+                "entities2": {
+                    "incomingTransactionResponseSize": 2,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
-                "incomingTransactionResponseSize": 657,
+                "incomingTransactionResponseSize": 6,
                 "incomingTransactions": 3,
                 "serviceTime": REGEX(.*)
             }
         },
         "S2": {
             "subservs": {
-                "SP3": {
-                    "incomingTransactionResponseSize": 219,
+                "entities3": {
+                    "incomingTransactionResponseSize": 2,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
-                "incomingTransactionResponseSize": 219,
+                "incomingTransactionResponseSize": 2,
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
         },
         "S3": {
             "subservs": {
-                "SP4": {
-                    "incomingTransactionResponseSize": 219,
+                "entities4": {
+                    "incomingTransactionResponseSize": 2,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
-                "incomingTransactionResponseSize": 219,
+                "incomingTransactionResponseSize": 2,
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
         },
         "sum": {
-            "incomingTransactionResponseSize": 1095,
+            "incomingTransactionResponseSize": 10,
             "incomingTransactions": 5,
             "serviceTime": REGEX(.*)
         }
