@@ -183,6 +183,8 @@ fi
 #
 # lint error categories
 #
+# FIXME P4: sev[13] has been set to MINOR, see PR #2764.
+#           Would be great to fix the problemas and set back sev[13] to MAYOR.
 #
 declare -A cat
 
