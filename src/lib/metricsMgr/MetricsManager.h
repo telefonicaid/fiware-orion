@@ -122,6 +122,8 @@
 *     The broker accepts a Service Path with empty components, e.g. "//sp1"
 *     We understand this is an error that should be fixed so, only the first '/' is removed
 *     for metrics
+* 11. Try to come up with better solution for metrics for requests using invalid service-path / tenant?
+*
 */
 class MetricsManager
 {
