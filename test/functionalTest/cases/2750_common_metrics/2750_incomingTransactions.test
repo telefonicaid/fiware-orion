@@ -148,7 +148,7 @@ Date: REGEX(.*)
 02. Ask for Metrics, see 5 Incoming Transactions
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 546
+Content-Length: 851
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -158,15 +158,18 @@ Date: REGEX(.*)
         "S1": {
             "subservs": {
                 "SP1": {
+                    "incomingTransactionResponseSize": 438,
                     "incomingTransactions": 2,
                     "serviceTime": REGEX(.*)
                 },
                 "SP2": {
+                    "incomingTransactionResponseSize": 219,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
+                "incomingTransactionResponseSize": 657,
                 "incomingTransactions": 3,
                 "serviceTime": REGEX(.*)
             }
@@ -174,11 +177,13 @@ Date: REGEX(.*)
         "S2": {
             "subservs": {
                 "SP3": {
+                    "incomingTransactionResponseSize": 219,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
+                "incomingTransactionResponseSize": 219,
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
@@ -186,16 +191,19 @@ Date: REGEX(.*)
         "S3": {
             "subservs": {
                 "SP4": {
+                    "incomingTransactionResponseSize": 219,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
+                "incomingTransactionResponseSize": 219,
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
         },
         "sum": {
+            "incomingTransactionResponseSize": 1095,
             "incomingTransactions": 5,
             "serviceTime": REGEX(.*)
         }

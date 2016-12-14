@@ -25,9 +25,12 @@
 *
 * Author: Fermín Galán
 */
+#include <stdint.h>   // int64_t et al
+#include <semaphore.h>
+
+#include <utility>
 #include <string>
 #include <map>
-#include <semaphore.h>
 
 
 
@@ -124,11 +127,11 @@
 class MetricsManager
 {
  private:
-  std::map<std::string, std::map<std::string, std::map<std::string, unsigned long long>*>*>  metrics;
+  std::map<std::string, std::map<std::string, std::map<std::string, uint64_t>*>*>  metrics;
   bool            on;
   sem_t           sem;
   bool            semWaitStatistics;
-  long long       semWaitTime;        // measured in microseconds
+  int64_t         semWaitTime;        // measured in microseconds
 
   void            semTake(void);
   void            semGive(void);
@@ -137,11 +140,11 @@ class MetricsManager
   MetricsManager();
 
   bool         init(bool _on, bool _semWaitStatistics);
-  void         add(const std::string& srv, const std::string& subServ, const std::string& metric, unsigned long long value);
+  void         add(const std::string& srv, const std::string& subServ, const std::string& metric, uint64_t value);
   void         reset(void);
   std::string  toJson(void);
   bool         isOn(void);
-  long long    semWaitTimeGet(void);
+  int64_t      semWaitTimeGet(void);
   const char*  semStateGet(void);
   void         release(void);
 };

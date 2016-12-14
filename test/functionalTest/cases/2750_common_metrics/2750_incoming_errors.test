@@ -242,7 +242,7 @@ Date: REGEX(.*)
 01. Ask for metrics and see no errors
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 217
+Content-Length: 331
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -252,16 +252,19 @@ Date: REGEX(.*)
         "": {
             "subservs": {
                 "get/version": {
+                    "incomingTransactionResponseSize": 219,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
+                "incomingTransactionResponseSize": 219,
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
         },
         "sum": {
+            "incomingTransactionResponseSize": 219,
             "incomingTransactions": 1,
             "serviceTime": REGEX(.*)
         }
@@ -286,7 +289,7 @@ Date: REGEX(.*)
 03. Ask for metrics and see one error
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 543
+Content-Length: 733
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -298,14 +301,17 @@ Date: REGEX(.*)
                 "error": {
                     "incomingTransactionErrors": 1,
                     "incomingTransactionRequestSize": 24,
+                    "incomingTransactionResponseSize": 150,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 },
                 "get/metrics": {
+                    "incomingTransactionResponseSize": 331,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 },
                 "get/version": {
+                    "incomingTransactionResponseSize": 219,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
@@ -313,6 +319,7 @@ Date: REGEX(.*)
             "sum": {
                 "incomingTransactionErrors": 1,
                 "incomingTransactionRequestSize": 24,
+                "incomingTransactionResponseSize": 700,
                 "incomingTransactions": 3,
                 "serviceTime": REGEX(.*)
             }
@@ -320,6 +327,7 @@ Date: REGEX(.*)
         "sum": {
             "incomingTransactionErrors": 1,
             "incomingTransactionRequestSize": 24,
+            "incomingTransactionResponseSize": 700,
             "incomingTransactions": 3,
             "serviceTime": REGEX(.*)
         }
@@ -450,7 +458,7 @@ Date: REGEX(.*)
 13. Ask for metrics and see 10 errors (only nine as step 08 isn't working properly)
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 840
+Content-Length: 1145
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -461,30 +469,36 @@ Date: REGEX(.*)
             "subservs": {
                 "": {
                     "incomingTransactionErrors": 1,
+                    "incomingTransactionResponseSize": 73,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 },
                 "L1/L2/L3/L4/L5/L6/L7/L8/L9/L10/L11": {
                     "incomingTransactionErrors": 1,
+                    "incomingTransactionResponseSize": 73,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 },
                 "XXX": {
                     "incomingTransactionErrors": 1,
+                    "incomingTransactionResponseSize": 111,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 },
                 "error": {
                     "incomingTransactionErrors": 6,
                     "incomingTransactionRequestSize": 39,
+                    "incomingTransactionResponseSize": 619,
                     "incomingTransactions": 7,
                     "serviceTime": REGEX(.*)
                 },
                 "get/metrics": {
+                    "incomingTransactionResponseSize": 1064,
                     "incomingTransactions": 2,
                     "serviceTime": REGEX(.*)
                 },
                 "get/version": {
+                    "incomingTransactionResponseSize": 219,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
@@ -492,6 +506,7 @@ Date: REGEX(.*)
             "sum": {
                 "incomingTransactionErrors": 9,
                 "incomingTransactionRequestSize": 39,
+                "incomingTransactionResponseSize": 2159,
                 "incomingTransactions": 13,
                 "serviceTime": REGEX(.*)
             }
@@ -499,6 +514,7 @@ Date: REGEX(.*)
         "sum": {
             "incomingTransactionErrors": 9,
             "incomingTransactionRequestSize": 39,
+            "incomingTransactionResponseSize": 2159,
             "incomingTransactions": 13,
             "serviceTime": REGEX(.*)
         }
