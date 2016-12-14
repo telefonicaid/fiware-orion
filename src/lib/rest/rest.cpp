@@ -1249,7 +1249,7 @@ static int connectionTreat
     // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
     // just silently "eat" the entire message.
     // 
-    // The problem occurs qhen the broker is lied to and there aren't ciP->httpHeaders.contentLength
+    // The problem occurs when the broker is lied to and there aren't ciP->httpHeaders.contentLength
     // bytes to read.
     // When this happens, MHD blocks until it times out (MHD_OPTION_CONNECTION_TIMEOUT defaults to 5 seconds),
     // and the broker isn't able to respond. MHD just closes the connection.
