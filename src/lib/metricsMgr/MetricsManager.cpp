@@ -234,7 +234,6 @@ static std::string metricsRender(std::map<std::string, uint64_t>& metricsMap)
   std::map<std::string, uint64_t>::iterator  it;
   uint64_t                                   incomingTransactions = 0;
   uint64_t                                   totalServiceTime     = 0;
-  int                                        metricsAdded         = 0;
   JsonHelper                                 jh;
 
   for (it = metricsMap.begin();  it != metricsMap.end(); ++it)
@@ -258,7 +257,6 @@ static std::string metricsRender(std::map<std::string, uint64_t>& metricsMap)
       jh.addFloat(METRIC_SERVICE_TIME, mValue);
       totalServiceTime     = 0;
       incomingTransactions = 0;
-      ++metricsAdded;
     }
 
     if (metric != _METRIC_TOTAL_SERVICE_TIME)
@@ -266,7 +264,6 @@ static std::string metricsRender(std::map<std::string, uint64_t>& metricsMap)
       if (value != 0)
       {
         jh.addNumber(metric, value);
-        ++metricsAdded;
       }
     }
   }
