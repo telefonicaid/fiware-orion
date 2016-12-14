@@ -111,7 +111,6 @@
 *     (probably difficult to beat) and syntax (current one is a bit awkward)
 * 02. In order to be homogeneous, probably 'metrics' should be a pointer (and the
 *     initial map created at constructor time)
-* 05. toJson() to be split into 3 methods (2 of them private)
 * 07. (Unsure) We could need maps for metrics different from int. If so, implement
 *     it (and the add method) using templates, to avoid repeating the same implementation
 *     N times
