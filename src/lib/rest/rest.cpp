@@ -1264,6 +1264,9 @@ static int connectionTreat
     // and the broker isn't able to respond. MHD just closes the connection.
     // Question asked in mhd mailing list.
     //
+    // See github issue:
+    //   https://github.com/telefonicaid/fiware-orion/issues/2761
+    //
     if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
     {
       //
