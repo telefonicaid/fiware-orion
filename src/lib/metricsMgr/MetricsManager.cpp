@@ -316,6 +316,7 @@ std::string MetricsManager::toJson(void)
   JsonHelper                                                                                 top;
   JsonHelper                                                                                 services;
   std::map<std::string, uint64_t>                                                            sum;
+  std::map<std::string, std::map<std::string, uint64_t> >                                    subServCrossTenant;
 
   for (serviceIter = metrics.begin(); serviceIter != metrics.end(); ++serviceIter)
   {
@@ -341,6 +342,7 @@ std::string MetricsManager::toJson(void)
         {
           serviceSum[metric] += value;
           sum[metric]        += value;
+          subServCrossTenant[subService][metric] += value;
         }
       }
 
@@ -366,8 +368,22 @@ std::string MetricsManager::toJson(void)
   // FIXME P8: Note that the sums for servicePaths over any tenant are missing
   //
   JsonHelper   lastSum;
-  std::string  sumString = metricsRender(&sum);
+  JsonHelper   jhSubServ;
 
+  std::map<std::string, std::map<std::string, uint64_t> >::iterator  it;
+  for (it = subServCrossTenant.begin();  it != subServCrossTenant.end(); ++it)
+  {
+    JsonHelper   jhSubServCross;
+    std::string  subService = it->first;
+    std::string  subServiceString;
+
+    subServiceString = metricsRender(&it->second);
+    jhSubServ.addRaw(subService, subServiceString);
+  }
+
+  lastSum.addRaw("subServs", jhSubServ.str());
+
+  std::string  sumString = metricsRender(&sum);
   lastSum.addRaw("sum", sumString);
 
   top.addRaw("services", services.str());

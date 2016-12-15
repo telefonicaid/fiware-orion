@@ -109,14 +109,13 @@
 *
 * 08. Empty services (no tenant given) to receive some default service name.
 * 09. What to do with default SP ("/")?
-*     When applying the rule "remove the inicial /", the default SP ends up as "".
-*     Not sure that we want that...
+*     When applying the rule "remove the initial /", the default SP ends up as "".
+*     Not sure that we want that ...
 * 10. About initial slash of service path:
 *     The broker accepts a Service Path with empty components, e.g. "//sp1"
 *     We understand this is an error that should be fixed so, only the first '/' is removed
 *     for metrics
 * 11. Try to come up with better solution for metrics for requests using invalid service-path / tenant?
-* 12. The sums over service-path independent of tenant are still missing
 *
 */
 class MetricsManager

@@ -25,6 +25,9 @@ Incoming Transactions and Common Metrics
 
 --SHELL-INIT--
 dbInit CB
+dbInit s1
+dbInit s2
+dbInit s3
 brokerStart CB
 
 --SHELL--
@@ -103,7 +106,7 @@ Date: REGEX(.*)
 02. Ask for Metrics, see 5 Incoming Transactions
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 879
+Content-Length: 1308
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -159,6 +162,28 @@ Date: REGEX(.*)
         }
     },
     "sum": {
+        "subServs": {
+            "SP/entities1": {
+                "incomingTransactionResponseSize": 4,
+                "incomingTransactions": 2,
+                "serviceTime": REGEX(.*)
+            },
+            "SP/entities2": {
+                "incomingTransactionResponseSize": 2,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            },
+            "SP/entities3": {
+                "incomingTransactionResponseSize": 2,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            },
+            "SP/entities4": {
+                "incomingTransactionResponseSize": 2,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            }
+        },
         "sum": {
             "incomingTransactionResponseSize": 10,
             "incomingTransactions": 5,
@@ -171,3 +196,6 @@ Date: REGEX(.*)
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
+dbDrop s1
+dbDrop s2
+dbDrop s3
