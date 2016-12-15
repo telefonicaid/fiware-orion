@@ -229,14 +229,14 @@ void MetricsManager::reset(void)
 *
 * metricsRender - 
 */
-static std::string metricsRender(std::map<std::string, uint64_t>& metricsMap)
+static std::string metricsRender(std::map<std::string, uint64_t>* metricsMap)
 {
   std::map<std::string, uint64_t>::iterator  it;
   uint64_t                                   incomingTransactions = 0;
   uint64_t                                   totalServiceTime     = 0;
   JsonHelper                                 jh;
 
-  for (it = metricsMap.begin();  it != metricsMap.end(); ++it)
+  for (it = metricsMap->begin();  it != metricsMap->end(); ++it)
   {
     std::string      metric = it->first;
     int64_t          value  = it->second;
@@ -326,7 +326,7 @@ std::string MetricsManager::toJson(void)
         }
       }
 
-      std::string subServiceString = metricsRender(*metricMap);
+      std::string subServiceString = metricsRender(metricMap);
 
       if (subServiceString != "{}")
       {
@@ -336,7 +336,7 @@ std::string MetricsManager::toJson(void)
 
     subServiceTop.addRaw("subservs", jhSubService.str());
 
-    std::string serviceSumString = metricsRender(serviceSum);
+    std::string serviceSumString = metricsRender(&serviceSum);
 
     subServiceTop.addRaw("sum", serviceSumString);
     services.addRaw(service, subServiceTop.str());
@@ -348,7 +348,7 @@ std::string MetricsManager::toJson(void)
   // FIXME P8: Note that the sums for servicePaths over any tenant are missing
   //
   JsonHelper   lastSum;
-  std::string  sumString = metricsRender(sum);
+  std::string  sumString = metricsRender(&sum);
 
   lastSum.addRaw("sum", sumString);
 

@@ -86,7 +86,7 @@ function finish()
     mMsg "found $totalErrors errors ($mayorErrors mayor, $minorErrors minor errors) in $lines lines of source code in $files files ($percentage% style-guide-incompatibilities)"
     exit 1
   else
-    mMsg "found no mayor errors ($minorErrors minor errors) in $lines lines of source code in $files files ($percentage% style-guide-incompatibilities)"
+    mMsg "[$dir]: found no mayor errors ($minorErrors minor errors) in $lines lines of source code in $files files ($percentage% style-guide-incompatibilities)"
     exit 0
   fi
 }
@@ -179,12 +179,8 @@ then
 fi
 
 
-
 #
 # lint error categories
-#
-# FIXME P4: sev[13] has been set to MINOR, see PR #2764.
-#           Would be great to fix the problemas and set back sev[13] to MAYOR.
 #
 declare -A cat
 
@@ -201,7 +197,7 @@ sev[9]=MAYOR;  cat[9]='Weird number of spaces at line-start'
 sev[10]=MAYOR; cat[10]='Blank line at the end of a code block'
 sev[11]=MAYOR; cat[11]='Include the directory when naming'
 sev[12]=MAYOR; cat[12]='Do not use namespace using-directives'
-sev[13]=MINOR; cat[13]='Is this a non-const reference'
+sev[13]=MAYOR; cat[13]='Is this a non-const reference'
 sev[14]=MAYOR; cat[14]='At least two spaces is best between code and comments'
 sev[15]=MAYOR; cat[15]='Labels should always be indented at least one space'
 sev[16]=MAYOR; cat[16]='Tab found; better to use spaces'
