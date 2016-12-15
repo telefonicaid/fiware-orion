@@ -120,7 +120,7 @@ Date: REGEX(.*)
 
 {
     "services": {
-        "S1": {
+        "s1": {
             "subservs": {
                 "SP1": {
                     "incomingTransactionResponseSize": 2,
@@ -181,7 +181,7 @@ Date: REGEX(.*)
                 "serviceTime": REGEX(.*)
             }
         },
-        "S1": {
+        "s1": {
             "subservs": {
                 "SP1": {
                     "incomingTransactionResponseSize": 2,
@@ -243,7 +243,7 @@ Date: REGEX(.*)
                 "serviceTime": REGEX(.*)
             }
         },
-        "S1": {
+        "s1": {
             "subservs": {
                 "SP1": {
                     "incomingTransactionResponseSize": 2,
@@ -311,7 +311,7 @@ Date: REGEX(.*)
                 "serviceTime": REGEX(.*)
             }
         },
-        "S1": {
+        "s1": {
             "subservs": {
                 "SP1": {
                     "incomingTransactionResponseSize": 2,
