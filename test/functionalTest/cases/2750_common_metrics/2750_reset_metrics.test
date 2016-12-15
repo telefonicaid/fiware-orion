@@ -38,28 +38,28 @@ brokerStart CB
 
 echo "01. Send a GET /v2/entities"
 echo "==========================="
-orionCurl --url /v2/entities  --servicePath /get/entities
+orionCurl --url /v2/entities  --servicePath /SP/get/entities
 echo
 echo
 
 
 echo "02. Ask for Metrics, see 1 Incoming Transaction"
 echo "==============================================="
-orionCurl --url /admin/metrics --servicePath /get/metrics
+orionCurl --url /admin/metrics --servicePath /SP/get/metrics
 echo
 echo
 
 
 echo "03. Reset metrics"
 echo "================="
-orionCurl --url /admin/metrics -X DELETE --servicePath /delete/metrics
+orionCurl --url /admin/metrics -X DELETE --servicePath /SP/delete/metrics
 echo
 echo
 
 
 echo "04. Ask for Metrics, see 1 Incoming Transaction (the reset-request in step 03 :-)"
 echo "================================================================================="
-orionCurl --url /admin/metrics --servicePath /get/metrics
+orionCurl --url /admin/metrics
 echo
 echo
 
@@ -79,7 +79,7 @@ Date: REGEX(.*)
 02. Ask for Metrics, see 1 Incoming Transaction
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 334
+Content-Length: 337
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -88,7 +88,7 @@ Date: REGEX(.*)
     "services": {
         "": {
             "subservs": {
-                "get/entities": {
+                "SP/get/entities": {
                     "incomingTransactionResponseSize": 2,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
@@ -123,7 +123,7 @@ Date: REGEX(.*)
 04. Ask for Metrics, see 1 Incoming Transaction (the reset-request in step 03 :-)
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 228
+Content-Length: 231
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -132,7 +132,7 @@ Date: REGEX(.*)
     "services": {
         "": {
             "subservs": {
-                "delete/metrics": {
+                "SP/delete/metrics": {
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }

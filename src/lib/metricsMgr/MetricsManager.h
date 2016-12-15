@@ -124,6 +124,7 @@
 *     for metrics
 * 11. Try to come up with better solution for metrics for requests using invalid service-path / tenant?
 * 12. The sums over service-path independent of tenant are still missing
+* 13. Service/Tenant name to be transformed to all lowercase (but not with service-path)
 *
 */
 class MetricsManager

@@ -36,15 +36,15 @@ brokerStart CB
 
 echo "01. Send five GET /v2/entities"
 echo "=============================="
-orionCurl --url /v2/entities --tenant S1 --servicePath /entities1
+orionCurl --url /v2/entities --tenant S1 --servicePath /SP/entities1
 echo
-orionCurl --url /v2/entities --tenant S1 --servicePath /entities1
+orionCurl --url /v2/entities --tenant S1 --servicePath /SP/entities1
 echo
-orionCurl --url /v2/entities --tenant S1 --servicePath /entities2
+orionCurl --url /v2/entities --tenant S1 --servicePath /SP/entities2
 echo
-orionCurl --url /v2/entities --tenant S2 --servicePath /entities3
+orionCurl --url /v2/entities --tenant S2 --servicePath /SP/entities3
 echo
-orionCurl --url /v2/entities --tenant S3 --servicePath /entities4
+orionCurl --url /v2/entities --tenant S3 --servicePath /SP/entities4
 echo
 echo
 
@@ -103,7 +103,7 @@ Date: REGEX(.*)
 02. Ask for Metrics, see 5 Incoming Transactions
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 867
+Content-Length: 879
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -112,12 +112,12 @@ Date: REGEX(.*)
     "services": {
         "S1": {
             "subservs": {
-                "entities1": {
+                "SP/entities1": {
                     "incomingTransactionResponseSize": 4,
                     "incomingTransactions": 2,
                     "serviceTime": REGEX(.*)
                 },
-                "entities2": {
+                "SP/entities2": {
                     "incomingTransactionResponseSize": 2,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
@@ -131,7 +131,7 @@ Date: REGEX(.*)
         },
         "S2": {
             "subservs": {
-                "entities3": {
+                "SP/entities3": {
                     "incomingTransactionResponseSize": 2,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
@@ -145,7 +145,7 @@ Date: REGEX(.*)
         },
         "S3": {
             "subservs": {
-                "entities4": {
+                "SP/entities4": {
                     "incomingTransactionResponseSize": 2,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)

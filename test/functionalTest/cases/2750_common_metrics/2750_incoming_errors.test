@@ -101,14 +101,14 @@ brokerStart CB
 
 echo "00. GET /v2/entities"
 echo "===================="
-orionCurl --url /v2/entities --servicePath /entities
+orionCurl --url /v2/entities --servicePath /SP/get/entities
 echo
 echo
 
 
 echo "01. Ask for metrics and see no errors"
 echo "====================================="
-orionCurl --url /admin/metrics --servicePath /get/metrics
+orionCurl --url /admin/metrics --servicePath /SP/get/metrics
 echo
 echo
 
@@ -116,27 +116,27 @@ echo
 echo "02. Send a request with an invalid JSON payload"
 echo "==============================================="
 payload='[ "error": "in vector" ]'
-orionCurl --url /v2/entities --payload "$payload" --servicePath /error
+orionCurl --url /v2/entities --payload "$payload" --servicePath /SP/error
 echo
 echo
 
 
 echo "03. Ask for metrics and see one error"
 echo "====================================="
-orionCurl --url /admin/metrics --servicePath /get/metrics
+orionCurl --url /admin/metrics --servicePath /SP/get/metrics
 echo
 echo
 
 
 echo "04. Send a request with an Invalid URL"
 echo "======================================"
-orionCurl --url /admin/invalid/url --servicePath /error
+orionCurl --url /admin/invalid/url --servicePath /SP/error
 echo
 echo
 
 echo "05. Send a request with an Invalid Service Path"
 echo "==============================================="
-orionCurl --url /v2/entities --servicePath XXX
+orionCurl --url /v2/entities --servicePath SPX
 echo
 echo
 
@@ -144,7 +144,7 @@ echo
 echo "06. Send a request with an Invalid Content-Type"
 echo "==============================================="
 payload='{ "id": "E1", "type": "T1" }'
-orionCurl --url /v2/entities --payload "$payload" --in "Invalid-Content-Type" --servicePath /error
+orionCurl --url /v2/entities --payload "$payload" --in "Invalid-Content-Type" --servicePath /SP/error
 echo
 echo
 
@@ -152,7 +152,7 @@ echo
 echo "07. Send a request with invalid value for URI param /options/"
 echo "============================================================="
 payload='{ "id": "E1", "type": "T1" }'
-orionCurl --url '/v2/entities?options=notValid' --payload "$payload" --servicePath /error
+orionCurl --url '/v2/entities?options=notValid' --payload "$payload" --servicePath /SP/error
 echo
 echo
 
@@ -160,7 +160,7 @@ echo
 echo "08. Send a request with a component-name too long in ServicePath"
 echo "================================================================"
 payload='{ "id": "E1", "type": "T1" }'
-orionCurl --url /v2/entities --payload "$payload" --servicePath /a/b12345678901234567890123456789012345678901234567890/c
+orionCurl --url /v2/entities --payload "$payload" --servicePath /SP/b12345678901234567890123456789012345678901234567890/c
 echo
 echo
 
@@ -173,7 +173,7 @@ echo
 echo "09. Send a request with no acceptable mime-type in accept header"
 echo "================================================================"
 payload='"a string"'
-orionCurl --url /v2/entities --payload "$payload" --out "bad-mime-type"  --servicePath /error
+orionCurl --url /v2/entities --payload "$payload" --out "bad-mime-type"  --servicePath /SP/error
 echo
 echo
 
@@ -189,7 +189,7 @@ echo
 echo "11. Send a request with too many components in ServicePath"
 echo "=========================================================="
 payload='{ "id": "E1", "type": "T1"}'
-orionCurl --url /v2/entities --payload "$payload" --servicePath /L1/L2/L3/L4/L5/L6/L7/L8/L9/L10/L11
+orionCurl --url /v2/entities --payload "$payload" --servicePath /SP/L1/L2/L3/L4/L5/L6/L7/L8/L9/L10
 echo
 echo
 
@@ -197,14 +197,14 @@ echo
 echo "12. Send a PUT /v2/entities/<id>/attrs/<attrName>/value for an non-existing entity E_NOPE"
 echo "========================================================================================="
 payload='{ "value": 12 }'
-orionCurl --url /v2/entities/E_NOPE/attrs/A1/value --payload "$payload" -X PUT --servicePath /error
+orionCurl --url /v2/entities/E_NOPE/attrs/A1/value --payload "$payload" -X PUT --servicePath /SP/error
 echo
 echo
 
 
 echo "13. Ask for metrics and see 10 errors"
 echo "====================================="
-orionCurl --url /admin/metrics --servicePath /get/metrics
+orionCurl --url /admin/metrics --servicePath /SP/get/metrics
 echo
 echo
 
@@ -224,7 +224,7 @@ Date: REGEX(.*)
 01. Ask for metrics and see no errors
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 330
+Content-Length: 337
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -233,7 +233,7 @@ Date: REGEX(.*)
     "services": {
         "": {
             "subservs": {
-                "entities": {
+                "SP/get/entities": {
                     "incomingTransactionResponseSize": 2,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
@@ -273,7 +273,7 @@ Date: REGEX(.*)
 03. Ask for metrics and see one error
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 736
+Content-Length: 749
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -282,20 +282,20 @@ Date: REGEX(.*)
     "services": {
         "": {
             "subservs": {
-                "entities": {
-                    "incomingTransactionResponseSize": 2,
-                    "incomingTransactions": 1,
-                    "serviceTime": REGEX(.*)
-                },
-                "error": {
+                "SP/error": {
                     "incomingTransactionErrors": 1,
                     "incomingTransactionRequestSize": 24,
                     "incomingTransactionResponseSize": 150,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 },
-                "get/metrics": {
-                    "incomingTransactionResponseSize": 330,
+                "SP/get/entities": {
+                    "incomingTransactionResponseSize": 2,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                },
+                "SP/get/metrics": {
+                    "incomingTransactionResponseSize": 337,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
@@ -303,7 +303,7 @@ Date: REGEX(.*)
             "sum": {
                 "incomingTransactionErrors": 1,
                 "incomingTransactionRequestSize": 24,
-                "incomingTransactionResponseSize": 482,
+                "incomingTransactionResponseSize": 489,
                 "incomingTransactions": 3,
                 "serviceTime": REGEX(.*)
             }
@@ -313,7 +313,7 @@ Date: REGEX(.*)
         "sum": {
             "incomingTransactionErrors": 1,
             "incomingTransactionRequestSize": 24,
-            "incomingTransactionResponseSize": 482,
+            "incomingTransactionResponseSize": 489,
             "incomingTransactions": 3,
             "serviceTime": REGEX(.*)
         }
@@ -453,7 +453,7 @@ Date: REGEX(.*)
 13. Ask for metrics and see 10 errors
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 1328
+Content-Length: 1341
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -468,46 +468,46 @@ Date: REGEX(.*)
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 },
-                "L1/L2/L3/L4/L5/L6/L7/L8/L9/L10/L11": {
+                "SP/L1/L2/L3/L4/L5/L6/L7/L8/L9/L10": {
                     "incomingTransactionErrors": 1,
                     "incomingTransactionResponseSize": 73,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 },
-                "XXX": {
-                    "incomingTransactionErrors": 1,
-                    "incomingTransactionResponseSize": 111,
-                    "incomingTransactions": 1,
-                    "serviceTime": REGEX(.*)
-                },
-                "a/b12345678901234567890123456789012345678901234567890/c": {
+                "SP/b12345678901234567890123456789012345678901234567890/c": {
                     "incomingTransactionErrors": 1,
                     "incomingTransactionResponseSize": 77,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 },
-                "entities": {
-                    "incomingTransactionResponseSize": 2,
-                    "incomingTransactions": 1,
-                    "serviceTime": REGEX(.*)
-                },
-                "error": {
+                "SP/error": {
                     "incomingTransactionErrors": 6,
                     "incomingTransactionRequestSize": 39,
                     "incomingTransactionResponseSize": 619,
                     "incomingTransactions": 6,
                     "serviceTime": REGEX(.*)
                 },
-                "get/metrics": {
-                    "incomingTransactionResponseSize": 1066,
+                "SP/get/entities": {
+                    "incomingTransactionResponseSize": 2,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                },
+                "SP/get/metrics": {
+                    "incomingTransactionResponseSize": 1086,
                     "incomingTransactions": 2,
+                    "serviceTime": REGEX(.*)
+                },
+                "SPX": {
+                    "incomingTransactionErrors": 1,
+                    "incomingTransactionResponseSize": 111,
+                    "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
                 "incomingTransactionErrors": 10,
                 "incomingTransactionRequestSize": 39,
-                "incomingTransactionResponseSize": 2021,
+                "incomingTransactionResponseSize": 2041,
                 "incomingTransactions": 13,
                 "serviceTime": REGEX(.*)
             }
@@ -517,7 +517,7 @@ Date: REGEX(.*)
         "sum": {
             "incomingTransactionErrors": 10,
             "incomingTransactionRequestSize": 39,
-            "incomingTransactionResponseSize": 2021,
+            "incomingTransactionResponseSize": 2041,
             "incomingTransactions": 13,
             "serviceTime": REGEX(.*)
         }

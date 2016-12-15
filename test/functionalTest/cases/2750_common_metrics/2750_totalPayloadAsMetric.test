@@ -86,7 +86,7 @@ echo
 
 echo "07. GET /v2/entities - to provoke payload in response"
 echo "====================================================="
-orionCurl --url /v2/entities --servicePath /get/entities
+orionCurl --url /v2/entities --servicePath /SP/get/entities
 echo
 echo
 
@@ -283,7 +283,7 @@ Date: REGEX(.*)
 08. Ask for Metrics, see 8, and see incomingTransactionResponseSize
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 756
+Content-Length: 759
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -298,7 +298,7 @@ Date: REGEX(.*)
                     "incomingTransactions": 5,
                     "serviceTime": REGEX(.*)
                 },
-                "get/entities": {
+                "SP/get/entities": {
                     "incomingTransactionResponseSize": 2,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
