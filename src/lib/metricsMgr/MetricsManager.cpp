@@ -345,10 +345,15 @@ std::string MetricsManager::toJson(void)
   //
   // Sum for grand total
   //
-  std::string sumString = metricsRender(sum);
+  // FIXME P8: Note that the sums for servicePaths over any tenant are missing
+  //
+  JsonHelper   lastSum;
+  std::string  sumString = metricsRender(sum);
 
-  services.addRaw("sum", sumString);
+  lastSum.addRaw("sum", sumString);
+
   top.addRaw("services", services.str());
+  top.addRaw("sum", lastSum.str());
 
   semGive();
 
