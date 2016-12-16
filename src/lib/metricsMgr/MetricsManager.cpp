@@ -381,7 +381,7 @@ std::string MetricsManager::toJson(void)
     jhSubServ.addRaw(subService, subServiceString);
   }
 
-  lastSum.addRaw("subServs", jhSubServ.str());
+  lastSum.addRaw("subservs", jhSubServ.str());
 
   std::string  sumString = metricsRender(&sum);
   lastSum.addRaw("sum", sumString);
