@@ -1216,7 +1216,7 @@ static int connectionTreat
     ciP->httpHeader.push_back("Fiware-Correlator");
     ciP->httpHeaderValue.push_back(ciP->httpHeaders.correlator);
 
-    if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
+    if ((ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE) && (ciP->apiVersion == V2))
     {
       char details[256];
       snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
