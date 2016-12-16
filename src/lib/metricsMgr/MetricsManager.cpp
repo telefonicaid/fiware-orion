@@ -365,7 +365,7 @@ std::string MetricsManager::toJson(void)
   //
   // Sum for grand total
   //
-  // FIXME P8: Note that the sums for servicePaths over any tenant are missing
+  // FIXME PR: Note that the sums for servicePaths over any tenant are missing
   //
   JsonHelper   lastSum;
   JsonHelper   jhSubServ;

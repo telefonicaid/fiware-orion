@@ -3,5 +3,5 @@
 - Fix: proper 500 Internal Server Error response with descriptive text when "sort fail" at DB occur (#2752)
 - Add: metrics REST API (#2750)
 - Add: new CLI '-disableMetrics' to disable metrics (#2750)
-- Fix: timeout of 6 seconds (hardcoded for now) for all incoming REST requests (Temporal fix, see #2762)
+- Fix: timeout of 6 seconds (hardcoded for now) for all incoming REST requests (temporal fix, see #2762)
 - Add: one more semaphore (the metrics semaphore) to the semWait block in GET /statistics and to the list in GET /admin/sem (#2750)
