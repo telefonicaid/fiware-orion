@@ -74,7 +74,7 @@ echo
 echo
 
 
-echo "03. Ask for Metrics, see 1 outgoing transaction"
+echo "03. Ask for metrics, see 1 outgoing transaction"
 echo "==============================================="
 orionCurl --url /admin/metrics  --servicePath /SP/get/metrics
 echo
@@ -102,7 +102,7 @@ echo
 echo
 
 
-echo "06. Ask for Metrics, see 2 outgoing transaction of which 1 failed"
+echo "06. Ask for metrics, see 2 outgoing transaction of which 1 failed"
 echo "================================================================="
 orionCurl --url /admin/metrics
 echo
@@ -133,7 +133,7 @@ Date: REGEX(.*)
 03. Ask for metrics, see 1 outgoing transaction
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 835
+Content-Length: 683
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -146,7 +146,6 @@ Date: REGEX(.*)
                     "incomingTransactionRequestSize": 177,
                     "incomingTransactions": 2,
                     "outgoingTransactionRequestSize": 124,
-                    "outgoingTransactionResponseSize": 152,
                     "outgoingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
@@ -155,7 +154,6 @@ Date: REGEX(.*)
                 "incomingTransactionRequestSize": 177,
                 "incomingTransactions": 2,
                 "outgoingTransactionRequestSize": 124,
-                "outgoingTransactionResponseSize": 152,
                 "outgoingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
@@ -167,7 +165,6 @@ Date: REGEX(.*)
                 "incomingTransactionRequestSize": 177,
                 "incomingTransactions": 2,
                 "outgoingTransactionRequestSize": 124,
-                "outgoingTransactionResponseSize": 152,
                 "outgoingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
@@ -176,7 +173,6 @@ Date: REGEX(.*)
             "incomingTransactionRequestSize": 177,
             "incomingTransactions": 2,
             "outgoingTransactionRequestSize": 124,
-            "outgoingTransactionResponseSize": 152,
             "outgoingTransactions": 1,
             "serviceTime": REGEX(.*)
         }
@@ -192,7 +188,7 @@ Date: REGEX(.*)
 ==========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=Thing
+Location: /v2/entities/E2?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -201,7 +197,7 @@ Date: REGEX(.*)
 06. Ask for metrics, see 2 outgoing transaction of which 1 failed
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 1247
+Content-Length: 1095
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -215,23 +211,21 @@ Date: REGEX(.*)
                     "incomingTransactions": 3,
                     "outgoingTransactionErrors": 1,
                     "outgoingTransactionRequestSize": 248,
-                    "outgoingTransactionResponseSize": 152,
                     "outgoingTransactions": 2,
                     "serviceTime": REGEX(.*)
                 },
                 "SP/get/metrics": {
-                    "incomingTransactionResponseSize": 835,
+                    "incomingTransactionResponseSize": 683,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
                 "incomingTransactionRequestSize": 227,
-                "incomingTransactionResponseSize": 835,
+                "incomingTransactionResponseSize": 683,
                 "incomingTransactions": 4,
                 "outgoingTransactionErrors": 1,
                 "outgoingTransactionRequestSize": 248,
-                "outgoingTransactionResponseSize": 152,
                 "outgoingTransactions": 2,
                 "serviceTime": REGEX(.*)
             }
@@ -244,23 +238,21 @@ Date: REGEX(.*)
                 "incomingTransactions": 3,
                 "outgoingTransactionErrors": 1,
                 "outgoingTransactionRequestSize": 248,
-                "outgoingTransactionResponseSize": 152,
                 "outgoingTransactions": 2,
                 "serviceTime": REGEX(.*)
             },
             "SP/get/metrics": {
-                "incomingTransactionResponseSize": 835,
+                "incomingTransactionResponseSize": 683,
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
         },
         "sum": {
             "incomingTransactionRequestSize": 227,
-            "incomingTransactionResponseSize": 835,
+            "incomingTransactionResponseSize": 683,
             "incomingTransactions": 4,
             "outgoingTransactionErrors": 1,
             "outgoingTransactionRequestSize": 248,
-            "outgoingTransactionResponseSize": 152,
             "outgoingTransactions": 2,
             "serviceTime": REGEX(.*)
         }

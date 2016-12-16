@@ -543,20 +543,23 @@ int httpRequestSendWithCurl
   else
   {
     //
+    // The Response is here
+    //
     // To get the size of the payload, simply search for Content-Len inside the HTTP headers and extract the number
     //
-    int   offset      = strlen("Content-Len:");
-    char* contentLenP = strstr(httpResponse->memory, "Content-Len:");
-    int   payloadLen  = (contentLenP == NULL)? 0 : atoi(&contentLenP[offset]);
+    int   offset      = strlen("Content-Length:");
+    char* contentLenP = strstr(httpResponse->memory, "Content-Length:");        // Point to beginning of 'Content-Length:'
 
-    // The Response is here
+    while ((*contentLenP == ' ') || (*contentLenP == '\t'))                     // Step over spaces and tabs ...
+    {
+      ++contentLenP;
+    }
+    int   payloadLen  = (contentLenP == NULL)? 0 : atoi(&contentLenP[offset]);  // ... and get the number
+
     LM_I(("Notification Successfully Sent to %s", url.c_str()));
     outP->assign(httpResponse->memory, httpResponse->size);
 
-    // NOTE/FIXME PR: httpResponse->size: is this total size or payload size?
     metricsMgr.add(tenant, servicePath, METRIC_TRANS_OUT_RESP_SIZE, payloadLen);
-    LM_W(("KZ: response of %d bytes: %s", httpResponse->size, httpResponse->memory));
-    LM_W(("KZ: Content-Len is %d bytes", payloadLen));
   }
 
   if (payloadSize > 0)
