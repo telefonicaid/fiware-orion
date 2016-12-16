@@ -38,10 +38,10 @@
 #include "alarmMgr/alarmMgr.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "ngsi10/NotifyContextRequest.h"
-#include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
-#include "ngsiNotify/Notifier.h"
 #include "rest/uriParamNames.h"
+#include "rest/ConnectionInfo.h"
+#include "ngsiNotify/Notifier.h"
 
 
 
