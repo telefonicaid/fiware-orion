@@ -520,7 +520,7 @@ std::string ContextAttribute::renderAsJsonObject
         break;
 
       case ValueTypeNumber:
-        if (type == DATE_TYPE)
+        if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
         {
           effectiveValue = isodate2str(numberValue);
         }
@@ -642,7 +642,7 @@ std::string ContextAttribute::render
         break;
 
       case ValueTypeNumber:
-        if (type == DATE_TYPE)
+        if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
         {
           effectiveValue = isodate2str(numberValue);
         }
@@ -744,7 +744,7 @@ std::string ContextAttribute::toJson
     }
     else if (valueType == orion::ValueTypeNumber)
     {
-      if (type == DATE_TYPE)
+      if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
       {
         out += JSON_STR(isodate2str(numberValue));
       }
@@ -805,7 +805,7 @@ std::string ContextAttribute::toJson
     }
     else if (valueType == orion::ValueTypeNumber)
     {
-      if (type == DATE_TYPE)
+      if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
       {
         out += JSON_VALUE("value", isodate2str(numberValue));;
       }
@@ -891,7 +891,7 @@ std::string ContextAttribute::toJsonAsValue
         break;
 
       case orion::ValueTypeNumber:
-        if (type == DATE_TYPE)
+        if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
         {
           out = isodate2str(numberValue);
         }

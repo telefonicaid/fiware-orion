@@ -89,6 +89,7 @@
 #define DEFAULT_ATTR_OBJECT_TYPE  "StructuredValue"
 #define DEFAULT_ATTR_NULL_TYPE    "None"
 #define DATE_TYPE                 "DateTime"
+#define DATE_TYPE_ALT             "ISO8601"
 
 
 

@@ -114,7 +114,7 @@ static std::string parseMetadataObject(const Value& start, Metadata* mdP)
   }
 
   // Is it a date?
-  if (mdP->type == DATE_TYPE)
+  if ((mdP->type == DATE_TYPE) || (mdP->type == DATE_TYPE_ALT))
   {
     mdP->numberValue =  parse8601Time(mdP->stringValue);
 

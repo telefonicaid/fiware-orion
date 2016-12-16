@@ -154,7 +154,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
   }
 
   // Is it a date?
-  if (caP->type == DATE_TYPE)
+  if ((caP->type == DATE_TYPE) || (caP->type == DATE_TYPE_ALT))
   {
     caP->numberValue =  parse8601Time(caP->stringValue);
 
