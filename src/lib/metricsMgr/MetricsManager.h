@@ -25,9 +25,12 @@
 *
 * Author: Fermín Galán
 */
+#include <stdint.h>   // int64_t et al
+#include <semaphore.h>
+
+#include <utility>
 #include <string>
 #include <map>
-#include <semaphore.h>
 
 
 
@@ -108,7 +111,6 @@
 *     (probably difficult to beat) and syntax (current one is a bit awkward)
 * 02. In order to be homogeneous, probably 'metrics' should be a pointer (and the
 *     initial map created at constructor time)
-* 05. toJson() to be split into 3 methods (2 of them private)
 * 07. (Unsure) We could need maps for metrics different from int. If so, implement
 *     it (and the add method) using templates, to avoid repeating the same implementation
 *     N times
@@ -120,15 +122,19 @@
 *     The broker accepts a Service Path with empty components, e.g. "//sp1"
 *     We understand this is an error that should be fixed so, only the first '/' is removed
 *     for metrics
+* 11. Try to come up with better solution for metrics for requests using invalid service-path / tenant?
+* 12. The sums over service-path independent of tenant are still missing
+* 13. Service/Tenant name to be transformed to all lowercase (but not with service-path)
+*
 */
 class MetricsManager
 {
  private:
-  std::map<std::string, std::map<std::string, std::map<std::string, unsigned long long>*>*>  metrics;
+  std::map<std::string, std::map<std::string, std::map<std::string, uint64_t>*>*>  metrics;
   bool            on;
   sem_t           sem;
   bool            semWaitStatistics;
-  long long       semWaitTime;        // measured in microseconds
+  int64_t         semWaitTime;        // measured in microseconds
 
   void            semTake(void);
   void            semGive(void);
@@ -137,11 +143,11 @@ class MetricsManager
   MetricsManager();
 
   bool         init(bool _on, bool _semWaitStatistics);
-  void         add(const std::string& srv, const std::string& subServ, const std::string& metric, unsigned long long value);
+  void         add(const std::string& srv, const std::string& subServ, const std::string& metric, uint64_t value);
   void         reset(void);
   std::string  toJson(void);
   bool         isOn(void);
-  long long    semWaitTimeGet(void);
+  int64_t      semWaitTimeGet(void);
   const char*  semStateGet(void);
   void         release(void);
 };

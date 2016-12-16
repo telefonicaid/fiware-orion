@@ -30,65 +30,56 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Send a GET /version
+# 01. Send a GET /v2/entities
 # 02. Ask for Metrics, see 1 Incoming Transaction
 # 03. Reset metrics
 # 04. Ask for Metrics, see 1 Incoming Transaction (the reset-request in step 03 :-)
 #
 
-echo "01. Send a GET /version"
-echo "======================="
-orionCurl --url /version  --servicePath /get/version
+echo "01. Send a GET /v2/entities"
+echo "==========================="
+orionCurl --url /v2/entities  --servicePath /SP/get/entities
 echo
 echo
 
 
 echo "02. Ask for Metrics, see 1 Incoming Transaction"
 echo "==============================================="
-orionCurl --url /admin/metrics --servicePath /get/metrics
+orionCurl --url /admin/metrics --servicePath /SP/get/metrics
 echo
 echo
 
 
 echo "03. Reset metrics"
 echo "================="
-orionCurl --url /admin/metrics -X DELETE --servicePath /delete/metrics
+orionCurl --url /admin/metrics -X DELETE --servicePath /SP/delete/metrics
 echo
 echo
 
 
 echo "04. Ask for Metrics, see 1 Incoming Transaction (the reset-request in step 03 :-)"
 echo "================================================================================="
-orionCurl --url /admin/metrics --servicePath /get/metrics
+orionCurl --url /admin/metrics
 echo
 echo
 
 
 --REGEXPECT--
-01. Send a GET /version
-=======================
+01. Send a GET /v2/entities
+===========================
 HTTP/1.1 200 OK
-Content-Length: REGEX(.*)
+Content-Length: 2
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "orion": {
-        "compile_time": "REGEX(.*)",
-        "compiled_by": "REGEX(.*)",
-        "compiled_in": "REGEX(.*)",
-        "git_hash": "REGEX(.*)",
-        "uptime": "REGEX(.*)",
-        "version": "REGEX(.*)"
-    }
-}
+[]
 
 
 02. Ask for Metrics, see 1 Incoming Transaction
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 99
+Content-Length: 337
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -97,11 +88,24 @@ Date: REGEX(.*)
     "services": {
         "": {
             "subservs": {
-                "get/version": {
+                "SP/get/entities": {
+                    "incomingTransactionResponseSize": 2,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
+            },
+            "sum": {
+                "incomingTransactionResponseSize": 2,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
             }
+        }
+    },
+    "sum": {
+        "sum": {
+            "incomingTransactionResponseSize": 2,
+            "incomingTransactions": 1,
+            "serviceTime": REGEX(.*)
         }
     }
 }
@@ -119,7 +123,7 @@ Date: REGEX(.*)
 04. Ask for Metrics, see 1 Incoming Transaction (the reset-request in step 03 :-)
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 102
+Content-Length: 231
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -128,11 +132,21 @@ Date: REGEX(.*)
     "services": {
         "": {
             "subservs": {
-                "delete/metrics": {
+                "SP/delete/metrics": {
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
+            },
+            "sum": {
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
             }
+        }
+    },
+    "sum": {
+        "sum": {
+            "incomingTransactions": 1,
+            "serviceTime": REGEX(.*)
         }
     }
 }

@@ -81,6 +81,7 @@ __thread char                    clientIp[IP_LENGTH_MAX + 1];
 static unsigned int              connMemory;
 static unsigned int              maxConns;
 static unsigned int              threadPoolSize;
+static unsigned int              mhdConnectionTimeout  = 0;
 
 
 
@@ -551,6 +552,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 }
 
 
+
 /* ****************************************************************************
 *
 * serve - 
@@ -628,6 +630,15 @@ static void requestCompleted
   // Metrics
   //
   metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN, 1);
+
+
+  //
+  // If the httpStatusCode is above the set of 200s, an error has occurred
+  //
+  if (ciP->httpStatusCode >= SccBadRequest)
+  {
+    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
+  }
 
   if (metricsMgr.isOn() && (ciP->transactionStart.tv_sec != 0))
   {
@@ -1245,10 +1256,22 @@ static int connectionTreat
   {
     //
     // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
-    // just silently "eat" the entire message
+    // just silently "eat" the entire message.
+    // 
+    // The problem occurs when the broker is lied to and there aren't ciP->httpHeaders.contentLength
+    // bytes to read.
+    // When this happens, MHD blocks until it times out (MHD_OPTION_CONNECTION_TIMEOUT defaults to 5 seconds),
+    // and the broker isn't able to respond. MHD just closes the connection.
+    // Question asked in mhd mailing list.
+    //
+    // See github issue:
+    //   https://github.com/telefonicaid/fiware-orion/issues/2761
     //
     if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
     {
+      //
+      // Errors can't be returned yet, postpone ...
+      //
       *upload_data_size = 0;
       return MHD_YES;
     }
@@ -1287,7 +1310,6 @@ static int connectionTreat
     return MHD_YES;
   }
 
-
   //
   // 3. Finally, serve the request (unless an error has occurred)
   // 
@@ -1298,6 +1320,7 @@ static int connectionTreat
   {
     alarmMgr.badInput(clientIp, "error in URI path");
     restReply(ciP, ciP->answer);
+    return MHD_YES;
   }
 
   ciP->servicePath = ciP->httpHeaders.servicePath;
@@ -1307,12 +1330,14 @@ static int connectionTreat
   {
     alarmMgr.badInput(clientIp, "error in ServicePath http-header");
     restReply(ciP, ciP->answer);
+    return MHD_YES;
   }
 
   if (contentTypeCheck(ciP) != 0)
   {
     alarmMgr.badInput(clientIp, "invalid mime-type in Content-Type http-header");
     restReply(ciP, ciP->answer);
+    return MHD_YES;
   }
   else
   {
@@ -1524,6 +1549,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                   MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
                                    MHD_OPTION_END);
 
     }
@@ -1540,6 +1566,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                   MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
                                    MHD_OPTION_END);
 
     }
@@ -1579,6 +1606,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                       MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
                                       MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                      MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
                                       MHD_OPTION_END);
     }
     else
@@ -1594,6 +1622,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                       MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
                                       MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                      MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
                                       MHD_OPTION_END);
     }
 
@@ -1634,6 +1663,7 @@ void restInit
   const std::string&  _rushHost,
   unsigned short      _rushPort,
   const char*         _allowedOrigin,
+  int                 _mhdTimeoutInSeconds,
   const char*         _httpsKey,
   const char*         _httpsCertificate,
   RestServeFunction   _serveFunction
@@ -1652,6 +1682,8 @@ void restInit
   threadPoolSize   = _mhdThreadPoolSize;
   rushHost         = _rushHost;
   rushPort         = _rushPort;
+
+  mhdConnectionTimeout = _mhdTimeoutInSeconds;
 
   strncpy(restAllowedOrigin, _allowedOrigin, sizeof(restAllowedOrigin));
 
