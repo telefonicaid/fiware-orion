@@ -1216,6 +1216,18 @@ static int connectionTreat
     ciP->httpHeader.push_back("Fiware-Correlator");
     ciP->httpHeaderValue.push_back(ciP->httpHeaders.correlator);
 
+    if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
+    {
+      char details[256];
+      snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
+
+      OrionError oe(SccRequestEntityTooLarge, details);
+
+      ciP->httpStatusCode = oe.code;
+      restReply(ciP, oe.smartRender(ciP->apiVersion));
+      return MHD_YES;
+    }
+
     //
     // Transaction starts here
     //
