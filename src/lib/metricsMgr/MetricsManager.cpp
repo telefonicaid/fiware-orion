@@ -142,23 +142,6 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
     subService = &subService[1];
   }
 
-  //
-  // Convert tenant/service to lowercase
-  //
-  char* sP   = (char*) srv.c_str();
-  char  diff = 'a' - 'A';  // To add to char to go from uppercase to lower case
-
-  while (*sP != 0)
-  {
-    if ((*sP >= 'A') && (*sP <= 'Z'))
-    {
-      *sP += diff;
-    }
-
-    ++sP;
-  }
-
-
   semTake();
 
 
