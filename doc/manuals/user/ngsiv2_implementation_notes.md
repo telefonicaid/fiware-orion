@@ -114,6 +114,8 @@ Orion always provides datetime attributes/metadata using the format `YYYY-MM-DDT
 timezone (which is the best default option, as clients/receivers may be running in any timezone). This may change in the
 future (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2663)).
 
+The string "ISO8601" as type for attributes and metadata is also supported. The effect is the same as when using "DateTime".
+
 [Top](#top)
 
 ## Scope functionality
