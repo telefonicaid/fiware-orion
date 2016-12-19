@@ -102,7 +102,7 @@ Date: REGEX(.*)
         }
     },
     "sum": {
-        "subServs": {
+        "subservs": {
             "SP/get/entities": {
                 "incomingTransactionResponseSize": 2,
                 "incomingTransactions": 1,
@@ -151,7 +151,7 @@ Date: REGEX(.*)
         }
     },
     "sum": {
-        "subServs": {
+        "subservs": {
             "SP/delete/metrics": {
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)

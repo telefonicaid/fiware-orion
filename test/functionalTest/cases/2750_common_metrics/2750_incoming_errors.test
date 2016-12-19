@@ -247,7 +247,7 @@ Date: REGEX(.*)
         }
     },
     "sum": {
-        "subServs": {
+        "subservs": {
             "SP/get/entities": {
                 "incomingTransactionResponseSize": 2,
                 "incomingTransactions": 1,
@@ -317,7 +317,7 @@ Date: REGEX(.*)
         }
     },
     "sum": {
-        "subServs": {
+        "subservs": {
             "SP/error": {
                 "incomingTransactionErrors": 1,
                 "incomingTransactionRequestSize": 24,
@@ -540,7 +540,7 @@ Date: REGEX(.*)
         }
     },
     "sum": {
-        "subServs": {
+        "subservs": {
             "": {
                 "incomingTransactionErrors": 1,
                 "incomingTransactionResponseSize": 73,

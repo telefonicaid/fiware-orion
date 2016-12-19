@@ -181,6 +181,34 @@ static void httpHeaderAdd
 }
 
 
+/* ****************************************************************************
+*
+* contentLenParse - extract content length fromn HTTP header string
+*
+* To get the size of the payload, simply search for "Content-Length"
+* inside the HTTP headers and extract the number.
+*/
+static int contentLenParse(char* s)
+{
+  char* contentLenP  = strstr(s, "Content-Length:");             // Point to beginning of 'Content-Length:'
+
+  if (contentLenP == NULL)
+  {
+    return 0;
+  }
+
+  int offset = strlen("Content-Length:");
+
+  while ((contentLenP[offset] == ' ') || (contentLenP[offset] == '\t'))        // Step over spaces and tabs ...
+  {
+    ++offset;
+  }
+
+
+  return atoi(&contentLenP[offset]);  // ... and get the number
+}
+
+
 
 /* ****************************************************************************
 *
@@ -426,7 +454,13 @@ int httpRequestSendWithCurl
   LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerContentLength.c_str()));
   httpHeaderAdd(&headers, "Content-length", headerContentLength, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
+  //
   // Add the size of the actual payload
+  //
+  // Note that 'outgoingMsgSize' is the TOTAL size of the outgoing message,
+  // including HTTP headers etc, while 'payloadSize' is the size of just
+  // the payload of the message.
+  //
   unsigned long long payloadSize = content.size();
   outgoingMsgSize += payloadSize;
 
@@ -545,16 +579,7 @@ int httpRequestSendWithCurl
     //
     // The Response is here
     //
-    // To get the size of the payload, simply search for Content-Len inside the HTTP headers and extract the number
-    //
-    int   offset      = strlen("Content-Length:");
-    char* contentLenP = strstr(httpResponse->memory, "Content-Length:");        // Point to beginning of 'Content-Length:'
-
-    while ((*contentLenP == ' ') || (*contentLenP == '\t'))                     // Step over spaces and tabs ...
-    {
-      ++contentLenP;
-    }
-    int   payloadLen  = (contentLenP == NULL)? 0 : atoi(&contentLenP[offset]);  // ... and get the number
+    int   payloadLen  = contentLenParse(httpResponse->memory);
 
     LM_I(("Notification Successfully Sent to %s", url.c_str()));
     outP->assign(httpResponse->memory, httpResponse->size);

@@ -83,7 +83,8 @@ void QueueNotifier::sendNotifyContextRequest
                                                                           metadataFilter,
                                                                           blacklist);
 
-  for (unsigned ix = 0; ix < paramsV->size(); ix++)
+  size_t notificationsNum = paramsV->size();
+  for (unsigned ix = 0; ix < notificationsNum; ix++)
   {
     clock_gettime(CLOCK_REALTIME, &(((*paramsV)[ix])->timeStamp));
   }
@@ -91,7 +92,7 @@ void QueueNotifier::sendNotifyContextRequest
   bool enqueued = queue.try_push(paramsV);
   if (!enqueued)
   {
-    QueueStatistics::incReject(paramsV->size());
+    QueueStatistics::incReject(notificationsNum);
     LM_E(("Runtime Error (notification queue is full)"));
     for (unsigned ix = 0; ix < paramsV->size(); ix++)
     {
@@ -102,5 +103,5 @@ void QueueNotifier::sendNotifyContextRequest
     return;
   }
 
-  QueueStatistics::incIn(paramsV->size());
+  QueueStatistics::incIn(notificationsNum);
 }
