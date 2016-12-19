@@ -194,6 +194,7 @@ template <typename T> std::string toString(T t)
 template <> std::string toString(float f);
 
 
+
 /*****************************************************************************
 *
 * isodate2str -
@@ -201,5 +202,12 @@ template <> std::string toString(float f);
 */
 extern std::string isodate2str(long long timestamp);
 
+
+
+/* ****************************************************************************
+*
+* toLowercase - convert string to lowercase
+*/
+extern void toLowercase(char* s);
 
 #endif  // SRC_LIB_COMMON_STRING_H_

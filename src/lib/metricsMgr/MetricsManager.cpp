@@ -142,23 +142,6 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
     subService = &subService[1];
   }
 
-  //
-  // Convert tenant/service to lowercase
-  //
-  char* sP   = (char*) srv.c_str();
-  char  diff = 'a' - 'A';  // To add to char to go from uppercase to lower case
-
-  while (*sP != 0)
-  {
-    if ((*sP >= 'A') && (*sP <= 'Z'))
-    {
-      *sP += diff;
-    }
-
-    ++sP;
-  }
-
-
   semTake();
 
 
@@ -173,9 +156,7 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
   if (metrics[srv]->find(subService) == metrics[srv]->end())
   {
     //
-    // not found: create it
-    // FIXME PR: this syntax should be simpler, closer to
-    // metrics[srv][subService] = new std::map<std::string, uint64_t>;
+    // Not Found: create it
     //
     metrics[srv]->insert(std::pair<std::string, std::map<std::string, uint64_t>*>
                          (subService,
@@ -186,9 +167,7 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
   if (metrics[srv]->at(subService)->find(metric) == metrics[srv]->at(subService)->end())
   {
     //
-    // not found: create it
-    // FIXME PR: I don't like the at() and pair() syntax, I'd prefer a syntax closer to:
-    // metrics[srv][subService][metric] = 0;
+    // Not Found: create it
     //
     metrics[srv]->at(subService)->insert(std::pair<std::string, uint64_t>(metric, 0));
   }
@@ -365,8 +344,6 @@ std::string MetricsManager::toJson(void)
   //
   // Sum for grand total
   //
-  // FIXME P8: Note that the sums for servicePaths over any tenant are missing
-  //
   JsonHelper   lastSum;
   JsonHelper   jhSubServ;
 
@@ -381,7 +358,7 @@ std::string MetricsManager::toJson(void)
     jhSubServ.addRaw(subService, subServiceString);
   }
 
-  lastSum.addRaw("subServs", jhSubServ.str());
+  lastSum.addRaw("subservs", jhSubServ.str());
 
   std::string  sumString = metricsRender(&sum);
   lastSum.addRaw("sum", sumString);

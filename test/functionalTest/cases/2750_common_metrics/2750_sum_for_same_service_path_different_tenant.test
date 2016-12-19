@@ -239,7 +239,7 @@ Date: REGEX(.*)
         }
     },
     "sum": {
-        "subServs": {
+        "subservs": {
             "SP1": {
                 "incomingTransactionResponseSize": 6,
                 "incomingTransactions": 3,
