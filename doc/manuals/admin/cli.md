@@ -76,11 +76,11 @@ The list of available options is the following:
 -   **-https**. Work in secure HTTP mode (See also `-cert` and `-key`).
 -   **-cert**. Certificate file for https. Use an absolute
     file path. Have a look at [this
-    script](https://github.com/telefonicaid/fiware-orion/blob/master/scripts/httpsPrepare.sh)
+    script](https://github.com/telefonicaid/fiware-orion/blob/master/test/functionalTest/httpsPrepare.sh)
     for an example on how to generate this file.
 -   **-key**. Private server key file for https. Use an absolute
     file path. Have a look at [this
-    script](https://github.com/telefonicaid/fiware-orion/blob/master/scripts/httpsPrepare.sh)
+    script](https://github.com/telefonicaid/fiware-orion/blob/master/test/functionalTest/httpsPrepare.sh)
     for an example on how to generate this file.
 -   **-logDir <dir\>**. Specifies the directory to use for the contextBroker log file.
 -   **-logAppend**. If used, the log lines are appended to the existing
