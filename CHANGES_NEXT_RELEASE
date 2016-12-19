@@ -4,3 +4,5 @@
 - Add: metrics REST API (#2750)
 - Add: new CLI '-disableMetrics' to disable metrics (#2750)
 - Add: one more semaphore (the metrics semaphore) to the semWait block in GET /statistics and to the list in GET /admin/sem (#2750)
+- Fix: bug in notification queue statistics, "in" value (#2744)
+
