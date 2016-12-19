@@ -32,6 +32,8 @@ import rpyc
 import json
 import logging
 
+from requests.exceptions import ConnectionError
+
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s | %(levelname)s | %(message)s',
                     filename='connections_stress_tests.log',
@@ -134,15 +136,29 @@ class Stablished_Connections:
         """
         return the number of established connections per ContextBroker
         using "prpyc" and "psutil" libraries.
-        :return string (connections)
+        :return a 3-uple with [established_conn, close_wait_conn]
         """
-        connections = """def get_number_established_conn():
+        conn = rpyc.classic.connect(self.host)
+
+        # Note the check for type(proc.name). This is due to, as far as I (Fermin)
+        # have checked, the psutil library API changed from 0.6.1 (the one in CentOS 6.x,
+        # which uses proc.name) to 2.1.1 (the one in modern Debian, which uses proc.name()).
+        # The solution is quite a hack and I don't like too much, but it works...
+        #
+        # Note also the starswith() method instead of just ==. This way, the process
+        # can have a name like contextBroker-1.4.3 and the logic will still work
+
+        connections_est = """def get_number_established_conn():
                import psutil
                process_name = "contextBroker"
                pid = 0
                e_c = 0
                for proc in psutil.process_iter():
-                      if proc.name == process_name:
+                      if type(proc.name) == str:
+                             name = proc.name
+                      else:
+                             name = proc.name()
+                      if name.startswith(process_name):
                              pid = proc.pid
                              break
                p = psutil.Process(pid)
@@ -152,10 +168,36 @@ class Stablished_Connections:
                              e_c += 1
                return e_c"""
 
-        conn = rpyc.classic.connect(self.host)
-        conn.execute(connections)
+        conn.execute(connections_est)
         remote_exec = conn.namespace['get_number_established_conn']
-        return str(remote_exec())
+        con_est = int(remote_exec())
+
+        # FIXME: it would be more efficient to get both ESTABLISHED and CLOSE_WAIT
+        # in a single shoot, but I (Fermin) don't know prpyc well enough to do that
+        connections_cw = """def get_number_close_wait_conn():
+               import psutil
+               process_name = "contextBroker"
+               pid = 0
+               e_c = 0
+               for proc in psutil.process_iter():
+                      if type(proc.name) == str:
+                             name = proc.name
+                      else:
+                             name = proc.name()
+                      if name.startswith(process_name):
+                             pid = proc.pid
+                             break
+               p = psutil.Process(pid)
+               connections = p.get_connections()
+               for c in connections:
+                      if c.status == "CLOSE_WAIT":
+                             e_c += 1
+               return e_c"""
+
+        conn.execute(connections_cw)
+        remote_exec = conn.namespace['get_number_close_wait_conn']
+        con_cw = int(remote_exec())
+        return [con_est, con_cw]
 
     def __init__(self, arguments):
         """
@@ -251,21 +293,26 @@ class Stablished_Connections:
         self.__print_by_console(resp)
 
         logging.info(" Reports each second:")
-        logging.info(" counter       version      queue   established")
-        logging.info("               request      size    connections")
-        logging.info(" --------------------------------------------------------")
+        logging.info(" counter       version      queue   established   close wait    sum")
+        logging.info("               request      size    connections   connections   connections")
+        logging.info(" --------------------------------------------------------------------------------")
         while (init_date+duration_in_secs) > time.time():
             # version request
             counter += 1
-            resp = requests.get("%s/version" % self.cb_endpoint)
-            self.__print_by_console(resp)
-            assert resp.status_code == 200, " ERROR - the version http code is not 200 - OK\n     - http code received: %s - %s" % (str(resp.status_code), resp. reason)
+            try:
+               resp = requests.get("%s/version" % self.cb_endpoint)
+               self.__print_by_console(resp)
+               assert resp.status_code == 200, " ERROR - the version http code is not 200 - OK\n     - http code received: %s - %s" % (str(resp.status_code), resp. reason)
+               version_result = resp.reason
+            except ConnectionError:
+               version_result = "NOK"
             # report
             if not self.no_queue_size_flag:
                 queue_size = self.__get_queue_size()
             if not self.no_established_connections_flag:
-                established_connections = self.__get_established_connections()
-            logging.info(" -------- %d -------- %s -------- %s -------- %s ----------" % (counter, resp.reason, queue_size, established_connections))
+                cons = self.__get_established_connections()
+            logging.info(" -------- %d -------- %s -------- %s -------- %d ---------- %d -------- %d ----------"
+                         % (counter, version_result, queue_size, cons[0], cons[1], cons[0] + cons[1]))
             time.sleep(self.version_delay)
 
         logging.info(" ALL (%d) \"/version\" requests responded correctly...Bye." % counter)
