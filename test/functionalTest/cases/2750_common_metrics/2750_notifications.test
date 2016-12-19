@@ -160,7 +160,7 @@ Date: REGEX(.*)
         }
     },
     "sum": {
-        "subServs": {
+        "subservs": {
             "SP": {
                 "incomingTransactionRequestSize": 177,
                 "incomingTransactions": 2,
@@ -232,7 +232,7 @@ Date: REGEX(.*)
         }
     },
     "sum": {
-        "subServs": {
+        "subservs": {
             "SP": {
                 "incomingTransactionRequestSize": 227,
                 "incomingTransactions": 3,
