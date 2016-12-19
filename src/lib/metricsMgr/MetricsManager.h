@@ -107,24 +107,15 @@
 *
 * FIXME PR: summary of things to improve
 *
-* 01. Check alternatives to "triple std::map" from the point of view of performance
-*     (probably difficult to beat) and syntax (current one is a bit awkward)
-* 02. In order to be homogeneous, probably 'metrics' should be a pointer (and the
-*     initial map created at constructor time)
-* 07. (Unsure) We could need maps for metrics different from int. If so, implement
-*     it (and the add method) using templates, to avoid repeating the same implementation
-*     N times
 * 08. Empty services (no tenant given) to receive some default service name.
 * 09. What to do with default SP ("/")?
-*     When applying the rule "remove the inicial /", the default SP ends up as "".
-*     Not sure that we want that...
+*     When applying the rule "remove the initial /", the default SP ends up as "".
+*     Not sure that we want that ...
 * 10. About initial slash of service path:
 *     The broker accepts a Service Path with empty components, e.g. "//sp1"
 *     We understand this is an error that should be fixed so, only the first '/' is removed
 *     for metrics
 * 11. Try to come up with better solution for metrics for requests using invalid service-path / tenant?
-* 12. The sums over service-path independent of tenant are still missing
-* 13. Service/Tenant name to be transformed to all lowercase (but not with service-path)
 *
 */
 class MetricsManager

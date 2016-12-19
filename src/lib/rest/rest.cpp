@@ -516,7 +516,11 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "Content-Type") == 0)      headerP->contentType    = value;
   else if (strcasecmp(key.c_str(), "Content-Length") == 0)    headerP->contentLength  = atoi(value);
   else if (strcasecmp(key.c_str(), "Origin") == 0)            headerP->origin         = value;
-  else if (strcasecmp(key.c_str(), "Fiware-Service") == 0)    headerP->tenant         = value;
+  else if (strcasecmp(key.c_str(), "Fiware-Service") == 0)
+  {
+    headerP->tenant = value;
+    toLowercase((char*) headerP->tenant.c_str());
+  }
   else if (strcasecmp(key.c_str(), "X-Auth-Token") == 0)      headerP->xauthToken     = value;
   else if (strcasecmp(key.c_str(), "X-Real-IP") == 0)         headerP->xrealIp        = value;
   else if (strcasecmp(key.c_str(), "X-Forwarded-For") == 0)   headerP->xforwardedFor  = value;

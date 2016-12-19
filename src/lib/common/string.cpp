@@ -924,3 +924,30 @@ std::string isodate2str(long long timestamp)
   strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S.00Z", gmtime(&rawtime));
   return std::string(buffer);
 }
+
+
+
+/* ****************************************************************************
+*
+* toLowercase - convert string to lowercase
+*
+* This function modifies the actual string.
+* See also the function 'strToLower', that converts one string to another, with all uppercase
+* changed to lowercase.
+*
+* This approach is faster as no copy is done.
+*/
+void toLowercase(char* s)
+{
+  int toLowerOffset = 'a' - 'A';
+
+  while (*s != 0)
+  {
+    if ((*s >= 'A') && (*s <= 'Z'))
+    {
+      *s += toLowerOffset;
+    }
+
+    ++s;
+  }
+}

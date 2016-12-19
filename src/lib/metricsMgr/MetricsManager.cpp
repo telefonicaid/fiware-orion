@@ -144,6 +144,7 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
 
   semTake();
 
+
   // Do we have the service in the map?
   if (metrics.find(srv) == metrics.end())
   {
@@ -155,9 +156,7 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
   if (metrics[srv]->find(subService) == metrics[srv]->end())
   {
     //
-    // not found: create it
-    // FIXME PR: this syntax should be simpler, closer to
-    // metrics[srv][subService] = new std::map<std::string, uint64_t>;
+    // Not Found: create it
     //
     metrics[srv]->insert(std::pair<std::string, std::map<std::string, uint64_t>*>
                          (subService,
@@ -168,9 +167,7 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
   if (metrics[srv]->at(subService)->find(metric) == metrics[srv]->at(subService)->end())
   {
     //
-    // not found: create it
-    // FIXME PR: I don't like the at() and pair() syntax, I'd prefer a syntax closer to:
-    // metrics[srv][subService][metric] = 0;
+    // Not Found: create it
     //
     metrics[srv]->at(subService)->insert(std::pair<std::string, uint64_t>(metric, 0));
   }
@@ -298,6 +295,7 @@ std::string MetricsManager::toJson(void)
   JsonHelper                                                                                 top;
   JsonHelper                                                                                 services;
   std::map<std::string, uint64_t>                                                            sum;
+  std::map<std::string, std::map<std::string, uint64_t> >                                    subServCrossTenant;
 
   for (serviceIter = metrics.begin(); serviceIter != metrics.end(); ++serviceIter)
   {
@@ -323,6 +321,7 @@ std::string MetricsManager::toJson(void)
         {
           serviceSum[metric] += value;
           sum[metric]        += value;
+          subServCrossTenant[subService][metric] += value;
         }
       }
 
@@ -345,11 +344,23 @@ std::string MetricsManager::toJson(void)
   //
   // Sum for grand total
   //
-  // FIXME PR: Note that the sums for servicePaths over any tenant are missing
-  //
   JsonHelper   lastSum;
-  std::string  sumString = metricsRender(&sum);
+  JsonHelper   jhSubServ;
 
+  std::map<std::string, std::map<std::string, uint64_t> >::iterator  it;
+  for (it = subServCrossTenant.begin();  it != subServCrossTenant.end(); ++it)
+  {
+    JsonHelper   jhSubServCross;
+    std::string  subService = it->first;
+    std::string  subServiceString;
+
+    subServiceString = metricsRender(&it->second);
+    jhSubServ.addRaw(subService, subServiceString);
+  }
+
+  lastSum.addRaw("subservs", jhSubServ.str());
+
+  std::string  sumString = metricsRender(&sum);
   lastSum.addRaw("sum", sumString);
 
   top.addRaw("services", services.str());
