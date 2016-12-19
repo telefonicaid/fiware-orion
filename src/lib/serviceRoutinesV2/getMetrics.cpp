@@ -41,6 +41,11 @@
 /* ****************************************************************************
 *
 * getMetrics -
+*
+* GET /admin/metrics
+*
+* URI parameters:
+*   - reset
 */
 std::string getMetrics
 (
@@ -58,5 +63,13 @@ std::string getMetrics
     return oe.toJson();
   }
 
-  return metricsMgr.toJson();
+  std::string  reset   = ciP->uriParam["reset"];
+  std::string  payload = metricsMgr.toJson();
+
+  if (reset == "true")
+  {
+    metricsMgr.reset();
+  }
+
+  return payload;
 }
