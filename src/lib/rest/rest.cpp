@@ -681,7 +681,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   //
   // 1. Max 10 paths  - ONLY ONE path allowed at this moment
   // 2. Max 10 levels in each path
-  // 3. Max 50 characters in each path component
+  // 3. Min 1, Max 50 characters in each path component
   // 4. Only alphanum and underscore allowed (just like in tenants)
   //    OR: Last component is EXACTLY '#'
   //
@@ -730,6 +730,14 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
       ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
       return 3;
     }
+
+    if (compV[ix].c_str()[0] == 0)
+    {
+      OrionError oe(SccBadRequest, "empty component in ServicePath");
+      ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      return 3;
+    }
+
 
     // Last token in the path is allowed to be *exactly* "#", as in /Madrid/Gardens/#. Note that
     // /Madrid/Gardens/North# is not allowed
@@ -820,7 +828,10 @@ int servicePathSplit(ConnectionInfo* ciP)
 
     ciP->servicePathV[ix] = removeTrailingSlash(stripped);
 
-    // This was previously a LM_T trace, but we have "promoted" it to INFO due to it is needed to check logs in a .test case (case 0392 service_path_http_header.test)
+    //
+    // This was previously an LM_T trace, but we have "promoted" it to INFO due to 
+    // it is needed to check logs in a .test case (case 0392 service_path_http_header.test)
+    //
     LM_I(("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
   }
 

@@ -1,0 +1,84 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Empty component in service path
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Try a NGSI v1 registration using a service path with an empty component, see error
+# 02. Try a NGSI v2 get entities using a service path with an empty component, see error
+#
+
+echo "01. Try a NGSI v1 registration using a service path with an empty component, see error"
+echo "======================================================================================"
+orionCurl --url /v1/registry/registerContext --payload "{}" --servicePath /c1//c3
+echo
+echo
+
+echo "02. Try a NGSI v2 get entities using a service path with an empty component, see error"
+echo "======================================================================================"
+orionCurl --url /v2/entities --servicePath /c1//c3/
+echo
+echo
+
+
+--REGEXPECT--
+01. Try a NGSI v1 registration using a service path with an empty component, see error
+======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 132
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "400",
+        "details": "empty component in ServicePath",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+02. Try a NGSI v2 get entities using a service path with an empty component, see error
+======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 69
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "empty component in ServicePath",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

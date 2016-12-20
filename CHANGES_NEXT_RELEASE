@@ -7,5 +7,6 @@
 - Fix: timeout of 6 seconds (hardcoded for now) for all incoming REST requests (temporal fix, see #2762)
 - Fix: if HTTP header Content-Length contains a value above the maximum payload size, an error is returned and the message is not read (#2761)
 - Add: one more semaphore (the metrics semaphore) to the semWait block in GET /statistics and to the list in GET /admin/sem (#2750)
+- Fix: no longer accepting a service path with an empty component (e.g. /comp1//comp3) (#2772)
 - Fix: bug in notification queue statistics, "in" value (#2744)
 
