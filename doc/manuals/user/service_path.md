@@ -44,11 +44,12 @@ Some additional remarks:
 -   Limitations:
     -   Scope must start with "/" (only 'absolute' scopes are allowed)
     -   10 maximum scope levels in a path
-    -   50 maximum characters in each level,
+    -   50 maximum characters in each level (1 char is minimum),
         only alphanum and underscore allowed
-    -   10 maximum dijoint scopes paths in a comman separated list in
+    -   10 maximum disjoint scope paths in a comma-separated list in
         query Fiware-ServicePath header (no more than 1 scope path in
         update Fiware-ServicePath header)
+    -   Trailing slashes are discarded
 
 -   Fiware-ServicePath is an optional header. It is assumed that all the
     entities created without Fiware-ServicePath (or that don't include
