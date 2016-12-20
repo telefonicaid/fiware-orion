@@ -276,7 +276,7 @@ bool            strictIdv1;
 bool            disableCusNotif;
 bool            logForHumans;
 bool            disableMetrics;
-int             mhdConnTmo;
+int             reqTimeout;
 
 
 
@@ -332,7 +332,7 @@ int             mhdConnTmo;
 #define LOG_TO_SCREEN_DESC     "log to screen"
 #define LOG_FOR_HUMANS_DESC    "human readible log to screen"
 #define METRICS_DESC           "turn off the 'metrics' feature"
-#define CONN_TMO_DESC          "connection timeout for REST requests (in seconds)"
+#define REQ_TMO_DESC           "connection timeout for REST requests (in seconds)"
 
 
 
@@ -372,7 +372,7 @@ PaArgument paArgs[] =
   { "-multiservice",  &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
 
   { "-httpTimeout",   &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
-  { "-connTimeout",   &mhdConnTmo,   "CONN_TIMEOUT",   PaLong,   PaOpt, 10,         0,      PaNL,  CONN_TMO_DESC      },
+  { "-reqTimeout",    &reqTimeout,   "REQ_TIMEOUT",    PaLong,   PaOpt, 10,         0,      PaNL,  REQ_TMO_DESC       },
   { "-reqMutexPolicy",reqMutexPolicy,"MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },  
   { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
 
@@ -1797,7 +1797,7 @@ int main(int argC, char* argV[])
              rushHost,
              rushPort,
              allowedOrigin,
-             mhdConnTmo,
+             reqTimeout,
              httpsPrivateServerKey,
              httpsCertificate);
 
@@ -1817,7 +1817,7 @@ int main(int argC, char* argV[])
              rushHost,
              rushPort,
              allowedOrigin,
-             mhdConnTmo);
+             reqTimeout);
   }
 
   LM_I(("Startup completed"));

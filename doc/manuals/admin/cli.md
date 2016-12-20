@@ -111,7 +111,7 @@ The list of available options is the following:
     broker process.
 -   **-httpTimeout <interval>**. Specifies the timeout in milliseconds
     for forwarding messages and for notifications.
--   **-connTimeout <interval>**. Specifies the timeout in seconds
+-   **-reqTimeout <interval>**. Specifies the timeout in seconds
     for REST connections. Note that if a zero is used, there is no timeout (wait forever).
 -   **-cprForwardLimit**. Maximum number of forwarded requests to Context Providers for a single client request
     (default is no limit). Use 0 to disable Context Providers forwarding completely.
