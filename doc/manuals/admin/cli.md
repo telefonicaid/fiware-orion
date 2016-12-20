@@ -76,11 +76,11 @@ The list of available options is the following:
 -   **-https**. Work in secure HTTP mode (See also `-cert` and `-key`).
 -   **-cert**. Certificate file for https. Use an absolute
     file path. Have a look at [this
-    script](https://github.com/telefonicaid/fiware-orion/blob/master/scripts/httpsPrepare.sh)
+    script](https://github.com/telefonicaid/fiware-orion/blob/master/test/functionalTest/httpsPrepare.sh)
     for an example on how to generate this file.
 -   **-key**. Private server key file for https. Use an absolute
     file path. Have a look at [this
-    script](https://github.com/telefonicaid/fiware-orion/blob/master/scripts/httpsPrepare.sh)
+    script](https://github.com/telefonicaid/fiware-orion/blob/master/test/functionalTest/httpsPrepare.sh)
     for an example on how to generate this file.
 -   **-logDir <dir\>**. Specifies the directory to use for the contextBroker log file.
 -   **-logAppend**. If used, the log lines are appended to the existing
@@ -111,6 +111,8 @@ The list of available options is the following:
     broker process.
 -   **-httpTimeout <interval>**. Specifies the timeout in milliseconds
     for forwarding messages and for notifications.
+-   **-reqTimeout <interval>**. Specifies the timeout in seconds
+    for REST connections. Note that if a zero is used, there is no timeout (wait forever).
 -   **-cprForwardLimit**. Maximum number of forwarded requests to Context Providers for a single client request
     (default is no limit). Use 0 to disable Context Providers forwarding completely.
 -   **-corsOrigin <domain>**. Configures CORS for GET requests,

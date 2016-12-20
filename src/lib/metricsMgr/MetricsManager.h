@@ -25,21 +25,35 @@
 *
 * Author: Fermín Galán
 */
+#include <stdint.h>   // int64_t et al
+#include <semaphore.h>
+
+#include <utility>
 #include <string>
 #include <map>
-#include <semaphore.h>
 
 
 
 /* ****************************************************************************
 *
 * Metrics - 
+*
+* NOTE
+*   _METRIC_TOTAL_SERVICE_TIME is in the metrics map but excluded from
+*   the metric response, while METRIC_SERVICE_TIME is NOT in the metrics map, but
+*   include in the metric response.
+*   METRIC_SERVICE_TIME == _METRIC_TOTAL_SERVICE_TIME / METRIC_TRANS_IN
+*
+*   All 'help-counters' in the set, like _METRIC_TOTAL_SERVICE_TIME will have the
+*   prefix '_', to help remember it's a help measure.
+*   A prefix'_' in both macro name and in its string translation
 */
 #define METRIC_TRANS_IN                            "incomingTransactions"
 #define METRIC_TRANS_IN_REQ_SIZE                   "incomingTransactionRequestSize"
 #define METRIC_TRANS_IN_RESP_SIZE                  "incomingTransactionResponseSize"
 #define METRIC_TRANS_IN_ERRORS                     "incomingTransactionErrors"
 #define METRIC_SERVICE_TIME                        "serviceTime"
+#define _METRIC_TOTAL_SERVICE_TIME                 "_totalServiceTime"
 
 #define METRIC_TRANS_OUT                           "outgoingTransactions"
 #define METRIC_TRANS_OUT_REQ_SIZE                  "outgoingTransactionRequestSize"
@@ -93,50 +107,42 @@
 *
 * FIXME PR: summary of things to improve
 *
-* 1. Check alternatives to "triple std::map" from the point of view of performance
-*    (probably difficult to beat) and syntax (current one is a bit awkward)
-* 2. In order to be homogeneous, probably 'metrics' should be a pointer (and the
-*    initial map created at constructor time)
-* 3. Destroy method, releasing all the maps in cascade (probably never used, as the
-*    singleton object in CB using this class will be destroyed at the end, but do it
-*    for class completeness)
-* 4. reset() method implementation (not delete maps, only set metrics to 0)
-* 5. toJson() to be split into 3 methods (2 of them private)
-* 6. Use 'long long' instead of 'int'
-* 7. (Unsure) We could need maps for metrics different from int. If so, implement
-*    it (and the add method) using templates, to avoid repeating the same implementation
-*    N times
-* 8. Empty services (no tenant given) to receive some default service name.
-* 9. What to do with default SP ("/")?
-*    When applying the rule "remove the inicial /", the default SP ends up as "".
-*    Not sure that we want that...
-* 10. Forgotten: initial slash should be skipped for service paths
-*     Fix in MetricsManager::add, simply.
-*     Is a Service Path of "//sp1" accepted by the broker?
-*     If so, only the first '/' is removed ... ?
+* 08. Empty services (no tenant given) to receive some default service name.
+* 09. What to do with default SP ("/")?
+*     When applying the rule "remove the initial /", the default SP ends up as "".
+*     Not sure that we want that ...
+* 10. About initial slash of service path:
+*     The broker accepts a Service Path with empty components, e.g. "//sp1"
+*     We understand this is an error that should be fixed so, only the first '/' is removed
+*     for metrics
+* 11. Try to come up with better solution for metrics for requests using invalid service-path / tenant?
+*
 */
 class MetricsManager
 {
  private:
-  std::map<std::string, std::map<std::string, std::map<std::string, int>*>*>  metrics;
+  std::map<std::string, std::map<std::string, std::map<std::string, uint64_t>*>*>  metrics;
   bool            on;
   sem_t           sem;
   bool            semWaitStatistics;
-  long long       semWaitTime;        // measured in microseconds
+  int64_t         semWaitTime;        // measured in microseconds
 
   void            semTake(void);
   void            semGive(void);
+  void            _reset(void);
+  std::string     _toJson(void);
 
  public:
   MetricsManager();
 
   bool         init(bool _on, bool _semWaitStatistics);
-  void         add(const std::string& srv, const std::string& subServ, const std::string& metric, int value);
+  void         add(const std::string& srv, const std::string& subServ, const std::string& metric, uint64_t value);
   void         reset(void);
-  std::string  toJson(void);
+  std::string  toJson(bool doReset);
   bool         isOn(void);
-  long long    semWaitTimeGet(void);
+  int64_t      semWaitTimeGet(void);
   const char*  semStateGet(void);
+  void         release(void);
 };
 
 #endif  // SRC_LIB_METRICSMGR_METRICSMANAGER_H_

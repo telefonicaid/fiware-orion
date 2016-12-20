@@ -425,7 +425,7 @@ std::string Metadata::toStringValue(void) const
     break;
 
   case orion::ValueTypeNumber:
-    if (type == DATE_TYPE)
+    if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
     {
       return JSON_STR(isodate2str(numberValue));
     }
@@ -482,7 +482,8 @@ std::string Metadata::toJson(bool isLastElement)
   else if (valueType == orion::ValueTypeNumber)
   {
     std::string effectiveValue;
-    if (type == DATE_TYPE)
+
+    if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
     {
       effectiveValue = JSON_STR(isodate2str(numberValue));
     }

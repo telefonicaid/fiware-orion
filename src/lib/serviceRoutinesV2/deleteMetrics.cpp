@@ -59,5 +59,8 @@ std::string deleteMetrics
     return oe.toJson();
   }
 
-  return "[ \"DELETE /admin/metrics not implemented\" ]";
+  metricsMgr.reset();
+
+  ciP->httpStatusCode = SccNoContent;
+  return "";
 }

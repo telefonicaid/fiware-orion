@@ -81,6 +81,7 @@ __thread char                    clientIp[IP_LENGTH_MAX + 1];
 static unsigned int              connMemory;
 static unsigned int              maxConns;
 static unsigned int              threadPoolSize;
+static unsigned int              mhdConnectionTimeout  = 0;
 
 
 
@@ -515,7 +516,11 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "Content-Type") == 0)      headerP->contentType    = value;
   else if (strcasecmp(key.c_str(), "Content-Length") == 0)    headerP->contentLength  = atoi(value);
   else if (strcasecmp(key.c_str(), "Origin") == 0)            headerP->origin         = value;
-  else if (strcasecmp(key.c_str(), "Fiware-Service") == 0)    headerP->tenant         = value;
+  else if (strcasecmp(key.c_str(), "Fiware-Service") == 0)
+  {
+    headerP->tenant = value;
+    toLowercase((char*) headerP->tenant.c_str());
+  }
   else if (strcasecmp(key.c_str(), "X-Auth-Token") == 0)      headerP->xauthToken     = value;
   else if (strcasecmp(key.c_str(), "X-Real-IP") == 0)         headerP->xrealIp        = value;
   else if (strcasecmp(key.c_str(), "X-Forwarded-For") == 0)   headerP->xforwardedFor  = value;
@@ -549,6 +554,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 
   return MHD_YES;
 }
+
 
 
 /* ****************************************************************************
@@ -591,8 +597,6 @@ static void requestCompleted
     clock_difftime(&reqEndTime, &ciP->reqStartTime, &threadLastTimeStat.reqTime);
   }  
 
-  delete(ciP);
-
   //
   // Statistics
   //
@@ -625,6 +629,36 @@ static void requestCompleted
 
     timeStatSemGive(__FUNCTION__, "updating statistics");
   }
+
+  //
+  // Metrics
+  //
+  metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN, 1);
+
+
+  //
+  // If the httpStatusCode is above the set of 200s, an error has occurred
+  //
+  if (ciP->httpStatusCode >= SccBadRequest)
+  {
+    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
+  }
+
+  if (metricsMgr.isOn() && (ciP->transactionStart.tv_sec != 0))
+  {
+    struct timeval  end;
+
+    if (gettimeofday(&end, NULL) == 0)
+    {
+      unsigned long long elapsed = 
+        (end.tv_sec  - ciP->transactionStart.tv_sec) * 1000000 + 
+        (end.tv_usec - ciP->transactionStart.tv_usec);
+
+      metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, _METRIC_TOTAL_SERVICE_TIME, elapsed);
+    }
+  }
+
+  delete(ciP);
 }
 
 
@@ -647,7 +681,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   //
   // 1. Max 10 paths  - ONLY ONE path allowed at this moment
   // 2. Max 10 levels in each path
-  // 3. Max 50 characters in each path component
+  // 3. Min 1, Max 50 characters in each path component
   // 4. Only alphanum and underscore allowed (just like in tenants)
   //    OR: Last component is EXACTLY '#'
   //
@@ -696,6 +730,14 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
       ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
       return 3;
     }
+
+    if (compV[ix].c_str()[0] == 0)
+    {
+      OrionError oe(SccBadRequest, "empty component in ServicePath");
+      ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      return 3;
+    }
+
 
     // Last token in the path is allowed to be *exactly* "#", as in /Madrid/Gardens/#. Note that
     // /Madrid/Gardens/North# is not allowed
@@ -786,7 +828,10 @@ int servicePathSplit(ConnectionInfo* ciP)
 
     ciP->servicePathV[ix] = removeTrailingSlash(stripped);
 
-    // This was previously a LM_T trace, but we have "promoted" it to INFO due to it is needed to check logs in a .test case (case 0392 service_path_http_header.test)
+    //
+    // This was previously an LM_T trace, but we have "promoted" it to INFO due to 
+    // it is needed to check logs in a .test case (case 0392 service_path_http_header.test)
+    //
     LM_I(("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
   }
 
@@ -1062,6 +1107,18 @@ static int connectionTreat
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (ciP == NULL)
   {
+    struct timeval transactionStart;
+
+    // Create point in time for transaction metrics
+    if (metricsMgr.isOn())
+    {
+      if (gettimeofday(&transactionStart, NULL) == -1)
+      {
+        transactionStart.tv_sec  = 0;
+        transactionStart.tv_usec = 0;
+      }
+    }
+
     //
     // First thing to do on a new connection, set correlator to N/A.
     // After reading HTTP headers, the correlator id either changes due to encountering a 
@@ -1123,6 +1180,9 @@ static int connectionTreat
       return MHD_NO;
     }
 
+    ciP->transactionStart.tv_sec  = transactionStart.tv_sec;
+    ciP->transactionStart.tv_usec = transactionStart.tv_usec;
+
     if (timingStatistics)
     {
       clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);
@@ -1150,7 +1210,6 @@ static int connectionTreat
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
     
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
-    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN, 1);
 
     if (ciP->httpHeaders.accept == "")  // No Accept: given, treated as */*
     {
@@ -1171,6 +1230,18 @@ static int connectionTreat
 
     ciP->httpHeader.push_back("Fiware-Correlator");
     ciP->httpHeaderValue.push_back(ciP->httpHeaders.correlator);
+
+    if ((ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE) && (ciP->apiVersion == V2))
+    {
+      char details[256];
+      snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
+
+      OrionError oe(SccRequestEntityTooLarge, details);
+
+      ciP->httpStatusCode = oe.code;
+      restReply(ciP, oe.smartRender(ciP->apiVersion));
+      return MHD_YES;
+    }
 
     //
     // Transaction starts here
@@ -1212,10 +1283,22 @@ static int connectionTreat
   {
     //
     // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
-    // just silently "eat" the entire message
+    // just silently "eat" the entire message.
+    // 
+    // The problem occurs when the broker is lied to and there aren't ciP->httpHeaders.contentLength
+    // bytes to read.
+    // When this happens, MHD blocks until it times out (MHD_OPTION_CONNECTION_TIMEOUT defaults to 5 seconds),
+    // and the broker isn't able to respond. MHD just closes the connection.
+    // Question asked in mhd mailing list.
+    //
+    // See github issue:
+    //   https://github.com/telefonicaid/fiware-orion/issues/2761
     //
     if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
     {
+      //
+      // Errors can't be returned yet, postpone ...
+      //
       *upload_data_size = 0;
       return MHD_YES;
     }
@@ -1254,7 +1337,6 @@ static int connectionTreat
     return MHD_YES;
   }
 
-
   //
   // 3. Finally, serve the request (unless an error has occurred)
   // 
@@ -1265,6 +1347,7 @@ static int connectionTreat
   {
     alarmMgr.badInput(clientIp, "error in URI path");
     restReply(ciP, ciP->answer);
+    return MHD_YES;
   }
 
   ciP->servicePath = ciP->httpHeaders.servicePath;
@@ -1274,12 +1357,14 @@ static int connectionTreat
   {
     alarmMgr.badInput(clientIp, "error in ServicePath http-header");
     restReply(ciP, ciP->answer);
+    return MHD_YES;
   }
 
   if (contentTypeCheck(ciP) != 0)
   {
     alarmMgr.badInput(clientIp, "invalid mime-type in Content-Type http-header");
     restReply(ciP, ciP->answer);
+    return MHD_YES;
   }
   else
   {
@@ -1491,6 +1576,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                   MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
                                    MHD_OPTION_END);
 
     }
@@ -1507,6 +1593,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                   MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
                                    MHD_OPTION_END);
 
     }
@@ -1546,6 +1633,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                       MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
                                       MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                      MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
                                       MHD_OPTION_END);
     }
     else
@@ -1561,6 +1649,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                       MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
                                       MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                      MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
                                       MHD_OPTION_END);
     }
 
@@ -1601,6 +1690,7 @@ void restInit
   const std::string&  _rushHost,
   unsigned short      _rushPort,
   const char*         _allowedOrigin,
+  int                 _mhdTimeoutInSeconds,
   const char*         _httpsKey,
   const char*         _httpsCertificate,
   RestServeFunction   _serveFunction
@@ -1619,6 +1709,8 @@ void restInit
   threadPoolSize   = _mhdThreadPoolSize;
   rushHost         = _rushHost;
   rushPort         = _rushPort;
+
+  mhdConnectionTimeout = _mhdTimeoutInSeconds;
 
   strncpy(restAllowedOrigin, _allowedOrigin, sizeof(restAllowedOrigin));
 

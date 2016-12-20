@@ -22,15 +22,18 @@
 *
 * Author: Ken Zangelin
 */
+#include <stdint.h>   // int64_t et al
 #include <sys/time.h>
+
+#include <utility>
 #include <string>
 #include <map>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "metricsMgr/MetricsManager.h"
 #include "common/JsonHelper.h"
+#include "metricsMgr/MetricsManager.h"
 
 
 
@@ -110,7 +113,7 @@ void MetricsManager::semGive(void)
 *
 * MetricsManager::semWaitTimeGet - 
 */
-long long MetricsManager::semWaitTimeGet(void)
+int64_t MetricsManager::semWaitTimeGet(void)
 {
   return semWaitTime;
 }
@@ -121,45 +124,55 @@ long long MetricsManager::semWaitTimeGet(void)
 *
 * MetricsManager::add -
 */
-void MetricsManager::add(const std::string& srv, const std::string& subServ, const std::string& metric, int value)
+void MetricsManager::add(const std::string& srv, const std::string& subServ, const std::string& metric, uint64_t value)
 {
   if (on == false)
   {
     return;
   }
 
+  //
+  // Exclude the first '/' from the Sub Service
+  // But, only if it starts with a '/'
+  //
+  const char* subService = subServ.c_str();
+
+  if (subService[0] == '/')
+  {
+    subService = &subService[1];
+  }
+
   semTake();
+
 
   // Do we have the service in the map?
   if (metrics.find(srv) == metrics.end())
   {
     // not found: create it
-    metrics[srv] = new std::map<std::string, std::map<std::string, int>*>;
+    metrics[srv] = new std::map<std::string, std::map<std::string, uint64_t>*>;
   }
 
   // Do we have the subservice in the map?
-  if (metrics[srv]->find(subServ) == metrics[srv]->end())
+  if (metrics[srv]->find(subService) == metrics[srv]->end())
   {
     //
-    // not found: create it
-    // FIXME PR: this syntax should be simpler, closer to
-    // metrics[srv][subServ] = new std::map<std::string, int>;
+    // Not Found: create it
     //
-    metrics[srv]->insert(std::pair<std::string, std::map<std::string, int>*>(subServ, new std::map<std::string, int>));
+    metrics[srv]->insert(std::pair<std::string, std::map<std::string, uint64_t>*>
+                         (subService,
+                          new std::map<std::string, uint64_t>));
   }
 
   // Do we have the metric in the map?
-  if (metrics[srv]->at(subServ)->find(metric) == metrics[srv]->at(subServ)->end())
+  if (metrics[srv]->at(subService)->find(metric) == metrics[srv]->at(subService)->end())
   {
     //
-    // not found: create it
-    // FIXME PR: I don't like the at() and pair() syntax, I'd prefer a syntax closer to:
-    // metrics[srv][subServ][metric] = 0;
+    // Not Found: create it
     //
-    metrics[srv]->at(subServ)->insert(std::pair<std::string, int>(metric, 0));
+    metrics[srv]->at(subService)->insert(std::pair<std::string, uint64_t>(metric, 0));
   }
 
-  metrics[srv]->at(subServ)->at(metric) += value;
+  metrics[srv]->at(subService)->at(metric) += value;
 
   semGive();
 }
@@ -168,79 +181,175 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
 
 /* ****************************************************************************
 *
-* MetricsManager::reset -
+* MetricsManager::_reset -
 */
-void MetricsManager::reset(void)
+void MetricsManager::_reset(void)
 {
-  if (on == false)
-  {
-    return;
-  }
-
-  semTake();
-  // FIXME PR (see .h)
-  semGive();
-}
-
-
-
-/* ****************************************************************************
-*
-* MetricsManager::toJson -
-*
-* FIXME PR: needs a refactor (see .h)
-*/
-std::string MetricsManager::toJson(void)
-{
-  if (on == false)
-  {
-    return "";
-  }
-
-  semTake();
-
   //
   // Three iterators needed to iterate over the 'triple-map' metrics:
   //   serviceIter      to iterate over all services
   //   subServiceIter   to iterate over all sub-services of a service
   //   metricIter       to iterate over all metrics of a sub-service
   //
-  std::map<std::string, std::map<std::string, std::map<std::string, int>*>*>::iterator  serviceIter;
-  std::map<std::string, std::map<std::string, int>*>::iterator                          subServiceIter;
-  std::map<std::string, int>::iterator                                                  metricIter;
-  JsonHelper                                                                            top;
-  JsonHelper                                                                            services;
+  std::map<std::string, std::map<std::string, std::map<std::string, uint64_t>*>*>::iterator  serviceIter;
+  std::map<std::string, std::map<std::string, uint64_t>*>::iterator                          subServiceIter;
+  std::map<std::string, uint64_t>::iterator                                                  metricIter;
 
   for (serviceIter = metrics.begin(); serviceIter != metrics.end(); ++serviceIter)
   {
-    JsonHelper                                          subServiceTop;
-    JsonHelper                                          jhSubService;
-    std::string                                         service        = serviceIter->first;
-    std::map<std::string, std::map<std::string, int>*>* servMap        = serviceIter->second;
+    std::map<std::string, std::map<std::string, uint64_t>*>* servMap  = serviceIter->second;
 
     for (subServiceIter = servMap->begin(); subServiceIter != servMap->end(); ++subServiceIter)
     {
-      JsonHelper                  jhMetrics;
-      std::string                 subServ    = subServiceIter->first;
-      std::map<std::string, int>* metricMap  = subServiceIter->second;
+      std::map<std::string, uint64_t>* metricMap  = subServiceIter->second;
+
+      for (metricIter = metricMap->begin(); metricIter != metricMap->end(); ++metricIter)
+      {
+        metricIter->second = 0;
+      }
+    }
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* metricsRender - 
+*/
+static std::string metricsRender(std::map<std::string, uint64_t>* metricsMap)
+{
+  std::map<std::string, uint64_t>::iterator  it;
+  uint64_t                                   incomingTransactions = 0;
+  uint64_t                                   totalServiceTime     = 0;
+  JsonHelper                                 jh;
+
+  for (it = metricsMap->begin();  it != metricsMap->end(); ++it)
+  {
+    std::string      metric = it->first;
+    int64_t          value  = it->second;
+
+    if (metric == _METRIC_TOTAL_SERVICE_TIME)
+    {
+      totalServiceTime = value;
+    }
+    else if (metric == METRIC_TRANS_IN)
+    {
+      incomingTransactions = value;
+    }
+
+    if ((totalServiceTime != 0) && (incomingTransactions != 0))
+    {
+      float mValue = (float) totalServiceTime / (float) (incomingTransactions * 1000000);
+
+      jh.addFloat(METRIC_SERVICE_TIME, mValue);
+      totalServiceTime     = 0;
+      incomingTransactions = 0;
+    }
+
+    if (metric != _METRIC_TOTAL_SERVICE_TIME)
+    {
+      if (value != 0)
+      {
+        jh.addNumber(metric, value);
+      }
+    }
+  }
+
+  return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* MetricsManager::_toJson -
+*/
+std::string MetricsManager::_toJson(void)
+{
+  //
+  // Three iterators needed to iterate over the 'triple-map' metrics:
+  //   serviceIter      to iterate over all services
+  //   subServiceIter   to iterate over all sub-services of a service
+  //   metricIter       to iterate over all metrics of a sub-service
+  //
+  std::map<std::string, std::map<std::string, std::map<std::string, uint64_t>*>*>::iterator  serviceIter;
+  std::map<std::string, std::map<std::string, uint64_t>*>::iterator                          subServiceIter;
+  std::map<std::string, uint64_t>::iterator                                                  metricIter;
+  JsonHelper                                                                                 top;
+  JsonHelper                                                                                 services;
+  std::map<std::string, uint64_t>                                                            sum;
+  std::map<std::string, std::map<std::string, uint64_t> >                                    subServCrossTenant;
+
+  for (serviceIter = metrics.begin(); serviceIter != metrics.end(); ++serviceIter)
+  {
+    JsonHelper                                                subServiceTop;
+    JsonHelper                                                jhSubService;
+    std::string                                               service        = serviceIter->first;
+    std::map<std::string, std::map<std::string, uint64_t>*>*  servMap        = serviceIter->second;
+    std::map<std::string, uint64_t>                           serviceSum;
+
+    for (subServiceIter = servMap->begin(); subServiceIter != servMap->end(); ++subServiceIter)
+    {
+      JsonHelper                        jhMetrics;
+      std::string                       subService           = subServiceIter->first;
+      std::map<std::string, uint64_t>*  metricMap            = subServiceIter->second;
 
       for (metricIter = metricMap->begin(); metricIter != metricMap->end(); ++metricIter)
       {
         std::string  metric = metricIter->first;
-        int          value  = metricIter->second;
+        int64_t      value  = metricIter->second;
 
-        jhMetrics.addNumber(metric, value);
+        // Add to 'sum-maps'
+        if (value != 0)
+        {
+          serviceSum[metric] += value;
+          sum[metric]        += value;
+          subServCrossTenant[subService][metric] += value;
+        }
       }
 
-      jhSubService.addRaw(subServ, jhMetrics.str());
+      std::string subServiceString = metricsRender(metricMap);
+
+      if (subServiceString != "{}")
+      {
+        jhSubService.addRaw(subService, subServiceString);
+      }
     }
 
     subServiceTop.addRaw("subservs", jhSubService.str());
+
+    std::string serviceSumString = metricsRender(&serviceSum);
+
+    subServiceTop.addRaw("sum", serviceSumString);
     services.addRaw(service, subServiceTop.str());
   }
 
+  //
+  // Sum for grand total
+  //
+  JsonHelper   lastSum;
+  JsonHelper   jhSubServ;
+
+  std::map<std::string, std::map<std::string, uint64_t> >::iterator  it;
+  for (it = subServCrossTenant.begin();  it != subServCrossTenant.end(); ++it)
+  {
+    JsonHelper   jhSubServCross;
+    std::string  subService = it->first;
+    std::string  subServiceString;
+
+    subServiceString = metricsRender(&it->second);
+    jhSubServ.addRaw(subService, subServiceString);
+  }
+
+  lastSum.addRaw("subservs", jhSubServ.str());
+
+  std::string  sumString = metricsRender(&sum);
+  lastSum.addRaw("sum", sumString);
+
   top.addRaw("services", services.str());
-  semGive();
+  top.addRaw("sum", lastSum.str());
+
   return top.str();
 }
 
@@ -275,5 +384,94 @@ const char* MetricsManager::semStateGet(void)
     return "taken";
   }
 
-  return "free";  
+  return "free";
+}
+
+
+
+/* ****************************************************************************
+*
+* MetricsManager::release -
+*/
+void MetricsManager::release(void)
+{
+  if (on == false)
+  {
+    return;
+  }
+
+  semTake();
+
+  //
+  // Two iterators needed to iterate over metrics, clearing all maps:
+  //   serviceIter      to iterate over all services
+  //   subServiceIter   to iterate over all sub-services of a service
+  //
+  std::map<std::string, std::map<std::string, std::map<std::string, uint64_t>*>*>::iterator  serviceIter;
+  std::map<std::string, std::map<std::string, uint64_t>*>::iterator                          subServiceIter;
+
+  for (serviceIter = metrics.begin(); serviceIter != metrics.end(); ++serviceIter)
+  {
+    std::string                                              service  = serviceIter->first;
+    std::map<std::string, std::map<std::string, uint64_t>*>* servMap  = serviceIter->second;
+
+    for (subServiceIter = servMap->begin(); subServiceIter != servMap->end(); ++subServiceIter)
+    {
+      std::string                       subService = subServiceIter->first;
+      std::map<std::string, uint64_t>*  metricMap  = subServiceIter->second;
+
+      metricMap->clear();
+      delete metricMap;
+    }
+    servMap->clear();
+    delete servMap;
+  }
+  metrics.clear();
+
+  semGive();
+}
+
+
+
+/* ****************************************************************************
+*
+* MetricsManager::reset -
+*/
+void MetricsManager::reset(void)
+{
+  if (on == false)
+  {
+    return;
+  }
+
+  semTake();
+  _reset();
+  semGive();
+}
+
+
+
+/* ****************************************************************************
+*
+* MetricsManager::toJson -
+*/
+std::string MetricsManager::toJson(bool doReset)
+{
+  if (on == false)
+  {
+    return "";
+  }
+
+  semTake();
+
+  std::string  s = _toJson();
+
+  if (doReset)
+  {
+    _reset();
+  }
+
+  semGive();
+
+  return s;
 }

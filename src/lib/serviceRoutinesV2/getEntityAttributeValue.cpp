@@ -132,7 +132,7 @@ std::string getEntityAttributeValue
       }
       else
       {
-        if (attributeType == DATE_TYPE)
+        if ((attributeType == DATE_TYPE) || (attributeType == DATE_TYPE_ALT))
         {
           TIMED_RENDER(answer = isodate2str(attribute.pcontextAttribute->numberValue));
         }

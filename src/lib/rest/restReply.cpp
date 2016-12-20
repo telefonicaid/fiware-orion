@@ -28,6 +28,7 @@
 
 #include "common/MimeType.h"
 #include "ngsi/StatusCode.h"
+#include "metricsMgr/metricsMgr.h"
 
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 #include "ngsi9/RegisterContextResponse.h"
@@ -65,6 +66,7 @@ static int replyIx = 0;
 void restReply(ConnectionInfo* ciP, const std::string& _answer)
 {
   MHD_Response*  response;
+  uint64_t       answerLen = answer.length();
 
   std::string answer;
 #if 0
@@ -90,14 +92,20 @@ void restReply(ConnectionInfo* ciP, const std::string& _answer)
 #endif
 
   ++replyIx;
-  LM_T(LmtServiceOutPayload, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answer.length(), ciP->httpStatusCode));
+  LM_T(LmtServiceOutPayload, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answerLen, ciP->httpStatusCode));
   LM_T(LmtServiceOutPayload, ("Response payload: '%s'", answer.c_str()));
 
-  response = MHD_create_response_from_buffer(answer.length(), (void*) answer.c_str(), MHD_RESPMEM_MUST_COPY);
+  response = MHD_create_response_from_buffer(answerLen, (void*) answer.c_str(), MHD_RESPMEM_MUST_COPY);
   if (!response)
   {
+    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
     LM_E(("Runtime Error (MHD_create_response_from_buffer FAILED)"));
     return;
+  }
+
+  if (answerLen > 0)
+  {
+    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_RESP_SIZE, answerLen);
   }
 
   for (unsigned int hIx = 0; hIx < ciP->httpHeader.size(); ++hIx)

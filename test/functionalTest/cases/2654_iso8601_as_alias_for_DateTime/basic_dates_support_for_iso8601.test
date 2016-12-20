@@ -1,0 +1,248 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Basic dates support
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity with invalid date
+# 02. Check entity hasn't been created
+# 03. Create entity with right date
+# 04. Get entity
+# 05. Update entity with invalid date
+# 06. Check entity hasn't been modified
+# 07. Update entity with right date
+# 08. Get entity
+#
+
+echo "01. Create entity with invalid date"
+echo "==================================="
+payload='{
+  "id": "E1",
+  "type": "T1",
+  "birthdate": {
+    "value": "foo",
+    "type": "ISO8601"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Check entity hasn't been created"
+echo "===================================="
+orionCurl --url /v2/entities/E1
+echo
+echo
+
+
+echo "03. Create entity with right date"
+echo "================================="
+payload='{
+  "id": "E1",
+  "type": "T1",
+  "birthdate": {
+    "value": "2050-04-05T14:00:00.00Z",
+    "type": "ISO8601"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Get entity"
+echo "=============="
+orionCurl --url /v2/entities/E1
+echo
+echo
+
+
+echo "05. Update entity with invalid date"
+echo "==================================="
+payload='{
+  "birthdate": {
+    "value": "bar",
+    "type": "ISO8601"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "06. Check entity hasn't been modified"
+echo "====================================="
+orionCurl --url /v2/entities/E1
+echo
+echo
+
+
+echo "07. Update entity with right date"
+echo "================================="
+payload='{
+  "birthdate": {
+    "value": "2018-12-03T13:21:42.00Z",
+    "type": "ISO8601"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "08. Get entity"
+echo "=============="
+orionCurl --url /v2/entities/E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity with invalid date
+===================================
+HTTP/1.1 400 Bad Request
+Content-Length: 62
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "date has invalid format",
+    "error": "BadRequest"
+}
+
+
+02. Check entity hasn't been created
+====================================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+03. Create entity with right date
+=================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Get entity
+==============
+HTTP/1.1 200 OK
+Content-Length: 102
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "birthdate": {
+        "metadata": {},
+        "type": "ISO8601",
+        "value": "2050-04-05T14:00:00.00Z"
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+05. Update entity with invalid date
+===================================
+HTTP/1.1 400 Bad Request
+Content-Length: 62
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "date has invalid format",
+    "error": "BadRequest"
+}
+
+
+06. Check entity hasn't been modified
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 102
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "birthdate": {
+        "metadata": {},
+        "type": "ISO8601",
+        "value": "2050-04-05T14:00:00.00Z"
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+07. Update entity with right date
+=================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Get entity
+==============
+HTTP/1.1 200 OK
+Content-Length: 102
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "birthdate": {
+        "metadata": {},
+        "type": "ISO8601",
+        "value": "2018-12-03T13:21:42.00Z"
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

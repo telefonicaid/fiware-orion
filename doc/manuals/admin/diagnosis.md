@@ -71,9 +71,9 @@ The solutions for this problem are the following:
 
 -   Stop the broker, remove the log file and start the broker again
 -   Configure [log rotation](logs.md)
--   Reduce the log verbosity level, e.g. if you are using `-t 0-255` the
-    log will grow very fast so, in case of problems, please avoid using
-    unneeded trace levels.
+-   Reduce the log verbosity level, e.g. if you are using `-logLevel DEBUG -t 0-255` the
+    log will grow very fast so, in case of problems, please run the broker in ERROR or
+    WARN level or avoid using unneeded trace levels in DEBUG level.
 
 [Top](#top)
 
