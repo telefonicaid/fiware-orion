@@ -1,33 +1,231 @@
 ## Connections Stress Test
 
-Verify that ContextBroker works properly with a large number of stablished connections.
+The purpose of this test is to verify that ContextBroker works properly with a large number of
+established connections.
 
-#### Tests procedure:
-- drop the database in mongo
-- create 5000 subscriptions with subject.entities.idPattern: .*
-- verify/modify the notification listener with a delay of 10 minutes before answering (recomend to use `notif_listener_with_delay_in_response` script).
-- modify the ContextBroker config with: `"-httpTimeout 600000 -notificationMode threadpool:60000:5000"` and restart it.
-- launch an entity update, that it triggers all subscriptions.
-- launch indefinitely a "/version" request per second and:
-     - report that its response is correct.
-     - report the number of established connections (if `-noEstablished` param is used this column is ignored)
-     - report the queue size into ContextBroker (if `-noQueueSize` param is used this column is ignored)
+### Pre-requirements
 
-**Note**: the contextBroker should be started by command (`/usr/bin/contextBtoker ...`), either with -fg or without it, instead of service (service contextBroker start), because threads in all users are limited to 1024 in all users except in `root`. See https://bugzilla.redhat.com/show_bug.cgi?id=919793
-     
-#### Mehod of use:
-- firstly, launch established connections listener (rpyc_classic.py) in CB machine. 
-    - download from `https://pypi.python.org/pypi/rpyc`
-    - install the dependencies: `pip install rpyc psutil`. If you have problem with the `psutil` installation, use `yum install python-devel python-psutil` to install it on your CentOS system.
-    - unzip and execute `python bin/rpyc_classic.py`.
-- after, launch the notifications listener `./notif_listener_with_delay_in_response`.
-- ContextBroker configuration recommended:
+* Install Remote Python Call (RPyC) and psutil in CB host:
+
 ```
-    BROKER_EXTRA_OPS="-reqMutexPolicy none -writeConcern 0 -httpTimeout 600000 -notificationMode threadpool:60000:5000 -statTiming -statSemWait -statCounters -statNotifQueue -multiservice -subCacheIval 5"
-```   
-- finally, execute in local the `connections_stress_test.py` script.
-   
-#### Usage
+sudo yum install python-devel python-psutil
+sudo pip install rpyc psutil
+```
+
+* Build slow_listener (requires Go compiler):
+
+```
+go build slow_listener.go
+chmod a+x slow_listener
+```
+
+### Test procedure
+
+* Launch RPyC listener:
+
+```
+$ rpyc_classic.py
+INFO:SLAVE/18812:server started on [0.0.0.0]:18812
+```
+
+* Launch slow_listener (e.g. 5 minutes delay, printing stats each 5 seconds). By default it
+  listens on port 8090.
+
+```
+./slow_listener -delay 5m -stats 5s
+```
+
+* Check CB limits for max processes and open files. Note that the setting for the test make CB
+  create 5000 threads for the notification pool (plus other threads dynamically created to deal
+  with incomming connections) and the same number for file descriptors when creating connections.
+  Thus a higher value (e.g. 8000) is recommended. The procedure can be a bit tricky, so it
+  is described in [a specific section](#raising-system-limits-for-the-test).
+
+* Launch CB as service. Use the following configuration in `/etc/sysconfig/contextBroker`:
+
+```
+BROKER_EXTRA_OPS="-reqMutexPolicy none -writeConcern 0 -httpTimeout 600000 -notificationMode threadpool:60000:5000 -statTiming -statSemWait -statCounters -statNotifQueue -multiservice -subCacheIval 5"
+```
+
+* Launch CB (alternative way, in foreground)
+
+```
+contextBroker -reqMutexPolicy none -writeConcern 0 -httpTimeout 600000 -notificationMode threadpool:60000:5000 -statTiming -statSemWait -statCounters -statNotifQueue -multiservice -subCacheIval 5 -fg
+```
+
+* Launch `python connections_stress_tests.py`. The script does the following steps:
+  * Drop the database in mongo associated to the service
+  * Create 5000 subscriptions with subject.entities.idPattern: .*
+  * Launch a single update, which triggers a notification per subscriptions (i.e. 5000 notifications). At this
+    moment you will see the following trace in `slow_listener` output: `Received  0 Rate 0 r/s`
+  * Enter in an infinite loop, that launchs indefinitely a "/version" request per second and:
+     * Report that its response is correct.
+     * Report the number of established connections (if `-noEstablished` param is used this column is ignored),
+       both ESTABLISHED, CLOSE_WAIT and sum.
+     * Report the queue size into ContextBroker (if `-noQueueSize` param is used this column is ignored)
+
+### Expected behaviour
+
+The following sample output will be printed in connections_stress_tests.log file:
+
+```
+2016-12-19 17:01:45,191 | INFO | Test init: 2016-12-19T17:01:45.191521Z
+2016-12-19 17:01:50,447 | INFO |  Reports each second:
+2016-12-19 17:01:50,448 | INFO |  counter       version      queue   established   close wait    sum
+2016-12-19 17:01:50,448 | INFO |                request      size    connections   connections   connections
+2016-12-19 17:01:50,449 | INFO |  --------------------------------------------------------------------------------
+2016-12-19 17:01:52,679 | INFO |  -------- 1 -------- OK -------- 0 -------- 5010 ---------- 0 -------- 5010 ----------
+2016-12-19 17:01:55,417 | INFO |  -------- 2 -------- OK -------- 0 -------- 5010 ---------- 0 -------- 5010 ----------
+2016-12-19 17:01:58,218 | INFO |  -------- 3 -------- OK -------- 0 -------- 5010 ---------- 0 -------- 5010 ----------
+2016-12-19 17:02:00,978 | INFO |  -------- 4 -------- OK -------- 0 -------- 5010 ---------- 0 -------- 5010 ----------
+2016-12-19 17:02:03,503 | INFO |  -------- 5 -------- OK -------- 0 -------- 5010 ---------- 0 -------- 5010 ----------
+2016-12-19 17:02:06,133 | INFO |  -------- 6 -------- OK -------- 0 -------- 5010 ---------- 0 -------- 5010 ----------
+...
+(After around 5 minutes, i.e. the delay configuration for slow_listener has passed and its output now
+shows "Received  5000 Rate 0 r/s")
+...
+2016-12-19 17:07:13,115 | INFO |  -------- 159 -------- OK -------- 0 -------- 5010 ---------- 0 -------- 5010 ----------
+2016-12-19 17:07:15,078 | INFO |  -------- 160 -------- OK -------- 0 -------- 5010 ---------- 0 -------- 5010 ----------
+2016-12-19 17:07:17,491 | INFO |  -------- 161 -------- OK -------- 0 -------- 4643 ---------- 1670 -------- 6313 ----------
+2016-12-19 17:07:20,036 | INFO |  -------- 162 -------- OK -------- 0 -------- 1119 ---------- 4501 -------- 5620 ----------
+2016-12-19 17:07:22,057 | INFO |  -------- 163 -------- OK -------- 0 -------- 10 ---------- 5000 -------- 5010 ----------
+2016-12-19 17:07:23,966 | INFO |  -------- 164 -------- OK -------- 0 -------- 10 ---------- 5000 -------- 5010 ----------
+2016-12-19 17:07:25,779 | INFO |  -------- 165 -------- OK -------- 0 -------- 10 ---------- 5000 -------- 5010 ----------
+2016-12-19 17:07:27,828 | INFO |  -------- 166 -------- OK -------- 0 -------- 10 ---------- 5000 -------- 5010 ----------
+...
+```
+
+Note that 5010 corresponds to the 5000 outgoing notifications plus the 10 connections to DB (default
+`-dbPoolSize`). After the delay time, all the 5000 connections to slow_listener passes to CLOSE_WAIT
+status, while the 10 corresponding to DB pool keep in establish status.
+
+Similar findings are got with `netstat -nputan | grep contextBr`.
+
+In this status note that Orion is able to server new incomming connection. You can check it running
+in parallel several `telnet localhost 1026`. We will still getting OK in the version column in the
+script output. As we will see in the following section failing in doing this is one of the symptons
+of a failing situation.
+
+#### Fail pattern
+
+The following fail pattern has been identified with versions previous to the one including the
+fix which allows large number of established/close_wait connections (e.g. Orion 1.4.3).
+
+The testing procedure is the same but the `connections_stress_tests.py` script has to be run with
+`-noQueueSize` (the queue size is bated in `GET /statistics` and in this situation CB will be
+unable to serve that request, resulting in ConnectionError exceptions):
+
+```
+python connections_stress_tests.py -noQueueSize
+```
+
+It can be surprising check that the script output is the same than in the happy case. In particular,
+the version check keep OK. This can be explained looking to the CB file descriptors information.
+The typical situation is as follows, the 5000 outgoing connections have exahusted almost (but not all) of
+the fd with number below to 1024:
+
+```
+$ lsof -p <pid cb>
+...
+contextBr 46790 fermin    0u   CHR   136,2      0t0       5 /dev/pts/2
+contextBr 46790 fermin    1u   CHR   136,2      0t0       5 /dev/pts/2
+contextBr 46790 fermin    2u   CHR   136,2      0t0       5 /dev/pts/2
+contextBr 46790 fermin    3r   CHR     1,9      0t0    7609 /dev/urandom
+contextBr 46790 fermin    4u   REG     8,1      330  915381 /tmp/contextBroker.log
+contextBr 46790 fermin    5w   REG     8,1        5  919967 /tmp/contextBroker.pid
+contextBr 16243 fermin    6u  IPv4 1316606      0t0     TCP localhost:42664->localhost:27017 (ESTABLISHED)
+contextBr 16243 fermin    7u  IPv4 1316608      0t0     TCP localhost:42665->localhost:27017 (ESTABLISHED)
+contextBr 16243 fermin    8u  IPv4 1316610      0t0     TCP localhost:42666->localhost:27017 (ESTABLISHED)
+contextBr 16243 fermin    9u  IPv4 1316612      0t0     TCP localhost:42667->localhost:27017 (ESTABLISHED)
+contextBr 16243 fermin   10u  IPv4 1316614      0t0     TCP localhost:42668->localhost:27017 (ESTABLISHED)
+contextBr 16243 fermin   11u  IPv4 1316616      0t0     TCP localhost:42669->localhost:27017 (ESTABLISHED)
+contextBr 16243 fermin   12u  IPv4 1316618      0t0     TCP localhost:42670->localhost:27017 (ESTABLISHED)
+contextBr 16243 fermin   13u  IPv4 1316620      0t0     TCP localhost:42671->localhost:27017 (ESTABLISHED)
+contextBr 16243 fermin   14u  IPv4 1316622      0t0     TCP localhost:42672->localhost:27017 (ESTABLISHED)
+contextBr 16243 fermin   15u  IPv4 1316624      0t0     TCP localhost:42673->localhost:27017 (ESTABLISHED)
+contextBr 16243 fermin   16u  IPv4 1316626      0t0     TCP *:1026 (LISTEN)
+contextBr 16243 fermin   17u  IPv6 1316631      0t0     TCP *:1026 (LISTEN)
+contextBr 16243 fermin   19u  IPv6 1372321      0t0     TCP localhost:39807->localhost:8090 (CLOSE_WAIT)
+contextBr 16243 fermin   20u  IPv6 1372322      0t0     TCP localhost:39808->localhost:8090 (CLOSE_WAIT)
+contextBr 16243 fermin   21u  IPv6 1372357      0t0     TCP localhost:39819->localhost:8090 (CLOSE_WAIT)
+...
+contextBr 16243 fermin 5015u  IPv6 1401317      0t0     TCP localhost:44810->localhost:8090 (CLOSE_WAIT)
+contextBr 16243 fermin 5016u  IPv6 1401320      0t0     TCP localhost:44811->localhost:8090 (CLOSE_WAIT)
+contextBr 16243 fermin 5017u  IPv6 1400253      0t0     TCP localhost:44812->localhost:8090 (CLOSE_WAIT)
+contextBr 16243 fermin 5018u  IPv6 1401325      0t0     TCP localhost:44813->localhost:8090 (CLOSE_WAIT)
+```
+
+Note the number of the file descriptor just after the last one used by the listening server is free
+(i.e. 18 in this case). This is probably due to this number was the one given to the update request
+thas triggered the 5000 notifications, so after closing that incoming connection, the number gets free again.
+
+Thus, you can "take" the last free fd (e.g. `telnet localhost 1026`, then hold the terminal), check it
+with `lsof -p <pid cb>`, then version column will start to show NOK, as shows below:
+
+```
+2016-12-20 10:24:17,042 | INFO | Test init: 2016-12-20T10:24:17.042571Z
+2016-12-20 10:24:18,517 | INFO |  Reports each second:
+2016-12-20 10:24:18,517 | INFO |  counter       version      queue   established   close wait    sum
+2016-12-20 10:24:18,517 | INFO |                request      size    connections   connections   connections
+2016-12-20 10:24:18,517 | INFO |  --------------------------------------------------------------------------------
+2016-12-20 10:24:21,685 | INFO |  -------- 1 -------- OK -------- N/A -------- 5010 ---------- 0 -------- 5010 ----------
+2016-12-20 10:24:26,019 | INFO |  -------- 2 -------- OK -------- N/A -------- 5010 ---------- 0 -------- 5010 ----------
+2016-12-20 10:24:30,021 | INFO |  -------- 3 -------- OK -------- N/A -------- 5011 ---------- 0 -------- 5011 ----------
+2016-12-20 10:24:34,032 | INFO |  -------- 4 -------- NOK -------- N/A -------- 5011 ---------- 0 -------- 5011 ----------
+2016-12-20 10:24:38,072 | INFO |  -------- 5 -------- NOK -------- N/A -------- 5011 ---------- 0 -------- 5011 ----------
+2016-12-20 10:24:42,263 | INFO |  -------- 6 -------- NOK -------- N/A -------- 5011 ---------- 0 -------- 5011 ----------
+2016-12-20 10:24:46,387 | INFO |  -------- 7 -------- NOK -------- N/A -------- 5011 ---------- 0 -------- 5011 ----------
+2016-12-20 10:24:50,570 | INFO |  -------- 8 -------- NOK -------- N/A -------- 5011 ---------- 0 -------- 5011 ----------
+2016-12-20 10:24:54,397 | INFO |  -------- 9 -------- NOK -------- N/A -------- 5011 ---------- 0 -------- 5011 ----------
+...
+(Do "telent localhost 1026" in a terminal)
+...
+2016-12-20 10:24:58,460 | INFO |  -------- 10 -------- NOK -------- N/A -------- 5011 ---------- 0 -------- 5011 ----------
+2016-12-20 10:25:02,325 | INFO |  -------- 11 -------- NOK -------- N/A -------- 5011 ---------- 0 -------- 5011 ----------
+2016-12-20 10:25:06,028 | INFO |  -------- 12 -------- NOK -------- N/A -------- 5011 ---------- 0 -------- 5011 ----------
+2016-12-20 10:25:09,546 | INFO |  -------- 13 -------- NOK -------- N/A -------- 5011 ---------- 0 -------- 5011 ----------
+2016-12-20 10:25:13,220 | INFO |  -------- 14 -------- NOK -------- N/A -------- 5011 ---------- 0 -------- 5011 ----------
+2016-12-20 10:25:16,861 | INFO |  -------- 15 -------- NOK -------- N/A -------- 5010 ---------- 0 -------- 5010 ----------
+...
+(Close the "telent localhost 1026" session, releasing its connection)
+...
+2016-12-20 10:25:20,339 | INFO |  -------- 16 -------- OK -------- N/A -------- 5010 ---------- 0 -------- 5010 ----------
+2016-12-20 10:25:23,676 | INFO |  -------- 17 -------- OK -------- N/A -------- 5010 ---------- 0 -------- 5010 ----------
+2016-12-20 10:25:27,150 | INFO |  -------- 18 -------- OK -------- N/A -------- 5010 ---------- 0 -------- 5010 ----------
+```
+
+### Raising system limits for the test
+
+In the case of running CB as foreground process:
+
+* If you are not using CentOS 6.x, probably just using `ulimit -u <new limit>` and `ulimit -n <new limit>`
+  to change respectively the max number of processed and the max number of open files will work.
+* If you are using CentOS 6.x edit the following file (as root): `/etc/security/limits.d/90-nproc.conf`
+  as shown below, then re-login (more detail in [this reference](https://bugzilla.redhat.com/show_bug.cgi?id=919793)):
+
+```
+*          soft    nproc     10240
+*          soft    nofile    10240
+*          hard    nproc     10240
+*          hard    nofile    10240
+```
+
+In the case of running CB as service in CentOS:
+
+* The contextBroker process is run by `orion` user with default configuration. The above configuration
+  in /etc/security/limits.d/90-nproc.conf should suffice but anyway it is advisable to check the limits
+  with `cat /proc/<pid>/limits` once the service has been started.
+* You have to run RPyC as `orion` user. Otherwise the connection inspection done by connections_stress_tests.py
+  will fail (rpyc_classic.py is the actual process that looks for CB process connections so it has to be run by the
+  same user that runs CB in order to have enough privilege level).
+
+```
+$ sudo su orion -c rpyc_classic.py
+INFO:SLAVE/18812:server started on [0.0.0.0]:18812
+```
+
+### Detailed `connections_stress_tests.py` usage
+
        Parameters:                                                                                                  
           -host=<host>         : CB host (OPTIONAL) (default: localhost).                                           
           -u                   : show this usage (OPTIONAL).                                                        
@@ -47,9 +245,14 @@ Verify that ContextBroker works properly with a large number of stablished conne
          - the version delay is a second                                                                            
          - the number of subscriptions is 5000     
 
-#### notif_listener_with_delay_in_response script
-It is a server to receive all notifications sent from CB, the port used is `8090` and any path is allowed. 
-The delay is the 10 minutes.
+### Detailed `slow_listener` usage
 
-#### Logging
-All the information is logged in `connections_stress_tests.log` in the same path.
+```
+$./slow_listener --help
+Usage of ./slow_listener:
+  -close=false: do not send Connection:close in response
+  -delay=0: delay in write response
+  -port="8090": port to listen to (8090 by default)
+  -stats=5s: interval for writing stats
+  -timeout=30s: timeout
+```
