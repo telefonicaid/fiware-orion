@@ -129,6 +129,8 @@ class MetricsManager
 
   void            semTake(void);
   void            semGive(void);
+  void            _reset(void);
+  std::string     _toJson(void);
 
  public:
   MetricsManager();
@@ -136,7 +138,7 @@ class MetricsManager
   bool         init(bool _on, bool _semWaitStatistics);
   void         add(const std::string& srv, const std::string& subServ, const std::string& metric, uint64_t value);
   void         reset(void);
-  std::string  toJson(void);
+  std::string  toJson(bool doReset);
   bool         isOn(void);
   int64_t      semWaitTimeGet(void);
   const char*  semStateGet(void);
