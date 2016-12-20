@@ -137,7 +137,7 @@ high load scenarios. In particular, according to [MHD feedback](http://lists.gnu
 the pool should be sized with a value equal or close to number of available CPU cores. If you set `-reqPoolSize` to a value higher than
 number of CPU cores then you'll most probably experience performance decrease.
 
-The other two parameters (`-maxConnections` and `-connectionMemory`) usually work well with their default values.
+The other three parameters (`-reqTimeout`, `-maxConnections` and `-connectionMemory`) usually work well with their default values.
 
 ![](requests_queue.png "requests_queue.png")
 
