@@ -63,13 +63,8 @@ std::string getMetrics
     return oe.toJson();
   }
 
-  std::string  reset   = ciP->uriParam["reset"];
-  std::string  payload = metricsMgr.toJson();
-
-  if (reset == "true")
-  {
-    metricsMgr.reset();
-  }
+  bool         doReset  = (ciP->uriParam["reset"] == "true")? true : false;
+  std::string  payload  = metricsMgr.toJson(doReset);
 
   return payload;
 }

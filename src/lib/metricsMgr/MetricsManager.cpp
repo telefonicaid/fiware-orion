@@ -181,17 +181,10 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
 
 /* ****************************************************************************
 *
-* MetricsManager::reset -
+* MetricsManager::_reset -
 */
-void MetricsManager::reset(void)
+void MetricsManager::_reset(void)
 {
-  if (on == false)
-  {
-    return;
-  }
-
-  semTake();
-
   //
   // Three iterators needed to iterate over the 'triple-map' metrics:
   //   serviceIter      to iterate over all services
@@ -216,8 +209,6 @@ void MetricsManager::reset(void)
       }
     }
   }
-
-  semGive();
 }
 
 
@@ -272,17 +263,10 @@ static std::string metricsRender(std::map<std::string, uint64_t>* metricsMap)
 
 /* ****************************************************************************
 *
-* MetricsManager::toJson -
+* MetricsManager::_toJson -
 */
-std::string MetricsManager::toJson(void)
+std::string MetricsManager::_toJson(void)
 {
-  if (on == false)
-  {
-    return "";
-  }
-
-  semTake();
-
   //
   // Three iterators needed to iterate over the 'triple-map' metrics:
   //   serviceIter      to iterate over all services
@@ -366,8 +350,6 @@ std::string MetricsManager::toJson(void)
   top.addRaw("services", services.str());
   top.addRaw("sum", lastSum.str());
 
-  semGive();
-
   return top.str();
 }
 
@@ -447,4 +429,49 @@ void MetricsManager::release(void)
   metrics.clear();
 
   semGive();
+}
+
+
+
+/* ****************************************************************************
+*
+* MetricsManager::reset -
+*/
+void MetricsManager::reset(void)
+{
+  if (on == false)
+  {
+    return;
+  }
+
+  semTake();
+  _reset();
+  semGive();
+}
+
+
+
+/* ****************************************************************************
+*
+* MetricsManager::toJson -
+*/
+std::string MetricsManager::toJson(bool doReset)
+{
+  if (on == false)
+  {
+    return "";
+  }
+
+  semTake();
+
+  std::string  s = _toJson();
+
+  if (doReset)
+  {
+    _reset();
+  }
+
+  semGive();
+
+  return s;
 }
