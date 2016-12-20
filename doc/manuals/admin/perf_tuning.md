@@ -129,12 +129,15 @@ following CLI parameters (see details in the corresponding document):
   thread pool is used (`poll()`). Some performance information regarding this can be found in [the documentation of the
   HTTP server library itself](https://www.gnu.org/software/libmicrohttpd/manual/libmicrohttpd.html#Thread-modes-and-event-loops).
 
+* **reqTimeout**. The inactivity timeout in seconds before a connection is closed. Default value is 10 seconds.
+  To disable this timeout and have the broker wait forever, use a value of 0 for this CLI parameter.
+
 Given that thread creation and destruction are costly operations, it is recommend to use `-reqPoolSize` in
 high load scenarios. In particular, according to [MHD feedback](http://lists.gnu.org/archive/html/libmicrohttpd/2016-12/msg00023.html),
 the pool should be sized with a value equal or close to number of available CPU cores. If you set `-reqPoolSize` to a value higher than
 number of CPU cores then you'll most probably experience performance decrease.
 
-The other two parameters (`-maxConnections` and `-connectionMemory`) usually work well with their default values.
+The other three parameters (`-reqTimeout`, `-maxConnections` and `-connectionMemory`) usually work well with their default values.
 
 ![](requests_queue.png "requests_queue.png")
 
