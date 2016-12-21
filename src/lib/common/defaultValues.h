@@ -28,8 +28,9 @@
 
 
 
-#define  DEFAULT_SERVICE_PATH_UPDATES  "/"
-#define  DEFAULT_SERVICE_PATH_QUERIES  "/#"
-
+#define  DEFAULT_SERVICE_PATH_UPDATES         "/"
+#define  DEFAULT_SERVICE_PATH_QUERIES         "/#"
+#define  DEFAULT_SERVICE_KEY_FOR_METRICS      "default-service"
+#define  DEFAULT_SUB_SERVICE_KEY_FOR_METRICS  "root-subserv"
 
 #endif  // SRC_LIB_COMMON_DEFAULTVALUES_H_

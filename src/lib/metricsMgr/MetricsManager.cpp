@@ -33,6 +33,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/JsonHelper.h"
+#include "common/defaultValues.h"
 #include "rest/rest.h"
 #include "rest/RestService.h"
 #include "metricsMgr/MetricsManager.h"
@@ -329,7 +330,14 @@ std::string MetricsManager::_toJson(void)
 
       if (subServiceString != "{}")
       {
-        jhSubService.addRaw(subService, subServiceString);
+        if (subService != "")
+        {
+          jhSubService.addRaw(subService, subServiceString);
+        }
+        else
+        {
+          jhSubService.addRaw(DEFAULT_SUB_SERVICE_KEY_FOR_METRICS, subServiceString);
+        }
       }
     }
 
@@ -338,7 +346,15 @@ std::string MetricsManager::_toJson(void)
     std::string serviceSumString = metricsRender(&serviceSum);
 
     subServiceTop.addRaw("sum", serviceSumString);
-    services.addRaw(service, subServiceTop.str());
+
+    if (service != "")
+    {
+      services.addRaw(service, subServiceTop.str());
+    }
+    else
+    {
+      services.addRaw(DEFAULT_SERVICE_KEY_FOR_METRICS, subServiceTop.str());
+    }
   }
 
   //
@@ -355,7 +371,15 @@ std::string MetricsManager::_toJson(void)
     std::string  subServiceString;
 
     subServiceString = metricsRender(&it->second);
-    jhSubServ.addRaw(subService, subServiceString);
+
+    if (subService != "")
+    {
+      jhSubServ.addRaw(subService, subServiceString);
+    }
+    else
+    {
+      jhSubServ.addRaw(DEFAULT_SUB_SERVICE_KEY_FOR_METRICS, subServiceString);
+    }
   }
 
   lastSum.addRaw("subservs", jhSubServ.str());
