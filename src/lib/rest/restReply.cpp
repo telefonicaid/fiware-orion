@@ -66,7 +66,6 @@ static int replyIx = 0;
 void restReply(ConnectionInfo* ciP, const std::string& _answer)
 {
   MHD_Response*  response;
-  uint64_t       answerLen = answer.length();
 
   std::string answer;
 #if 0
@@ -90,6 +89,8 @@ void restReply(ConnectionInfo* ciP, const std::string& _answer)
 #else
   answer = _answer;
 #endif
+
+  uint64_t  answerLen = answer.length();
 
   ++replyIx;
   LM_T(LmtServiceOutPayload, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answerLen, ciP->httpStatusCode));
