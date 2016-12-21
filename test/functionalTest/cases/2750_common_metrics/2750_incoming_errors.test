@@ -90,12 +90,13 @@ brokerStart CB
 # 05. Send a request with an Invalid Service Path
 # 06. Send a request with an Invalid Content-Type
 # 07. Send a request with invalid value for URI param /options/
-# 08. Send a request with Content-Length > PAYLOAD_MAX_SIZE
+# 08. Send a request with a component-name too long in ServicePath
 # 09. Send a request with no acceptable mime-type in accept header
 # 10. Send a request with an invalid character in a URI parameter
 # 11. Send a request with too many components in ServicePath
 # 12. Send a PUT /v2/entities/<id>/attrs/<attrName>/value for an non-existing entity E_NOPE
-# 13. Ask for metrics and see 10 errors
+# 13. Send a request with an Invalid Tenant
+# 14. Ask for metrics and see 7 errors (as Service Path and Tenant errors are ignored in metrics)
 #
 
 
@@ -202,8 +203,14 @@ echo
 echo
 
 
-echo "13. Ask for metrics and see 10 errors"
-echo "====================================="
+echo "13. Send a request with an Invalid Tenant"
+echo "========================================="
+orionCurl --url /v2/entities --tenant 'a.b'
+echo
+echo
+
+echo "14. Ask for metrics and see 7 errors (as Service Path and Tenant errors are ignored in metrics)"
+echo "==============================================================================================="
 orionCurl --url /admin/metrics --servicePath /SP/get/metrics
 echo
 echo
@@ -476,10 +483,24 @@ Date: REGEX(.*)
 }
 
 
-13. Ask for metrics and see 10 errors
-=====================================
+13. Send a request with an Invalid Tenant
+=========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 125
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "bad character in tenant name - only underscore and alphanumeric characters are allowed",
+    "error": "BadRequest"
+}
+
+
+14. Ask for metrics and see 7 errors (as Service Path and Tenant errors are ignored in metrics)
+===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 2323
+Content-Length: 1397
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -491,18 +512,6 @@ Date: REGEX(.*)
                 "": {
                     "incomingTransactionErrors": 1,
                     "incomingTransactionResponseSize": 73,
-                    "incomingTransactions": 1,
-                    "serviceTime": REGEX(.*)
-                },
-                "SP/L1/L2/L3/L4/L5/L6/L7/L8/L9/L10": {
-                    "incomingTransactionErrors": 1,
-                    "incomingTransactionResponseSize": 73,
-                    "incomingTransactions": 1,
-                    "serviceTime": REGEX(.*)
-                },
-                "SP/b12345678901234567890123456789012345678901234567890/c": {
-                    "incomingTransactionErrors": 1,
-                    "incomingTransactionResponseSize": 77,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 },
@@ -522,19 +531,13 @@ Date: REGEX(.*)
                     "incomingTransactionResponseSize": 1602,
                     "incomingTransactions": 2,
                     "serviceTime": REGEX(.*)
-                },
-                "SPX": {
-                    "incomingTransactionErrors": 1,
-                    "incomingTransactionResponseSize": 111,
-                    "incomingTransactions": 1,
-                    "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
-                "incomingTransactionErrors": 10,
+                "incomingTransactionErrors": 7,
                 "incomingTransactionRequestSize": 39,
-                "incomingTransactionResponseSize": 2557,
-                "incomingTransactions": 13,
+                "incomingTransactionResponseSize": 2296,
+                "incomingTransactions": 10,
                 "serviceTime": REGEX(.*)
             }
         }
@@ -544,18 +547,6 @@ Date: REGEX(.*)
             "": {
                 "incomingTransactionErrors": 1,
                 "incomingTransactionResponseSize": 73,
-                "incomingTransactions": 1,
-                "serviceTime": REGEX(.*)
-            },
-            "SP/L1/L2/L3/L4/L5/L6/L7/L8/L9/L10": {
-                "incomingTransactionErrors": 1,
-                "incomingTransactionResponseSize": 73,
-                "incomingTransactions": 1,
-                "serviceTime": REGEX(.*)
-            },
-            "SP/b12345678901234567890123456789012345678901234567890/c": {
-                "incomingTransactionErrors": 1,
-                "incomingTransactionResponseSize": 77,
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
             },
@@ -575,19 +566,13 @@ Date: REGEX(.*)
                 "incomingTransactionResponseSize": 1602,
                 "incomingTransactions": 2,
                 "serviceTime": REGEX(.*)
-            },
-            "SPX": {
-                "incomingTransactionErrors": 1,
-                "incomingTransactionResponseSize": 111,
-                "incomingTransactions": 1,
-                "serviceTime": REGEX(.*)
             }
         },
         "sum": {
-            "incomingTransactionErrors": 10,
+            "incomingTransactionErrors": 7,
             "incomingTransactionRequestSize": 39,
-            "incomingTransactionResponseSize": 2557,
-            "incomingTransactions": 13,
+            "incomingTransactionResponseSize": 2296,
+            "incomingTransactions": 10,
             "serviceTime": REGEX(.*)
         }
     }

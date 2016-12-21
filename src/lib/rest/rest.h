@@ -105,4 +105,12 @@ extern void restInit
    RestServeFunction   _serveFunction     = NULL
 );
 
+
+
+/* ****************************************************************************
+*
+* servicePathCheck - 
+*/
+extern int servicePathCheck(ConnectionInfo* ciP, const char* servicePath);
+
 #endif

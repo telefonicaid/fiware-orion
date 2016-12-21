@@ -33,6 +33,8 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/JsonHelper.h"
+#include "rest/rest.h"
+#include "rest/RestService.h"
 #include "metricsMgr/MetricsManager.h"
 
 
@@ -127,6 +129,20 @@ int64_t MetricsManager::semWaitTimeGet(void)
 void MetricsManager::add(const std::string& srv, const std::string& subServ, const std::string& metric, uint64_t value)
 {
   if (on == false)
+  {
+    return;
+  }
+
+  // FIXME P4: See github issue #2781
+  if (tenantCheck(srv) != "OK")
+  {
+    return;
+  }
+
+  // FIXME P4: See github issue #2781
+  ConnectionInfo ci;
+  ci.httpHeaders.servicePathReceived = true;
+  if (servicePathCheck(&ci, subServ.c_str()) != 0)
   {
     return;
   }

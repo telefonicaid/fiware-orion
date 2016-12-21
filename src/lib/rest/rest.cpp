@@ -673,8 +673,6 @@ static void requestCompleted
 * to make sure there is only ONE service path and that there is no '#' present.
 *
 * FIXME P5: updates should also call the other servicePathCheck (in common lib)
-*
-* [ Not static just to let unit tests call this function ]
 */
 int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 {
