@@ -35,9 +35,9 @@ INFO:SLAVE/18812:server started on [0.0.0.0]:18812
 ./slow_listener -delay 5m -stats 5s
 ```
 
-* Check CB limits for max processes and open files. Note that the setting for the test make CB
+* Check CB limits for max processes and open files. Note that the setting for the test makes the CB
   create 5000 threads for the notification pool (plus other threads dynamically created to deal
-  with incomming connections) and the same number for file descriptors when creating connections.
+  with incoming connections) and the same number for file descriptors when creating connections.
   Thus a higher value (e.g. 8000) is recommended. The procedure can be a bit tricky, so it
   is described in [a specific section](#raising-system-limits-for-the-test).
 
@@ -54,15 +54,15 @@ contextBroker -reqMutexPolicy none -writeConcern 0 -httpTimeout 600000 -notifica
 ```
 
 * Launch `python connections_stress_tests.py`. The script does the following steps:
-  * Drop the database in mongo associated to the service
-  * Create 5000 subscriptions with subject.entities.idPattern: .*
-  * Launch a single update, which triggers a notification per subscriptions (i.e. 5000 notifications). At this
+  * Drops the database in mongo associated with the service
+  * Creates 5000 subscriptions with subject.entities.idPattern: .*
+  * Launches a single update, which triggers a notification per subscriptions (i.e. 5000 notifications). At this
     moment you will see the following trace in `slow_listener` output: `Received  0 Rate 0 r/s`
-  * Enter in an infinite loop, that launchs indefinitely a "/version" request per second and:
-     * Report that its response is correct.
-     * Report the number of established connections (if `-noEstablished` param is used this column is ignored),
+  * Enters an infinite loop, that launches indefinitely a "GET /version" request per second and:
+     * Reports that its response is correct.
+     * Reports the number of established connections (if `-noEstablished` param is used this column is ignored),
        both ESTABLISHED, CLOSE_WAIT and sum.
-     * Report the queue size into ContextBroker (if `-noQueueSize` param is used this column is ignored)
+     * Reports the queue size into ContextBroker (if `-noQueueSize` param is used this column is ignored)
 
 ### Expected behaviour
 
@@ -81,7 +81,7 @@ The following sample output will be printed in connections_stress_tests.log file
 2016-12-19 17:02:03,503 | INFO |  -------- 5 -------- OK -------- 0 -------- 5010 ---------- 0 -------- 5010 ----------
 2016-12-19 17:02:06,133 | INFO |  -------- 6 -------- OK -------- 0 -------- 5010 ---------- 0 -------- 5010 ----------
 ...
-(After around 5 minutes, i.e. the delay configuration for slow_listener has passed and its output now
+(After around 5 minutes, i.e., the delay configuration for slow_listener has passed and its output now
 shows "Received  5000 Rate 0 r/s")
 ...
 2016-12-19 17:07:13,115 | INFO |  -------- 159 -------- OK -------- 0 -------- 5010 ---------- 0 -------- 5010 ----------
@@ -96,33 +96,33 @@ shows "Received  5000 Rate 0 r/s")
 ```
 
 Note that 5010 corresponds to the 5000 outgoing notifications plus the 10 connections to DB (default
-`-dbPoolSize`). After the delay time, all the 5000 connections to slow_listener passes to CLOSE_WAIT
-status, while the 10 corresponding to DB pool keep in establish status.
+`-dbPoolSize`). After the delay, all the 5000 connections to slow_listener pass to CLOSE_WAIT
+status, while the 10 connections corresponding to the DB pool stay in established status.
 
-Similar findings are got with `netstat -nputan | grep contextBr`.
+Similar findings are obtained with `netstat -nputan | grep contextBr`.
 
-In this status note that Orion is able to server new incomming connection. You can check it running
-in parallel several `telnet localhost 1026`. We will still getting OK in the version column in the
-script output. As we will see in the following section failing in doing this is one of the symptons
+In this state, note that Orion is able to serve new incoming connections. You can check this running
+(in parallel) several `telnet localhost 1026`. We will still get OK in the version column in the
+script output. As we will see in the following section, failure in doing this is one of the symptoms
 of a failing situation.
 
-#### Fail pattern
+#### Failure pattern
 
-The following fail pattern has been identified with versions previous to the one including the
-fix which allows large number of established/close_wait connections (e.g. Orion 1.4.3).
+The following failure pattern has been identified with versions previous to the one that includes the
+fix allowing large number of established/close_wait connections (e.g. Orion 1.4.3).
 
 The testing procedure is the same but the `connections_stress_tests.py` script has to be run with
-`-noQueueSize` (the queue size is bated in `GET /statistics` and in this situation CB will be
+`-noQueueSize` (the queue size is based on `GET /statistics` and in this situation, the CB is
 unable to serve that request, resulting in ConnectionError exceptions):
 
 ```
 python connections_stress_tests.py -noQueueSize
 ```
 
-It can be surprising check that the script output is the same than in the happy case. In particular,
-the version check keep OK. This can be explained looking to the CB file descriptors information.
-The typical situation is as follows, the 5000 outgoing connections have exahusted almost (but not all) of
-the fd with number below to 1024:
+It may be a surprise to see that the script output is the same as in the working scenario. In particular,
+the version check keeps showing OK. This can be explained looking at the CB file descriptor information.
+The typical situation is as follows, the 5000 outgoing connections have exhausted almost (but not all) of
+the fds with numbers below 1024:
 
 ```
 $ lsof -p <pid cb>
@@ -156,8 +156,8 @@ contextBr 16243 fermin 5018u  IPv6 1401325      0t0     TCP localhost:44813->loc
 ```
 
 Note the number of the file descriptor just after the last one used by the listening server is free
-(i.e. 18 in this case). This is probably due to this number was the one given to the update request
-thas triggered the 5000 notifications, so after closing that incoming connection, the number gets free again.
+(i.e. 18 in this case). This is probably due to this fd was the one given to the update request
+thas triggered the 5000 notifications, so after closing that incoming connection, the fd is available again.
 
 Thus, you can "take" the last free fd (e.g. `telnet localhost 1026`, then hold the terminal), check it
 with `lsof -p <pid cb>`, then version column will start to show NOK, as shows below:
@@ -199,8 +199,8 @@ with `lsof -p <pid cb>`, then version column will start to show NOK, as shows be
 In the case of running CB as foreground process:
 
 * If you are not using CentOS 6.x, probably just using `ulimit -u <new limit>` and `ulimit -n <new limit>`
-  to change respectively the max number of processed and the max number of open files will work.
-* If you are using CentOS 6.x edit the following file (as root): `/etc/security/limits.d/90-nproc.conf`
+  to change respectively the max number of processes and the max number of open file descriptors will work.
+* If you are using CentOS 6.x, edit the following file (as root): `/etc/security/limits.d/90-nproc.conf`
   as shown below, then re-login (more detail in [this reference](https://bugzilla.redhat.com/show_bug.cgi?id=919793)):
 
 ```
@@ -210,12 +210,12 @@ In the case of running CB as foreground process:
 *          hard    nofile    10240
 ```
 
-In the case of running CB as service in CentOS:
+In the case of running CB as a service in CentOS:
 
-* The contextBroker process is run by `orion` user with default configuration. The above configuration
+* The contextBroker process is run by the `orion` user with default configuration. The above configuration
   in /etc/security/limits.d/90-nproc.conf should suffice but anyway it is advisable to check the limits
   with `cat /proc/<pid>/limits` once the service has been started.
-* You have to run RPyC as `orion` user. Otherwise the connection inspection done by connections_stress_tests.py
+* You have to run RPyC as `orion` user. Otherwise, the connection inspection done by connections_stress_tests.py
   will fail (rpyc_classic.py is the actual process that looks for CB process connections so it has to be run by the
   same user that runs CB in order to have enough privilege level).
 
