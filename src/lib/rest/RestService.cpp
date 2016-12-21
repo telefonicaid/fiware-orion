@@ -149,7 +149,7 @@ std::string payloadParse
 *
 * tenantCheck - 
 */
-std::string tenantCheck(const std::string& tenant)
+extern std::string tenantCheck(const std::string& tenant)
 {
   char*        name    = (char*) tenant.c_str();
 

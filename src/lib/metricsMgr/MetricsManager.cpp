@@ -152,11 +152,36 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
   // Exclude the first '/' from the Sub Service
   // But, only if it starts with a '/'
   //
-  const char* subService = subServ.c_str();
+  // Also, if service path ends in '/#', cancel out that part
+  //
+  // Note that for the 'cancel out' part we need to allocate a copy of
+  // the service path (and frre it after usage).
+  //
+  char* subService;
 
-  if (subService[0] == '/')
+  if (subServ.c_str()[0] == '/')
   {
-    subService = &subService[1];
+    subService = strdup(&subServ.c_str()[1]);
+  }
+  else
+  {
+    subService = strdup(subServ.c_str());
+  }
+
+  //
+  // Now, if service path ends in '/#', cancel out that part
+  //
+  int subServiceLen = strlen(subService);
+
+  if ((subServiceLen >= 2) && (subService[subServiceLen - 1] == '#') && (subService[subServiceLen - 2] == '/'))
+  {
+    subService[subServiceLen - 2] = 0;
+  }
+
+  // Need to cover the '/#' case as well (only '#' left as the first '/' has been skipped already)
+  if ((subService[0] == '#') && (subService[1] == 0))
+  {
+    subService[0] = 0;
   }
 
   semTake();
@@ -192,6 +217,8 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
   metrics[srv]->at(subService)->at(metric) += value;
 
   semGive();
+
+  free(subService);
 }
 
 

@@ -567,6 +567,7 @@ static void serve(ConnectionInfo* ciP)
 }
 
 
+
 /* ****************************************************************************
 *
 * requestCompleted -
@@ -832,6 +833,14 @@ int servicePathSplit(ConnectionInfo* ciP)
     //
     LM_I(("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
   }
+
+  //
+  // stringSplit destroys ciP->servicePath.
+  //
+  // After splitting ciP->servicePath to ciP->servicePathV, we need
+  // to make ciP->servicePath point to ciP->servicePathV[0] for metrics
+  //
+  ciP->httpHeaders.servicePath = ciP->servicePathV[0];
 
   for (int ix = 0; ix < servicePaths; ++ix)
   {
