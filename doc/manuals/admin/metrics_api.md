@@ -27,12 +27,12 @@ GET /admin/metrics
 ```
 
 The response payload is a multi-level JSON tree storing the information in an structured way. It is
-based in the [service](../user/multitenancy.md) and [subservice](../user/service_path.md) (sometimes
-refered as "service path"). At any point of the tree the value of a key could be `{}` to mean that
+based on the [service](../user/multitenancy.md) and [subservice](../user/service_path.md) (sometimes
+refered to as "service path"). At any point of the tree, the value of a key could be `{}` to mean that
 there isn't actual information associated to that key.
 
-At the first level, there are two keys: **services** and **sum**. In sequence, **services** value is
-an object which keys are service names and which values are objects with information for the corresponding
+At the first level there are two keys: **services** and **sum**. In sequence, **services** value is
+an object whose keys are service names and whose values are objects with information about the corresponding
 service. The **sum** value is an object with information for the aggregated information for all services.
 
 ```
@@ -48,7 +48,7 @@ service. The **sum** value is an object with information for the aggregated info
 ```
 
 Regarding service information objects, they use two keys: **subservs** and **sum**. In sequence, **subservs**
-value is an object which keys are subservice names and which values are objects with information for
+value is an object whose keys are subservice names and whose values are objects with information about
 the corresponding subservice. The **sum** value is an object with information for the aggregated information
 for all subservices in the given services.
 
@@ -64,9 +64,9 @@ for all subservices in the given services.
 }
 ```
 
-Subservices names in the above structure are shown without the initial slash. E.g. if the subservice
-names is (as used in the `Fiware-ServicePath` header) `/gardens` then the key used for it would be
-`gardens` (without `/`). Others slashes appart from the initial one are not removed, e.g. `/gardens/north`
+Subservice names in the above structure are shown without the initial slash. E.g. if the subservice
+name is (as used in the `Fiware-ServicePath` header) `/gardens` then the key used for it would be
+`gardens` (without `/`). Others slashes apart from the initial one are not removed, e.g. `/gardens/north`
 uses the key `gardens/north`.
 
 Regarding subservice information object, keys are the name of the different metrics.
@@ -91,10 +91,10 @@ Some additional remarks:
   regular services as the `-` character is not allowed in regular services.
 * The root subservice (`/`) uses **root-subserv** as subservice key. Note that it cannot collide
   with regular subservices as the `-` character is not allowed in regular subservices.
-* Request using an enumeration of subservices (e.g. `Fiware-ServicePath: /A, /B`) are associated to the
-  first element of the list, e.g. `A`.
-* Request using "recursive subservice" (e.g. `Fiware-ServicePath: /A/#`) are associated to the subservice
-  without considering recursivity, e.g. `A`.
+* Requests using an enumeration of subservices (e.g. `Fiware-ServicePath: /A, /B`) are associated to the
+  first element of the list, i.e. `A`.
+* Requests using "recursive subservice" (e.g. `Fiware-ServicePath: /A/#`) are associated to the subservice
+  without considering recursivity, i.e. `A`.
 
 [Top](#top)
 
@@ -104,7 +104,7 @@ Some additional remarks:
 DELETE /admin/metrics
 ```
 
-This operation reset all metrics, i.e. as if Orion would has been just started.
+This operation resets all metrics, as if Orion would had just been started.
 
 [Top](#top)
 
@@ -115,7 +115,7 @@ GET /admin/metrics?reset=true
 ```
 
 This operation (in fact, a variant of [get metrics](#get-metrics)) get results and, at the same time
-in an atomical way, reset metrics.
+in an atomical way, resets metrics.
 
 [Top](#top)
 
