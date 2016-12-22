@@ -33,10 +33,18 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/JsonHelper.h"
-#include "common/defaultValues.h"
 #include "rest/rest.h"
 #include "rest/RestService.h"
 #include "metricsMgr/MetricsManager.h"
+
+
+
+/* ****************************************************************************
+*
+* Default values for metrics - 
+*/
+#define  DEFAULT_SERVICE_KEY_FOR_METRICS      "default-service"
+#define  ROOT_SUB_SERVICE_KEY_FOR_METRICS     "root-subserv"
 
 
 
@@ -370,7 +378,7 @@ std::string MetricsManager::_toJson(void)
         }
         else
         {
-          jhSubService.addRaw(DEFAULT_SUB_SERVICE_KEY_FOR_METRICS, subServiceString);
+          jhSubService.addRaw(ROOT_SUB_SERVICE_KEY_FOR_METRICS, subServiceString);
         }
       }
     }
@@ -412,7 +420,7 @@ std::string MetricsManager::_toJson(void)
     }
     else
     {
-      jhSubServ.addRaw(DEFAULT_SUB_SERVICE_KEY_FOR_METRICS, subServiceString);
+      jhSubServ.addRaw(ROOT_SUB_SERVICE_KEY_FOR_METRICS, subServiceString);
     }
   }
 
