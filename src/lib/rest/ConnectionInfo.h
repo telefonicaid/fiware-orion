@@ -59,7 +59,6 @@ public:
     inMimeType             (JSON),
     outMimeType            (JSON),
     tenant                 (""),
-    servicePath            (""),
     payload                (NULL),
     payloadSize            (0),
     callNo                 (1),
@@ -81,7 +80,6 @@ public:
     inMimeType             (JSON),
     outMimeType            (_outMimeType),
     tenant                 (""),
-    servicePath            (""),
     payload                (NULL),
     payloadSize            (0),
     callNo                 (1),
@@ -106,7 +104,6 @@ public:
     method                 (_method),
     version                (_version),
     tenant                 (""),
-    servicePath            (""),
     payload                (NULL),
     payloadSize            (0),
     callNo                 (1),
@@ -149,7 +146,6 @@ public:
   std::string                charset;
   std::string                tenantFromHttpHeader;
   std::string                tenant;
-  std::string                servicePath;
   std::vector<std::string>   servicePathV;
   HttpHeaders                httpHeaders;
   char*                      payload;
