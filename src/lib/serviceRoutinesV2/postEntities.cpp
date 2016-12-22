@@ -81,7 +81,7 @@ std::string postEntities
 {
   Entity*  eP = &parseDataP->ent.res;
 
-  if (!legalEntityLength(eP, ciP->servicePath))
+  if (!legalEntityLength(eP, ciP->httpHeaders.servicePath))
   {
     OrionError oe(SccBadRequest, "Too long entity id/type/servicePath combination", "BadRequest");
     eP->release();
