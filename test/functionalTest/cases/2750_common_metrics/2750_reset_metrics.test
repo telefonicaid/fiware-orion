@@ -95,14 +95,14 @@ Date: REGEX(.*)
 02. Ask for Metrics, see 1 Incoming Transaction
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 457
+Content-Length: 472
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "services": {
-        "": {
+        "default-service": {
             "subservs": {
                 "SP/get/entities": {
                     "incomingTransactionResponseSize": 2,
@@ -146,14 +146,14 @@ Date: REGEX(.*)
 04. Ask for Metrics, see 1 Incoming Transaction (the reset-request in step 03 :-)
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 317
+Content-Length: 332
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "services": {
-        "": {
+        "default-service": {
             "subservs": {
                 "SP/delete/metrics": {
                     "incomingTransactions": 1,
@@ -184,27 +184,27 @@ Date: REGEX(.*)
 05. Ask for Metrics, with ?reset=true to reset after responding
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 581
+Content-Length: 620
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "services": {
-        "": {
+        "default-service": {
             "subservs": {
-                "": {
-                    "incomingTransactionResponseSize": 317,
+                "SP/delete/metrics": {
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 },
-                "SP/delete/metrics": {
+                "root-subserv": {
+                    "incomingTransactionResponseSize": 332,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
-                "incomingTransactionResponseSize": 317,
+                "incomingTransactionResponseSize": 332,
                 "incomingTransactions": 2,
                 "serviceTime": REGEX(.*)
             }
@@ -212,18 +212,18 @@ Date: REGEX(.*)
     },
     "sum": {
         "subservs": {
-            "": {
-                "incomingTransactionResponseSize": 317,
+            "SP/delete/metrics": {
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
             },
-            "SP/delete/metrics": {
+            "root-subserv": {
+                "incomingTransactionResponseSize": 332,
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
         },
         "sum": {
-            "incomingTransactionResponseSize": 317,
+            "incomingTransactionResponseSize": 332,
             "incomingTransactions": 2,
             "serviceTime": REGEX(.*)
         }
@@ -234,23 +234,23 @@ Date: REGEX(.*)
 06. Ask for Metrics, see 1 Incoming Transaction (step 05)
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 441
+Content-Length: 456
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "services": {
-        "": {
+        "default-service": {
             "subservs": {
                 "SP5": {
-                    "incomingTransactionResponseSize": 581,
+                    "incomingTransactionResponseSize": 620,
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
-                "incomingTransactionResponseSize": 581,
+                "incomingTransactionResponseSize": 620,
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
@@ -259,13 +259,13 @@ Date: REGEX(.*)
     "sum": {
         "subservs": {
             "SP5": {
-                "incomingTransactionResponseSize": 581,
+                "incomingTransactionResponseSize": 620,
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
         },
         "sum": {
-            "incomingTransactionResponseSize": 581,
+            "incomingTransactionResponseSize": 620,
             "incomingTransactions": 1,
             "serviceTime": REGEX(.*)
         }
