@@ -33,8 +33,8 @@ brokerStart CB
 # 01. Send a GET /v2/entities with service path /A1/#
 # 02. Send a GET /v2/entities with service path /A2,/B2
 # 03. Send a GET /v2/entities with service path /#
-# 04. Send a GET /v2/entities without service path (/# is default service path)
-# 05. Ask for Metrics, see A1 and A2 as service paths, as well as two 'default service path'
+# 04. Send a GET /v2/entities without service path (/# is used as service path)
+# 05. Ask for Metrics, see A1 and A2 as service paths, as well as two 'root service path'
 #
 
 echo "01. Send a GET /v2/entities with service path /A1/#"
@@ -58,15 +58,15 @@ echo
 echo
 
 
-echo "04. Send a GET /v2/entities without service path (/# is default service path)"
+echo "04. Send a GET /v2/entities without service path (/# is used as service path)"
 echo "============================================================================="
 orionCurl --url /v2/entities
 echo
 echo
 
 
-echo "05. Ask for Metrics, see A1 and A2 as service paths, as well as two 'default service path'"
-echo "=========================================================================================="
+echo "05. Ask for Metrics, see A1 and A2 as service paths, as well as two 'root service path'"
+echo "======================================================================================="
 orionCurl --url /admin/metrics
 echo
 echo
@@ -106,7 +106,7 @@ Date: REGEX(.*)
 []
 
 
-04. Send a GET /v2/entities without service path (/# is default service path)
+04. Send a GET /v2/entities without service path (/# is used as service path)
 =============================================================================
 HTTP/1.1 200 OK
 Content-Length: 2
@@ -117,8 +117,8 @@ Date: REGEX(.*)
 []
 
 
-05. Ask for Metrics, see A1 and A2 as service paths, as well as two 'default service path'
-==========================================================================================
+05. Ask for Metrics, see A1 and A2 as service paths, as well as two 'root service path'
+=======================================================================================
 HTTP/1.1 200 OK
 Content-Length: 842
 Content-Type: application/json
