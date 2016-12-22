@@ -131,6 +131,9 @@ class MetricsManager
   void            semGive(void);
   void            _reset(void);
   std::string     _toJson(void);
+  bool            serviceValid(const std::string& srv);
+  bool            subServiceValid(const std::string& subsrv);
+  bool            servicePathForMetrics(const std::string& spath, std::string* subServiceP);
 
  public:
   MetricsManager();

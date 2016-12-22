@@ -33,7 +33,18 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/JsonHelper.h"
+#include "rest/rest.h"
+#include "rest/RestService.h"
 #include "metricsMgr/MetricsManager.h"
+
+
+
+/* ****************************************************************************
+*
+* Default values for metrics - 
+*/
+#define  DEFAULT_SERVICE_KEY_FOR_METRICS      "default-service"
+#define  ROOT_SUB_SERVICE_KEY_FOR_METRICS     "root-subserv"
 
 
 
@@ -43,6 +54,42 @@
 */
 MetricsManager::MetricsManager(): on(false), semWaitStatistics(false), semWaitTime(0)
 {
+}
+
+
+
+/* ****************************************************************************
+*
+* MetricsManager::serviceValid - 
+*/
+bool MetricsManager::serviceValid(const std::string& srv)
+{
+  if (tenantCheck(srv) != "OK")
+  {
+    return false;
+  }
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* MetricsManager::subServiceValid - 
+*/
+bool MetricsManager::subServiceValid(const std::string& subsrv)
+{
+  ConnectionInfo ci;
+
+  ci.httpHeaders.servicePathReceived = true;
+
+  if (servicePathCheck(&ci, subsrv.c_str()) != 0)
+  {
+    return false;
+  }
+
+  return true;
 }
 
 
@@ -122,24 +169,94 @@ int64_t MetricsManager::semWaitTimeGet(void)
 
 /* ****************************************************************************
 *
+* MetricsManager::servicePathForMetrics - 
+*
+* PARAMETERS
+*   spathIn:       original service path (input)
+*   subServiceP    pointer to resulting service path (output)
+*/
+bool MetricsManager::servicePathForMetrics(const std::string& spathIn, std::string* subServiceP)
+{
+  if (spathIn == "")
+  {
+    *subServiceP = "";
+    return true;
+  }
+
+  char* spath  = strdup(spathIn.c_str());
+  char* toFree = spath;
+
+  if (subServiceValid(spath) == false)
+  {
+    free(toFree);
+    return false;
+  }
+
+  //
+  // Exclude the first '/' from the Service Path
+  // But, only if it starts with a '/'
+  //
+  // Also, if service path ends in '/#', cancel out that part
+  //
+  // Note that for the 'cancel out' part we need to allocate a copy of
+  // the service path (and free it after usage).
+  //
+  if (spath[0] == '/')
+  {
+    ++spath;
+  }
+
+  //
+  // Now, if service path ends in '/#', cancel out that part
+  //
+  int spathLen = strlen(spath);
+
+  if ((spathLen >= 2) && (spath[spathLen - 1] == '#') && (spath[spathLen - 2] == '/'))
+  {
+    spath[spathLen - 2] = 0;
+  }
+
+  // Need to cover the '/#' case as well (only '#' left as the first '/' has been skipped already)
+  if ((spath[0] == '#') && (spath[1] == 0))
+  {
+    spath[0] = 0;
+  }
+
+  *subServiceP = spath;
+  free(toFree);
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
 * MetricsManager::add -
+*
+* FIXME P4: About the calls to serviceValid and subServiceValid:
+*   we check that 'srv' and 'subServ' are legal names, and if not, metrics are skipped.
+*   Doing this each time add() is called is not optimal for performance.
+*   The github issue #2781 is about better solutions for this.
+*   Note that the call to subServiceValid is inside servicePathForMetrics()
 */
 void MetricsManager::add(const std::string& srv, const std::string& subServ, const std::string& metric, uint64_t value)
 {
+  std::string subService = "not-set";
+
   if (on == false)
   {
     return;
   }
 
-  //
-  // Exclude the first '/' from the Sub Service
-  // But, only if it starts with a '/'
-  //
-  const char* subService = subServ.c_str();
-
-  if (subService[0] == '/')
+  if (serviceValid(srv) == false)
   {
-    subService = &subService[1];
+    return;
+  }
+
+  if (servicePathForMetrics(subServ, &subService) == false)
+  {
+    return;
   }
 
   semTake();
@@ -313,7 +430,14 @@ std::string MetricsManager::_toJson(void)
 
       if (subServiceString != "{}")
       {
-        jhSubService.addRaw(subService, subServiceString);
+        if (subService != "")
+        {
+          jhSubService.addRaw(subService, subServiceString);
+        }
+        else
+        {
+          jhSubService.addRaw(ROOT_SUB_SERVICE_KEY_FOR_METRICS, subServiceString);
+        }
       }
     }
 
@@ -322,7 +446,15 @@ std::string MetricsManager::_toJson(void)
     std::string serviceSumString = metricsRender(&serviceSum);
 
     subServiceTop.addRaw("sum", serviceSumString);
-    services.addRaw(service, subServiceTop.str());
+
+    if (service != "")
+    {
+      services.addRaw(service, subServiceTop.str());
+    }
+    else
+    {
+      services.addRaw(DEFAULT_SERVICE_KEY_FOR_METRICS, subServiceTop.str());
+    }
   }
 
   //
@@ -339,7 +471,15 @@ std::string MetricsManager::_toJson(void)
     std::string  subServiceString;
 
     subServiceString = metricsRender(&it->second);
-    jhSubServ.addRaw(subService, subServiceString);
+
+    if (subService != "")
+    {
+      jhSubServ.addRaw(subService, subServiceString);
+    }
+    else
+    {
+      jhSubServ.addRaw(ROOT_SUB_SERVICE_KEY_FOR_METRICS, subServiceString);
+    }
   }
 
   lastSum.addRaw("subservs", jhSubServ.str());

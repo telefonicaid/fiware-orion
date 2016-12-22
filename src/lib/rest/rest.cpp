@@ -567,6 +567,7 @@ static void serve(ConnectionInfo* ciP)
 }
 
 
+
 /* ****************************************************************************
 *
 * requestCompleted -
@@ -580,6 +581,7 @@ static void requestCompleted
 )
 {
   ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
+  std::string      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
   struct timespec  reqEndTime;
 
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
@@ -633,7 +635,7 @@ static void requestCompleted
   //
   // Metrics
   //
-  metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN, 1);
+  metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN, 1);
 
 
   //
@@ -641,7 +643,7 @@ static void requestCompleted
   //
   if (ciP->httpStatusCode >= SccBadRequest)
   {
-    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
+    metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
   }
 
   if (metricsMgr.isOn() && (ciP->transactionStart.tv_sec != 0))
@@ -654,7 +656,7 @@ static void requestCompleted
         (end.tv_sec  - ciP->transactionStart.tv_sec) * 1000000 + 
         (end.tv_usec - ciP->transactionStart.tv_usec);
 
-      metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, _METRIC_TOTAL_SERVICE_TIME, elapsed);
+      metricsMgr.add(ciP->httpHeaders.tenant, spath, _METRIC_TOTAL_SERVICE_TIME, elapsed);
     }
   }
 
@@ -668,13 +670,11 @@ static void requestCompleted
 * servicePathCheck - check vector of service paths
 *
 * This function is called for ALL requests, when a service-path URI-parameter is found.
-* So, '#' is considered a valid character at it is valid for discoveries and queries.
+* So, '#' is considered a valid character as it is valid for discoveries and queries.
 * Later on, if the request is a registration or notification, another function is called
 * to make sure there is only ONE service path and that there is no '#' present.
 *
 * FIXME P5: updates should also call the other servicePathCheck (in common lib)
-*
-* [ Not static just to let unit tests call this function ]
 */
 int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 {
@@ -785,6 +785,28 @@ static char* removeTrailingSlash(std::string path)
 
 /* ****************************************************************************
 *
+* firstServicePath - extract first component of service-path
+*/
+void firstServicePath(const char* servicePath, char* servicePath0, int servicePath0Len)
+{
+  char* spEnd;
+
+  memset(servicePath0, 0, servicePath0Len);
+
+  if ((spEnd = strchr((char*) servicePath, ',')) != NULL)
+  {
+    strncpy(servicePath0, servicePath, spEnd - servicePath);
+  }
+  else
+  {
+    strncpy(servicePath0, servicePath, servicePath0Len);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * servicePathSplit - 
 */
 int servicePathSplit(ConnectionInfo* ciP)
@@ -797,7 +819,7 @@ int servicePathSplit(ConnectionInfo* ciP)
   //           Must implement a functest to reproduce this situation.
   //           And, if that is not possible, just remove the whole thing
   //
-  if ((ciP->httpHeaders.servicePathReceived == true) && (ciP->servicePath == ""))
+  if ((ciP->httpHeaders.servicePathReceived == true) && (ciP->httpHeaders.servicePath == ""))
   {
     OrionError e(SccBadRequest, "empty service path");
     ciP->answer = e.render();
@@ -805,13 +827,27 @@ int servicePathSplit(ConnectionInfo* ciP)
     return -1;
   }
 #endif
+  char* servicePathCopy = NULL;
+  int   servicePaths    = 0;
 
-  int servicePaths = stringSplit(ciP->servicePath, ',', ciP->servicePathV);
+  if (ciP->httpHeaders.servicePath != "")
+  {
+    servicePathCopy = strdup(ciP->httpHeaders.servicePath.c_str());
+    servicePaths    = stringSplit(servicePathCopy, ',', ciP->servicePathV);
+  }
+  else
+  {
+    // No service path? Add a single item being the empty string
+    ciP->servicePathV.push_back("");
+  }
 
   if (servicePaths == 0)
   {
-    /* In this case the result is a vector with an empty string */
-    ciP->servicePathV.push_back("");
+    // In this case the result is a vector with one item that is an empty string
+    if (servicePathCopy != NULL)
+    {
+      free(servicePathCopy);
+    }
     return 0;
   }
 
@@ -819,6 +855,12 @@ int servicePathSplit(ConnectionInfo* ciP)
   {
     OrionError e(SccBadRequest, "too many service paths - a maximum of ten service paths is allowed");
     ciP->answer = e.render();
+
+    if (servicePathCopy != NULL)
+    {
+      free(servicePathCopy);
+    }
+
     return -1;
   }
 
@@ -835,14 +877,25 @@ int servicePathSplit(ConnectionInfo* ciP)
     LM_I(("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
   }
 
+
   for (int ix = 0; ix < servicePaths; ++ix)
   {
     int s;
 
     if ((s = servicePathCheck(ciP, ciP->servicePathV[ix].c_str())) != 0)
     {
+      if (servicePathCopy != NULL)
+      {
+        free(servicePathCopy);
+      }
+
       return s;
     }
+  }
+
+  if (servicePathCopy != NULL)
+  {
+    free(servicePathCopy);
   }
 
   return 0;
@@ -1350,8 +1403,7 @@ static int connectionTreat
     return MHD_YES;
   }
 
-  ciP->servicePath = ciP->httpHeaders.servicePath;
-  lmTransactionSetSubservice(ciP->servicePath.c_str());
+  lmTransactionSetSubservice(ciP->httpHeaders.servicePath.c_str());
 
   if (servicePathSplit(ciP) != 0)
   {

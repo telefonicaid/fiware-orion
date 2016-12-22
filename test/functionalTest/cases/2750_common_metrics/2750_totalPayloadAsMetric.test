@@ -166,16 +166,16 @@ Date: REGEX(.*)
 04. Ask for Metrics, see 3 Incoming Transactions, and 50 bytes in incomingTransactionRequestSize
 ================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 884
+Content-Length: 923
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "services": {
-        "": {
+        "default-service": {
             "subservs": {
-                "": {
+                "root-subserv": {
                     "incomingTransactionRequestSize": 50,
                     "incomingTransactionResponseSize": 435,
                     "incomingTransactions": 2,
@@ -206,15 +206,15 @@ Date: REGEX(.*)
     },
     "sum": {
         "subservs": {
-            "": {
-                "incomingTransactionRequestSize": 50,
-                "incomingTransactionResponseSize": 435,
-                "incomingTransactions": 2,
-                "serviceTime": REGEX(.*)
-            },
             "SP1": {
                 "incomingTransactionResponseSize": 2,
                 "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            },
+            "root-subserv": {
+                "incomingTransactionRequestSize": 50,
+                "incomingTransactionResponseSize": 435,
+                "incomingTransactions": 2,
                 "serviceTime": REGEX(.*)
             }
         },
@@ -241,25 +241,25 @@ Date: REGEX(.*)
 06. Ask for Metrics, see 5 Incoming Transactions, and 150 bytes in incomingTransactionRequestSize
 =================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 892
+Content-Length: 931
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "services": {
-        "": {
+        "default-service": {
             "subservs": {
-                "": {
+                "root-subserv": {
                     "incomingTransactionRequestSize": 150,
-                    "incomingTransactionResponseSize": 1319,
+                    "incomingTransactionResponseSize": 1358,
                     "incomingTransactions": 4,
                     "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
                 "incomingTransactionRequestSize": 150,
-                "incomingTransactionResponseSize": 1319,
+                "incomingTransactionResponseSize": 1358,
                 "incomingTransactions": 4,
                 "serviceTime": REGEX(.*)
             }
@@ -281,21 +281,21 @@ Date: REGEX(.*)
     },
     "sum": {
         "subservs": {
-            "": {
-                "incomingTransactionRequestSize": 150,
-                "incomingTransactionResponseSize": 1319,
-                "incomingTransactions": 4,
-                "serviceTime": REGEX(.*)
-            },
             "SP1": {
                 "incomingTransactionResponseSize": 2,
                 "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            },
+            "root-subserv": {
+                "incomingTransactionRequestSize": 150,
+                "incomingTransactionResponseSize": 1358,
+                "incomingTransactions": 4,
                 "serviceTime": REGEX(.*)
             }
         },
         "sum": {
             "incomingTransactionRequestSize": 150,
-            "incomingTransactionResponseSize": 1321,
+            "incomingTransactionResponseSize": 1360,
             "incomingTransactions": 5,
             "serviceTime": REGEX(.*)
         }
@@ -317,30 +317,30 @@ Date: REGEX(.*)
 08. Ask for Metrics, see 8, and see incomingTransactionResponseSize
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 1106
+Content-Length: 1145
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "services": {
-        "": {
+        "default-service": {
             "subservs": {
-                "": {
-                    "incomingTransactionRequestSize": 150,
-                    "incomingTransactionResponseSize": 2211,
-                    "incomingTransactions": 5,
-                    "serviceTime": REGEX(.*)
-                },
                 "SP/get/entities": {
                     "incomingTransactionResponseSize": 2,
                     "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                },
+                "root-subserv": {
+                    "incomingTransactionRequestSize": 150,
+                    "incomingTransactionResponseSize": 2289,
+                    "incomingTransactions": 5,
                     "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
                 "incomingTransactionRequestSize": 150,
-                "incomingTransactionResponseSize": 2213,
+                "incomingTransactionResponseSize": 2291,
                 "incomingTransactions": 6,
                 "serviceTime": REGEX(.*)
             }
@@ -362,12 +362,6 @@ Date: REGEX(.*)
     },
     "sum": {
         "subservs": {
-            "": {
-                "incomingTransactionRequestSize": 150,
-                "incomingTransactionResponseSize": 2211,
-                "incomingTransactions": 5,
-                "serviceTime": REGEX(.*)
-            },
             "SP/get/entities": {
                 "incomingTransactionResponseSize": 2,
                 "incomingTransactions": 1,
@@ -377,11 +371,17 @@ Date: REGEX(.*)
                 "incomingTransactionResponseSize": 2,
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
+            },
+            "root-subserv": {
+                "incomingTransactionRequestSize": 150,
+                "incomingTransactionResponseSize": 2289,
+                "incomingTransactions": 5,
+                "serviceTime": REGEX(.*)
             }
         },
         "sum": {
             "incomingTransactionRequestSize": 150,
-            "incomingTransactionResponseSize": 2215,
+            "incomingTransactionResponseSize": 2293,
             "incomingTransactions": 7,
             "serviceTime": REGEX(.*)
         }
