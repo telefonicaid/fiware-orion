@@ -134,10 +134,14 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
     return;
   }
 
-  std::string subService  = subServ;  // Now we have a copy of the service path ...
-  char*       subServiceP = (char*) subServ.c_str();
+  // FIXME P4: See github issue #2781
+  if (tenantCheck(srv) != "OK")
+  {
+    return;
+  }
 
-  LM_W(("KZ: incoming subServ: '%s'", subServ.c_str()));
+  char* toFree = strdup(subServ.c_str());
+  char* subServiceP = toFree;
 
   //
   // If more than one service path, use only the first one
@@ -149,18 +153,11 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
   }
 
   // FIXME P4: See github issue #2781
-  if (tenantCheck(srv) != "OK")
-  {
-    LM_W(("KZ: skipping metrics due to TENANT (%s)", srv.c_str()));
-    return;
-  }
-
-  // FIXME P4: See github issue #2781
   ConnectionInfo ci;
   ci.httpHeaders.servicePathReceived = true;
   if (servicePathCheck(&ci, subServiceP) != 0)
   {
-    LM_W(("KZ: skipping metrics due to servicePath (%s)", subServ.c_str()));
+    free(toFree);
     return;
   }
 
@@ -193,8 +190,6 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
   {
     subServiceP[0] = 0;
   }
-
-  LM_W(("KZ: Final service path: '%s'", subServiceP));
 
   semTake();
 
@@ -229,6 +224,8 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
   metrics[srv]->at(subServiceP)->at(metric) += value;
 
   semGive();
+
+  free(toFree);
 }
 
 

@@ -529,7 +529,6 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   {
     headerP->servicePath         = value;
     headerP->servicePathReceived = true;
-    LM_W(("KZ: Got servicePath: '%s'", value));
   }
   else
   {
@@ -855,8 +854,6 @@ int servicePathSplit(ConnectionInfo* ciP)
     LM_I(("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
   }
 
-
-  // KZ: ciP->servicePath = ciP->servicePathV[0];
 
   for (int ix = 0; ix < servicePaths; ++ix)
   {
