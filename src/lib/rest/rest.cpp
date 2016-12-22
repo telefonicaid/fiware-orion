@@ -529,6 +529,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   {
     headerP->servicePath         = value;
     headerP->servicePathReceived = true;
+    LM_W(("KZ: Got servicePath: '%s'", value));
   }
   else
   {
@@ -669,7 +670,7 @@ static void requestCompleted
 * servicePathCheck - check vector of service paths
 *
 * This function is called for ALL requests, when a service-path URI-parameter is found.
-* So, '#' is considered a valid character at it is valid for discoveries and queries.
+* So, '#' is considered a valid character as it is valid for discoveries and queries.
 * Later on, if the request is a registration or notification, another function is called
 * to make sure there is only ONE service path and that there is no '#' present.
 *
@@ -834,13 +835,8 @@ int servicePathSplit(ConnectionInfo* ciP)
     LM_I(("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
   }
 
-  //
-  // stringSplit destroys ciP->servicePath.
-  //
-  // After splitting ciP->servicePath to ciP->servicePathV, we need
-  // to make ciP->servicePath point to ciP->servicePathV[0] for metrics
-  //
-  ciP->httpHeaders.servicePath = ciP->servicePathV[0];
+
+  // KZ: ciP->servicePath = ciP->servicePathV[0];
 
   for (int ix = 0; ix < servicePaths; ++ix)
   {

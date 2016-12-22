@@ -134,17 +134,33 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
     return;
   }
 
+  std::string subService  = subServ;  // Now we have a copy of the service path ...
+  char*       subServiceP = (char*) subServ.c_str();
+
+  LM_W(("KZ: incoming subServ: '%s'", subServ.c_str()));
+
+  //
+  // If more than one service path, use only the first one
+  //
+  char* commaP;
+  if ((commaP = strchr(subServiceP, ',')) != NULL)
+  {
+    *commaP = 0;
+  }
+
   // FIXME P4: See github issue #2781
   if (tenantCheck(srv) != "OK")
   {
+    LM_W(("KZ: skipping metrics due to TENANT (%s)", srv.c_str()));
     return;
   }
 
   // FIXME P4: See github issue #2781
   ConnectionInfo ci;
   ci.httpHeaders.servicePathReceived = true;
-  if (servicePathCheck(&ci, subServ.c_str()) != 0)
+  if (servicePathCheck(&ci, subServiceP) != 0)
   {
+    LM_W(("KZ: skipping metrics due to servicePath (%s)", subServ.c_str()));
     return;
   }
 
@@ -157,32 +173,28 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
   // Note that for the 'cancel out' part we need to allocate a copy of
   // the service path (and frre it after usage).
   //
-  char* subService;
-
-  if (subServ.c_str()[0] == '/')
+  if (subServiceP[0] == '/')
   {
-    subService = strdup(&subServ.c_str()[1]);
-  }
-  else
-  {
-    subService = strdup(subServ.c_str());
+    ++subServiceP;
   }
 
   //
   // Now, if service path ends in '/#', cancel out that part
   //
-  int subServiceLen = strlen(subService);
+  int subServiceLen = strlen(subServiceP);
 
-  if ((subServiceLen >= 2) && (subService[subServiceLen - 1] == '#') && (subService[subServiceLen - 2] == '/'))
+  if ((subServiceLen >= 2) && (subServiceP[subServiceLen - 1] == '#') && (subServiceP[subServiceLen - 2] == '/'))
   {
-    subService[subServiceLen - 2] = 0;
+    subServiceP[subServiceLen - 2] = 0;
   }
 
   // Need to cover the '/#' case as well (only '#' left as the first '/' has been skipped already)
-  if ((subService[0] == '#') && (subService[1] == 0))
+  if ((subServiceP[0] == '#') && (subServiceP[1] == 0))
   {
-    subService[0] = 0;
+    subServiceP[0] = 0;
   }
+
+  LM_W(("KZ: Final service path: '%s'", subServiceP));
 
   semTake();
 
@@ -195,30 +207,28 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
   }
 
   // Do we have the subservice in the map?
-  if (metrics[srv]->find(subService) == metrics[srv]->end())
+  if (metrics[srv]->find(subServiceP) == metrics[srv]->end())
   {
     //
     // Not Found: create it
     //
     metrics[srv]->insert(std::pair<std::string, std::map<std::string, uint64_t>*>
-                         (subService,
+                         (subServiceP,
                           new std::map<std::string, uint64_t>));
   }
 
   // Do we have the metric in the map?
-  if (metrics[srv]->at(subService)->find(metric) == metrics[srv]->at(subService)->end())
+  if (metrics[srv]->at(subServiceP)->find(metric) == metrics[srv]->at(subServiceP)->end())
   {
     //
     // Not Found: create it
     //
-    metrics[srv]->at(subService)->insert(std::pair<std::string, uint64_t>(metric, 0));
+    metrics[srv]->at(subServiceP)->insert(std::pair<std::string, uint64_t>(metric, 0));
   }
 
-  metrics[srv]->at(subService)->at(metric) += value;
+  metrics[srv]->at(subServiceP)->at(metric) += value;
 
   semGive();
-
-  free(subService);
 }
 
 

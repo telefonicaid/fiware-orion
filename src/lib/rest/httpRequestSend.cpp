@@ -23,6 +23,7 @@
 * Author: developer
 */
 #include <unistd.h>                             // close()
+#include <string.h>                             // strchr()
 #include <sys/types.h>                          // system types ...
 #include <sys/socket.h>                         // socket, bind, listen
 #include <sys/un.h>                             // sockaddr_un
@@ -266,8 +267,21 @@ int httpRequestSendWithCurl
   int                             outgoingMsgSize       = 0;
   std::string                     content_type(orig_content_type);
   std::map<std::string, bool>     usedExtraHeaders;
+  char                            servicePath0[64];  // 64 > 50 (max component length in service path)
+  char*                           spEnd;
 
-  metricsMgr.add(tenant, servicePath, METRIC_TRANS_OUT, 1);
+  memset(servicePath0, 0, sizeof(servicePath0));
+
+  if ((spEnd = strchr((char*) servicePath.c_str(), ',')) != NULL)
+  {
+    strncpy(servicePath0, servicePath.c_str(), spEnd - servicePath.c_str());
+  }
+  else
+  {
+    strncpy(servicePath0, servicePath.c_str(), sizeof(servicePath0));
+  }
+
+  metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT, 1);
 
   ++callNo;
 
