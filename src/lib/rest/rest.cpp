@@ -797,7 +797,7 @@ int servicePathSplit(ConnectionInfo* ciP)
   //           Must implement a functest to reproduce this situation.
   //           And, if that is not possible, just remove the whole thing
   //
-  if ((ciP->httpHeaders.servicePathReceived == true) && (ciP->servicePath == ""))
+  if ((ciP->httpHeaders.servicePathReceived == true) && (ciP->httpHeaders.servicePath == ""))
   {
     OrionError e(SccBadRequest, "empty service path");
     ciP->answer = e.render();
@@ -805,13 +805,27 @@ int servicePathSplit(ConnectionInfo* ciP)
     return -1;
   }
 #endif
+  char* servicePathCopy = NULL;
+  int   servicePaths    = 0;
 
-  int servicePaths = stringSplit(ciP->servicePath, ',', ciP->servicePathV);
+  if (ciP->httpHeaders.servicePath != "")
+  {
+    servicePathCopy = strdup(ciP->httpHeaders.servicePath.c_str());
+    servicePaths    = stringSplit(servicePathCopy, ',', ciP->servicePathV);
+  }
+  else
+  {
+    // No service path? Add a single item being the empty string
+    ciP->servicePathV.push_back("");
+  }
 
   if (servicePaths == 0)
   {
-    /* In this case the result is a vector with an empty string */
-    ciP->servicePathV.push_back("");
+    // In this case the result is a vector with one item that is an empty string
+    if (servicePathCopy != NULL)
+    {
+      free(servicePathCopy);
+    }
     return 0;
   }
 
@@ -819,6 +833,12 @@ int servicePathSplit(ConnectionInfo* ciP)
   {
     OrionError e(SccBadRequest, "too many service paths - a maximum of ten service paths is allowed");
     ciP->answer = e.render();
+
+    if (servicePathCopy != NULL)
+    {
+      free(servicePathCopy);
+    }
+
     return -1;
   }
 
@@ -844,8 +864,18 @@ int servicePathSplit(ConnectionInfo* ciP)
 
     if ((s = servicePathCheck(ciP, ciP->servicePathV[ix].c_str())) != 0)
     {
+      if (servicePathCopy != NULL)
+      {
+        free(servicePathCopy);
+      }
+
       return s;
     }
+  }
+
+  if (servicePathCopy != NULL)
+  {
+    free(servicePathCopy);
   }
 
   return 0;
@@ -1353,8 +1383,7 @@ static int connectionTreat
     return MHD_YES;
   }
 
-  ciP->servicePath = ciP->httpHeaders.servicePath;
-  lmTransactionSetSubservice(ciP->servicePath.c_str());
+  lmTransactionSetSubservice(ciP->httpHeaders.servicePath.c_str());
 
   if (servicePathSplit(ciP) != 0)
   {

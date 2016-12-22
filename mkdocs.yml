@@ -51,6 +51,7 @@ pages:
       - 'Watchdog': 'admin/watchdog.md'
       - 'Rush relayer': 'admin/rush.md'
       - 'Management REST interface': 'admin/management_api.md'
+      - 'Metrics API': 'admin/metrics_api.md'
       - 'Statistics': 'admin/statistics.md'
       - 'Performance tuning': 'admin/perf_tuning.md'
       - 'Upgrading from previous to 0.14.1': 'admin/upgrading_crossing_0-14-1.md'
