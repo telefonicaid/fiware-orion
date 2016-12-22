@@ -666,6 +666,12 @@ int httpRequestSend
   get_curl_context(_ip, &cc);
   if (cc.curl == NULL)
   {
+    //
+    // FIXME P4: servicePath may contain more than one service path, i.e.  /A,/B.
+    //           Only if coming from a forward of a query (postQueryContext())
+    //           This is taken care of in metricsMgr.add(), but could be moved here instead
+    //           as it is the only place where this can happen (99% sure about this).
+    //
     metricsMgr.add(tenant, servicePath, METRIC_TRANS_OUT,        1);
     metricsMgr.add(tenant, servicePath, METRIC_TRANS_OUT_ERRORS, 1);
 
