@@ -60,6 +60,42 @@ MetricsManager::MetricsManager(): on(false), semWaitStatistics(false), semWaitTi
 
 /* ****************************************************************************
 *
+* MetricsManager::serviceValid - 
+*/
+bool MetricsManager::serviceValid(const std::string& srv)
+{
+  if (tenantCheck(srv) != "OK")
+  {
+    return false;
+  }
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* MetricsManager::subServiceValid - 
+*/
+bool MetricsManager::subServiceValid(const std::string& subsrv)
+{
+  ConnectionInfo ci;
+
+  ci.httpHeaders.servicePathReceived = true;
+
+  if (servicePathCheck(&ci, subsrv.c_str()) != 0)
+  {
+    return false;
+  }
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
 * MetricsManager::init -
 *
 * NOTE
@@ -134,6 +170,11 @@ int64_t MetricsManager::semWaitTimeGet(void)
 /* ****************************************************************************
 *
 * MetricsManager::add -
+*
+* FIXME P4: About the calls to serviceValid and subServiceValid:
+*   we check that 'srv' and 'subServ' are legal names, and if not, metrics are skipped.
+*   Doing this each time add() is called is not optimal for performance.
+*   The github issue #2781 is about better solutions for this.
 */
 void MetricsManager::add(const std::string& srv, const std::string& subServ, const std::string& metric, uint64_t value)
 {
@@ -142,13 +183,12 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
     return;
   }
 
-  // FIXME P4: See github issue #2781
-  if (tenantCheck(srv) != "OK")
+  if (serviceValid(srv) == false)
   {
     return;
   }
 
-  char* toFree = strdup(subServ.c_str());
+  char* toFree      = strdup(subServ.c_str());
   char* subServiceP = toFree;
 
   //
@@ -160,10 +200,7 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
     *commaP = 0;
   }
 
-  // FIXME P4: See github issue #2781
-  ConnectionInfo ci;
-  ci.httpHeaders.servicePathReceived = true;
-  if (servicePathCheck(&ci, subServiceP) != 0)
+  if (subServiceValid(subServiceP) == false)
   {
     free(toFree);
     return;
