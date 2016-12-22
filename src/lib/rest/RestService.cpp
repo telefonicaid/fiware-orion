@@ -149,9 +149,9 @@ std::string payloadParse
 *
 * tenantCheck - 
 */
-extern std::string tenantCheck(const std::string& tenant)
+std::string tenantCheck(const std::string& tenant)
 {
-  char*        name    = (char*) tenant.c_str();
+  char*  name = (char*) tenant.c_str();
 
   if (strlen(name) > SERVICE_NAME_MAX_LEN)
   {
