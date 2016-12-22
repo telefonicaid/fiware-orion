@@ -634,7 +634,7 @@ static void requestCompleted
   //
   // Metrics
   //
-  metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN, 1);
+  metricsMgr.add(ciP->httpHeaders.tenant, ciP->servicePathV[0], METRIC_TRANS_IN, 1);
 
 
   //
@@ -642,7 +642,7 @@ static void requestCompleted
   //
   if (ciP->httpStatusCode >= SccBadRequest)
   {
-    metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, METRIC_TRANS_IN_ERRORS, 1);
+    metricsMgr.add(ciP->httpHeaders.tenant, ciP->servicePathV[0], METRIC_TRANS_IN_ERRORS, 1);
   }
 
   if (metricsMgr.isOn() && (ciP->transactionStart.tv_sec != 0))
@@ -655,7 +655,7 @@ static void requestCompleted
         (end.tv_sec  - ciP->transactionStart.tv_sec) * 1000000 + 
         (end.tv_usec - ciP->transactionStart.tv_usec);
 
-      metricsMgr.add(ciP->httpHeaders.tenant, ciP->httpHeaders.servicePath, _METRIC_TOTAL_SERVICE_TIME, elapsed);
+      metricsMgr.add(ciP->httpHeaders.tenant, ciP->servicePathV[0], _METRIC_TOTAL_SERVICE_TIME, elapsed);
     }
   }
 
