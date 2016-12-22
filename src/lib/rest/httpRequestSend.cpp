@@ -213,6 +213,28 @@ static int contentLenParse(char* s)
 
 /* ****************************************************************************
 *
+* servicePathForMetrics - extract first component of service-path
+*/
+static void servicePathForMetrics(const char* servicePath, char* servicePath0, int servicePath0Len)
+{
+  char* spEnd;
+
+  memset(servicePath0, 0, servicePath0Len);
+
+  if ((spEnd = strchr((char*) servicePath, ',')) != NULL)
+  {
+    strncpy(servicePath0, servicePath, spEnd - servicePath);
+  }
+  else
+  {
+    strncpy(servicePath0, servicePath, servicePath0Len);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * httpRequestSendWithCurl -
 *
 * The waitForResponse arguments specifies if the method has to wait for response
@@ -267,19 +289,9 @@ int httpRequestSendWithCurl
   int                             outgoingMsgSize       = 0;
   std::string                     content_type(orig_content_type);
   std::map<std::string, bool>     usedExtraHeaders;
-  char                            servicePath0[64];  // 64 > 50 (max component length in service path)
-  char*                           spEnd;
+  char                            servicePath0[SERVICE_PATH_MAX_COMPONENT_LEN + 1];  // +1 for zero termination
 
-  memset(servicePath0, 0, sizeof(servicePath0));
-
-  if ((spEnd = strchr((char*) servicePath.c_str(), ',')) != NULL)
-  {
-    strncpy(servicePath0, servicePath.c_str(), spEnd - servicePath.c_str());
-  }
-  else
-  {
-    strncpy(servicePath0, servicePath.c_str(), sizeof(servicePath0));
-  }
+  servicePathForMetrics(servicePath.c_str(), servicePath0, sizeof(servicePath0));
 
   metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT, 1);
 
@@ -666,14 +678,12 @@ int httpRequestSend
   get_curl_context(_ip, &cc);
   if (cc.curl == NULL)
   {
-    //
-    // FIXME P4: servicePath may contain more than one service path, i.e.  /A,/B.
-    //           Only if coming from a forward of a query (postQueryContext())
-    //           This is taken care of in metricsMgr.add(), but could be moved here instead
-    //           as it is the only place where this can happen (99% sure about this).
-    //
-    metricsMgr.add(tenant, servicePath, METRIC_TRANS_OUT,        1);
-    metricsMgr.add(tenant, servicePath, METRIC_TRANS_OUT_ERRORS, 1);
+    char servicePath0[SERVICE_PATH_MAX_COMPONENT_LEN + 1];  // +1 for zero termination
+
+    servicePathForMetrics(servicePath.c_str(), servicePath0, sizeof(servicePath0));
+
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT,        1);
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
 
     release_curl_context(&cc);
     LM_E(("Runtime Error (could not init libcurl)"));

@@ -169,71 +169,80 @@ int64_t MetricsManager::semWaitTimeGet(void)
 
 /* ****************************************************************************
 *
+* MetricsManager::servicePathForMetrics - 
+*
+* PARAMETERS
+*   sp:            original service path (input)
+*   subServiceP    pointer to resulting service path (output)
+*/
+bool MetricsManager::servicePathForMetrics(char* sp, std::string* subServiceP)
+{
+  char* spath  = strdup(sp);
+  char* toFree = spath;
+
+  if (subServiceValid(spath) == false)
+  {
+    free(toFree);
+    return false;
+  }
+
+  //
+  // Exclude the first '/' from the Service Path
+  // But, only if it starts with a '/'
+  //
+  // Also, if service path ends in '/#', cancel out that part
+  //
+  // Note that for the 'cancel out' part we need to allocate a copy of
+  // the service path (and free it after usage).
+  //
+  if (spath[0] == '/')
+  {
+    ++spath;
+  }
+
+  //
+  // Now, if service path ends in '/#', cancel out that part
+  //
+  int spathLen = strlen(spath);
+
+  if ((spathLen >= 2) && (spath[spathLen - 1] == '#') && (spath[spathLen - 2] == '/'))
+  {
+    spath[spathLen - 2] = 0;
+  }
+
+  // Need to cover the '/#' case as well (only '#' left as the first '/' has been skipped already)
+  if ((spath[0] == '#') && (spath[1] == 0))
+  {
+    spath[0] = 0;
+  }
+
+  *subServiceP = spath;
+  free(toFree);
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
 * MetricsManager::add -
 *
 * FIXME P4: About the calls to serviceValid and subServiceValid:
 *   we check that 'srv' and 'subServ' are legal names, and if not, metrics are skipped.
 *   Doing this each time add() is called is not optimal for performance.
 *   The github issue #2781 is about better solutions for this.
+*   Note that the call to subServiceValid is inside servicePathForMetrics()
 */
 void MetricsManager::add(const std::string& srv, const std::string& subServ, const std::string& metric, uint64_t value)
 {
-  if (on == false)
+  std::string subService = "not-set";
+
+  if ((on == false)                 ||
+      (serviceValid(srv) == false)  ||
+      (servicePathForMetrics((char*) subServ.c_str(), &subService) == false))
   {
     return;
-  }
-
-  if (serviceValid(srv) == false)
-  {
-    return;
-  }
-
-  char* toFree      = strdup(subServ.c_str());
-  char* subServiceP = toFree;
-
-  //
-  // If more than one service path, use only the first one
-  //
-  char* commaP;
-  if ((commaP = strchr(subServiceP, ',')) != NULL)
-  {
-    *commaP = 0;
-  }
-
-  if (subServiceValid(subServiceP) == false)
-  {
-    free(toFree);
-    return;
-  }
-
-  //
-  // Exclude the first '/' from the Sub Service
-  // But, only if it starts with a '/'
-  //
-  // Also, if service path ends in '/#', cancel out that part
-  //
-  // Note that for the 'cancel out' part we need to allocate a copy of
-  // the service path (and frre it after usage).
-  //
-  if (subServiceP[0] == '/')
-  {
-    ++subServiceP;
-  }
-
-  //
-  // Now, if service path ends in '/#', cancel out that part
-  //
-  int subServiceLen = strlen(subServiceP);
-
-  if ((subServiceLen >= 2) && (subServiceP[subServiceLen - 1] == '#') && (subServiceP[subServiceLen - 2] == '/'))
-  {
-    subServiceP[subServiceLen - 2] = 0;
-  }
-
-  // Need to cover the '/#' case as well (only '#' left as the first '/' has been skipped already)
-  if ((subServiceP[0] == '#') && (subServiceP[1] == 0))
-  {
-    subServiceP[0] = 0;
   }
 
   semTake();
@@ -247,30 +256,28 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
   }
 
   // Do we have the subservice in the map?
-  if (metrics[srv]->find(subServiceP) == metrics[srv]->end())
+  if (metrics[srv]->find(subService) == metrics[srv]->end())
   {
     //
     // Not Found: create it
     //
     metrics[srv]->insert(std::pair<std::string, std::map<std::string, uint64_t>*>
-                         (subServiceP,
+                         (subService,
                           new std::map<std::string, uint64_t>));
   }
 
   // Do we have the metric in the map?
-  if (metrics[srv]->at(subServiceP)->find(metric) == metrics[srv]->at(subServiceP)->end())
+  if (metrics[srv]->at(subService)->find(metric) == metrics[srv]->at(subService)->end())
   {
     //
     // Not Found: create it
     //
-    metrics[srv]->at(subServiceP)->insert(std::pair<std::string, uint64_t>(metric, 0));
+    metrics[srv]->at(subService)->insert(std::pair<std::string, uint64_t>(metric, 0));
   }
 
-  metrics[srv]->at(subServiceP)->at(metric) += value;
+  metrics[srv]->at(subService)->at(metric) += value;
 
   semGive();
-
-  free(toFree);
 }
 
 
