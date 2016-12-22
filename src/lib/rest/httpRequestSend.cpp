@@ -213,28 +213,6 @@ static int contentLenParse(char* s)
 
 /* ****************************************************************************
 *
-* servicePathForMetrics - extract first component of service-path
-*/
-static void servicePathForMetrics(const char* servicePath, char* servicePath0, int servicePath0Len)
-{
-  char* spEnd;
-
-  memset(servicePath0, 0, servicePath0Len);
-
-  if ((spEnd = strchr((char*) servicePath, ',')) != NULL)
-  {
-    strncpy(servicePath0, servicePath, spEnd - servicePath);
-  }
-  else
-  {
-    strncpy(servicePath0, servicePath, servicePath0Len);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * httpRequestSendWithCurl -
 *
 * The waitForResponse arguments specifies if the method has to wait for response
@@ -291,7 +269,7 @@ int httpRequestSendWithCurl
   std::map<std::string, bool>     usedExtraHeaders;
   char                            servicePath0[SERVICE_PATH_MAX_COMPONENT_LEN + 1];  // +1 for zero termination
 
-  servicePathForMetrics(servicePath.c_str(), servicePath0, sizeof(servicePath0));
+  firstServicePath(servicePath.c_str(), servicePath0, sizeof(servicePath0));
 
   metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT, 1);
 
@@ -680,7 +658,7 @@ int httpRequestSend
   {
     char servicePath0[SERVICE_PATH_MAX_COMPONENT_LEN + 1];  // +1 for zero termination
 
-    servicePathForMetrics(servicePath.c_str(), servicePath0, sizeof(servicePath0));
+    firstServicePath(servicePath.c_str(), servicePath0, sizeof(servicePath0));
 
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT,        1);
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);

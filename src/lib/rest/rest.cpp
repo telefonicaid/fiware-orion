@@ -581,6 +581,7 @@ static void requestCompleted
 )
 {
   ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
+  std::string      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
   struct timespec  reqEndTime;
 
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
@@ -634,7 +635,7 @@ static void requestCompleted
   //
   // Metrics
   //
-  metricsMgr.add(ciP->httpHeaders.tenant, ciP->servicePathV[0], METRIC_TRANS_IN, 1);
+  metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN, 1);
 
 
   //
@@ -642,7 +643,7 @@ static void requestCompleted
   //
   if (ciP->httpStatusCode >= SccBadRequest)
   {
-    metricsMgr.add(ciP->httpHeaders.tenant, ciP->servicePathV[0], METRIC_TRANS_IN_ERRORS, 1);
+    metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
   }
 
   if (metricsMgr.isOn() && (ciP->transactionStart.tv_sec != 0))
@@ -655,7 +656,7 @@ static void requestCompleted
         (end.tv_sec  - ciP->transactionStart.tv_sec) * 1000000 + 
         (end.tv_usec - ciP->transactionStart.tv_usec);
 
-      metricsMgr.add(ciP->httpHeaders.tenant, ciP->servicePathV[0], _METRIC_TOTAL_SERVICE_TIME, elapsed);
+      metricsMgr.add(ciP->httpHeaders.tenant, spath, _METRIC_TOTAL_SERVICE_TIME, elapsed);
     }
   }
 
@@ -778,6 +779,28 @@ static char* removeTrailingSlash(std::string path)
   }
 
   return cpath;
+}
+
+
+
+/* ****************************************************************************
+*
+* firstServicePath - extract first component of service-path
+*/
+void firstServicePath(const char* servicePath, char* servicePath0, int servicePath0Len)
+{
+  char* spEnd;
+
+  memset(servicePath0, 0, servicePath0Len);
+
+  if ((spEnd = strchr((char*) servicePath, ',')) != NULL)
+  {
+    strncpy(servicePath0, servicePath, spEnd - servicePath);
+  }
+  else
+  {
+    strncpy(servicePath0, servicePath, servicePath0Len);
+  }
 }
 
 

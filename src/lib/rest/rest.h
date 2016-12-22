@@ -113,4 +113,12 @@ extern void restInit
 */
 extern int servicePathCheck(ConnectionInfo* ciP, const char* servicePath);
 
+
+
+/* ****************************************************************************
+*
+* firstServicePath - extract first component of service-path
+*/
+extern void firstServicePath(const char* servicePath, char* servicePath0, int servicePath0Len);
+
 #endif

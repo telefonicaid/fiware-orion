@@ -66,6 +66,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
 {
   MHD_Response*  response;
   uint64_t       answerLen = answer.length();
+  std::string    spath     = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
 
   ++replyIx;
   LM_T(LmtServiceOutPayload, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answerLen, ciP->httpStatusCode));
@@ -74,14 +75,14 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   response = MHD_create_response_from_buffer(answerLen, (void*) answer.c_str(), MHD_RESPMEM_MUST_COPY);
   if (!response)
   {
-    metricsMgr.add(ciP->httpHeaders.tenant, ciP->servicePathV[0], METRIC_TRANS_IN_ERRORS, 1);
+    metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
     LM_E(("Runtime Error (MHD_create_response_from_buffer FAILED)"));
     return;
   }
 
   if (answerLen > 0)
   {
-    metricsMgr.add(ciP->httpHeaders.tenant, ciP->servicePathV[0], METRIC_TRANS_IN_RESP_SIZE, answerLen);
+    metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_RESP_SIZE, answerLen);
   }
 
   for (unsigned int hIx = 0; hIx < ciP->httpHeader.size(); ++hIx)

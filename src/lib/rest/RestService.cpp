@@ -534,10 +534,11 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     if ((ciP->payload != NULL) && (ciP->payloadSize != 0) && (ciP->payload[0] != 0) && (serviceV[ix].verb != "*"))
     {
       std::string response;
+      std::string spath = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
 
       LM_T(LmtParsedPayload, ("Parsing payload for URL '%s', method '%s', service vector index: %d", ciP->url.c_str(), ciP->method.c_str(), ix));
       ciP->parseDataP = &parseData;
-      metricsMgr.add(ciP->httpHeaders.tenant, ciP->servicePathV[0], METRIC_TRANS_IN_REQ_SIZE, ciP->payloadSize);
+      metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_REQ_SIZE, ciP->payloadSize);
       LM_T(LmtPayload, ("Parsing payload '%s'", ciP->payload));
       response = payloadParse(ciP, &parseData, &serviceV[ix], &jsonReqP, &jsonRelease, compV);
       LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));

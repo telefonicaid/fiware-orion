@@ -172,12 +172,18 @@ int64_t MetricsManager::semWaitTimeGet(void)
 * MetricsManager::servicePathForMetrics - 
 *
 * PARAMETERS
-*   sp:            original service path (input)
+*   spathIn:       original service path (input)
 *   subServiceP    pointer to resulting service path (output)
 */
-bool MetricsManager::servicePathForMetrics(char* sp, std::string* subServiceP)
+bool MetricsManager::servicePathForMetrics(const std::string& spathIn, std::string* subServiceP)
 {
-  char* spath  = strdup(sp);
+  if (spathIn == "")
+  {
+    *subServiceP = "";
+    return true;
+  }
+
+  char* spath  = strdup(spathIn.c_str());
   char* toFree = spath;
 
   if (subServiceValid(spath) == false)
@@ -238,9 +244,17 @@ void MetricsManager::add(const std::string& srv, const std::string& subServ, con
 {
   std::string subService = "not-set";
 
-  if ((on == false)                 ||
-      (serviceValid(srv) == false)  ||
-      (servicePathForMetrics((char*) subServ.c_str(), &subService) == false))
+  if (on == false)
+  {
+    return;
+  }
+
+  if (serviceValid(srv) == false)
+  {
+    return;
+  }
+
+  if (servicePathForMetrics(subServ, &subService) == false)
   {
     return;
   }
