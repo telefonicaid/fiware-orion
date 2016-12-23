@@ -46,6 +46,12 @@
 #include "rest/uriParamNames.h"
 #include "serviceRoutines/postUpdateContext.h"
 
+#ifdef PARANOID_JSON_INDENT
+#include "rapidjson/document.h"
+#include "rapidjson/prettywriter.h"
+#include "common/string.h"   // jsonFix
+#endif
+
 
 
 /* ****************************************************************************
@@ -132,12 +138,41 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   // 2. Render the string of the request we want to forward
   //
   MimeType     outMimeType = ciP->outMimeType;
-  std::string  payload;
+  std::string  _payload;
   char*        cleanPayload;
 
   ciP->outMimeType  = JSON;
 
-  TIMED_RENDER(payload = upcrP->render(ciP->apiVersion, asJsonObject));
+  TIMED_RENDER(_payload = upcrP->render(ciP->apiVersion, asJsonObject));
+
+  std::string payload;
+#ifdef PARANOID_JSON_INDENT
+  if (ciP->apiVersion != V2)
+  {
+    // First stage: conventional pretty printer
+    rapidjson::Document doc;
+    doc.Parse(_payload.c_str());
+
+    rapidjson::StringBuffer s;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+    writer.SetIndent(' ', 2);
+    doc.Accept(writer);
+
+    std::string prettyPrinted = s.GetString();
+
+    // Second stage: "key": "value" -> "key" : value (legacy reasons... this was the
+    // way we implement JSON rendering at the very beggining)
+    char* prettyPrinted2 = jsonFix(prettyPrinted.c_str());
+    payload = std::string(prettyPrinted2);
+    free(prettyPrinted2);
+  }
+  else
+  {
+    payload = _payload;
+  }
+#else
+  payload = _payload;
+#endif
 
   ciP->outMimeType  = outMimeType;
   cleanPayload      = (char*) payload.c_str();

@@ -43,6 +43,11 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsiNotify/Notifier.h"
 
+#ifdef PARANOID_JSON_INDENT
+#include "rapidjson/document.h"
+#include "rapidjson/prettywriter.h"
+#include "common/string.h"   // jsonFix
+#endif
 
 
 /* ****************************************************************************
@@ -115,7 +120,29 @@ void Notifier::sendNotifyContextAvailabilityRequest
 )
 {
     /* Render NotifyContextAvailabilityRequest */
-    std::string payload = ncar->render();
+    std::string _payload = ncar->render();
+
+    std::string payload;
+#ifdef PARANOID_JSON_INDENT
+    // First stage: conventional pretty printer
+    rapidjson::Document doc;
+    doc.Parse(_payload.c_str());
+
+    rapidjson::StringBuffer s;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+    writer.SetIndent(' ', 2);
+    doc.Accept(writer);
+
+    std::string prettyPrinted = s.GetString();
+
+    // Second stage: "key": "value" -> "key" : value (legacy reasons... this was the
+    // way we implement JSON rendering at the very beggining)
+    char* prettyPrinted2 = jsonFix(prettyPrinted.c_str());
+    payload = std::string(prettyPrinted2);
+    free(prettyPrinted2);
+#else
+    payload = _payload;
+#endif
 
     /* Parse URL */
     std::string  host;
@@ -440,16 +467,45 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
     ci.outMimeType = JSON;
 
-    std::string payloadString;
+    std::string _payloadString;
     if (renderFormat == NGSI_V1_LEGACY)
     {
       bool asJsonObject = (ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON);
-      payloadString = ncrP->render(ci.apiVersion, asJsonObject);
+      _payloadString = ncrP->render(ci.apiVersion, asJsonObject);
     }
     else
     {
-      payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
+      _payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
     }
+
+    std::string payloadString;
+#ifdef PARANOID_JSON_INDENT
+    if (renderFormat == NGSI_V1_LEGACY)
+    {
+      // First stage: conventional pretty printer
+      rapidjson::Document doc;
+      doc.Parse(_payloadString.c_str());
+
+      rapidjson::StringBuffer s;
+      rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+      writer.SetIndent(' ', 2);
+      doc.Accept(writer);
+
+      std::string prettyPrinted = s.GetString();
+
+      // Second stage: "key": "value" -> "key" : value (legacy reasons... this was the
+      // way we implement JSON rendering at the very beggining)
+      char* prettyPrinted2 = jsonFix(prettyPrinted.c_str());
+      payloadString = std::string(prettyPrinted2);
+      free(prettyPrinted2);
+    }
+    else
+    {
+      payloadString = _payloadString;
+    }
+#else
+    payloadString = _payloadString;
+#endif
 
     /* Parse URL */
     std::string  host;

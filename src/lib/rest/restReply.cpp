@@ -54,8 +54,11 @@
 
 #include "logMsg/traceLevels.h"
 
+#ifdef PARANOID_JSON_INDENT
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
+#include "common/string.h"   // jsonFix
+#endif
 
 static int replyIx = 0;
 
@@ -68,10 +71,11 @@ void restReply(ConnectionInfo* ciP, const std::string& _answer)
   MHD_Response*  response;
 
   std::string answer;
-#if 0
-  // FIXME PR: maybe we could use this code (branch haderding/remove_ngsiv1_indent)
-  if ((ciP->outMimeType == JSON) && (ciP->apiVersion != V2))
+
+#ifdef PARANOID_JSON_INDENT
+  if ((ciP->outMimeType == JSON) && (ciP->apiVersion == V1) && (_answer.length() != 0))
   {
+    // First stage: conventional pretty printer
     rapidjson::Document doc;
     doc.Parse(_answer.c_str());
 
@@ -80,7 +84,13 @@ void restReply(ConnectionInfo* ciP, const std::string& _answer)
     writer.SetIndent(' ', 2);
     doc.Accept(writer);
 
-    answer = s.GetString();
+    std::string prettyPrinted = s.GetString();
+
+    // Second stage: "key": "value" -> "key" : value (legacy reasons... this was the
+    // way we implement JSON rendering at the very beggining)
+    char* prettyPrinted2 = jsonFix(prettyPrinted.c_str());
+    answer = std::string(prettyPrinted2);
+    free(prettyPrinted2);
   }
   else
   {

@@ -32,7 +32,11 @@
 #include "common/Timer.h"
 #include "common/sem.h"
 
-
+/* ****************************************************************************
+*
+* FIXME P10: temporal definition, it should be removed soon
+*/
+#define PARANOID_JSON_INDENT
 
 /* ****************************************************************************
 *
