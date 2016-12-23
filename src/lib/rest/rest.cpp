@@ -1262,6 +1262,11 @@ static int connectionTreat
     ciP->uriParam[URI_PARAM_PAGINATION_LIMIT]   = DEFAULT_PAGINATION_LIMIT;
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
     
+    // Note we need to get API version before MHD_get_connection_values() as the later
+    // function may result in an error after processing Accept headers (and the
+    // render for the error depends on API version)
+    ciP->apiVersion = apiVersionGet(ciP->url.c_str());
+
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
 
     if (ciP->httpHeaders.accept == "")  // No Accept: given, treated as */*
@@ -1269,8 +1274,6 @@ static int connectionTreat
       ciP->httpHeaders.accept = "*/*";
       acceptParse(ciP, "*/*");
     }
-
-    ciP->apiVersion = apiVersionGet(ciP->url.c_str());
 
     char correlator[CORRELATOR_ID_SIZE + 1];
     if (ciP->httpHeaders.correlator == "")
