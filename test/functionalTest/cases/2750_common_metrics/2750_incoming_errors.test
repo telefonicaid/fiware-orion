@@ -166,11 +166,6 @@ echo
 echo
 
 
-#
-# FIXME P6
-# Note that the response of this API v2 request is of API v1 type.
-# See github issue #2765
-#
 echo "09. Send a request with no acceptable mime-type in accept header"
 echo "================================================================"
 payload='"a string"'
@@ -427,17 +422,14 @@ Date: REGEX(.*)
 09. Send a request with no acceptable mime-type in accept header
 ================================================================
 HTTP/1.1 406 Not Acceptable
-Content-Length: 145
+Content-Length: 82
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "orionError": {
-        "code": "406",
-        "details": "no acceptable mime-type in accept header",
-        "reasonPhrase": "Not Acceptable"
-    }
+    "description": "no acceptable mime-type in accept header",
+    "error": "NotAcceptable"
 }
 
 
@@ -512,7 +504,7 @@ Date: REGEX(.*)
                 "SP/error": {
                     "incomingTransactionErrors": 6,
                     "incomingTransactionRequestSize": 39,
-                    "incomingTransactionResponseSize": 619,
+                    "incomingTransactionResponseSize": 556,
                     "incomingTransactions": 6,
                     "serviceTime": REGEX(.*)
                 },
@@ -536,7 +528,7 @@ Date: REGEX(.*)
             "sum": {
                 "incomingTransactionErrors": 7,
                 "incomingTransactionRequestSize": 39,
-                "incomingTransactionResponseSize": 2326,
+                "incomingTransactionResponseSize": 2263,
                 "incomingTransactions": 10,
                 "serviceTime": REGEX(.*)
             }
@@ -547,7 +539,7 @@ Date: REGEX(.*)
             "SP/error": {
                 "incomingTransactionErrors": 6,
                 "incomingTransactionRequestSize": 39,
-                "incomingTransactionResponseSize": 619,
+                "incomingTransactionResponseSize": 556,
                 "incomingTransactions": 6,
                 "serviceTime": REGEX(.*)
             },
@@ -571,7 +563,7 @@ Date: REGEX(.*)
         "sum": {
             "incomingTransactionErrors": 7,
             "incomingTransactionRequestSize": 39,
-            "incomingTransactionResponseSize": 2326,
+            "incomingTransactionResponseSize": 2263,
             "incomingTransactions": 10,
             "serviceTime": REGEX(.*)
         }
