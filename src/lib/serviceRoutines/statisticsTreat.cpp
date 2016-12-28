@@ -363,18 +363,18 @@ std::string statisticsCacheTreat
   //
   // mongo sub cache counters
   //
-  int   mscRefreshs = 0;
-  int   mscInserts  = 0;
-  int   mscRemoves  = 0;
-  int   mscUpdates  = 0;
-  int   cacheItems  = 0;
-  char  listBuffer[1024];
+  int          mscRefreshs = 0;
+  int          mscInserts  = 0;
+  int          mscRemoves  = 0;
+  int          mscUpdates  = 0;
+  int          cacheItems  = 0;
+  std::string  listBuffer;
 
   cacheSemTake(__FUNCTION__, "statisticsCacheTreat");
-  subCacheStatisticsGet(&mscRefreshs, &mscInserts, &mscRemoves, &mscUpdates, &cacheItems, listBuffer, sizeof(listBuffer));
+  subCacheStatisticsGet(&mscRefreshs, &mscInserts, &mscRemoves, &mscUpdates, &cacheItems, &listBuffer);
   cacheSemGive(__FUNCTION__, "statisticsCacheTreat");
 
-  js.addString("ids", listBuffer);    // FIXME P10: this seems not printing anything... is listBuffer working fine?
+  js.addString("ids", listBuffer);
   js.addNumber("refresh", mscRefreshs);
   js.addNumber("inserts", mscInserts);
   js.addNumber("removes", mscRemoves);

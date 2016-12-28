@@ -86,14 +86,14 @@ static void insertInCache
   }
 
   cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
-  subCacheItemInsert(tenant.c_str(),
-                     servicePath.c_str(),
+  subCacheItemInsert(tenant,
+                     servicePath,
                      sub.notification.httpInfo,
                      sub.subject.entities,
                      sub.notification.attributes,
                      sub.notification.metadata,
                      sub.subject.condition.attributes,
-                     subId.c_str(),
+                     subId,
                      sub.expires,
                      sub.throttling,
                      sub.attrsFormat,

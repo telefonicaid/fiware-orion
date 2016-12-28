@@ -22,7 +22,6 @@
 *
 * Author: Fermin Galan
 */
-
 #include <map>
 #include <string>
 #include <vector>
@@ -39,7 +38,6 @@
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/mongoSubCache.h"
 #include "common/defaultValues.h"
-
 #include "cache/subCache.h"
 
 using namespace mongo;
@@ -212,6 +210,7 @@ static void setEntities(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
     LM_T(LmtMongo, ("Subscription entities: %s", entities.toString().c_str()));
   }
 }
+
 
 
 /* ****************************************************************************
@@ -620,6 +619,7 @@ void updateInCache
   long long                  lastSuccess
 )
 {
+  //
   // StringFilter in Scope?
   //
   // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in subUp.restriction.scopeVector?
@@ -662,7 +662,7 @@ void updateInCache
   //
   // This is resolved by two separate functions, one that removes the old one, if found (subCacheItemLookup+subCacheItemRemove),
   // and the other one that inserts the sub, IF it should be inserted (subCacheItemInsert).
-  // If inserted, subCacheUpdateStatisticsIncrement is called to update the statistics counter of insertions.
+  // If inserted, subCacheStatisticsIncrementUpdates is called to update the statistics counter of insertions.
   //
 
 
@@ -670,11 +670,13 @@ void updateInCache
 
   cacheSemTake(__FUNCTION__, "Updating cached subscription");
 
-  // Second lookup for the same in the mongo update subscription process. However, we have to do it, as the item in the cache could have been changed
+  //
+  // Second lookup for the same in the mongo update subscription process.
+  // However, we have to do it, as the item in the cache could have been changed
   // in the meanwhile.
-  CachedSubscription* subCacheP = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
-
-  char* servicePathCache = (char*) ((subCacheP == NULL)? "" : subCacheP->servicePath);
+  //
+  CachedSubscription* subCacheP        = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
+  char*               servicePathCache = (char*) ((subCacheP == NULL)? "" : subCacheP->servicePath.c_str());
 
   LM_T(LmtSubCache, ("update: %s", doc.toString().c_str()));
 
@@ -683,9 +685,11 @@ void updateInCache
   std::string geom;
   std::string coords;
   std::string georel;
+
   if (doc.hasField(CSUB_EXPR))
   {
     BSONObj expr = getObjectFieldF(doc, CSUB_EXPR);
+
     q      = expr.hasField(CSUB_EXPR_Q)?      getStringFieldF(expr, CSUB_EXPR_Q)      : "";
     mq     = expr.hasField(CSUB_EXPR_MQ)?     getStringFieldF(expr, CSUB_EXPR_MQ)     : "";
     geom   = expr.hasField(CSUB_EXPR_GEOM)?   getStringFieldF(expr, CSUB_EXPR_GEOM)   : "";
@@ -693,30 +697,45 @@ void updateInCache
     georel = expr.hasField(CSUB_EXPR_GEOREL)? getStringFieldF(expr, CSUB_EXPR_GEOREL) : "";
   }
 
-  int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
+  int mscInsert = mongoSubCacheItemInsert(tenant,
                                           doc,
-                                          subUp.id.c_str(),
+                                          subUp.id,
                                           servicePathCache,
                                           lastNotification,
                                           lastFailure,
                                           lastSuccess,
                                           doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
                                           doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_STATUS) : STATUS_ACTIVE,
-                                          q, mq, geom, coords, georel,
+                                          q,
+                                          mq,
+                                          geom,
+                                          coords,
+                                          georel,
                                           stringFilterP,
                                           mdStringFilterP,
                                           doc.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(doc, CSUB_FORMAT)) : NGSI_V2_NORMALIZED);
 
   if (mscInsert == 0)  // 0: Insertion was really made
   {
-    subCacheUpdateStatisticsIncrement();
-    if (subCacheP != NULL)
-    {
-      LM_T(LmtSubCache, ("Calling subCacheItemRemove"));
-      subCacheItemRemove(subCacheP);
-    }
-  }
+    subCacheStatisticsIncrementUpdates();
 
+    //
+    // To simulate the old way of updating:
+    //   1. Create and insert the new item
+    //   2. Remove and delete the old item
+    //
+    // ... we here increment a 'removed sub cache item'
+    //
+    // With the new implementation of the sub-cache (with a std::map instead of the linked list),
+    // when inserting an item 'over' an old one it gets replaced.
+    // Not sure how this work though as the new item seems to shadow the old item.
+    // For sure we will have a leak unless we *delete* the old CachedSubscription,
+    // but, this may not be enough - a map::erase muy be neseccary as well, and if so,
+    // it must be done BEFORE the new sub-cache item is inserted.
+    //
+    subCacheStatisticsIncrementRemoves();
+    delete subCacheP;
+  }
   cacheSemGive(__FUNCTION__, "Updating cached subscription");
 }
 
@@ -741,7 +760,6 @@ std::string mongoUpdateSubscription
   const std::string&                   fiwareCorrelator
 )
 {
-
   bool reqSemTaken = false;
 
   reqSemTake(__FUNCTION__, "ngsiv2 update subscription request", SemWriteOp, &reqSemTaken);

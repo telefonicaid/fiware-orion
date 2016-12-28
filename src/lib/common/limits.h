@@ -64,10 +64,11 @@
 * Others -
 *
 */
-#define IP_LENGTH_MAX           15    // Based on xxx.xxx.xxx.xxx
-#define STRING_SIZE_FOR_INT     16    // Room enough for an integer
-#define STRING_SIZE_FOR_DOUBLE  64    // Room enough for a double
-#define CORRELATOR_ID_SIZE      36    // Max size of a UUIDv4 string
+#define IP_LENGTH_MAX                           15    // Based on xxx.xxx.xxx.xxx
+#define STRING_SIZE_FOR_INT                     16    // Room enough for an integer
+#define STRING_SIZE_FOR_DOUBLE                  64    // Room enough for a double
+#define CORRELATOR_ID_SIZE                      36    // Max size of a UUIDv4 string
+#define MAX_SUBSCRIPTIONS_FOR_STATISTICS_LIST   20    // For GET /v2/subscriptions
 
 
 
@@ -94,6 +95,7 @@
 */
 #define  LOCAL_IP_V6  "::"
 #define  LOCAL_IP_V4  "0.0.0.0"
+#define  MAX_LEN_IP   64
 
 
 
@@ -128,14 +130,6 @@
 * Pagination definitions - 
 */
 #define MAX_PAGINATION_LIMIT            "1000"
-
-
-
-/* ****************************************************************************
-*
-* MAX_LEN_IP - 
-*/
-#define MAX_LEN_IP  64
 
 
 

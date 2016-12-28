@@ -677,6 +677,7 @@ static bool contextAttributeCustomMetadataToBson(BSONObj* md, BSONArray* mdNames
 }
 
 
+
 /* ****************************************************************************
 *
 * updateAttribute -
@@ -1100,7 +1101,7 @@ static bool addTriggeredSubscriptions_withCache
   std::vector<CachedSubscription*>  subVec;
 
   cacheSemTake(__FUNCTION__, "match subs for notifications");
-  subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
+  subCacheMatch(tenant, servicePath, entityId, entityType, modifiedAttrs, &subVec);
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
   int now = getCurrentTime();
@@ -1111,14 +1112,14 @@ static bool addTriggeredSubscriptions_withCache
     // Outdated subscriptions are skipped
     if (cSubP->expirationTime < now)
     {
-      LM_T(LmtSubCache, ("%s is EXPIRED (EXP:%lu, NOW:%lu, DIFF: %d)", cSubP->subscriptionId, cSubP->expirationTime, now, now - cSubP->expirationTime));
+      LM_T(LmtSubCache, ("%s is EXPIRED (EXP:%lu, NOW:%lu, DIFF: %d)", cSubP->subscriptionId.c_str(), cSubP->expirationTime, now, now - cSubP->expirationTime));
       continue;
     }
 
     // Status is inactive
     if (cSubP->status == STATUS_INACTIVE)
     {
-      LM_T(LmtSubCache, ("%s is INACTIVE", cSubP->subscriptionId));
+      LM_T(LmtSubCache, ("%s is INACTIVE", cSubP->subscriptionId.c_str()));
       continue;
     }
 
@@ -1143,7 +1144,7 @@ static bool addTriggeredSubscriptions_withCache
       if ((now - cSubP->lastNotificationTime) < cSubP->throttling)
       {
         LM_T(LmtSubCache, ("subscription '%s' ignored due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
-                           cSubP->subscriptionId,
+                           cSubP->subscriptionId.c_str(),
                            cSubP->throttling,
                            cSubP->lastNotificationTime,
                            now,
@@ -1154,7 +1155,7 @@ static bool addTriggeredSubscriptions_withCache
       else
       {
         LM_T(LmtSubCache, ("subscription '%s' NOT ignored due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
-                           cSubP->subscriptionId,
+                           cSubP->subscriptionId.c_str(),
                            cSubP->throttling,
                            cSubP->lastNotificationTime,
                            now,
@@ -1165,7 +1166,7 @@ static bool addTriggeredSubscriptions_withCache
     else
     {
       LM_T(LmtSubCache, ("subscription '%s' NOT ignored due to throttling II (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
-                         cSubP->subscriptionId,
+                         cSubP->subscriptionId.c_str(),
                          cSubP->throttling,
                          cSubP->lastNotificationTime,
                          now,
@@ -1174,12 +1175,12 @@ static bool addTriggeredSubscriptions_withCache
     }
 
     TriggeredSubscription* subP = new TriggeredSubscription((long long) cSubP->throttling,
-                                                           (long long) cSubP->lastNotificationTime,
-                                                           cSubP->renderFormat,
-                                                           cSubP->httpInfo,
-                                                           aList,
-                                                           cSubP->subscriptionId,
-                                                           cSubP->tenant);
+                                                            (long long) cSubP->lastNotificationTime,
+                                                            cSubP->renderFormat,
+                                                            cSubP->httpInfo,
+                                                            aList,
+                                                            cSubP->subscriptionId,
+                                                            cSubP->tenant.c_str());
     subP->blacklist = cSubP->blacklist;
     subP->metadata  = cSubP->metadata;
 
@@ -1753,6 +1754,7 @@ static bool processOnChangeConditionForUpdateContext
 }
 
 
+
 /* ****************************************************************************
 *
 * setActionTypeMetadata -
@@ -2095,7 +2097,7 @@ static bool processSubscriptions
           cSubP->lastNotificationTime = rightNow;
           cSubP->count               += 1;
 
-          LM_T(LmtSubCache, ("set lastNotificationTime to %lu and count to %lu for '%s'", cSubP->lastNotificationTime, cSubP->count, cSubP->subscriptionId));
+          LM_T(LmtSubCache, ("set lastNotificationTime to %lu and count to %lu for '%s'", cSubP->lastNotificationTime, cSubP->count, cSubP->subscriptionId.c_str()));
         }
         else
         {

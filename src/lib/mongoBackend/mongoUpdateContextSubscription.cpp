@@ -22,9 +22,9 @@
 *
 * Author: Fermin Galan Marquez
 */
-
 #include <string>
 #include <vector>
+
 #include "rest/OrionError.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
@@ -35,18 +35,19 @@
 using namespace ngsiv2;
 
 
+
 /* ****************************************************************************
 *
 * mongoUpdateContextSubscription - 
 */
 HttpStatusCode mongoUpdateContextSubscription
 (
-    UpdateContextSubscriptionRequest*   requestP,
-    UpdateContextSubscriptionResponse*  responseP,
-    const std::string&                  tenant,
-    const std::string&                  xauthToken,
-    const std::vector<std::string>&     servicePathV,
-    const std::string&                  fiwareCorrelator
+  UpdateContextSubscriptionRequest*   requestP,
+  UpdateContextSubscriptionResponse*  responseP,
+  const std::string&                  tenant,
+  const std::string&                  xauthToken,
+  const std::vector<std::string>&     servicePathV,
+  const std::string&                  fiwareCorrelator
 )
 { 
   OrionError         oe;

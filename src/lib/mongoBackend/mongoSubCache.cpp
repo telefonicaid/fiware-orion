@@ -63,7 +63,7 @@ using namespace mongo;
 * Note that the 'count' of the inserted subscription is set to ZERO.
 *
 */
-int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
+int mongoSubCacheItemInsert(const std::string& tenant, const BSONObj& sub)
 {
   //
   // 01. Check validity of subP parameter 
@@ -100,9 +100,9 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   std::string               renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
   RenderFormat              renderFormat       = stringToRenderFormat(renderFormatString);
 
-  cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);
-  cSubP->subscriptionId        = strdup(idField.OID().toString().c_str());
-  cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(sub, CSUB_SERVICE_PATH).c_str() : "/");
+  cSubP->tenant                = tenant;
+  cSubP->subscriptionId        = idField.OID().toString();
+  cSubP->servicePath           = sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(sub, CSUB_SERVICE_PATH).c_str() : "/";
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       : 0;
@@ -112,7 +112,6 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(sub, CSUB_LASTFAILURE)      : -1;
   cSubP->lastSuccess           = sub.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongF(sub, CSUB_LASTSUCCESS)      : -1;
   cSubP->count                 = 0;
-  cSubP->next                  = NULL;
 
 
   //
@@ -191,7 +190,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
     if (!entity.hasField(CSUB_ENTITY_ID))
     {
-      LM_W(("Runtime Error (got a subscription without id)"));
+      LM_W(("Runtime Error (got a subscription without entity id)"));
       continue;
     }
 
@@ -250,10 +249,10 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 */
 int mongoSubCacheItemInsert
 (
-  const char*         tenant,
+  const std::string&  tenant,
   const BSONObj&      sub,
-  const char*         subscriptionId,
-  const char*         servicePath,
+  const std::string&  subscriptionId,
+  const std::string&  servicePath,
   int                 lastNotificationTime,
   int                 lastFailure,
   int                 lastSuccess,
@@ -345,9 +344,9 @@ int mongoSubCacheItemInsert
     lastNotificationTime = getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION);
   }
 
-  cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
-  cSubP->subscriptionId        = strdup(subscriptionId);
-  cSubP->servicePath           = strdup(servicePath);
+  cSubP->tenant                = tenant;
+  cSubP->subscriptionId        = subscriptionId;
+  cSubP->servicePath           = servicePath;
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;
@@ -359,7 +358,6 @@ int mongoSubCacheItemInsert
   cSubP->expression.geometry   = geometry;
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
-  cSubP->next                  = NULL;
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
 
   //
@@ -394,7 +392,7 @@ int mongoSubCacheItemInsert
     cSubP->expression.mdStringFilter.fill(mdStringFilterP, &errorString);
   }
 
-  LM_T(LmtSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
+  LM_T(LmtSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId.c_str()));
 
 
   //
@@ -466,7 +464,7 @@ void mongoSubCacheRefresh(const std::string& database)
       continue;
     }
 
-    int r = mongoSubCacheItemInsert(tenant.c_str(), sub);
+    int r = mongoSubCacheItemInsert(tenant, sub);
     if (r == 0)
     {
       ++subNo;
