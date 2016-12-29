@@ -653,6 +653,12 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 
   ++subCache.noOfInserts;
 
+  if (subCache.list[cSubP->tenant + cSubP->subscriptionId] != NULL)
+  {
+    subCacheItemDestroy(subCache.list[cSubP->tenant + cSubP->subscriptionId]);
+    delete subCache.list[cSubP->tenant + cSubP->subscriptionId];
+  }
+
   subCache.list[cSubP->tenant + cSubP->subscriptionId] = cSubP;
 }
 

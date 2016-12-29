@@ -727,15 +727,12 @@ void updateInCache
     // ... we here increment a 'removed sub cache item'
     //
     // With the new implementation of the sub-cache (with a std::map instead of the linked list),
-    // when inserting an item 'over' an old one it gets replaced.
-    // Not sure how this work though as the new item seems to shadow the old item.
-    // For sure we will have a leak unless we *delete* the old CachedSubscription,
-    // but, this may not be enough - a map::erase muy be neseccary as well, and if so,
-    // it must be done BEFORE the new sub-cache item is inserted.
+    // when inserting an item 'over' an old one it gets replaced,
+    // so, in subCache.cpp, function subCacheItemInsert(), when nothing can go wrong,
+    // right before inserting the modified CachedSubscription in the map,
+    // the old copy is destroyed.
     //
     subCacheStatisticsIncrementRemoves();
-    subCacheItemDestroy(subCacheP);
-    delete subCacheP;
   }
   cacheSemGive(__FUNCTION__, "Updating cached subscription");
 }
