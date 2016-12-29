@@ -734,6 +734,7 @@ void updateInCache
     // it must be done BEFORE the new sub-cache item is inserted.
     //
     subCacheStatisticsIncrementRemoves();
+    subCacheItemDestroy(subCacheP);
     delete subCacheP;
   }
   cacheSemGive(__FUNCTION__, "Updating cached subscription");
