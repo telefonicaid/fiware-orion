@@ -952,6 +952,7 @@ int subCacheItemRemove(CachedSubscription* cSubP)
   CachedSubscription* csP = it->second;
 
   subCacheItemDestroy(csP);
+  delete csP;
   ++subCache.noOfRemoves;
   subCache.list.erase(it);
 
