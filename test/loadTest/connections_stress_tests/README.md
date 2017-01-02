@@ -5,7 +5,7 @@ established connections.
 
 ### Pre-requirements
 
-* Install Remote Python Call (RPyC) and psutil in CB host:
+* Install [Remote Python Call (RPyC)](https://pypi.python.org/pypi/rpyc) and psutil in CB host:
 
 ```
 sudo yum install python-devel python-psutil
@@ -21,7 +21,7 @@ chmod a+x slow_listener
 
 ### Test procedure
 
-* Launch RPyC listener `https://pypi.python.org/pypi/rpyc`:
+* Launch RPyC listener:
 
 ```
 $ rpyc_classic.py
