@@ -51,10 +51,10 @@ class Stablished_Connections:
     - verify/modify the notification listener with a delay of 10 minutes before answering.
     - modify the ContextBroker config with: -httpTimeout 600000 -notificationMode threadpool:60000:5000 and restart it.
     - launch an entity update, that it triggers all subscriptions.
-    - launch indefinitely a "/version" request per second and:
-         - report that its response is correct.
-         - report the number of established connections (if `-noEstablished` param is not used this column is ignored)
-         - report the notification queue size into ContextBroker (if `-noQueueSize` param is used this column is ignored)
+    - launch for a given time (in minutes) a "/version" request per second and:
+         - reports that its response is correct.
+         - reports the number of ESTABLISHED, CLOSE_WAIT and SUM connections (if `-noEstablished` param is used the established, the close_wait and the sum columns are ignored)
+         - reports the notification queue size into ContextBroker (if `-noQueueSize` param is used this column is ignored)
     """
     # variables
     max_subscription_created = 5000
@@ -84,7 +84,7 @@ class Stablished_Connections:
         print " *     -host=<host>         : CB host (OPTIONAL) (default: localhost).                                           *"
         print " *     -u                   : show this usage (OPTIONAL).                                                        *"
         print " *     -v                   : verbose with all responses (OPTIONAL) (default: False).                            *"
-        print " *     -noEstablished       : is used to ignore the established connections (OPTIONAL) (default: False).         *"
+        print " *     -noEstablished       : is used to ignore established and close wait connections (OPTIONAL)(default: False)*"
         print " *     -noQueueSize         : is used to ignore the Notification Queue Size (OPTIONAL) (default: False).         *"
         print " *     -service=<value>     : service header (OPTIONAL) (default: stablished_connections).                       *"
         print " *     -service_path=<value>: service path header (OPTIONAL) (default: /test)                                    *"
@@ -134,70 +134,36 @@ class Stablished_Connections:
 
     def __get_established_connections(self):
         """
-        return the number of established connections per ContextBroker
-        using "prpyc" and "psutil" libraries.
-        :return a 3-uple with [established_conn, close_wait_conn]
+        return the number of established connections per ContextBroker using "prpyc" and "psutil" libraries.
+        Note: the starswith() method is used instead of just ==. This way, the process
+             can have a name like "contextBroker-1.4.3..." and the logic will still work
+        :return tuple (established_conn, close_wait_conn)
         """
         conn = rpyc.classic.connect(self.host)
-
-        # Note the check for type(proc.name). This is due to, as far as I (Fermin)
-        # have checked, the psutil library API changed from 0.6.1 (the one in CentOS 6.x,
-        # which uses proc.name) to 2.1.1 (the one in modern Debian, which uses proc.name()).
-        # The solution is quite a hack and I don't like too much, but it works...
-        #
-        # Note also the starswith() method instead of just ==. This way, the process
-        # can have a name like contextBroker-1.4.3 and the logic will still work
-
         connections_est = """def get_number_established_conn():
                import psutil
                process_name = "contextBroker"
                pid = 0
                e_c = 0
+               cw_c = 0
                for proc in psutil.process_iter():
-                      if type(proc.name) == str:
-                             name = proc.name
-                      else:
-                             name = proc.name()
-                      if name.startswith(process_name):
-                             pid = proc.pid
-                             break
+                    pinfo = proc.as_dict(attrs=['pid', 'name'])
+                    if pinfo["name"].startswith(process_name):
+                        pid = pinfo["pid"]
+                        break
                p = psutil.Process(pid)
                connections = p.get_connections()
                for c in connections:
-                      if c.status == "ESTABLISHED":
-                             e_c += 1
-               return e_c"""
+                    if c.status == "ESTABLISHED":
+                        e_c += 1
+                    elif c.status == "CLOSE_WAIT":
+                        cw_c += 1
+               return str(e_c), str(cw_c)"""
 
         conn.execute(connections_est)
         remote_exec = conn.namespace['get_number_established_conn']
-        con_est = int(remote_exec())
-
-        # FIXME: it would be more efficient to get both ESTABLISHED and CLOSE_WAIT
-        # in a single shoot, but I (Fermin) don't know prpyc well enough to do that
-        connections_cw = """def get_number_close_wait_conn():
-               import psutil
-               process_name = "contextBroker"
-               pid = 0
-               e_c = 0
-               for proc in psutil.process_iter():
-                      if type(proc.name) == str:
-                             name = proc.name
-                      else:
-                             name = proc.name()
-                      if name.startswith(process_name):
-                             pid = proc.pid
-                             break
-               p = psutil.Process(pid)
-               connections = p.get_connections()
-               for c in connections:
-                      if c.status == "CLOSE_WAIT":
-                             e_c += 1
-               return e_c"""
-
-        conn.execute(connections_cw)
-        remote_exec = conn.namespace['get_number_close_wait_conn']
-        con_cw = int(remote_exec())
-        return [con_est, con_cw]
+        total_conns = remote_exec()
+        return total_conns
 
     def __init__(self, arguments):
         """
@@ -267,11 +233,16 @@ class Stablished_Connections:
         """
         payload = u'{"description": "subscription used to epoll test",  "subject": {"entities": [{"idPattern": ".*"}], "condition": {"attrs": ["temperature"]}}, "notification": {"http": {"url": "%s"}, "attrs": ["temperature"]}}' % self.notif_url
         logging.info(" creating %d subscriptions..." % self.max_subscription_created)
+        subsc_error = 0
         for i in range(self.max_subscription_created):
-            resp = requests.post("%s/v2/subscriptions" % self.cb_endpoint, headers=self.headers, data=payload)
-            self.__print_by_console(resp)
-            assert resp.status_code == 201, " ERROR - the subcriptions request is failed: \n - status code: %s \n - response: %s" % (str(resp.status_code), resp.text)
-        logging.info(" %d subscriptions have been created" % self.max_subscription_created)
+            try:
+                resp = requests.post("%s/v2/subscriptions" % self.cb_endpoint, headers=self.headers, data=payload)
+                self.__print_by_console(resp)
+                if resp.status_code != 201:
+                    subsc_error += 1
+            except Exception, e:
+                logging.warn(" creating a new subscription: \n    %s" % e)
+        logging.info(" %d subscriptions have been created" % (self.max_subscription_created - subsc_error))
 
     def update_and_version(self):
         """
@@ -281,38 +252,46 @@ class Stablished_Connections:
         init_date = time.time()
         duration_in_secs = self.duration * 60
         queue_size = u'N/A'
-        established_connections = u'N/A'
+        e_c = u'N/A'
+        cw_c = u'N/A'
+        s = u'N/A'
         counter = 0
 
         # update request
         logging.info("Test init: %s " % self.__convert_timestamp_to_zulu(init_date))
         random_value = random.randint(1, 100)  # random value between 1..100 for attribute value. See the payload below.
         payload = u'{"actionType": "APPEND", "entities": [{"id": "Bcn-Welt", "temperature": {"value": %s}}]}' % random_value
-        resp = requests.post("%s/v2/op/update" % self.cb_endpoint, headers=self.headers, data=payload)
-        assert resp.status_code == 204, " ERROR - the update batch op request is failed: \n - status code: %s \n - response: %s" % (str(resp.status_code), resp.text)
-        self.__print_by_console(resp)
+        try:
+            resp = requests.post("%s/v2/op/update" % self.cb_endpoint, headers=self.headers, data=payload)
+            assert resp.status_code == 204, " ERROR - the update batch op request is failed: \n - status code: %s \n - response: %s" % (str(resp.status_code), resp.text)
+            self.__print_by_console(resp)
+        except Exception, e:
+            logging.error(e)
+            raise Exception(" ERROR - %s \n - status code: %d \n - response: %s" % (e, resp.status_code, resp.text))
 
         logging.info(" Reports each second:")
-        logging.info(" counter       version      queue   established   close wait    sum")
+        logging.info(" counter       version      queue   established   close wait        sum")
         logging.info("               request      size    connections   connections   connections")
         logging.info(" --------------------------------------------------------------------------------")
         while (init_date+duration_in_secs) > time.time():
             # version request
             counter += 1
             try:
-               resp = requests.get("%s/version" % self.cb_endpoint)
-               self.__print_by_console(resp)
-               assert resp.status_code == 200, " ERROR - the version http code is not 200 - OK\n     - http code received: %s - %s" % (str(resp.status_code), resp. reason)
-               version_result = resp.reason
+                resp = requests.get("%s/version" % self.cb_endpoint)
+                self.__print_by_console(resp)
+                assert resp.status_code == 200, " ERROR - the version http code is not 200 - OK\n     - http code received: %s - %s" % (str(resp.status_code), resp. reason)
+                version_result = resp.reason
             except ConnectionError:
-               version_result = "NOK"
+                version_result = "NOK"
             # report
             if not self.no_queue_size_flag:
                 queue_size = self.__get_queue_size()
             if not self.no_established_connections_flag:
-                cons = self.__get_established_connections()
-            logging.info(" -------- %d -------- %s -------- %s -------- %d ---------- %d -------- %d ----------"
-                         % (counter, version_result, queue_size, cons[0], cons[1], cons[0] + cons[1]))
+                e_c, cw_c = self.__get_established_connections()
+                s = str(int(e_c) + int(cw_c))
+
+            logging.info(" --- %d -------- %s -------- %s -------- %s ---------- %s -------- %s ---"
+                         % (counter, version_result, queue_size, e_c, cw_c, s))
             time.sleep(self.version_delay)
 
         logging.info(" ALL (%d) \"/version\" requests responded correctly...Bye." % counter)
@@ -329,5 +308,6 @@ if __name__ == '__main__':
     conn.create_subscriptions()
 
     # modify a entity that it triggers all subscriptions and...
-    # ...launch indefinitely a "/version" request and verify that its response is correct.
+    # ...launch for a given time (in minutes) a "/version" request and verify that its response is correct.
     conn.update_and_version()
+    print("\n\n   - See the \"connections_stress_tests.log\" file with the report...Bye.")

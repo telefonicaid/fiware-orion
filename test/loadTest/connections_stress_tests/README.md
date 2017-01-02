@@ -21,7 +21,7 @@ chmod a+x slow_listener
 
 ### Test procedure
 
-* Launch RPyC listener:
+* Launch RPyC listener `https://pypi.python.org/pypi/rpyc`:
 
 ```
 $ rpyc_classic.py
@@ -58,15 +58,16 @@ contextBroker -reqMutexPolicy none -writeConcern 0 -httpTimeout 600000 -notifica
   * Creates 5000 subscriptions with subject.entities.idPattern: .*
   * Launches a single update, which triggers a notification per subscriptions (i.e. 5000 notifications). At this
     moment you will see the following trace in `slow_listener` output: `Received  0 Rate 0 r/s`
-  * Enters an infinite loop, that launches indefinitely a "GET /version" request per second and:
+  * Launches for a given time (in minutes, see `-duration` param) a "GET /version" request per second and:
      * Reports that its response is correct.
      * Reports the number of established connections (if `-noEstablished` param is used this column is ignored),
        both ESTABLISHED, CLOSE_WAIT and sum.
      * Reports the queue size into ContextBroker (if `-noQueueSize` param is used this column is ignored)
 
+
 ### Expected behaviour
 
-The following sample output will be printed in connections_stress_tests.log file:
+The following sample output will be printed in **connections_stress_tests.log** file:
 
 ```
 2016-12-19 17:01:45,191 | INFO | Test init: 2016-12-19T17:01:45.191521Z
