@@ -1,0 +1,147 @@
+# Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Fix for the bug which was precluding geo:point attributes updating location when updateContext APPEND was used
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity with geo:point
+# 02. Check location field at DB is -4.33, 36.12
+# 03. Update entity using v1 updateContext APPEND
+# 04. Check location field at DB is -11.22, 22.33
+#
+
+
+echo "01. Create entity with geo:point"
+echo "================================"
+payload='{
+  "id": "line1",
+  "type": "bus",
+  "loc": {
+    "type": "geo:point",
+    "value": "36.12,-4.33"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Check location field at DB is -4.33, 36.12"
+echo "=============================================="
+mongoCmd ${CB_DB_NAME} 'db.entities.find({"_id.id": "line1"}, {_id: 0, location: 1})'
+echo
+echo
+
+
+echo "03. Update entity using v1 updateContext APPEND"
+echo "==============================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "bus",
+      "id": "line1",
+      "attributes": [
+        {
+          "name": "loc",
+          "type": "geo:point",
+          "value": "22.33,-11.22"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo "04. Check location field at DB is -11.22, 22.33"
+echo "==============================================="
+mongoCmd ${CB_DB_NAME} 'db.entities.find({"_id.id": "line1"}, {_id: 0, location: 1})'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity with geo:point
+================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/line1?type=bus
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Check location field at DB is -4.33, 36.12
+==============================================
+{ "location" : { "attrName" : "loc", "coords" : { "type" : "Point", "coordinates" : [ -4.33, 36.12 ] } } }
+
+
+03. Update entity using v1 updateContext APPEND
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 391
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "loc",
+                        "type": "geo:point",
+                        "value": ""
+                    }
+                ],
+                "id": "line1",
+                "isPattern": "false",
+                "type": "bus"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+04. Check location field at DB is -11.22, 22.33
+===============================================
+{ "location" : { "attrName" : "loc", "coords" : { "type" : "Point", "coordinates" : [ -11.22, 22.33 ] } } }
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
