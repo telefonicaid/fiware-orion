@@ -53,7 +53,7 @@ class Stablished_Connections:
     - launch an entity update, that it triggers all subscriptions.
     - launch for a given time (in minutes) a "/version" request per second and:
          - reports that its response is correct.
-         - reports the number of ESTABLISHED, CLOSE_WAIT and SUM connections (if `-noEstablished` param is used the established, the close_wait and the sum columns are ignored)
+         - reports the number of ESTABLISHED and CLOSE_WAIT connections and the sum of both (if -noConnectionInfo param is used this informations is not provided)"
          - reports the notification queue size into ContextBroker (if `-noQueueSize` param is used this column is ignored)
     """
     # variables
@@ -67,7 +67,7 @@ class Stablished_Connections:
     mongo_host = "localhost"
     mongo_port = u'27017'
     verbose = False
-    no_established_connections_flag = False
+    no_connections_info_flag = False
     no_queue_size_flag = False
     duration = 60       # time in minutes
     version_delay = 1   # time in seconds
@@ -84,7 +84,7 @@ class Stablished_Connections:
         print " *     -host=<host>         : CB host (OPTIONAL) (default: localhost).                                           *"
         print " *     -u                   : show this usage (OPTIONAL).                                                        *"
         print " *     -v                   : verbose with all responses (OPTIONAL) (default: False).                            *"
-        print " *     -noEstablished       : is used to ignore established and close wait connections (OPTIONAL)(default: False)*"
+        print " *     -noConnectionInfo    : is used to ignore ESTABLISHED and CLOSE_WAIT connections (OPTIONAL)(default: False)*"
         print " *     -noQueueSize         : is used to ignore the Notification Queue Size (OPTIONAL) (default: False).         *"
         print " *     -service=<value>     : service header (OPTIONAL) (default: stablished_connections).                       *"
         print " *     -service_path=<value>: service path header (OPTIONAL) (default: /test)                                    *"
@@ -132,15 +132,15 @@ class Stablished_Connections:
         resp_dict = json.loads(resp.text)
         return str(resp_dict["notifQueue"]["size"])
 
-    def __get_established_connections(self):
+    def __get_connection_info(self):
         """
-        return the number of established connections per ContextBroker using "prpyc" and "psutil" libraries.
+        return the number of ESTABLISHED and CLOSE_WAIT connections per ContextBroker using "prpyc" and "psutil" libraries.
         Note: the starswith() method is used instead of just ==. This way, the process
              can have a name like "contextBroker-1.4.3..." and the logic will still work
         :return tuple (established_conn, close_wait_conn)
         """
         conn = rpyc.classic.connect(self.host)
-        connections_est = """def get_number_established_conn():
+        connections_est = """def get_number_of_connections():
                import psutil
                process_name = "contextBroker"
                pid = 0
@@ -161,7 +161,7 @@ class Stablished_Connections:
                return str(e_c), str(cw_c)"""
 
         conn.execute(connections_est)
-        remote_exec = conn.namespace['get_number_established_conn']
+        remote_exec = conn.namespace['get_number_of_connections']
         total_conns = remote_exec()
         return total_conns
 
@@ -176,8 +176,8 @@ class Stablished_Connections:
                 self.verbose = True
             if arguments[i].find('-noQueueSize') >= 0:
                 self.no_queue_size_flag = True
-            if arguments[i].find('-noEstablished') >= 0:
-                self.no_established_connections_flag = True
+            if arguments[i].find('-noConnectionInfo') >= 0:
+                self.no_connections_info_flag = True
             if arguments[i].find('-host') >= 0:
                 self.host = str(arguments[i]).split("=")[1]
                 self.cb_endpoint = "http://%s:%s" % (self.host, self.port)
@@ -206,7 +206,7 @@ class Stablished_Connections:
         logging.info("   test duration: %s minutes (%s seconds)" % (str(self.duration), str(self.duration * 60)))
         logging.info("   version requests delay: %d seconds" % self.version_delay)
         logging.info("   max subcription: %d" % self.max_subscription_created)
-        logging.info("   noEstablished flag: %s" % str(self.no_established_connections_flag))
+        logging.info("   noConnectionInfo flag: %s" % str(self.no_connections_info_flag))
         logging.info("   noQueueSize flag: %s" % str(self.no_queue_size_flag))
         logging.warn(" ***************************************************************************************")
         logging.warn(" *  verify if the listener has a delay in the response (10 minutes recommended)        *")
@@ -286,8 +286,8 @@ class Stablished_Connections:
             # report
             if not self.no_queue_size_flag:
                 queue_size = self.__get_queue_size()
-            if not self.no_established_connections_flag:
-                e_c, cw_c = self.__get_established_connections()
+            if not self.no_connections_info_flag:
+                e_c, cw_c = self.__get_connection_info()
                 s = str(int(e_c) + int(cw_c))
 
             logging.info(" --- %d -------- %s -------- %s -------- %s ---------- %s -------- %s ---"

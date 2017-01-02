@@ -60,7 +60,7 @@ contextBroker -reqMutexPolicy none -writeConcern 0 -httpTimeout 600000 -notifica
     moment you will see the following trace in `slow_listener` output: `Received  0 Rate 0 r/s`
   * Launches for a given time (in minutes, see `-duration` param) a "GET /version" request per second and:
      * Reports that its response is correct.
-     * Reports the number of established connections (if `-noEstablished` param is used this column is ignored),
+     * Reports the number of established connections (if `-noConnectionInfo` param is used this column is ignored),
        both ESTABLISHED, CLOSE_WAIT and sum.
      * Reports the queue size into ContextBroker (if `-noQueueSize` param is used this column is ignored)
 
@@ -231,7 +231,7 @@ INFO:SLAVE/18812:server started on [0.0.0.0]:18812
           -host=<host>         : CB host (OPTIONAL) (default: localhost).                                           
           -u                   : show this usage (OPTIONAL).                                                        
           -v                   : verbose with all responses (OPTIONAL) (default: False). 
-          -noEstablished       : is used to ignore the established connections (OPTIONAL) (default: False).                         
+          -noConnectionInfo    : is used to ignore ESTABLISHED and CLOSE_WAIT connections (OPTIONAL)(default: False)
           -noQueueSize         : is used to ignore the Queue size (OPTIONAL) (default: False).                         
           -service=<value>     : service header (OPTIONAL) (default: stablished_connections).                                        
           -service_path=<value>: service path header (OPTIONAL) (default: /test)                                    
