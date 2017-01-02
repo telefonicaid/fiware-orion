@@ -476,6 +476,15 @@ bool processLocationAtAppendAttribute
       }
       *currentLocAttrName = targetAttr->name;
     }
+
+    /* Case 2c: all pre-conditions ok -> update location with the new value */
+    if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
+    {
+      *errDetail = "error parsing location attribute: " + subErr;
+      oe->fill(SccBadRequest, *errDetail, "BadRequest");
+      return false;
+    }
+    return true;
   }
   /* Check 3: in the case of append-as-update, type changes from location -> no-location for the current location
    * attribute, then remove location attribute */
