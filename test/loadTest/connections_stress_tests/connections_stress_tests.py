@@ -149,24 +149,24 @@ class Stablished_Connections:
         :return tuple (established_conn, close_wait_conn)
         """
         connections_est = """def get_number_of_connections():
-                   import psutil
-                   process_name = "contextBroker"
-                   pid = 0
-                   e_c = 0
-                   cw_c = 0
-                   for proc in psutil.process_iter():
-                        pinfo = proc.as_dict(attrs=['pid', 'name'])
-                        if pinfo["name"].startswith(process_name):
-                            pid = pinfo["pid"]
-                            break
-                   p = psutil.Process(pid)
-                   connections = p.get_connections()
-                   for c in connections:
-                        if c.status == "ESTABLISHED":
-                            e_c += 1
-                        elif c.status == "CLOSE_WAIT":
-                            cw_c += 1
-                   return str(e_c), str(cw_c)"""
+               import psutil
+               process_name = "contextBroker"
+               pid = 0
+               e_c = 0
+               cw_c = 0
+               for proc in psutil.process_iter():
+                    pinfo = proc.as_dict(attrs=['pid', 'name'])
+                    if pinfo["name"].startswith(process_name):
+                        pid = pinfo["pid"]
+                        break
+               p = psutil.Process(pid)
+               connections = p.get_connections()
+               for c in connections:
+                    if c.status == "ESTABLISHED":
+                        e_c += 1
+                    elif c.status == "CLOSE_WAIT":
+                        cw_c += 1
+               return str(e_c), str(cw_c)"""
         try:
             conn = rpyc.classic.connect(self.host)
             conn.execute(connections_est)
