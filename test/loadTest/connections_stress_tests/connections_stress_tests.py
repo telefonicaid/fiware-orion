@@ -53,7 +53,7 @@ class Stablished_Connections:
     - launch an entity update, that it triggers all subscriptions.
     - launch for a given time (in minutes) a "/version" request per second and:
          - reports that its response is correct.
-         - reports the number of ESTABLISHED and CLOSE_WAIT connections and the sum of both (if -noConnectionInfo param is used this informations is not provided)"
+         - reports the number of ESTABLISHED and CLOSE_WAIT connections and the sum of both (if -noConnectionInfo param is used this informations is not provided)
          - reports the notification queue size into ContextBroker (if `-noQueueSize` param is used this column is ignored)
     """
     # variables

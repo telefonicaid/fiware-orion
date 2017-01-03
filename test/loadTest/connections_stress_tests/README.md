@@ -21,12 +21,21 @@ chmod a+x slow_listener
 
 ### Test procedure
 
-* Launch RPyC listener:
+* Launch RPyC listener. If you are going to launch CB as service, you have to use the second alternative
+  (i.e. running the process as `orion` user), otherwise the connection inspection done by connections_stress_tests.py
+  will fail (rpyc_classic.py is the actual process that looks for CB process connections so it has to be run by the
+  same user that runs CB in order to have enough privilege level).
 
 ```
 $ rpyc_classic.py
 INFO:SLAVE/18812:server started on [0.0.0.0]:18812
 ```
+
+```
+$ sudo su orion -c rpyc_classic.py
+INFO:SLAVE/18812:server started on [0.0.0.0]:18812
+```
+
 
 * Launch slow_listener (e.g. 5 minutes delay, printing stats each 5 seconds). By default it
   listens on port 8090.
@@ -100,7 +109,7 @@ Note that 5010 corresponds to the 5000 outgoing notifications plus the 10 connec
 `-dbPoolSize`). After the delay, all the 5000 connections to slow_listener pass to CLOSE_WAIT
 status, while the 10 connections corresponding to the DB pool stay in established status.
 
-Similar findings are obtained with `netstat -nputan | grep contextBr`.
+Similar findings are obtained with `netstat -putan | grep contextBr`.
 
 In this state, note that Orion is able to serve new incoming connections. You can check this running
 (in parallel) several `telnet localhost 1026`. We will still get OK in the version column in the
@@ -216,14 +225,6 @@ In the case of running CB as a service in CentOS:
 * The contextBroker process is run by the `orion` user with default configuration. The above configuration
   in /etc/security/limits.d/90-nproc.conf should suffice but anyway it is advisable to check the limits
   with `cat /proc/<pid>/limits` once the service has been started.
-* You have to run RPyC as `orion` user. Otherwise, the connection inspection done by connections_stress_tests.py
-  will fail (rpyc_classic.py is the actual process that looks for CB process connections so it has to be run by the
-  same user that runs CB in order to have enough privilege level).
-
-```
-$ sudo su orion -c rpyc_classic.py
-INFO:SLAVE/18812:server started on [0.0.0.0]:18812
-```
 
 ### Detailed `connections_stress_tests.py` usage
 
