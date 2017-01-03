@@ -225,8 +225,8 @@ Note that, from the point of view of [subscriptions](walkthrough_apiv1.md#contex
 attribute or adding a new metadata element is considered a change even
 if attribute value itself hasn't changed. Metadata elements cannot be
 deleted once introduced: in order to delete metadata elements you have
-to remove the entity attribute (see [DELETE action type](update_action_types.md#DELETE)),
-then re-create it (see [APPEND action type](update_action_types.md#APPEND)).
+to remove the entity attribute (see [DELETE action type](update_action_types.md#delete)),
+then re-create it (see [APPEND action type](update_action_types.md#append)).
 
 ## Metadata ID for attributes
 
@@ -400,7 +400,7 @@ attributes using ID metadata:
 -   DELETE /v1/contextEntities/Room1/attributes/temperature/ground: to
     remove an specific attribute identified by ID (see DELETE attribute
     semantics [described in a previous
-    section](update_action_types.md#DELETE)).
+    section](update_action_types.md#delete)).
 
 
 ## Metadata in notifications

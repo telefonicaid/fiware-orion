@@ -723,7 +723,7 @@ operation with UPDATE action type. The basic rule to take into account
 with updateContext is that APPEND creates new context elements, while
 UPDATE updates already existing context elements (however, Orion
 interprets APPEND as UPDATE if the entity already
-exists; you can avoid that using [APPEND_STRICT](update_action_types.md#APPEND_STRICT)).
+exists; you can avoid that using [APPEND_STRICT](update_action_types.md#append_strict)).
 
 Now we will play the role of a context producer application, i.e. a
 source of context information. Let's assume that this application in a
@@ -1343,7 +1343,7 @@ which response is:
 You can also create an attribute (and the containing entity along the
 way) in the following way (additional attributes could be added after
 that, as described in [this
-section](update_action_types.md#APPEND)):
+section](update_action_types.md#append)):
 
 ```
 (curl localhost:1026/v1/contextEntities/Room3/attributes/temperature -s -S \
