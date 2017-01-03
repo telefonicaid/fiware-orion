@@ -1,31 +1,50 @@
-# Adding and removing attributes and entities (using NGSIv2)
+# Update action types
 
-Entities are added using the `POST /v2/entities` operation. They
-are deleted using `DELETE /v2/entities/{id}` (in case the entity id
-univocally identifies the entity) or `DELETE /v2/entities/{id}?type={entityType}`
-(in case the type is also needed to fully identify the entity).
+Both `POST /v1/updateContext` (NGSIv1) and `POST /v2/op/update` use an `actionType` field.
+This field allows the following values. In the case of NGSIv2, equivalence to RESTful
+operations are described (see [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/)
+for details); similar equivalences exist to convenicence operations in the case of NGSIv1 (the
+final example illustrate them).
 
-Regarding entity attributes, you can update the value of entity attributes
-using the `PATCH /v2/entities/{id}/attrs` or `POST /v2/entities/{id}/attrs`
-operations (again, you need to use `?type={entityType}` in case `{id}`
-doesn't univocally identify the entity). The basic rule to take into account
-is that PATCH assumes that the attributes already exist in the entity, while
-POST is used to update existing attributes or to add new ones. If you want
-to use POST to strictly append attributes (i.e. raising an error if some of
-the attributes already exist) then `option=append` needs to be added, i.e.
-`POST /v2/entities/{id}/attrs?options=append`.
+## APPEND
 
-In order to remove attributes, use `DELETE /v2/entities/{id}/attrs/{attrName}`
-or `DELETE /v2/entities/{id}/attrs/{attrName}?type={entityType}`
+This action type is used to create new entities, create new attributes in existing entities
+or update already existing attributes. In the latest case, it is equal to UPDATE.
 
-Finally, you can use the batch operation `POST /op/update` to add or remove entities and/or
-attributes using the different `actionType`s which that the operation allows: APPEND,
-APPEND_STRICT or DELETE.
+In the case of NGSIv2, it maps to `POST /v2/entities` (if the entity does not already exist)
+or `POST /v2/entities/<id>/attrs` (if the entity already exists).
 
-All the operations mentioned above are described in detail in the
-[NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
+## APPEND_STRICT
 
-# Adding and removing attributes and entities with APPEND and DELETE in updateContext (using NGSIv1)
+This action type is used to create new entities or creating new attributes in existing entities.
+Attempting to use it to update already existing attributes (as APPEND allows) will result in error.
+
+In the case of NGSIv2, it maps to `POST /v2/entities` (if the entity does not already exist)
+or `POST /v2/entities/<id>/attrs?options=append` (if the entity already exists).
+
+## UPDATE
+
+This action type is used to update already existing attributes. Attempting to use it to create
+new entities or attributes (as APPEND or APPEND_STRICT allow) will result in error.
+
+In the case of NGSIv2, it maps to `PATCH /v2/entities/<id>/attrs`.
+
+## DELETE
+
+This action type is used to removing attributes in existing entities (but without removing the
+entity itself) or to delete entities.
+
+In the case of NGSIv2, it maps to `DELETE /v2/entities/<id>/attrs/<attrName>` on every attribute included
+in the entity or to `DELETE /v2/entities/<id>` if no attribute were included in the entity.
+
+## REPLACE
+
+This action type replace attributes on existing entities, i.e. all the existing attributes are
+removes, then the ones included in the request are added.
+
+In the case of NGSIv2, it maps to `PATCH /v2/entities/<id>/attrs`.
+
+## Example about creating and removing attributes in NGSIv1
 
 We have seen how to use updateContext with APPEND action type to [create
 new entities](walkthrough_apiv1.md#entity-creation). In addition, APPEND can be
@@ -36,7 +55,7 @@ We start creating a simple entity 'E1' with one attribute named 'A':
 ```
 (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-```                                                                                                                  
+```
 
 Now, in order to append a new attribute (let's name it 'B') we use
 updateContext APPEND with an entityId matching 'E1':
@@ -60,13 +79,13 @@ updateContext APPEND with an entityId matching 'E1':
         }
     ],
     "updateAction": "APPEND"
-} 
+}
 EOF
-``` 
+```
 Now we can check with a query to that entity that both attributes A and
 B are there:
 
-``` 
+```
 (curl localhost:1026/v1/contextEntities/E1 -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' | python -mjson.tool)<<EOF
 {
@@ -93,7 +112,7 @@ B are there:
     }
 }
 EOF
-``` 
+```
 
 
 APPEND is interpreted as UPDATE in existing context elements. However, you can use APPEND_STRICT instead of APPEND as updateAction. In that case,
@@ -125,7 +144,7 @@ contextValue element):
         }
     ],
     "updateAction": "DELETE"
-} 
+}
 EOF
 ```
 
@@ -154,8 +173,8 @@ Now, a query to the entity shows attribute B:
 }
 EOF
 ```
-        
-  
+
+
 You can also use convenience operations with POST and DELETE verbs to
 add and delete attributes. Try the following:
 
@@ -177,7 +196,7 @@ Add a new attribute 'C' and 'D':
             "value": "4"
         }
     ]
-} 
+}
 EOF
 ```
 
@@ -216,6 +235,34 @@ Query entity (should see 'C' and 'D', but not 'B'):
     }
 }
 EOF
-``` 
+```
 
-To delete an entire entity, please check [this document](delete_entity.md).
+Apart from deleting individual attributes from a given entity,
+you can also delete an entire entity, including all its attributes and
+their corresponding metadata. In order to do so, the updateContext
+operation is used, with DELETE as actionType and with an empty
+list of attributes, as in the following example:
+
+```
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextElements": [
+        {
+            "type": "T",
+            "isPattern": "false",
+            "id": "E1"
+        }
+    ],
+    "updateAction": "DELETE"
+}
+EOF
+```
+
+You can also use the following equivalent convenience operation:
+```
+curl localhost:1026/v1/contextEntities/E1 -s -S \
+    --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -X DELETE
+```
+
