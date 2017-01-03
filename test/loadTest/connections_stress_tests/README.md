@@ -36,6 +36,15 @@ $ sudo su orion -c rpyc_classic.py
 INFO:SLAVE/18812:server started on [0.0.0.0]:18812
 ```
 
+* Check limits for max processes and open files (in all the host machines involved in the test, in the
+  case you are using more than one). Note that the setting for the test makes the CB
+  create 5000 threads for the notification pool (plus other threads dynamically created to deal
+  with incoming connections) and the same number for file descriptors when creating connections.
+  Thus a higher value (e.g. 8000) is recommended. In addition, slow_listener also needs to create
+  5000 incoming connections (the error `http: Accept error: accept tcp [::]:8090: accept4: too many open files; retrying in 1s`
+  is a typical sympton of that problem). The procedure to set limits can be a bit tricky, so it is described 
+  in [a specific section](#raising-system-limits-for-the-test).
+
 
 * Launch slow_listener (e.g. 5 minutes delay, printing stats each 5 seconds). By default it
   listens on port 8090.
@@ -43,12 +52,6 @@ INFO:SLAVE/18812:server started on [0.0.0.0]:18812
 ```
 ./slow_listener -delay 5m -stats 5s
 ```
-
-* Check CB limits for max processes and open files. Note that the setting for the test makes the CB
-  create 5000 threads for the notification pool (plus other threads dynamically created to deal
-  with incoming connections) and the same number for file descriptors when creating connections.
-  Thus a higher value (e.g. 8000) is recommended. The procedure can be a bit tricky, so it
-  is described in [a specific section](#raising-system-limits-for-the-test).
 
 * Launch CB as service. Use the following configuration in `/etc/sysconfig/contextBroker`:
 
@@ -206,12 +209,12 @@ with `lsof -p <pid cb>`, then version column will start to show NOK, as shows be
 
 ### Raising system limits for the test
 
-In the case of running CB as foreground process:
-
 * If you are not using CentOS 6.x, probably just using `ulimit -u <new limit>` and `ulimit -n <new limit>`
   to change respectively the max number of processes and the max number of open file descriptors will work.
 * If you are using CentOS 6.x, edit the following file (as root): `/etc/security/limits.d/90-nproc.conf`
-  as shown below, then re-login (more detail in [this reference](https://bugzilla.redhat.com/show_bug.cgi?id=919793)):
+  as shown below, then re-login (more detail in [this reference](https://bugzilla.redhat.com/show_bug.cgi?id=919793)). This
+  would work, no matter if you run CB at foreground or as a service (which runs CB as `orion` user) but anyway it is 
+  advisable to check the limits with `cat /proc/<pid>/limits` once the CB has been started.
 
 ```
 *          soft    nproc     10240
@@ -219,12 +222,6 @@ In the case of running CB as foreground process:
 *          hard    nproc     10240
 *          hard    nofile    10240
 ```
-
-In the case of running CB as a service in CentOS:
-
-* The contextBroker process is run by the `orion` user with default configuration. The above configuration
-  in /etc/security/limits.d/90-nproc.conf should suffice but anyway it is advisable to check the limits
-  with `cat /proc/<pid>/limits` once the service has been started.
 
 ### Detailed `connections_stress_tests.py` usage
 
