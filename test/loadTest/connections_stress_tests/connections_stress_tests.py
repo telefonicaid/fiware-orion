@@ -148,7 +148,6 @@ class Stablished_Connections:
              can have a name like "contextBroker-1.4.3..." and the logic will still work
         :return tuple (established_conn, close_wait_conn)
         """
-        conn = rpyc.classic.connect(self.host)
         connections_est = """def get_number_of_connections():
                import psutil
                process_name = "contextBroker"
@@ -168,11 +167,15 @@ class Stablished_Connections:
                     elif c.status == "CLOSE_WAIT":
                         cw_c += 1
                return str(e_c), str(cw_c)"""
-
-        conn.execute(connections_est)
-        remote_exec = conn.namespace['get_number_of_connections']
-        total_conns = remote_exec()
-        return total_conns
+        try:
+            conn = rpyc.classic.connect(self.host)
+            conn.execute(connections_est)
+            remote_exec = conn.namespace['get_number_of_connections']
+            total_conns = remote_exec()
+            return total_conns
+        except Exception, e:
+            logging.error("the host: %s has problem of conectivity. \n   %s" % (self.host, e))
+            raise Exception(" ERROR - connecting to host: %s...\n %s" % (self.host, str(e)))
 
     def __init__(self, arguments):
         """
@@ -299,7 +302,6 @@ class Stablished_Connections:
             if not self.no_connections_info_flag:
                 e_c, cw_c = self.__get_connection_info()
                 s = str(int(e_c) + int(cw_c))
-
             logging.info(" --- %d -------- %s -------- %s -------- %s ---------- %s -------- %s ---"
                          % (counter, version_result, self.queue_size, e_c, cw_c, s))
             time.sleep(self.version_delay)
