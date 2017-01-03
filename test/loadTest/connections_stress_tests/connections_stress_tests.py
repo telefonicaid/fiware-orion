@@ -71,6 +71,9 @@ class Stablished_Connections:
     no_queue_size_flag = False
     duration = 60       # time in minutes
     version_delay = 1   # time in seconds
+    queue_size = u'N/A'
+    stat_error = False
+    subsc_error = False
 
     @staticmethod
     def __usage():
@@ -126,11 +129,17 @@ class Stablished_Connections:
         return the notification queue size
         :return: string (size)
         """
-        resp = requests.get("%s/statistics" % self.cb_endpoint)
-        self.__print_by_console(resp)
-        assert resp.status_code == 200, " ERROR - the statistics request is failed: \n - status code: %s \n - response: %s" % (str(resp.status_code), resp.text)
-        resp_dict = json.loads(resp.text)
-        return str(resp_dict["notifQueue"]["size"])
+        try:
+            resp = requests.get("%s/statistics" % self.cb_endpoint)
+            self.__print_by_console(resp)
+            resp_dict = json.loads(resp.text)
+            self.stat_error = False
+            self.queue_size = str(resp_dict["notifQueue"]["size"])
+        except Exception, e:
+            if not self.stat_error:
+                self.stat_error = True
+                logging.warn("Statistics operation failed. This is typical in the failng case scenario so noQueueSize parameter is recommended. Check documentation for details")
+                self.queue_size = u'NOK'
 
     def __get_connection_info(self):
         """
@@ -238,10 +247,12 @@ class Stablished_Connections:
             try:
                 resp = requests.post("%s/v2/subscriptions" % self.cb_endpoint, headers=self.headers, data=payload)
                 self.__print_by_console(resp)
-                if resp.status_code != 201:
-                    subsc_error += 1
+                self.subsc_error = False
             except Exception, e:
-                logging.warn(" creating a new subscription: \n    %s" % e)
+                if not self.subsc_error:
+                    self.subsc_error = True
+                    logging.warn("some subscriptions are not created... %s" % e)
+                subsc_error += 1
         logging.info(" %d subscriptions have been created" % (self.max_subscription_created - subsc_error))
 
     def update_and_version(self):
@@ -251,7 +262,6 @@ class Stablished_Connections:
         """
         init_date = time.time()
         duration_in_secs = self.duration * 60
-        queue_size = u'N/A'
         e_c = u'N/A'
         cw_c = u'N/A'
         s = u'N/A'
@@ -267,7 +277,7 @@ class Stablished_Connections:
             self.__print_by_console(resp)
         except Exception, e:
             logging.error(e)
-            raise Exception(" ERROR - %s \n - status code: %d \n - response: %s" % (e, resp.status_code, resp.text))
+            raise Exception(" ERROR - %s " % e)
 
         logging.info(" Reports each second:")
         logging.info(" counter       version      queue   established   close wait        sum")
@@ -285,13 +295,13 @@ class Stablished_Connections:
                 version_result = "NOK"
             # report
             if not self.no_queue_size_flag:
-                queue_size = self.__get_queue_size()
+                self.__get_queue_size()
             if not self.no_connections_info_flag:
                 e_c, cw_c = self.__get_connection_info()
                 s = str(int(e_c) + int(cw_c))
 
             logging.info(" --- %d -------- %s -------- %s -------- %s ---------- %s -------- %s ---"
-                         % (counter, version_result, queue_size, e_c, cw_c, s))
+                         % (counter, version_result, self.queue_size, e_c, cw_c, s))
             time.sleep(self.version_delay)
 
         logging.info(" ALL (%d) \"/version\" requests responded correctly...Bye." % counter)
