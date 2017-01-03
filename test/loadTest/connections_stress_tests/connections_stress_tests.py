@@ -148,9 +148,7 @@ class Stablished_Connections:
              can have a name like "contextBroker-1.4.3..." and the logic will still work
         :return tuple (established_conn, close_wait_conn)
         """
-        try:
-            conn = rpyc.classic.connect(self.host)
-            connections_est = """def get_number_of_connections():
+        connections_est = """def get_number_of_connections():
                    import psutil
                    process_name = "contextBroker"
                    pid = 0
@@ -169,7 +167,8 @@ class Stablished_Connections:
                         elif c.status == "CLOSE_WAIT":
                             cw_c += 1
                    return str(e_c), str(cw_c)"""
-
+        try:
+            conn = rpyc.classic.connect(self.host)
             conn.execute(connections_est)
             remote_exec = conn.namespace['get_number_of_connections']
             total_conns = remote_exec()
