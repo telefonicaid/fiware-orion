@@ -124,22 +124,29 @@ void Notifier::sendNotifyContextAvailabilityRequest
 
     std::string payload;
 #ifdef PARANOID_JSON_INDENT
-    // First stage: conventional pretty printer
-    rapidjson::Document doc;
-    doc.Parse(_payload.c_str());
+    if (paranoidV1Indent)
+    {
+      // First stage: conventional pretty printer
+      rapidjson::Document doc;
+      doc.Parse(_payload.c_str());
 
-    rapidjson::StringBuffer s;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
-    writer.SetIndent(' ', 2);
-    doc.Accept(writer);
+      rapidjson::StringBuffer s;
+      rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+      writer.SetIndent(' ', 2);
+      doc.Accept(writer);
 
-    std::string prettyPrinted = s.GetString();
+      std::string prettyPrinted = s.GetString();
 
-    // Second stage: "key": "value" -> "key" : value (legacy reasons... this was the
-    // way we implement JSON rendering at the very beggining)
-    char* prettyPrinted2 = jsonFix(prettyPrinted.c_str());
-    payload = std::string(prettyPrinted2);
-    free(prettyPrinted2);
+      // Second stage: "key": "value" -> "key" : value (legacy reasons... this was the
+      // way we implement JSON rendering at the very beggining)
+      char* prettyPrinted2 = jsonFix(prettyPrinted.c_str());
+      payload = std::string(prettyPrinted2);
+      free(prettyPrinted2);
+    }
+    else
+    {
+      payload = _payload;
+    }
 #else
     payload = _payload;
 #endif
@@ -480,7 +487,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
     std::string payloadString;
 #ifdef PARANOID_JSON_INDENT
-    if (renderFormat == NGSI_V1_LEGACY)
+    if (paranoidV1Indent && (renderFormat == NGSI_V1_LEGACY))
     {
       // First stage: conventional pretty printer
       rapidjson::Document doc;

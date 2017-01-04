@@ -214,7 +214,7 @@ extern void toLowercase(char* s);
 #ifdef PARANOID_JSON_INDENT
 // -----------------------------------------------------------------------------
 //
-// jsonFix - replace all ':' with ' :' in a JSON buffer
+// jsonFix - replace all ':' with ' :' in a JSON buffer (and some others fixes)
 //
 //
 extern char* jsonFix(const char* in);

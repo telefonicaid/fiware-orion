@@ -956,7 +956,7 @@ void toLowercase(char* s)
 #ifdef PARANOID_JSON_INDENT
 // -----------------------------------------------------------------------------
 //
-// jsonFix - replace all ':' with ' :' in a JSON buffer
+// jsonFix - replace all ':' with ' :' in a JSON buffer (as some other fixes)
 //
 // 01. Count number of replacements - to get necessary size of out buffer
 // 02. Go over the in buffer and copy one by one in -> out, avoiding replacements
