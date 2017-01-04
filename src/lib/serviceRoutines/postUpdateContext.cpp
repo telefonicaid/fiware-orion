@@ -147,29 +147,29 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   std::string payload;
 #ifdef PARANOID_JSON_INDENT
-  if (ciP->apiVersion != V2)
-  {
-    // First stage: conventional pretty printer
-    rapidjson::Document doc;
-    doc.Parse(_payload.c_str());
+  // As stated in documentation (v1_v2_coexistence.md#ngsiv2-query-update-forwarding-to-context-providers):
+  //
+  //  "The forwarded message in the CB to CPr communication, and its response, is done using NGSIv1."
+  //
+  // So, different from restReply(), nothing to check here
 
-    rapidjson::StringBuffer s;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
-    writer.SetIndent(' ', 2);
-    doc.Accept(writer);
+  // First stage: conventional pretty printer
+  rapidjson::Document doc;
+  doc.Parse(_payload.c_str());
 
-    std::string prettyPrinted = s.GetString();
+  rapidjson::StringBuffer ss;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(ss);
+  writer.SetIndent(' ', 2);
+  doc.Accept(writer);
 
-    // Second stage: "key": "value" -> "key" : value (legacy reasons... this was the
-    // way we implement JSON rendering at the very beggining)
-    char* prettyPrinted2 = jsonFix(prettyPrinted.c_str());
-    payload = std::string(prettyPrinted2);
-    free(prettyPrinted2);
-  }
-  else
-  {
-    payload = _payload;
-  }
+  std::string prettyPrinted = ss.GetString();
+
+  // Second stage: "key": "value" -> "key" : value (legacy reasons... this was the
+  // way we implement JSON rendering at the very beggining)
+  char* prettyPrinted2 = jsonFix(prettyPrinted.c_str());
+  payload = std::string(prettyPrinted2);
+  free(prettyPrinted2);
+
 #else
   payload = _payload;
 #endif
