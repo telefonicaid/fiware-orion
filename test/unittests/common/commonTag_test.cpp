@@ -36,17 +36,16 @@
 TEST(commonTag, startTag)
 {
    std::string      tag    = "TAG";
-   std::string      indent = "  ";
    std::string      out;
 
    out = startTag(tag, false);
-   EXPECT_EQ("  \"TAG\" : {\n", out);
+   EXPECT_EQ("  \"TAG\":{", out);
 
    out = startTag(tag, true);
-   EXPECT_EQ("  \"TAG\" : [\n", out);
+   EXPECT_EQ("  \"TAG\":[", out);
 
    out = startTag();
-   EXPECT_EQ("  {\n", out);
+   EXPECT_EQ("  {", out);
 }
 
 

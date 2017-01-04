@@ -240,15 +240,15 @@ std::string Metadata::render(bool comma)
   }
   else if (valueType == orion::ValueTypeNumber)
   {
-    out += JSON_STR("value") + ": " + xValue;
+    out += JSON_STR("value") + ":" + xValue;
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
-    out += JSON_STR("value") + ": " + xValue;
+    out += JSON_STR("value") + ":" + xValue;
   }
   else if (valueType == orion::ValueTypeNone)
   {
-    out += JSON_STR("value") + ": " + xValue;
+    out += JSON_STR("value") + ":" + xValue;
   }
   else if (valueType == orion::ValueTypeObject)
   {
@@ -268,14 +268,14 @@ std::string Metadata::render(bool comma)
     else if (compoundValueP->isVector())
     {
       compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
-      part = JSON_STR("value") + ": [" + compoundValueP->toJson(true, false) + "]";
+      part = JSON_STR("value") + ":[" + compoundValueP->toJson(true, false) + "]";
     }    
 
     out += part;
   }
   else
   {
-    out += JSON_STR("value") + ": " + JSON_STR("unknown json type");
+    out += JSON_STR("value") + ":" + JSON_STR("unknown json type");
   }
 
   out += endTag(comma);

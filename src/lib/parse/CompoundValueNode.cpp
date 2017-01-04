@@ -711,11 +711,11 @@ std::string CompoundValueNode::render(ApiVersion apiVersion)
     {
       if (container->valueType == orion::ValueTypeObject)  // 03. Inside object
       {
-        out = indent + "\"" + name + "\" : [\n";
+        out = indent + "\"" + name + "\":[";
       }
       else  // 02. Inside vector
       {
-        out += indent + "  " + "[\n";
+        out += indent + "  " + "[";
       }
 
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
@@ -723,7 +723,7 @@ std::string CompoundValueNode::render(ApiVersion apiVersion)
         out += childV[ix]->render(apiVersion, indent + "  ");
       }
 
-      out += indent + "  ]\n";
+      out += indent + "]";
     }
     
   }

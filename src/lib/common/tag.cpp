@@ -223,20 +223,20 @@ std::string startTag
 
   if (isVector && showKey)
   {
-    return "\"" + key + "\" : [\n";
+    return "\"" + key + "\":[";
   }
   else if (isVector && !showKey)
   {
-    return "[\n";
+    return "[";
   }
   else if (!isVector && showKey)
   {
-    return "\"" + key + "\" : {\n";
+    return "\"" + key + "\":{";
   }
 
   // else: !isVector && !showKey
 
-  return "{\n";
+  return "{";
 }
 
 
@@ -255,8 +255,6 @@ std::string endTag
 
   out += isVector?  "]"  : "}";
   out += comma?     ","  : "";
-
-  out += "\n";
 
   return out;
 }
@@ -306,12 +304,12 @@ std::string valueTag
   {
     if (isVectorElement == true)
     {
-      std::string out = effectiveValue + ",\n";
+      std::string out = effectiveValue + ",";
       return out;
     }
     else
     {
-      std::string out = "\"" + key + "\" : " + effectiveValue + ",\n";
+      std::string out = "\"" + key + "\":" + effectiveValue + ",";
       return out;
     }
   }
@@ -319,12 +317,12 @@ std::string valueTag
   {
     if (isVectorElement == true)
     {
-      std::string out = effectiveValue + "\n";
+      std::string out = effectiveValue;
       return out;
     }
     else
     {
-      std::string out = "\"" + key + "\" : " + effectiveValue + "\n";
+      std::string out = "\"" + key + "\":" + effectiveValue;
       return out;
     }
   }

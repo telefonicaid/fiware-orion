@@ -115,7 +115,7 @@ std::string UpdateContextAttributeRequest::check
 
   std::string out = response.render(false);
 
-  out = "{\n" + out + "}\n";
+  out = "{" + out + "}";
 
   return out;
 }

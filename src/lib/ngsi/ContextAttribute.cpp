@@ -583,11 +583,11 @@ std::string ContextAttribute::renderAsNameString(bool comma)
 
   if (comma)
   {
-    out += "\"" + name + "\",\n";
+    out += "\"" + name + "\",";
   }
   else
   {
-    out += "\"" + name + "\"\n";
+    out += "\"" + name + "\"";
   }
 
   return out;

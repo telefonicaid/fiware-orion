@@ -88,20 +88,19 @@ std::string EntityId::render(bool comma, bool isInVector)
   char*        typeEscaped      = htmlEscape(type.c_str());
   char*        idEscaped        = htmlEscape(id.c_str());
 
-  out += (isInVector? "{\n" : "");
-  out = out + "\"type\" : \""      + typeEscaped      + "\","  + "\n";
-  out = out + "\"isPattern\" : \"" + isPatternEscaped + "\","  + "\n";
-  out = out + "\"id\" : \""        + idEscaped        + "\"";
+  out += (isInVector? "{" : "");
+  out = out + "\"type\":\""      + typeEscaped      + "\",";
+  out = out + "\"isPattern\":\"" + isPatternEscaped + "\",";
+  out = out + "\"id\":\""        + idEscaped        + "\"";
 
   if ((comma == true) && (isInVector == false))
   {
-    out += ",\n";
+    out += ",";
   }
   else
   {
-    out += "\n";
     out += (isInVector? "}" : "");
-    out += (comma == true)? ",\n" : (isInVector? "\n" : "");
+    out += (comma == true)? "," : "";
   }
 
   free(typeEscaped);
