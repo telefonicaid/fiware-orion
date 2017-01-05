@@ -26,7 +26,7 @@ Service Path In Single ONCHANGE Notification
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0-255
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -185,28 +185,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "ET",
-        "isPattern" : "false",
-        "id" : "E1",
-        "attributes" : [
-          {
-            "name" : "A",
-            "type" : "string",
-            "value" : "V"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "string",
+                        "value": "V"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "ET"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 

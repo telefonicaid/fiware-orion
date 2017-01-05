@@ -26,7 +26,7 @@ Custom metadata ONCHANGE subscription
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart 127.0.0.1 "$LISTENER_PORT"
+accumulatorStart --pretty-print 127.0.0.1 "$LISTENER_PORT"
 
 --SHELL--
 echo "=== 1. Create ONCHANGE subscription"
@@ -465,40 +465,40 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Room",
-        "isPattern" : "false",
-        "id" : "Room1",
-        "attributes" : [
-          {
-            "name" : "temperature",
-            "type" : "centigrade",
-            "value" : "43",
-            "metadatas" : [
-              {
-                "name" : "colour",
-                "type" : "string",
-                "value" : "red"
-              },
-              {
-                "name" : "feeling",
-                "type" : "string",
-                "value" : "angry"
-              }
-            ]
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "colour",
+                                "type": "string",
+                                "value": "red"
+                            },
+                            {
+                                "name": "feeling",
+                                "type": "string",
+                                "value": "angry"
+                            }
+                        ],
+                        "name": "temperature",
+                        "type": "centigrade",
+                        "value": "43"
+                    }
+                ],
+                "id": "Room1",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
@@ -510,40 +510,40 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Room",
-        "isPattern" : "false",
-        "id" : "Room1",
-        "attributes" : [
-          {
-            "name" : "temperature",
-            "type" : "centigrade",
-            "value" : "28",
-            "metadatas" : [
-              {
-                "name" : "colour",
-                "type" : "string",
-                "value" : "red"
-              },
-              {
-                "name" : "feeling",
-                "type" : "string",
-                "value" : "angry"
-              }
-            ]
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "colour",
+                                "type": "string",
+                                "value": "red"
+                            },
+                            {
+                                "name": "feeling",
+                                "type": "string",
+                                "value": "angry"
+                            }
+                        ],
+                        "name": "temperature",
+                        "type": "centigrade",
+                        "value": "28"
+                    }
+                ],
+                "id": "Room1",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
@@ -555,40 +555,40 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Room",
-        "isPattern" : "false",
-        "id" : "Room1",
-        "attributes" : [
-          {
-            "name" : "temperature",
-            "type" : "centigrade",
-            "value" : "28",
-            "metadatas" : [
-              {
-                "name" : "colour",
-                "type" : "string",
-                "value" : "red"
-              },
-              {
-                "name" : "feeling",
-                "type" : "string",
-                "value" : "happy"
-              }
-            ]
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "colour",
+                                "type": "string",
+                                "value": "red"
+                            },
+                            {
+                                "name": "feeling",
+                                "type": "string",
+                                "value": "happy"
+                            }
+                        ],
+                        "name": "temperature",
+                        "type": "centigrade",
+                        "value": "28"
+                    }
+                ],
+                "id": "Room1",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
@@ -600,40 +600,40 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Room",
-        "isPattern" : "false",
-        "id" : "Room1",
-        "attributes" : [
-          {
-            "name" : "temperature",
-            "type" : "centigrade",
-            "value" : "12",
-            "metadatas" : [
-              {
-                "name" : "colour",
-                "type" : "string",
-                "value" : "white"
-              },
-              {
-                "name" : "feeling",
-                "type" : "string",
-                "value" : "happy"
-              }
-            ]
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "colour",
+                                "type": "string",
+                                "value": "white"
+                            },
+                            {
+                                "name": "feeling",
+                                "type": "string",
+                                "value": "happy"
+                            }
+                        ],
+                        "name": "temperature",
+                        "type": "centigrade",
+                        "value": "12"
+                    }
+                ],
+                "id": "Room1",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 

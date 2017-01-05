@@ -26,7 +26,7 @@ ConvOp putAvailabilitySubscriptionConvOp: PUT /v1/registry/contextAvailabilitySu
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -329,28 +329,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "contextRegistrationResponses" : [
-    {
-      "contextRegistration" : {
-        "entities" : [
-          {
-            "type" : "T1",
-            "isPattern" : "false",
-            "id" : "E1"
-          }
-        ],
-        "attributes" : [
-          {
-            "name" : "A2",
-            "type" : "string",
-            "isDomain" : "false"
-          }
-        ],
-        "providingApplication" : "http://localhost:REGEX(\d+)/notify"
-      }
-    }
-  ]
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "A2",
+                        "type": "string"
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "E1",
+                        "isPattern": "false",
+                        "type": "T1"
+                    }
+                ],
+                "providingApplication": "http://localhost:9997/notify"
+            }
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 
@@ -380,28 +380,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "contextRegistrationResponses" : [
-    {
-      "contextRegistration" : {
-        "entities" : [
-          {
-            "type" : "T1",
-            "isPattern" : "false",
-            "id" : "E1"
-          }
-        ],
-        "attributes" : [
-          {
-            "name" : "A2",
-            "type" : "string",
-            "isDomain" : "false"
-          }
-        ],
-        "providingApplication" : "http://localhost:REGEX(\d+)/notify"
-      }
-    }
-  ]
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "A2",
+                        "type": "string"
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "E1",
+                        "isPattern": "false",
+                        "type": "T1"
+                    }
+                ],
+                "providingApplication": "http://localhost:9997/notify"
+            }
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 

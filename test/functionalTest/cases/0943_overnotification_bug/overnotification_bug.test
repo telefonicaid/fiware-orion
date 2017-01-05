@@ -26,7 +26,7 @@ Notification caused by update in not covered attribute
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
