@@ -1150,7 +1150,12 @@ function orionCurl()
       if [ "$payloadCheckFormat" == json ] || [ "$payloadCheckFormat" == "" ]
       then
         vMsg Running python tool for $_response
-        echo $_response | python -mjson.tool
+        #
+        # We need to apply pretty-print on _response. Otherwise positional processing used in .test
+        # (e.g. to get SUB_ID typically grep and awk are used) will break
+        #
+        _response=$(echo $_response | python -mjson.tool)
+        echo "$_response"
       else
         dMsg Unknown payloadCheckFormat
       fi
