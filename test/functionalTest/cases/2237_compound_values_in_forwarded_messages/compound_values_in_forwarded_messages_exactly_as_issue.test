@@ -26,7 +26,7 @@ Compound values forwarded to context providers - exactly as issue 2237
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -232,25 +232,25 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "contextElements" : [
-    {
-      "type" : "device",
-      "isPattern" : "false",
-      "id" : "devicetest",
-      "attributes" : [
+    "contextElements": [
         {
-          "name" : "ping",
-          "type" : "command",
-          "value" : {
-            "param3" : "33",
-            "param2" : "22",
-            "param1" : "11"
-          }
+            "attributes": [
+                {
+                    "name": "ping",
+                    "type": "command",
+                    "value": {
+                        "param1": "11",
+                        "param2": "22",
+                        "param3": "33"
+                    }
+                }
+            ],
+            "id": "devicetest",
+            "isPattern": "false",
+            "type": "device"
         }
-      ]
-    }
-  ],
-  "updateAction" : "UPDATE"
+    ],
+    "updateAction": "UPDATE"
 }
 =======================================
 

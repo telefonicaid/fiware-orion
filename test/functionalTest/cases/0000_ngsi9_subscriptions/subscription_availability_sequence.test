@@ -26,7 +26,7 @@ Subscription availability sequence
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -428,28 +428,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "contextRegistrationResponses" : [
-    {
-      "contextRegistration" : {
-        "entities" : [
-          {
-            "type" : "Room",
-            "isPattern" : "false",
-            "id" : "ConferenceRoom"
-          }
-        ],
-        "attributes" : [
-          {
-            "name" : "temperature",
-            "type" : "degree",
-            "isDomain" : "false"
-          }
-        ],
-        "providingApplication" : "http://sensor1:1028"
-      }
-    }
-  ]
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "temperature",
+                        "type": "degree"
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "ConferenceRoom",
+                        "isPattern": "false",
+                        "type": "Room"
+                    }
+                ],
+                "providingApplication": "http://sensor1:1028"
+            }
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
@@ -461,28 +461,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "contextRegistrationResponses" : [
-    {
-      "contextRegistration" : {
-        "entities" : [
-          {
-            "type" : "Room",
-            "isPattern" : "false",
-            "id" : "BathRoom"
-          }
-        ],
-        "attributes" : [
-          {
-            "name" : "temperature",
-            "type" : "degree",
-            "isDomain" : "false"
-          }
-        ],
-        "providingApplication" : "http://sensor2:1028"
-      }
-    }
-  ]
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "temperature",
+                        "type": "degree"
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "BathRoom",
+                        "isPattern": "false",
+                        "type": "Room"
+                    }
+                ],
+                "providingApplication": "http://sensor2:1028"
+            }
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
@@ -494,28 +494,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "contextRegistrationResponses" : [
-    {
-      "contextRegistration" : {
-        "entities" : [
-          {
-            "type" : "Room",
-            "isPattern" : "false",
-            "id" : "ConferenceRoom"
-          }
-        ],
-        "attributes" : [
-          {
-            "name" : "temperature",
-            "type" : "degree",
-            "isDomain" : "false"
-          }
-        ],
-        "providingApplication" : "http://sensor1:1028"
-      }
-    }
-  ]
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "temperature",
+                        "type": "degree"
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "ConferenceRoom",
+                        "isPattern": "false",
+                        "type": "Room"
+                    }
+                ],
+                "providingApplication": "http://sensor1:1028"
+            }
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
@@ -527,28 +527,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "contextRegistrationResponses" : [
-    {
-      "contextRegistration" : {
-        "entities" : [
-          {
-            "type" : "Room",
-            "isPattern" : "false",
-            "id" : "LivingRoom"
-          }
-        ],
-        "attributes" : [
-          {
-            "name" : "temperature",
-            "type" : "degree",
-            "isDomain" : "false"
-          }
-        ],
-        "providingApplication" : "http://sensor5:1028"
-      }
-    }
-  ]
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "temperature",
+                        "type": "degree"
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "LivingRoom",
+                        "isPattern": "false",
+                        "type": "Room"
+                    }
+                ],
+                "providingApplication": "http://sensor5:1028"
+            }
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 

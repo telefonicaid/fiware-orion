@@ -28,7 +28,7 @@ dbInit CB
 dbInit CP1
 brokerStart CB 0-255
 brokerStart CP1 0-255
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -245,28 +245,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "ET",
-        "isPattern" : "false",
-        "id" : "E1",
-        "attributes" : [
-          {
-            "name" : "A1",
-            "type" : "AT",
-            "value" : "V"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "AT",
+                        "value": "V"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "ET"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 
@@ -322,28 +322,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "ET",
-        "isPattern" : "false",
-        "id" : "E1",
-        "attributes" : [
-          {
-            "name" : "A1",
-            "type" : "AT",
-            "value" : "V2"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "AT",
+                        "value": "V2"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "ET"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 
