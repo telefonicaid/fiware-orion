@@ -26,7 +26,7 @@ Subscription sequence ONCHANGE expiration check
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -190,28 +190,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Room",
-        "isPattern" : "false",
-        "id" : "OfficeRoom",
-        "attributes" : [
-          {
-            "name" : "temperature",
-            "type" : "degree",
-            "value" : "27"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "27"
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 --TEARDOWN--

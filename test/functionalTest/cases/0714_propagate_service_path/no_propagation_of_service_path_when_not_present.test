@@ -27,7 +27,7 @@ Do NOT propagate Service-Path when not in initial frequest
 dbInit CB
 
 brokerStart CB
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -140,21 +140,21 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "contextElements" : [
-    {
-      "type" : "T",
-      "isPattern" : "false",
-      "id" : "E1",
-      "attributes" : [
+    "contextElements": [
         {
-          "name" : "A1",
-          "type" : "string",
-          "value" : "W1-CB"
+            "attributes": [
+                {
+                    "name": "A1",
+                    "type": "string",
+                    "value": "W1-CB"
+                }
+            ],
+            "id": "E1",
+            "isPattern": "false",
+            "type": "T"
         }
-      ]
-    }
-  ],
-  "updateAction" : "UPDATE"
+    ],
+    "updateAction": "UPDATE"
 }
 =======================================
 

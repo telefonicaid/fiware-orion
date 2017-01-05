@@ -24,6 +24,8 @@
 NGSIv2 notification formats (different from values)
 
 --SHELL-INIT--
+# Note that accumulatorStart doesn't use --pretty-print as the purpose of the
+# test is to check attribute ordering and the pretty print changes that order
 dbInit CB
 brokerStart CB 0
 accumulatorStart

@@ -26,7 +26,7 @@ Subscription sequence ONCHANGE without subCache
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0 IPv4 -noCache
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 url="/v1/contextSubscriptions"
@@ -542,28 +542,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Room",
-        "isPattern" : "false",
-        "id" : "OfficeRoom",
-        "attributes" : [
-          {
-            "name" : "ligthstatus",
-            "type" : "light",
-            "value" : "L23"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "ligthstatus",
+                        "type": "light",
+                        "value": "L23"
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})
 }
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
@@ -575,33 +575,33 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Room",
-        "isPattern" : "false",
-        "id" : "OfficeRoom",
-        "attributes" : [
-          {
-            "name" : "ligthstatus",
-            "type" : "light",
-            "value" : "L23"
-          },
-          {
-            "name" : "temperature",
-            "type" : "degree",
-            "value" : "t100"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "ligthstatus",
+                        "type": "light",
+                        "value": "L23"
+                    },
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "t100"
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
@@ -613,33 +613,33 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Room",
-        "isPattern" : "false",
-        "id" : "OfficeRoom",
-        "attributes" : [
-          {
-            "name" : "ligthstatus",
-            "type" : "light",
-            "value" : "L53"
-          },
-          {
-            "name" : "temperature",
-            "type" : "degree",
-            "value" : "t100"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "ligthstatus",
+                        "type": "light",
+                        "value": "L53"
+                    },
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "t100"
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
@@ -651,33 +651,33 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Room",
-        "isPattern" : "false",
-        "id" : "OfficeRoom",
-        "attributes" : [
-          {
-            "name" : "ligthstatus",
-            "type" : "light",
-            "value" : "L63"
-          },
-          {
-            "name" : "temperature",
-            "type" : "degree",
-            "value" : "t39"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "ligthstatus",
+                        "type": "light",
+                        "value": "L63"
+                    },
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "t39"
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 --TEARDOWN--
