@@ -26,7 +26,7 @@ notifyFormat_ngsi10
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 38,101,102 IPv4 -subCacheIval 8 --cache
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -359,28 +359,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Thing",
-        "isPattern" : "false",
-        "id" : "E10",
-        "attributes" : [
-          {
-            "name" : "A1",
-            "type" : "Text",
-            "value" : "01. Creation"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "Text",
+                        "value": "01. Creation"
+                    }
+                ],
+                "id": "E10",
+                "isPattern": "false",
+                "type": "Thing"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
@@ -392,28 +392,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Thing",
-        "isPattern" : "false",
-        "id" : "E10",
-        "attributes" : [
-          {
-            "name" : "A1",
-            "type" : "Text",
-            "value" : "09. Updated"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "Text",
+                        "value": "09. Updated"
+                    }
+                ],
+                "id": "E10",
+                "isPattern": "false",
+                "type": "Thing"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
@@ -425,28 +425,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Thing",
-        "isPattern" : "false",
-        "id" : "E10",
-        "attributes" : [
-          {
-            "name" : "A1",
-            "type" : "Text",
-            "value" : "10. Updated"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "Text",
+                        "value": "10. Updated"
+                    }
+                ],
+                "id": "E10",
+                "isPattern": "false",
+                "type": "Thing"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
@@ -458,28 +458,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Thing",
-        "isPattern" : "false",
-        "id" : "E10",
-        "attributes" : [
-          {
-            "name" : "A1",
-            "type" : "Text",
-            "value" : "11. Updated"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "Text",
+                        "value": "11. Updated"
+                    }
+                ],
+                "id": "E10",
+                "isPattern": "false",
+                "type": "Thing"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 

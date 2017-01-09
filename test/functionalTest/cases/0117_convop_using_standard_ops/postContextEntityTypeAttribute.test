@@ -46,7 +46,7 @@ payload='{
   "providingApplication": "none"
 }'
 orionCurl --url /v1/registry/contextEntityTypes/ET/attributes/A1 --payload "$payload"
-REG_ID=$(echo "$_response" | grep -Po '(?<="registrationId" : ")[^"]*')
+REG_ID=$(echo "$_response" | grep registrationId | awk -F\" '{ print $4}')
 echo
 echo
 

@@ -122,7 +122,6 @@ echo "===================================="
 orionCurl --url '/v2/entities/E?options=keyValues&attrs=dateCreated,dateModified,*'
 CRE_DATE=$(echo "$_response" | python -mjson.tool | grep dateCreated | awk -F '"' '{print $4}')
 MOD_DATE=$(echo "$_response" | python -mjson.tool | grep dateModified | awk -F '"' '{print $4}')
-#echo "$_response" | python -mjson.tool | grep dateCreated
 echo
 echo
 

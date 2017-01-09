@@ -26,7 +26,7 @@ Subscription availability expiration check
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0-255
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -183,28 +183,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "contextRegistrationResponses" : [
-    {
-      "contextRegistration" : {
-        "entities" : [
-          {
-            "type" : "Room",
-            "isPattern" : "false",
-            "id" : "ConferenceRoom"
-          }
-        ],
-        "attributes" : [
-          {
-            "name" : "temperature",
-            "type" : "degree",
-            "isDomain" : "false"
-          }
-        ],
-        "providingApplication" : "http://localhost:1028"
-      }
-    }
-  ]
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "temperature",
+                        "type": "degree"
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "ConferenceRoom",
+                        "isPattern": "false",
+                        "type": "Room"
+                    }
+                ],
+                "providingApplication": "http://localhost:1028"
+            }
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 

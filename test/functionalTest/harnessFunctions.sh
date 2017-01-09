@@ -370,35 +370,36 @@ function localBrokerStart()
     IPvOption="-ipv6"
   fi
 
+  CB_START_CMD_PREFIX="contextBroker -harakiri"
   if [ "$role" == "CB" ]
   then
     port=$CB_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CB_PORT  -pidpath $CB_PID_FILE  -dbhost $dbHost:$dbPort -db $CB_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption $extraParams"
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CB_PORT  -pidpath $CB_PID_FILE  -dbhost $dbHost:$dbPort -db $CB_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption $extraParams"
   elif [ "$role" == "CP1" ]
   then
     mkdir -p $CP1_LOG_DIR
     port=$CP1_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP1_PORT -pidpath $CP1_PID_FILE -dbhost $dbHost:$dbPort -db $CP1_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP1_LOG_DIR $extraParams"
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP1_PORT -pidpath $CP1_PID_FILE -dbhost $dbHost:$dbPort -db $CP1_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP1_LOG_DIR $extraParams"
   elif [ "$role" == "CP2" ]
   then
     mkdir -p $CP2_LOG_DIR
     port=$CP2_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP2_PORT -pidpath $CP2_PID_FILE -dbhost $dbHost:$dbPort -db $CP2_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP2_LOG_DIR $extraParams"
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP2_PORT -pidpath $CP2_PID_FILE -dbhost $dbHost:$dbPort -db $CP2_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP2_LOG_DIR $extraParams"
   elif [ "$role" == "CP3" ]
   then
     mkdir -p $CP3_LOG_DIR
     port=$CP3_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP3_PORT -pidpath $CP3_PID_FILE -dbhost $dbHost:$dbPort -db $CP3_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP3_LOG_DIR $extraParams"
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP3_PORT -pidpath $CP3_PID_FILE -dbhost $dbHost:$dbPort -db $CP3_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP3_LOG_DIR $extraParams"
   elif [ "$role" == "CP4" ]
   then
     mkdir -p $CP4_LOG_DIR
     port=$CP4_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP4_PORT -pidpath $CP4_PID_FILE -dbhost $dbHost:$dbPort -db $CP4_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP4_LOG_DIR $extraParams"
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP4_PORT -pidpath $CP4_PID_FILE -dbhost $dbHost:$dbPort -db $CP4_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP4_LOG_DIR $extraParams"
   elif [ "$role" == "CP5" ]
   then
     mkdir -p $CP5_LOG_DIR
     port=$CP5_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP5_PORT -pidpath $CP5_PID_FILE -dbhost $dbHost:$dbPort -db $CP5_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP5_LOG_DIR $extraParams"
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP5_PORT -pidpath $CP5_PID_FILE -dbhost $dbHost:$dbPort -db $CP5_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP5_LOG_DIR $extraParams"
   fi
 
 
@@ -1149,7 +1150,12 @@ function orionCurl()
       if [ "$payloadCheckFormat" == json ] || [ "$payloadCheckFormat" == "" ]
       then
         vMsg Running python tool for $_response
-        echo $_response | python -mjson.tool
+        #
+        # We need to apply pretty-print on _response. Otherwise positional processing used in .test
+        # (e.g. to get SUB_ID typically grep and awk are used) will break
+        #
+        _response=$(echo $_response | python -mjson.tool)
+        echo "$_response"
       else
         dMsg Unknown payloadCheckFormat
       fi

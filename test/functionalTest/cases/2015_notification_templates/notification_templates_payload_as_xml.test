@@ -24,6 +24,8 @@
 Notification Templates with payload as XML for notifications
 
 --SHELL-INIT--
+# Note that accumulatorStart doesn't use --pretty-print as in this case the accumulator is
+# not receiving JSON payloads
 dbInit CB
 brokerStart CB
 accumulatorStart
