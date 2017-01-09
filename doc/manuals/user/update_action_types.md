@@ -8,50 +8,50 @@ final example illustrate them).
 
 ## APPEND
 
-This action type is used to create new entities, create new attributes in existing entities
-or update already existing attributes. In the latest case, it is equal to UPDATE.
+This action type is used for creation of entities, creation of attributes in existing entities
+and for updating existing attributes in existing entities. In the latter case, it is equal to UPDATE.
 
-In the case of NGSIv2, it maps to `POST /v2/entities` (if the entity does not already exist)
+In NGSIv2 it maps to `POST /v2/entities` (if the entity does not already exist)
 or `POST /v2/entities/<id>/attrs` (if the entity already exists).
 
 ## APPEND_STRICT
 
-This action type is used to create new entities or creating new attributes in existing entities.
-Attempting to use it to update already existing attributes (as APPEND allows) will result in error.
+This action type is used for creation of entities or attributes in existing entities.
+Attempts to use it to update already existing attributes (as APPEND allows) will result in an error.
 
-In the case of NGSIv2, it maps to `POST /v2/entities` (if the entity does not already exist)
+In NGSIv2 it maps to `POST /v2/entities` (if the entity does not already exist)
 or `POST /v2/entities/<id>/attrs?options=append` (if the entity already exists).
 
 ## UPDATE
 
-This action type is used to update already existing attributes. Attempting to use it to create
-new entities or attributes (as APPEND or APPEND_STRICT allow) will result in error.
+This action type is used for modification of already existing attributes. Attempts to use it to create
+new entities or attributes (as APPEND or APPEND_STRICT allow) will result in an error.
 
-In the case of NGSIv2, it maps to `PATCH /v2/entities/<id>/attrs`.
+In NGSIv2 it maps to `PATCH /v2/entities/<id>/attrs`.
 
 ## DELETE
 
-This action type is used to removing attributes in existing entities (but without removing the
-entity itself) or to delete entities.
+This action type is used for removal of attributes in existing entities (but without removing the
+entity itself) or for deletion of entities.
 
-In the case of NGSIv2, it maps to `DELETE /v2/entities/<id>/attrs/<attrName>` on every attribute included
-in the entity or to `DELETE /v2/entities/<id>` if no attribute were included in the entity.
+In NGSIv2 it maps to `DELETE /v2/entities/<id>/attrs/<attrName>` on every attribute included
+in the entity or to `DELETE /v2/entities/<id>` if the entity has no attributes.
 
 ## REPLACE
 
-This action type replace attributes on existing entities, i.e. all the existing attributes are
-removes, then the ones included in the request are added.
+This action type is used for replacement of attributes in existing entities, i.e. all the existing attributes are
+removed and the ones included in the request are added.
 
-In the case of NGSIv2, it maps to `PATCH /v2/entities/<id>/attrs`.
+In NGSIv2 it maps to `PATCH /v2/entities/<id>/attrs`.
 
-## Example about creating and removing attributes in NGSIv1
+## Example about creation and removal of attributes in NGSIv1
 
-We have seen how to use updateContext with APPEND action type to [create
+We have seen how to use updateContext with the APPEND action type to [create
 new entities](walkthrough_apiv1.md#entity-creation). In addition, APPEND can be
 used to add a new attribute after entity creation. Let's illustrate this
 with an example.
 
-We start creating a simple entity 'E1' with one attribute named 'A':
+We start by creating a simple entity 'E1' with one attribute named 'A':
 ```
 (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
@@ -82,7 +82,7 @@ updateContext APPEND with an entityId matching 'E1':
 }
 EOF
 ```
-Now we can check with a query to that entity that both attributes A and
+We can now check with a query to that entity that both attribute A and
 B are there:
 
 ```
@@ -115,14 +115,15 @@ EOF
 ```
 
 
-APPEND is interpreted as UPDATE in existing context elements. However, you can use APPEND_STRICT instead of APPEND as updateAction. In that case,
-existing attributes are not updated and an error is reported in that case. Note that if your APPEND_STRICT request includes several attributes
-(e.g. A and B), some of them existing and some other not existing (e.g. A exists and B doesn't exist) the ones that doesn't exist are added (in
-this case, B is added) and an error is reported for the existing ones (in this case, an error is reported about A already exists).
+APPEND is interpreted as an UPDATE on existing context elements. However, you can use APPEND_STRICT instead of APPEND
+as updateAction. Using APPEND_STRICT, existing attributes are not updated but an error is reported.
+Note that if your APPEND_STRICT request includes several attributes (e.g. A and B), some of them existing and other not
+existing (e.g. A exists and B doesn't exist), then the ones that doesn't exist are added (in this case, B is added) and
+an error is reported for the existing ones (in this case, an error is reported about A that already exists).
 
 
-We can also remove attributes in a similar way, using the DELETE action
-type. For example, to remove attribute 'A' we will use (note the empty
+You can also remove attributes in a similar way, using the DELETE action type.
+For example, to remove attribute 'A', we will use (note the empty
 contextValue element):
 
 ```
@@ -148,7 +149,7 @@ contextValue element):
 EOF
 ```
 
-Now, a query to the entity shows attribute B:
+Now, a query on the entity shows attribute B:
 
 ```
 (curl localhost:1026/v1/contextEntities/E1 -s -S --header 'Content-Type: application/json' \
@@ -175,7 +176,7 @@ EOF
 ```
 
 
-You can also use convenience operations with POST and DELETE verbs to
+You can also use convenience operations with POST and DELETE methods to
 add and delete attributes. Try the following:
 
 Add a new attribute 'C' and 'D':
@@ -240,7 +241,7 @@ EOF
 Apart from deleting individual attributes from a given entity,
 you can also delete an entire entity, including all its attributes and
 their corresponding metadata. In order to do so, the updateContext
-operation is used, with DELETE as actionType and with an empty
+operation is used, with DELETE as actionType and without any
 list of attributes, as in the following example:
 
 ```
