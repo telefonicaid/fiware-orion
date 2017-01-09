@@ -405,7 +405,10 @@ int mongoSubCacheItemInsert
   //
   // 07. Push metadata names to Metadata Vector (cSubP->metadatas)
   //
-  setStringVectorF(sub, CSUB_METADATA, &(cSubP->metadata));
+  if (sub.hasField(CSUB_METADATA))
+  {
+    setStringVectorF(sub, CSUB_METADATA, &(cSubP->metadata));
+  }
 
   //
   // 08. Fill in cSubP->notifyConditionV from condVec

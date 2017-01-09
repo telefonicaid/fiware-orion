@@ -1551,7 +1551,10 @@ static bool addTriggeredSubscriptions_noCache
 
       trigs->blacklist = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
 
-      setStringVectorF(sub, CSUB_METADATA, &(trigs->metadata));
+      if (sub.hasField(CSUB_METADATA))
+      {
+        setStringVectorF(sub, CSUB_METADATA, &(trigs->metadata));
+      }
 
       if (sub.hasField(CSUB_EXPR))
       {
