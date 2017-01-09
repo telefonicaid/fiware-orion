@@ -9,10 +9,11 @@ This field allows the following values:
 * [DELETE](#delete)
 * [REPLACE](#replace)
 
-They are described in the next subsections. In the case of NGSIv2, equivalences to RESTful operations are described 
-(see [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/) for details); similar equivalences 
-exist to convenicence operations in the case of NGSIv1 (the 
-[final example](#example-about-creation-and-removal-of-attributes-in-ngsiv1) illustrate them).
+The actionType values are described in following subsections. 
+In the case of NGSIv2, equivalences to RESTful operations are described as well
+(see [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/) for details).
+Similar equivalences exist as convenicence operations in the case of NGSIv1 (the 
+[final example](#example-about-creation-and-removal-of-attributes-in-ngsiv1) illustrates them).
 
 ## APPEND
 
