@@ -51,7 +51,7 @@ in the entity or to `DELETE /v2/entities/<id>` if the entity has no attributes.
 This action type is used for replacement of attributes in existing entities, i.e. all the existing attributes are
 removed and the ones included in the request are added.
 
-In NGSIv2 it maps to `PATCH /v2/entities/<id>/attrs`.
+In NGSIv2 it maps to `PUT /v2/entities/<id>/attrs`.
 
 ## Example about creation and removal of attributes in NGSIv1
 
