@@ -925,8 +925,8 @@ also use complex structures. This is an advance topic, described in
 Apart from APPEND or UPDATE there are additional possibilities for the
 `actionType` field, e.g. REPLACE to replace entity attributes (if your
 entity has the attributes A and B and you send an updateContext REPLACE
-request with A, then the entity at the end will have A, i.e. B attribute
-is removed). Have a look to [the section about action types](update_action_types.md)
+request with A, then the entity at the end will have only A, i.e., the attribute B
+has been removed). Have a look at [the section about action types](update_action_types.md)
 for the complete list.
 
 [Top](#top)
