@@ -1,10 +1,18 @@
 # Update action types
 
 Both `POST /v1/updateContext` (NGSIv1) and `POST /v2/op/update` use an `actionType` field.
-This field allows the following values. In the case of NGSIv2, equivalence to RESTful
-operations are described (see [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/)
-for details); similar equivalences exist to convenicence operations in the case of NGSIv1 (the
-final example illustrate them).
+This field allows the following values:
+
+* [APPEND](#append)
+* [APPEND_STRICT](#append_strict)
+* [UPDATE](#update)
+* [DELETE](#delete)
+* [REPLACE](#replace)
+
+They are described in the next subsections. In the case of NGSIv2, equivalences to RESTful operations are described 
+(see [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/) for details); similar equivalences 
+exist to convenicence operations in the case of NGSIv1 (the 
+[final example](#example-about-creation-and-removal-of-attributes-in-ngsiv1) illustrate them).
 
 ## APPEND
 
