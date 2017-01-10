@@ -14,3 +14,4 @@
 - Fix: no longer accepting a service path with an empty component (e.g. /comp1//comp3) (#2772)
 - Fix: bug in notification queue statistics, "in" value (#2744)
 - Fix: Accept header errors in NGSIv2 requests were incorrectly being rendered using "OrionError" element (#2765)
+- Hardening: NGSIv1 responses don't use pretty-print JSON format any longer, as NGSIv2 responses work (potentially saving around 50% size) (#2760)
