@@ -27,7 +27,6 @@ previousValue with compound cases
 dbInit CB
 brokerStart CB
 accumulatorStart --pretty-print
-#accumulatorStart
 
 --SHELL--
 
