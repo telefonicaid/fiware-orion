@@ -654,11 +654,14 @@ std::string CompoundValueNode::check(void)
 *
 * render -
 */
-std::string CompoundValueNode::render(ApiVersion apiVersion, const std::string& indent)
+std::string CompoundValueNode::render(ApiVersion apiVersion, const std::string& indent, bool noComma, bool noTag)
 {
   std::string  out       = "";
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
   std::string  key       = (container->valueType == orion::ValueTypeVector)? "item" : name;
+
+  if (noComma == true)
+    jsonComma = false;
 
   if (apiVersion == V2)
   {
@@ -764,14 +767,21 @@ std::string CompoundValueNode::render(ApiVersion apiVersion, const std::string& 
     if (rootP != this)
     {
       LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is NOT a Vector", name.c_str()));     
-      out += startTag(indent, key);
+
+      if (noTag == false)
+      {
+        out += startTag(indent, key);
+      }
 
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
       {
         out += childV[ix]->render(apiVersion, indent + "  ");
       }
 
-      out += endTag(indent, jsonComma, false);
+      if (noTag == false)
+      {
+        out += endTag(indent, jsonComma, false);
+      }
     }
     else
     {
@@ -903,7 +913,7 @@ std::string CompoundValueNode::toJson(bool isLastElement, bool comma)
   {
     if (name == "toplevel")
     {
-      name ="value";
+      name = "value";
     }
 
     out += JSON_STR(name) + ":{";

@@ -252,34 +252,22 @@ std::string Metadata::render(const std::string& indent, bool comma)
   }
   else if (valueType == orion::ValueTypeObject)
   {
-    std::string part;
+    bool        isCompoundVector = false;
+    ApiVersion  apiVersion       = V1;
 
-    if (compoundValueP->isObject())
+    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::ValueTypeVector))
     {
-      //
-      // Note in this case we don't add the "value" key, the toJson()
-      // method does it for toplevel compound (a bit crazy... this deserves a FIXME mark)
-      // FIXME P4: modify/simplify the rendering of compound values. Too many if/else ...
-      //
-      compoundValueP->renderName = true;
-      compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
-#if 0
-      part = compoundValueP->toJson(true, false);
-#else
-      part = compoundValueP->render(V1, indent + "  ");
-#endif
+      isCompoundVector = true;
     }
-    else if (compoundValueP->isVector())
-    {
-      compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
-#if 0
-      part = JSON_STR("value") + ": [" + compoundValueP->toJson(true, false) + "]";
-#else
-      part = JSON_STR("value") + ": [" + compoundValueP->render(V1, indent + "  ") + "]";
-#endif
-    }    
 
-    out += part;
+    //
+    // Make compoundValueP->render not render the name 'value'
+    //
+    compoundValueP->container = compoundValueP;
+
+    out += startTag(indent + "  ", "value", isCompoundVector);
+    out += compoundValueP->render(apiVersion, indent + "    ", true, true);
+    out += endTag(indent + "  ", false, isCompoundVector);
   }
   else
   {
@@ -300,7 +288,8 @@ std::string Metadata::render(const std::string& indent, bool comma)
     out += "\n";
   }
 
-  out += endTag(indent, comma);
+  std::string end = endTag(indent, comma);
+  out += end;
 
   return out;
 }

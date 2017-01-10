@@ -46,7 +46,7 @@ class EntityType
   explicit EntityType(std::string _type);
 
   std::string   check(ApiVersion apiVersion, const std::string& predetectedError);
-  std::string   render(ApiVersion          apiVersion,
+  std::string   render2(ApiVersion          apiVersion,
                        bool                asJsonObject,
                        bool                asJsonOut,
                        bool                collapsed,

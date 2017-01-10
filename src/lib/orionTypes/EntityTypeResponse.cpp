@@ -56,7 +56,7 @@ std::string EntityTypeResponse::render
 
   out += startTag(indent);
 
-  out += entityType.render(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", true, true);
+  out += entityType.render2(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", true, true);
   out += statusCode.render(indent + "  ");
 
   out += endTag(indent);

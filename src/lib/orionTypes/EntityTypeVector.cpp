@@ -70,7 +70,7 @@ std::string EntityTypeVector::render
 
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
-      out += vec[ix]->render(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", ix != vec.size() - 1);
+      out += vec[ix]->render2(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", ix != vec.size() - 1);
     }
     out += endTag(indent, comma, true);
   }

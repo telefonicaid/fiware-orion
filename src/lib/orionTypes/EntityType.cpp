@@ -67,7 +67,7 @@ EntityType::EntityType(std::string _type): type(_type), count(0)
 *
 * 'typeNameBefore' is set to TRUE when called from EntityTypeResponse
 */
-std::string EntityType::render
+std::string EntityType::render2
 (
   ApiVersion          apiVersion,
   bool                asJsonObject,
@@ -91,12 +91,12 @@ std::string EntityType::render
 
     if (collapsed || contextAttributeVector.size() == 0)
     {
-      out += valueTag(indent, "name", type, false);
+      out += valueTag(indent + "  ", "name", type, false);
     }
     else
     {
-      out += valueTag(indent, "name", type, true);
-      out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, indent, false, true, true);
+      out += valueTag(indent + "  ", "name", type, true);
+      out += contextAttributeVector.render(apiVersion, asJsonObject, EntityTypes, indent + "  ", false, true, true);
     }
 
     out += endTag(indent, comma, false);
