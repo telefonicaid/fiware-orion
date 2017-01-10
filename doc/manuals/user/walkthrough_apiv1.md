@@ -723,7 +723,7 @@ operation with UPDATE action type. The basic rule to take into account
 with updateContext is that APPEND creates new context elements, while
 UPDATE updates already existing context elements (however, Orion
 interprets APPEND as UPDATE if the entity already
-exists; you can avoid that using [APPEND_STRICT](append_and_delete.md)).
+exists; you can avoid that using [APPEND_STRICT](update_action_types.md#append_strict)).
 
 Now we will play the role of a context producer application, i.e. a
 source of context information. Let's assume that this application in a
@@ -922,11 +922,12 @@ Apart from simple values (i.e. strings) for attribute values, you can
 also use complex structures. This is an advance topic, described in
 [this section](structured_attribute_valued.md#structured-attribute-values).
 
-Finally, you can use REPLACE as updateAction. In that case, the entity
-attributes are replaced by the ones in the request. For example, if your
+Apart from APPEND or UPDATE there are additional possibilities for the
+`actionType` field, e.g. REPLACE to replace entity attributes (if your
 entity has the attributes A and B and you send an updateContext REPLACE
-request with A, then the entity at the end will have A (i.e. B attribute
-is removed).
+request with A, then the entity at the end will have only A, i.e., the attribute B
+has been removed). Have a look at [the section about action types](update_action_types.md)
+for the complete list.
 
 [Top](#top)
 
@@ -1342,7 +1343,7 @@ which response is:
 You can also create an attribute (and the containing entity along the
 way) in the following way (additional attributes could be added after
 that, as described in [this
-section](append_and_delete.md#adding-and-removing-attributes-with-append-and-delete-in-updatecontext)):
+section](update_action_types.md#append)):
 
 ```
 (curl localhost:1026/v1/contextEntities/Room3/attributes/temperature -s -S \
