@@ -48,9 +48,9 @@ typedef struct RegisterProviderRequest
 
   RegisterProviderRequest();
 
-  std::string  render(std::string indent);
-  std::string  check(ApiVersion apiVersion, RequestType requestType, std::string indent, const std::string& preError);
-  void         present(std::string indent);
+  std::string  render(void);
+  std::string  check(ApiVersion apiVersion, RequestType requestType, const std::string& preError);
+  void         present(const std::string&  indent);
   void         release();
 } RegisterProviderRequest;
 

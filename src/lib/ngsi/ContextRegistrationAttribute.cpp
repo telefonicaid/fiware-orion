@@ -67,7 +67,7 @@ ContextRegistrationAttribute::ContextRegistrationAttribute
 *
 * ContextRegistrationAttribute::render -
 */
-std::string ContextRegistrationAttribute::render(const std::string& indent, bool comma)
+std::string ContextRegistrationAttribute::render(bool comma)
 {
   std::string out = "";
 
@@ -78,12 +78,12 @@ std::string ContextRegistrationAttribute::render(const std::string& indent, bool
   // The only doubt here is whether isDomain should have the comma or not,
   // that depends on whether the metadataVector is empty or not.
   //
-  out += startTag(indent);
-  out += valueTag(indent + "  ", "name",     name, true);
-  out += valueTag(indent + "  ", "type",     type, true);
-  out += valueTag(indent + "  ", "isDomain", isDomain, metadataVector.size() != 0);
-  out += metadataVector.render(indent + "  ");
-  out += endTag(indent, comma);
+  out += startTag();
+  out += valueTag("name",     name, true);
+  out += valueTag("type",     type, true);
+  out += valueTag("isDomain", isDomain, metadataVector.size() != 0);
+  out += metadataVector.render(false);
+  out += endTag(comma);
 
   return out;
 }

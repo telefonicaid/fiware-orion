@@ -77,12 +77,12 @@ TEST(UpdateContextSubscriptionRequest, badLength_json)
   ucsrP->present(""); // No output
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
-  out  = ucsrP->check("", "FORCED ERROR", 0);
+  out  = ucsrP->check("FORCED ERROR", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ucsrP->duration.set("XXXYYYZZZ");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
-  out  = ucsrP->check("", "", 0);
+  out  = ucsrP->check("", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ucsrP->present("");

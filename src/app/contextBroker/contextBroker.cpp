@@ -278,6 +278,9 @@ bool            logForHumans;
 bool            disableMetrics;
 int             reqTimeout;
 
+#ifdef PARANOID_JSON_INDENT
+bool            paranoidV1Indent;
+#endif
 
 
 /* ****************************************************************************
@@ -400,6 +403,10 @@ PaArgument paArgs[] =
 
   { "-logForHumans",   &logForHumans,    "LOG_FOR_HUMANS",     PaBool, PaOpt, false, false, true,             LOG_FOR_HUMANS_DESC },
   { "-disableMetrics", &disableMetrics,  "DISABLE_METRICS",    PaBool, PaOpt, false, false, true,             METRICS_DESC        },
+
+#ifdef PARANOID_JSON_INDENT
+  { "-paranoidV1Indent", &paranoidV1Indent, "PARANOID_V1_INDENT", PaBool, PaHid, false, false, true, "you shouldn't use this ;)" },
+#endif
 
   PA_END_OF_ARGS
 };

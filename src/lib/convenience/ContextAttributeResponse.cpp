@@ -44,18 +44,17 @@
 */
 std::string ContextAttributeResponse::render
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         request,
-  const std::string&  indent
+  ApiVersion   apiVersion,
+  bool         asJsonObject,
+  RequestType  request
 )
 {
   std::string out = "";
 
-  out += startTag(indent);
-  out += contextAttributeVector.render(apiVersion, asJsonObject, request, indent + "  ", true);
-  out += statusCode.render(indent + "  ");
-  out += endTag(indent);
+  out += startTag();
+  out += contextAttributeVector.render(apiVersion, asJsonObject, request, true);
+  out += statusCode.render(false);
+  out += endTag();
 
   return out;
 }
@@ -71,7 +70,6 @@ std::string ContextAttributeResponse::check
   ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
-  std::string         indent,
   const std::string&  predetectedError
 )
 {
@@ -101,7 +99,7 @@ std::string ContextAttributeResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, requestType, indent);
+  return render(apiVersion, asJsonObject, requestType);
 }
 
 
@@ -110,7 +108,7 @@ std::string ContextAttributeResponse::check
 *
 * present - 
 */
-void ContextAttributeResponse::present(std::string indent)
+void ContextAttributeResponse::present(const std::string&  indent)
 {
   contextAttributeVector.present(indent);
   statusCode.present(indent);

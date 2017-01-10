@@ -39,7 +39,7 @@ std::string orionLogReply(ConnectionInfo* ciP, const std::string& what, const st
    std::string out = "";
 
    out += '{';
-   out += valueTag(" ", what, value);
+   out += valueTag(what, value);
    out += '}';
 
    ciP->httpStatusCode = SccOk;

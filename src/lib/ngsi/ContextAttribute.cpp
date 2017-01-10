@@ -488,19 +488,18 @@ std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
 */
 std::string ContextAttribute::renderAsJsonObject
 (
-  ApiVersion          apiVersion,
-  RequestType         request,
-  const std::string&  indent,
-  bool                comma,
-  bool                omitValue
+  ApiVersion   apiVersion,
+  RequestType  request,
+  bool         comma,
+  bool         omitValue
 )
 {
   std::string  out                    = "";
   bool         commaAfterContextValue = metadataVector.size() != 0;
   bool         commaAfterType         = !omitValue || commaAfterContextValue;
 
-  out += startTag(indent, name, false);
-  out += valueTag(indent + "  ", "type",         type,  commaAfterType);
+  out += startTag(name, false);
+  out += valueTag("type",         type,  commaAfterType);
 
   if (compoundValueP == NULL)
   {
@@ -546,9 +545,9 @@ std::string ContextAttribute::renderAsJsonObject
       // renderAsJsonObject is used in v1 only.
       // => we only need to care about stringValue (not boolValue, numberValue nor nullValue)
       //
-      out += valueTag(indent + "  ", "value",
-                            (request != RtUpdateContextResponse)? effectiveValue : "",
-                            commaAfterContextValue, false, withoutQuotes);
+      out += valueTag("value",
+                      (request != RtUpdateContextResponse)? effectiveValue : "",
+                      commaAfterContextValue, false, withoutQuotes);
     }
   }
   else
@@ -560,17 +559,17 @@ std::string ContextAttribute::renderAsJsonObject
       isCompoundVector = true;
     }
 
-    out += startTag(indent + "  ", "value", isCompoundVector);
-    out += compoundValueP->render(apiVersion, indent + "    ");
-    out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
+    out += startTag("value", isCompoundVector);
+    out += compoundValueP->render(apiVersion);
+    out += endTag(commaAfterContextValue, isCompoundVector);
   }
 
   if (omitValue == false)
   {
-    out += metadataVector.render(indent + "  ", false);
+    out += metadataVector.render(false);
   }
 
-  out += endTag(indent, comma);
+  out += endTag(comma);
 
   return out;
 }
@@ -581,17 +580,17 @@ std::string ContextAttribute::renderAsJsonObject
 *
 * renderAsNameString -
 */
-std::string ContextAttribute::renderAsNameString(const std::string& indent, bool comma)
+std::string ContextAttribute::renderAsNameString(bool comma)
 {
   std::string  out = "";
 
   if (comma)
   {
-    out += indent + "\"" + name + "\",\n";
+    out += "\"" + name + "\",";
   }
   else
   {
-    out += indent + "\"" + name + "\"\n";
+    out += "\"" + name + "\"";
   }
 
   return out;
@@ -606,12 +605,11 @@ std::string ContextAttribute::renderAsNameString(const std::string& indent, bool
 */
 std::string ContextAttribute::render
 (
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  RequestType         request,
-  const std::string&  indent,
-  bool                comma,
-  bool                omitValue
+  ApiVersion   apiVersion,
+  bool         asJsonObject,
+  RequestType  request,
+  bool         comma,
+  bool         omitValue
 )
 {
   std::string  out                    = "";
@@ -621,12 +619,12 @@ std::string ContextAttribute::render
 
   if (asJsonObject)
   {
-    return renderAsJsonObject(apiVersion, request, indent, comma, omitValue);
+    return renderAsJsonObject(apiVersion, request, comma, omitValue);
   }
 
-  out += startTag(indent);
-  out += valueTag(indent + "  ", "name", name,  true);  // attribute.type is always rendered
-  out += valueTag(indent + "  ", "type", type,  commaAfterType);
+  out += startTag();
+  out += valueTag("name", name,  true);  // attribute.type is always rendered
+  out += valueTag("type", type,  commaAfterType);
 
   if (compoundValueP == NULL)
   {
@@ -667,8 +665,7 @@ std::string ContextAttribute::render
         LM_E(("Runtime Error (unknown value type: %d)", valueType));
       }
 
-      out += valueTag(indent + "  ",
-                      "value",
+      out += valueTag("value",
                       (request != RtUpdateContextResponse)? effectiveValue : "",
                       commaAfterContextValue,
                       false,
@@ -677,7 +674,7 @@ std::string ContextAttribute::render
     }
     else if (request == RtUpdateContextResponse)
     {
-      out += valueTag(indent + "  ", "value", "", commaAfterContextValue);
+      out += valueTag("value", "", commaAfterContextValue);
     }
   }
   else
@@ -689,13 +686,13 @@ std::string ContextAttribute::render
       isCompoundVector = true;
     }
 
-    out += startTag(indent + "  ", "value", isCompoundVector);
-    out += compoundValueP->render(apiVersion, indent + "    ");
-    out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
+    out += startTag("value", isCompoundVector);
+    out += compoundValueP->render(apiVersion);
+    out += endTag(commaAfterContextValue, isCompoundVector);
   }
 
-  out += metadataVector.render(indent + "  ", false);
-  out += endTag(indent, comma);
+  out += metadataVector.render(false);
+  out += endTag(comma);
 
   return out;
 }
@@ -740,11 +737,11 @@ std::string ContextAttribute::toJson
     {
       if (compoundValueP->isObject())
       {
-        out += "{" + compoundValueP->toJson(true) + "}";
+        out += "{" + compoundValueP->toJson(true, true) + "}";
       }
       else if (compoundValueP->isVector())
       {
-        out += "[" + compoundValueP->toJson(true) + "]";
+        out += "[" + compoundValueP->toJson(true, true) + "]";
       }
     }
     else if (valueType == orion::ValueTypeNumber)
@@ -801,11 +798,11 @@ std::string ContextAttribute::toJson
     {
       if (compoundValueP->isObject())
       {
-        out += JSON_STR("value") + ":{" + compoundValueP->toJson(true) + "}";
+        out += JSON_STR("value") + ":{" + compoundValueP->toJson(true, true) + "}";
       }
       else if (compoundValueP->isVector())
       {
-        out += JSON_STR("value") + ":[" + compoundValueP->toJson(true) + "]";
+        out += JSON_STR("value") + ":[" + compoundValueP->toJson(true, true) + "]";
       }
     }
     else if (valueType == orion::ValueTypeNumber)
@@ -944,11 +941,11 @@ std::string ContextAttribute::toJsonAsValue
 
       if (compoundValueP->isVector())
       {
-        out = "[" + compoundValueP->toJson(true) + "]";
+        out = "[" + compoundValueP->toJson(true, true) + "]";
       }
       else  // Object
       {
-        out = "{" + compoundValueP->toJson(false) + "}";
+        out = "{" + compoundValueP->toJson(false, true) + "}";
       }
     }
   }

@@ -228,7 +228,7 @@ Date: REGEX(.*)
 05. Dump and reset: see notification A: [1, {b: foo} ], previousValue: 1
 ========================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 736
+Content-Length: 737
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json

@@ -46,19 +46,19 @@ TEST(ContextRegistrationAttributeVector, render)
 
   utInit();
 
-  out = crav.render("");
+  out = crav.render(false);
   EXPECT_STREQ("", out.c_str());
 
-  out = crav.render("");
+  out = crav.render(false);
   EXPECT_STREQ("", out.c_str());
 
   crav.push_back(&cra);
-  out = crav.render("");
+  out = crav.render(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   crav.push_back(&cra2);
-  out = crav.render("");
+  out = crav.render(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

@@ -43,7 +43,7 @@ TEST(Scope, render)
 
   utInit();
 
-  out = scope.render("", false);
+  out = scope.render(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -72,16 +72,16 @@ TEST(Scope, check)
   
   utInit();
 
-  checked = scope.check(RegisterContext, "", "", 0);
+  checked = scope.check();
   EXPECT_STREQ(checked.c_str(), expected.c_str());
 
-  checked = scope1.check(RegisterContext, "", "", 0);
+  checked = scope1.check();
   EXPECT_STREQ(checked.c_str(), expected1.c_str());
 
-  checked = scope2.check(RegisterContext, "", "", 0);
+  checked = scope2.check();
   EXPECT_STREQ(checked.c_str(), expected2.c_str());
 
-  checked = scope3.check(RegisterContext, "", "", 0);
+  checked = scope3.check();
   EXPECT_STREQ(checked.c_str(), expected3.c_str());
 
   utExit();

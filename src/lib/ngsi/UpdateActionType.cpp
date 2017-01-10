@@ -116,14 +116,14 @@ void UpdateActionType::present(const std::string& indent)
 *
 * UpdateActionType::render - 
 */
-std::string UpdateActionType::render(const std::string& indent, bool comma)
+std::string UpdateActionType::render(bool comma)
 {
   if (string == "")
   {
     return "";
   }
 
-  return valueTag(indent, "updateAction", string, comma);
+  return valueTag("updateAction", string, comma);
 }
 
 

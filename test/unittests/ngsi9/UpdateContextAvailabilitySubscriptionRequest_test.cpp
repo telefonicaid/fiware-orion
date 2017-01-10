@@ -63,16 +63,16 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
   UpdateContextAvailabilitySubscriptionRequest* ucasP = &parseData.ucas.res;
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out = ucasP->render("");
+  out = ucasP->render();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  out = ucasP->check("", "predetected error", 0);
+  out = ucasP->check("predetected error", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   ucasP->duration.set("eeeee");
-  out = ucasP->check("", "", 0);
+  out = ucasP->check("", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -125,7 +125,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, response)
 
   ucas.subscriptionId.set("012345678901234567890123");
 
-  out = ucas.check("", "", 0);
+  out = ucas.check("");
   EXPECT_EQ("OK", out);
   
   utExit();

@@ -330,7 +330,7 @@ void jsonAcerRelease(ParseData* reqData)
 std::string jsonAcerCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-  return reqData->acer.res.check(ciP->apiVersion, asJsonObject, AppendContextElement, "", reqData->errorString);
+  return reqData->acer.res.check(ciP->apiVersion, asJsonObject, AppendContextElement, reqData->errorString);
 }
 
 

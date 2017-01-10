@@ -31,6 +31,7 @@
 #include <vector>
 
 #include "common/limits.h"
+#include "common/globals.h"  // FIXME P10: PARANOID_JSON_INDENT
 
 // the same macro in parseArg library
 #define FT(x) (x == true)? "true" : "false"
@@ -209,5 +210,14 @@ extern std::string isodate2str(long long timestamp);
 * toLowercase - convert string to lowercase
 */
 extern void toLowercase(char* s);
+
+#ifdef PARANOID_JSON_INDENT
+// -----------------------------------------------------------------------------
+//
+// jsonFix - replace all ':' with ' :' in a JSON buffer (and some others fixes)
+//
+//
+extern char* jsonFix(const char* in);
+#endif
 
 #endif  // SRC_LIB_COMMON_STRING_H_

@@ -94,7 +94,7 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 *
 * QueryContextRequest::render - 
 */
-std::string QueryContextRequest::render(const std::string& indent)
+std::string QueryContextRequest::render(void)
 {
   std::string   out                      = "";
   bool          attributeListRendered    = attributeList.size() != 0;
@@ -102,11 +102,11 @@ std::string QueryContextRequest::render(const std::string& indent)
   bool          commaAfterAttributeList  = restrictionRendered;
   bool          commaAfterEntityIdVector = attributeListRendered || restrictionRendered;
 
-  out += startTag(indent);
-  out += entityIdVector.render(indent + "  ", commaAfterEntityIdVector);
-  out += attributeList.render( indent + "  ", commaAfterAttributeList);
-  out += restriction.render(   indent + "  ", restrictions, false);
-  out += endTag(indent);
+  out += startTag();
+  out += entityIdVector.render(commaAfterEntityIdVector);
+  out += attributeList.render(commaAfterAttributeList);
+  out += restriction.render(restrictions, false);
+  out += endTag();
 
   return out;
 }
@@ -117,7 +117,7 @@ std::string QueryContextRequest::render(const std::string& indent)
 *
 * QueryContextRequest::check - 
 */
-std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError)
+std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError)
 {
   std::string           res;
   QueryContextResponse  response;
@@ -126,9 +126,9 @@ std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject,
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = entityIdVector.check(QueryContext, indent))                                 != "OK") ||
-           ((res = attributeList.check(QueryContext,  indent, predetectedError, 0))            != "OK") ||
-           ((res = restriction.check(QueryContext,    indent, predetectedError, restrictions)) != "OK"))
+  else if (((res = entityIdVector.check(QueryContext)) != "OK") ||
+           ((res = attributeList.check())              != "OK") ||
+           ((res = restriction.check(restrictions))    != "OK"))
   {
     alarmMgr.badInput(clientIp, res);
     response.errorCode.fill(SccBadRequest, res);
@@ -138,7 +138,7 @@ std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject,
     return "OK";
   }
 
-  return response.render(apiVersion, asJsonObject, indent);
+  return response.render(apiVersion, asJsonObject);
 }
 
 

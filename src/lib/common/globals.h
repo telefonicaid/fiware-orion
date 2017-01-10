@@ -32,7 +32,11 @@
 #include "common/Timer.h"
 #include "common/sem.h"
 
-
+/* ****************************************************************************
+*
+* FIXME P10: temporal definition, it should be removed soon
+*/
+#define PARANOID_JSON_INDENT
 
 /* ****************************************************************************
 *
@@ -218,6 +222,10 @@ extern bool               notifQueueStatistics;
 
 extern bool               checkIdv1;
 extern bool               disableCusNotif;
+
+#ifdef PARANOID_JSON_INDENT
+extern bool               paranoidV1Indent;
+#endif
 
 
 

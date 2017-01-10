@@ -225,30 +225,30 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 *
 * Metadata::render -
 */
-std::string Metadata::render(const std::string& indent, bool comma)
+std::string Metadata::render(bool comma)
 {
   std::string out     = "";
   std::string xValue  = toStringValue();
 
-  out += startTag(indent);
-  out += valueTag(indent + "  ", "name", name, true);
-  out += valueTag(indent + "  ", "type", type, true);
+  out += startTag();
+  out += valueTag("name", name, true);
+  out += valueTag("type", type, true);
 
   if (valueType == orion::ValueTypeString)
   {
-    out += valueTag(indent + "  ", "value", xValue, false);
+    out += valueTag("value", xValue, false);
   }
   else if (valueType == orion::ValueTypeNumber)
   {
-    out += indent + "  " + JSON_STR("value") + ": " + xValue;
+    out += JSON_STR("value") + ":" + xValue;
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
-    out += indent + "  " + JSON_STR("value") + ": " + xValue;
+    out += JSON_STR("value") + ":" + xValue;
   }
   else if (valueType == orion::ValueTypeNone)
   {
-    out += indent + "  " + JSON_STR("value") + ": " + xValue; 
+    out += JSON_STR("value") + ":" + xValue;
   }
   else if (valueType == orion::ValueTypeObject)
   {
@@ -259,19 +259,23 @@ std::string Metadata::render(const std::string& indent, bool comma)
     {
       isCompoundVector = true;
     }
+    else if (compoundValueP->isVector())
+    {
+      compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
+    }    
 
     //
     // Make compoundValueP->render not render the name 'value'
     //
     compoundValueP->container = compoundValueP;
 
-    out += startTag(indent + "  ", "value", isCompoundVector);
-    out += compoundValueP->render(apiVersion, indent + "    ", true, true);
-    out += endTag(indent + "  ", false, isCompoundVector);
+    out += startTag("value", isCompoundVector);
+    out += compoundValueP->render(apiVersion, true, true);
+    out += endTag(false, isCompoundVector);
   }
   else
   {
-    out += indent + "  " + JSON_STR("value") + ": " + JSON_STR("unknown json type");
+    out += JSON_STR("value") + ":" + JSON_STR("unknown json type");
   }
 
   if ((valueType == orion::ValueTypeNumber) || (valueType == orion::ValueTypeBoolean) || (valueType == orion::ValueTypeNone))
@@ -288,8 +292,7 @@ std::string Metadata::render(const std::string& indent, bool comma)
     out += "\n";
   }
 
-  std::string end = endTag(indent, comma);
-  out += end;
+  out += endTag(comma);
 
   return out;
 }
