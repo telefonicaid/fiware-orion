@@ -661,7 +661,9 @@ std::string CompoundValueNode::render(ApiVersion apiVersion, const std::string& 
   std::string  key       = (container->valueType == orion::ValueTypeVector)? "item" : name;
 
   if (noComma == true)
+  {
     jsonComma = false;
+  }
 
   if (apiVersion == V2)
   {

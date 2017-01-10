@@ -67,7 +67,7 @@ EntityType::EntityType(std::string _type): type(_type), count(0)
 *
 * 'typeNameBefore' is set to TRUE when called from EntityTypeResponse
 */
-std::string EntityType::render2
+std::string EntityType::render
 (
   ApiVersion          apiVersion,
   bool                asJsonObject,
