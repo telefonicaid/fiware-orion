@@ -137,7 +137,13 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   ciP->outMimeType  = JSON;
 
-  TIMED_RENDER(payload = upcrP->render(ciP->apiVersion, asJsonObject, ""));
+  //
+  // FIXME: Forwards are done using NGSIv1 only, for now
+  //        This will hopefully change soon ...
+  //        Once we implement forwards in NGSIv2, this render() should be like this:
+  //        TIMED_RENDER(payload = upcrP->render(ciP->apiVersion, asJsonObject, ""));
+  //
+  TIMED_RENDER(payload = upcrP->render(V1, asJsonObject, ""));
 
   ciP->outMimeType  = outMimeType;
   cleanPayload      = (char*) payload.c_str();

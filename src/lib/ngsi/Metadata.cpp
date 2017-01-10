@@ -263,12 +263,20 @@ std::string Metadata::render(const std::string& indent, bool comma)
       //
       compoundValueP->renderName = true;
       compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
+#if 0
       part = compoundValueP->toJson(true, false);
+#else
+      part = compoundValueP->render(V1, indent + "  ");
+#endif
     }
     else if (compoundValueP->isVector())
     {
       compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
+#if 0
       part = JSON_STR("value") + ": [" + compoundValueP->toJson(true, false) + "]";
+#else
+      part = JSON_STR("value") + ": [" + compoundValueP->render(V1, indent + "  ") + "]";
+#endif
     }    
 
     out += part;
@@ -276,6 +284,20 @@ std::string Metadata::render(const std::string& indent, bool comma)
   else
   {
     out += indent + "  " + JSON_STR("value") + ": " + JSON_STR("unknown json type");
+  }
+
+  if ((valueType == orion::ValueTypeNumber) || (valueType == orion::ValueTypeBoolean) || (valueType == orion::ValueTypeNone))
+  {
+    //
+    // Adding newline for the types that do not use the valueTag() function
+    //
+    // FIXME: This might destroy V2 rendering
+    //   This newline is only desired for V1 requests and as this function hasn't that knowledge, we 'hardcode'
+    //   V1 behavior here, as V2 requests should use toJson and not render().
+    //   So, if V2 rendering is destroyed by this modification, it is only because the V2 rendering is using
+    //   a method that it SHOULD NOT USE !
+    //
+    out += "\n";
   }
 
   out += endTag(indent, comma);

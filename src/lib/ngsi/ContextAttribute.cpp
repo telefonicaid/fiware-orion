@@ -86,7 +86,7 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr) const
 *
 * ContextAttribute::valueBson -
 *
-* Used to render attribute value to BSON, appended into the bsonAttr builder
+* Used to renderattribute value to BSON, appended into the bsonAttr builder
 */
 void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr) const
 {
@@ -574,6 +574,8 @@ std::string ContextAttribute::renderAsJsonObject
   return out;
 }
 
+
+
 /* ****************************************************************************
 *
 * renderAsNameString -
@@ -594,6 +596,8 @@ std::string ContextAttribute::renderAsNameString(const std::string& indent, bool
   return out;
 
 }
+
+
 
 /* ****************************************************************************
 *
