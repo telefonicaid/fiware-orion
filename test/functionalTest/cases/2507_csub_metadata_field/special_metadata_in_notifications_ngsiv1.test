@@ -354,7 +354,7 @@ Date: REGEX(.*)
 05. Dump and reset: see notification with actionType=update and previousValue=2 for B
 =====================================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 991
+Content-Length: 992
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -422,7 +422,7 @@ Date: REGEX(.*)
 07. Dump and reset: see notification with actionType=update for B and C, previousValue=20 for B, previousValue=3 for C
 ======================================================================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 1312
+Content-Length: 1314
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -502,7 +502,7 @@ Date: REGEX(.*)
 09. Dump and reset: see notification with actionType=update and previousValue=1 for A
 =====================================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 992
+Content-Length: 993
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -570,7 +570,7 @@ Date: REGEX(.*)
 11. Dump and reset: see notification with actionType=update and previousValue=10 for A
 ======================================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 993
+Content-Length: 994
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
