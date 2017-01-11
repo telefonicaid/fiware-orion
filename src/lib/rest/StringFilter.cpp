@@ -478,6 +478,8 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   char* rhs     = NULL;
   char* lhs     = NULL;
 
+  LM_W(("KZ: parsing StringFilterItem: '%s'", qItem));
+
   type = _type;
 
   s = wsStrip(s);
@@ -486,31 +488,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     free(toFree);
     *errorStringP = "empty q-item";
     return false;
-  }
-
-  //
-  // If string starts with single-quote it must also end with single-quote and it is
-  // a string, of course.
-  // Also, the resulting string after removing the quotes cannot contain any quotes ... ?
-  //
-  if (*s == '\'')
-  {
-    ++s;
-
-    if (s[strlen(s) - 1] != '\'')
-    {
-      free(toFree);
-      *errorStringP = "non-terminated forced string";
-      return false;
-    }
-    s[strlen(s) - 1] = 0;
-
-    if (strchr(s, '\'') != NULL)
-    {
-      free(toFree);
-      *errorStringP = "quote in forced string";
-      return false;
-    }
   }
 
 
@@ -590,6 +567,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   //
   lhsParse();
 
+
   //
   // Check for empty RHS
   //
@@ -598,6 +576,34 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     *errorStringP = "empty right-hand-side in q-item";
     free(toFree);
     return false;
+  }
+
+
+  //
+  // Check for invalid forced string in RHS
+  //
+  // If string starts with single-quote it must also end with single-quote and it is
+  // a string, of course.
+  // Also, the resulting string after removing the quotes cannot contain any quotes ... ?
+  //
+  if (*rhs == '\'')
+  {
+    ++rhs;
+
+    if (rhs[strlen(rhs) - 1] != '\'')
+    {
+      free(toFree);
+      *errorStringP = "non-terminated forced string";
+      return false;
+    }
+    rhs[strlen(rhs) - 1] = 0;
+
+    if (strchr(rhs, '\'') != NULL)
+    {
+      free(toFree);
+      *errorStringP = "quote in forced string";
+      return false;
+    }
   }
 
 
