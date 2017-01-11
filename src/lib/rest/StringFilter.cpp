@@ -1709,8 +1709,11 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
         break;
 
       case SfvtNull:
-        *errorStringP = "null values not supported";
-        return false;
+        //
+        // NOTE: $type 10 corresponds to NULL value
+        // SEE:  https://docs.mongodb.com/manual/reference/bson-types/
+        //
+        bb.append("$exists", true).append("$type", 10);
         break;
 
       case SfvtNumber:
@@ -1777,8 +1780,13 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       }
       else if (itemP->valueType == SfvtNull)
       {
-        *errorStringP = "null values not supported";
-        return false;
+        //
+        // NOTE: $type 10 corresponds to NULL value
+        // SEE:  https://docs.mongodb.com/manual/reference/bson-types/
+        //
+        bb.append("$exists", true).append("$not", BSON("$type" << 10));
+        bob.append(k, bb.obj());
+        f = bob.obj();
       }
       else if ((itemP->valueType == SfvtNumber) || (itemP->valueType == SfvtDate))
       {
