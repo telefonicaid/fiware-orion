@@ -540,7 +540,6 @@ void subCacheMatch
   {
     CachedSubscription*  cSubP = it->second;
 
-    LM_W(("Calling subMatch with cSubP at %p", cSubP));
     if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV))
     {
       subVecP->push_back(cSubP);
