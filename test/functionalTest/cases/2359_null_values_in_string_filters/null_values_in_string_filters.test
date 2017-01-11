@@ -45,6 +45,11 @@ brokerStart CB
 # 11. Query with q=A1.M1==null, See E5/A1
 # 12. Query with q=A1.M1!=null, See E6/A1
 #
+# 13. Create E7 with A1 with M1 compound containing X1 with value NULL
+# 14. Create E8 with A1 with M1 compound containing X1 with value 1
+# 15. Query with mq=A1.M1.X1==null, See E7/A1
+# 16. Query with mq=A1.M1.X1!=null, See E8/A1
+#
 
 echo "01. Create E1 with A1 with value NULL"
 echo "====================================="
@@ -174,6 +179,62 @@ echo
 echo "12. Query with q=A1.M1!=null, See E6/A1"
 echo "======================================="
 orionCurl --url '/v2/entities?q=A1.M1!=null'
+echo
+echo
+
+
+echo "13. Create E7 with A1 with M1 compound containing X1 with value NULL"
+echo "===================================================================="
+payload='{
+  "id": "E7",
+  "A1": {
+    "metadata": {
+      "M1": {
+        "value": {
+          "X1": null,
+          "X2": 13
+        }
+      }
+    },
+    "value": "Step 13"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "14. Create E8 with A1 with M1 compound containing X1 with value 1"
+echo "================================================================="
+payload='{
+  "id": "E8",
+  "A1": {
+    "metadata": {
+      "M1": {
+        "value": {
+          "X1": 1,
+          "X2": null
+        }
+      }
+    },
+    "value": "Step 14"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "15. Query with mq=A1.M1.X1==null, See E7/A1"
+echo "==========================================="
+orionCurl --url '/v2/entities?mq=A1.M1.X1==null'
+echo
+echo
+
+
+echo "16. Query with mq=A1.M1.X1!=null, See E8/A1"
+echo "==========================================="
+orionCurl --url '/v2/entities?mq=A1.M1.X1!=null'
 echo
 echo
 
@@ -376,6 +437,84 @@ Date: REGEX(.*)
             }
         },
         "id": "E6",
+        "type": "Thing"
+    }
+]
+
+
+13. Create E7 with A1 with M1 compound containing X1 with value NULL
+====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E7?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+14. Create E8 with A1 with M1 compound containing X1 with value 1
+=================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E8?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+15. Query with mq=A1.M1.X1==null, See E7/A1
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 140
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "X1": null,
+                        "X2": 13
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "Step 13"
+        },
+        "id": "E7",
+        "type": "Thing"
+    }
+]
+
+
+16. Query with mq=A1.M1.X1!=null, See E8/A1
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 139
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "X1": 1,
+                        "X2": null
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "Step 14"
+        },
+        "id": "E8",
         "type": "Thing"
     }
 ]
