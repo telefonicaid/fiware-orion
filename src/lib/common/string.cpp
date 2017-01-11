@@ -962,7 +962,7 @@ void toLowercase(char* s)
 // 02. Go over the in buffer and copy one by one in -> out, avoiding replacements
 //     while inside strings.
 //
- char* jsonFix(const char* in)
+char* jsonFix(const char* in)
 {
   int          outSize   = 1;  // Room for zero-termination char
   const char*  inP       = in;
@@ -1044,9 +1044,9 @@ void toLowercase(char* s)
     ++inP;
   }
 
-  // Last byte must be /0 and the one before it a \n
-  out[outSize-2] = '\n';
-  out[outSize-1] = 0;
+  // End buffer with newline and zero termination
+  out[oIx++] = '\n';
+  out[oIx++] = 0;
 
   return out;
 }
