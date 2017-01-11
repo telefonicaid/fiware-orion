@@ -92,6 +92,17 @@
 /* ****************************************************************************
 *
 * IP - 
+*
+* About MAX_LEN_IP:
+* An IPv4 address has the following format:
+*   xxx.xxx.xxx.xxx
+* As a string, 4x4 (16) chars are needed to hold the address (including the zero termination char)
+*
+* An IPv6 address has the following format:
+*   xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:
+* As a string, 8x5 (40) chars are needed to hold theaddress(including the zero termination char)
+*
+* 64 is more than sufficient to holsd any numerical IP address as a string
 */
 #define  LOCAL_IP_V6  "::"
 #define  LOCAL_IP_V4  "0.0.0.0"

@@ -276,7 +276,7 @@ Date: REGEX(.*)
     "inserts": REGEX((2|3)),
     "items": 1,
     "refresh": REGEX((0|1|2)),
-    "removes": 1,
+    "removes": 0,
     "updates": 1
 }
 
@@ -298,7 +298,7 @@ Date: REGEX(.*)
     "inserts": REGEX((2|3|4)),
     "items": 1,
     "refresh": REGEX((0|1|2|3|4)),
-    "removes": 1,
+    "removes": 0,
     "updates": 1
 }
 
@@ -343,7 +343,7 @@ Date: REGEX(.*)
     "inserts": REGEX((2|3|4)),
     "items": 1,
     "refresh": REGEX((0|2|3)),
-    "removes": 1,
+    "removes": 0,
     "updates": 1
 }
 

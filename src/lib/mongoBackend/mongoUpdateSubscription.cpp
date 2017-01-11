@@ -718,21 +718,6 @@ void updateInCache
   if (mscInsert == 0)  // 0: Insertion was really made
   {
     subCacheStatisticsIncrementUpdates();
-
-    //
-    // To simulate the old way of updating:
-    //   1. Create and insert the new item
-    //   2. Remove and delete the old item
-    //
-    // ... we here increment a 'removed sub cache item'
-    //
-    // With the new implementation of the sub-cache (with a std::map instead of the linked list),
-    // when inserting an item 'over' an old one it gets replaced,
-    // so, in subCache.cpp, function subCacheItemInsert(), when nothing can go wrong,
-    // right before inserting the modified CachedSubscription in the map,
-    // the old copy is destroyed.
-    //
-    subCacheStatisticsIncrementRemoves();
   }
   cacheSemGive(__FUNCTION__, "Updating cached subscription");
 }
