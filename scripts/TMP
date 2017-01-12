@@ -1,0 +1,2 @@
+grepp LM_TMP *.cpp | grep -v './Cosas' | grep -v '// LM_TMP'
+grepp LM_TMP *.h   | grep -v './Cosas' | grep -v src/lib/logMsg/logMsg.h

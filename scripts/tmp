@@ -1,0 +1,1 @@
+egrep 'lvl=WARN|lvl=ERR' /tmp/contextBroker.log | awk -F\| '{ print $9$10 }'
