@@ -5,6 +5,7 @@
 - Fix: giving a descriptive response with payload, without reading the request for too big payloads (#2761)
 - Add: the string "ISO6801" can now be used as an alias for "DateTime" as type for attributes and metadata (#2654)
 - Add: metrics REST API (#2750)
+- Add: support for quotes (') in string filters to let attribute/metadata names contain dots (#2805)
 - Add: new CLI '-disableMetrics' to disable metrics (#2750)
 - Fix: timeout of 6 seconds (hardcoded for now) for all incoming REST requests (temporal fix, see #2762)
 - Fix: NGSIv1 updateContext APPEND on existing geo:point attributes (and probably other geo: attributes) failing to update location (#2770)
