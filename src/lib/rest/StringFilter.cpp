@@ -120,7 +120,7 @@ StringFilterItem::~StringFilterItem()
 bool StringFilterItem::valueParse(char* s, std::string* errorStringP)
 {
   bool b;
-
+  
   b = valueGet(s, &valueType, &numberValue, &stringValue, &boolValue, errorStringP);
 
   if (b == false)
@@ -478,8 +478,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   char* rhs     = NULL;
   char* lhs     = NULL;
 
-  LM_W(("KZ: parsing StringFilterItem: '%s'", qItem));
-
   type = _type;
 
   s = wsStrip(s);
@@ -542,7 +540,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     return false;
   }
 
-  if (forbiddenChars(lhs, ""))
+  if (forbiddenChars(lhs, "'"))
   {
     if (type == SftQ)
     {
@@ -580,34 +578,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
 
 
   //
-  // Check for invalid forced string in RHS
-  //
-  // If string starts with single-quote it must also end with single-quote and it is
-  // a string, of course.
-  // Also, the resulting string after removing the quotes cannot contain any quotes ... ?
-  //
-  if (*rhs == '\'')
-  {
-    ++rhs;
-
-    if (rhs[strlen(rhs) - 1] != '\'')
-    {
-      free(toFree);
-      *errorStringP = "non-terminated forced string";
-      return false;
-    }
-    rhs[strlen(rhs) - 1] = 0;
-
-    if (strchr(rhs, '\'') != NULL)
-    {
-      free(toFree);
-      *errorStringP = "quote in forced string";
-      return false;
-    }
-  }
-
-
-  //
   // Now, the right-hand-side, is it a RANGE, a LIST, a SIMPLE VALUE, or an attribute name?
   // And, what type of values?
   //
@@ -639,13 +609,75 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
 
 /* ****************************************************************************
 *
+* lhsFix - change dots for equals, then remove all quotes
+*/
+static char* lhsFix(char* s)
+{
+  char* scopyP        = strdup(s);
+  char* dotP          = scopyP;
+  bool  insideQuotes  = false;
+  
+  //
+  // Replace ',' for '=' if inside quotes
+  //
+  while (*dotP != 0)
+  {
+    if (*dotP == '\'')
+    {
+      insideQuotes = (insideQuotes == false)? true : false;
+    }
+    else if ((insideQuotes == true) && (*dotP == '.'))
+    {
+      *dotP = '=';
+    }
+
+    ++dotP;
+  }
+
+  //
+  // Now that all '.' inside quotes are changed to '=', we can remove the quotes
+  // As the resulting string is always smaller than the initial string (or equal if no quotes are present)
+  // It is safe to use the inital buffer 's' to save the resulting string
+  //
+  int sIx = 0;  // Index of 's'
+  int iIx = 0;  // Index of 'initial buffer', which is 'scopyP'
+
+  while (scopyP[iIx] != 0)
+  {
+    if (scopyP[iIx] != '\'')
+    {
+      s[sIx] = scopyP[iIx];
+      ++sIx;
+    }
+    ++iIx;
+  }
+  s[sIx] = 0;
+
+  free(scopyP);
+  return s;
+}
+
+
+
+/* ****************************************************************************
+*
 * StringFilterItem::lhsParse - 
+*
+* It is not enough to just look for the first occurance of '.', as the dot
+* might be inside quotes.
 */
 void StringFilterItem::lhsParse(void)
 {
   char* start = (char*) left.c_str();
-  char* dotP  = strchr(start, '.');
+  char* dotP  = start;
 
+  start = lhsFix(start);
+
+  attributeName = "";
+  metadataName  = "";
+  compoundPath  = "";
+
+  dotP = strchr(start, '.');
   if (dotP == NULL)
   {
     attributeName = start;

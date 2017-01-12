@@ -546,6 +546,27 @@ do                                                                     \
 #endif
 
 
+#ifdef LM_NO_TMP
+#define LM_TMP(s)
+#else
+/* ****************************************************************************
+*
+* LM_TMP - log message
+*/
+#define LM_TMP(s)                                                        \
+do                                                                       \
+{                                                                        \
+  char* text;                                                            \
+                                                                         \
+  if (LM_MASK(LogLevelWarning) && (text = lmTextGet s) != NULL)          \
+  {                                                                      \
+    lmOut(text, 'W', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
+    ::free(text);                                                        \
+  }                                                                      \
+} while (0)
+#endif
+
+
 #ifdef LM_NO_W
 #define LM_W(s)
 #else

@@ -191,8 +191,8 @@ echo
 echo
 
 
-echo "12. GET entities with birthdate=2016-02-25T10:00:00.00Z, see E25"
-echo "================================================================"
+echo "12. GET entities with birthdate='2016-02-25T10:00:00.00Z', see E25"
+echo "=================================================================="
 orionCurl --url "/v2/entities?q=birthdate=='2016-02-25T10:00:00.00Z'"
 echo
 echo
@@ -491,8 +491,8 @@ Date: REGEX(.*)
 []
 
 
-12. GET entities with birthdate=2016-02-25T10:00:00.00Z, see E25
-================================================================
+12. GET entities with birthdate='2016-02-25T10:00:00.00Z', see E25
+==================================================================
 HTTP/1.1 200 OK
 Content-Length: 107
 Content-Type: application/json

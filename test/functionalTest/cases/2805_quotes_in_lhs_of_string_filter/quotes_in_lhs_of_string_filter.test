@@ -30,15 +30,42 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create E1 with an attribute called A1.B1, with value 'A1' and with a metadata called M1='M1'
-# 02. Query with q=A1.B1, no hits
-# 03. Query with q='A1.B1', see E1
-# 04. Query with q='A1.B1'.M1==M1, see E1
-# 05. Query with q='A1.B1'.M1==M2, no hits
+# To test:
+#   01. 'A1.B1'.M1    for attribute called 'A1.B1' with metadata called M1
+#   02. 'A1.B1'.C1    for attribute called 'A1.B1' with compound { "C1": 21 }
+#   03. A1.'M1.x'     for attribute called A1 with metadata called 'M1.x'
+#
+# And, those that will most probably fail:
+#   04. A1.'C1.x'     for attribute called A1 with compound { "C1.x": 4 }
+#   05. A1.M1.'MC1.x' for attribute called A1 with metadata called M1 with compound { "MC1.x": 4 }
+#   06. 'A1.B1'.'M1.x'.'C1.x'  attribute 'A1.B1', metadata 'M1.x', compound 'C1.x'
+#
+# These tests will go in another functest:
+#   2805_quotes_in_lhs_of_string_filter/quotes_in_lhs_compound_of_string_filter.test
+#
+#
+# 01.01. Create E1 with an attribute called A1.B1, with value 'A1' and with a metadata called M1='M1'
+# 01.02. Query with q=A1.B1, no hits
+# 01.03. Query with q='A1.B1', see E1
+# 01.04. Query with mq='A1.B1'.M1==M1, see E1
+# 01.05. Query with mq='A1.B1'.M1==M2, no hits
+# 01.06. Query with q='A1.B1'.M1, no hits, as M1 is a metadata, not inside a compound value
+# 
+# 02.01. Create E2 with an attribute called A1.B1, with compound value { "C1": 21, "C2": 22 }
+# 02.02. Query with q=A1.B1.C1, no hits
+# 02.03. Query with q='A1.B1'.C1, see E2
+# 02.04. Query with q='A1.B1'.C1==21, see E2
+# 02.05. Query with q='A1.B1'.C1==22, no hits
+#
+# 03.01. Create E3 with an attribute called A1, with a metadata called 'M1.x'='mix'
+# 03.02. Query with mq=A1.'M1.x', see E3
+# 03.03. Query with mq=A1.M1.x, no hits
+# 03.04. Query with mq=A1.'M1.x'==mix, see E3
+# 03.05. Query with mq=A1.'M1.x'==max, no hits
 #
 
-echo "01. Create E1 with an attribute called A1.B1, with value 'A1' and with a metadata called M1='M1'"
-echo "================================================================================================"
+echo "01.01. Create E1 with an attribute called A1.B1, with value 'A1' and with a metadata called M1='M1'"
+echo "==================================================================================================="
 payload='{
   "id": "E1",
   "A1.B1": {
@@ -46,45 +73,143 @@ payload='{
       "M1": {
         "value": "M1"
       }
-    }
+    },
+    "value": "A1"
   }
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
-echo "02. Query with q=A1.B1, no hits"
-echo "==============================="
+echo "01.02. Query with q=A1.B1, no hits"
+echo "=================================="
 orionCurl --url "/v2/entities?q=A1.B1"
 echo
 echo
 
 
-echo "03. Query with q='A1.B1', see E1"
-echo "================================"
+echo "01.03. Query with q='A1.B1', see E1"
+echo "==================================="
 orionCurl --url "/v2/entities?q='A1.B1'"
 echo
 echo
 
 
-echo "04. Query with q='A1.B1'.M1==M1, see E1"
-echo "======================================="
-orionCurl --url "/v2/entities?q='A1.B1'.M1==M1"
+echo "01.04. Query with mq='A1.B1'.M1==M1, see E1"
+echo "==========================================="
+orionCurl --url "/v2/entities?mq='A1.B1'.M1==M1"
 echo
 echo
 
 
-echo "05. Query with q='A1.B1'.M1==M2, no hits"
-echo "========================================"
-orionCurl --url "/v2/entities?q='A1.B1'.M1==M2"
+echo "01.05. Query with mq='A1.B1'.M1==M2, no hits"
+echo "============================================"
+orionCurl --url "/v2/entities?mq='A1.B1'.M1==M2"
+echo
+echo
+
+
+echo "01.06. Query with q='A1.B1'.M1, no hits, as M1 is a metadata, not inside a compound value"
+echo "========================================================================================="
+orionCurl --url "/v2/entities?q='A1.B1'.M1"
+echo
+echo
+
+
+echo '02.01. Create E2 with an attribute called A1.B1, with compound value { "C1": 21, "C2": 22 }'
+echo '==========================================================================================='
+payload='{
+  "id": "E2",
+  "A1.B1": {
+    "value": {
+      "C1": 21,
+      "C2": 22
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02.02. Query with q=A1.B1.C1, no hits"
+echo "====================================="
+orionCurl --url "/v2/entities?q=A1.B1.C1"
+echo
+echo
+
+
+echo "02.03. Query with q='A1.B1'.C1, see E2"
+echo "======================================"
+orionCurl --url "/v2/entities?q='A1.B1'.C1"
+echo
+echo
+
+
+echo "02.04. Query with q='A1.B1'.C1==21, see E2"
+echo "=========================================="
+orionCurl --url "/v2/entities?q='A1.B1'.C1==21"
+echo
+echo
+
+
+echo "02.05. Query with q='A1.B1'.C1==22, no hits"
+echo "==========================================="
+orionCurl --url "/v2/entities?q='A1.B1'.C1==22"
+echo
+echo
+
+
+echo "03.01. Create E3 with an attribute called A1, with a metadata called 'M1.x'='mix'"
+echo "================================================================================="
+payload='{
+  "id": "E3",
+  "A1": {
+    "metadata": {
+      "M1.x": {
+        "value": "mix"
+      }
+    },
+    "value": "a1 with metadata mix"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03.02. Query with mq=A1.'M1.x', see E3"
+echo "======================================"
+orionCurl --url "/v2/entities?mq=A1.'M1.x'"
+echo
+echo
+
+
+echo "03.03. Query with mq=A1.M1.x, no hits"
+echo "====================================="
+orionCurl --url "/v2/entities?mq=A1.M1.x"
+echo
+echo
+
+
+echo "03.04. Query with mq=A1.'M1.x'==mix, see E3"
+echo "==========================================="
+orionCurl --url "/v2/entities?mq=A1.'M1.x'==mix"
+echo
+echo
+
+
+echo "03.05. Query with mq=A1.'M1.x'==max, no hits"
+echo "============================================"
+orionCurl --url "/v2/entities?mq=A1.'M1.x'==max"
 echo
 echo
 
 
 --REGEXPECT--
-01. Create E1 with an attribute called A1.B1, with value 'A1' and with a metadata called M1='M1'
-================================================================================================
+01.01. Create E1 with an attribute called A1.B1, with value 'A1' and with a metadata called M1='M1'
+===================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=Thing
@@ -93,8 +218,8 @@ Date: REGEX(.*)
 
 
 
-02. Query with q=A1.B1, no hits
-================================
+01.02. Query with q=A1.B1, no hits
+==================================
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
@@ -104,13 +229,14 @@ Date: REGEX(.*)
 []
 
 
-03. Query with q='A1.B1', see E1
-================================
+01.03. Query with q='A1.B1', see E1
+===================================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 112
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+
 [
     {
         "A1.B1": {
@@ -129,13 +255,14 @@ Date: REGEX(.*)
 ]
 
 
-04. Query with q='A1.B1'.M1==M1, see E1
-=============================0=========
+01.04. Query with mq='A1.B1'.M1==M1, see E1
+===========================================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 112
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+
 [
     {
         "A1.B1": {
@@ -154,8 +281,183 @@ Date: REGEX(.*)
 ]
 
 
-05. Query with q='A1.B1'.M1==M2, no hits
-========================================
+01.05. Query with mq='A1.B1'.M1==M2, no hits
+============================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+01.06. Query with q='A1.B1'.M1, no hits, as M1 is a metadata, not inside a compound value
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+02.01. Create E2 with an attribute called A1.B1, with compound value { "C1": 21, "C2": 22 }
+===========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02.02. Query with q=A1.B1.C1, no hits
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+02.03. Query with q='A1.B1'.C1, see E2
+======================================
+HTTP/1.1 200 OK
+Content-Length: 103
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1.B1": {
+            "metadata": {},
+            "type": "StructuredValue",
+            "value": {
+                "C1": 21,
+                "C2": 22
+            }
+        },
+        "id": "E2",
+        "type": "Thing"
+    }
+]
+
+
+02.04. Query with q='A1.B1'.C1==21, see E2
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 103
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1.B1": {
+            "metadata": {},
+            "type": "StructuredValue",
+            "value": {
+                "C1": 21,
+                "C2": 22
+            }
+        },
+        "id": "E2",
+        "type": "Thing"
+    }
+]
+
+
+02.05. Query with q='A1.B1'.C1==22, no hits
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+03.01. Create E3 with an attribute called A1, with a metadata called 'M1.x'='mix'
+=================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03.02. Query with mq=A1.'M1.x', see E3
+======================================
+HTTP/1.1 200 OK
+Content-Length: 130
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1.x": {
+                    "type": "Text",
+                    "value": "mix"
+                }
+            },
+            "type": "Text",
+            "value": "a1 with metadata mix"
+        },
+        "id": "E3",
+        "type": "Thing"
+    }
+]
+
+
+03.03. Query with mq=A1.M1.x, no hits
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+03.04. Query with mq=A1.'M1.x'==mix, see E3
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 130
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1.x": {
+                    "type": "Text",
+                    "value": "mix"
+                }
+            },
+            "type": "Text",
+            "value": "a1 with metadata mix"
+        },
+        "id": "E3",
+        "type": "Thing"
+    }
+]
+
+
+03.05. Query with mq=A1.'M1.x'==max, no hits
+============================================
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
