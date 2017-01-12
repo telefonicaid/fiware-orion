@@ -178,6 +178,7 @@ SET (DYNAMIC_LIBS
     pthread
     gcrypt
     uuid
+    mosquitto
 )
 
 #

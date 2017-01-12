@@ -259,8 +259,9 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
   //
   // Ensuring the scheme is present
+  // FIXME PoC: adding mqtt to the supported protocol list. Not sure if this is the best alternative...
   //
-  if ((urlTokens.size() == 0) || ((urlTokens[0] != "https:") && (urlTokens[0] != "http:")))
+  if ((urlTokens.size() == 0) || ((urlTokens[0] != "https:") && (urlTokens[0] != "http:") && (urlTokens[0] != "mqtt:")))
   {
     return false;
   }

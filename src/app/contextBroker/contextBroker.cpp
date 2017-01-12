@@ -64,6 +64,8 @@
 #include <vector>
 #include <limits.h>
 
+#include <mosquitto.h>  // FIXME PoC: it would be not needed is mqttInit() is moved elsewere
+
 #include "mongoBackend/MongoGlobal.h"
 #include "cache/subCache.h"
 
@@ -277,6 +279,7 @@ bool            disableCusNotif;
 bool            logForHumans;
 bool            disableMetrics;
 int             reqTimeout;
+struct          mosquitto *mosq;  // FIXME PoC: probably not in this file
 
 
 
@@ -1410,6 +1413,38 @@ static void contextBrokerInit(std::string dbPrefix, bool multitenant)
 }
 
 
+/* ****************************************************************************
+*
+* mqttInit -
+*
+* FIXME PoC: not sure if this is the best place for this library (vs. an independent module)
+*/
+void mqttOnPublishCallback(struct mosquitto *mosq, void *userdata, int mid)
+{
+  LM_W(("PoC: in the publish callback"));
+}
+
+
+/* ****************************************************************************
+*
+* mqttInit -
+*
+* FIXME PoC: not sure if this is the best place for this library (vs. an independent module)
+* FIXME PoC: mosquitto_disconnect(mosq) mosquitto_destroy(mosq) should be done in the exit function, for clearness
+*/
+static void mqttInit(void)
+{
+  // Init library and connect to MQTT broker
+  mosquitto_lib_init();
+  mosq = mosquitto_new(NULL, true, NULL);
+  mosquitto_threaded_set(mosq, true);
+  mosquitto_publish_callback_set(mosq, mqttOnPublishCallback);
+
+  // FIXME PoC: unhardwire
+  mosquitto_connect(mosq, "localhost", 1883, 60);
+}
+
+
 
 /* ****************************************************************************
 *
@@ -1737,6 +1772,7 @@ int main(int argC, char* argV[])
   SemOpType policy = policyGet(reqMutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
   mongoInit(dbHost, rplSet, dbName, user, pwd, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
+  mqttInit();
   contextBrokerInit(dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
   alarmMgr.init(relogAlarms);

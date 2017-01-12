@@ -219,6 +219,8 @@ extern bool               notifQueueStatistics;
 extern bool               checkIdv1;
 extern bool               disableCusNotif;
 
+extern struct             mosquitto *mosq;  // FIXME PoC: probably not in this file
+
 
 
 /* ****************************************************************************
