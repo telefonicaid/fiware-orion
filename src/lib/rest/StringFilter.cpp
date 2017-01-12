@@ -120,7 +120,7 @@ StringFilterItem::~StringFilterItem()
 bool StringFilterItem::valueParse(char* s, std::string* errorStringP)
 {
   bool b;
-  
+
   b = valueGet(s, &valueType, &numberValue, &stringValue, &boolValue, errorStringP);
 
   if (b == false)
@@ -662,9 +662,6 @@ static char* lhsFix(char* s)
 /* ****************************************************************************
 *
 * StringFilterItem::lhsParse - 
-*
-* It is not enough to just look for the first occurance of '.', as the dot
-* might be inside quotes.
 */
 void StringFilterItem::lhsParse(void)
 {
