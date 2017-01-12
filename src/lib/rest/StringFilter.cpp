@@ -609,16 +609,16 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
 
 /* ****************************************************************************
 *
-* lhsFix - change dots for equals, then remove all quotes
+* lhsDotToEqualIfInsideQuote - change dots for equals, then remove all quotes
 */
-static char* lhsFix(char* s)
+static char* lhsDotToEqualIfInsideQuote(char* s)
 {
   char* scopyP        = strdup(s);
   char* dotP          = scopyP;
   bool  insideQuotes  = false;
   
   //
-  // Replace ',' for '=' if inside quotes
+  // Replace '.' for '=' if inside quotes
   //
   while (*dotP != 0)
   {
@@ -668,7 +668,7 @@ void StringFilterItem::lhsParse(void)
   char* start = (char*) left.c_str();
   char* dotP  = start;
 
-  start = lhsFix(start);
+  start = lhsDotToEqualIfInsideQuote(start);
 
   attributeName = "";
   metadataName  = "";

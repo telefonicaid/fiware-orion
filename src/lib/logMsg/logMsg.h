@@ -551,7 +551,10 @@ do                                                                     \
 #else
 /* ****************************************************************************
 *
-* LM_TMP - log message
+* LM_TMP - temporal log message
+*
+* LM_TMP is meant *only* for temporal logging and all occurrencies of LM_TMP
+* should be removed before creating pull requests for review.
 */
 #define LM_TMP(s)                                                        \
 do                                                                       \
