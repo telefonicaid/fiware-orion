@@ -35,15 +35,6 @@ brokerStart CB
 #   02. 'A1.B1'.C1    for attribute called 'A1.B1' with compound { "C1": 21 }
 #   03. A1.'M1.x'     for attribute called A1 with metadata called 'M1.x'
 #
-# And, those that will most probably fail:
-#   04. A1.'C1.x'     for attribute called A1 with compound { "C1.x": 4 }
-#   05. A1.M1.'MC1.x' for attribute called A1 with metadata called M1 with compound { "MC1.x": 4 }
-#   06. 'A1.B1'.'M1.x'.'C1.x'  attribute 'A1.B1', metadata 'M1.x', compound 'C1.x'
-#
-# These tests will go in another functest:
-#   2805_quotes_in_lhs_of_string_filter/quotes_in_lhs_compound_of_string_filter.test
-#
-#
 # 01.01. Create E1 with an attribute called A1.B1, with value 'A1' and with a metadata called M1='M1'
 # 01.02. Query with q=A1.B1, no hits
 # 01.03. Query with q='A1.B1', see E1
@@ -62,6 +53,18 @@ brokerStart CB
 # 03.03. Query with mq=A1.M1.x, no hits
 # 03.04. Query with mq=A1.'M1.x'==mix, see E3
 # 03.05. Query with mq=A1.'M1.x'==max, no hits
+#
+#
+# FIXME: The following text to be removed once implemented the next functest:
+#   'quotes_in_lhs_compound_of_string_filter.test'
+#
+# And, those that will most probably fail ...
+#   04. A1.'C1.x'              for attribute called A1 with compound { "C1.x": 4 }
+#   05. A1.M1.'MC1.x'          for attribute called A1 with metadata called M1 with compound { "MC1.x": 4 }
+#   06. 'A1.B1'.'M1.x'.'C1.x'  for attribute 'A1.B1', metadata 'M1.x', compound 'C1.x'
+#
+# ... these tests go in a separate functest:
+#   2805_quotes_in_lhs_of_string_filter/quotes_in_lhs_compound_of_string_filter.test
 #
 
 echo "01.01. Create E1 with an attribute called A1.B1, with value 'A1' and with a metadata called M1='M1'"
