@@ -1320,10 +1320,29 @@ static int connectionTreat
       lmTransactionSetFrom(ip);
     }
 
-    char tenant[SERVICE_NAME_MAX_LEN + 1];
-    ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
+    //
+    // Max name length of a database name for a tenant:
+    // Remember the database name is created like this:
+    //   orion-<tenant>
+    //
+    // 'orion' is the default database name prefix, but this
+    // string is configurable via CLI.
+    // However, its maximum allowed length is SERVICE_NAME_MAX_LEN, so
+    // this we can always use.
+    //
+    // Now:
+    //   DB_NAME_MAX_LEN + 1 + SERVICE_NAME_MAX_LEN + 1:
+    //     DB_NAME_MAX_LEN:      'orion'
+    //     1:                    '-'
+    //     SERVICE_NAME_MAX_LEN: tenant name, via HTTP header 'Fiware-Service' 
+    //     1:                    zero-termination of the string
+    // 
+    //
+    char tenant[DB_NAME_MAX_LEN + 1 + SERVICE_NAME_MAX_LEN + 1];
 
-    ciP->outMimeType = mimeTypeSelect(ciP, "Normal");
+    ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
+    ciP->outMimeType          = mimeTypeSelect(ciP, "Normal");
+
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
 
     return MHD_YES;
