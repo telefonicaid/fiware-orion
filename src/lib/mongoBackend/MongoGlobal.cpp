@@ -563,6 +563,7 @@ void ensureLocationIndex(const std::string& tenant)
 }
 
 
+
 /* ****************************************************************************
 *
 * matchEntity -
@@ -588,9 +589,9 @@ bool matchEntity(const EntityId* en1, const EntityId* en2)
     else
     {
       idMatch = (regexec(&regex, en1->id.c_str(), 0, NULL, 0) == 0);
-    }
 
-    regfree(&regex);
+      regfree(&regex);  // If regcomp fails it frees up itself (see glibc sources for details)
+    }
   }
   else  /* isPattern == false */
   {
@@ -600,6 +601,7 @@ bool matchEntity(const EntityId* en1, const EntityId* en2)
   // Note that type == "" is like a * wildcard for type
   return idMatch && (en1->type == "" || en2->type == "" || en2->type == en1->type);
 }
+
 
 
 /* ****************************************************************************

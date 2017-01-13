@@ -180,7 +180,7 @@ std::string EntityId::check
     {
       return "invalid regex for entity id pattern";
     }
-    regfree(&re);
+    regfree(&re);  // If regcomp fails it frees up itself (see glibc sources for details)
   }
   return "OK";
 }

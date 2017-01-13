@@ -106,7 +106,7 @@ StringFilterItem::~StringFilterItem()
 
   if (compiledPattern == true)
   {
-    regfree(&patternValue);
+    regfree(&patternValue);  // If regcomp fails it frees up itself (see glibc sources for details)
     compiledPattern = false;
   }
 }

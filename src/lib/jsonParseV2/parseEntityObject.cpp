@@ -85,7 +85,7 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
       {
         return "invalid regex for entity id pattern";
       }
-      regfree(&re);
+      regfree(&re);  // If regcomp fails it frees up itself (see glibc sources for details)
 
       eP->id        = iter->value.GetString();
       eP->isPattern = "true";
@@ -112,7 +112,7 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
       {
         return "invalid regex for entity type pattern";
       }
-      regfree(&re);
+      regfree(&re);  // If regcomp fails it frees up itself (see glibc sources for details)
 
       eP->type          = iter->value.GetString();
       eP->isTypePattern = true;
