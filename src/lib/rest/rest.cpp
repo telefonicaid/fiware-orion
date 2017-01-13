@@ -281,21 +281,16 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 *
 * mimeTypeSelect - 
 */
-static MimeType mimeTypeSelect(ConnectionInfo* ciP, const std::string& what)
+static MimeType mimeTypeSelect(ConnectionInfo* ciP)
 {
-  if ((what == "Error") ||   // JSON Error to be returned
-      (what == "Normal"))    // Normal handling - same as Error
+  if (ciP->httpHeaders.accepted("application/json"))
   {
-    if (ciP->httpHeaders.accepted("application/json"))
-    {
-      return JSON;
-    }
-    if (ciP->httpHeaders.accepted("text/plain"))
-    {
-      return TEXT;
-    }
-
     return JSON;
+  }
+
+  if (ciP->httpHeaders.accepted("text/plain"))
+  {
+    return TEXT;
   }
 
   return JSON;
@@ -416,7 +411,7 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
   {
     ciP->acceptHeaderError = "qvalue in accept header is not a number";
     ciP->httpStatusCode    = SccBadRequest;
-    ciP->outMimeType       = mimeTypeSelect(ciP, "Error");
+    ciP->outMimeType       = mimeTypeSelect(ciP);
     delete acceptHeaderP;
     return false;
   }
@@ -1320,28 +1315,10 @@ static int connectionTreat
       lmTransactionSetFrom(ip);
     }
 
-    //
-    // Max name length of a database name for a tenant:
-    // Remember the database name is created like this:
-    //   orion-<tenant>
-    //
-    // 'orion' is the default database name prefix, but this
-    // string is configurable via CLI.
-    // However, its maximum allowed length is SERVICE_NAME_MAX_LEN, so
-    // this we can always use.
-    //
-    // Now:
-    //   DB_NAME_MAX_LEN + 1 + SERVICE_NAME_MAX_LEN + 1:
-    //     DB_NAME_MAX_LEN:      'orion'
-    //     1:                    '-'
-    //     SERVICE_NAME_MAX_LEN: tenant name, via HTTP header 'Fiware-Service' 
-    //     1:                    zero-termination of the string
-    // 
-    //
-    char tenant[DB_NAME_MAX_LEN + 1 + SERVICE_NAME_MAX_LEN + 1];
+    char tenant[DB_AND_SERVICE_NAME_MAX_LEN];
 
     ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
-    ciP->outMimeType          = mimeTypeSelect(ciP, "Normal");
+    ciP->outMimeType          = mimeTypeSelect(ciP);
 
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
 
