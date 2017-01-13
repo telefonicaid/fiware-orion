@@ -281,21 +281,16 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 *
 * mimeTypeSelect - 
 */
-static MimeType mimeTypeSelect(ConnectionInfo* ciP, const std::string& what)
+static MimeType mimeTypeSelect(ConnectionInfo* ciP)
 {
-  if ((what == "Error") ||   // JSON Error to be returned
-      (what == "Normal"))    // Normal handling - same as Error
+  if (ciP->httpHeaders.accepted("application/json"))
   {
-    if (ciP->httpHeaders.accepted("application/json"))
-    {
-      return JSON;
-    }
-    if (ciP->httpHeaders.accepted("text/plain"))
-    {
-      return TEXT;
-    }
-
     return JSON;
+  }
+
+  if (ciP->httpHeaders.accepted("text/plain"))
+  {
+    return TEXT;
   }
 
   return JSON;
@@ -416,7 +411,7 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
   {
     ciP->acceptHeaderError = "qvalue in accept header is not a number";
     ciP->httpStatusCode    = SccBadRequest;
-    ciP->outMimeType       = mimeTypeSelect(ciP, "Error");
+    ciP->outMimeType       = mimeTypeSelect(ciP);
     delete acceptHeaderP;
     return false;
   }
@@ -1320,10 +1315,11 @@ static int connectionTreat
       lmTransactionSetFrom(ip);
     }
 
-    char tenant[SERVICE_NAME_MAX_LEN + 1];
-    ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
+    char tenant[DB_AND_SERVICE_NAME_MAX_LEN];
 
-    ciP->outMimeType = mimeTypeSelect(ciP, "Normal");
+    ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
+    ciP->outMimeType          = mimeTypeSelect(ciP);
+
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
 
     return MHD_YES;

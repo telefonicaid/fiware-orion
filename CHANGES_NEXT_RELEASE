@@ -9,6 +9,7 @@
 - Add: new CLI '-disableMetrics' to disable metrics (#2750)
 - Fix: timeout of 6 seconds (hardcoded for now) for all incoming REST requests (temporal fix, see #2762)
 - Fix: NGSIv1 updateContext APPEND on existing geo:point attributes (and probably other geo: attributes) failing to update location (#2770)
+- Fix: bug when tenants are over 44 bytes long (#2811)
 - Add: Support for null values in string filters (#2359)
 - Fix: wrongly overlogging metadata abscense in csub docs as Runtime Error (#2796)
 - Fix: if HTTP header Content-Length contains a value above the maximum payload size, an error is returned and the message is not read (#2761)
