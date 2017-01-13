@@ -59,7 +59,7 @@ echo
 echo
 
 
-echo "02. Create a subscription with a pretty long tenant name (46 chars), see it fail"
+echo "02. Create a subscription with a pretty long tenant name (46 chars), see it work"
 echo "================================================================================"
 payload='{
   "notification": {
@@ -116,7 +116,7 @@ Date: REGEX(.*)
 }
 
 
-02. Create a subscription with a pretty long tenant name (46 chars), see it fail
+02. Create a subscription with a pretty long tenant name (46 chars), see it work
 ================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
