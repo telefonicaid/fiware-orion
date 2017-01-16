@@ -12,7 +12,6 @@
 - Fix: bug when tenants are over 44 bytes long (#2811)
 - Add: Support for null values in string filters (#2359)
 - Fix: Partial sanity check for custon url, only if the url contains no replacements using ${xxx} (#2280, #2279)
-- Fix: empty entity ids not accepted at subscription creation (#2184). [ This was fixed around June 2016 ]
 - Fix: not calling regfree when regcomp fails. Potential fix for a crash (#2769)
 - Fix: wrongly overlogging metadata abscense in csub docs as Runtime Error (#2796)
 - Fix: if HTTP header Content-Length contains a value above the maximum payload size, an error is returned and the message is not read (#2761)
