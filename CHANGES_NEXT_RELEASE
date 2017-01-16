@@ -3,6 +3,7 @@
 - Fix: modified the upper limit for CLI '-maxConnections', from 1020 to UNLIMITED
 - Fix: proper 500 Internal Server Error response with descriptive text when "sort fail" at DB occur (#2752)
 - Fix: giving a descriptive response with payload, without reading the request for too big payloads (#2761)
+- Fix: checking for forbidden characters inside the components of string filters (#1994)
 - Add: the string "ISO6801" can now be used as an alias for "DateTime" as type for attributes and metadata (#2654)
 - Add: metrics REST API (#2750)
 - Add: support for quotes (') in string filters to let attribute/metadata names contain dots (#2805)

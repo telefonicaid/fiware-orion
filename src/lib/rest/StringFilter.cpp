@@ -133,6 +133,11 @@ bool StringFilterItem::valueParse(char* s, std::string* errorStringP)
   //
   if ((op == SfopEquals) || (op == SfopDiffers))  // ALL value types are valid for == and !=
   {
+    if (forbiddenChars(s, ""))
+    {
+      *errorStringP = std::string("forbidden characters in String Filter");
+      return false;
+    }
     return true;
   }
   else if ((op == SfopGreaterThan) || (op == SfopGreaterThanOrEqual) || (op == SfopLessThan) || (op == SfopLessThanOrEqual))
@@ -152,6 +157,14 @@ bool StringFilterItem::valueParse(char* s, std::string* errorStringP)
       return false;
     }
     compiledPattern = true;
+  }
+  else
+  {
+    if (forbiddenChars(s, ""))
+    {
+      *errorStringP = std::string("forbidden characters in String Filter");
+      return false;
+    }
   }
 
   return true;
@@ -229,6 +242,11 @@ bool StringFilterItem::rangeParse(char* s, std::string* errorStringP)
   else if (vtFrom == SfvtString)
   {
     valueType = SfvtStringRange;
+    if (forbiddenChars(fromString, "") || forbiddenChars(toString, ""))
+    {
+      *errorStringP = "forbidden characters in range of String Filter";
+      return false;
+    }
   }
   else if (vtFrom == SfvtDate)
   {
@@ -359,6 +377,12 @@ bool StringFilterItem::listParse(char* s, std::string* errorStringP)
         *errorStringP = "empty item in list";
         return false;
       }
+
+      if (forbiddenChars(itemStart, ""))
+      {
+        *errorStringP = "forbidden characters in list item of String Filter";
+        return false;
+      }
     }
     else
     {
@@ -469,7 +493,6 @@ bool StringFilterItem::valueGet
 *       !          Translates to DOES NOT EXIST (the string that comes after is the name of an attribute)
 *       NOTHING:   Translates to EXISTS (the string is the name of an attribute)
 *
-* 
 */
 bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilterType _type)
 {
@@ -593,9 +616,30 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
         return false;
       }
     }
+
+    //
+    // If existence or non-existence, RHS is the name of an attribute
+    // and thus cannot contain any chars forbidden in an attribute name
+    //
+    if (forbiddenChars(rhs, ""))
+    {
+      if (type == SftQ)
+      {
+        *errorStringP = "invalid character found in unary RHS of URI param /q/";
+      }
+      else
+      {
+        *errorStringP = "invalid character found in unary RHS of URI param /mq/";
+      }
+      return true;
+    }
   }
   else
   {
+    //
+    // Forbidden char check is performed inside rangeParse, listParse, and valueParse
+    // as only there the component of RHS are known
+    //
     if      (strstr(rhs, "..") != NULL)   b = rangeParse(rhs, errorStringP);
     else if (strstr(rhs, ",")  != NULL)   b = listParse(rhs, errorStringP);
     else                                  b = valueParse(rhs, errorStringP);
