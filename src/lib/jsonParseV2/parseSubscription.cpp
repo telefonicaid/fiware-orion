@@ -469,17 +469,11 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
         return badInput(ciP, "forbidden characters in http field /url/");
       }
 
+      if (!validUrl(urlOpt.value))
       {
-        std::string  host;
-        int          port;
-        std::string  path;
-        std::string  protocol;
-
-        if (parseUrl(urlOpt.value, host, port, path, protocol) == false)
-        {
-          return badInput(ciP, "Invalid URL parsing notification url");
-        }
+        return badInput(ciP, "Invalid URL parsing notification url");
       }
+
       subsP->notification.httpInfo.url    = urlOpt.value;
       subsP->notification.httpInfo.custom = false;
     }
@@ -505,6 +499,20 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       if (forbiddenChars(urlOpt.value.c_str()))
       {
         return badInput(ciP, "forbidden characters in custom /url/");
+      }
+
+      //
+      // Sanity check for custom url:
+      // If the url contains custom stuff (any ${xxx}), there is not
+      // much we can do.
+      // But if not, then the same check as for non-custom url can be used.
+      //
+      if (strstr(urlOpt.value.c_str(), "${") == NULL)
+      {
+        if (!validUrl(urlOpt.value))
+        {
+          return badInput(ciP, "invalid custom /url/");
+        }
       }
 
       subsP->notification.httpInfo.url = urlOpt.value;

@@ -54,7 +54,6 @@ extern int stringSplit(const std::string& in, char delimiter, std::vector<std::s
 /* ****************************************************************************
 *
 * parseUrl -
-*
 */
 extern bool parseUrl
 (
@@ -64,6 +63,14 @@ extern bool parseUrl
   std::string&        path,
   std::string&        protocol
 );
+
+
+
+/* ****************************************************************************
+*
+* validUrl - check validity of a URL
+*/
+extern bool validUrl(const std::string& url);
 
 
 
