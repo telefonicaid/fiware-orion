@@ -1,0 +1,256 @@
+# Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscriptions with invalid expires dates
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Attempt to create sub with expires date of wrong JSON data type, see error
+# 02. Attempt to create sub with invalid expires date (SSS), see error
+# 03. Attempt to create sub with expires date as valid ISO8601, but with a trailing '.,00L', see error
+# 04. Create a sub with correct expires 2016-04-05T14:10:00.000+01.00
+# 05. GET /v2/subscriptions, see only the sub from step 04
+#
+
+echo "01. Attempt to create sub with expires date of wrong JSON data type, see error"
+echo "=============================================================================="
+payload='{
+  "notification": {
+    "http": {
+      "url": "http://localhost:1234"
+    },
+    "attrs": [ "temperature"]
+  },
+  "expires": true,
+  "description": "expires is a bool",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "room"
+      }
+    ],
+    "condition": {
+      "attrs": [ "temperature_0", "temperature_1", "temperature_2" ]
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to create sub with invalid expires date (SSS), see error"
+echo "===================================================================="
+payload='{
+  "notification": {
+    "http": {
+      "url": "http://localhost:1234"
+    },
+    "attrs": [ "temperature"]
+  },
+  "expires": "just a string",
+  "description": "expires is a string that is not an ISO8601",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "room"
+      }
+    ],
+    "condition": {
+      "attrs": [ "temperature_0", "temperature_1", "temperature_2" ]
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Attempt to create sub with expires date as valid ISO8601, but with a trailing '.,00L', see error"
+echo "===================================================================================================="
+payload='{
+  "notification": {
+    "http": {
+      "url": "http://localhost:1234"
+    },
+    "attrs": [ "temperature"]
+  },
+  "expires": "2016-04-05T14:10:00.,00L",
+  "description": "expires is a valid ISO8601 except for a trailing ,00L",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "room"
+      }
+    ],
+    "condition": {
+      "attrs": [ "temperature_0", "temperature_1", "temperature_2" ]
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Create a sub with correct expires 2016-04-05T14:10:00.000+01.00"
+echo "==================================================================="
+payload='{
+  "notification": {
+    "http": {
+      "url": "http://localhost:1234"
+    },
+    "attrs": [ "temperature"]
+  },
+  "expires": "2016-04-05T14:10:00.000+01.00",
+  "description": "expires is a valid ISO8601 with milliseconds and time-zone",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "room"
+      }
+    ],
+    "condition": {
+      "attrs": [ "temperature_0", "temperature_1", "temperature_2" ]
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. GET /v2/subscriptions, see only the sub from step 04"
+echo "========================================================"
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+--REGEXPECT--
+01. Attempt to create sub with expires date of wrong JSON data type, see error
+==============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 62
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "expires is not a string",
+    "error": "BadRequest"
+}
+
+
+02. Attempt to create sub with invalid expires date (SSS), see error
+====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 68
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "expires has an invalid format",
+    "error": "BadRequest"
+}
+
+
+03. Attempt to create sub with expires date as valid ISO8601, but with a trailing '.,00L', see error
+====================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 68
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "expires has an invalid format",
+    "error": "BadRequest"
+}
+
+
+04. Create a sub with correct expires 2016-04-05T14:10:00.000+01.00
+===================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. GET /v2/subscriptions, see only the sub from step 04
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 402
+Content-Type: application/json 
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "description": "expires is a valid ISO8601 with milliseconds and time-zone",
+        "expires": "2016-04-05T13:10:00.00Z",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [
+                "temperature"
+            ],
+            "attrsFormat": "normalized",
+            "http": {
+                "url": "http://localhost:1234"
+            }
+        },
+        "status": "expired",
+        "subject": {
+            "condition": {
+                "attrs": [
+                    "temperature_0",
+                    "temperature_1",
+                    "temperature_2"
+                ]
+            },
+            "entities": [
+                {
+                    "idPattern": ".*",
+                    "type": "room"
+                }
+            ]
+        }
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

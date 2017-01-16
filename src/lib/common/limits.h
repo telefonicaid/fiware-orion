@@ -71,6 +71,32 @@
 
 
 
+/* *****************************************************************************
+*
+* DB_AND_SERVICE_NAME_MAX_LEN - 
+*
+* Max name length of a database name for a tenant:
+* Remember the database name is created like this:
+*   orion-<tenant>
+*
+* 'orion' is the default database name prefix, but this
+* string is configurable via CLI.
+* However, its maximum allowed length is SERVICE_NAME_MAX_LEN, so
+* this we can always use.
+*
+* Now:
+*   DB_NAME_MAX_LEN + 1 + SERVICE_NAME_MAX_LEN + 1:
+*
+*     DB_NAME_MAX_LEN:      'orion'
+*     1:                    '-'
+*     SERVICE_NAME_MAX_LEN: tenant name, via HTTP header 'Fiware-Service' 
+*     1:                    zero-termination of the string
+* 
+*/
+#define DB_AND_SERVICE_NAME_MAX_LEN     (DB_NAME_MAX_LEN + 1 + SERVICE_NAME_MAX_LEN + 1)
+
+
+
 /* ****************************************************************************
 *
 * Message definitions - 
