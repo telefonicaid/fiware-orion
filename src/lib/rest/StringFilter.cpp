@@ -133,11 +133,6 @@ bool StringFilterItem::valueParse(char* s, std::string* errorStringP)
   //
   if ((op == SfopEquals) || (op == SfopDiffers))  // ALL value types are valid for == and !=
   {
-    if (forbiddenChars(s, ""))
-    {
-      *errorStringP = std::string("forbidden characters in String Filter");
-      return false;
-    }
     return true;
   }
   else if ((op == SfopGreaterThan) || (op == SfopGreaterThanOrEqual) || (op == SfopLessThan) || (op == SfopLessThanOrEqual))
@@ -157,14 +152,6 @@ bool StringFilterItem::valueParse(char* s, std::string* errorStringP)
       return false;
     }
     compiledPattern = true;
-  }
-  else
-  {
-    if (forbiddenChars(s, ""))
-    {
-      *errorStringP = std::string("forbidden characters in String Filter");
-      return false;
-    }
   }
 
   return true;
@@ -242,11 +229,6 @@ bool StringFilterItem::rangeParse(char* s, std::string* errorStringP)
   else if (vtFrom == SfvtString)
   {
     valueType = SfvtStringRange;
-    if (forbiddenChars(fromString, "") || forbiddenChars(toString, ""))
-    {
-      *errorStringP = "forbidden characters in range of String Filter";
-      return false;
-    }
   }
   else if (vtFrom == SfvtDate)
   {
@@ -291,12 +273,6 @@ bool StringFilterItem::listItemAdd(char* s, std::string* errorStringP)
   {
     if (vType == SfvtString)
     {
-      if (forbiddenChars(str.c_str()))
-      {
-        *errorStringP = "forbidden characters in list item of String Filter";
-        return false;
-      }
-
       valueType = SfvtStringList;
       stringList.push_back(str);
     }
@@ -320,12 +296,6 @@ bool StringFilterItem::listItemAdd(char* s, std::string* errorStringP)
   {
     if ((vType == SfvtString) && (valueType == SfvtStringList))
     {
-      if (forbiddenChars(str.c_str()))
-      {
-        *errorStringP = "forbidden characters in list item of String Filter";
-        return false;
-      }
-
       stringList.push_back(str);
     }
     else if ((vType == SfvtDate) && (valueType == SfvtDateList))
@@ -470,6 +440,15 @@ bool StringFilterItem::valueGet
   {
     *valueTypeP = SfvtString;
     *stringP = s;
+  }
+
+  if (*valueTypeP == SfvtString)  // FIXME PR: perhaps not calling forbiddenChars if pattern matching ...
+  {
+    if (forbiddenChars(s, ""))
+    {
+      *errorStringP = std::string("forbidden characters in String Filter");
+      return false;
+    }
   }
 
   return true;
@@ -622,23 +601,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
         free(toFree);
         return false;
       }
-    }
-
-    //
-    // If existence or non-existence, RHS is the name of an attribute
-    // and thus cannot contain any chars forbidden in an attribute name
-    //
-    if (forbiddenChars(rhs, ""))
-    {
-      if (type == SftQ)
-      {
-        *errorStringP = "invalid character found in unary RHS of URI param /q/";
-      }
-      else
-      {
-        *errorStringP = "invalid character found in unary RHS of URI param /mq/";
-      }
-      return true;
     }
   }
   else
