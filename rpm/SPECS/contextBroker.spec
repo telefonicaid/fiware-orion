@@ -220,7 +220,7 @@ fi
 - Add: accepting compound values for metadatas (#1068)
 - Add: GET /admin/log operation to retrieve log level (#2352)
 - Add: new operation: GET /admin/sem, to see list of the brokers semaphores (#2145)
-- Fix: NGSIv2 subscriptions payload validation (#1946, #1964, #1965, #1967, #1973, #1974, #1975, #1979, #1980, #1981, #1983, #1984, #1986, #1988, #1999, #2000, #2006, #2007, #2018, #2093, #2095, #2099, #2100)
+- Fix: NGSIv2 subscriptions payload validation (#1946, #1964, #1965, #1967, #1973, #1974, #1975, #1979, #1980, #1981, #1983, #1984, #1986, #1988, #1999, #2000, #2006, #2007, #2018, #2093, #2095, #2099, #2100, #2184)
 - Fix: Return error on NGSIv1 register requests with entity isPattern set to "true" (#2332)
 - Fix: UTC as time in log file (#2232)
 - Fix: Removed capping in NGSIv2 update forwarding (#2193)
