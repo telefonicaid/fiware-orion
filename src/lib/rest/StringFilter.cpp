@@ -291,6 +291,12 @@ bool StringFilterItem::listItemAdd(char* s, std::string* errorStringP)
   {
     if (vType == SfvtString)
     {
+      if (forbiddenChars(str.c_str()))
+      {
+        *errorStringP = "forbidden characters in list item of String Filter";
+        return false;
+      }
+
       valueType = SfvtStringList;
       stringList.push_back(str);
     }
@@ -314,6 +320,12 @@ bool StringFilterItem::listItemAdd(char* s, std::string* errorStringP)
   {
     if ((vType == SfvtString) && (valueType == SfvtStringList))
     {
+      if (forbiddenChars(str.c_str()))
+      {
+        *errorStringP = "forbidden characters in list item of String Filter";
+        return false;
+      }
+
       stringList.push_back(str);
     }
     else if ((vType == SfvtDate) && (valueType == SfvtDateList))
@@ -365,6 +377,7 @@ bool StringFilterItem::listParse(char* s, std::string* errorStringP)
     {
       *cP = 0;
 
+      // forbiddenChars check is done inside listItemAdd
       if (listItemAdd(itemStart, errorStringP) == false)
       {
         return false;
@@ -375,12 +388,6 @@ bool StringFilterItem::listParse(char* s, std::string* errorStringP)
       if (*itemStart == 0)
       {
         *errorStringP = "empty item in list";
-        return false;
-      }
-
-      if (forbiddenChars(itemStart, ""))
-      {
-        *errorStringP = "forbidden characters in list item of String Filter";
         return false;
       }
     }
