@@ -462,6 +462,10 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | random=10                                                 |
       | random=100                                                |
       | random=256                                                |
+      | house_?                                                   |
+      | house_/                                                   |
+      | house_#                                                   |
+      | my house                                                  |
 
   @condition_expression_q_escaped @BUG_1988
   Scenario:  try to create a new subscription using NGSI v2 with "q" condition expression but with escaped string
@@ -610,17 +614,19 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | error       | BadRequest                               |
       | description | invalid character found in URI param /q/ |
     Examples: # now all return 201 and the subsc is created
-      | q           |
-      | house<flat> |
-      | house=flat  |
-      | house"flat" |
-      | house'flat' |
-      | house;flat  |
-      | house(flat) |
-      | house_?     |
-      | house_/     |
-      | house_#     |
-      | my house    |
+      | q                        |
+      | temperature==house<flat> |
+      | temperature==house=flat  |
+      | temperature==house"flat" |
+      | temperature==house'flat' |
+      | temperature==house;flat  |
+      | temperature==house(flat) |
+      | house<flat>==34          |
+      | house=flat==34           |
+      | house"flat"==34          |
+      | house'flat'==34          |
+      | house;flat==34           |
+      | house(flat)==34          |
 
   @condition_expression_q_invalid_date @BUG_2106 @BUG_1996 @skip
   # FIXME: below Examples only represent at the "Complete date plus hours, minutes, seconds and a decimal fraction of a second" level in https://www.w3.org/TR/NOTE-datetime
