@@ -75,7 +75,7 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
 
       if (forbiddenChars(eP->id.c_str(), ""))
       {
-        return "forbidden chars in entity id";
+        return "Invalid characters in entity id";
       }
     }
     else if (name == "idPattern")
@@ -107,7 +107,7 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
 
       if (forbiddenChars(eP->type.c_str(), ""))
       {
-        return "forbidden chars in entity type";
+        return "Invalid characters in entity type";
       }
     }
     else if (name == "typePattern")
