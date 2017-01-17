@@ -187,7 +187,7 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
     return std::string(errorMsg);
   }
 
-  if ((requestType == EntitiesRequest) && (id == ""))
+  if ((requestType == EntitiesRequest) && (id.empty()))
   {
     return "No Entity ID";
   }
@@ -199,7 +199,7 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
     return std::string(errorMsg);
   }
 
-  if (isPattern == "")
+  if (isPattern.empty())
   {
     isPattern = "false";
   }
