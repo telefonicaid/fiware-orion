@@ -347,6 +347,7 @@ bool StringFilterItem::listParse(char* s, std::string* errorStringP)
     {
       *cP = 0;
 
+      // forbiddenChars check is done inside listItemAdd
       if (listItemAdd(itemStart, errorStringP) == false)
       {
         return false;
@@ -441,6 +442,15 @@ bool StringFilterItem::valueGet
     *stringP = s;
   }
 
+  if ((*valueTypeP == SfvtString) && (op != SfopMatchPattern))
+  {
+    if (forbiddenChars(s, ""))
+    {
+      *errorStringP = std::string("forbidden characters in String Filter");
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -469,7 +479,6 @@ bool StringFilterItem::valueGet
 *       !          Translates to DOES NOT EXIST (the string that comes after is the name of an attribute)
 *       NOTHING:   Translates to EXISTS (the string is the name of an attribute)
 *
-* 
 */
 bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilterType _type)
 {
@@ -596,6 +605,10 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   }
   else
   {
+    //
+    // Forbidden char check is performed inside rangeParse, listParse, and valueParse
+    // as only there the component of RHS are known
+    //
     if      (strstr(rhs, "..") != NULL)   b = rangeParse(rhs, errorStringP);
     else if (strstr(rhs, ",")  != NULL)   b = listParse(rhs, errorStringP);
     else                                  b = valueParse(rhs, errorStringP);
