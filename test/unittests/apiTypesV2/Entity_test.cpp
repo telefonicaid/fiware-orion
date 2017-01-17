@@ -57,10 +57,11 @@ TEST(Entity, check)
 
   utInit();
 
-  Entity* enP    = new Entity();
-  enP->id        = "E";
-  enP->type      = "T";
-  enP->isPattern = "false";
+  Entity* enP         = new Entity();
+  enP->id             = "E";
+  enP->type           = "T";
+  enP->isPattern      = "false";
+  enP->isTypePattern  = false;
 
   ContextAttribute* caP = new ContextAttribute("A", "T", "val");
   enP->attributeVector.push_back(caP);
@@ -72,14 +73,19 @@ TEST(Entity, check)
 
   enP->id = "E<1>";
   EXPECT_EQ("Invalid characters in entity id", enP->check(V1, EntitiesRequest));
-  enP->id = "E";
+  enP->isPattern = "true";
+  EXPECT_EQ("OK", enP->check(V1, EntitiesRequest));
+  enP->id        = "E";
+  enP->isPattern = "false";
 
   enP->type = "T<1>";
   EXPECT_EQ("Invalid characters in entity type", enP->check(V1, EntitiesRequest));
+  enP->isTypePattern  = true;
+  EXPECT_EQ("OK", enP->check(V1, EntitiesRequest));
   enP->type = "T";
 
   enP->isPattern = "<false>";
-  EXPECT_EQ("Invalid characters in entity isPattern", enP->check(V1, EntitiesRequest));
+  EXPECT_EQ("Invalid value for isPattern", enP->check(V1, EntitiesRequest));
 
   utExit();
 }

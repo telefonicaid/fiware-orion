@@ -257,7 +257,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     containsForbiddenChars = forbiddenChars(val, ";");
   }
-  else if ((key != URI_PARAM_Q) && (key != URI_PARAM_MQ) && (key != "idPattern"))
+  else if ((key != URI_PARAM_Q) && (key != URI_PARAM_MQ) && (key != "idPattern") && (key != "typePattern"))
   {
     containsForbiddenChars = forbiddenChars(ckey) || forbiddenChars(val);
   }
