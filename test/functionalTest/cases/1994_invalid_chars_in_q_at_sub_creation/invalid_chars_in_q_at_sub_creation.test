@@ -164,13 +164,13 @@ Date: REGEX(.*)
 03. Attempt to create subscription with qstring filter 'house==flat,flat>' - see error for invalid chars
 ========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 89
+Content-Length: 76
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "forbidden characters in list item of String Filter",
+    "description": "forbidden characters in String Filter",
     "error": "BadRequest"
 }
 
@@ -178,13 +178,13 @@ Date: REGEX(.*)
 04. Attempt to create subscription with qstring filter 'house==flat..flat>' - see error for invalid chars
 =========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 85
+Content-Length: 76
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "forbidden characters in range of String Filter",
+    "description": "forbidden characters in String Filter",
     "error": "BadRequest"
 }
 
