@@ -204,13 +204,15 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
     isPattern = "false";
   }
 
+  // isPattern MUST be either "true" or "false" (or empty => "false")
   if ((isPattern != "true") && (isPattern != "false"))
   {
     alarmMgr.badInput(clientIp, "invalid value for isPattern");
     return "Invalid value for isPattern";
   }
 
-  if (isPattern != "true")
+  // Check for forbidden chars for "id", but not if "id" is a pattern
+  if (isPattern == "false")
   {
     if (forbiddenIdChars(apiVersion, id.c_str()))
     {
@@ -237,6 +239,7 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
     }
   }
 
+  // Check for forbidden chars for "type", but not if "type" is a pattern
   if (isTypePattern == false)
   {
     if (forbiddenIdChars(apiVersion, type.c_str()))
