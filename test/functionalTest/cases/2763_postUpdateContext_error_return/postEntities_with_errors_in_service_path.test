@@ -31,7 +31,7 @@ brokerStart CB
 
 #
 # 01. Try to create an entity with more than one service path - see error
-# 02. Make sure the entity doesn't exist in the database
+# 02. Make sure the entity hasn't been created
 #
 
 echo "01. Try to create an entity with more than one service path - see error"
@@ -42,9 +42,9 @@ echo
 echo
 
 
-echo "02. Make sure the entity doesn't exist in the database"
-echo "======================================================"
-echo "db.entities.findOne()" | mongo ftest
+echo "02. Make sure the entity hasn't been created"
+echo "============================================"
+orionCurl --url /v2/entities
 echo
 echo
 
@@ -64,12 +64,15 @@ Date: REGEX(.*)
 }
 
 
-02. Make sure the entity doesn't exist in the database
-======================================================
-MongoDB shell version: REGEX(.*)
-connecting to: ftest
-null
-bye
+02. Make sure the entity hasn't been created
+============================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
 
 
 --TEARDOWN--
