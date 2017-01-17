@@ -167,6 +167,14 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 
       eP->type      = iter->value.GetString();
       eP->typeGiven = true;
+
+      if (eP->type.empty())
+      {
+        alarmMgr.badInput(clientIp, "empty entity type");
+        ciP->httpStatusCode = SccBadRequest;
+        OrionError oe(SccBadRequest, "empty entity type", "BadRequest");
+        return oe.toJson();
+      }
     }
     else  // attribute
     {

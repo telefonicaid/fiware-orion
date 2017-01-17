@@ -105,6 +105,11 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
       eP->type      = iter->value.GetString();
       eP->typeGiven = true;
 
+      if (eP->type.empty())
+      {
+        return "empty entity type";
+      }
+
       if (forbiddenChars(eP->type.c_str(), ""))
       {
         return "Invalid characters in entity type";
