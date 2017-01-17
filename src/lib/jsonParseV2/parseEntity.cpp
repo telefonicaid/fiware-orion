@@ -172,7 +172,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       {
         alarmMgr.badInput(clientIp, "empty entity type");
         ciP->httpStatusCode = SccBadRequest;
-        OrionError oe(SccBadRequest, "empty entity type", "BadRequest");
+        OrionError oe(SccBadRequest, "entity type length: 0, min length supported: 1", "BadRequest");
         return oe.toJson();
       }
     }

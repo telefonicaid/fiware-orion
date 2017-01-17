@@ -107,7 +107,7 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
 
       if (eP->type.empty())
       {
-        return "empty entity type";
+        return "entity type length: 0, min length supported: 1";
       }
 
       if (forbiddenChars(eP->type.c_str(), ""))
