@@ -177,8 +177,8 @@ std::string Entity::render
 */
 std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
 {
-  ssize_t len;
-  char errorMsg[128];
+  ssize_t  len;
+  char     errorMsg[128];
 
   if (((apiVersion == V2) && (len = strlen(id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
   {
@@ -199,10 +199,24 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdChars(apiVersion, id.c_str()))
+  if (isPattern == "")
   {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the id of an entity");
-    return "Invalid characters in entity id";
+    isPattern = "false";
+  }
+
+  if ((isPattern != "true") && (isPattern != "false"))
+  {
+    alarmMgr.badInput(clientIp, "invalid value for isPattern");
+    return "Invalid value for isPattern";
+  }
+
+  if (isPattern != "true")
+  {
+    if (forbiddenIdChars(apiVersion, id.c_str()))
+    {
+      alarmMgr.badInput(clientIp, "found a forbidden character in the id of an entity");
+      return "Invalid characters in entity id";
+    }
   }
 
   if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
@@ -214,7 +228,6 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
 
 
   if (!((requestType == BatchQueryRequest) || (requestType == BatchUpdateRequest && !typeGiven)))
-
   {
     if ((apiVersion == V2) && ((len = strlen(type.c_str())) < MIN_ID_LEN))
     {
@@ -224,16 +237,13 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
     }
   }
 
-  if (forbiddenIdChars(apiVersion, type.c_str()))
+  if (isTypePattern == false)
   {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the type of an entity");
-    return "Invalid characters in entity type";
-  }
-
-  if (forbiddenChars(isPattern.c_str()))
-  {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the pattern of an entity");
-    return "Invalid characters in entity isPattern";
+    if (forbiddenIdChars(apiVersion, type.c_str()))
+    {
+      alarmMgr.badInput(clientIp, "found a forbidden character in the type of an entity");
+      return "Invalid characters in entity type";
+    }
   }
 
   return attributeVector.check(apiVersion, requestType);
