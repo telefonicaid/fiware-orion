@@ -442,7 +442,7 @@ bool StringFilterItem::valueGet
     *stringP = s;
   }
 
-  if (*valueTypeP == SfvtString)  // FIXME PR: perhaps not calling forbiddenChars if pattern matching ...
+  if ((*valueTypeP == SfvtString) && (op != SfopMatchPattern))
   {
     if (forbiddenChars(s, ""))
     {
