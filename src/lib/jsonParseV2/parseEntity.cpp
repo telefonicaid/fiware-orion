@@ -140,11 +140,9 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       {
         if (type != "String")
         {
-          const char* errorText = "Invalid JSON type for entity id";
-
-          alarmMgr.badInput(clientIp, errorText);
+          alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID);
           ciP->httpStatusCode = SccBadRequest;
-          OrionError oe(SccBadRequest, errorText, "BadRequest");
+          OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID, "BadRequest");
 
           return oe.toJson();
         }
@@ -175,11 +173,9 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     {
       if (type != "String")
       {
-        const char* errorText = "Invalid JSON type for entity type";
-
-        alarmMgr.badInput(clientIp, errorText);
+        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE);
         ciP->httpStatusCode = SccBadRequest;
-        OrionError oe(SccBadRequest, errorText, "BadRequest");
+        OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE, "BadRequest");
 
         return oe.toJson();
       }

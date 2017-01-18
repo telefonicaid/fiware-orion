@@ -58,6 +58,8 @@
 #define ERROR_DESC_BAD_REQUEST_EMPTY_ENTITIES_VECTOR  "empty entities vector"
 #define ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID     "Invalid characters in entity id"
 #define ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE   "Invalid characters in entity type"
+#define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID    "Invalid JSON type for entity id"
+#define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE  "Invalid JSON type for entity type"
 
 #define ERROR_NOT_FOUND                               "NotFound"
 #define ERROR_DESC_NOT_FOUND_ENTITY                   "The requested entity has not been found. Check type and id"
