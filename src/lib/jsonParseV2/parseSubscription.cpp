@@ -384,6 +384,10 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
         {
           return badInput(ciP, "max type length exceeded");
         }
+        if (typeOpt.value.empty())
+        {
+          return badInput(ciP, "entity type length: 0, min length supported: 1");
+        }
         type = typeOpt.value;
       }
     }
