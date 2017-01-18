@@ -352,6 +352,22 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
 /* ****************************************************************************
 *
+* validUrl - check validity of a URL
+*/
+bool validUrl(const std::string& url)
+{
+  std::string  host;
+  int          port;
+  std::string  path;
+  std::string  protocol;
+
+  return parseUrl(url, host, port, path, protocol);
+}
+
+
+
+/* ****************************************************************************
+*
 * i2s - integer to string
 */
 char* i2s(int i, char* placeholder, int placeholderSize)

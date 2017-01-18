@@ -106,7 +106,7 @@ StringFilterItem::~StringFilterItem()
 
   if (compiledPattern == true)
   {
-    regfree(&patternValue);
+    regfree(&patternValue);  // If regcomp fails it frees up itself (see glibc sources for details)
     compiledPattern = false;
   }
 }
@@ -347,6 +347,7 @@ bool StringFilterItem::listParse(char* s, std::string* errorStringP)
     {
       *cP = 0;
 
+      // forbiddenChars check is done inside listItemAdd
       if (listItemAdd(itemStart, errorStringP) == false)
       {
         return false;
@@ -441,6 +442,15 @@ bool StringFilterItem::valueGet
     *stringP = s;
   }
 
+  if ((*valueTypeP == SfvtString) && (op != SfopMatchPattern))
+  {
+    if (forbiddenChars(s, ""))
+    {
+      *errorStringP = std::string("forbidden characters in String Filter");
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -469,7 +479,6 @@ bool StringFilterItem::valueGet
 *       !          Translates to DOES NOT EXIST (the string that comes after is the name of an attribute)
 *       NOTHING:   Translates to EXISTS (the string is the name of an attribute)
 *
-* 
 */
 bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilterType _type)
 {
@@ -486,31 +495,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     free(toFree);
     *errorStringP = "empty q-item";
     return false;
-  }
-
-  //
-  // If string starts with single-quote it must also end with single-quote and it is
-  // a string, of course.
-  // Also, the resulting string after removing the quotes cannot contain any quotes ... ?
-  //
-  if (*s == '\'')
-  {
-    ++s;
-
-    if (s[strlen(s) - 1] != '\'')
-    {
-      free(toFree);
-      *errorStringP = "non-terminated forced string";
-      return false;
-    }
-    s[strlen(s) - 1] = 0;
-
-    if (strchr(s, '\'') != NULL)
-    {
-      free(toFree);
-      *errorStringP = "quote in forced string";
-      return false;
-    }
   }
 
 
@@ -565,7 +549,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     return false;
   }
 
-  if (forbiddenChars(lhs, ""))
+  if (forbiddenChars(lhs, "'"))
   {
     if (type == SftQ)
     {
@@ -589,6 +573,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   // Or, is it a path to an item in a complex value?
   //
   lhsParse();
+
 
   //
   // Check for empty RHS
@@ -620,6 +605,10 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   }
   else
   {
+    //
+    // Forbidden char check is performed inside rangeParse, listParse, and valueParse
+    // as only there the component of RHS are known
+    //
     if      (strstr(rhs, "..") != NULL)   b = rangeParse(rhs, errorStringP);
     else if (strstr(rhs, ",")  != NULL)   b = listParse(rhs, errorStringP);
     else                                  b = valueParse(rhs, errorStringP);
@@ -633,13 +622,72 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
 
 /* ****************************************************************************
 *
+* lhsDotToEqualIfInsideQuote - change dots for equals, then remove all quotes
+*/
+static char* lhsDotToEqualIfInsideQuote(char* s)
+{
+  char* scopyP        = strdup(s);
+  char* dotP          = scopyP;
+  bool  insideQuotes  = false;
+  
+  //
+  // Replace '.' for '=' if inside quotes
+  //
+  while (*dotP != 0)
+  {
+    if (*dotP == '\'')
+    {
+      insideQuotes = (insideQuotes == false)? true : false;
+    }
+    else if ((insideQuotes == true) && (*dotP == '.'))
+    {
+      *dotP = '=';
+    }
+
+    ++dotP;
+  }
+
+  //
+  // Now that all '.' inside quotes are changed to '=', we can remove the quotes
+  // As the resulting string is always smaller than the initial string (or equal if no quotes are present)
+  // It is safe to use the inital buffer 's' to save the resulting string
+  //
+  int sIx = 0;  // Index of 's'
+  int iIx = 0;  // Index of 'initial buffer', which is 'scopyP'
+
+  while (scopyP[iIx] != 0)
+  {
+    if (scopyP[iIx] != '\'')
+    {
+      s[sIx] = scopyP[iIx];
+      ++sIx;
+    }
+    ++iIx;
+  }
+  s[sIx] = 0;
+
+  free(scopyP);
+  return s;
+}
+
+
+
+/* ****************************************************************************
+*
 * StringFilterItem::lhsParse - 
 */
 void StringFilterItem::lhsParse(void)
 {
   char* start = (char*) left.c_str();
-  char* dotP  = strchr(start, '.');
+  char* dotP  = start;
 
+  start = lhsDotToEqualIfInsideQuote(start);
+
+  attributeName = "";
+  metadataName  = "";
+  compoundPath  = "";
+
+  dotP = strchr(start, '.');
   if (dotP == NULL)
   {
     attributeName = start;
@@ -1709,8 +1757,11 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
         break;
 
       case SfvtNull:
-        *errorStringP = "null values not supported";
-        return false;
+        //
+        // NOTE: $type 10 corresponds to NULL value
+        // SEE:  https://docs.mongodb.com/manual/reference/bson-types/
+        //
+        bb.append("$exists", true).append("$type", 10);
         break;
 
       case SfvtNumber:
@@ -1777,8 +1828,13 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       }
       else if (itemP->valueType == SfvtNull)
       {
-        *errorStringP = "null values not supported";
-        return false;
+        //
+        // NOTE: $type 10 corresponds to NULL value
+        // SEE:  https://docs.mongodb.com/manual/reference/bson-types/
+        //
+        bb.append("$exists", true).append("$not", BSON("$type" << 10));
+        bob.append(k, bb.obj());
+        f = bob.obj();
       }
       else if ((itemP->valueType == SfvtNumber) || (itemP->valueType == SfvtDate))
       {

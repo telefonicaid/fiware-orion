@@ -1,4 +1,4 @@
-# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Crash with invalid subscription when matching
+Empty Entity ID at Sub Creation
 
 --SHELL-INIT--
 dbInit CB
@@ -30,59 +30,59 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create subscription with invalid regex in idPattern
-# 02. Make sure the subscription was not created
+# 01. Attempt to create subscription with empty Entity ID - see error
+# 02. Get /v2/subscriptions, see no subscriptions
 #
 
-echo "01. Create subscription with invalid regex in idPattern"
-echo "======================================================="
+echo "01. Attempt to create subscription with empty Entity ID - see error"
+echo "==================================================================="
 payload='{
-    "subject": {
-        "entities": [
-            {
-                "idPattern": "[.*",
-                "type": "T"
-            }
-        ],
-        "condition": {
-            "attrs": [ ]
-         }
-    },
-    "notification": {
-        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
-        "attrs": [ ]
-    },
-    "expires": "2050-04-05T14:00:00.00Z"
+  "subject": {
+    "entities": [
+      {
+        "id" : ""
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpCustom": {
+      "method": "PUT",
+      "url": "http://localhost:1234/notify"
+    }
+  }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
 
-echo "02. Make sure the subscription was not created"
-echo "=============================================="
+echo "02. Get /v2/subscriptions, see no subscriptions"
+echo "==============================================="
 orionCurl --url /v2/subscriptions
 echo
 echo
 
 
 --REGEXPECT--
-01. Create subscription with invalid regex in idPattern
-=======================================================
+01. Attempt to create subscription with empty Entity ID - see error
+===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
+Content-Length: 75
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Invalid regex for entity idPattern",
+    "description": "subject entities element id is empty",
     "error": "BadRequest"
 }
 
 
-02. Make sure the subscription was not created
-==============================================
+02. Get /v2/subscriptions, see no subscriptions
+===============================================
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json

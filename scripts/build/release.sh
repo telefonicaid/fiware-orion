@@ -38,7 +38,7 @@ function usage
 
 
 #
-# Chewcking command line parameters
+# Checking command line parameters
 #
 if [ "$1" == "-u" ]
 then
@@ -49,6 +49,22 @@ if [ $# != 3 ]
 then
   usage
 fi
+
+
+#
+# Make sure there are no occurrences of LM_TMP in the source code
+#
+find . -name "*.cpp" -exec grep LM_TMP {} /dev/null \; | grep -v '// LM_TMP'              > /tmp/LM_TMP
+find . -name "*.h"   -exec grep LM_TMP {} /dev/null \; | grep -v src/lib/logMsg/logMsg.h >> /tmp/LM_TMP
+lines=$(wc -l /tmp/LM_TMP)
+\rm -f /tmp/LM_TMP
+
+if [ "$lines" != "0 /tmp/LM_TMP" ]
+then
+  echo "occurrences of LM_TMP found - release aborted"
+  exit 1
+fi
+
 
 
 #

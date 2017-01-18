@@ -413,7 +413,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | http://my_host:3455/my_path               |
       | http://my_host:3455/my_path/multiple      |
 
-  @notification_http_custom_url_empty @BUG_2279 @skip
+  @notification_http_custom_url_empty @BUG_2279
   Scenario:  try to create a new subscription using NGSI v2 with empty values in notification httpCustom url
     Given  a definition of headers
       | parameter          | value                            |
@@ -431,11 +431,11 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                                |
-      | error       | BadRequest                           |
-      | description | Invalid URL parsing notification url |
+      | parameter   | value                |
+      | error       | BadRequest           |
+      | description | invalid custom /url/ |
 
-  @notification_http_custom_url_invalid_desc @BUG_2280 @skip
+  @notification_http_custom_url_invalid_desc @BUG_2280
   Scenario Outline:  try to create a new subscription using NGSI v2 with notification httpCustom url field invalid values
     Given  a definition of headers
       | parameter          | value                            |
@@ -453,9 +453,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                                |
-      | error       | BadRequest                           |
-      | description | Invalid URL parsing notification url |
+      | parameter   | value                |
+      | error       | BadRequest           |
+      | description | invalid custom /url/ |
     Examples:
       | url               |
       | ws://             |
@@ -525,7 +525,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | http://www.foo.bar./       |
       | http://.www.foo.bar./      |
 
-  @notification_http_custom_url_invalid_crash @BUG_2280 @skip
+  @notification_http_custom_url_invalid_crash @BUG_2280
   Scenario Outline:  try to create a new subscription using NGSI v2 with notification httpCustom url field invalid values
     Given  a definition of headers
       | parameter          | value                            |
@@ -543,9 +543,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                                |
-      | error       | BadRequest                           |
-      | description | Invalid URL parsing notification url |
+      | parameter   | value                |
+      | error       | BadRequest           |
+      | description | invalid custom /url/ |
     Examples:
       | url       |
       | //        |

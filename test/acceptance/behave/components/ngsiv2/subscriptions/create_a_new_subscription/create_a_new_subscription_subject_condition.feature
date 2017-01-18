@@ -462,6 +462,10 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | random=10                                                 |
       | random=100                                                |
       | random=256                                                |
+      | house_?                                                   |
+      | house_/                                                   |
+      | house_#                                                   |
+      | my house                                                  |
 
   @condition_expression_q_escaped @BUG_1988
   Scenario:  try to create a new subscription using NGSI v2 with "q" condition expression but with escaped string
@@ -585,7 +589,39 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | speed==100..1  | invested range |
       | speed==100..-1 | invested range |
 
-  @condition_expression_q_invalid_chars @BUG_2106 @BUG_1994 @skip
+  @condition_expression_q_invalid_chars @BUG_2106 @BUG_1994
+  Scenario Outline:  try to create a new subscription using NGSI v2 with "q" condition expression but with invalid chars
+    Given  a definition of headers
+      | parameter          | value                           |
+      | Fiware-Service     | test_condition_expression_error |
+      | Fiware-ServicePath | /test                           |
+      | Content-Type       | application/json                |
+      | Accept             | application/json                |
+  # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter             | value                   |
+      | subject_type          | room                    |
+      | subject_idPattern     | .*                      |
+      | condition_attrs       | temperature             |
+      | condition_expression  | q>>><q>                 |
+      | notification_http_url | http://localhost:1234   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
+    When create a new subscription
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                 |
+      | error       | BadRequest                            |
+      | description | forbidden characters in String Filter |
+    Examples:
+      | q                        |
+      | temperature==house<flat> |
+      | temperature==house=flat  |
+      | temperature==house"flat" |
+      | temperature==house'flat' |
+      | temperature==house(flat) |
+
+  @condition_expression_q_invalid_chars @BUG_2106 @BUG_1994
   Scenario Outline:  try to create a new subscription using NGSI v2 with "q" condition expression but with invalid chars
     Given  a definition of headers
       | parameter          | value                           |
@@ -609,18 +645,13 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | parameter   | value                                    |
       | error       | BadRequest                               |
       | description | invalid character found in URI param /q/ |
-    Examples: # now all return 201 and the subsc is created
-      | q           |
-      | house<flat> |
-      | house=flat  |
-      | house"flat" |
-      | house'flat' |
-      | house;flat  |
-      | house(flat) |
-      | house_?     |
-      | house_/     |
-      | house_#     |
-      | my house    |
+    Examples:
+      | q                        |
+      | house<flat>==34          |
+      | house=flat==34           |
+      | house"flat"==34          |
+      | house'flat'==34          |
+      | house(flat)==34          |
 
   @condition_expression_q_invalid_date @BUG_2106 @BUG_1996 @skip
   # FIXME: below Examples only represent at the "Complete date plus hours, minutes, seconds and a decimal fraction of a second" level in https://www.w3.org/TR/NOTE-datetime
