@@ -56,6 +56,8 @@
 #define ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_TYPE      "entity type length: 0, min length supported: "    STR(MIN_ID_LEN)
 #define ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD          "empty payload"
 #define ERROR_DESC_BAD_REQUEST_EMPTY_ENTITIES_VECTOR  "empty entities vector"
+#define ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID     "Invalid characters in entity id"
+#define ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE   "Invalid characters in entity type"
 
 #define ERROR_NOT_FOUND                               "NotFound"
 #define ERROR_DESC_NOT_FOUND_ENTITY                   "The requested entity has not been found. Check type and id"
@@ -67,6 +69,6 @@
 #define ERROR_TOO_MANY                                "TooManyResults"
 #define ERROR_DESC_TOO_MANY_ENTITIES                  "More than one matching entity. Please refine your query"
 
-#define ERROR_DESC_BAD_VERB                       "method not allowed"
+#define ERROR_DESC_BAD_VERB                           "method not allowed"
 
 #endif // SRC_LIB_COMMON_ERRORMESSAGES_H

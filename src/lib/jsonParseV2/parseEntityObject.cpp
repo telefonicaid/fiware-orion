@@ -24,6 +24,7 @@
 */
 #include "rapidjson/document.h"
 
+#include "common/errorMessages.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
@@ -75,7 +76,7 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
 
       if (forbiddenIdChars(ciP->apiVersion, eP->id.c_str(), ""))
       {
-        return "Invalid characters in entity id";
+        return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
       }
     }
     else if (name == "idPattern")
@@ -112,7 +113,7 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
 
       if (forbiddenIdChars(ciP->apiVersion, eP->type.c_str(), ""))
       {
-        return "Invalid characters in entity type";
+        return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
       }
     }
     else if (name == "typePattern")

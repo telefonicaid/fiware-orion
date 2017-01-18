@@ -153,11 +153,9 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 
         if (forbiddenIdChars(ciP->apiVersion, eP->id.c_str(), ""))
         {
-          const char* errorText = "Invalid characters in entity id";
-
-          alarmMgr.badInput(clientIp, errorText);
+          alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID);
           ciP->httpStatusCode = SccBadRequest;
-          OrionError oe(SccBadRequest, errorText, "BadRequest");
+          OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, "BadRequest");
 
           return oe.toJson();
         }
@@ -202,11 +200,9 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 
       if (forbiddenIdChars(ciP->apiVersion, eP->type.c_str(), ""))
       {
-        const char* errorText = "Invalid characters in entity type";
-
-        alarmMgr.badInput(clientIp, errorText);
+        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE);
         ciP->httpStatusCode = SccBadRequest;
-        OrionError oe(SccBadRequest, errorText, "BadRequest");
+        OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, "BadRequest");
 
         return oe.toJson();
       }

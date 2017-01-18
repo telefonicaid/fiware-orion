@@ -216,8 +216,8 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
   {
     if (forbiddenIdChars(apiVersion, id.c_str()))
     {
-      alarmMgr.badInput(clientIp, "found a forbidden character in the id of an entity");
-      return "Invalid characters in entity id";
+      alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID);
+      return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
     }
   }
 
@@ -244,8 +244,8 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
   {
     if (forbiddenIdChars(apiVersion, type.c_str()))
     {
-      alarmMgr.badInput(clientIp, "found a forbidden character in the type of an entity");
-      return "Invalid characters in entity type";
+      alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE);
+      return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
     }
   }
 
