@@ -31,6 +31,8 @@ brokerStart CB
 
 #
 # 01. Attempt to create a subscription with an empty entity type, see error
+# 02. Create a subscription
+# 03. Attempt to modify a subscription with an empty entity type, see error
 #
 
 echo "01. Attempt to create a subscription with an empty entity type, see error"
@@ -58,8 +60,76 @@ echo
 echo
 
 
+echo "02. Create a subscription"
+echo "========================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ],
+    "condition": {
+      "attrs": [ ]
+    }
+  },
+  "notification": {
+    "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"},
+    "metadata": [ "dateCreated", "dateModified" ]
+  },
+  "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "03. Attempt to modify a subscription with an empty entity type, see error"
+echo "========================================================================="
+payload='
+{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": ""
+      }
+    ]
+  }
+}'
+orionCurl -X PATCH --url /v2/subscriptions/$SUB_ID --payload "$payload"
+echo
+echo
+
+
 --REGEXPECT--
 01. Attempt to create a subscription with an empty entity type, see error
+=========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 85
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity type length: 0, min length supported: 1",
+    "error": "BadRequest"
+}
+
+
+02. Create a subscription
+=========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Attempt to modify a subscription with an empty entity type, see error
 =========================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 85

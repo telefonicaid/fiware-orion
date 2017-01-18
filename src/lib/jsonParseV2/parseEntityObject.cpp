@@ -69,7 +69,7 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
     {
       if (type != "String")
       {
-        return "invalid JSON type for entity id";
+        return ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID;
       }
 
       eP->id = iter->value.GetString();
@@ -83,13 +83,13 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
     {
       if (type != "String")
       {
-        return "invalid JSON type for entity idPattern";
+        return ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTIDPATTERN;
       }
 
       regex_t re;
       if (regcomp(&re, iter->value.GetString(), REG_EXTENDED) != 0)
       {
-        return "invalid regex for entity id pattern";
+        return ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTIDPATTERN;
       }
       regfree(&re);  // If regcomp fails it frees up itself (see glibc sources for details)
 
@@ -100,7 +100,7 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
     {
       if (type != "String")
       {
-        return "invalid JSON type for entity type";
+        return ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE;
       }
 
       eP->type      = iter->value.GetString();
@@ -120,13 +120,13 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
     {
       if (type != "String")
       {
-        return "invalid JSON type for entity typePattern";
+        return ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPEPATTERN;
       }
 
       regex_t re;
       if (regcomp(&re, iter->value.GetString(), REG_EXTENDED) != 0)
       {
-        return "invalid regex for entity type pattern";
+        return ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTTYPEPATTERN;
       }
       regfree(&re);  // If regcomp fails it frees up itself (see glibc sources for details)
 
