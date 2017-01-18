@@ -386,7 +386,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
         }
         if (typeOpt.value.empty())
         {
-          return badInput(ciP, "entity type length: 0, min length supported: 1");
+          return badInput(ciP, ERROR_DESC_BAD_REQUEST_EMPTY_ENTTYPE);
         }
         type = typeOpt.value;
       }

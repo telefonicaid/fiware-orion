@@ -108,7 +108,7 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
 
       if (eP->type.empty())
       {
-        return "entity type length: 0, min length supported: 1";
+        return ERROR_DESC_BAD_REQUEST_EMPTY_ENTTYPE;
       }
 
       if (forbiddenIdChars(ciP->apiVersion, eP->type.c_str(), ""))
