@@ -99,17 +99,17 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
   {
     if (document.HasMember("id"))
     {
-      alarmMgr.badInput(clientIp, "entity id specified in payload");
+      alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_ENTID_IN_PAYLOAD);
       ciP->httpStatusCode = SccBadRequest;
-      OrionError oe(SccBadRequest, "entity id specified in payload", "BadRequest");
+      OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_ENTID_IN_PAYLOAD, "BadRequest");
       return oe.toJson();
     }
 
     if (document.HasMember("type"))
     {
-      alarmMgr.badInput(clientIp, "entity type specified in payload");
+      alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_ENTTYPE_IN_PAYLOAD);
       ciP->httpStatusCode = SccBadRequest;
-      OrionError oe(SccBadRequest, "entity type specified in payload", "BadRequest");
+      OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_ENTTYPE_IN_PAYLOAD, "BadRequest");
       return oe.toJson();
     }
   }
@@ -120,7 +120,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     // research was made and "ObjectEmpty" was found. As the broker stopped crashing and complaints
     // about crashes with small docs and "Empty()" were found on the internet, we opted to use ObjectEmpty
     //
-    alarmMgr.badInput(clientIp, "Empty payload");
+    alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD);
     ciP->httpStatusCode = SccBadRequest;
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
     return oe.toJson();
@@ -160,11 +160,9 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       }
       else  // "id" is present in payload for /v2/entities/<eid> - not a valid payload
       {
-        const char* errorText = "invalid input, 'id' as attribute";
-
-        alarmMgr.badInput(clientIp, errorText);
+        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_ID_AS_ATTR);
         ciP->httpStatusCode = SccBadRequest;
-        OrionError oe(SccBadRequest, errorText, "BadRequest");
+        OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_ID_AS_ATTR, "BadRequest");
 
         return oe.toJson();
       }
@@ -185,7 +183,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 
       if (eP->type.empty())
       {
-        const char* errorText = "entity type length: 0, min length supported: 1";
+        const char* errorText = ERROR_DESC_BAD_REQUEST_EMPTY_ENTTYPE;
 
         alarmMgr.badInput(clientIp, errorText);
         ciP->httpStatusCode = SccBadRequest;

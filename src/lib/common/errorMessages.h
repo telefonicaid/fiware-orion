@@ -60,10 +60,15 @@
 #define ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE   "Invalid characters in entity type"
 #define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID    "Invalid JSON type for entity id"
 #define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE  "Invalid JSON type for entity type"
+
 #define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTIDPATTERN     "Invalid JSON type for entity idPattern"
 #define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPEPATTERN   "Invalid JSON type for entity typePattern"
 #define ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTIDPATTERN     "Invalid regex for entity idPattern"
 #define ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTTYPEPATTERN   "Invalid regex for entity typePattern"
+#define ERROR_DESC_BAD_REQUEST_EMPTY_ENTTYPE                  "entity type length: 0, min length supported: 1"
+#define ERROR_DESC_BAD_REQUEST_ID_AS_ATTR                     "invalid input, 'id' as attribute"
+#define ERROR_DESC_BAD_REQUEST_ENTID_IN_PAYLOAD               "entity id specified in payload"
+#define ERROR_DESC_BAD_REQUEST_ENTTYPE_IN_PAYLOAD             "entity type specified in payload"
 
 #define ERROR_NOT_FOUND                               "NotFound"
 #define ERROR_DESC_NOT_FOUND_ENTITY                   "The requested entity has not been found. Check type and id"
