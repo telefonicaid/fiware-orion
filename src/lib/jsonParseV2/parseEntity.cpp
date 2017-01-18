@@ -150,6 +150,17 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
         }
 
         eP->id = iter->value.GetString();
+
+        if (forbiddenIdChars(ciP->apiVersion, eP->id.c_str(), ""))
+        {
+          const char* errorText = "Invalid characters in entity id";
+
+          alarmMgr.badInput(clientIp, errorText);
+          ciP->httpStatusCode = SccBadRequest;
+          OrionError oe(SccBadRequest, errorText, "BadRequest");
+
+          return oe.toJson();
+        }
       }
       else  // "id" is present in payload for /v2/entities/<eid> - not a valid payload
       {
@@ -189,7 +200,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
         return oe.toJson();
       }
 
-      if (forbiddenChars(eP->type.c_str(), ""))
+      if (forbiddenIdChars(ciP->apiVersion, eP->type.c_str(), ""))
       {
         const char* errorText = "Invalid characters in entity type";
 

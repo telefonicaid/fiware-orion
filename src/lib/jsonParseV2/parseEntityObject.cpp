@@ -73,7 +73,7 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
 
       eP->id = iter->value.GetString();
 
-      if (forbiddenChars(eP->id.c_str(), ""))
+      if (forbiddenIdChars(ciP->apiVersion, eP->id.c_str(), ""))
       {
         return "Invalid characters in entity id";
       }
@@ -110,7 +110,7 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
         return "entity type length: 0, min length supported: 1";
       }
 
-      if (forbiddenChars(eP->type.c_str(), ""))
+      if (forbiddenIdChars(ciP->apiVersion, eP->type.c_str(), ""))
       {
         return "Invalid characters in entity type";
       }
