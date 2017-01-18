@@ -24,6 +24,7 @@
 */
 #include "rapidjson/document.h"
 
+#include "common/errorMessages.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
@@ -68,27 +69,27 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
     {
       if (type != "String")
       {
-        return "invalid JSON type for entity id";
+        return ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID;
       }
 
       eP->id = iter->value.GetString();
 
-      if (forbiddenChars(eP->id.c_str(), ""))
+      if (forbiddenIdChars(ciP->apiVersion, eP->id.c_str(), ""))
       {
-        return "Invalid characters in entity id";
+        return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
       }
     }
     else if (name == "idPattern")
     {
       if (type != "String")
       {
-        return "invalid JSON type for entity idPattern";
+        return ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTIDPATTERN;
       }
 
       regex_t re;
       if (regcomp(&re, iter->value.GetString(), REG_EXTENDED) != 0)
       {
-        return "invalid regex for entity id pattern";
+        return ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTIDPATTERN;
       }
       regfree(&re);  // If regcomp fails it frees up itself (see glibc sources for details)
 
@@ -99,28 +100,33 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
     {
       if (type != "String")
       {
-        return "invalid JSON type for entity type";
+        return ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE;
       }
 
       eP->type      = iter->value.GetString();
       eP->typeGiven = true;
 
-      if (forbiddenChars(eP->type.c_str(), ""))
+      if (eP->type.empty())
       {
-        return "Invalid characters in entity type";
+        return "entity type length: 0, min length supported: 1";
+      }
+
+      if (forbiddenIdChars(ciP->apiVersion, eP->type.c_str(), ""))
+      {
+        return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
       }
     }
     else if (name == "typePattern")
     {
       if (type != "String")
       {
-        return "invalid JSON type for entity typePattern";
+        return ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPEPATTERN;
       }
 
       regex_t re;
       if (regcomp(&re, iter->value.GetString(), REG_EXTENDED) != 0)
       {
-        return "invalid regex for entity type pattern";
+        return ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTTYPEPATTERN;
       }
       regfree(&re);  // If regcomp fails it frees up itself (see glibc sources for details)
 

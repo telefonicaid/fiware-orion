@@ -32,6 +32,7 @@
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseEntity.h"
 #include "jsonParseV2/parseContextAttribute.h"
+#include "parse/forbiddenChars.h"
 #include "alarmMgr/alarmMgr.h"
 
 using namespace rapidjson;
@@ -139,19 +140,32 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       {
         if (type != "String")
         {
-          alarmMgr.badInput(clientIp, "invalid JSON type for entity id");
-          ciP->httpStatusCode = SccBadRequest;;
-          OrionError oe(SccBadRequest, "invalid JSON type for entity id", "BadRequest");
+          alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID);
+          ciP->httpStatusCode = SccBadRequest;
+          OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID, "BadRequest");
+
           return oe.toJson();
         }
 
         eP->id = iter->value.GetString();
+
+        if (forbiddenIdChars(ciP->apiVersion, eP->id.c_str(), ""))
+        {
+          alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID);
+          ciP->httpStatusCode = SccBadRequest;
+          OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, "BadRequest");
+
+          return oe.toJson();
+        }
       }
       else  // "id" is present in payload for /v2/entities/<eid> - not a valid payload
       {
-        alarmMgr.badInput(clientIp, "'id' is not a valid attribute");
-        ciP->httpStatusCode = SccBadRequest;;
-        OrionError oe(SccBadRequest, "invalid input, 'id' as attribute", "BadRequest");
+        const char* errorText = "invalid input, 'id' as attribute";
+
+        alarmMgr.badInput(clientIp, errorText);
+        ciP->httpStatusCode = SccBadRequest;
+        OrionError oe(SccBadRequest, errorText, "BadRequest");
+
         return oe.toJson();
       }
     }
@@ -159,14 +173,35 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     {
       if (type != "String")
       {
-        alarmMgr.badInput(clientIp, "invalid JSON type for entity type");
+        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE);
         ciP->httpStatusCode = SccBadRequest;
-        OrionError oe(SccBadRequest, "invalid JSON type for entity type", "BadRequest");
+        OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE, "BadRequest");
+
         return oe.toJson();
       }
 
       eP->type      = iter->value.GetString();
       eP->typeGiven = true;
+
+      if (eP->type.empty())
+      {
+        const char* errorText = "entity type length: 0, min length supported: 1";
+
+        alarmMgr.badInput(clientIp, errorText);
+        ciP->httpStatusCode = SccBadRequest;
+        OrionError oe(SccBadRequest, errorText, "BadRequest");
+
+        return oe.toJson();
+      }
+
+      if (forbiddenIdChars(ciP->apiVersion, eP->type.c_str(), ""))
+      {
+        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE);
+        ciP->httpStatusCode = SccBadRequest;
+        OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, "BadRequest");
+
+        return oe.toJson();
+      }
     }
     else  // attribute
     {

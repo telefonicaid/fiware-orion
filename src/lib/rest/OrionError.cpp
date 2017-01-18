@@ -109,7 +109,7 @@ std::string OrionError::smartRender(ApiVersion apiVersion)
 */
 std::string OrionError::setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpStatusCode* scP)
 {
-  if (apiVersion == V2)
+  if ((apiVersion == V2) || (apiVersion == ADMIN_API))
   {
     *scP = code;
   }
