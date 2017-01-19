@@ -650,7 +650,6 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | house<flat>==34          |
       | house=flat==34           |
       | house"flat"==34          |
-      | house'flat'==34          |
       | house(flat)==34          |
 
   @condition_expression_q_invalid_date @BUG_2106 @BUG_1996 @skip
