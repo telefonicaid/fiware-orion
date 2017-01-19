@@ -593,6 +593,13 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   bool b = true;
   if ((op == SfopNotExists) || (op == SfopExists))
   {
+    if (forbiddenQuotes(rhs))
+    {
+      *errorStringP = std::string("forbidden characters in String Filter");
+      free(toFree);
+      return false;
+    }
+
     if (type == SftMq)
     {
       if (metadataName == "")
