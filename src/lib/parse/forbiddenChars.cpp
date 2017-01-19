@@ -147,3 +147,45 @@ bool forbiddenIdCharsV2(const char* s, const char* exceptions)
 
   return false;
 }
+
+
+
+/* ****************************************************************************
+*
+* forbiddenQuotes - any unauthorized quotes?
+*
+* Quotes (') are used to delimit attribute/metadata/compound-node names that contain a dot (.).
+*
+* Example (of metadata, but valid also for attribute name and compound node name):
+*   We have an attribute A with a metadata called "M.x" (without double-quotes - 3 chars).
+*   For a string filter (mq) on M.x, we need to use quotes.
+*   A.M.x is interpreted as attribute A, metadata M, compound node x
+*   A.'M.x' is what we need to reach the metadata M.x.
+*
+* So, quotes are allowed as first and last character, and if there is a dot
+* before or after the quote.
+*
+* If a quote is found elsewhere, an error should be returned.
+*/
+bool forbiddenQuotes(char* s)
+{
+  int ix = 0;
+
+  while (s[ix] != 0)
+  {
+    ++ix;  // Remember, quote is allowed as first char, ok to step over ix==0
+
+    if (s[ix] == '\'')
+    {
+      if      (s[ix - 1] == '.')  {}  // OK - a.'x.b' is allowed (see quote in pos 2 - dot before)
+      else if (s[ix + 1] == '.')  {}  // OK - a.'x.b'.c is allowed (see quote in pos 6 - dot after)
+      else if (s[ix + 1] == 0)    {}  // OK - quote as last char is allowed
+      else
+      {
+        return true;  // NOT OK - unauthorized quote found
+      }
+    }
+  }
+
+  return false;
+}
