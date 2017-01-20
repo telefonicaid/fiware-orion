@@ -298,6 +298,7 @@ Date: REGEX(.*)
 03. Dump and reset: see initial notification with A, B and C
 ============================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 671
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
@@ -354,6 +355,7 @@ Date: REGEX(.*)
 05. Dump and reset: see notification with actionType=update and previousValue=2 for B
 =====================================================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 990
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
@@ -422,6 +424,7 @@ Date: REGEX(.*)
 07. Dump and reset: see notification with actionType=update for B and C, previousValue=20 for B, previousValue=3 for C
 ======================================================================================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 1310
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
@@ -502,6 +505,7 @@ Date: REGEX(.*)
 09. Dump and reset: see notification with actionType=update and previousValue=1 for A
 =====================================================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 991
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
@@ -570,6 +574,7 @@ Date: REGEX(.*)
 11. Dump and reset: see notification with actionType=update and previousValue=10 for A
 ======================================================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 992
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
@@ -639,6 +644,7 @@ Date: REGEX(.*)
 13. Dump and reset: see notification with actionType=append for A, B, C
 =======================================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 1217
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
@@ -717,6 +723,7 @@ Date: REGEX(.*)
 15. Dump and reset: see notification with 2 entities with A, B and C
 ====================================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 1234
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)

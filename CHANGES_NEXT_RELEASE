@@ -8,6 +8,7 @@
 - Fix: checking for forbidden characters inside the components of string filters (#1994)
 - Add: the string "ISO6801" can now be used as an alias for "DateTime" as type for attributes and metadata (#2654)
 - Add: metrics REST API (#2750)
+- Fix: including Service-Path in notifications also when the service path is the default one (/). For notifications due to 'standard subscriptions', notifications due to 'custom subscriptions' already work this way (#2584)
 - Add: support for quotes (') in string filters to let attribute/metadata names contain dots (#2805)
 - Add: new CLI '-disableMetrics' to disable metrics (#2750)
 - Fix: timeout of 6 seconds (hardcoded for now) for all incoming REST requests (temporal fix, see #2762)

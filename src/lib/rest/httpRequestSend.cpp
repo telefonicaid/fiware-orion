@@ -44,6 +44,7 @@
 #include "common/string.h"
 #include "common/sem.h"
 #include "common/limits.h"
+#include "common/defaultValues.h"
 #include "alarmMgr/alarmMgr.h"
 #include "metricsMgr/metricsMgr.h"
 #include "rest/ConnectionInfo.h"
@@ -425,11 +426,8 @@ int httpRequestSendWithCurl
   }
 
   // ----- Service-Path
-  if (servicePath != "")
-  {
-    std::string fiwareServicePath = std::string("Fiware-ServicePath: ") + servicePath;
-    httpHeaderAdd(&headers, "Fiware-ServicePath", fiwareServicePath, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
-  }
+  std::string fiwareServicePath = std::string("Fiware-ServicePath: ") + ((servicePath.empty())? "/" : servicePath);
+  httpHeaderAdd(&headers, "Fiware-ServicePath", fiwareServicePath, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- X-Auth-Token
   if (xauthToken != "")
