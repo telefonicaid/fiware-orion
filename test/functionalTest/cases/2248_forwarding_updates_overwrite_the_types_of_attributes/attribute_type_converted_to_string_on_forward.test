@@ -112,6 +112,7 @@ Date: REGEX(.*)
 03. Dump accumulator to see the forward message - is the Number a Number or a string? Must be a Number
 ======================================================================================================
 POST http://localhost:REGEX(\d+)/v1/updateContext
+Fiware-Servicepath: /
 Content-Length: 332
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)

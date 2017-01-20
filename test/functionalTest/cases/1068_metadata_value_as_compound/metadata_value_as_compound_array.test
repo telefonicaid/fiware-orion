@@ -184,6 +184,7 @@ Date: REGEX(.*)
 04. Dump accumulator to see the compound value of M1 correctly rendered in the notification
 ===========================================================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 174
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -234,6 +235,7 @@ Date: REGEX(.*)
 07. Dump accumulator to see the compound value of M1 correctly rendered in the notification
 ===========================================================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 174
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized

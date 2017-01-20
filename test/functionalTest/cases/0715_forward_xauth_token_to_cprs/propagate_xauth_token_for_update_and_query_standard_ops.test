@@ -244,6 +244,8 @@ Date: REGEX(.*)
 ===================================================
 POST http://localhost:REGEX(\d+)/v1/updateContext
 Content-Length: 274
+Fiware-Servicepath: /
+Fiware-Servicepath: /
 X-Auth-Token: kz
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
@@ -271,6 +273,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/v1/queryContext
 Content-Length: 137
+Fiware-Servicepath: /
+Fiware-Servicepath: /
 X-Auth-Token: kz
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
@@ -292,6 +296,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 POST http://localhost:REGEX(\d+)/v1/updateContext
+Fiware-Servicepath: /
+Fiware-Servicepath: /
 Content-Length: 274
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
@@ -318,6 +324,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 POST http://localhost:REGEX(\d+)/v1/queryContext
+Fiware-Servicepath: /
+Fiware-Servicepath: /
 Content-Length: 137
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)

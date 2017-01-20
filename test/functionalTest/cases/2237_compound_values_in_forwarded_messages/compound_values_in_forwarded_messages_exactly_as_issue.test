@@ -224,6 +224,7 @@ Date: REGEX(.*)
 04. Dump accumulator to see the forward message
 ===============================================
 POST http://localhost:REGEX(\d+)/v1/updateContext
+Fiware-Servicepath: /
 Content-Length: 382
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)

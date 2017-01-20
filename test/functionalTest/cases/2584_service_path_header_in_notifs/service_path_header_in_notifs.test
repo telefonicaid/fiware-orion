@@ -1,4 +1,4 @@
-# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,28 +21,26 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-POST Subscriptions V2 permanent subscription
+Service Path in Notifications
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 0
 accumulatorStart --pretty-print
 
 --SHELL--
 
 #
-# 01. Create subscription
-# 02. Create entity with status=off (not notif)
-# 03. Update entity to status=on (notif)
-# 04. Update entity to status=fail (not notif)
-# 05. Update entity to status=on (notif)
-# 06. Dump accumulator (2 notifications)
+# 01. Create a subscription
+# 02. Create Entity with Service-Path / to provoke notification
+# 03. Dump and reset accumulator, see notification with Service-Path / as HTTP Header
+# 04. Modify Entity, provoke notification
+# 05. Dump and reset accumulator, see notification with Service-Path / as HTTP Header
 #
 
-echo "01. Create subscription with q: status==on"
-echo "=========================================="
-payload='
-{
+echo "01. Create a subscription"
+echo "========================="
+payload='{
     "subject": {
         "entities": [
             {
@@ -51,76 +49,62 @@ payload='
             }
         ],
         "condition": {
-            "attrs": [ ],
-            "expression": {
-               "q": "status==on"
-            }
+            "attrs": []
          }
     },
     "notification": {
         "http": {
             "url": "http://localhost:'$LISTENER_PORT'/notify"
         },
-        "attrs": [ ]
+        "attrs": []
     }
-}
-'
+}'
 orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
 
-echo "02. Create entity with status=off (not notif)"
-echo "============================================="
+echo "02. Create Entity with Service-Path / to provoke notification"
+echo "============================================================="
 payload='{
   "id": "E1",
   "type": "T",
-  "status": "off"
+  "A1": 2
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --servicePath /
 echo
 echo
 
 
-echo "03. Update entity to status=on (notif)"
-echo "======================================"
-payload='{
-  "status": "on"
-}'
-orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" -X PATCH
-echo
-echo
-
-
-echo "04. Update entity to status=fail (not notif)"
-echo "============================================"
-payload='{
-  "status": "fail"
-}'
-orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" -X PATCH
-echo
-echo
-
-
-echo "05. Update entity to status=on (notif)"
-echo "======================================"
-payload='{
-  "status": "on"
-}'
-orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" -X PATCH
-echo
-echo
-
-
-echo "06. Get accumulator dump (2 notifications)"
-echo "=========================================="
+echo "03. Dump and reset accumulator, see notification with Service-Path / as HTTP Header"
+echo "==================================================================================="
 accumulatorDump
+accumulatorReset
 echo
 echo
+
+
+echo "04. Modify Entity, provoke notification"
+echo "======================================="
+payload='{
+  "A1": 4
+}'
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --servicePath / -X PUT
+echo
+echo
+
+
+echo "05. Dump and reset accumulator, see notification with Service-Path / as HTTP Header"
+echo "==================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
 
 --REGEXPECT--
-01. Create subscription with q: status==on
-==========================================
+01. Create a subscription
+=========================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -129,8 +113,8 @@ Date: REGEX(.*)
 
 
 
-02. Create entity with status=off (not notif)
-=============================================
+02. Create Entity with Service-Path / to provoke notification
+=============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T
@@ -139,38 +123,11 @@ Date: REGEX(.*)
 
 
 
-03. Update entity to status=on (notif)
-======================================
-HTTP/1.1 204 No Content
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-04. Update entity to status=fail (not notif)
-============================================
-HTTP/1.1 204 No Content
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-05. Update entity to status=on (notif)
-======================================
-HTTP/1.1 204 No Content
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-06. Get accumulator dump (2 notifications)
-==========================================
+03. Dump and reset accumulator, see notification with Service-Path / as HTTP Header
+===================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 129
+Content-Length: 124
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -181,21 +138,34 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 {
     "data": [
         {
-            "id": "E1", 
-            "status": {
+            "A1": {
                 "metadata": {}, 
-                "type": "Text", 
-                "value": "on"
+                "type": "Number", 
+                "value": 2
             }, 
+            "id": "E1", 
             "type": "T"
         }
     ], 
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
+
+
+04. Modify Entity, provoke notification
+=======================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Dump and reset accumulator, see notification with Service-Path / as HTTP Header
+===================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 129
+Content-Length: 124
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -206,12 +176,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 {
     "data": [
         {
-            "id": "E1", 
-            "status": {
+            "A1": {
                 "metadata": {}, 
-                "type": "Text", 
-                "value": "on"
+                "type": "Number", 
+                "value": 4
             }, 
+            "id": "E1", 
             "type": "T"
         }
     ], 
