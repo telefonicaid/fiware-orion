@@ -458,54 +458,69 @@ bool StringFilterItem::valueGet
 
 /* ****************************************************************************
 *
-* opFind - 
+* opFind - return the operator of the expression (and LHS + RHS as well)
+*
+* PARAMETERS:
+*   expression:   (input)  the expression to parse (e.g. A==7  or  !a1  or  'b.c'.a>14)
+*   lhsP:         (output) pointer to the string (char*) that references the Left Hand Side
+*   rhsP:         (output) pointer to the string (char*) that references the Right Hand Side
+*
+* RETURN VALUE
+*   The operator is returned. If 'no operator is found', then it is a unary expression for
+*   existence and 'SfopExists' is returned.
 */
-static StringFilterOp opFind(char* s, char** restPP)
+static StringFilterOp opFind(char* expression, char** lhsP, char** rhsP)
 {
-  char*           start        = s;
+  char*           eP           = expression;
   bool            insideQuotes = false;
-  StringFilterOp  op           = SfopExists;
+  StringFilterOp  op           = SfopExists;  // No operator found => SfopExists
 
-  if (*s == '!')
+  if (*eP == '!')  // Unary negation?
   {
-    *restPP = &s[1];
+    *lhsP = &eP[1];  // !a: a is LHS ...
+    *rhsP = &eP[1];  // !a: a is RHS ... FIXME P1: Funny? yeah, a little. This is how it works
+
     return SfopNotExists;
   }
 
-  while (*s != 0)
+  *lhsP = expression;  // For all ops != Unary negation, LHS is the beginning of expression
+
+  while (*eP != 0)
   {
-    if (*s == '\'')
+    if (*eP == '\'')
     {
       insideQuotes = insideQuotes? false : true;
     }
     else if (!insideQuotes)
     {
-      if (s[1] == '=')
+      if (eP[1] == '=')
       {
-        if      (*s == '=') { *restPP = &s[2]; op = SfopEquals;             }
-        else if (*s == '~') { *restPP = &s[2]; op = SfopMatchPattern;       }
-        else if (*s == '!') { *restPP = &s[2]; op = SfopDiffers;            }
-        else if (*s == '>') { *restPP = &s[2]; op = SfopGreaterThanOrEqual; }
-        else if (*s == '<') { *restPP = &s[2]; op = SfopLessThanOrEqual;    }
+        if      (*eP == '=') { *rhsP = &eP[2]; op = SfopEquals;             }
+        else if (*eP == '~') { *rhsP = &eP[2]; op = SfopMatchPattern;       }
+        else if (*eP == '!') { *rhsP = &eP[2]; op = SfopDiffers;            }
+        else if (*eP == '>') { *rhsP = &eP[2]; op = SfopGreaterThanOrEqual; }
+        else if (*eP == '<') { *rhsP = &eP[2]; op = SfopLessThanOrEqual;    }
       }
-      else   if (*s == '<') { *restPP = &s[1]; op = SfopLessThan;           }
-      else   if (*s == '>') { *restPP = &s[1]; op = SfopGreaterThan;        }
-      else   if (*s == ':') { *restPP = &s[1]; op = SfopEquals;             }
+      else   if (*eP == '<') { *rhsP = &eP[1]; op = SfopLessThan;           }
+      else   if (*eP == '>') { *rhsP = &eP[1]; op = SfopGreaterThan;        }
+      else   if (*eP == ':') { *rhsP = &eP[1]; op = SfopEquals;             }
 
-      if (op != SfopExists) // operator found, restPP already set
+      if (op != SfopExists)  // operator found, RHS already set
       {
-        // Mark the end of LHS - RHS returned in restPP
-        *s = 0;
+        // Mark the end of LHS - but not if op is Exists, where expression == LHS == RHS 
+        *eP = 0;
+
         return op;
       }
     }
     
-    ++s;
+    ++eP;
   }
 
-  *restPP = start;
+  *rhsP = expression;
   return SfopExists; 
 }
+
 
 
 /* ****************************************************************************
@@ -565,21 +580,9 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   //
 
   //
-  // 1. Find operator
+  // 1. Find operator (which also gives up LHS and RHS)
   //
-  // if 'No-Operator-Found' it's a test for EXISTENCE of an attribute
-  //
-  op = opFind(s, &rhs);
-
-  //
-  // FIXME P4: assigning lhs IS but should NOT BE necessary (for SfopNotExists only)
-  //           We should take a look at this, perhaps it's just an absurd check ...
-  //
-  if (op == SfopNotExists)
-  {
-    lhs = rhs;
-  }
-
+  op   = opFind(s, &lhs, &rhs);
   lhs  = wsStrip(lhs);
   rhs  = wsStrip(rhs);
 

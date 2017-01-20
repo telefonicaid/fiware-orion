@@ -18,6 +18,7 @@
 - Fix: Partial sanity check for custon url, only if the url contains no replacements using ${xxx} (#2280, #2279)
 - Fix: if entity::type is given but as an empty string, in payload of POST /v2/subscriptions or PATCH /v2/subscriptions/{sub}, an error is returned (#1985)
 - Fix: more intelligent, quote-aware, operator lookup inside q/mq string filters (#2452)
+- Fix: attribute names that include ':' now are supported, with the single-quote syntax. E.g. q='devices:location' (#2452)
 - Fix: admin requests (such as GET /version) with errors now return '400 Bad Request', not '200 OK'
 - Fix: attempt to create an entity with an error in service path (and probably more types of errors) now returns '400 Bad Request', not '200 OK' (#2763)
 - Fix: not calling regfree when regcomp fails. Potential fix for a crash (#2769)
