@@ -271,7 +271,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Fiware-Servicepath: /
 Content-Length: 129
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -297,7 +296,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Fiware-Servicepath: /
 Content-Length: 126
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -322,7 +320,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Fiware-Servicepath: /
 Fiware-Servicepath: /
 Content-Length: 125
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -350,7 +347,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 PUT http://127.0.0.1:REGEX(\d+)/notify?a1=true&type=T1&id=E1
 Fiware-Servicepath: /
 Entity-Id: E1
-Fiware-Servicepath: /
 Content-Length: 36
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
@@ -370,7 +366,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 PUT http://127.0.0.1:REGEX(\d+)/notify?a2=null&type=T2&id=E1
 Fiware-Servicepath: /
 Entity-Id: E1
-Fiware-Servicepath: /
 Content-Length: 36
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
@@ -391,7 +386,6 @@ PUT http://127.0.0.1:REGEX(\d+)/notify?a3=3&type=T3&id=E1
 Fiware-Servicepath: /
 Ngsiv2-Attrsformat: custom
 Entity-Id: E1
-Fiware-Servicepath: /
 Content-Length: 33
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Accept: application/json

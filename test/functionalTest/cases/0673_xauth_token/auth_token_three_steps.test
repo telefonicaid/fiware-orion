@@ -236,9 +236,8 @@ Date: REGEX(.*)
 04. Check that the X-Auth-Token from the subscribe request was propagated to accumulator
 ========================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 459
-Fiware-Servicepath: /
-Fiware-Servicepath: /
 X-Auth-Token: kz02
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
@@ -315,9 +314,8 @@ Date: REGEX(.*)
 07. Make sure the accumulator receives the Update, with the correct X-Auth token
 ================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 460
-Fiware-Servicepath: /
-Fiware-Servicepath: /
 X-Auth-Token: kz03
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
