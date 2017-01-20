@@ -120,7 +120,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for entity id",
+    "description": "Invalid JSON type for entity id",
     "error": "BadRequest"
 }
 
@@ -134,7 +134,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for entity type",
+    "description": "Invalid JSON type for entity type",
     "error": "BadRequest"
 }
 
