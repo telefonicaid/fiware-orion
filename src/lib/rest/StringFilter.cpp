@@ -458,6 +458,58 @@ bool StringFilterItem::valueGet
 
 /* ****************************************************************************
 *
+* opFind - 
+*/
+static StringFilterOp opFind(char* s, char** restPP)
+{
+  char*           start        = s;
+  bool            insideQuotes = false;
+  StringFilterOp  op           = SfopExists;
+
+  if (*s == '!')
+  {
+    *restPP = &s[1];
+    return SfopNotExists;
+  }
+
+  while (*s != 0)
+  {
+    if (*s == '\'')
+    {
+      insideQuotes = insideQuotes? false : true;
+    }
+    else if (!insideQuotes)
+    {
+      if (s[1] == '=')
+      {
+        if      (*s == '=') { *restPP = &s[2]; op = SfopEquals;             }
+        else if (*s == '~') { *restPP = &s[2]; op = SfopMatchPattern;       }
+        else if (*s == '!') { *restPP = &s[2]; op = SfopDiffers;            }
+        else if (*s == '>') { *restPP = &s[2]; op = SfopGreaterThanOrEqual; }
+        else if (*s == '<') { *restPP = &s[2]; op = SfopLessThanOrEqual;    }
+      }
+      else   if (*s == '<') { *restPP = &s[1]; op = SfopLessThan;           }
+      else   if (*s == '>') { *restPP = &s[1]; op = SfopGreaterThan;        }
+      else   if (*s == ':') { *restPP = &s[1]; op = SfopEquals;             }
+
+      if (op != SfopExists) // operator found, restPP already set
+      {
+        // Mark the end of LHS - RHS returned in restPP
+        *s = 0;
+        return op;
+      }
+    }
+    
+    ++s;
+  }
+
+  *restPP = start;
+  return SfopExists; 
+}
+
+
+/* ****************************************************************************
+*
 * StringFilterItem::parse - 
 *
 * A StringFilterItem is a string of the form:
@@ -515,26 +567,19 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   //
   // 1. Find operator
   //
-  // if 'No-Operator-Found' => Test for EXISTENCE of an attribute
+  // if 'No-Operator-Found' it's a test for EXISTENCE of an attribute
   //
-  char* opP = NULL;
+  op = opFind(s, &rhs);
 
-  if      ((opP = strstr(s, "==")) != NULL)  { op  = SfopEquals;              rhs = &opP[2];        }
-  else if ((opP = strstr(s, "~=")) != NULL)  { op  = SfopMatchPattern;        rhs = &opP[2];        }
-  else if ((opP = strstr(s, "!=")) != NULL)  { op  = SfopDiffers;             rhs = &opP[2];        }
-  else if ((opP = strstr(s, "<=")) != NULL)  { op  = SfopLessThanOrEqual;     rhs = &opP[2];        }
-  else if ((opP = strstr(s, "<"))  != NULL)  { op  = SfopLessThan;            rhs = &opP[1];        }
-  else if ((opP = strstr(s, ">=")) != NULL)  { op  = SfopGreaterThanOrEqual;  rhs = &opP[2];        }
-  else if ((opP = strstr(s, ">"))  != NULL)  { op  = SfopGreaterThan;         rhs = &opP[1];        }
-  else if ((opP = strstr(s, ":"))  != NULL)  { op  = SfopEquals;              rhs = &opP[1];        }
-  else if (*s == '!')                        { op  = SfopNotExists;           rhs = &s[1]; lhs = rhs; opP = s; }
-  else                                       { op  = SfopExists;              rhs = s;              }
-
-  // Mark the end of LHS
-  if (opP != NULL)
+  //
+  // FIXME P4: assigning lhs IS but should NOT BE necessary (for SfopNotExists only)
+  //           We should take a look at this, perhaps it's just an absurd check ...
+  //
+  if (op == SfopNotExists)
   {
-    *opP = 0;
+    lhs = rhs;
   }
+
   lhs  = wsStrip(lhs);
   rhs  = wsStrip(rhs);
 
