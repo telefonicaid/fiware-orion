@@ -117,13 +117,13 @@ Date: REGEX(.*)
 02. POST /v2/op/query with forbidden chars '<>=;' in entity::id, see it fail due to forbidden chars
 ===================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 67
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "forbidden chars in entity id",
+    "description": "Invalid characters in entity id",
     "error": "BadRequest"
 }
 
@@ -131,13 +131,13 @@ Date: REGEX(.*)
 03. POST /v2/op/query with forbidden chars '<>=;' in entity::type, see it fail due to forbidden chars
 =====================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 69
+Content-Length: 72
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "forbidden chars in entity type",
+    "description": "Invalid characters in entity type",
     "error": "BadRequest"
 }
 
