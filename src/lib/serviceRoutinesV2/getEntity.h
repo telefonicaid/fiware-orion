@@ -1,5 +1,5 @@
 #ifndef SRC_LIB_SERVICEROUTINESV2_GETENTITY_H_
-#define SRC_LIB_SERVICEROUTINESv2_GETENTITY_H_
+#define SRC_LIB_SERVICEROUTINESV2_GETENTITY_H_
 
 /*
 *
@@ -45,5 +45,5 @@ extern std::string getEntity
   ParseData*                 parseDataP
 );
 
-#endif  // SRC_LIB_SERVICEROUTINESv2_GETENTITY_H_
+#endif  // SRC_LIB_SERVICEROUTINESV2_GETENTITY_H_
 
