@@ -194,8 +194,7 @@ do                                                \
   }                                               \
   else                                            \
   {                                               \
-    strncat(line, "noprogname",                   \
-	    lineLen - strlen(line) - 1);	  \
+    strncat(line, "noprogname", lineLen - strlen(line) - 1); \
   }                                               \
                                                   \
   fi += l;                                        \
@@ -214,7 +213,7 @@ do                                         \
                                            \
   snprintf(xin, sizeof(xin), "%d", i);     \
   strncat(line, xin,                       \
-	  lineLen - strlen(line) - 1);	   \
+          lineLen - strlen(line) - 1);     \
                                            \
   fi += l;                                 \
 } while (0)
