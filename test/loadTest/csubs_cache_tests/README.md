@@ -1,13 +1,12 @@
-# Cache refresh Tests
+# Subscriptions Cache refresh Tests
 
-These tests are used to verify that the notifications rate from ContextBroker is similar to the rate received in the listener.
+These scripts are used to verify that the notifications rate from ContextBroker is similar to the rate received in the listener.
 
 
 #### Requirements
 
-- Bash shell (linux)
-- Jmeter (2.11 verson or higher)
-- Python (2.7.x version)
+- Jmeter (2.11 version or higher)
+- http listener (see Notes)
 
 
 #### Architecture for testing
@@ -18,14 +17,27 @@ These tests are used to verify that the notifications rate from ContextBroker is
 - 1 node for launch jmeter
 
 Notes: 
-The listener recommended is the [listen.js](https://github.com/telefonicaid/iotqatools/blob/master/iotqatools/simulators/listen/listen.js) with this config:
+  - The listener recommended is the [listen.js](https://github.com/telefonicaid/iotqatools/blob/master/iotqatools/simulators/listen/listen.js) with this config:
 ```
      node listen.js -a -s1 -p8090 -ds0
 ```
-The `startAgent.sh` of Jmeter must be installed in CB node, for monitoring the CPU, Memory and TCP.
+ - The `startAgent.sh` of Jmeter must be installed in CB node, for monitoring the CPU, Memory and TCP.
 ```
      nohup ./startAgent.sh --udp-port 0 --tcp-port 4444 &
 ```
+  - The ContextBroker configuration recommended:
+```
+	BROKER_EXTRA_OPS="-reqMutexPolicy none -writeConcern 0 -notificationMode threadpool:60000:300 -statTiming -statSemWait -statCounters -statNotifQueue -multiservice -subCacheIval 0 -reqTimeout 50"
+
+```
+
+#### Steps:
+   - drop de database
+   - populate with N entities and subscriptions, with relation 1:1 (jmeter script)
+   - launch the listener (listen.js)
+   - launch the test (jmeter script)
+
+
 
 #### Scripts used:
 
