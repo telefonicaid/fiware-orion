@@ -1013,11 +1013,6 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | house'flat' |
       | house;flat  |
       | house(flat) |
-      | house_?     |
-      | house_&     |
-      | house_/     |
-      | house_#     |
-      | my house    |
 
   @id_pattern_invalid_raw
   Scenario Outline:  try to create an subscription using NGSI v2 with several invalid entities idPattern (integer, boolean, no-string, etc)

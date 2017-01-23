@@ -245,7 +245,6 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | http://localhost\my_path   |
       | http://e34.56.45.34        |
       | http://34,56.45.34         |
-      | http://34.56.45.34;3454    |
       | http://34.56:3454          |
       | http://.                   |
       | http://..                  |
@@ -254,7 +253,6 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | http://??/                 |
       | http://#                   |
       | http://##/                 |
-      | http://foo.bar/foo(bar)baz |
       | http://-error-.invalid/    |
       | http://a.b--c.de/          |
       | http://-a.b.co             |
@@ -267,6 +265,32 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | http://.www.foo.bar/       |
       | http://www.foo.bar./       |
       | http://.www.foo.bar./      |
+
+  @notification_http_url_invalid @BUG_2006 @BUG_2009
+  Scenario Outline:  try to create a new subscription using NGSI v2 with notification http url field invalid values
+    Given  a definition of headers
+      | parameter          | value                            |
+      | Fiware-Service     | test_notification_http_url_error |
+      | Fiware-ServicePath | /test                            |
+      | Content-Type       | application/json                 |
+     # These properties below are used in subscriptions request
+    And properties to subscriptions
+      | parameter             | value                   |
+      | subject_idPattern     | .*                      |
+      | condition_attrs       | temperature             |
+      | notification_http_url | <url>                   |
+      | notification_attrs    | temperature             |
+      | expires               | 2016-04-05T14:00:00.00Z |
+    When create a new subscription
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                    |
+      | error       | BadRequest                               |
+      | description | forbidden characters in http field /url/ |
+    Examples:
+      | url                        |
+      | http://34.56.45.34;3454    |
+      | http://foo.bar/foo(bar)baz |
 
   @notification_http_url_invalid_crash @BUG_2006 @BUG_2092
   Scenario Outline:  try to create a new subscription using NGSI v2 with notification http url field invalid values
