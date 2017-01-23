@@ -754,7 +754,7 @@ static bool updateAttribute
     /* Custom metadata */
     BSONObj    md;
     BSONArray  mdNames;
-    if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2));
+    if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2))
     {
       newAttr.append(ENT_ATTRS_MD, md);
     }
