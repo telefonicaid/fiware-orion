@@ -616,3 +616,44 @@ Feature: get common metrics in Context Broker
     When get common metrics
     And verify that receive an "OK" http code
     Then verify that incoming Transactions are "10" by "default-service" service and "root-subserv" subservice
+
+  # generals
+  @version
+  Scenario: get common metrics using the version (GET) requests and several services and subservices in Context Broker
+    Given send a version request
+    And verify that receive an "OK" http code
+    And send a version request
+    And verify that receive an "OK" http code
+    When get common metrics
+    And verify that receive an "OK" http code
+    Then verify that incoming Transactions are "13" by "default-service" service and "root-subserv" subservice
+
+  @statistics
+  Scenario: get common metrics using the statistics (GET) requests and several services and subservices in Context Broker
+    Given send a statistics request
+    And verify that receive an "OK" http code
+    And send a statistics request
+    And verify that receive an "OK" http code
+    When get common metrics
+    And verify that receive an "OK" http code
+    Then verify that incoming Transactions are "16" by "default-service" service and "root-subserv" subservice
+
+ @cache_statistics
+  Scenario: get common metrics using the cache statistics (GET) requests and several services and subservices in Context Broker
+    Given send a cache statistics request
+    And verify that receive an "OK" http code
+    And send a cache statistics request
+    And verify that receive an "OK" http code
+    When get common metrics
+    And verify that receive an "OK" http code
+    Then verify that incoming Transactions are "19" by "default-service" service and "root-subserv" subservice
+
+ @entry_point
+  Scenario: get common metrics using the API entry point (GET) requests and several services and subservices in Context Broker
+    Given send a API entry point request
+    And verify that receive an "OK" http code
+    And send a API entry point request
+    And verify that receive an "OK" http code
+    When get common metrics
+    And verify that receive an "OK" http code
+    Then verify that incoming Transactions are "22" by "default-service" service and "root-subserv" subservice
