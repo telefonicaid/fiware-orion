@@ -606,7 +606,7 @@ Feature: get common metrics in Context Broker
 
   # log level
   @log_level
-  Scenario: get common metrics using the log level (POST and GET) requests and several services and subservices in Context Broker
+  Scenario: get common metrics with reset parameter using the log level (POST and GET) requests and several services and subservices in Context Broker
     Given change the log level
       | parameter | value |
       | level     | INFO  |
@@ -614,46 +614,56 @@ Feature: get common metrics in Context Broker
     And retrieve the log level
     And verify that receive an "OK" http code
     When get common metrics
+      | parameter | value |
+      | reset     | true  |
     And verify that receive an "OK" http code
     Then verify that incoming Transactions are "10" by "default-service" service and "root-subserv" subservice
 
   # generals
   @version
-  Scenario: get common metrics using the version (GET) requests and several services and subservices in Context Broker
+  Scenario: get common metrics with reset parameter using the version (GET) requests and several services and subservices in Context Broker
     Given send a version request
     And verify that receive an "OK" http code
     And send a version request
     And verify that receive an "OK" http code
     When get common metrics
+      | parameter | value |
+      | reset     | true  |
     And verify that receive an "OK" http code
-    Then verify that incoming Transactions are "13" by "default-service" service and "root-subserv" subservice
+    Then verify that incoming Transactions are "3" by "default-service" service and "root-subserv" subservice
 
   @statistics
-  Scenario: get common metrics using the statistics (GET) requests and several services and subservices in Context Broker
+  Scenario: get common metrics with reset parameter using the statistics (GET) requests and several services and subservices in Context Broker
     Given send a statistics request
     And verify that receive an "OK" http code
     And send a statistics request
     And verify that receive an "OK" http code
     When get common metrics
+      | parameter | value |
+      | reset     | true  |
     And verify that receive an "OK" http code
-    Then verify that incoming Transactions are "16" by "default-service" service and "root-subserv" subservice
+    Then verify that incoming Transactions are "3" by "default-service" service and "root-subserv" subservice
 
- @cache_statistics
-  Scenario: get common metrics using the cache statistics (GET) requests and several services and subservices in Context Broker
+  @cache_statistics
+  Scenario: get common metrics with reset parameter using the cache statistics (GET) requests and several services and subservices in Context Broker
     Given send a cache statistics request
     And verify that receive an "OK" http code
     And send a cache statistics request
     And verify that receive an "OK" http code
     When get common metrics
+      | parameter | value |
+      | reset     | true  |
     And verify that receive an "OK" http code
-    Then verify that incoming Transactions are "19" by "default-service" service and "root-subserv" subservice
+    Then verify that incoming Transactions are "3" by "default-service" service and "root-subserv" subservice
 
- @entry_point
-  Scenario: get common metrics using the API entry point (GET) requests and several services and subservices in Context Broker
+  @entry_point
+  Scenario: get common metrics with reset parameter using the API entry point (GET) requests and several services and subservices in Context Broker
     Given send a API entry point request
     And verify that receive an "OK" http code
     And send a API entry point request
     And verify that receive an "OK" http code
     When get common metrics
+      | parameter | value |
+      | reset     | true  |
     And verify that receive an "OK" http code
-    Then verify that incoming Transactions are "22" by "default-service" service and "root-subserv" subservice
+    Then verify that incoming Transactions are "3" by "default-service" service and "root-subserv" subservice
