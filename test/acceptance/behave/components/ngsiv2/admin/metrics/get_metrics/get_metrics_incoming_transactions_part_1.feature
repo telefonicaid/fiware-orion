@@ -1198,3 +1198,12 @@ Feature: get common metrics in Context Broker
     And verify that receive an "OK" http code
     Then verify that incoming Transactions are "48,49" by "test_incomingTransactions_1" service and "test,root-subserv" subservice
     And verify that incoming Transactions are "50" by "test_incomingTransactions_2" service and "root-subserv" subservice
+
+  # remove metrics
+  @version @BUG_2846 @skip
+  Scenario: get common metrics with reset parameter using the version (GET) requests and several services and subservices in Context Broker
+    Given delete common metrics
+    And verify that receive an "No Content" http code
+    When get common metrics
+    And verify that receive an "OK" http code
+    Then verify that incoming Transactions are "1" by "default-service" service and "root-subserv" subservice

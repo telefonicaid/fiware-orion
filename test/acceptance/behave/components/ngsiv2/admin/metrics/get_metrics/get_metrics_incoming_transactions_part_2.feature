@@ -604,6 +604,7 @@ Feature: get common metrics in Context Broker
       | operation |
       | APPEND    |
 
+  # reset metrics
   # log level
   @log_level
   Scenario: get common metrics with reset parameter using the log level (POST and GET) requests and several services and subservices in Context Broker
@@ -620,7 +621,7 @@ Feature: get common metrics in Context Broker
     Then verify that incoming Transactions are "10" by "default-service" service and "root-subserv" subservice
 
   # generals
-  @version
+  @version @BUG_2846 @skip
   Scenario: get common metrics with reset parameter using the version (GET) requests and several services and subservices in Context Broker
     Given send a version request
     And verify that receive an "OK" http code
@@ -632,7 +633,7 @@ Feature: get common metrics in Context Broker
     And verify that receive an "OK" http code
     Then verify that incoming Transactions are "3" by "default-service" service and "root-subserv" subservice
 
-  @statistics
+  @statistics @BUG_2846 @skip
   Scenario: get common metrics with reset parameter using the statistics (GET) requests and several services and subservices in Context Broker
     Given send a statistics request
     And verify that receive an "OK" http code
@@ -644,7 +645,7 @@ Feature: get common metrics in Context Broker
     And verify that receive an "OK" http code
     Then verify that incoming Transactions are "3" by "default-service" service and "root-subserv" subservice
 
-  @cache_statistics
+  @cache_statistics @BUG_2846 @skip
   Scenario: get common metrics with reset parameter using the cache statistics (GET) requests and several services and subservices in Context Broker
     Given send a cache statistics request
     And verify that receive an "OK" http code
@@ -656,7 +657,7 @@ Feature: get common metrics in Context Broker
     And verify that receive an "OK" http code
     Then verify that incoming Transactions are "3" by "default-service" service and "root-subserv" subservice
 
-  @entry_point
+  @entry_point @BUG_2846 @skip
   Scenario: get common metrics with reset parameter using the API entry point (GET) requests and several services and subservices in Context Broker
     Given send a API entry point request
     And verify that receive an "OK" http code
