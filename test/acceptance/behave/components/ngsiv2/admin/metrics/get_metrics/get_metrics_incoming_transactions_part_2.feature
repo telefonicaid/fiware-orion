@@ -607,7 +607,7 @@ Feature: get common metrics in Context Broker
   # reset metrics
   # log level
   @log_level
-  Scenario: get common metrics with reset parameter using the log level (POST and GET) requests and several services and subservices in Context Broker
+  Scenario: get common metrics with reset parameter using the log level (POST and GET) requests
     Given change the log level
       | parameter | value |
       | level     | INFO  |
@@ -622,7 +622,7 @@ Feature: get common metrics in Context Broker
 
   # generals
   @version @BUG_2846 @skip
-  Scenario: get common metrics with reset parameter using the version (GET) requests and several services and subservices in Context Broker
+  Scenario: get common metrics with reset parameter using the version (GET) requests
     Given send a version request
     And verify that receive an "OK" http code
     And send a version request
@@ -634,7 +634,7 @@ Feature: get common metrics in Context Broker
     Then verify that incoming Transactions are "3" by "default-service" service and "root-subserv" subservice
 
   @statistics @BUG_2846 @skip
-  Scenario: get common metrics with reset parameter using the statistics (GET) requests and several services and subservices in Context Broker
+  Scenario: get common metrics with reset parameter using the statistics (GET) requests
     Given send a statistics request
     And verify that receive an "OK" http code
     And send a statistics request
@@ -646,7 +646,7 @@ Feature: get common metrics in Context Broker
     Then verify that incoming Transactions are "3" by "default-service" service and "root-subserv" subservice
 
   @cache_statistics @BUG_2846 @skip
-  Scenario: get common metrics with reset parameter using the cache statistics (GET) requests and several services and subservices in Context Broker
+  Scenario: get common metrics with reset parameter using the cache statistics (GET) requests
     Given send a cache statistics request
     And verify that receive an "OK" http code
     And send a cache statistics request
@@ -658,7 +658,7 @@ Feature: get common metrics in Context Broker
     Then verify that incoming Transactions are "3" by "default-service" service and "root-subserv" subservice
 
   @entry_point @BUG_2846 @skip
-  Scenario: get common metrics with reset parameter using the API entry point (GET) requests and several services and subservices in Context Broker
+  Scenario: get common metrics with reset parameter using the API entry point (GET) requests
     Given send a API entry point request
     And verify that receive an "OK" http code
     And send a API entry point request

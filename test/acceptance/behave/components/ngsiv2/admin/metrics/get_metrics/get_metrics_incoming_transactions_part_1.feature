@@ -1201,7 +1201,7 @@ Feature: get common metrics in Context Broker
 
   # remove metrics
   @version @BUG_2846 @skip
-  Scenario: get common metrics with reset parameter using the version (GET) requests and several services and subservices in Context Broker
+  Scenario: get common metrics after delete metrics (DELETE) requests
     Given delete common metrics
     And verify that receive an "No Content" http code
     When get common metrics
