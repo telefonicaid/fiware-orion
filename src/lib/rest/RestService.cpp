@@ -541,6 +541,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_REQ_SIZE, ciP->payloadSize);
       LM_T(LmtPayload, ("Parsing payload '%s'", ciP->payload));
       response = payloadParse(ciP, &parseData, &serviceV[ix], &jsonReqP, &jsonRelease, compV);
+      LM_TMP(("jsonRelease at %p", jsonRelease));
       LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
 
       if (response != "OK")
@@ -620,18 +621,23 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       alarmMgr.badInputReset(clientIp);
     }
 
+    LM_TMP(("Calling treat function"));
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
-
+    LM_TMP(("After treat function - calling filterRelease"));
     filterRelease(&parseData, serviceV[ix].request);   
+    LM_TMP(("After filterRelease"));
 
     if (jsonReqP != NULL)
     {
+      LM_TMP(("Calling jsonReqP->release"));
       jsonReqP->release(&parseData);
     }
 
     if (ciP->apiVersion == V2)
     {
+      LM_TMP(("Calling delayedRelease"));
       delayedRelease(&jsonRelease);
+      LM_TMP(("After delayedRelease"));
     }
 
     compV.clear();
@@ -641,6 +647,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       orionExitFunction(0, "Received a 'DIE' request on REST interface");
     }
 
+    LM_TMP(("Calling restReply"));
     restReply(ciP, response);
     return response;
   }
