@@ -15,6 +15,7 @@
 - Fix: NGSIv1 updateContext APPEND on existing geo:point attributes (and probably other geo: attributes) failing to update location (#2770)
 - Fix: bug when tenants are over 44 bytes long (#2811)
 - Add: Support for null values in string filters (#2359)
+- Fix: pattern matching in q/mq: pattern is always a string (#2226)
 - Fix: Partial sanity check for custon url, only if the url contains no replacements using ${xxx} (#2280, #2279)
 - Fix: if entity::type is given but as an empty string, in payload of POST /v2/subscriptions or PATCH /v2/subscriptions/{sub}, an error is returned (#1985)
 - Fix: more intelligent, quote-aware, operator lookup inside q/mq string filters (#2452)

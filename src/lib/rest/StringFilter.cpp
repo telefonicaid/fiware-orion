@@ -586,6 +586,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   lhs  = wsStrip(lhs);
   rhs  = wsStrip(rhs);
 
+
   //
   // Check for invalid LHS
   // LHS can be empty ONLY if UNARY OP, i.e. SfopNotExists OR SfopExists
@@ -633,7 +634,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     return false;
   }
 
-
   //
   // Now, the right-hand-side, is it a RANGE, a LIST, a SIMPLE VALUE, or an attribute name?
   // And, what type of values?
@@ -657,6 +657,33 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
         return false;
       }
     }
+  }
+  else if (op == SfopMatchPattern)
+  {
+    //
+    // RHS is a forced string for ~=
+    // forbiddenChars to run over the entire RHS, no exceptions
+    //
+    if (forbiddenChars(rhs, ""))
+    {
+      *errorStringP = std::string("forbidden characters in String Filter");
+      free(toFree);
+      return false;
+    }
+
+    valueType   = SfvtString;
+    stringValue = rhs;
+
+    //
+    // Can't call valueParse here, as the forced valueType 'SfvtString' will be knocked back to its 'default'.
+    // So, instead we just perform the part of SfopMatchPattern of valueParse
+    //
+    if (regcomp(&patternValue, stringValue.c_str(), REG_EXTENDED) != 0)
+    {
+      *errorStringP = std::string("error compiling filter regex: '") + stringValue + "'";
+      return false;
+    }
+    compiledPattern = true;
   }
   else
   {
