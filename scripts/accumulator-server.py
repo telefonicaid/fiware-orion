@@ -35,6 +35,7 @@ __author__ = 'fermin'
 # * Curl users: use -H "Content-Type: application/xml"  for XML payload (the default:
 #   "Content-Type: application/x-www-form-urlencoded" has been problematic in the pass)
 
+from OpenSSL import SSL
 from flask import Flask, request, Response
 from getopt import getopt, GetoptError
 from datetime import datetime
@@ -74,6 +75,7 @@ def usage():
     print "  --port <port>: port to use (default is 1028)"
     print "  --url <server url>: server URL to use (default is /accumulate)"
     print "  --pretty-print: pretty print mode"
+    print "  --https: start in https"
     print "  -v: verbose mode"
     print "  -u: print this usage message"
 
@@ -88,9 +90,10 @@ host       = '0.0.0.0'
 server_url = '/accumulate'
 verbose    = 0
 pretty     = False
+https      = False
 
 try:
-    opts, args = getopt(sys.argv[1:], 'vu', ['host=', 'port=', 'url=', 'pretty-print' ])
+    opts, args = getopt(sys.argv[1:], 'vu', ['host=', 'port=', 'url=', 'pretty-print', 'https' ])
 except GetoptError:
     usage_and_exit('wrong parameter')
 
@@ -111,6 +114,8 @@ for opt, arg in opts:
         verbose = 1
     elif opt == '--pretty-print':
         pretty = True
+    elif opt == '--https':
+        https = True
     else:
         usage_and_exit()
 
@@ -120,6 +125,7 @@ if verbose:
     print "host: " + str(host)
     print "server_url: " + str(server_url)
     print "pretty: " + str(pretty)
+    print "https: " + str(https)
 
 pid     = str(os.getpid())
 pidfile = "/tmp/accumulator." + str(port) + ".pid"
@@ -298,4 +304,11 @@ if __name__ == '__main__':
     # Note that using debug=True breaks the the procedure to write the PID into a file. In particular
     # makes the calle os.path.isfile(pidfile) return True, even if the file doesn't exist. Thus,
     # use debug=True below with care :)
-    app.run(host=host, port=port)
+    if (https):
+      context = SSL.Context(SSL.SSLv23_METHOD)
+      # FIXME PR: unhardwire files
+      context.use_privatekey_file('domain.key')
+      context.use_certificate_file('domain.crt')
+      app.run(host=host, port=port, debug=False, ssl_context=context)
+    else:
+      app.run(host=host, port=port)

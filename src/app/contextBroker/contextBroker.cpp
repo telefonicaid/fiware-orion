@@ -60,6 +60,7 @@
 #include <sys/stat.h>
 #include <signal.h>
 #include <curl/curl.h>
+#include <openssl/ssl.h>
 #include <string>
 #include <vector>
 #include <limits.h>
@@ -1738,10 +1739,19 @@ int main(int argC, char* argV[])
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
   mongoInit(dbHost, rplSet, dbName, user, pwd, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   contextBrokerInit(dbName, mtenant);
-  curl_global_init(CURL_GLOBAL_NOTHING);
   alarmMgr.init(relogAlarms);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
+
+  // According to http://stackoverflow.com/questions/28048885/initializing-ssl-and-libcurl-and-getting-out-of-memory/37295100,
+  // openSSL library needs to be initialized with SSL_library_init() before any use of it by other the other libraries
+  SSL_library_init();
+
+  // Startup libcurl
+  if (curl_global_init(CURL_GLOBAL_SSL) != 0)
+  {
+    LM_X(1, ("Fatal Error (could not init libcurl)"));
+  }
 
   if (rush[0] != 0)
   {
