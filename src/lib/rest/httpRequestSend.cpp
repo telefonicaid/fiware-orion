@@ -534,9 +534,11 @@ int httpRequestSendWithCurl
   }
   url = protocol + "//" + url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
 
-  // FIXME PR: I wonder if these next two should be disabled by default.
-  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); // ignore self-signed certificates for SSL end-points
-  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+  if (acceptSelfSignedCert)
+  {
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); // ignore self-signed certificates for SSL end-points
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+  }
 
   // Prepare CURL handle with obtained options
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());

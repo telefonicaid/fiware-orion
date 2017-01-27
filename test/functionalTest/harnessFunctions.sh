@@ -676,9 +676,32 @@ function accumulatorStop()
 #
 function accumulatorStart()
 {
+  # FIXME P6: note that due to the way argument processing work, the arguments have to be
+  # in a fixed order in the .test, i.e.: --pretty-print, --https, --key, --cert
+
   if [ "$1" = "--pretty-print" ]
   then
     pretty="$1"
+    shift
+  fi
+
+  if [ "$1" = "--https" ]
+  then
+    https="$1"
+    shift
+  fi
+
+  if [ "$1" = "--key" ]
+  then
+    key="$1 $2"
+    shift
+    shift
+  fi
+
+  if [ "$1" = "--cert" ]
+  then
+    cert="$1 $2"
+    shift
     shift
   fi
 
@@ -698,7 +721,7 @@ function accumulatorStart()
 
   accumulatorStop $port
 
-  accumulator-server.py --port $port --url /notify --host $bindIp $pretty > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+  accumulator-server.py --port $port --url /notify --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
   echo accumulator running as PID $$
 
   # Wait until accumulator has started or we have waited a given maximum time
@@ -729,14 +752,27 @@ function accumulatorStart()
 #
 function accumulatorDump()
 {
+  # FIXME P6: Argument processing in this is ugly... needs a cleanup
+
   valgrindSleep 2
 
   if [ "$1" == "IPV6" ]
   then
-    curl -g [::1]:${LISTENER_PORT}/dump -s -S 2> /dev/null
+    url="[::1]:${LISTENER_PORT}/dump"
+    g_flag="-g"
   else
-    curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+    url="localhost:${LISTENER_PORT}/dump"
   fi
+
+  if [ "$2" == "HTTPS" ]
+  then
+    schema="https://"
+    k_flag="-k"
+  else
+    schema="http://"
+  fi
+
+  curl $k_flag $g_flag $schema$url -s -S 2> /dev/null
 }
 
 

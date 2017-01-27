@@ -140,6 +140,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
 
     params->ip               = host;
     params->port             = port;
+    params->protocol         = protocol;
     params->verb             = "POST";
     params->tenant           = tenant;
     params->resource         = uriPath;   

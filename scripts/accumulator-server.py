@@ -76,6 +76,8 @@ def usage():
     print "  --url <server url>: server URL to use (default is /accumulate)"
     print "  --pretty-print: pretty print mode"
     print "  --https: start in https"
+    print "  --key: key file (only used if https is enabled)"
+    print "  --cert: cert file (only used if https is enabled)"
     print "  -v: verbose mode"
     print "  -u: print this usage message"
 
@@ -91,9 +93,11 @@ server_url = '/accumulate'
 verbose    = 0
 pretty     = False
 https      = False
+key_file   = None
+cert_file  = None
 
 try:
-    opts, args = getopt(sys.argv[1:], 'vu', ['host=', 'port=', 'url=', 'pretty-print', 'https' ])
+    opts, args = getopt(sys.argv[1:], 'vu', ['host=', 'port=', 'url=', 'pretty-print', 'https', 'key=', 'cert=' ])
 except GetoptError:
     usage_and_exit('wrong parameter')
 
@@ -116,8 +120,17 @@ for opt, arg in opts:
         pretty = True
     elif opt == '--https':
         https = True
+    elif opt == '--key':
+        key_file = arg
+    elif opt == '--cert':
+        cert_file = arg
     else:
         usage_and_exit()
+
+if https:
+    if key_file is None or cert_file is None:
+        print "if --https is used then you have to provide --key and --cert"
+        os.exit(1)
 
 if verbose:
     print "verbose mode is on"
@@ -126,6 +139,8 @@ if verbose:
     print "server_url: " + str(server_url)
     print "pretty: " + str(pretty)
     print "https: " + str(https)
+    print "key file: " + key_file
+    print "cert file: " + cert_file
 
 pid     = str(os.getpid())
 pidfile = "/tmp/accumulator." + str(port) + ".pid"
@@ -306,9 +321,8 @@ if __name__ == '__main__':
     # use debug=True below with care :)
     if (https):
       context = SSL.Context(SSL.SSLv23_METHOD)
-      # FIXME PR: unhardwire files
-      context.use_privatekey_file('domain.key')
-      context.use_certificate_file('domain.crt')
+      context.use_privatekey_file(key_file)
+      context.use_certificate_file(cert_file)
       app.run(host=host, port=port, debug=False, ssl_context=context)
     else:
       app.run(host=host, port=port)
