@@ -621,6 +621,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     }
 
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
+
     filterRelease(&parseData, serviceV[ix].request);   
 
     if (jsonReqP != NULL)
