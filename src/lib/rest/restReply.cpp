@@ -85,10 +85,8 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_RESP_SIZE, answerLen);
   }
 
-  LM_TMP(("%d headers for response", ciP->httpHeader.size()));
   for (unsigned int hIx = 0; hIx < ciP->httpHeader.size(); ++hIx)
   {
-    LM_TMP(("header %d: '%s': '%s'", hIx, ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str()));
     MHD_add_response_header(response, ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str());
   }
 
@@ -119,7 +117,6 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     }
   }
 
-  LM_TMP(("Queueing response with ciP->httpStatusCode %d", ciP->httpStatusCode));
   MHD_queue_response(ciP->connection, ciP->httpStatusCode, response);
   MHD_destroy_response(response);
 }

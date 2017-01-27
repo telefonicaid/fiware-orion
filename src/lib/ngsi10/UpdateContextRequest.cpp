@@ -116,7 +116,6 @@ std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject
 */
 void UpdateContextRequest::release(void)
 {
-  LM_TMP(("Releasing a contextElementVector with %d items", contextElementVector.size()));
   contextElementVector.release();
 }
 
@@ -289,13 +288,11 @@ void UpdateContextRequest::fill
 void UpdateContextRequest::fill(const Entity* entP, const std::string& _updateActionType)
 {
   ContextElement*  ceP = new ContextElement(entP->id, entP->type, "false");
-  LM_TMP(("new ContextElement at %p", ceP));
 
   ceP->contextAttributeVector.fill((ContextAttributeVector*) &entP->attributeVector);
 
   contextElementVector.push_back(ceP);
   updateActionType.set(_updateActionType);
-  LM_TMP((" ContextElement pushed to contextElementVector"));
 }
 
 
