@@ -586,9 +586,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   lhs  = wsStrip(lhs);
   rhs  = wsStrip(rhs);
 
-  LM_TMP(("lhs is:     '%s'", lhs));
-  LM_TMP(("operator is '%s'", opName()));
-  LM_TMP(("rhs is:     '%s'", rhs));
 
   //
   // Check for invalid LHS
@@ -637,7 +634,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     return false;
   }
 
-  LM_TMP(("RHS: --%s--", rhs));
   //
   // Now, the right-hand-side, is it a RANGE, a LIST, a SIMPLE VALUE, or an attribute name?
   // And, what type of values?
@@ -677,7 +673,17 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
 
     valueType   = SfvtString;
     stringValue = rhs;
-    LM_TMP(("Set valueType to SfvtString and stringValue to '%s' for RHS of ~=", stringValue.c_str()));
+
+    //
+    // Can't call valueParse here, as the forced valueType 'SfvtString' will be knocked back to its 'default'.
+    // So, instead we just perform the part of SfopMatchPattern of valueParse
+    //
+    if (regcomp(&patternValue, stringValue.c_str(), REG_EXTENDED) != 0)
+    {
+      *errorStringP = std::string("error compiling filter regex: '") + stringValue + "'";
+      return false;
+    }
+    compiledPattern = true;
   }
   else
   {
@@ -1981,7 +1987,6 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     case SfopMatchPattern:
       if (itemP->valueType != SfvtString)
       {
-        LM_TMP(("Skipping filter as 'Pattern filter only makes sense with string value' - BUG"));
         // Pattern filter only makes sense with string value
         continue;
       }
