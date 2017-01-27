@@ -129,12 +129,12 @@ following CLI parameters (see details in the corresponding document):
   thread pool is used (`poll()`). Some performance information regarding this can be found in [the documentation of the
   HTTP server library itself](https://www.gnu.org/software/libmicrohttpd/manual/libmicrohttpd.html#Thread-modes-and-event-loops).
 
-* **reqTimeout**. The inactivity timeout in seconds before a connection is closed. Default value is 0 seconds, which means
-infinity. This is the recommended behaviour and setting it to a non-infinite timeout could cause Orion to close the connection
-before completing the request (e.g. a query request involving several CPrs forwards can take a long time). This could be
-considered an "HTTP-unpolite" behaviour from the point of view of the server (Orion) given that, in this case, it should be the
-client the one to close the connection if it doesn't want to wait. However, this parameter could be used to limit resource
-consumption at server side (Orion). Use it with care.
+* **reqTimeout**. The inactivity timeout in seconds before a connection is closed. Default value is 0 seconds, 
+which means infinity. This is the recommended behaviour and setting it to a non-infinite timeout could cause Orion 
+to close the connection before completing the request (e.g. a query request involving several CPr forwards can 
+take a long time). This could be considered an "HTTP-unpolite" behaviour from the point of view of the server 
+(Orion) given that, in this case, it should be the client the one to close the connection if it doesn't want to 
+wait. However, this parameter could be used to limit resource consumption at server side (Orion). Use it with care.
 
 Given that thread creation and destruction are costly operations, it is recommend to use `-reqPoolSize` in
 high load scenarios. In particular, according to [MHD feedback](http://lists.gnu.org/archive/html/libmicrohttpd/2016-12/msg00023.html),
