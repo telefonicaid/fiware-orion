@@ -81,8 +81,8 @@ accumulatorDump IPV4 HTTPS
 echo
 echo
 
-# Note the REGEX(given|known) in the REGEXPECT part for step 4. This is due to the log message is slightly different
-# depending on libcurl version, some ones (newers) use "given" some others (older) use "known"
+# Note the REGEX(given|known) in the REGEXPECT part for step 4. This is due to that the log message is slightly different
+# depending on the libcurl version, some versions (newer ones) use "given" while other (older versions) use "known"
 
 echo "04. Look in the CB log for the warning about cert not accepted"
 echo "=============================================================="
