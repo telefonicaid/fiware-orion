@@ -442,9 +442,7 @@ std::string MetricsManager::_toJson(void)
     }
 
     subServiceTop.addRaw("subservs", jhSubService.str());
-
     std::string serviceSumString = metricsRender(&serviceSum);
-
     subServiceTop.addRaw("sum", serviceSumString);
 
     if (service != "")

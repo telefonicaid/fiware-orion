@@ -34,6 +34,7 @@
 
 #include "common/string.h"
 #include "common/wsStrip.h"
+#include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 
 
@@ -213,6 +214,68 @@ int stringSplit(const std::string& in, char delimiter, std::vector<std::string>&
 
 
 
+/* *****************************************************************************
+*
+* hostnameIsValid - check a hostname for validity
+*
+* See https://en.wikipedia.org/wiki/Hostname
+*/
+static bool hostnameIsValid(const char* hostname)
+{
+  if (strchr(hostname, ':') != NULL)  // hostname contains a ':' ?
+  {
+    //
+    // Looks like a numerical IPv6 address.
+    // That requires a different approach for validity check
+    //
+    // FIXME P4: Implement validity check of numerical IPv6 addresses.
+    //
+    return true;
+  }
+
+  int len = strlen(hostname);
+
+  if (len > 253)  // Max length is 253 chars
+  {
+    return false;
+  }
+
+  if (*hostname == '.')  // Cannot start with a dot
+  {
+    return false;
+  }
+
+  if (hostname[len - 1] == '.')  // Cannot end in a dot
+  {
+    return false;
+  }
+
+  if (strstr(hostname, "..") != NULL)  // Cannot contain two consecutive dots
+  {
+    return false;
+  }
+
+
+  char* hNameP = (char*) hostname;
+  while (*hNameP != 0)
+  {
+    if      ((*hNameP == '.') || (*hNameP == '-'))  {}  // OK single dot or a hyphen
+    else if ((*hNameP >= 'a') && (*hNameP <= 'z'))  {}  // OK a-c
+    else if ((*hNameP >= 'A') && (*hNameP <= 'Z'))  {}  // OK: A-Z
+    else if ((*hNameP >= '0') && (*hNameP <= '9'))  {}  // OK: 0-9
+    else                                                // NOT OK - forbidden character in hostname
+    {
+      return false;
+    }
+    
+    ++hNameP;
+  }
+
+  return true;
+}
+
+
+
 /* ****************************************************************************
 *
 * parseUrl - parse a URL and return its pieces
@@ -281,8 +344,8 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
   path = "";
   //
-  // Note that components could be 3, in which case we don't enter in the for. This is
-  // the case of URL without '/' like eg. "http://www.google.com"
+  // Note that components could be 3, in which case we don't enter the for-loop. This is
+  // the case of URL without '/' like "http://www.google.com"
   //
   for (int ix = 3; ix < components; ++ix)
   {
@@ -345,6 +408,21 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
     }
   }
 
+  //
+  // Is 'port' a valid number?
+  // MAX_PORT is the maximum number that a port can have.
+  // Negative port numbers cannot exist and 0 is reserved.
+  //
+  if ((port > MAX_PORT) || (port <= 0))
+  {
+    return false;
+  }
+
+  if (hostnameIsValid(host.c_str()) == false)
+  {
+    return false;
+  }
+
   return true;
 }
 
@@ -375,6 +453,7 @@ char* i2s(int i, char* placeholder, int placeholderSize)
   snprintf(placeholder, placeholderSize, "%d", i);
   return placeholder;
 }
+
 
 
 /* ****************************************************************************
