@@ -441,24 +441,17 @@ std::string MetricsManager::_toJson(void)
       }
     }
 
-    std::string subService = jhSubService.str();
-    LM_TMP(("subService: %s", subService.c_str()));
-    if (subService != "{}")
+    subServiceTop.addRaw("subservs", jhSubService.str());
+    std::string serviceSumString = metricsRender(&serviceSum);
+    subServiceTop.addRaw("sum", serviceSumString);
+
+    if (service != "")
     {
-      subServiceTop.addRaw("subservs", jhSubService.str());
-
-      std::string serviceSumString = metricsRender(&serviceSum);
-
-      subServiceTop.addRaw("sum", serviceSumString);
-
-      if (service != "")
-      {
-        services.addRaw(service, subServiceTop.str());
-      }
-      else
-      {
-        services.addRaw(DEFAULT_SERVICE_KEY_FOR_METRICS, subServiceTop.str());
-      }
+      services.addRaw(service, subServiceTop.str());
+    }
+    else
+    {
+      services.addRaw(DEFAULT_SERVICE_KEY_FOR_METRICS, subServiceTop.str());
     }
   }
 
