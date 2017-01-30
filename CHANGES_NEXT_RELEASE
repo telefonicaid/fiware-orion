@@ -2,7 +2,6 @@
 - Add: new option to set the timeout for REST request: -reqTimeout (#2762)
 - Fix: modified the upper limit for CLI '-maxConnections', from 1020 to UNLIMITED
 - Fix: proper 500 Internal Server Error response with descriptive text when "sort fail" at DB occur (#2752)
-- Fix: avoid to present empty metrics for services (#2846)
 - Fix: giving a descriptive response with payload, without reading the request for too big payloads (#2761)
 - Fix: check for forbidden chars in entity type and id in POST /v2/op/query request (#2819)
 - Fix: removed check for forbidden chars in URI param typePattern (#2819)
