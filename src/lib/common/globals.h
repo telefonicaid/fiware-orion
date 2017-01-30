@@ -219,7 +219,7 @@ extern bool               notifQueueStatistics;
 extern bool               checkIdv1;
 extern bool               disableCusNotif;
 
-extern bool               acceptSelfSignedCert;
+extern bool               insecureNotif;
 
 
 

@@ -534,7 +534,7 @@ int httpRequestSendWithCurl
   }
   url = protocol + "//" + url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
 
-  if (acceptSelfSignedCert)
+  if (insecureNotif)
   {
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); // ignore self-signed certificates for SSL end-points
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);

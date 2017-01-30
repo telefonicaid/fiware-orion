@@ -87,6 +87,6 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-disableCustomNotifications' (disable NGSIv2 custom notifications)]
                       [option '-logForHumans' (human readible log to screen)]
                       [option '-disableMetrics' (turn off the 'metrics' feature)]
-                      [option '-acceptSelfSignedCert' (accept self signed certificate when used by HTTPS notification endpoints)]
+                      [option '-insecureNotif' (allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates)]
 
 --TEARDOWN--

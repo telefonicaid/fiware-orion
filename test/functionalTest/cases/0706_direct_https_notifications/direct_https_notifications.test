@@ -27,7 +27,7 @@ Direct HTTP notification (accepting self signed certs)
 ${SCRIPT_HOME}/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName /tmp/harnessTest.pem
 
 dbInit CB
-brokerStart CB 0 IPV4 -acceptSelfSignedCert
+brokerStart CB 0 IPV4 -insecureNotif
 accumulatorStart --pretty-print --https --key /tmp/harnessTest.key --cert /tmp/harnessTest.pem
 
 --SHELL--

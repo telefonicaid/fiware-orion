@@ -278,7 +278,7 @@ bool            disableCusNotif;
 bool            logForHumans;
 bool            disableMetrics;
 int             reqTimeout;
-bool            acceptSelfSignedCert;
+bool            insecureNotif;
 
 
 
@@ -335,7 +335,7 @@ bool            acceptSelfSignedCert;
 #define LOG_FOR_HUMANS_DESC    "human readible log to screen"
 #define METRICS_DESC           "turn off the 'metrics' feature"
 #define REQ_TMO_DESC           "connection timeout for REST requests (in seconds)"
-#define SELF_SIGNED_CRT_DESC   "accept self signed certificate when used by HTTPS notification endpoints"
+#define INSECURE_NOTIF         "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
 
 
 
@@ -404,7 +404,7 @@ PaArgument paArgs[] =
   { "-logForHumans",   &logForHumans,    "LOG_FOR_HUMANS",     PaBool, PaOpt, false, false, true,             LOG_FOR_HUMANS_DESC },
   { "-disableMetrics", &disableMetrics,  "DISABLE_METRICS",    PaBool, PaOpt, false, false, true,             METRICS_DESC        },
 
-  { "-acceptSelfSignedCert", &acceptSelfSignedCert, "ACCEPT_SELF_SIGNED_CRT", PaBool, PaOpt, false, false, true, SELF_SIGNED_CRT_DESC },
+  { "-insecureNotif", &insecureNotif, "INSECURE_NOTIF", PaBool, PaOpt, false, false, true, INSECURE_NOTIF },
 
   PA_END_OF_ARGS
 };
