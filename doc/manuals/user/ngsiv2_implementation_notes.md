@@ -12,6 +12,8 @@
 * [`actionType` metadata](#actiontype-metadata)
 * [`noAttrDetail` option](#noattrdetail-option)
 * [Notification throttling](#notification-throttling)
+* [Ordering between:$
+ different attribute value types](#ordering-between-different-attribute-value-types)
 * [Deprecated features](#deprecated-features)
 
 This document describes some considerations to take into account
@@ -209,6 +211,29 @@ In addition, Orion implements throttling in a local way. In multi-CB configurati
 measure is local to each Orion node. Although each node periodically synchronizes with the DB in order to get potencially newer
 values (more on this [here](perf_tuning.md#subscription-cache)) it may happen that a particular node has an old value, so throttling
 is not 100% accurate.
+
+[Top](#top)
+
+## Ordering between different attribute value types
+
+From NGISv2 specification "Ordering Results" section:
+
+> Operations that retrieve lists of entities permit the `orderBy` URI parameter to specify 
+> the attributes or properties to be be used as criteria when ordering results
+
+It is an implementation aspect how each type orders regarding others. In the case of Orion,
+we use the same criteria than the one used by the underlying implementation (MongoDB). See
+[the following link](https://docs.mongodb.com/manual/reference/method/cursor.sort/#ascending-descending-sort) 
+for details.
+
+From lowest to highest:
+
+1. Null
+2. Number
+3. String
+4. Object
+5. Array
+6. Boolean
 
 [Top](#top)
 
