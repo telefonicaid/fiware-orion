@@ -28,13 +28,13 @@
 #include <string>
 #include <vector>
 #include <math.h>    // modf
-#include <values.h>  // MAXSHORT
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "common/string.h"
 #include "common/wsStrip.h"
+#include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 
 
@@ -222,6 +222,17 @@ int stringSplit(const std::string& in, char delimiter, std::vector<std::string>&
 */
 static bool hostnameIsValid(const char* hostname)
 {
+  if (strchr(hostname, ':') != NULL)  // hostname contains a ':' ?
+  {
+    //
+    // Looks like a numerical IPv6 address.
+    // That requires a different approach for validity check
+    //
+    // FIXME P4: Implement validity check of numerical IPv6 addresses.
+    //
+    return true;
+  }
+
   int len = strlen(hostname);
 
   if (len > 253)  // Max length is 253 chars
@@ -399,10 +410,10 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
   //
   // Is 'port' a valid number?
-  // Remember the port is really an 'unsigned short', so numbers over MAXSHORT (0xFFFF) are
-  // not valid. Negative port numbers cannot exist and 0 is reserved.
+  // MAX_PORT is the maximum number that a port can have.
+  // Negative port numbers cannot exist and 0 is reserved.
   //
-  if ((port > MAXSHORT) || (port <= 0))
+  if ((port > MAX_PORT) || (port <= 0))
   {
     return false;
   }
