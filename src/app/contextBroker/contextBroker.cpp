@@ -1742,7 +1742,6 @@ int main(int argC, char* argV[])
   SemOpType policy = policyGet(reqMutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
   mongoInit(dbHost, rplSet, dbName, user, pwd, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
-  contextBrokerInit(dbName, mtenant);
   alarmMgr.init(relogAlarms);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
@@ -1782,6 +1781,11 @@ int main(int argC, char* argV[])
   {
     LM_T(LmtSubCache, ("noCache == false"));
   }
+
+  // Given that contextBrokerInit() may create thread (in the threadpool notification mode,
+  // it has to be done before curl_global_init(), see https://curl.haxx.se/libcurl/c/threaded-ssl.html
+  // Otherwise, we have empirically checked that CB may randomly crash
+  contextBrokerInit(dbName, mtenant);
 
   if (https)
   {
