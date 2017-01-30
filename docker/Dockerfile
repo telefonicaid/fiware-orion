@@ -19,6 +19,7 @@ RUN \
       gnutls-devel \
       libgcrypt-devel \
       libcurl-devel \
+      openssl-devel \
       libuuid-devel \
       make \
       nc \

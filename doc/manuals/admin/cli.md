@@ -157,3 +157,5 @@ The list of available options is the following:
 -   **-logForHumans**. To make the traces to standard out formated for humans (note that the traces in the log file are not affected)
 -   **-disableMetrics**. To turn off the 'metrics' feature. Gathering of metrics is a bit costly, as system calls and semaphores are involved.
     Use this parameter to start the broker without metrics overhead.
+-   **-insecureNotif**. Allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates. This is similar
+    to the `-k` or `--insecure` parameteres of the curl command.
