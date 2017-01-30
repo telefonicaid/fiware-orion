@@ -221,8 +221,8 @@ From NGISv2 specification "Ordering Results" section:
 > Operations that retrieve lists of entities permit the `orderBy` URI parameter to specify 
 > the attributes or properties to be be used as criteria when ordering results
 
-It is an implementation aspect how each type orders regarding others. In the case of Orion,
-we use the same criteria than the one used by the underlying implementation (MongoDB). See
+It is an implementation aspect how each type is ordered with regard to other types. In the case of Orion,
+we use the same criteria as the one used by the underlying implementation (MongoDB). See
 [the following link](https://docs.mongodb.com/manual/reference/method/cursor.sort/#ascending-descending-sort) 
 for details.
 
