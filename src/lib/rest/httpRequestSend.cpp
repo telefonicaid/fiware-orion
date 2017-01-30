@@ -286,7 +286,8 @@ int httpRequestSendWithCurl
     timeoutInMilliseconds = defaultTimeout;
   }
 
-  lmTransactionStart("to", (_protocol + "//").c_str(), + ip.c_str(), port, resource.c_str());
+  std::string protocol = _protocol + "//";
+  lmTransactionStart("to", protocol.c_str(), + ip.c_str(), port, resource.c_str());
 
   // Preconditions check
   if (port == 0)
@@ -372,8 +373,6 @@ int httpRequestSendWithCurl
     useRush = false;
   }
 
-  std::string protocol = _protocol;
-
   if (useRush)
   {
     char         rushHeaderPortAsString[STRING_SIZE_FOR_INT];
@@ -394,10 +393,10 @@ int httpRequestSendWithCurl
                   extraHeaders,
                   usedExtraHeaders);
 
-    if (_protocol == "https:")
+    if (protocol == "https://")
     {
       // "Switching" protocol https -> http is needed in this case, as CB->Rush request will use HTTP
-      protocol = "http:";
+      protocol = "http://";
       headerRushHttp = "X-relayer-protocol: https";
       LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerRushHttp.c_str()));
       httpHeaderAdd(&headers, "X-relayer-protocol", headerRushHttp, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
@@ -532,7 +531,7 @@ int httpRequestSendWithCurl
   {
     url = ip;
   }
-  url = protocol + "//" + url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
+  url = protocol + url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
 
   if (insecureNotif)
   {

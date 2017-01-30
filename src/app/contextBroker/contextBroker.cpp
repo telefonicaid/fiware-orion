@@ -1748,13 +1748,13 @@ int main(int argC, char* argV[])
   logSummaryInit(&lsPeriod);
 
   // According to http://stackoverflow.com/questions/28048885/initializing-ssl-and-libcurl-and-getting-out-of-memory/37295100,
-  // openSSL library needs to be initialized with SSL_library_init() before any use of it by other the other libraries
+  // openSSL library needs to be initialized with SSL_library_init() before any use of it by any other libraries
   SSL_library_init();
 
   // Startup libcurl
   if (curl_global_init(CURL_GLOBAL_SSL) != 0)
   {
-    LM_X(1, ("Fatal Error (could not init libcurl)"));
+    LM_X(1, ("Fatal Error (could not initialize libcurl)"));
   }
 
   if (rush[0] != 0)

@@ -81,9 +81,12 @@ accumulatorDump IPV4 HTTPS
 echo
 echo
 
+# Note the REGEX(given|known) in the REGEXPECT part for step 4. This is due to the log message is slightly different
+# depending on libcurl version, some ones (newers) use "given" some others (older) use "known"
+
 echo "04. Look in the CB log for the warning about cert not accepted"
 echo "=============================================================="
-grep "(curl_easy_perform failed: Peer certificate cannot be authenticated with given CA certificates)" /tmp/contextBroker.log | awk -F "curl_easy_perform" '{ print "(curl_easy_perform" $2 }'
+grep "(curl_easy_perform failed: Peer certificate cannot be authenticated" /tmp/contextBroker.log | awk -F "curl_easy_perform" '{ print $2 }' | awk -F ")" '{ print $1 }'
 echo
 echo
 
@@ -115,7 +118,7 @@ Date: REGEX(.*)
 
 04. Look in the CB log for the warning about cert not accepted
 ==============================================================
-(curl_easy_perform failed: Peer certificate cannot be authenticated with given CA certificates)
+ failed: Peer certificate cannot be authenticated with REGEX(given|known) CA certificates
 
 
 --TEARDOWN--
