@@ -20,6 +20,7 @@
 - Fix: Stricter validity check of URL before accepting a subscription (#2009)
 - Fix: if entity::type is given but as an empty string, in payload of POST /v2/subscriptions or PATCH /v2/subscriptions/{sub}, an error is returned (#1985)
 - Fix: more intelligent, quote-aware, operator lookup inside q/mq string filters (#2452)
+- Fix: weird 'md: { }' added with some update operations (#2831)
 - Fix: attribute names that include ':' now are supported, with the single-quote syntax. E.g. q='devices:location' (#2452)
 - Fix: admin requests (such as GET /version) with errors now return '400 Bad Request', not '200 OK'
 - Fix: attempt to create an entity with an error in service path (and probably more types of errors) now returns '400 Bad Request', not '200 OK' (#2763)
