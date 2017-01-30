@@ -220,14 +220,8 @@ int stringSplit(const std::string& in, char delimiter, std::vector<std::string>&
 *
 * See https://en.wikipedia.org/wiki/Hostname
 */
-static bool hostnameIsValid(const char* hostname, bool isIPv6)
+static bool hostnameIsValid(const char* hostname)
 {
-  if (isIPv6 == true)  // No checks for IPv6
-  {
-    // FIXME P4: Implement hostnameIsValid for IPv6 addresses
-    return true;
-  }
-
   int len = strlen(hostname);
 
   if (len > 253)  // Max length is 253 chars
@@ -357,13 +351,11 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
   std::string  auxIp;
   std::string  auxPort;
-  bool         ipV6 = false;
 
   // First we check if it is IPv6
   if (getIPv6Port(urlTokens[2], auxIp, auxPort))
   {
     // IPv6
-    ipV6 = true;
     host = auxIp;
     port = atoi(auxPort.c_str());
   }
@@ -415,7 +407,7 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
     return false;
   }
 
-  if (hostnameIsValid(host.c_str(), ipV6) == false)
+  if (hostnameIsValid(host.c_str()) == false)
   {
     return false;
   }
