@@ -118,7 +118,7 @@ Date: REGEX(.*)
 
 04. Look in the CB log for the warning about cert not accepted
 ==============================================================
- failed: Peer certificate cannot be authenticated with REGEX(given|known) CA certificates
+ failed: Peer certificate cannot be authenticated with REGEX((given)|(known)) CA certificates
 
 
 --TEARDOWN--
