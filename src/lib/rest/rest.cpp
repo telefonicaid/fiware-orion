@@ -257,7 +257,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     containsForbiddenChars = forbiddenChars(val, ";");
   }
-  else if ((key != URI_PARAM_Q) && (key != URI_PARAM_MQ) && (key != "idPattern"))
+  else if ((key != URI_PARAM_Q) && (key != URI_PARAM_MQ) && (key != "idPattern") && (key != "typePattern"))
   {
     containsForbiddenChars = forbiddenChars(ckey) || forbiddenChars(val);
   }
@@ -1298,7 +1298,7 @@ static int connectionTreat
     //
     // Transaction starts here
     //
-    lmTransactionStart("from", ip, port, url);  // Incoming REST request starts
+    lmTransactionStart("from", "", ip, port, url);  // Incoming REST request starts
 
     /* X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides ip.
        X-Real-IP takes preference over X-Forwarded-For, if both appear */
@@ -1593,7 +1593,10 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     // while in MHD 0.9.51, the name of the define has changed to MHD_USE_EPOLL.
     // So, to support both names, we need a ifdef/else cpp directive here.
     //
-#ifdef MHD_USE_EPOLL
+    // And, in some newer versions of microhttpd, MHD_USE_EPOLL is an enum and not a define,
+    // so, an additional check in needed
+    //
+#if defined(MHD_USE_EPOLL) || MHD_VERSION >= 0x00095100
     serverMode = MHD_USE_SELECT_INTERNALLY | MHD_USE_EPOLL;
 #else
     serverMode = MHD_USE_SELECT_INTERNALLY | MHD_USE_EPOLL_LINUX_ONLY;

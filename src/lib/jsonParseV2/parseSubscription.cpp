@@ -362,7 +362,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
         regex_t re;
         if (regcomp(&re, idPattern.c_str(), REG_EXTENDED) != 0)
         {
-          return badInput(ciP, "Invalid regex for entity id pattern");
+          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTIDPATTERN);
         }
         regfree(&re);  // If regcomp fails it frees up itself
       }
@@ -383,6 +383,10 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
         if (typeOpt.value.length() > MAX_ID_LEN)
         {
           return badInput(ciP, "max type length exceeded");
+        }
+        if (typeOpt.value.empty())
+        {
+          return badInput(ciP, ERROR_DESC_BAD_REQUEST_EMPTY_ENTTYPE);
         }
         type = typeOpt.value;
       }
@@ -407,7 +411,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
         regex_t re;
         if (regcomp(&re, typePattern.c_str(), REG_EXTENDED) != 0)
         {
-          return badInput(ciP, "Invalid regex for entity id pattern");
+          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTTYPEPATTERN);
         }
         regfree(&re);  // If regcomp fails it frees up itself
       }

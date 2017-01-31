@@ -292,7 +292,7 @@ TEST(mongoQueryContextRequest_filters, equalToOne_s)
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
-    /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+    /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     EXPECT_EQ("E1", RES_CER(0).entityId.id);
     EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -340,7 +340,7 @@ TEST(mongoQueryContextRequest_filters, equalToOne_n)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   EXPECT_EQ("E2", RES_CER(0).entityId.id);
 
@@ -398,7 +398,7 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_s)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(3, res.contextElementResponseVector.size());
   EXPECT_EQ("E1", RES_CER(0).entityId.id);
   EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -447,7 +447,7 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_n)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(2, res.contextElementResponseVector.size());
   EXPECT_EQ("E3", RES_CER(0).entityId.id);
   EXPECT_EQ("E4", RES_CER(1).entityId.id);
@@ -506,7 +506,7 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_s)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(3, res.contextElementResponseVector.size());
   EXPECT_EQ("E3", RES_CER(0).entityId.id);
   EXPECT_EQ("E4", RES_CER(1).entityId.id);
@@ -555,7 +555,7 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_n)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(4, res.contextElementResponseVector.size());
   EXPECT_EQ("E1", RES_CER(0).entityId.id);
   EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -616,7 +616,7 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_s)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(2, res.contextElementResponseVector.size());
   EXPECT_EQ("E3", RES_CER(0).entityId.id);
   EXPECT_EQ("E5", RES_CER(1).entityId.id);
@@ -664,7 +664,7 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_n)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(3, res.contextElementResponseVector.size());
   EXPECT_EQ("E2", RES_CER(0).entityId.id);
   EXPECT_EQ("E3", RES_CER(1).entityId.id);
@@ -724,7 +724,7 @@ TEST(mongoQueryContextRequest_filters, greaterThan_n)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(3, res.contextElementResponseVector.size());
   EXPECT_EQ("E1", RES_CER(0).entityId.id);
   EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -784,7 +784,7 @@ TEST(mongoQueryContextRequest_filters, greaterThanOrEqual_n)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(2, res.contextElementResponseVector.size());
   EXPECT_EQ("E2", RES_CER(0).entityId.id);
   EXPECT_EQ("E3", RES_CER(1).entityId.id);
@@ -843,7 +843,7 @@ TEST(mongoQueryContextRequest_filters, lessThan_n)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(3, res.contextElementResponseVector.size());
   EXPECT_EQ("E1", RES_CER(0).entityId.id);
   EXPECT_EQ("E4", RES_CER(1).entityId.id);
@@ -903,7 +903,7 @@ TEST(mongoQueryContextRequest_filters, lessThanOrEqual_n)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(2, res.contextElementResponseVector.size());
   EXPECT_EQ("E4", RES_CER(0).entityId.id);
   EXPECT_EQ("E5", RES_CER(1).entityId.id);
@@ -962,7 +962,7 @@ TEST(mongoQueryContextRequest_filters, insideRange_n)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(2, res.contextElementResponseVector.size());
   EXPECT_EQ("E4", RES_CER(0).entityId.id);
   EXPECT_EQ("E5", RES_CER(1).entityId.id);
@@ -1021,7 +1021,7 @@ TEST(mongoQueryContextRequest_filters, outsideRange_n)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(3, res.contextElementResponseVector.size());
   EXPECT_EQ("E1", RES_CER(0).entityId.id);
   EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -1082,7 +1082,7 @@ TEST(mongoQueryContextRequest_filters, withAttribute)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(5, res.contextElementResponseVector.size());
   EXPECT_EQ("E1", RES_CER(0).entityId.id);
   EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -1136,7 +1136,7 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(6, res.contextElementResponseVector.size());
   EXPECT_EQ("C1", RES_CER(0).entityId.id);
   EXPECT_EQ("C2", RES_CER(1).entityId.id);
@@ -1192,7 +1192,7 @@ TEST(mongoQueryContextRequest_filters, stringsWithCommas)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(2, res.contextElementResponseVector.size());
   EXPECT_EQ("C1", RES_CER(0).entityId.id);
   EXPECT_EQ("C2", RES_CER(1).entityId.id);
@@ -1245,7 +1245,7 @@ TEST(mongoQueryContextRequest_filters, combiningSeveralFilters)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   EXPECT_EQ("E1", RES_CER(0).entityId.id);
 
@@ -1295,7 +1295,7 @@ TEST(mongoQueryContextRequest_filters, repeatSameFilter)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(2, res.contextElementResponseVector.size());
   EXPECT_EQ("E4", RES_CER(0).entityId.id);
   EXPECT_EQ("E5", RES_CER(1).entityId.id);
@@ -1346,7 +1346,7 @@ TEST(mongoQueryContextRequest_filters, rangeWithDecimals)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
   ASSERT_EQ(2, res.contextElementResponseVector.size());
   EXPECT_EQ("E4", RES_CER(0).entityId.id);
   EXPECT_EQ("E5", RES_CER(1).entityId.id);

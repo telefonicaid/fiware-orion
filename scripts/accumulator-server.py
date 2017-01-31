@@ -35,6 +35,7 @@ __author__ = 'fermin'
 # * Curl users: use -H "Content-Type: application/xml"  for XML payload (the default:
 #   "Content-Type: application/x-www-form-urlencoded" has been problematic in the pass)
 
+from OpenSSL import SSL
 from flask import Flask, request, Response
 from getopt import getopt, GetoptError
 from datetime import datetime
@@ -74,6 +75,9 @@ def usage():
     print "  --port <port>: port to use (default is 1028)"
     print "  --url <server url>: server URL to use (default is /accumulate)"
     print "  --pretty-print: pretty print mode"
+    print "  --https: start in https"
+    print "  --key: key file (only used if https is enabled)"
+    print "  --cert: cert file (only used if https is enabled)"
     print "  -v: verbose mode"
     print "  -u: print this usage message"
 
@@ -88,9 +92,12 @@ host       = '0.0.0.0'
 server_url = '/accumulate'
 verbose    = 0
 pretty     = False
+https      = False
+key_file   = None
+cert_file  = None
 
 try:
-    opts, args = getopt(sys.argv[1:], 'vu', ['host=', 'port=', 'url=', 'pretty-print' ])
+    opts, args = getopt(sys.argv[1:], 'vu', ['host=', 'port=', 'url=', 'pretty-print', 'https', 'key=', 'cert=' ])
 except GetoptError:
     usage_and_exit('wrong parameter')
 
@@ -111,8 +118,19 @@ for opt, arg in opts:
         verbose = 1
     elif opt == '--pretty-print':
         pretty = True
+    elif opt == '--https':
+        https = True
+    elif opt == '--key':
+        key_file = arg
+    elif opt == '--cert':
+        cert_file = arg
     else:
         usage_and_exit()
+
+if https:
+    if key_file is None or cert_file is None:
+        print "if --https is used then you have to provide --key and --cert"
+        os.exit(1)
 
 if verbose:
     print "verbose mode is on"
@@ -120,6 +138,9 @@ if verbose:
     print "host: " + str(host)
     print "server_url: " + str(server_url)
     print "pretty: " + str(pretty)
+    print "https: " + str(https)
+    print "key file: " + key_file
+    print "cert file: " + cert_file
 
 pid     = str(os.getpid())
 pidfile = "/tmp/accumulator." + str(port) + ".pid"
@@ -298,4 +319,13 @@ if __name__ == '__main__':
     # Note that using debug=True breaks the the procedure to write the PID into a file. In particular
     # makes the calle os.path.isfile(pidfile) return True, even if the file doesn't exist. Thus,
     # use debug=True below with care :)
-    app.run(host=host, port=port)
+    if (https):
+      # According to http://stackoverflow.com/questions/28579142/attributeerror-context-object-has-no-attribute-wrap-socket/28590266, the
+      # original way of using context is deprecated. New way is simpler
+      #context = SSL.Context(SSL.SSLv23_METHOD)
+      #context.use_privatekey_file(key_file)
+      #context.use_certificate_file(cert_file)
+      context = (cert_file, key_file)
+      app.run(host=host, port=port, debug=False, ssl_context=context)
+    else:
+      app.run(host=host, port=port)

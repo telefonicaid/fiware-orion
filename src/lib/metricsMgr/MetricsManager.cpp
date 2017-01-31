@@ -441,9 +441,24 @@ std::string MetricsManager::_toJson(void)
       }
     }
 
-    subServiceTop.addRaw("subservs", jhSubService.str());
-
+    std::string subservs = jhSubService.str();
+    subServiceTop.addRaw("subservs", subservs);
     std::string serviceSumString = metricsRender(&serviceSum);
+
+    if ((subservs == "{}") && (serviceSumString == "{}"))
+    {
+      //
+      // Skipping empty tenant
+      //
+      // Remember - when doing reset of the metrics, emptied tenants aren't removed.
+      // They are only emptied, to save the time of delete and then create again.
+      // [ Most likely they will be needed soon after the reset ]
+      //
+      // But, we don't want to show those 'emptied tenants' in the metrics output
+      // so, we skip those tenants, calling 'continue' right here
+      //
+      continue;
+    }
 
     subServiceTop.addRaw("sum", serviceSumString);
 

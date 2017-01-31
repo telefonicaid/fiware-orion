@@ -228,6 +228,7 @@ Date: REGEX(.*)
 05. Dump accumulator to see E1/T1
 =================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 465
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)

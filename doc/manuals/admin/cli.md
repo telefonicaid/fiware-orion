@@ -112,7 +112,7 @@ The list of available options is the following:
 -   **-httpTimeout <interval>**. Specifies the timeout in milliseconds
     for forwarding messages and for notifications.
 -   **-reqTimeout <interval>**. Specifies the timeout in seconds
-    for REST connections. Note that if a zero is used, there is no timeout (wait forever).
+    for REST connections. Note that the default value is zero, i.e., no timeout (wait forever).
 -   **-cprForwardLimit**. Maximum number of forwarded requests to Context Providers for a single client request
     (default is no limit). Use 0 to disable Context Providers forwarding completely.
 -   **-corsOrigin <domain>**. Configures CORS for GET requests,
@@ -157,3 +157,5 @@ The list of available options is the following:
 -   **-logForHumans**. To make the traces to standard out formated for humans (note that the traces in the log file are not affected)
 -   **-disableMetrics**. To turn off the 'metrics' feature. Gathering of metrics is a bit costly, as system calls and semaphores are involved.
     Use this parameter to start the broker without metrics overhead.
+-   **-insecureNotif**. Allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates. This is similar
+    to the `-k` or `--insecure` parameteres of the curl command.

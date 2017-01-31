@@ -47,7 +47,7 @@ bool            paHelpVar;      /* the -help option                   */
 bool            paVersion;
 char            paHome[512];
 bool            paNoClear;
-bool            paClearAt;
+int             paClearAt;
 int             paKeepLines;
 int             paLastLines;
 bool            paLogAppend;
