@@ -320,9 +320,12 @@ if __name__ == '__main__':
     # makes the calle os.path.isfile(pidfile) return True, even if the file doesn't exist. Thus,
     # use debug=True below with care :)
     if (https):
-      context = SSL.Context(SSL.SSLv23_METHOD)
-      context.use_privatekey_file(key_file)
-      context.use_certificate_file(cert_file)
+      # According to http://stackoverflow.com/questions/28579142/attributeerror-context-object-has-no-attribute-wrap-socket/28590266, the
+      # original way of using context is deprecated. New way is simpler
+      #context = SSL.Context(SSL.SSLv23_METHOD)
+      #context.use_privatekey_file(key_file)
+      #context.use_certificate_file(cert_file)
+      context = (cert_file, key_file)
       app.run(host=host, port=port, debug=False, ssl_context=context)
     else:
       app.run(host=host, port=port)
