@@ -11,7 +11,7 @@ These scripts are used to verify that the notifications rate from ContextBroker 
 
 #### Architecture for testing
 
-- 1 node with a context broker installed ()
+- 1 node with a context broker installed
 - 1 node with mongoDB (associated to the CB)
 - 1 node for launch listener
 - 1 node for launch jmeter
@@ -21,13 +21,13 @@ Notes:
 ```
      node listen.js -a -s1 -p8090 -ds0
 ```
- - The `startAgent.sh` of Jmeter must be installed in CB node, for monitoring the CPU, Memory and TCP.
+ - The `startAgent.sh` of Jmeter must be installed in CB node, for monitoring the CPU, Memory and TCP throughput.
 ```
      nohup ./startAgent.sh --udp-port 0 --tcp-port 4444 &
 ```
   - The ContextBroker configuration recommended:
 ```
-	BROKER_EXTRA_OPS="-reqMutexPolicy none -writeConcern 0 -notificationMode threadpool:60000:300 -statTiming -statSemWait -statCounters -statNotifQueue -multiservice -subCacheIval 0 -reqTimeout 50"
+	BROKER_EXTRA_OPS="-reqMutexPolicy none -writeConcern 0 -notificationMode threadpool:60000:300 -statTiming -statSemWait -statCounters -statNotifQueue -multiservice -subCacheIval 0 -reqTimeout 0"
 
 ```
 
