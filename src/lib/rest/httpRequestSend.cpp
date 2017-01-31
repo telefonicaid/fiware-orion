@@ -240,7 +240,7 @@ int httpRequestSendWithCurl
    CURL*                                      curl,
    const std::string&                         _ip,
    unsigned short                             port,
-   const std::string&                         protocol,
+   const std::string&                         _protocol,
    const std::string&                         verb,
    const std::string&                         tenant,
    const std::string&                         servicePath,
@@ -260,7 +260,6 @@ int httpRequestSendWithCurl
 {
   char                            portAsString[STRING_SIZE_FOR_INT];
   static unsigned long long       callNo             = 0;
-  std::string                     result;
   std::string                     ip                 = _ip;
   struct curl_slist*              headers            = NULL;
   MemoryStruct*                   httpResponse       = NULL;
@@ -287,7 +286,8 @@ int httpRequestSendWithCurl
     timeoutInMilliseconds = defaultTimeout;
   }
 
-  lmTransactionStart("to", ip.c_str(), port, resource.c_str());
+  std::string protocol = _protocol + "//";
+  lmTransactionStart("to", protocol.c_str(), + ip.c_str(), port, resource.c_str());
 
   // Preconditions check
   if (port == 0)
@@ -393,8 +393,10 @@ int httpRequestSendWithCurl
                   extraHeaders,
                   usedExtraHeaders);
 
-    if (protocol == "https:")
+    if (protocol == "https://")
     {
+      // "Switching" protocol https -> http is needed in this case, as CB->Rush request will use HTTP
+      protocol = "http://";
       headerRushHttp = "X-relayer-protocol: https";
       LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerRushHttp.c_str()));
       httpHeaderAdd(&headers, "X-relayer-protocol", headerRushHttp, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
@@ -522,10 +524,20 @@ int httpRequestSendWithCurl
   // Set up URL
   std::string url;
   if (isIPv6(ip))
+  {
     url = "[" + ip + "]";
+  }
   else
+  {
     url = ip;
-  url = url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
+  }
+  url = protocol + url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
+
+  if (insecureNotif)
+  {
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); // ignore self-signed certificates for SSL end-points
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+  }
 
   // Prepare CURL handle with obtained options
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());

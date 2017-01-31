@@ -1298,7 +1298,7 @@ static int connectionTreat
     //
     // Transaction starts here
     //
-    lmTransactionStart("from", ip, port, url);  // Incoming REST request starts
+    lmTransactionStart("from", "", ip, port, url);  // Incoming REST request starts
 
     /* X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides ip.
        X-Real-IP takes preference over X-Forwarded-For, if both appear */

@@ -1,3 +1,5 @@
+- Add: HTTPS native notifications (#706), fixing at the same time issue #2844
+- Add: new option to accept self-signed certifications used by HTTPS notification endpoints: -insecureNotif (#706)
 - Fix: libmicrohttpd now uses poll()/epoll() and not select() so fds greater than 1023 can be used for incoming connections (#2724, #2166)
 - Add: new option to set the timeout for REST request: -reqTimeout (#2762)
 - Fix: modified the upper limit for CLI '-maxConnections', from 1020 to UNLIMITED
