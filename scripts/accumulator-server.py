@@ -321,11 +321,12 @@ if __name__ == '__main__':
     # use debug=True below with care :)
     if (https):
       # According to http://stackoverflow.com/questions/28579142/attributeerror-context-object-has-no-attribute-wrap-socket/28590266, the
-      # original way of using context is deprecated. New way is simpler
-      #context = SSL.Context(SSL.SSLv23_METHOD)
-      #context.use_privatekey_file(key_file)
-      #context.use_certificate_file(cert_file)
-      context = (cert_file, key_file)
+      # original way of using context is deprecated. New way is simpler. However, we are still testing this... some environments
+      # fail in some configurations (the current one is an attempt to make this to work at jenkins)
+      context = SSL.Context(SSL.SSLv23_METHOD)
+      context.use_privatekey_file(key_file)
+      context.use_certificate_file(cert_file)
+      #context = (cert_file, key_file)
       app.run(host=host, port=port, debug=False, ssl_context=context)
     else:
       app.run(host=host, port=port)
