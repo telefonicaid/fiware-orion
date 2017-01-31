@@ -81,7 +81,7 @@ accumulatorDump IPV4 HTTPS
 echo
 echo
 
-# Note the REGEX(given|known) in the REGEXPECT part for step 4. This is due to that the log message is slightly different
+# Note the REGEX(\S+) in the REGEXPECT part for step 4. This is due to that the log message is slightly different
 # depending on the libcurl version, some versions (newer ones) use "given" while other (older versions) use "known"
 
 echo "04. Look in the CB log for the warning about cert not accepted"
@@ -118,7 +118,7 @@ Date: REGEX(.*)
 
 04. Look in the CB log for the warning about cert not accepted
 ==============================================================
- failed: Peer certificate cannot be authenticated with REGEX((given)|(known)) CA certificates
+ failed: Peer certificate cannot be authenticated with REGEX(\S+) CA certificates
 
 
 --TEARDOWN--
