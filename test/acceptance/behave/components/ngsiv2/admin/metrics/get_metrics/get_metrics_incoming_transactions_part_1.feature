@@ -1200,7 +1200,7 @@ Feature: get common metrics in Context Broker
     And verify that incoming Transactions are "50" by "test_incomingTransactions_2" service and "root-subserv" subservice
 
   # remove metrics
-  @version @BUG_2846 @skip
+  @version @BUG_2846
   Scenario: get common metrics after delete metrics (DELETE) requests
     Given delete common metrics
     And verify that receive an "No Content" http code
