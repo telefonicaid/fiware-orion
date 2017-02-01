@@ -256,19 +256,55 @@ static bool hostnameIsValid(const char* hostname)
   }
 
 
-  char* hNameP = (char*) hostname;
-  while (*hNameP != 0)
+  //
+  // Now split hostname into labels: . label . label . label ... 
+  //
+  // We've already seen that no '..' exists and also that 'hostname' doesn't start nor end in a dot.
+  // This means we have no empty labels, and that is good :-)
+  //
+  std::vector<std::string> labelV;
+  
+  stringSplit(hostname, '.', labelV);
+
+  for (unsigned int ix = 0; ix < labelV.size(); ++ix)
   {
-    if      ((*hNameP == '.') || (*hNameP == '-'))  {}  // OK single dot or a hyphen
-    else if ((*hNameP >= 'a') && (*hNameP <= 'z'))  {}  // OK a-c
-    else if ((*hNameP >= 'A') && (*hNameP <= 'Z'))  {}  // OK: A-Z
-    else if ((*hNameP >= '0') && (*hNameP <= '9'))  {}  // OK: 0-9
-    else                                                // NOT OK - forbidden character in hostname
+    char* label    = (char*) labelV[ix].c_str();
+    int   labelLen = strlen(label);
+
+    //
+    // Maximum allowed length of a label is 63 characters (and min is 1)
+    // [ that the label is not empty we have checked already. Let's do it again! :-) ]
+    //
+    if ((labelLen > 63) || (labelLen <= 0))
     {
       return false;
     }
-    
-    ++hNameP;
+
+    //
+    // A label cannot start nor end with a hyphen
+    //
+    if ((*label == '-') || (label[labelLen - 1] == '-'))
+    {
+      return false;
+    }
+
+    //
+    // Labels can only contain the characters [a-z], [A-Z], [0-9] and hyphen
+    // Labels CAN start with [0-9] - this saves us as NUMERICAL IPs pass the check as well ... :-)
+    //
+    while (*label != 0)
+    {
+      if      ((*label >= '0') && (*label <= '9'))  {}    // OK: 0-9
+      else if ((*label >= 'a') && (*label <= 'z'))  {}    // OK: a-c
+      else if ((*label >= 'A') && (*label <= 'Z'))  {}    // OK: A-C
+      else if (*label == '-')                       {}    // OK: hyphen (not first nor last char)
+      else                                                // NOT OK - forbidden char
+      {
+        return false;
+      }
+
+      ++label;
+    }
   }
 
   return true;
