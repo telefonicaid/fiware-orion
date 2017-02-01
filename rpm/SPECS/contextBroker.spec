@@ -35,8 +35,8 @@ Packager:   Fermín Galán <fermin.galanmarquez@telefonica.com>
 URL:        http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker
 Source:     %{name}-%{broker_version}.tar.gz
 BuildRoot: /var/tmp/%{name}-buildroot
-Requires:  libstdc++, boost-thread, boost-filesystem, gnutls, libgcrypt, libcurl, logrotate, libuuid
-Buildrequires: gcc, cmake, gcc-c++, gnutls-devel, libgcrypt-devel, libcurl-devel, boost-devel, libuuid-devel
+Requires:  libstdc++, boost-thread, boost-filesystem, gnutls, libgcrypt, libcurl, openssl, logrotate, libuuid
+Buildrequires: gcc, cmake, gcc-c++, gnutls-devel, libgcrypt-devel, libcurl-devel, openssl-devel, boost-devel, libuuid-devel
 Requires(pre): shadow-utils
 
 %description
