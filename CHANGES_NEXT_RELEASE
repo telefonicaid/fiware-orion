@@ -32,3 +32,4 @@
 - Fix: no longer accepting a service path with an empty component (e.g. /comp1//comp3) (#2772)
 - Fix: bug in notification queue statistics, "in" value (#2744)
 - Fix: Accept header errors in NGSIv2 requests were incorrectly being rendered using "OrionError" element (#2765)
+- Hardening: Mongo driver migrated to legacy-1.1.2 (several bugfixes in the legacy-1.0.7 to legacy-1.1.2 delta)
