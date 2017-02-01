@@ -290,7 +290,7 @@ static bool hostnameIsValid(const char* hostname)
 
     //
     // Labels can only contain the characters [a-z], [A-Z], [0-9] and hyphen
-    // Labels CAN start with [0-9] - this saves us as NUMERICAL IPs pass the check as well ... :-)
+    // Labels CAN start with [0-9] - this saves us, as NUMERICAL IPs pass the check as well ... :-)
     //
     while (*label != 0)
     {

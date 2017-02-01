@@ -30,7 +30,7 @@ brokerStart CB
 --SHELL--
 
 #
-# To check that the broker correcxtly detects invalid hostnames, subscription creation
+# To check that the broker correctly detects invalid hostnames, subscription creation
 # is attempted with a number of invalid hostnames as notification::http::url.
 # None of these subscriptions should be allowed to be created.
 #
