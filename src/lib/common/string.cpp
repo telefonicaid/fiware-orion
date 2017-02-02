@@ -34,6 +34,7 @@
 
 #include "common/string.h"
 #include "common/wsStrip.h"
+#include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 
 
@@ -213,6 +214,104 @@ int stringSplit(const std::string& in, char delimiter, std::vector<std::string>&
 
 
 
+/* *****************************************************************************
+*
+* hostnameIsValid - check a hostname for validity
+*
+* See https://en.wikipedia.org/wiki/Hostname
+*/
+static bool hostnameIsValid(const char* hostname)
+{
+  if (strchr(hostname, ':') != NULL)  // hostname contains a ':' ?
+  {
+    //
+    // Looks like a numerical IPv6 address.
+    // That requires a different approach for validity check
+    //
+    // FIXME P4: Implement validity check of numerical IPv6 addresses.
+    //
+    return true;
+  }
+
+  int len = strlen(hostname);
+
+  if (len > 253)  // Max length is 253 chars
+  {
+    return false;
+  }
+
+  if (*hostname == '.')  // Cannot start with a dot
+  {
+    return false;
+  }
+
+  if (hostname[len - 1] == '.')  // Cannot end in a dot
+  {
+    return false;
+  }
+
+  if (strstr(hostname, "..") != NULL)  // Cannot contain two consecutive dots
+  {
+    return false;
+  }
+
+
+  //
+  // Now split hostname into labels: . label . label . label ... 
+  //
+  // We've already seen that no '..' exists and also that 'hostname' doesn't start nor end in a dot.
+  // This means we have no empty labels, and that is good :-)
+  //
+  std::vector<std::string> labelV;
+  
+  stringSplit(hostname, '.', labelV);
+
+  for (unsigned int ix = 0; ix < labelV.size(); ++ix)
+  {
+    char* label    = (char*) labelV[ix].c_str();
+    int   labelLen = strlen(label);
+
+    //
+    // Maximum allowed length of a label is 63 characters (and min is 1)
+    // [ that the label is not empty we have checked already. Let's do it again! :-) ]
+    //
+    if ((labelLen > 63) || (labelLen <= 0))
+    {
+      return false;
+    }
+
+    //
+    // A label cannot start nor end with a hyphen
+    //
+    if ((*label == '-') || (label[labelLen - 1] == '-'))
+    {
+      return false;
+    }
+
+    //
+    // Labels can only contain the characters [a-z], [A-Z], [0-9] and hyphen
+    // Labels CAN start with [0-9] - this saves us, as NUMERICAL IPs pass the check as well ... :-)
+    //
+    while (*label != 0)
+    {
+      if      ((*label >= '0') && (*label <= '9'))  {}    // OK: 0-9
+      else if ((*label >= 'a') && (*label <= 'z'))  {}    // OK: a-c
+      else if ((*label >= 'A') && (*label <= 'Z'))  {}    // OK: A-C
+      else if (*label == '-')                       {}    // OK: hyphen (not first nor last char)
+      else                                                // NOT OK - forbidden char
+      {
+        return false;
+      }
+
+      ++label;
+    }
+  }
+
+  return true;
+}
+
+
+
 /* ****************************************************************************
 *
 * parseUrl - parse a URL and return its pieces
@@ -281,8 +380,8 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
   path = "";
   //
-  // Note that components could be 3, in which case we don't enter in the for. This is
-  // the case of URL without '/' like eg. "http://www.google.com"
+  // Note that components could be 3, in which case we don't enter the for-loop. This is
+  // the case of URL without '/' like "http://www.google.com"
   //
   for (int ix = 3; ix < components; ++ix)
   {
@@ -345,7 +444,38 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
     }
   }
 
+  //
+  // Is 'port' a valid number?
+  // MAX_PORT is the maximum number that a port can have.
+  // Negative port numbers cannot exist and 0 is reserved.
+  //
+  if ((port > MAX_PORT) || (port <= 0))
+  {
+    return false;
+  }
+
+  if (hostnameIsValid(host.c_str()) == false)
+  {
+    return false;
+  }
+
   return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* validUrl - check validity of a URL
+*/
+bool validUrl(const std::string& url)
+{
+  std::string  host;
+  int          port;
+  std::string  path;
+  std::string  protocol;
+
+  return parseUrl(url, host, port, path, protocol);
 }
 
 
@@ -359,6 +489,7 @@ char* i2s(int i, char* placeholder, int placeholderSize)
   snprintf(placeholder, placeholderSize, "%d", i);
   return placeholder;
 }
+
 
 
 /* ****************************************************************************

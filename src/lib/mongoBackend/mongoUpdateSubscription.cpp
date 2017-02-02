@@ -288,7 +288,10 @@ static void setCondsAndInitialNotifyNgsiv1
   setStringVectorF(subOrig, CSUB_ATTRS, &attributes);
 
   std::vector<std::string> metadata;
-  setStringVectorF(subOrig, CSUB_METADATA, &metadata);
+  if (subOrig.hasField(CSUB_METADATA))
+  {
+    setStringVectorF(subOrig, CSUB_METADATA, &metadata);
+  }
 
   /* Conds vector (and maybe an initial notification) */
   *notificationDone = false;
@@ -361,8 +364,11 @@ static void setCondsAndInitialNotify
     {
       httpInfo.fill(subOrig);
       blacklist = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(subOrig, CSUB_BLACKLIST) : false;
-      setStringVectorF(subOrig, CSUB_METADATA, &metadataV);
       setStringVectorF(subOrig, CSUB_ATTRS, &notifAttributesV);
+      if (subOrig.hasField(CSUB_METADATA))
+      {
+        setStringVectorF(subOrig, CSUB_METADATA, &metadataV);
+      }
     }
 
     RenderFormat attrsFormat;
@@ -597,7 +603,13 @@ static void setMetadata(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
   }
   else
   {
-    BSONArray metadata = getArrayFieldF(subOrig, CSUB_METADATA);
+    // Note that if subOrig doesn't have CSUB_METADATA (e.g. old subscription in the DB created before
+    // this feature) BSONArray constructor ensures an empty array
+    BSONArray metadata;
+    if (subOrig.hasField(CSUB_METADATA))
+    {
+      metadata = getArrayFieldF(subOrig, CSUB_METADATA);
+    }
     b->append(CSUB_METADATA, metadata);
     LM_T(LmtMongo, ("Subscription metadata: %s", metadata.toString().c_str()));
   }

@@ -191,6 +191,7 @@ Date: REGEX(.*)
 03. Check that the X-Auth-Token from the subscribe request was propagated to accumulator
 ========================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 459
 X-Auth-Token: xauth_from_subscription
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -250,6 +251,7 @@ Date: REGEX(.*)
 06. Check that the X-Auth-Token from the update subscription request was propagated to accumulator
 ==================================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 459
 X-Auth-Token: xauth_from_update_subscription
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)

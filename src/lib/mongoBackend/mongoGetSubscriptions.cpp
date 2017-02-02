@@ -139,7 +139,10 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
   setStringVectorF(r, CSUB_ATTRS, &(subP->notification.attributes));
 
   // Metadata
-  setStringVectorF(r, CSUB_METADATA, &(subP->notification.metadata));
+  if (r.hasField(CSUB_METADATA))
+  {
+    setStringVectorF(r, CSUB_METADATA, &(subP->notification.metadata));
+  }
 
   subP->notification.httpInfo.fill(r);
 

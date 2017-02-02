@@ -26,6 +26,7 @@
 * Author: Orion dev team
 */
 
+#include <string>
 #include "rapidjson/document.h"
 
 template <typename T>

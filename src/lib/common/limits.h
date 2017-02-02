@@ -64,11 +64,38 @@
 * Others -
 *
 */
-#define IP_LENGTH_MAX                           15    // Based on xxx.xxx.xxx.xxx
-#define STRING_SIZE_FOR_INT                     16    // Room enough for an integer
-#define STRING_SIZE_FOR_DOUBLE                  64    // Room enough for a double
-#define CORRELATOR_ID_SIZE                      36    // Max size of a UUIDv4 string
-#define MAX_SUBSCRIPTIONS_FOR_STATISTICS_LIST   20    // For GET /v2/subscriptions
+#define IP_LENGTH_MAX                           15     // Based on xxx.xxx.xxx.xxx
+#define STRING_SIZE_FOR_INT                     16     // Room enough for an integer
+#define STRING_SIZE_FOR_DOUBLE                  64     // Room enough for a double
+#define CORRELATOR_ID_SIZE                      36     // Max size of a UUIDv4 string
+#define MAX_SUBSCRIPTIONS_FOR_STATISTICS_LIST   20     // For GET /v2/subscriptions
+#define MAX_PORT                                65535  // Max port number (== 0xFFFF)
+
+
+
+/* *****************************************************************************
+*
+* DB_AND_SERVICE_NAME_MAX_LEN - 
+*
+* Max name length of a database name for a tenant:
+* Remember the database name is created like this:
+*   orion-<tenant>
+*
+* 'orion' is the default database name prefix, but this
+* string is configurable via CLI.
+* However, its maximum allowed length is SERVICE_NAME_MAX_LEN, so
+* this we can always use.
+*
+* Now:
+*   DB_NAME_MAX_LEN + 1 + SERVICE_NAME_MAX_LEN + 1:
+*
+*     DB_NAME_MAX_LEN:      'orion'
+*     1:                    '-'
+*     SERVICE_NAME_MAX_LEN: tenant name, via HTTP header 'Fiware-Service' 
+*     1:                    zero-termination of the string
+* 
+*/
+#define DB_AND_SERVICE_NAME_MAX_LEN     (DB_NAME_MAX_LEN + 1 + SERVICE_NAME_MAX_LEN + 1)
 
 
 

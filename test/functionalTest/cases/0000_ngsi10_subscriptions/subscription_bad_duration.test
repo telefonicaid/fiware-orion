@@ -42,7 +42,7 @@ payload='{
     "attributes": [
         "temperature"
     ],
-    "reference": "http://127.0.0.1:${LISTENER_PORT}/notify",
+    "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
     "duration": "PT99Y",
     "notifyConditions": [
         {
@@ -69,7 +69,7 @@ payload='{
     "attributes": [
         "temperature"
     ],
-    "reference": "http://127.0.0.1:${LISTENER_PORT}/notify",
+    "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
     "duration": "PY99",
     "notifyConditions": [
         {

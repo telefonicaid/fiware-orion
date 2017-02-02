@@ -141,6 +141,7 @@ Date: REGEX(.*)
 03. Check that the X-Auth-Token was propagated to accumulator
 =============================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 459
 X-Auth-Token: kz
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)

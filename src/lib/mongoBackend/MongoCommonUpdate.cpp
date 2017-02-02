@@ -755,7 +755,7 @@ static bool updateAttribute
     /* Custom metadata */
     BSONObj    md;
     BSONArray  mdNames;
-    if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2));
+    if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2))
     {
       newAttr.append(ENT_ATTRS_MD, md);
     }
@@ -1552,7 +1552,10 @@ static bool addTriggeredSubscriptions_noCache
 
       trigs->blacklist = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
 
-      setStringVectorF(sub, CSUB_METADATA, &(trigs->metadata));
+      if (sub.hasField(CSUB_METADATA))
+      {
+        setStringVectorF(sub, CSUB_METADATA, &(trigs->metadata));
+      }
 
       if (sub.hasField(CSUB_EXPR))
       {

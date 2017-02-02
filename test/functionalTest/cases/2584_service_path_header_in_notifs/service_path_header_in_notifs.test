@@ -1,0 +1,196 @@
+# Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Service Path in Notifications
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create a subscription
+# 02. Create Entity with Service-Path / to provoke notification
+# 03. Dump and reset accumulator, see notification with Service-Path / as HTTP Header
+# 04. Modify Entity, provoke notification
+# 05. Dump and reset accumulator, see notification with Service-Path / as HTTP Header
+#
+
+echo "01. Create a subscription"
+echo "========================="
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attrs": []
+         }
+    },
+    "notification": {
+        "http": {
+            "url": "http://localhost:'$LISTENER_PORT'/notify"
+        },
+        "attrs": []
+    }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create Entity with Service-Path / to provoke notification"
+echo "============================================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A1": 2
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --servicePath /
+echo
+echo
+
+
+echo "03. Dump and reset accumulator, see notification with Service-Path / as HTTP Header"
+echo "==================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04. Modify Entity, provoke notification"
+echo "======================================="
+payload='{
+  "A1": 4
+}'
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --servicePath / -X PUT
+echo
+echo
+
+
+echo "05. Dump and reset accumulator, see notification with Service-Path / as HTTP Header"
+echo "==================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription
+=========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create Entity with Service-Path / to provoke notification
+=============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Dump and reset accumulator, see notification with Service-Path / as HTTP Header
+===================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 124
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 2
+            }, 
+            "id": "E1", 
+            "type": "T"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+04. Modify Entity, provoke notification
+=======================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Dump and reset accumulator, see notification with Service-Path / as HTTP Header
+===================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 124
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 4
+            }, 
+            "id": "E1", 
+            "type": "T"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop $LISTENER_PORT
+dbDrop CB

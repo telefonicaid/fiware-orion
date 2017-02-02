@@ -178,6 +178,7 @@ Date: REGEX(.*)
 03. Dump and reset: see notification A:1 and no previousValue
 =============================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 123
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -215,6 +216,7 @@ Date: REGEX(.*)
 05. Dump and reset: see notification A: [1, {b: foo} ], previousValue: 1
 ========================================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 187
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -262,6 +264,7 @@ Date: REGEX(.*)
 07. Dump and reset: see notification A: {x: 1, y: [true: foo] }, previousValue: [1, {b: foo} ]
 ==============================================================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 220
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -315,6 +318,7 @@ Date: REGEX(.*)
 09. Dump and reset: see notification A: x, previousValue: {x: 1, y: [true, foo] }
 =================================================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 196
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized

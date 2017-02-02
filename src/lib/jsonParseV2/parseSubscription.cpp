@@ -362,9 +362,9 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
         regex_t re;
         if (regcomp(&re, idPattern.c_str(), REG_EXTENDED) != 0)
         {
-          return badInput(ciP, "Invalid regex for entity id pattern");
+          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTIDPATTERN);
         }
-        regfree(&re);  // As the regex is not yet propagated ...
+        regfree(&re);  // If regcomp fails it frees up itself
       }
     }
 
@@ -383,6 +383,10 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
         if (typeOpt.value.length() > MAX_ID_LEN)
         {
           return badInput(ciP, "max type length exceeded");
+        }
+        if (typeOpt.value.empty())
+        {
+          return badInput(ciP, ERROR_DESC_BAD_REQUEST_EMPTY_ENTTYPE);
         }
         type = typeOpt.value;
       }
@@ -407,9 +411,9 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
         regex_t re;
         if (regcomp(&re, typePattern.c_str(), REG_EXTENDED) != 0)
         {
-          return badInput(ciP, "Invalid regex for entity id pattern");
+          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTTYPEPATTERN);
         }
-        regfree(&re);  // As the regex is not yet propagated ...
+        regfree(&re);  // If regcomp fails it frees up itself
       }
     }
 
@@ -469,17 +473,11 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
         return badInput(ciP, "forbidden characters in http field /url/");
       }
 
+      if (!validUrl(urlOpt.value))
       {
-        std::string  host;
-        int          port;
-        std::string  path;
-        std::string  protocol;
-
-        if (parseUrl(urlOpt.value, host, port, path, protocol) == false)
-        {
-          return badInput(ciP, "Invalid URL parsing notification url");
-        }
+        return badInput(ciP, "Invalid URL parsing notification url");
       }
+
       subsP->notification.httpInfo.url    = urlOpt.value;
       subsP->notification.httpInfo.custom = false;
     }
@@ -505,6 +503,20 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       if (forbiddenChars(urlOpt.value.c_str()))
       {
         return badInput(ciP, "forbidden characters in custom /url/");
+      }
+
+      //
+      // Sanity check for custom url:
+      // If the url contains custom stuff (any ${xxx}), there is not
+      // much we can do.
+      // But if not, then the same check as for non-custom url can be used.
+      //
+      if (strstr(urlOpt.value.c_str(), "${") == NULL)
+      {
+        if (!validUrl(urlOpt.value))
+        {
+          return badInput(ciP, "invalid custom /url/");
+        }
       }
 
       subsP->notification.httpInfo.url = urlOpt.value;

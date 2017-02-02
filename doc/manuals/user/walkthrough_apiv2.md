@@ -629,7 +629,7 @@ use complex structures or custom metadata. These are advanced topics, described 
 [this section](structured_attribute_valued.md#structured-attribute-values ) and
 [this other](metadata.md#custom-attribute-metadata ), respectively.
 
-More details on adding/removing attributes can be found in [this section](append_and_delete.md)
+More details on adding/removing attributes can be found in [this section](update_action_types.md)
 of the manual.
 
 [Top](#top)
@@ -1047,9 +1047,8 @@ curl -v localhost:1026/v2/op/update -s -S --header 'Content-Type: application/js
 EOF
 ```
 
-Apart from APPEND and UPDATE, there are other action types: DELETE, APPEND_STRICT, etc. Check out the 
-[NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable)
-for details.
+Apart from APPEND and UPDATE, there are other action types: DELETE, APPEND_STRICT, etc. Check out
+[this section](update_action_types.md) for details.
 
 Finally, the `POST /v2/op/query` allows to retrieve entities matching a query condition
 specified in the payload. It is very similar to `GET /v2/entities` (in fact, the response

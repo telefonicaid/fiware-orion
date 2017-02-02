@@ -1318,6 +1318,139 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | timestamp>2017-11-02T213444    | 1        |
       | timestamp>2017-11-02T21:34:44Z | 1        |
 
+  @q_regexp @BUG_2226
+  Scenario Outline: list entities using NGSI v2 with q and regular expression
+    Given  a definition of headers
+      | parameter          | value                   |
+      | Fiware-Service     | test_list_only_q_regexp |
+      | Fiware-ServicePath | /test                   |
+      | Content-Type       | application/json        |
+    And initialize entity groups recorder
+    And properties to entities
+      | parameter        | value                    |
+      | entities_type    | "random=4"               |
+      | entities_id      | "room1"                  |
+      | attributes_name  | "temperature"&"humidity" |
+      | attributes_value | 34&101                   |
+      | attributes_type  | "celsius"&"absolute"     |
+      | metadatas_name   | "very_high"              |
+      | metadatas_type   | "alarm"                  |
+      | metadatas_value  | "high"                   |
+    When create an entity in raw and "normalized" modes
+    And verify that receive a "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value                 |
+      | entities_type    | "random=4"            |
+      | entities_id      | "room2"               |
+      | attributes_name  | "pressure"&"humidity" |
+      | attributes_value | 989&"101"             |
+      | attributes_type  | "bar"                 |
+      | metadatas_name   | "very_hard"           |
+      | metadatas_type   | "alarm"               |
+      | metadatas_value  | "high"                |
+    When create an entity in raw and "normalized" modes
+    And verify that receive a "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value              |
+      | entities_type    | "random=4"         |
+      | entities_id      | "room3"            |
+      | attributes_name  | "speed"&"humidity" |
+      | attributes_value | 80&103             |
+      | attributes_type  | "kmh"              |
+    When create an entity in raw and "normalized" modes
+    And verify that receive a "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value              |
+      | entities_type    | "random=4"         |
+      | entities_id      | "room4"            |
+      | attributes_name  | "speed"&"humidity" |
+      | attributes_value | 80&"absolute"      |
+    When create an entity in raw and "normalized" modes
+    And verify that receive a "Created" http code
+    And record entity group
+    # the "X-Auth-Token" header is passed internally from previous step
+    And modify headers and keep previous values "false"
+      | parameter          | value                   |
+      | Fiware-Service     | test_list_only_q_regexp |
+      | Fiware-ServicePath | /test                   |
+    Then get all entities
+      | parameter | value          |
+      | options   | count          |
+      | q         | <q_expression> |
+    And verify that receive a "OK" http code
+    And verify that "<returned>" entities are returned
+    Examples:
+      | q_expression   | returned |
+      | humidity~=100  | 0        |
+      | humidity~=101  | 1        |
+      | humidity~=abso | 1        |
+
+  @q_regexp_error @BUG_2226
+  Scenario Outline: list entities using NGSI v2 with q and regular expression
+    Given  a definition of headers
+      | parameter          | value                   |
+      | Fiware-Service     | test_list_only_q_regexp |
+      | Fiware-ServicePath | /test                   |
+      | Content-Type       | application/json        |
+    And initialize entity groups recorder
+    And properties to entities
+      | parameter        | value                    |
+      | entities_type    | "random=4"               |
+      | entities_id      | "room1"                  |
+      | attributes_name  | "temperature"&"humidity" |
+      | attributes_value | 34&101                   |
+      | attributes_type  | "celsius"&"absolute"     |
+      | metadatas_name   | "very_high"              |
+      | metadatas_type   | "alarm"                  |
+      | metadatas_value  | "high"                   |
+    When create an entity in raw and "normalized" modes
+    And verify that receive a "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value                 |
+      | entities_type    | "random=4"            |
+      | entities_id      | "room2"               |
+      | attributes_name  | "pressure"&"humidity" |
+      | attributes_value | 989&"101"             |
+      | attributes_type  | "bar"                 |
+      | metadatas_name   | "very_hard"           |
+      | metadatas_type   | "alarm"               |
+      | metadatas_value  | "high"                |
+    When create an entity in raw and "normalized" modes
+    And verify that receive a "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value              |
+      | entities_type    | "random=4"         |
+      | entities_id      | "room3"            |
+      | attributes_name  | "speed"&"humidity" |
+      | attributes_value | 80&103             |
+      | attributes_type  | "kmh"              |
+    When create an entity in raw and "normalized" modes
+    And verify that receive a "Created" http code
+    And record entity group
+    # the "X-Auth-Token" header is passed internally from previous step
+    And modify headers and keep previous values "false"
+      | parameter          | value                   |
+      | Fiware-Service     | test_list_only_q_regexp |
+      | Fiware-ServicePath | /test                   |
+    Then get all entities
+      | parameter | value          |
+      | options   | count          |
+      | q         | <q_expression> |
+    And verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                 |
+      | error       | BadRequest                            |
+      | description | forbidden characters in String Filter |
+    Examples:
+      | q_expression      |
+      | humidity~="101"   |
+      | humidity~="dffdf" |
+
   # --- mq = <expression> ---
 
   @only_mq_attribute_datetime  @ISSUE_2632
@@ -1433,3 +1566,141 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | temperature.timestamp:2017-11-02T2134      | 1        |
       | temperature.timestamp>2017-11-02T213444    | 1        |
       | temperature.timestamp>2017-11-02T21:34:44Z | 1        |
+
+  @mq_regexp @BUG_2226
+  Scenario Outline: list entities using NGSI v2 with mq and regular expression
+    Given  a definition of headers
+      | parameter          | value                    |
+      | Fiware-Service     | test_list_only_mq_regexp |
+      | Fiware-ServicePath | /test                    |
+      | Content-Type       | application/json         |
+    And initialize entity groups recorder
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | "random=4"  |
+      | entities_id      | "room1"     |
+      | attributes_name  | "humidity"  |
+      | attributes_value | 101         |
+      | attributes_type  | "absolute"  |
+      | metadatas_name   | "very_high" |
+      | metadatas_type   | "alarm"     |
+      | metadatas_value  | 101         |
+    When create an entity in raw and "normalized" modes
+    And verify that receive a "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | "random=4"  |
+      | entities_id      | "room2"     |
+      | attributes_name  | "humidity"  |
+      | attributes_value | "101"       |
+      | metadatas_name   | "very_high" |
+      | metadatas_type   | "alarm"     |
+      | metadatas_value  | "101"       |
+    When create an entity in raw and "normalized" modes
+    And verify that receive a "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | "random=4"  |
+      | entities_id      | "room3"     |
+      | attributes_name  | "humidity"  |
+      | attributes_value | 103         |
+      | metadatas_name   | "very_high" |
+      | metadatas_type   | "alarm"     |
+      | metadatas_value  | 103         |
+    When create an entity in raw and "normalized" modes
+    And verify that receive a "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | "random=4"  |
+      | entities_id      | "room4"     |
+      | attributes_name  | "humidity"  |
+      | attributes_value | "absolute"  |
+      | metadatas_name   | "very_high" |
+      | metadatas_type   | "alarm"     |
+      | metadatas_value  | "absolute"  |
+    When create an entity in raw and "normalized" modes
+    And verify that receive a "Created" http code
+    And record entity group
+    # the "X-Auth-Token" header is passed internally from previous step
+    And modify headers and keep previous values "false"
+      | parameter          | value                    |
+      | Fiware-Service     | test_list_only_mq_regexp |
+      | Fiware-ServicePath | /test                    |
+    Then get all entities
+      | parameter | value           |
+      | options   | count           |
+      | mq        | <mq_expression> |
+    And verify that receive a "OK" http code
+    And verify that "<returned>" entities are returned
+    Examples:
+      | mq_expression            | returned |
+      | humidity.very_high~=100  | 0        |
+      | humidity.very_high~=101  | 1        |
+      | humidity.very_high~=abso | 1        |
+
+  @mq_regexp_error @BUG_2226
+  Scenario Outline: list entities using NGSI v2 with mq and regular expression
+    Given  a definition of headers
+      | parameter          | value                    |
+      | Fiware-Service     | test_list_only_mq_regexp |
+      | Fiware-ServicePath | /test                    |
+      | Content-Type       | application/json         |
+    And initialize entity groups recorder
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | "random=4"  |
+      | entities_id      | "room1"     |
+      | attributes_name  | "humidity"  |
+      | attributes_value | 101         |
+      | attributes_type  | "absolute"  |
+      | metadatas_name   | "very_high" |
+      | metadatas_type   | "alarm"     |
+      | metadatas_value  | 101         |
+    When create an entity in raw and "normalized" modes
+    And verify that receive a "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | "random=4"  |
+      | entities_id      | "room2"     |
+      | attributes_name  | "humidity"  |
+      | attributes_value | "101"       |
+      | metadatas_name   | "very_high" |
+      | metadatas_type   | "alarm"     |
+      | metadatas_value  | "101"       |
+    When create an entity in raw and "normalized" modes
+    And verify that receive a "Created" http code
+    And record entity group
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | "random=4"  |
+      | entities_id      | "room3"     |
+      | attributes_name  | "humidity"  |
+      | attributes_value | 103         |
+      | metadatas_name   | "very_high" |
+      | metadatas_type   | "alarm"     |
+      | metadatas_value  | 103         |
+    When create an entity in raw and "normalized" modes
+    And verify that receive a "Created" http code
+    And record entity group
+    # the "X-Auth-Token" header is passed internally from previous step
+    And modify headers and keep previous values "false"
+      | parameter          | value                    |
+      | Fiware-Service     | test_list_only_mq_regexp |
+      | Fiware-ServicePath | /test                    |
+    Then get all entities
+      | parameter | value           |
+      | options   | count           |
+      | mq        | <mq_expression> |
+    And verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                 |
+      | error       | BadRequest                            |
+      | description | forbidden characters in String Filter |
+    Examples:
+      | mq_expression     |
+      | humidity~="101"   |
+      | humidity~="dffdf" |

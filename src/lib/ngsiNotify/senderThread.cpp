@@ -66,8 +66,6 @@ void* startSenderThread(void* p)
       std::string  out;
       int          r;
 
-      std::map<std::string, std::string> headers;
-
       r = httpRequestSend(params->ip,
                           params->port,
                           params->protocol,

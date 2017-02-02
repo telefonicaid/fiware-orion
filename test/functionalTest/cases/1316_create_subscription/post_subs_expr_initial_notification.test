@@ -211,6 +211,7 @@ Date: REGEX(.*)
 07. Dump accumulator (1 notification with E1+E2)
 ================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 427
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized

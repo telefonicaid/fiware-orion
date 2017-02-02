@@ -193,6 +193,7 @@ Date: REGEX(.*)
 04. See notification of E1 in accumulator
 =========================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 128
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -240,6 +241,7 @@ Date: REGEX(.*)
 07. See no new notification in accumulator (only E1)
 ====================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 128
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -278,6 +280,7 @@ Date: REGEX(.*)
 09. See two notifications in accumulator (E1 and E4)
 ====================================================
 POST http://localhost:9997/notify
+Fiware-Servicepath: /
 Content-Length: 128
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -302,6 +305,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 POST http://localhost:9997/notify
+Fiware-Servicepath: /
 Content-Length: 129
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized

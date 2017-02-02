@@ -713,13 +713,13 @@ In the case of equal or unequal, if s string to match includes a `,`, you can us
 (`'`) to disable the special meaning of the comma,  e.g: `color=='light,green','deep,blue'`.
 The first example would match a color with the exact value 'light,green' OR 'deep,blue'. The
 simple quote syntax can be also used to force string interpretation in filters, e.g.
-`q=tittle=='20'` will match string "20" but not number 20.
+`q=title=='20'` will match string "20" but not number 20.
 
 Unary negatory statements use the unary operator `!`, while affirmative unary statements use no
 operator at all.
 The unary statements are used to check for the existence of the *target property*.
 E.g. `temperature` matches entities that have an attribute called 'temperature' (no matter its
-value), while `!temperature` matches entities that do not have a temperature called 'attribute'.
+value), while `!temperature` matches entities that do not have an attribute called 'temperature'.
  
 ## Geographical Queries
 

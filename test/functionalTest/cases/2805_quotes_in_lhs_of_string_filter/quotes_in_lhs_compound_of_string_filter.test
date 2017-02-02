@@ -1,0 +1,655 @@
+# Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Quotes in LHS in compounds of String Filters
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# To test:
+#   01. A1.'C1.x'              for attribute called A1 with compound { "C1.x": "Step01_01" }
+#   02. A1.M1.'MC1.x'          for attribute called A1 with metadata called M1 with compound { "MC1.x": "Step02_01" }
+#   03. 'A1.B1'.'M1.x'.'C1.x'  for attribute 'A1.B1', metadata 'M1.x', compound 'C1.x'
+#   04. 'A.B'.C.'D.E'.F.'G.H'  as a *very* complex test
+#
+# 01.01. Create E1 with an attribute called A1, with value { "C1.x": "Step01_01" }
+# 01.02. Query with q=A1.C1.x, no hits
+# 01.03. Query with q=A1.'C1.x', see E1
+# 01.04. Query with q=A1.'C1.x'==Step01_01, see E1
+# 01.05. Query with q=A1.'C1.x'==Step01_02, no hits
+#
+# 02.01. Create E2 with an attribute A1, with a metadata M1, with compound value { "MC1.x": "Step02_01" }
+# 02.02. Query with mq=A1.M1.MC1.x, no hits
+# 02.03. Query with mq=A1.M1.'MC1.x', see E2
+# 02.04. Query with q=A1.M1.'MC1.x', no hits (as M1 is metadata, not part of compound)
+# 02.05. Query with mq=A1.M1.'MC1.x'==Step02_01, see E2
+# 02.06. Query with mq=A1.M1.'MC1.x'==Step02_02, no hits
+#
+# 03.01. Create E3 with an attribute 'A1.B1', with a metadata 'M1.x', with compound value { "C1.x": "Step03_01" }
+# 03.02. Query with mq=A1.B1.M1.x.C1.x, no hits
+# 03.03. Query with mq='A1.B1'.'M1.x'.'C1.x', see E3
+# 03.04. Query with q='A1.B1'.'M1.x'.'C1.x', no hits (as M1.x is metadata, not part of compound)
+# 03.05. Query with mq='A1.B1'.'M1.x'.'C1.x'==Step03_01, see E3
+# 03.06. Query with mq='A1.B1'.'M1.x'.'C1.x'==Step03_02, no hits
+#
+# 04.01. Create E4 with attribute 'A.B' with metadata 'C' == { "D.E": { "F": { "G.H": "Step04_01" } } }
+# 04.02. Query with mq=A.B.C.D.E.F.G.H, no hits
+# 04.03. Query with mq='A.B'.C.'D.E'.F.'G.H', see E4
+# 04.04. Query with q='A.B'.C.'D.E'.F.'G.H', no hits (as C is metadata, not part of compound)
+# 04.05. Query with mq='A.B'.C.'D.E'.F.'G.H'==Step04_01, see E4
+# 04.06. Query with mq='A.B'.C.'D.E'.F.'G.H'==Step04_02, no hits
+#
+echo '01.01. Create E1 with an attribute called A1, with value { "C1.x": "Step01_01" }'
+echo '================================================================================'
+payload='{
+  "id": "E1",
+  "A1": {
+    "value": { "C1.x": "Step01_01" }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "01.02. Query with q=A1.C1.x, no hits"
+echo "===================================="
+orionCurl --url "/v2/entities?q=A1.C1.x"
+echo
+echo
+
+
+echo "01.03. Query with q=A1.'C1.x', see E1"
+echo "====================================="
+orionCurl --url "/v2/entities?q=A1.'C1.x'"
+echo
+echo
+
+
+echo "01.04. Query with q=A1.'C1.x'==Step01_01, see E1"
+echo "================================================"
+orionCurl --url "/v2/entities?q=A1.'C1.x'==Step01_01"
+echo
+echo
+
+
+echo "01.05. Query with q=A1.'C1.x'==Step01_02, no hits"
+echo "================================================="
+orionCurl --url "/v2/entities?q=A1.'C1.x'==Step01_02"
+echo
+echo
+
+
+echo '02.01. Create E2 with an attribute A1, with a metadata M1, with compound value { "MC1.x": "Step02_01" }'
+echo '======================================================================================================='
+payload='{
+  "id": "E2",
+  "A1": {
+    "metadata": {
+      "M1": {
+        "value": { "MC1.x": "Step02_01" }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02.02. Query with mq=A1.M1.MC1.x, no hits"
+echo "========================================="
+orionCurl --url "/v2/entities?mq=A1.M1.MC1.x"
+echo
+echo
+
+
+echo "02.03. Query with mq=A1.M1.'MC1.x', see E2"
+echo "=========================================="
+orionCurl --url "/v2/entities?mq=A1.M1.'MC1.x'"
+echo
+echo
+
+
+echo "02.04. Query with q=A1.M1.'MC1.x', no hits (as M1 is metadata, not part of compound)"
+echo "===================================================================================="
+orionCurl --url "/v2/entities?q=A1.M1.'MC1.x'"
+echo
+echo
+
+
+echo "02.05. Query with mq=A1.M1.'MC1.x'==Step02_01, see E2"
+echo "====================================================="
+orionCurl --url "/v2/entities?mq=A1.M1.'MC1.x'==Step02_01"
+echo
+echo
+
+
+echo "02.06. Query with mq=A1.M1.'MC1.x'==Step02_02, no hits"
+echo "======================================================"
+orionCurl --url "/v2/entities?mq=A1.M1.'MC1.x'==Step02_02"
+echo
+echo
+
+
+echo "03.01. Create E3 with an attribute 'A1.B1', with a metadata 'M1.x', with compound value { \"C1.x\": \"Step03_01\" }"
+echo "==============================================================================================================="
+payload='{
+  "id": "E3",
+  "A1.B1": {
+    "metadata": {
+      "M1.x": {
+        "value": { "C1.x": "Step03_01" }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03.02. Query with mq=A1.B1.M1.x.C1.x, no hits"
+echo "============================================="
+orionCurl --url "/v2/entities?mq=A1.B1.M1.x.C1.x"
+echo
+echo
+
+
+echo "03.03. Query with mq='A1.B1'.'M1.x'.'C1.x', see E3"
+echo "=================================================="
+orionCurl --url "/v2/entities?mq='A1.B1'.'M1.x'.'C1.x'"
+echo
+echo
+
+
+echo "03.04. Query with q='A1.B1'.'M1.x'.'C1.x', no hits (as M1.x is metadata, not part of compound)"
+echo "=============================================================================================="
+orionCurl --url "/v2/entities?q='A1.B1'.'M1.x'.'C1.x'"
+echo
+echo
+
+
+echo "03.05. Query with mq='A1.B1'.'M1.x'.'C1.x'==Step03_01, see E3"
+echo "============================================================="
+orionCurl --url "/v2/entities?mq='A1.B1'.'M1.x'.'C1.x'==Step03_01"
+echo
+echo
+
+
+echo "03.06. Query with mq='A1.B1'.'M1.x'.'C1.x'==Step03_02, no hits"
+echo "=============================================================="
+orionCurl --url "/v2/entities?mq='A1.B1'.'M1.x'.'C1.x'==Step03_02"
+echo
+echo
+
+
+echo "04.01. Create E4 with attribute 'A.B' with metadata 'C' == { \"D.E\": { \"F\": { \"G.H\": \"Step04_01\" } } }"
+echo "====================================================================================================="
+payload='{
+  "id": "E4",
+  "A.B": {
+    "metadata": {
+      "C": {
+        "value": {
+          "D.E": {
+            "F": {
+              "G.H": "Step04_01"
+            }
+          }
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "04.02. Query with mq=A.B.C.D.E.F.G.H, no hits"
+echo "============================================="
+orionCurl --url "/v2/entities?mq=A.B.C.D.E.F.G.H"
+echo
+echo
+
+
+echo "04.03. Query with mq='A.B'.C.'D.E'.F.'G.H', see E4"
+echo "=================================================="
+orionCurl --url "/v2/entities?mq='A.B'.C.'D.E'.F.'G.H'"
+echo
+echo
+
+
+echo "04.04. Query with q='A.B'.C.'D.E'.F.'G.H', no hits (as C is metadata, not part of compound)"
+echo "==========================================================================================="
+orionCurl --url "/v2/entities?q='A.B'.C.'D.E'.F.'G.H'"
+echo
+echo
+
+
+echo "04.05. Query with mq='A.B'.C.'D.E'.F.'G.H'==Step04_01, see E4"
+echo "============================================================="
+orionCurl --url "/v2/entities?mq='A.B'.C.'D.E'.F.'G.H'==Step04_01"
+echo
+echo
+
+
+echo "04.06. Query with mq='A.B'.C.'D.E'.F.'G.H'==Step04_02, no hits"
+echo "=============================================================="
+orionCurl --url "/v2/entities?mq='A.B'.C.'D.E'.F.'G.H'==Step04_02"
+echo
+echo
+
+
+--REGEXPECT--
+01.01. Create E1 with an attribute called A1, with value { "C1.x": "Step01_01" }
+================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+01.02. Query with q=A1.C1.x, no hits
+====================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+01.03. Query with q=A1.'C1.x', see E1
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 103
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "StructuredValue",
+            "value": {
+                "C1.x": "Step01_01"
+            }
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+01.04. Query with q=A1.'C1.x'==Step01_01, see E1
+================================================
+HTTP/1.1 200 OK
+Content-Length: 103
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "StructuredValue",
+            "value": {
+                "C1.x": "Step01_01"
+            }
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+01.05. Query with q=A1.'C1.x'==Step01_02, no hits
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+02.01. Create E2 with an attribute A1, with a metadata M1, with compound value { "MC1.x": "Step02_01" }
+=======================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02.02. Query with mq=A1.M1.MC1.x, no hits
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+02.03. Query with mq=A1.M1.'MC1.x', see E2
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 137
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "MC1.x": "Step02_01"
+                    }
+                }
+            },
+            "type": "None",
+            "value": null
+        },
+        "id": "E2",
+        "type": "Thing"
+    }
+]
+
+
+02.04. Query with q=A1.M1.'MC1.x', no hits (as M1 is metadata, not part of compound)
+====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+02.05. Query with mq=A1.M1.'MC1.x'==Step02_01, see E2
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 137
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "MC1.x": "Step02_01"
+                    }
+                }
+            },
+            "type": "None",
+            "value": null
+        },
+        "id": "E2",
+        "type": "Thing"
+    }
+]
+
+
+02.06. Query with mq=A1.M1.'MC1.x'==Step02_02, no hits
+======================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+03.01. Create E3 with an attribute 'A1.B1', with a metadata 'M1.x', with compound value { "C1.x": "Step03_01" }
+===============================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03.02. Query with mq=A1.B1.M1.x.C1.x, no hits
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+03.03. Query with mq='A1.B1'.'M1.x'.'C1.x', see E3
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1.B1": {
+            "metadata": {
+                "M1.x": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "C1.x": "Step03_01"
+                    }
+                }
+            },
+            "type": "None",
+            "value": null
+        },
+        "id": "E3",
+        "type": "Thing"
+    }
+]
+
+
+03.04. Query with q='A1.B1'.'M1.x'.'C1.x', no hits (as M1.x is metadata, not part of compound)
+==============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+03.05. Query with mq='A1.B1'.'M1.x'.'C1.x'==Step03_01, see E3
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1.B1": {
+            "metadata": {
+                "M1.x": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "C1.x": "Step03_01"
+                    }
+                }
+            },
+            "type": "None",
+            "value": null
+        },
+        "id": "E3",
+        "type": "Thing"
+    }
+]
+
+
+03.06. Query with mq='A1.B1'.'M1.x'.'C1.x'==Step03_02, no hits
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+04.01. Create E4 with attribute 'A.B' with metadata 'C' == { "D.E": { "F": { "G.H": "Step04_01" } } }
+=====================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04.02. Query with mq=A.B.C.D.E.F.G.H, no hits
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+04.03. Query with mq='A.B'.C.'D.E'.F.'G.H', see E4
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 149
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A.B": {
+            "metadata": {
+                "C": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "D.E": {
+                            "F": {
+                                "G.H": "Step04_01"
+                            }
+                        }
+                    }
+                }
+            },
+            "type": "None",
+            "value": null
+        },
+        "id": "E4",
+        "type": "Thing"
+    }
+]
+
+
+04.04. Query with q='A.B'.C.'D.E'.F.'G.H', no hits (as C is metadata, not part of compound)
+===========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+04.05. Query with mq='A.B'.C.'D.E'.F.'G.H'==Step04_01, see E4
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 149
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A.B": {
+            "metadata": {
+                "C": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "D.E": {
+                            "F": {
+                                "G.H": "Step04_01"
+                            }
+                        }
+                    }
+                }
+            },
+            "type": "None",
+            "value": null
+        },
+        "id": "E4",
+        "type": "Thing"
+    }
+]
+
+
+04.06. Query with mq='A.B'.C.'D.E'.F.'G.H'==Step04_02, no hits
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

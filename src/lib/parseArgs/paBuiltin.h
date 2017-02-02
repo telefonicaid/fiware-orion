@@ -35,7 +35,7 @@
 */
 extern char            paHome[512];
 extern bool            paNoClear;
-extern bool            paClearAt;
+extern int             paClearAt;
 extern bool            paAssertAtExit;
 extern int             paKeepLines;
 extern int             paLastLines;
