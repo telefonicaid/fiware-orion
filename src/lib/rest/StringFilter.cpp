@@ -458,6 +458,73 @@ bool StringFilterItem::valueGet
 
 /* ****************************************************************************
 *
+* opFind - return the operator of the expression (and LHS + RHS as well)
+*
+* PARAMETERS:
+*   expression:   (input)  the expression to parse (e.g. A==7  or  !a1  or  'b.c'.a>14)
+*   lhsP:         (output) pointer to the string (char*) that references the Left Hand Side
+*   rhsP:         (output) pointer to the string (char*) that references the Right Hand Side
+*
+* RETURN VALUE
+*   The operator is returned. If 'no operator is found', then it is a unary expression for
+*   existence and 'SfopExists' is returned.
+*/
+static StringFilterOp opFind(char* expression, char** lhsP, char** rhsP)
+{
+  char*           eP           = expression;
+  bool            insideQuotes = false;
+  StringFilterOp  op           = SfopExists;  // No operator found => SfopExists
+
+  if (*eP == '!')  // Unary negation?
+  {
+    *lhsP = &eP[1];  // !a: a is LHS ...
+    *rhsP = &eP[1];  // !a: a is RHS ... FIXME P1: Funny? yeah, a little. This is how it works
+
+    return SfopNotExists;
+  }
+
+  *lhsP = expression;  // For all ops != Unary negation, LHS is the beginning of expression
+
+  while (*eP != 0)
+  {
+    if (*eP == '\'')
+    {
+      insideQuotes = insideQuotes? false : true;
+    }
+    else if (!insideQuotes)
+    {
+      if (eP[1] == '=')
+      {
+        if      (*eP == '=') { *rhsP = &eP[2]; op = SfopEquals;             }
+        else if (*eP == '~') { *rhsP = &eP[2]; op = SfopMatchPattern;       }
+        else if (*eP == '!') { *rhsP = &eP[2]; op = SfopDiffers;            }
+        else if (*eP == '>') { *rhsP = &eP[2]; op = SfopGreaterThanOrEqual; }
+        else if (*eP == '<') { *rhsP = &eP[2]; op = SfopLessThanOrEqual;    }
+      }
+      else   if (*eP == '<') { *rhsP = &eP[1]; op = SfopLessThan;           }
+      else   if (*eP == '>') { *rhsP = &eP[1]; op = SfopGreaterThan;        }
+      else   if (*eP == ':') { *rhsP = &eP[1]; op = SfopEquals;             }
+
+      if (op != SfopExists)  // operator found, RHS already set
+      {
+        // Mark the end of LHS - but not if op is Exists, where expression == LHS == RHS 
+        *eP = 0;
+
+        return op;
+      }
+    }
+    
+    ++eP;
+  }
+
+  *rhsP = expression;
+  return SfopExists; 
+}
+
+
+
+/* ****************************************************************************
+*
 * StringFilterItem::parse - 
 *
 * A StringFilterItem is a string of the form:
@@ -513,30 +580,12 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   //
 
   //
-  // 1. Find operator
+  // 1. Find operator (which also gives up LHS and RHS)
   //
-  // if 'No-Operator-Found' => Test for EXISTENCE of an attribute
-  //
-  char* opP = NULL;
-
-  if      ((opP = strstr(s, "==")) != NULL)  { op  = SfopEquals;              rhs = &opP[2];        }
-  else if ((opP = strstr(s, "~=")) != NULL)  { op  = SfopMatchPattern;        rhs = &opP[2];        }
-  else if ((opP = strstr(s, "!=")) != NULL)  { op  = SfopDiffers;             rhs = &opP[2];        }
-  else if ((opP = strstr(s, "<=")) != NULL)  { op  = SfopLessThanOrEqual;     rhs = &opP[2];        }
-  else if ((opP = strstr(s, "<"))  != NULL)  { op  = SfopLessThan;            rhs = &opP[1];        }
-  else if ((opP = strstr(s, ">=")) != NULL)  { op  = SfopGreaterThanOrEqual;  rhs = &opP[2];        }
-  else if ((opP = strstr(s, ">"))  != NULL)  { op  = SfopGreaterThan;         rhs = &opP[1];        }
-  else if ((opP = strstr(s, ":"))  != NULL)  { op  = SfopEquals;              rhs = &opP[1];        }
-  else if (*s == '!')                        { op  = SfopNotExists;           rhs = &s[1]; lhs = rhs; opP = s; }
-  else                                       { op  = SfopExists;              rhs = s;              }
-
-  // Mark the end of LHS
-  if (opP != NULL)
-  {
-    *opP = 0;
-  }
+  op   = opFind(s, &lhs, &rhs);
   lhs  = wsStrip(lhs);
   rhs  = wsStrip(rhs);
+
 
   //
   // Check for invalid LHS
@@ -585,7 +634,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     return false;
   }
 
-
   //
   // Now, the right-hand-side, is it a RANGE, a LIST, a SIMPLE VALUE, or an attribute name?
   // And, what type of values?
@@ -593,6 +641,13 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   bool b = true;
   if ((op == SfopNotExists) || (op == SfopExists))
   {
+    if (forbiddenQuotes(rhs))
+    {
+      *errorStringP = std::string("forbidden characters in String Filter");
+      free(toFree);
+      return false;
+    }
+
     if (type == SftMq)
     {
       if (metadataName == "")
@@ -602,6 +657,33 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
         return false;
       }
     }
+  }
+  else if (op == SfopMatchPattern)
+  {
+    //
+    // RHS is a forced string for ~=
+    // forbiddenChars to run over the entire RHS, no exceptions
+    //
+    if (forbiddenChars(rhs, ""))
+    {
+      *errorStringP = std::string("forbidden characters in String Filter");
+      free(toFree);
+      return false;
+    }
+
+    valueType   = SfvtString;
+    stringValue = rhs;
+
+    //
+    // Can't call valueParse here, as the forced valueType 'SfvtString' will be knocked back to its 'default'.
+    // So, instead we just perform the part of SfopMatchPattern of valueParse
+    //
+    if (regcomp(&patternValue, stringValue.c_str(), REG_EXTENDED) != 0)
+    {
+      *errorStringP = std::string("error compiling filter regex: '") + stringValue + "'";
+      return false;
+    }
+    compiledPattern = true;
   }
   else
   {

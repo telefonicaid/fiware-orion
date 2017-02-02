@@ -276,6 +276,7 @@ Date: REGEX(.*)
 06. Dump accumulator to see dateCreated and dateModified for E1/A1
 ==================================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 401
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -322,6 +323,7 @@ Date: REGEX(.*)
 08. Dump accumulator to see dateCreated and dateModified for E1/A1
 ==================================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 402
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized

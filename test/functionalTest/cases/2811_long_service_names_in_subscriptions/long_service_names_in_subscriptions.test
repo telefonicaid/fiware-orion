@@ -64,7 +64,7 @@ echo "==========================================================================
 payload='{
   "notification": {
     "http": {
-      "url": "http://host:port/notify"
+      "url": "http://host:6666/notify"
     }
   },
   "subject": {
@@ -149,7 +149,7 @@ Date: REGEX(.*)
             "attrs": [],
             "attrsFormat": "normalized",
             "http": {
-                "url": "http://host:port/notify"
+                "url": "http://host:6666/notify"
             }
         },
         "status": "active",

@@ -60,6 +60,7 @@
 #include <sys/stat.h>
 #include <signal.h>
 #include <curl/curl.h>
+#include <openssl/ssl.h>
 #include <string>
 #include <vector>
 #include <limits.h>
@@ -277,6 +278,7 @@ bool            disableCusNotif;
 bool            logForHumans;
 bool            disableMetrics;
 int             reqTimeout;
+bool            insecureNotif;
 
 #ifdef PARANOID_JSON_INDENT
 bool            paranoidV1Indent;
@@ -336,6 +338,7 @@ bool            paranoidV1Indent;
 #define LOG_FOR_HUMANS_DESC    "human readible log to screen"
 #define METRICS_DESC           "turn off the 'metrics' feature"
 #define REQ_TMO_DESC           "connection timeout for REST requests (in seconds)"
+#define INSECURE_NOTIF         "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
 
 
 
@@ -375,7 +378,7 @@ PaArgument paArgs[] =
   { "-multiservice",  &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
 
   { "-httpTimeout",   &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
-  { "-reqTimeout",    &reqTimeout,   "REQ_TIMEOUT",    PaLong,   PaOpt, 10,         0,      PaNL,  REQ_TMO_DESC       },
+  { "-reqTimeout",    &reqTimeout,   "REQ_TIMEOUT",    PaLong,   PaOpt,  0,          0,     PaNL,  REQ_TMO_DESC       },
   { "-reqMutexPolicy",reqMutexPolicy,"MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },  
   { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
 
@@ -403,6 +406,8 @@ PaArgument paArgs[] =
 
   { "-logForHumans",   &logForHumans,    "LOG_FOR_HUMANS",     PaBool, PaOpt, false, false, true,             LOG_FOR_HUMANS_DESC },
   { "-disableMetrics", &disableMetrics,  "DISABLE_METRICS",    PaBool, PaOpt, false, false, true,             METRICS_DESC        },
+
+  { "-insecureNotif", &insecureNotif, "INSECURE_NOTIF", PaBool, PaOpt, false, false, true, INSECURE_NOTIF },
 
 #ifdef PARANOID_JSON_INDENT
   { "-paranoidV1Indent", &paranoidV1Indent, "PARANOID_V1_INDENT", PaBool, PaHid, false, false, true, "you shouldn't use this ;)" },
@@ -1744,11 +1749,19 @@ int main(int argC, char* argV[])
   SemOpType policy = policyGet(reqMutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
   mongoInit(dbHost, rplSet, dbName, user, pwd, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
-  contextBrokerInit(dbName, mtenant);
-  curl_global_init(CURL_GLOBAL_NOTHING);
   alarmMgr.init(relogAlarms);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
+
+  // According to http://stackoverflow.com/questions/28048885/initializing-ssl-and-libcurl-and-getting-out-of-memory/37295100,
+  // openSSL library needs to be initialized with SSL_library_init() before any use of it by any other libraries
+  SSL_library_init();
+
+  // Startup libcurl
+  if (curl_global_init(CURL_GLOBAL_SSL) != 0)
+  {
+    LM_X(1, ("Fatal Error (could not initialize libcurl)"));
+  }
 
   if (rush[0] != 0)
   {
@@ -1775,6 +1788,11 @@ int main(int argC, char* argV[])
   {
     LM_T(LmtSubCache, ("noCache == false"));
   }
+
+  // Given that contextBrokerInit() may create thread (in the threadpool notification mode,
+  // it has to be done before curl_global_init(), see https://curl.haxx.se/libcurl/c/threaded-ssl.html
+  // Otherwise, we have empirically checked that CB may randomly crash
+  contextBrokerInit(dbName, mtenant);
 
   if (https)
   {

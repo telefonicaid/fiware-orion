@@ -34,6 +34,8 @@ brokerStart CB
 # 02. Attempt to create subscription with qstring filter 'house==flat>' - see error for invalid chars
 # 03. Attempt to create subscription with qstring filter 'house==flat,flat>' - see error for invalid chars
 # 04. Attempt to create subscription with qstring filter 'house==flat..flat>' - see error for invalid chars
+# 05. Attempt to create subscription with qstring filter  q=house'flat' - see error for invalid chars
+# 06. Attempt to create subscription with qstring filter  q=a==house'flat' - see error for invalid chars
 #
 
 echo "01. Attempt to create subscription with qstring filter 'house<flat>' - see error for invalid chars"
@@ -132,6 +134,54 @@ echo
 echo
 
 
+echo "05. Attempt to create subscription with qstring filter  q=house'flat' - see error for invalid chars"
+echo "==================================================================================================="
+payload='{
+  "description": "invalid q",
+  "subject": {
+    "entities": [ { "idPattern": ".*" } ],
+    "condition": {
+      "attributes": [ "temperature" ],
+      "expression": {
+        "q": "house'"'flat'"'"
+      }
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1234"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "06. Attempt to create subscription with qstring filter  q=a==house'flat' - see error for invalid chars"
+echo "======================================================================================================"
+payload='{
+  "description": "invalid q",
+  "subject": {
+    "entities": [ { "idPattern": ".*" } ],
+    "condition": {
+      "attributes": [ "temperature" ],
+      "expression": {
+        "q": "a==house'"'flat'"'"
+      }
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1234"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
 --REGEXPECT--
 01. Attempt to create subscription with qstring filter 'house<flat>' - see error for invalid chars
 ==================================================================================================
@@ -177,6 +227,34 @@ Date: REGEX(.*)
 
 04. Attempt to create subscription with qstring filter 'house==flat..flat>' - see error for invalid chars
 =========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "forbidden characters in String Filter",
+    "error": "BadRequest"
+}
+
+
+05. Attempt to create subscription with qstring filter  q=house'flat' - see error for invalid chars
+===================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "forbidden characters in String Filter",
+    "error": "BadRequest"
+}
+
+
+06. Attempt to create subscription with qstring filter  q=a==house'flat' - see error for invalid chars
+======================================================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 76
 Content-Type: application/json

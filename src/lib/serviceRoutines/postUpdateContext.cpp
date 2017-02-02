@@ -509,6 +509,7 @@ std::string postUpdateContext
     alarmMgr.badInput(clientIp, "more than one service path for an update request");
 
     TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject));
+    upcrP->release();
 
     return answer;
   }
@@ -524,6 +525,7 @@ std::string postUpdateContext
 
     TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject));
 
+    upcrP->release();
     return answer;
   }
 

@@ -223,10 +223,11 @@ extern bool               notifQueueStatistics;
 extern bool               checkIdv1;
 extern bool               disableCusNotif;
 
+extern bool               insecureNotif;
+
 #ifdef PARANOID_JSON_INDENT
 extern bool               paranoidV1Indent;
 #endif
-
 
 
 /* ****************************************************************************

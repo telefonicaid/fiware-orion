@@ -1,0 +1,128 @@
+# Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Direct HTTP notification (not accepting self signed certs)
+
+--SHELL-INIT--
+${SCRIPT_HOME}/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName /tmp/harnessTest.pem
+
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print --https --key /tmp/harnessTest.key --cert /tmp/harnessTest.pem
+
+--SHELL--
+
+#
+# 01. Create subscription to an HTTPS endpoint
+# 02. Create entity, triggering notification
+# 03. Dump accumulator and see no notification
+# 04. Look in the CB log for the warning about cert not accepted
+#
+
+
+echo "01. Create subscription to an HTTPS endpoint"
+echo "============================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern": "E.*"
+      }
+    ],
+    "condition": {
+      "attrs": [ ]
+    }
+  },
+  "notification": {
+    "http": {"url": "https://localhost:'$LISTENER_PORT'/notify"}
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity, triggering notification"
+echo "=========================================="
+payload='{
+  "id": "E1",
+  "A1": {
+    "value": 1
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Dump accumulator and see no notification"
+echo "============================================"
+accumulatorDump IPV4 HTTPS
+echo
+echo
+
+# Note the REGEX(\S+) in the REGEXPECT part for step 4. This is due to that the log message is slightly different
+# depending on the libcurl version, some versions (newer ones) use "given" while other (older versions) use "known"
+
+echo "04. Look in the CB log for the warning about cert not accepted"
+echo "=============================================================="
+grep "(curl_easy_perform failed: Peer certificate cannot be authenticated" /tmp/contextBroker.log | awk -F "curl_easy_perform" '{ print $2 }' | awk -F ")" '{ print $1 }'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription to an HTTPS endpoint
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity, triggering notification
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Dump accumulator and see no notification
+============================================
+
+
+04. Look in the CB log for the warning about cert not accepted
+==============================================================
+ failed: Peer certificate cannot be authenticated with REGEX(\S+) CA certificates
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop
+rm -f /tmp/harnessTest.key /tmp/harnessTest.pem
