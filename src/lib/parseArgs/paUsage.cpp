@@ -166,10 +166,10 @@ static void getApVals
     break;
 
   case PaInt64:
-    snprintf(defVal,  defValLen,  "%ld", aP->def);
-    snprintf(minVal,  minValLen,  "%ld", aP->min);
-    snprintf(maxVal,  maxValLen,  "%ld", aP->max);
-    snprintf(realVal, realValLen, "%ld", *((int64_t*) aP->varP));
+    snprintf(defVal,  defValLen,  "%lld", aP->def);
+    snprintf(minVal,  minValLen,  "%lld", aP->min);
+    snprintf(maxVal,  maxValLen,  "%lld", aP->max);
+    snprintf(realVal, realValLen, "%lld", *((int64_t*) aP->varP));
     break;
 
   case PaIntU:
@@ -180,10 +180,10 @@ static void getApVals
     break;
 
   case PaIntU64:
-    snprintf(defVal,  defValLen,  "%lu", aP->def);
-    snprintf(minVal,  minValLen,  "%lu", aP->min);
-    snprintf(maxVal,  maxValLen,  "%lu", aP->max);
-    snprintf(realVal, realValLen, "%lu", *((uint64_t*) aP->varP));
+    snprintf(defVal,  defValLen,  "%llu", aP->def);
+    snprintf(minVal,  minValLen,  "%llu", aP->min);
+    snprintf(maxVal,  maxValLen,  "%llu", aP->max);
+    snprintf(realVal, realValLen, "%llu", *((uint64_t*) aP->varP));
     break;
 
   case PaShort:
