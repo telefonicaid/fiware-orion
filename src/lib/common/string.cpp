@@ -218,7 +218,7 @@ int stringSplit(const std::string& in, char delimiter, std::vector<std::string>&
 *
 * hostnameIsValid - check a hostname for validity
 *
-* See https://en.wikipedia.org/wiki/Hostname
+* See https://tools.ietf.org/html/rfc1034#section-3.1
 */
 static bool hostnameIsValid(const char* hostname)
 {
