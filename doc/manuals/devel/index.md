@@ -1,4 +1,7 @@
-# Design details of the Orion Context Broker
+# <a name='top'></a>Design details of the Orion Context Broker
+
+*Note: This document describes Orion Context Broker as of release 1.4.x.*
+
 
 ## <a name='directory_structure'></a>Directory Structure
 
@@ -58,6 +61,9 @@ scripts used for testing and release making are found under `scripts/`.
 * [src/lib/logSummary/ (Log Summary implementation)](#src/lib/logSummary/)
 * [src/lib/metricsMgr/ (Metrics Manager implementation)](#src/lib/metricsMgr/)
 
+[Top](#top)
+
+
 ## <a name='src/app/contextBroker/'></a>src/app/contextBroker/
 The main program is found in `contextBroker.cpp` and its purpose it to:
 
@@ -71,6 +77,8 @@ This is the file to go to when adding a command line parameter and when adding
 a REST service for the broker.
 See the [cookbook](cookbook.md) for details about these two important topics.
 
+[Top](#top)
+
 
 ## <a name='src/lib/logMsg/'></a>src/lib/logMsg/
 The log message library takes care of writing log lines to the log file, whose default location is
@@ -80,10 +88,14 @@ See `lmTransactionStart()` et al in `logMsg.cpp/h`.
 About debugging the broker, see especially the trace levels (that are set using the `-t` CLI param),
 in `traceLevels.h`.
 
+[Top](#top)
+
 
 ## <a name='src/lib/parseArgs/'></a>src/lib/parseArgs/
 The CLI parameter parsing is taken care of by the **parseArgs** library.
 Its input is a PaArgument vector, describing all the CLI parameters, that is defined in `contextBroker.cpp`.
+
+[Top](#top)
 
 
 ## <a name='src/lib/common/'></a>src/lib/common/
@@ -108,6 +120,8 @@ source code of the broker:
 * tag - macros/functions for JSON rendering
 * wsStrip - function that strips a string from leading and trailing whitespace
 
+[Top](#top)
+
 
 ## <a name='src/lib/orionTypes/'></a>src/lib/orionTypes/
 In the **orionTypes** library you will find important types, some of them similar to those found in the `ngsi`
@@ -127,6 +141,8 @@ However, the library also contains some more modules, namely:
 
 * OrionValueType, that is a type used to keep track of the 'JSON type' that an attribute/metadata-value is of.
 * areas, containing geometrical shapes, such as Point, Line, Box, Circle and Polygon.
+
+[Top](#top)
 
 
 ## src/lib/rest/
@@ -173,6 +189,9 @@ and another vector for the URI parameters.
 
 For detailed information about the microhttpd library, see [its dedicated page in gnu.org](https://www.gnu.org/software/libmicrohttpd/).
 
+[Top](#top)
+
+
 ## <a name='src/lib/ngsi/'></a>src/lib/ngsi/
 The **ngsi** library contains a collection of classes for the different payloads that constitutes the common part
 of the ngsi9 and ngsi10 protocols.
@@ -218,6 +237,8 @@ Now, the methods *render, check, release, ...* are called ina tree-like fashion,
 Each class invokes the method for its underlying classes.  
 The example above was made with the *check()* method, but the same thing is true also for *release()*, *present()*, etc.
 
+[Top](#top)
+
 
 ## <a name='src/lib/ngsi10/'></a>src/lib/ngsi10/
 The **ngsi10** library contains the 'top hierarchy' classes for NGSI10 (NGSIv1) requests (and responses):
@@ -230,6 +251,8 @@ The **ngsi10** library contains the 'top hierarchy' classes for NGSI10 (NGSIv1) 
 * NotifyContextRequest/Response (outgoing request, sent by Orion, to notify subscribers)
 
 See the explanation of methods and hierarchy of the [ngsi library](#methods and hierarchy).
+
+[Top](#top)
 
 
 ## <a name='src/lib/ngsi9/'></a>src/lib/ngsi9/
@@ -244,6 +267,8 @@ Just like the ngsi10 library, the **ngsi9** library contains the 'top hierarchy'
 
 See the explanation of methods and hierarchy of the [ngsi library](#methods and hierarchy).
 
+[Top](#top)
+
 
 ## <a name='src/lib/apiTypesV2/'></a>src/lib/apiTypesV2/
 The **apiTypesV2**, just like the *ngsi* libraries, contains classes, both basic classes (like the library *ngsi*)
@@ -251,10 +276,15 @@ and 'top hierarchy classes (like the libraries *ngsi9* and *ngsi10*), for NGSIv2
 
 The hierarchical methods *release/toJson/check/etc* are found in these classes as well.
 
+[Top](#top)
+
+
 ## <a name='src/lib/parse/'></a>src/lib/parse/
 The **parse** library contains types and functions that are common to all types of parsing.
 It is really a reminiscent from when the broker supported XML apart from JSON and its contents could be moved
 to other libraries and this library thus be eliminated.
+
+[Top](#top)
 
 
 ## <a name='src/lib/jsonParse/'></a>src/lib/jsonParse/
@@ -265,6 +295,8 @@ the ngsi classes.
 This library contains a vector of the type JsonRequest, that defines how to parse the different requests.
 The function `jsonTreat` picks the parsing method and jsonParse takes care of the parsing, with the help from
 
+[Top](#top)
+
 
 ## <a name='src/lib/jsonParseV2/'></a>src/lib/jsonParseV2/
 This is where the newer NGSIv2 request payloads are parsed, using DOM but apart from that similar to **jsonParse**.
@@ -273,6 +305,9 @@ tree of objects representing the JSON payload.
 
 Especially important is the function `jsonRequestTreat()` that basically is a switch that calls the different
 parsing routines according to the type of the payload.
+
+[Top](#top)
+
 
 ## <a name='src/lib/serviceRoutines/'></a>src/lib/serviceRoutines/
 The **serviceRoutines** is especially important, as this is where the requests are treated and sent to mongo backend library
@@ -288,9 +323,13 @@ Forwarding of queries/updates to context providers are implemented in these two 
 **IMPORTANT**: Also NGSIv2 requests depend on these two service routines, so even if NGSIv2 still has no forwarding mechanism of its own,
 these two routines 'gives' forwarding to NGSIv2. Note that the forwarded messages are translated into NGSIv1 requests.
 
+[Top](#top)
+
 
 ## <a name='src/lib/serviceRoutinesV2/'></a>src/lib/serviceRoutinesV2/
 Similar to the *serviceRoutines* library, the **serviceRoutinesV2** library contains the service routines for NGSIv2 requests.
+
+[Top](#top)
 
 
 ## <a name='src/lib/convenience/'></a>src/lib/convenience/
@@ -298,12 +337,17 @@ The **convenience** library contains 'top hierarchy' classes for the NGSIv1 conv
 For a complete list of these requests, kindly see [the document XXX]().
 This library is similar to the *ngsi9/10* libraries.
 
+[Top](#top)
+
 
 ## <a name='src/lib/mongoBackend/'></a>src/lib/mongoBackend/
 The most important of all libraries of the broker, the **mongoBackend** library is where all the database interaction
-taker place.
+takes place.
 
 TBD
+
+[Top](#top)
+
 
 ## <a name='src/lib/ngsiNotify/'></a>src/lib/ngsiNotify/
 The **ngsiNotify** library is where notifications to subscriptions are implemented.
@@ -313,11 +357,15 @@ the subscriber will be sent a notification, and it is the task of this library t
 Actually, a function from the **rest** library is used: `httpRequestSend`.
 Another important aspect of this library is that the notifications are sent by separete threads, using a thread pool if desired.
 
+[Top](#top)
+
 
 ## <A name='src/lib/alarmMgr/'></a>src/lib/alarmMgr/
 Alarms are simply special log messages inserted into the log file.
 However, to record the number of consecutive alarms of the same type, and to not repeat them when they're already active, etc,
 a manager has been implemented. This *Alarm Manager* resides in the library **alarmMgr**.
+
+[Top](#top)
 
 
 ## <a name='src/lib/cache/'></a>src/lib/cache/
@@ -335,12 +383,17 @@ called '-subCacheIval' and defaults to 60 seconds.
 Note that the NGSIv2 GET subscription requests **do not** take the subcription information from the subscription cache, but directly
 from the database.
 
+[Top](#top)
+
+
 ## <a name='src/lib/logSummary/'></a>src/lib/logSummary/
 The **logSummary** library implements a thread that periodically 'spits out' a summary of the alarms
 maintained by the [Alarm Manager](#src/lib/alarmMgr/).
 This functionality is off by default and turned on by starting orion with the CLI patameter `-logSummary <summary period in seconds>`.
 
 What it does is basically to compile a summary of the current state of the Alaram Manager and ssnd the information to the log file.
+
+[Top](#top)
 
 
 ## <a name='src/lib/metricsMgr/'></a>src/lib/metricsMgr/
