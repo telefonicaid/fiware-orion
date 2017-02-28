@@ -310,7 +310,7 @@ The **ngsiNotify** library is where notifications to subscriptions are implement
 When an entity is created or modified or when a subscription is created or modified, in case there is an active subscription/entity,
 the subscriber will be sent a notification, and it is the task of this library to make sure that happens.
 **mongoBackend** decides when to notify and **ngsiNotify** executes the notification, with the help of the external library **libcurl**.
-Actually, a function from the **rest** library is used: `httpRequestSend.
+Actually, a function from the **rest** library is used: `httpRequestSend`.
 Another important aspect of this library is that the notifications are sent by separete threads, using a thread pool if desired.
 
 
