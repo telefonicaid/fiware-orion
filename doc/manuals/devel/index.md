@@ -316,8 +316,8 @@ Another important aspect of this library is that the notifications are sent by s
 
 ## <A name='src/lib/alarmMgr/'></a>src/lib/alarmMgr/
 Alarms are simply special log messages inserted into the log file.
-However, to record numerof of consecutive similar alarms, and to not repeat them when they're already active, etc, a manager
-has been implemented for this task. This *Alarm Manager* resides in the library **alarmMgr**.
+However, to record the number of consecutive alarms of the same type, and to not repeat them when they're already active, etc,
+a manager has been implemented. This *Alarm Manager* resides in the library **alarmMgr**.
 
 
 ## <a name='src/lib/cache/'></a>src/lib/cache/
