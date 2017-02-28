@@ -21,26 +21,7 @@ Note that contribution workflows themselves (e.g. pull requests, etc.) are descr
 
 ## Filesystem layout guidelines
 
-### Directory layout
-
-* **src**: contains the source code, with the following subdirectories
-* **app**: contains the code for applications (each application in a separate subdirectory). The main application, the Orion context broker, resides in the **contextBroker** directory.
-* **lib**: contains code libraries (each library in a separate subdirectory)
-* **test**: contains tests. There are several subdirectories (each subdirectory corresponding to a different test 
-  suite/procedure), but the most important ones for the time being are: 
-  * **unittest**: contains unit tests
-  * **functionalTest**: contains functional end-to-end tests based on the “test harness” engine
-  * **acceptance**: contains functional end-to-end test based on the Behave (NGSIv2) or Lettuce (NGSIv1) Python  
-    frameworks.
-* **scripts**: contains utility scripts (e.g. scripts included in the Orion RPM along with Orion binary itself,
-  scripts used by the test frameworks, etc.)
-* **doc**: contains documentation, with the following subdirectories:
-  * **apiary**: for apiary-based documentation
-  * **manuals**: for markdown based documentation
-* **rpm**: contains files for RPM building
-* **etc**: scripts that are installed under etc/ (typically, included in RPM package)
-* **docker**: contains the docker files
-* **archive**: contains older files that is no longer used but that we don’t want to remove yet.
+For a detailed explanation of the directory structure, see [this link](devel/index.md#directory_structure).
 
 ### File layout for source code files 
 

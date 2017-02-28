@@ -91,7 +91,7 @@ static void* logSummary(void* vP)
     //
     alarmMgr.semTake();
 
-    bool       deActive;         // de: Database Error
+    bool     deActive;         // de: Database Error
     int64_t  deRaised;
     int64_t  deReleased;
     int64_t  neActive;         // ne: Notification Error
