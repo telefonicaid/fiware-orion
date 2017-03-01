@@ -69,15 +69,18 @@ Edit `src/app/contextBroker/contextBroker.cpp, and look for an already existing 
        { "-port", &port, "PORT", PaInt, PaOpt, 1026, PaNL, PaNL, PORT_DESC },  
         { "-xyz",  &xyz,  "XYZ",  PaInt, PaOpt, 1026, PaNL, PaNL, XYZ_DESC  },
     ```    
-1. Create the **XYZ_DESC** description string, right after **PORT_DESC**.
+1. Create the `XYZ_DESC` description string, right after `PORT_DESC`.
 1. If xyz is a *required option*, change **PaOpt** for **PaReq**, or **PaHid** if it is to be hidden.
 1. Change the **1026** for the default value for xyz, e.g. 47
 1. Set the minimum and maximum values of xyz (items 7 and 8 in the PaArgument line).
 1. Compile the broker (make di)
-1. Run: `contextBroker -u` and you should see:  
+1. Run: `contextBroker -u` and you should see (unless **PaHid** was used):  
     `[option '-xyz <description of xyz>]`
 1. Run: `contextBroker -U` and you will see more information about the CLI parameters,
    including default values, min and max values, etc.
+1. If you gave -xyz any min/max limits, try starting the broker with invalid values and see it complain.
+1. If you made -xyz **PaReq**, try starting the broker without -xyz and see what happens.
+1. If you made -xyz **PaHid**, make sure it **is not visible** running `contextBroker -u`
 
 
 A note about environment variables as options:  
