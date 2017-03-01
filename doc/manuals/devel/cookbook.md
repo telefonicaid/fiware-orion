@@ -3,7 +3,7 @@
 ## Adding a command line parameter
 It's fairly easy to add a new CLI parameter to Orion, as there is a library in charge of
 parsing and checking the CLI parameters.
-This library (**parseArgs) is called by the main program in contextBroker.cpp as one of its first
+This library (**parseArgs**) is called by the main program in contextBroker.cpp as one of its first
 actions. The function to parse CLI arguments is called parseArgs, and it has three parameters:
 
 * argC - the number of arguments for the main program
@@ -42,6 +42,13 @@ The item in the PaArgument vector `paArgs` contains nine different pieces of inf
 
 **Remember**:
 
+* Boolean CLI parameters can only take two possible values: `true` or `false`.  
+  No value is added on command line,  
+  just the option itself, e.g.:  
+  `-fg`  
+  As opposed to  
+  `-port <port number>`  
+
 * There are no minimum/maximum values for string (doesn't make much sense, does it?), so PaNL is
   always used for strings.
 * The second item in the PaArgument must be a pointer, so if not a string (a char vector is a pointer),
@@ -53,7 +60,7 @@ The item in the PaArgument vector `paArgs` contains nine different pieces of inf
 ### Example: adding an integer CLI parameter -xyz
 As a hands-on example, lets add an integer CLI parameter, called **-xyz**:  
 
-Edit `src/app/contextBroker/contextBroker.cpp, and look for an already existing integer CLI parameter.
+Edit `src/app/contextBroker/contextBroker.cpp`, and look for an already existing integer CLI parameter.
 
 1. Create the integer variable `xyz`, right where 'int port' is (search for 'Option variables').
 
@@ -65,15 +72,15 @@ Edit `src/app/contextBroker/contextBroker.cpp, and look for an already existing 
 
     Copy that line, and in the copied line, change all 'port' for 'xyz', end up seeing this:
 
-    ```    
-       { "-port", &port, "PORT", PaInt, PaOpt, 1026, PaNL, PaNL, PORT_DESC },  
-        { "-xyz",  &xyz,  "XYZ",  PaInt, PaOpt, 1026, PaNL, PaNL, XYZ_DESC  },
+    ```
+       { "-port", &port, "PORT", PaInt, PaOpt, 1026, PaNL, PaNL, PORT_DESC },
+       { "-xyz",  &xyz,  "XYZ",  PaInt, PaOpt, 1026, PaNL, PaNL, XYZ_DESC  },
     ```    
 1. Create the `XYZ_DESC` description string, right after `PORT_DESC`.
 1. If xyz is a *required option*, change **PaOpt** for **PaReq**, or **PaHid** if it is to be hidden.
 1. Change the **1026** for the default value for xyz, e.g. 47
 1. Set the minimum and maximum values of xyz (items 7 and 8 in the PaArgument line).
-1. Compile the broker (make di)
+1. Compile the broker (make debug)
 1. Run: `contextBroker -u` and you should see (unless **PaHid** was used):  
     `[option '-xyz <description of xyz>]`
 1. Run: `contextBroker -U` and you will see more information about the CLI parameters,
@@ -90,3 +97,14 @@ complete name of the environment variable is ORION_XYZ*
 
 
 ## Adding a REST service
+
+## Adding a Functional Test Case
+
+## Fixing a memory leak
+ 1. Add a leak somewhere 'deep down'
+ 1. start broker with valgrindSuite (select a functest that exercises the leak)
+ 1. Must be compiler in DEBUG (exit/harakiri)
+ 1. Edit the valgrind result file and find out where exactly the leak is
+    Show what to look for (definitely lost), and show the info line in the valgrind output.
+ 1. Explain possible scenarios (local variable with malloc must be freed unless pushed to some response/request vector)
+    If pushed to some response/request vector, the relase() tree of functions will free
