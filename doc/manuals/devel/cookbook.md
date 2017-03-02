@@ -183,7 +183,7 @@ Now just add `putMetadata.cpp` to the CMake file `src/lib/serviceRoutinesV2/CMak
 To test that `putMetadata` works correctly, a new **Functional Test Case** should be implemented.
 The following recipe explains how to do that.
 
-To capture "POST/PATCH/XXX /v2/entities/*/attrs/*/metadata/*" and respond with a `405 Method Not Allowed',
+To capture "POST/PATCH/XXX /v2/entities/*/attrs/*/metadata/*" and respond with a `405 Method Not Allowed`,
 please have a look at [the recipe about Bad Method](#Method Not Allowed).
 
 
