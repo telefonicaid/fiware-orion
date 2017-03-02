@@ -279,8 +279,8 @@ following section, the Expect/Regexpect section.
 
 A typical step (e.g. to create an entity) looks like this:  
 
-
-`echo "01. Create entity E1 with attribute A1"  
+```
+echo "01. Create entity E1 with attribute A1"  
 echo "======================================"  
 payload='{  
   "id": "E1",  
@@ -297,7 +297,8 @@ payload='{
 }'  
 orionCurl --url /v2/entities --payload "$payload"  
 echo  
-echo`
+echo
+```
 
 ### EXPECT/REGEXPECT Section
 First of all, the test harness (`test/functionalTest/testHarness.sh`) admits two types of 'expect sections'. Either
@@ -422,7 +423,7 @@ So, as you can see, if a request with the URL path "/v2/entities/{EntityId}", an
 then the service routine `getEntity` takes care of the request.
 If the method is instead "DELETE", then `deleteEntity` takes care of the request.
 Any other verb (POST, PUT, etc), and `badVerbGetDeleteOnly` takes care of the request.
-When badVerbGetDeleteOnly takes care of the request, the response comes as `405 Method Not Allowed` and the HTTP header `Allow: GET, DELETE`:
+When badVerbGetDeleteOnly takes care of the request, the response comes as `405 Method Not Allowed` and the HTTP header `Allow: GET, DELETE`.
 
 ## Fixing a memory leak
  1. Add a leak somewhere 'deep down'
