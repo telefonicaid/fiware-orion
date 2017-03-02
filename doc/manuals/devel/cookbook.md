@@ -97,8 +97,332 @@ complete name of the environment variable is ORION_XYZ*
 
 
 ## Adding a REST service
+The REST services that the Orion context broker supports are items in the RestService vector `restServiceV`,
+found in `src/lib/contextBroker/contextBroker.cpp`.
+This vector is a reminiscent from back when the broker also implemented the **FIWARE Configuration Manager**
+and thus had to be able to assume different roles. The set of services that are supported pretty much defines
+the role and by starting the REST interface with one RestService vector or another took care of the role selection.
+Now Orion has only one role, to work as context broker, but the RestService vector remains.
+
+To add a REST service to Orion, a new item in `RestService restServiceV[]` is needed.
+Just like with CLI parameters, the easiest way is to copy an old service and then modify the copy to suit your needs.
+
+To understand this new item in the RestService vector, take a look at the struct RestService, in `src/lib/rest/RestService.h`:
+
+```
+typedef struct RestService  
+{  
+  std::string   verb;             // The method of the service, as a plain string. ("*" matches ALL methods)  
+  RequestType   request;          // The type of the request  
+  int           components;       // Number of components in the URL path  
+  std::string   compV[10];        // Vector of URL path components. E.g. { "v2", "entities" }  
+  std::string   payloadWord;      // No longer used, should be removed ... ?  
+  RestTreat     treat;            // service function pointer  
+} RestService;
+```
+
+So, to add a REST service "PUT /v2/entities/{EntitId}/attrs/{AttributeName}/metadata/{MetadataName},
+the new item if the RestService vector would look like this:  
+```
+{ "PUT", Metadata,  7, { "v2", "entities", "*", "attrs", "*", "metadata", "*" }, "", putMetadata }
+```
+
+NOTE:
+
+* Item 2: `Metadata`:  
+  Metadata would have to be added as an enum constant in the **enum RequestType** in `src/lib/ngsi/Request.h`
+* Item 4: "*"
+    An asterisc in the component vector `RestService::compV` matches ANY string, and whenever a path including 
+    entity id, attribute name, etc is defined, `"*"` must be used.
+* Item 6: `putMetadata`
+    putMetadata is the service routine for `GET /v2/entities/*/attrs/*/metadata/*` and the function must be implemented.
+    The directory of the library for NGSIv2 service routines is `src/lib/serviceRoutinesV2`.
+
+Note also that in contextBroker.cpp, these RestService vector lines have been grouped and as the lines got really long, 
+defines for the component vector have been created.  
+In the beginning it might be a little hard to find your way among all those defines. Sorry about that ...  
+[ The style guide says a source code line **cannot be** longer than 150 chars and **shouldn't** be longer than 120 chars.  
+  These lines, before splitting into defines were well over 200 chars.  
+  Unfortunately, the new way, with shorter lines, is a lot more difficult to read. ]
+
+Now, the service routine `putMetadata` should reside in `src/lib/serviceRoutinesV2/putMetadata.h/cpp` and its signature must
+be as follows:  
+```
+std::string putMetadata  
+(  
+  ConnectionInfo*            ciP,  
+  int                        components,  
+  std::vector<std::string>&  compV,  
+  ParseData*                 parseDataP  
+)  
+```
+
+The `entity id`, `attribute name`, and `metadata name` (all part of the URL path), must be "extracted" from the component vector `compV`:
+
+```
+  std::string entityId      = compV[2];  
+  std::string attributeName = compV[4];  
+  std::string metadataName  = compV[6];  
+```
+
+Most service routines that modify/create entities/attributes/metadata (if not all) rely on the NGSIv1 service routine `postUpdateContext`.
+`putMetadata` is no exception. So, what needs to be done in `putMetadata` is to build a `UpdateContextRequest` object using the parameters of putMetadata
+and call `postUpdateContext`. Something like this:
+
+```
+  parseDataP->upcr.res.fill(entityId, attributeName, metadataName, "APPEND");  
+  postUpdateContext(ciP, components, compV, parseDataP, NGSIV2_FLAVOUR_ONAPPEND);    
+```
+
+`UpdateContextRequest` has a bunch of fill methods (seven fill methods as of March 2017) and if there is no fill method
+suited for your demands in `putMetadata`, then another fill method must be implemented for `UpdateContextRequest`.  
+
+It is easy enough, just copy from an older, similar, fill method.
+
+Now just add `putMetadata.cpp` to the CMake file `src/lib/serviceRoutinesV2/CMakeLists.txt` and compile the broker.
+To test that `putMetadata` works correctly, a new **Functional Test Case** should be implemented.
+The following recipe explains how to do that.
+
+To capture "POST/PATCH/XXX /v2/entities/*/attrs/*/metadata/*" and respond with a `405 Method Not Allowed',
+please have a look at [the recipe about Bad Method](#Method Not Allowed).
+
 
 ## Adding a Functional Test Case
+The functional tests of Orion are text files with the suffix `.test` and reside in `test/functionalTest/cases/{case-dir}`.  
+The 'case directories' are named after the github issues.
+
+As always, the easiest way to implement a new functional test is to "steal" from older ones.  
+
+A functional test file contains six sections:
+
+1. COPYRIGHT Section
+1. NAME Section
+1. SHELL-INIT Section
+1. SHELL Section
+1. EXPECT/REGEXPECT Section
+1. TEARDOWN Section
+
+Each section (except the Copyright Section, that starts from the beginning of the file) must have a header,
+that tells the functional test harness where every section starts/ends:
+
+* --NAME--
+* --SHELL-INIT--
+* --SHELL--
+* --REGEXPECT-- / --EXPECT--
+* --TEARDOWN--
+
+If --REGEXPECT-- is used (and not --EXPECT--), then the expected section permits regular expressions.
+
+### COPYRIGHT Section
+This section is simply for the Copyright header - copy an old one, try to remember to change the year, if necessary
+
+### NAME Section
+Simply put the name of the test in this section:
+
+```
+--NAME--  
+Example Test Case
+```
+
+### SHELL-INIT Section
+This is where initialization tasks are performed.
+Like:
+
+* Wiping out data bases
+* Starting the broker
+* Starting context providers
+* Starting the accumulator
+
+Example (normal case):
+
+```
+--SHELL-INIT--  
+dbInit CB  
+brokerStart CB  
+```
+
+Example with broker and five context providers (fwd_query_limited.test)
+
+```
+--SHELL-INIT--  
+dbInit CB  
+dbInit CP1  
+dbInit CP2  
+dbInit CP3  
+dbInit CP4  
+dbInit CP5  
+brokerStart CB 0 IPV4 "-cprForwardLimit 3"  
+brokerStart CP1  
+brokerStart CP2  
+brokerStart CP3  
+brokerStart CP4  
+brokerStart CP5  
+```
+
+### SHELL Section
+The broker was started in the Shell-Init section and this section is where curl commands are sent to Orion
+to perform the functional test.  
+
+A shell function called `orionCurl` is implemented for the Shell section to be easier to read and implement.
+[ See the implementation of `orionCurl` in `test/functionalTest/harnessFunctions.sh`. ]
+
+Note that each step in the Shell section starts with a short descriptive header, like this:
+
+```
+echo "0x. description of test step 0x"  
+echo "==============================="  
+```
+
+and the steps end with two calls to `echo`, to separate the current step from the next in the output.
+This is pretty important as it makes it so much easier to read the output, which must match what is in the
+following section, the Expect/Regexpect section.
+
+A typical step (e.g. to create an entity) looks like this:  
+
+
+`echo "01. Create entity E1 with attribute A1"  
+echo "======================================"  
+payload='{  
+  "id": "E1",  
+  "type": "T1",  
+  "A1": {  
+    "value": 1,  
+    "type": "Integer",  
+    "metadata": {  
+      "md1": {  
+        "value": 14  
+      }  
+    }  
+  }  
+}'  
+orionCurl --url /v2/entities --payload "$payload"  
+echo  
+echo`
+
+### EXPECT/REGEXPECT Section
+First of all, the test harness (`test/functionalTest/testHarness.sh`) admits two types of 'expect sections'. Either
+
+```
+--EXPECT--
+```
+
+or
+
+```
+--REG-EXPECT--
+```
+
+You have to **pick one**. The broker pretty much always uses the `--REG-EXPECT--` type.
+The advantage with --REG-EXPECT-- is that is permits to add regular expressions, which is very important for 
+the comparison of dates, or ids created by Orion and returned in the response, like a registration id or a correlator
+or a simple timestamp.  
+An important limitation is that there can only be **one REGEX** per line in the REG-EXPECT section.  
+
+That said, in the REG-EXPECT section, just add what is the expected output from the test step in question.  
+For example, the example "01. Create entity E1 with attribute A1" from the above sub-chapter about the SHELL Section would
+have this corresponding piece in the --REGEXPECT-- section:  
+
+```
+01. Create entity E1 with attribute A1  
+======================================  
+HTTP/1.1 201 Created  
+Content-Length: 0  
+Location: /v2/entities/E1?type=T1  
+Fiware-Correlator: REGEX([0-9a-f\-]{36})  
+Date: REGEX(.*)  
+  
+  
+  
+```
+
+Note that after two first lines, what comes out from orionCurl is first the HTTP headers, and after that eventual payload.
+In this example there is no payload.  
+Note the two calls to REGEX, for the correlator and the date.  
+The correlator is a string of 36 characters, that is a hex number with hyphens. This regex could be made better, now that we know exactly
+where each hyphen must come, however, it's not really necesary.  
+The second REGEX, for the `Date` HTTP header could also be more elaborated. Also not necessary.
+
+### TEARDOWN Section
+This is where processes are killed and databases are removed, so that the next test case will start with a clean slate.
+The most typical commands used are:
+
+```
+--TEARDOWN--  
+brokerStop CB  
+dbDrop CB  
+```
+
+If the accumulator is used, or context providers, those must be stopped also:
+
+```
+accumulatorStop  
+brokerStop CP1  
+brokerStop CP2  
+```
+
+Note that in the functional tests, we start instances of Orion to act as context providers.
+The log file directory and the port number, etc, are changed for the instances acting as context providers.
+[ See `scripts/testEnv.sh` for the variables CP1_PORT, CP2_PORT etc. ]
+
+And, the databases (tenants) must be wiped out:
+
+```
+dbDrop CP1  
+dbDrop CP2  
+```
+
+If tenants are used with Orion running just as Orion (as opposed to a context provider):
+
+```
+orionCurl --tenant T1 --url /v2/entities --payload "$payload"  
+```
+
+then the tenant T1 (database name ftest-T1) must ne wiped out as well:
+
+```
+dbDrop t1  
+```
+
+Note that `t1` is used and not `T1`. This is because Orion converts all tenants to all lowercase.
+
+## <a name='Method Not Allowed'></a>Catching a '405 Method Not Allowed'
+Orion supports the request `GET /v2/entities/{EntityId}` AND `DELETE /v2/entities/{EntityId}`, but, what happens
+if a `POST /v2/entities/{EntityId}` is issued to the broker?
+Well, normally (as POST /v2/entities/{EntityId} is not supported), a `404 Not Found` would be the result.
+However, as Orion catches ANY method for the URL `/v2/entities/{EntityId}` with the service routine `badVerbGetDeleteOnly`,
+Orion is able to respond with a `405 Method Not Allowed`.  
+
+Please enter contextBroker.cpp and search for this section:  
+
+```
+  #define API_V2                                                                                       \  
+  { "GET",    EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          entryPointsTreat         }, \  
+  { "*",      EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          badVerbGetOnly           }, \  
+                                                                                                       \  
+  { "GET",    ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          getEntities              }, \  
+  { "POST",   ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          postEntities             }, \  
+  { "*",      ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          badVerbGetPostOnly       }, \  
+  
+  { "GET",    IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         getEntity                }, \  
+  { "DELETE", IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         deleteEntity             }, \  
+  { "*",      IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         badVerbGetDeleteOnly     }, \  
+```
+
+The last three lines are the interesting ones.  
+
+Before this section, these definitions are made:
+
+```
+  #define IENT                    EntityRequest  
+  #define IENT_COMPS_V2           3, { "v2", "entities", "*" }  
+  #define IENT_COMPS_WORD         ""  
+```
+
+So, as you can see, if a request with the URL path "/v2/entities/{EntityId}", and the method "GET" enters the broker,
+then the service routine `getEntity` takes care of the request.
+If the method is instead "DELETE", then `deleteEntity` takes care of the request.
+Any other verb (POST, PUT, etc), and `badVerbGetDeleteOnly` takes care of the request.
+When badVerbGetDeleteOnly takes care of the request, the response comes as `405 Method Not Allowed` and the HTTP header `Allow: GET, DELETE`:
 
 ## Fixing a memory leak
  1. Add a leak somewhere 'deep down'
