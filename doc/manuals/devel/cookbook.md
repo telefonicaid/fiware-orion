@@ -425,11 +425,62 @@ If the method is instead "DELETE", then `deleteEntity` takes care of the request
 Any other verb (POST, PUT, etc), and `badVerbGetDeleteOnly` takes care of the request.
 When badVerbGetDeleteOnly takes care of the request, the response comes as `405 Method Not Allowed` and the HTTP header `Allow: GET, DELETE`.
 
+
 ## Fixing a memory leak
- 1. Add a leak somewhere 'deep down'
- 1. start broker with valgrindSuite (select a functest that exercises the leak)
- 1. Must be compiler in DEBUG (exit/harakiri)
- 1. Edit the valgrind result file and find out where exactly the leak is
-    Show what to look for (definitely lost), and show the info line in the valgrind output.
- 1. Explain possible scenarios (local variable with malloc must be freed unless pushed to some response/request vector)
-    If pushed to some response/request vector, the relase() tree of functions will free
+Memory leaks are detected using **valgrind memcheck**.  
+A special shell script `test/valgrind/valgrindTestSuite.sh` has been developed for this purpose and a make step is linked to it: `make valgrind`.
+If `valgrindTestSuite.sh` is run by hand, remember that Orion must be compiled in DEBUG mode for it to work (`make debug install`).  
+
+The output of the valgrind run is saved to a file with the same name of the test case, but with the suffix `valgrind.out`.  
+
+Normally, the broker has no memory leaks, so to make an exercise, we'll add one:
+
+* Open the file src/lib/ngsi10/UpdateContextRequest.cpp in your favorite editor
+* Find the method `UpdateContextRequest::release` and comment the call to contextElementVector.release:
+  ```
+  void UpdateContextRequest::release(void)  
+  {  
+    // contextElementVector.release();  
+  }  
+  ```
+* Recompile the broker:
+  ```
+  make debug install
+  ```
+* Run the valgrind test for a test case that uses UpdateContextRequest to see the leak:
+  ```
+  % valgrindTestSuite.sh -filter in_out_formats.test
+
+  Test 001/1: 0000_content_related_headers/in_out_formats  ..... FAILED (lost: 2000). Check in_out_formats.valgrind.out for clues
+
+  1 tests leaked memory:
+    001: 0000_content_related_headers/in_out_formats.test (lost 2000 bytes, see in_out_formats.valgrind.out)
+  ```
+* Open the file `test/functionalTest/cases/0000_content_related_headers/in_out_formats.valgrind.out`
+* Search for the string "definitely lost":
+```
+==19688== 2,000 (544 direct, 1,456 indirect) bytes in 4 blocks are definitely lost in loss record 313 of 318  
+==19688==    at 0x4A075FC: operator new(unsigned long) (vg_replace_malloc.c:298)  
+==19688==    by 0x6EABD4: contextElement(std::string const&, std::string const&, ParseData*) (jsonUpdateContextRequest.cpp:50)  
+==19688==    by 0x6A7CF7: treat(ConnectionInfo*, std::string const&, std::string const&, JsonNode*, ParseData*) (jsonParse.cpp:180)  
+==19688==    by 0x6A9935: jsonParse(ConnectionInfo*, std::pair<std::string const, boost::property_tree::basic_ptree<std::string, std::string, std::less<std::string> > >&, std::string const&, JsonNode*, ParseData*) (jsonParse.cpp:376)  
+==19688==    by 0x6AA0BF: jsonParse(ConnectionInfo*, std::pair<std::string const, boost::property_tree::basic_ptree<std::string, std::string, std::less<std::string> > >&, std::string const&, JsonNode*, ParseData*) (jsonParse.cpp:416)  
+==19688==    by 0x6AA94A: jsonParse(ConnectionInfo*, char const*, std::string const&, JsonNode*, ParseData*) (jsonParse.cpp:532)  
+==19688==    by 0x6A3E6F: jsonTreat(char const*, ConnectionInfo*, ParseData*, RequestType, std::string const&, JsonRequest**) (jsonRequest.cpp:232)  
+==19688==    by 0x688C42: payloadParse(ConnectionInfo*, ParseData*, RestService*, JsonRequest**, JsonDelayedRelease*, std::vector<std::string, std::allocator<std::string> >&) (RestService.cpp:122)  
+==19688==    by 0x68B112: restService(ConnectionInfo*, RestService*) (RestService.cpp:543)  
+==19688==    by 0x67E8E7: serve(ConnectionInfo*) (rest.cpp:561)  
+==19688==    by 0x683E4A: connectionTreat(void*, MHD_Connection*, char const*, char const*, char const*, char const*, unsigned long*, void**) (rest.cpp:1550)  
+==19688==    by 0x850B78: call_connection_handler (connection.c:1584)  
+```
+
+Now, looking at stack frame #2, the leak seems to come from a call to `contextElement()` in `jsonUpdateContextRequest.cpp`, line 50.
+We already know why we have this leak, as we've commented a call to `ContextElementVector::release()` in `UpdateContextRequest::release`, but 
+one thing is where the allocation is done, and another thing (sometimes a very different thing), is where the allocted object should be freed.  
+
+That is the tricky part of fixing leaks, knowing where the call to free/delete should be made.
+It is often obvious, but far from always.
+It is not rare, when trying to fix a leak, to release an allocated buffer too soon, i.e. before it is used for the last time, so it is
+very important to make sure that all functional tests are fully working once all leaks are fixed.
+Imagine this leak found in jsonUpdateContextRequest.cpp, if we release the buffer right after it is allocated, then somewhere 
+between there and ContextElementVector::release(), the buffer will be used and we will most probably experience a SIGSEGV.
