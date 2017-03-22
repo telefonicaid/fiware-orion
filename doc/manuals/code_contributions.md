@@ -80,7 +80,7 @@ api.retrieveAPIResources(callback);
 ```
 
 JavaScript:
-```javascript
+```html
 <script src="https://smartsdk.github.io/ngsi-sdk-javascript/js/ngsi.js"></script>
 <script>
   var NgsiV2 = FIWARE.NgsiV2;
