@@ -53,7 +53,7 @@ Thanks to Alejandro Villamarin (published around October 2013):
 
 ## JavaScript and NodeJS
 SmartSDK team developed and [SDK Client](https://github.com/smartsdk/ngsi-sdk-javascript) compatible with NSGIv2. 
-It allows to develop both NodeJS applicaitions and JavaScript applications.
+It allows to develop both NodeJS applicaitions and JavaScript applications (published March 2017).
 
 NodeJS:
 ```javascript
@@ -63,10 +63,10 @@ var defaultClient = NgsiV2.ApiClient.instance;
 
 // Configure API key authorization: fiware_token
 var fiware_token = defaultClient.authentications['fiware_token'];
-fiware_token.apiKey = "YOUR API KEY"
+fiware_token.apiKey = "YOUR API KEY";
 // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
-//fiware_token.apiKeyPrefix['X-Auth-Token'] = "Token"
-var api = new NgsiV2.APIEntryPointApi()
+//fiware_token.apiKeyPrefix['X-Auth-Token'] = "Token";
+var api = new NgsiV2.APIEntryPointApi();
 
 var callback = function(error, data, response) {
   if (error) {
@@ -87,10 +87,10 @@ JavaScript:
   var defaultClient = NgsiV2.ApiClient.instance;
   // Configure API key authorization: fiware_token
   var fiware_token = defaultClient.authentications['fiware_token'];
-  fiware_token.apiKey = "My Token"
+  fiware_token.apiKey = "My Token";
   // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
-  //fiware_token.apiKeyPrefix['X-Auth-Token'] = "Token"
-  var api = new NgsiV2.APIEntryPointApi()
+  //fiware_token.apiKeyPrefix['X-Auth-Token'] = "Token";
+  var api = new NgsiV2.APIEntryPointApi();
   var callback = function(error, data, response) {
     if (error) {
       console.error(error);
