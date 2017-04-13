@@ -115,7 +115,7 @@ std::string Entity::render
   }
 
  // Add special attributes with the service path
-  if ((uriParamOptions[SERVICE_PATH] || (std::find(attrsFilter.begin(), attrsFilter.end(), SERVICE_PATH) != attrsFilter.end())))
+  if (std::find(attrsFilter.begin(), attrsFilter.end(), SERVICE_PATH) != attrsFilter.end())
   {
     ContextAttribute* caP = new ContextAttribute(SERVICE_PATH, DEFAULT_ATTR_STRING_TYPE, servicePath);
     attributeVector.push_back(caP);
