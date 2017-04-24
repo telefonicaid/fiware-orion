@@ -27,7 +27,7 @@ The subscription cache is write-through, i.e., updates to subscriptions are perf
 Also important: `GET /v2/subscriptions` and `GET /v2/subscriptions/{subscription id}` both attack directly the database, ignoring the cache.
 
 When the broker starts, the subscription cache is populated with the subscriptions found in mongo.
-A subscription in the subscription caches contains the following fields:
+A subscription in the subscription cache contains the following fields:
 
 ```
   std::vector<EntityInfo*>    entityIdInfos;
@@ -70,15 +70,6 @@ They are updated in mongo only on refreshing the cache, like this:
 
 All this is to ensure that the values are correct in the case of having more than one broker working against the database - so called active-active configurations.
 
-### Propagation of subscriptions in active-active configurations
-A subscription is created/updated in **one** instance of Orion (*Orion 1* in the figure), the one that receives the subscription request.
-This subscription in inserted/modified in the sub-cache and in the datadase.
-The second instance of Orion (*Orion 2* in the figure) knows nothing of the new/modified subscription until its `subCacheRefresh()` executes and merges the database content with its sub-cache contents.
-
-![SUBSCRIPTION PROPAGATION IMAGE](images/sc02.png)
-
-The case of the four special fields (lastNotificationTime, count, lastFailure, and lastSuccess) is a bit more complex as the *most recent* information of these fields lives **only** in the sub-cache. So, to propagate `lastNotificationTime` from one Orion (Orion1) to another (Orion2), first Orion1 needs to refresh its sub-cache and **after that**, Orion2 must refresh its sub-cache. Not before this happens, in that order, Orion2 will be aware of the `lastNotificationTime` coming from Orion1.
-
 ### Services/Tenants
 Orion is capable of working with different databases, in a single instance of Orion.
 This concept has two names, the official name being **Service**, set with the HTTP Header **Fiware-Service** in requests to Orion.
@@ -110,12 +101,15 @@ The start function calls `subCacheRefresh()` to initially populate the sub cache
 ### Subscription Cache Refresh
 The following figure shows graphically the program flow during a refresh of the sub-cache.
 
+<a name='figure_sc01'></a>
 ![CACHE REFRESH IMAGE](images/sc01.png)
+_Figure SC-01_
+
 
 The next sub-chapters intend to spread some light on the more significant functions in the image.
 
 #### subCacheRefresherThread()
-The refresher thread is simply an infinite loop that sleeps the amount of seconds that is stated in `subCacheInterval` and then calls `subCacheSync()` to refresh the cache. See points 1 and 2 in the CACHE REFRESH figure.
+The refresher thread is simply an infinite loop that sleeps the amount of seconds that is stated in `subCacheInterval` and then calls `subCacheSync()` to refresh the cache. See points 1 and 2 in [figure SC-01](#figure_sc01).
 
 
 #### subCacheSync()
@@ -137,7 +131,7 @@ After repopulation of the sub.-cache, the saved information in the `CachedSubSav
 
 This is a costly operation and the semaphore that protects the sub-cache must be taken during the entire process to guarantee a successful outcome.
 
-See points 3 to 5 and 12 to 14 in the CACHE REFRESH figure.
+See points 3 to 5 and 12 to 14 in [figure SC-01](#figure_sc01).
 
 #### subCacheRefresh()
 The simplest approach is used, which is to:
@@ -155,21 +149,33 @@ Now, subCacheRefresh does the following:
 * Get the complete list of Services (which are mongo databases)
 * For each Service, invoke `mongoSubCacheRefresh()` to populate the sub-cache with the subscriptions of the Service in turn
 
-See points 6, 7 and 8 in the CACHE REFRESH figure.
+See points 6, 7 and 8 in [figure SC-01](#figure_sc01).
 
 #### mongoSubCacheRefresh()
 This function gets **all subscriptions** (NGSI10 subscriptions that is) from the database for the Service in question and then loops over the result and inserts all the subscriptions in the sub-cache by calling `mongoSubCacheItemInsert()`.
 
-See points 9 and 10 in the CACHE REFRESH figure.
+See points 9 and 10 in [figure SC-01](#figure_sc01).
 
 #### mongoSubCacheItemInsert
 The subscription of BSON object form is translated into a struct CachedSubscription, while inserting default values for missing fields.
 Some checks are performed and finally `subCacheItemInsert()` is called to insert the subscription into the sub-cache.
 
-See point 11 in the CACHE REFRESH figure.
+See point 11 in [figure SC-01](#figure_sc01).
 
 #### subCacheItemInsert
 The subscription cache is meda up by a simple single linked list, written in pure C. The list head and tail are kept and inserts are done at the end of the list.
+
+### Propagation of subscriptions in active-active configurations
+A subscription is created/updated in **one** instance of Orion (*Orion 1* in figure [SC-02](#figure_sc02) below), the one that receives the subscription request.
+This subscription in inserted/modified in the sub-cache and in the datadase.
+The second instance of Orion (*Orion 2* in figure [SC-02](#figure_sc02) below) knows nothing of the new/modified subscription until its `subCacheRefresh()` executes and merges the database content with its sub-cache contents.
+
+<a name='figure_sc02'></a>
+![SUBSCRIPTION PROPAGATION IMAGE](images/sc02.png)
+_Figure SC-02_
+
+
+The case of the four special fields (lastNotificationTime, count, lastFailure, and lastSuccess) is a bit more complex as the *most recent* information of these fields lives **only** in the sub-cache. So, to propagate `lastNotificationTime` from one Orion (Orion1) to another (Orion2), first Orion1 needs to refresh its sub-cache and **after that**, Orion2 must refresh its sub-cache. Not before this happens, in that order, Orion2 will be aware of the `lastNotificationTime` coming from Orion1.
 
 ### Semaphore
 The semaphore that protects the sub-cache is implemented in `lib/common/sem.cpp`, functions `cacheSemTake()` and `cacheSemGive()`.

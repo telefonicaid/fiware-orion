@@ -75,7 +75,7 @@ The main program is found in `contextBroker.cpp` and its purpose it to:
 
 This is the file to go to when adding a command line parameter and when adding
 a REST service for the broker.
-See the [cookbook](cookbook.md) for details about these two important topics.
+See the [cookbook](cookbook.md) for details about these two important topics.  
 
 [Top](#top)
 
