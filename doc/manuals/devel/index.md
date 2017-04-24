@@ -374,15 +374,13 @@ this purpose. One of the main reasons for this cache is that matching subscripti
 $where operations in mongo is needed (HELP). A mongo $where operation is a piece of Javascript code that is inserted into
 mongo and executed. This is of course very slow and using a cache in RAM with all subscriptions it is avoided.
 
-When the broker starts, the contents of the 'csubs' collection is extracted from the database and the subscription cache is
-populated.
+When the broker starts, the contents of the 'csubs' collection is extracted from the database and the subscription cache is populated.
 When a subscription is updated/created, only the subscription cache is modified.
-The database is updated first after a period of time, called the sub-cache-interval, which is configurable as a CLI parameter
-called '-subCacheIval' and defaults to 60 seconds.
+The database is updated first after a period of time, called the sub-cache-interval, which is configurable as a CLI parameter called '-subCacheIval' and defaults to 60 seconds.
 
-Note that the NGSIv2 GET subscription requests **do not** take the subcription information from the subscription cache, but directly
-from the database.
+Note that the NGSIv2 GET subscription requests **do not** take the subcription information from the subscription cache, but directly from the database.
 
+See full documentation on the subscription cache in its [dedicated document](subscriptionCache.md).
 [Top](#top)
 
 
