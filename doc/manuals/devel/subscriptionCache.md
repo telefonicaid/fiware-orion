@@ -102,8 +102,9 @@ The start function calls `subCacheRefresh()` to initially populate the sub cache
 The following figure shows graphically the program flow during a refresh of the sub-cache.
 
 <a name='figure_sc01'></a>
-![CACHE REFRESH IMAGE](images/sc01.png)
-_Figure SC-01_
+![CACHE REFRESH IMAGE](images/SC-01.png)
+
+_Figure SC-01_  
 
 
 The next sub-chapters intend to spread some light on the more significant functions in the image.
@@ -171,8 +172,9 @@ This subscription in inserted/modified in the sub-cache and in the datadase.
 The second instance of Orion (*Orion 2* in figure [SC-02](#figure_sc02) below) knows nothing of the new/modified subscription until its `subCacheRefresh()` executes and merges the database content with its sub-cache contents.
 
 <a name='figure_sc02'></a>
-![SUBSCRIPTION PROPAGATION IMAGE](images/sc02.png)
-_Figure SC-02_
+![SUBSCRIPTION PROPAGATION IMAGE](images/SC-02.png)
+
+_Figure SC-02_  
 
 
 The case of the four special fields (lastNotificationTime, count, lastFailure, and lastSuccess) is a bit more complex as the *most recent* information of these fields lives **only** in the sub-cache. So, to propagate `lastNotificationTime` from one Orion (Orion1) to another (Orion2), first Orion1 needs to refresh its sub-cache and **after that**, Orion2 must refresh its sub-cache. Not before this happens, in that order, Orion2 will be aware of the `lastNotificationTime` coming from Orion1.
