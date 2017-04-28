@@ -1,8 +1,8 @@
 # Context Providers
 The Orion context broker, as explained in [the User & Programmers Manual](http://fiware-orion.readthedocs.io/en/master/index.html), supports
 the concept of context providers. In short, when for an update/query, an entity/attribute is not found, Orion checks its list of registrations (ngsi9) and
-if found there, a request is forwarded to a Context Provider.
-This Context Provider is found in the field `providingApplication` of the `struct ContextRegistration` that is part of the registration request `RegisterContextRequest`.
+if found there, a request is forwarded to a Context Provider.  
+The IP, port and path of the Context Provider is found in the field `providingApplication` of the `struct ContextRegistration` that is part of the registration request `RegisterContextRequest`.
 
 ## Forwarding of Update Requests
 
@@ -18,7 +18,7 @@ This field can take on five different values:
 *[ The first three are "standard NGSIv1" while the second two were added for NGSIv2 ]*  
 
 * Requests with `UPDATE` or `REPLACE` may provoke forwarding of the request.
-  Only if **not found locally but found in a regstration**.
+  Only if **not found locally but found in a registration**.
 * If `APPEND` is used, the action will always be local. If the entity/attribute already exists it will be
   updated. If not, it is created.
 * `APPEND_STRICT` fails if the entity/attribute already exists.
