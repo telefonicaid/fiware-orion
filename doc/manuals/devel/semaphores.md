@@ -16,8 +16,8 @@ respective structure/class.
 
 
 ## Mongo Request Semaphore
-The *Mongo Request Semaphore* resides in `lib/common/sem.cpp` and its semaphore variable is	`reqSem`.
-The functions to take/give the semaphore are	`reqSemTake` and `reqSemGive`.
+The *Mongo Request Semaphore* resides in `lib/common/sem.cpp` and its semaphore variable is	`reqSem`.  
+The functions to take/give the semaphore are	`reqSemTake` and `reqSemGive`.  
 The function `reqSemTake` is somewhat special as there are four different working modes for the Mongo Request Semaphore:
 
 * None
@@ -26,14 +26,14 @@ The function `reqSemTake` is somewhat special as there are four different workin
 * Both **Read and Write** operations
 
 None meaning that the semaphore isn't used.  
-The way this semaphore works is set using the CLI option `-reqMutexPolicy`. Default value is "Both Read and	Write operations".
+The operation mode of this semaphore is set using the CLI option `-reqMutexPolicy`. Default value is "Both Read and	Write operations".
 
 This semaphore is used for each and every request to the database - **only** by top level functions of mongoBackend, i.e. those functions
 that are external and called by service routines.
 
 
 ## Transaction ID Semaphore
-The *Transaction ID Semaphore* resides in `lib/common/sem.cpp` and its semaphore variable is `transSem`.
+The *Transaction ID Semaphore* resides in `lib/common/sem.cpp` and its semaphore variable is `transSem`.  
 The functions to take/give the semaphore are  `transSemTake` and `transSemGive`.  
 
 Each REST request that Orion receives is given a unique **Transaction ID**:  
@@ -58,8 +58,8 @@ See the function `transactionIdSet` in the file `lib/common/globals.cpp`.
 
 
 ## Subscription Cache Semaphore
-The *Subscription Cache Semaphore* resides in `lib/common/sem.cpp` and its semaphore variable is `cacheSem`.
-The functions to take/give the semaphore are  `cacheSemTake` and `cacheSemGive` and they are used by functions in two different libraries:
+The *Subscription Cache Semaphore* resides in `lib/common/sem.cpp` and its semaphore variable is `cacheSem`.  
+The functions to take/give the semaphore are `cacheSemTake` and `cacheSemGive` and they are used by functions in two different libraries:
 
 * mongoBackend and
 * cache
@@ -72,7 +72,7 @@ Details on this semaphore is already present in the [dedicated document of the S
 
 
 ## Timing Statistics Semaphore
-The *Timing Statistics Semaphore* resides in `lib/common/sem.cpp` and its semaphore variable is called `timeStatSem`.
+The *Timing Statistics Semaphore* resides in `lib/common/sem.cpp` and its semaphore variable is called `timeStatSem`.  
 The functions to take/give the semaphore are `timeStatSemTake()` and `timeStatSemGive()`.
 
 Timing Statistics were invented as a tool to detect bottlenecks in run-time and as system-calls are used to measure time, this impacts the
@@ -91,8 +91,8 @@ The variables holding these two semaphores are called:
 
 and they are initialized in `mongoConnectionPoolInit()` in `lib/mongoBackend/mongoConnectionPool.cpp`, and taken/given in two functions of the same file:
 
-* mongoPoolConnectionGet
-* mongoPoolConnectionRelease
+* mongoPoolConnectionGet()
+* mongoPoolConnectionRelease()
 
 The variables holding the semaphores are static and thus cannot be accessed outside this file (`mongoConnectionPool.cpp`).
 
@@ -131,7 +131,7 @@ The semaphore is used when ever the Metrics List is read or updated, which is do
 
 
 ## Alarm Manager Semaphore
-The Alarm Manager is pretty similar to the Metrics Manager, and its semaphore follows the same pattern.
+The Alarm Manager is pretty similar to the Metrics Manager, and its semaphore follows the same pattern.  
 The class `AlarmManager` has a private field called `sem` and methods:
 
 * AlarmManager::semTake()
@@ -149,9 +149,9 @@ The semaphore protects the list of alarms and is accessed by the following metho
 * badInput
 * badInputReset
 
-### NOTE
+#### NOTE
 The Alarm Manager semaphore is private in the class `AlarmManager`, **but** the methods `semTake()` and `semGive()` are **public**.
-This is a mistake, the methods should be provate as well. They aro only called from within methods of `AlarmManager`, so, no problem in
+This is a mistake, the methods should be private as well. They aro only called from within methods of `AlarmManager`, so, no problem in
 making the methods private.
 
 
@@ -166,7 +166,7 @@ The semaphore is initialized in the function `lmSemInit()` and used in the two s
 
 ## Notification Queue Statistics Semaphore
 The statistics of the Notification Queue is protected by the semaphore `mtxTimeInQ` in `lib/ngsiNotify/QueueStatistics.cpp`.
-This is the only semaphore of the type `boost::mutex` and it used whenever the timing statistics of the Notification Queue is accessed:
+This is the only semaphore of the type `boost::mutex` and it used whenever the timing statistics of the Notification Queue is modified/queried:
 
 * QueueStatistics::getTimeInQ()
 * QueueStatistics::addTimeInQWithSize()
