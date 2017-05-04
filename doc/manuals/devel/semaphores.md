@@ -9,6 +9,7 @@ Orion manages a number of semaphores for protection of delicate data and resourc
 * Metrics Manager
 * Alarm Manager
 * Log File
+* Notification Queue
 * Notification Queue Statistics
 
 Of these semaphores, the first four use helper functions in `lib/common/sem.[cpp|h]`, while the others are part of their
@@ -164,9 +165,36 @@ The semaphore is initialized in the function `lmSemInit()` and used in the two s
 * lmClear()
 
 
+## Notification Queue Semaphore
+When a thread pool is selected (using the CLI parameter -notificationMode), for sending of notifications, a queue is used to feed the notifications
+to the workers in the thread pool. This queue is of course protected by a semaphore. 
+The semaphore, of type `boost::mutex` is called `mtx` and is a private member of the class `SyncQOverflow`, found in `src/lib/common/SyncQOverflow.h`:
+```
+template <typename Data> class SyncQOverflow
+{
+private:
+  std::queue<Data>           queue;
+  mutable boost::mutex       mtx;
+  boost::condition_variable  addedElement;
+  size_t                     max_size;
+
+public:
+  SyncQOverflow(size_t sz): max_size(sz) {}
+  bool     try_push(Data element);
+  Data     pop();
+  size_t   size() const;
+};
+```
+The class `QueueWorkers` includes a private member of type SyncQOverflow, while the class `QueueNotifier` includes a private member of type QueueWorkers.
+Finally, `contextBrokerInit()` in `src/app/contextBroker/contextBroker.cpp` creates an instance of `QueueNotifier` as a singleton, when requested (when CLI parameter `-notificationMode` equals **threadpool**).
+The method `try_push()` of the template class `SyncQOverflow` takes this semaphore before pushing items to the notification queue and likewise the method `pop()` takes it before popping an element.
+This semaphore protects pushing and popping to the notification queue. However, there is a need for a mechanism to wait for items in the queue as well and
+for this purpose a `boost::condition_variable` called `addedElement` is used. `addedElement` is a private member of the class `SyncQOverflow`.
+
+
 ## Notification Queue Statistics Semaphore
 The statistics of the Notification Queue is protected by the semaphore `mtxTimeInQ` in `lib/ngsiNotify/QueueStatistics.cpp`.
-This is the only semaphore of the type `boost::mutex` and it used whenever the timing statistics of the Notification Queue is modified/queried:
+This semaphore is of the type `boost::mutex` and it is used whenever the timing statistics of the Notification Queue is modified/queried:
 
 * QueueStatistics::getTimeInQ()
 * QueueStatistics::addTimeInQWithSize()
