@@ -86,6 +86,7 @@ std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
 
 After returning from the service routine, the result of the parse can be released without risk.
 
+[Top](#json-parse-v1)
 
 ## jsonParse
 As mentioned, there are two different functions called `jsonParse()` in `src/lib/jsonParse/jsonParse.cpp`. One top level and one lower level.
