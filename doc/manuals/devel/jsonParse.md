@@ -88,7 +88,6 @@ After returning from the service routine, the result of the parse can be release
 
 
 ## jsonParse
-<a name='jsonParse'></a>
 As mentioned, there are two different functions called `jsonParse()` in `src/lib/jsonParse/jsonParse.cpp`. One top level and one lower level.
 The top level `jsonParse()` is the entry function and it is visible from outside of `src/lib/jsonParse/jsonParse.cpp`:
 
