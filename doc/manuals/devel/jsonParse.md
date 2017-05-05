@@ -12,7 +12,7 @@ The two json libraries of Orion implement the necessary adaption of the external
 The library jsonParse contains two overloaded functions with the name **jsonParse**.
 The first one is the toplevel function that is called only once per reqeust.
 The second jsonParse (invoked by the first) on the other hand is invoked recursively once per node in the parsed tree that
-is output from *Boost property_tree*. See full explanation in the [dedicated section on jsonParse()](#jsonParse)
+is output from *Boost property_tree*. See full explanation in the [dedicated section on jsonParse()](#jsonparse)
 The concrete example used for this image is the parsing of payload for POST /v1/updateContextRequest
 
 <a name='figure_pp01'></a>
