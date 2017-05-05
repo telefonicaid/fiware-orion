@@ -7,7 +7,7 @@ To describe the flow of NGSIv2 parse, we need an example payload as the code is 
 The request POST /v2/entities is used in this example flow
 
 <a name='figure_pp03'></a>
-![CACHE REFRESH IMAGE](images/PP-03.png)
+![CACHE REFRESH IMAGE](images/Flow-PP-03.png)
 
 _Figure PP-03_  
 
