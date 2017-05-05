@@ -484,7 +484,7 @@ _NF-03: Notification on entity-attribute Update/Creation with thread pool_
 
 * A vector of SenderThreadParams is built, each item of this vector corresponding to one notification (step 1).
 * The vector is pushed onto the Notification Message Queue and control is returned to mongoBackend (step 2). This is done using `SyncQOverflow::try_push()
-` function, which uses the notification queue semaphore to synchronize access to the queue (see [this document for more detail](semaphores.md#notification-queue-semaphore)). The threads that receives from the queue will take care of the notification when it can. 
+` function, which uses the notification queue semaphore to synchronize access to the queue (see [this document for more detail](semaphores.md#notification-queue-semaphore)). The threads that receives from the queue will take care of the notification when it can.
 * One of the worker threads in the thread pool pops an item from the message queue (step 3). This is done using the `SyncQOverflow::pop()` function, which uses the notification queue semaphore to synchronize access to the queue.
 * The worker thread loops over the SenderThreadParam vector of the popped queue item and sends one notification per SenderThreadParams item in the vector (steps 4, 5 and 6). The response from the receiver of the notification is awaited on (with a timeout), and all notifications are done in a serialized manner.
 * After that, the worker thread sleeps, waiting to wake up when a new item in the queue needs to be processed.
