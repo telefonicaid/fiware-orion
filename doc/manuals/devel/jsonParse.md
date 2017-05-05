@@ -12,7 +12,7 @@ The two json libraries of Orion implement the necessary adaption of the external
 The library jsonParse contains two overloaded functions with the name **jsonParse**.
 The first one is the toplevel function that is called only once per reqeust.
 The second jsonParse (invoked by the first) on the other hand is invoked recursively once per node in the parsed tree that
-is output from *Boost property_tree*. See full explanation in the [dedicated section on jsonParse()](#jsonParse)
+is output from *Boost property_tree*. See full explanation in the [dedicated section on jsonParse()](#jsonparse)
 The concrete example used for this image is the parsing of payload for POST /v1/updateContextRequest
 
 <a name='figure_pp01'></a>
@@ -86,9 +86,9 @@ std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
 
 After returning from the service routine, the result of the parse can be released without risk.
 
+[Top](#json-parse-v1)
 
 ## jsonParse
-<a name='jsonParse'></a>
 As mentioned, there are two different functions called `jsonParse()` in `src/lib/jsonParse/jsonParse.cpp`. One top level and one lower level.
 The top level `jsonParse()` is the entry function and it is visible from outside of `src/lib/jsonParse/jsonParse.cpp`:
 
