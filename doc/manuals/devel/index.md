@@ -63,6 +63,12 @@ scripts used for testing and release making are found under `scripts/`.
 
 [Top](#top)
 
+## Cross-library topics
+
+* [Cook book](cookbook.md). This document describes some useful development related receipts.
+* [Semaphores](semaphores.md). This document provides detailed information about the different semaphores that Orion for internal synchronization.
+
+[Top](#top)
 
 ## <a name='src/app/contextBroker/'></a>src/app/contextBroker/
 The main program is found in `contextBroker.cpp` and its purpose it to:
@@ -193,56 +199,47 @@ and another vector for the URI parameters.
 For detailed information about the microhttpd library, see [its dedicated page in gnu.org](https://www.gnu.org/software/libmicrohttpd/).
 
 ### Request Flow
-<a name='figure_rq01'></a>
-![Request Reception](images/RQ-01.png)
 
-_Figure RQ-01_  
+<a name='flow-rq-01'></a>
+![Reception of a request](images/Flow-RQ-01.png)
 
-* (2)   connectionTreat is the brokers callback function for incoming connections from MHD (microhttpd). This callback is setup in the call to MHD_start_daemon in 
-* (4+5) As long as MHD receives payload from the client, the callback function (connectionTreat) is called with a new chunk of payload
-* (6)   The last call to connectionTreat is to inform the client callback (connectionTreat) that the entire request has been sent. This is done by setting
-        the data length to ZERO in this last callback
-* (7)   The entire request is read so serveFunction() takes care of serving the request, all the way until responding to the request. 
+_RQ-01: Reception of a request_
 
+* The client sends a request (step 1).
+* connectionTreat is the brokers callback function for incoming connections from MHD (microhttpd). This callback is setup in the call to MHD_start_daemon in `restStart()` in `src/lib/rest/rest.cpp' and invoked upon client request arrival (step 2 and 3).
+* As long as MHD receives payload from the client, the callback function (connectionTreat) is called with a new chunk of payload (steps 4 and 5)
+* The last call to connectionTreat is to inform the client callback (connectionTreat) that the entire request has been sent. This is done by setting the data length to ZERO in this last callback (step 6).
+* The entire request is read so serveFunction() takes care of serving the request, all the way until responding to the request (step 7). See diagrfam RQ-02.
+* Control is returned to MHD (step 8).
 
 ### Treating an Incoming Request
-<a name='figure_rq02'></a>
-![Request Treatment](images/RQ-02.png)
 
-_Figure RQ-02_  
+<a name='flow-rq-02'></a>
+![Treatment of a request](images/Flow-RQ-02.png)
 
-* (00) serveFunction() is actually not a function but a pointer to one. By default it points to the function serve() from lib/rest/rest.cpp,
-       but this can be configured by setting some function as parameter _serveFunction in the call to restInit.
-* (01) serveFunction calls restService(), The function restService examines the URL PATH and picks a service function to treat the request.
-* (02) Also, if payload is present, restService calls payloadParse() to parse the payload
-* (03) The service function of the request takes over. To dermine which of all the service functions (found in lib/serviceFunctions and lib/serviceFunctionV2,
-       please see the RestService vector in app/contextBroker/contextBroker.cpp).
-* (04) The service function could invoke a lower level service function. See helping table for detail
-* (05) Finally, mongoBackend is invoked 
-* (06) Response string created by Service Routine  and returned to restService
-* (07) After database processing of the request, the response is returned to the client.
-         Note that on error, e.g. parse error, or non-supported URL, etc, the flow would end long before reaching mongoBackend as the error-response
-         would be returned from a higher layer.
-         The response is done by the function restReply() in lib/rest, with the help of MHD functions, especially MHD_queue_response().
-* (08) restReply() calls MHD_queue_response()
-* (09) MHD responds to Client
-* (10) Once mongoBackend is ready and the response is sent, the service routine returns, to restService, that returns all the way back to MHD
-       (See point 8 and 9 on [the previous slide](#figure_rq01))
+_RQ-02: Treatment of a request_
+
+* `serveFunction()` calls `restService()` (step 1). Actually, `serveFunction()` is not a function but a pointer to one. By default it points to the function `serve()` from `lib/rest/rest.cpp`, but this can be configured by setting some function as parameter `_serveFunction` in the call to `restInit()`.
+* Also, if payload is present, `restService()` calls `payloadParse()` to parse the payload (step 2). Details are provided in PP diagrams.
+* The service function of the request takes over (step 3). Service function is choosen based on the URL path used in the request. To determine which of all the service functions (found in lib/serviceFunctions and lib/serviceFunctionV2, please see the `RestService` vector in `app/contextBroker/contextBroker.cpp`). 
+* The service function could invoke a lower level service function. See helping table for detail (step 4).
+* Finally, mongoBackend is invoked (step 5). The MB diagrams provide detailed descriptions for the different cases. 
+* Response string created by Service Routine and returned to restService (step 6).
+* After database processing of the request, the response is returned to the client (step 7). Note that on error, e.g. parse error, or non-supported URL, etc, the flow would end long before reaching mongoBackend as the error-response would be returned from a higher layer. The response is done by the function restReply() in lib/rest, with the help of MHD functions, especially MHD_queue_response().
+* restReply() calls MHD_queue_response() (step 8) which in sequence responds to client (step 9).
+* Once mongoBackend is ready and the response is sent, the service routine returns, to restService, that returns all the way back to MHD (step 10).
 
 ### payloadParse()
+
 The payload to Orion can be of three different types:
 
 * V1 JSON,
 * V2 JSON,
 * Plain Text
 
-The function `payloadParse()`, that resides in the rest library, in `lib/rest/RestService.cpp`, serves as a fork and calls the
-appropriate parse function.
+The function `payloadParse()`, that resides in the rest library, in `lib/rest/RestService.cpp`, serves as a fork and calls the appropriate parse function, as shown in the picture below:
 
-<a name='figure_pp04'></a>
-![Payload Parse Fork](images/PP-04.png)
-
-_Figure PP-04_  
+![Parsing alternatives](images/parsing-alternatives.png)
 
 The JSON parse implementations reside in dedicated libraries while the text parse, as it is pretty simple, is a part of the **parse** library.
 
@@ -343,18 +340,13 @@ to other libraries and this library thus be eliminated.
 
 However, as parsing of **text** is a very simple task, this never got its own directory/library but resides here in the common part.
 
-<a name='figure_pp02'></a>
-![Text Payload Parse](images/PP-02.png)
+<a name='flow-pp-02'></a>
+![Parsing a TEXT Payload](images/Flow-PP-02.png)
 
-_Figure PP-02_  
+_PP-02: Parsing a TEXT Payload_
 
-
-* payloadParse() calls textRequestTreat() which contains a switch that calls the correct treat function depending on the type of the request.
-    As of the moment of writing this document, Orion supports TEXT payloads only for one single type of request,
-    so there is only one treat function to choose from (or ERROR if the request type is not EntityAttributeValueRequest).
-* textParseAttributeValue() extracts the string and checks for special strings such as true, false, and null and also examines the string
-  to see whether it is a Number.
-  Then this value along with the type of the value is set to the attribute that is a parameter for the function. 
+* payloadParse() calls textRequestTreat() (step 1) which contains a switch that calls the correct treat function depending on the type of the request (step 2). As of the moment of writing this document, Orion supports TEXT payloads only for one single type of request, so there is only one treat function to choose from (or ERROR if the request type is not EntityAttributeValueRequest).
+* textParseAttributeValue() extracts the string and checks for special strings such as true, false, and null and also examines the string to see whether it is a Number. Then this value along with the type of the value is set to the attribute that is a parameter for the function. 
 
 [Top](#top)
 
@@ -367,7 +359,8 @@ the ngsi classes.
 This library contains a vector of the type JsonRequest, that defines how to parse the different requests.
 The function `jsonTreat` picks the parsing method and jsonParse takes care of the parsing, with the help from
 
-See detailed explanation of the V2 JSON parse implementation in its [dedicated document](jsonParse.md)
+See detailed explanation of the V2 JSON parse implementation in its [dedicated document](jsonParse.md).
+
 [Top](#top)
 
 
@@ -379,7 +372,8 @@ tree of objects representing the JSON payload.
 Especially important is the function `jsonRequestTreat()` that basically is a switch that calls the different
 parsing routines according to the type of the payload.
 
-See detailed explanation of the V2 JSON parse implementation in its [dedicated document](jsonParseV2.md)
+See detailed explanation of the V2 JSON parse implementation in its [dedicated document](jsonParseV2.md).
+
 [Top](#top)
 
 
@@ -454,10 +448,9 @@ This library is similar to the *ngsi9/10* libraries.
 
 
 ## <a name='src/lib/mongoBackend/'></a>src/lib/mongoBackend/
-The most important of all libraries of the broker, the **mongoBackend** library is where all the database interaction
-takes place.
 
-TBD
+The most important of all libraries of the broker, the **mongoBackend** library is where all the database interaction takes place. This library is described in detail in [a separate document](mongoBackend.md).
+
 
 [Top](#top)
 
@@ -470,63 +463,47 @@ the subscriber will be sent a notification, and it is the task of this library t
 Actually, a function from the **rest** library is used: `httpRequestSend`.
 Another important aspect of this library is that the notifications are sent by separete threads, using a thread pool if desired.
 
-Using the CLI option `-notificationMode`, Orion can be started with a thread pool for sending of notifications (`-notificationMode threadpool`).
-If not used, then a thread will be created for each notification to be sent (default value of `-notificationMode` is "transient").
+Using the CLI option `-notificationMode`, Orion can be started with a thread pool for sending of notifications (`-notificationMode threadpool`). If so, during Orion startup, a pool of threads is created and these threads awaits new items in the notification queue and when an item is present, it is taken from the queue and processed, sending the notification in question. If not used, then a thread will be created for each notification to be sent (default value of `-notificationMode` is "transient").
 
-The following two images demonstrate the program flow for context entity notifications without and with thread pool
+The invoking function in the case of Notification due to attribute update/creation is `processOnChangeConditionForUpdateContext` in `lib/mongoBackend/MongoCommonUpdate.cpp`. The following two images demonstrate the program flow for context entity notifications without and with thread pool.
 
-<a name='figure_nf01'></a>
-![NGSI10 Notifications Without Thread Pool](images/NF-01.png)
+<a name='flow-nf-01'></a>
+![Notification on entity-attribute Update/Creation without thread pool](images/Flow-NF-01.png)
 
-_Figure NF-01_  
+_NF-01: Notification on entity-attribute Update/Creation without thread pool_
 
-The invoking function in the case of Notification due to attribute update/creation is `processOnChangeConditionForUpdateContext` in 'lib/mongoBackend/MongoCommonUpdate.cpp`.
-The preceding (and following after returning to mongoBackend) flow is depicted in [Figure NF-01](#figure_nf01).
+* A vector of SenderThreadParams is built, each item of this vector corresponding to one notification (step 1).
+* pthread_create is called to create a new thread for sending of the notifications and without waiting any results, the control is returned to mongoBackend (step 2).
+* pthread_create spawns the new thread which has startSenderThread an starting point (step 3).
+* startSenderThread loops over the SenderThreadParams vector and sends a notification per item (steps 4, 5 and 6). The response from the receiver of the notification is awaited on (with a timeout), and all notifications are done in a serialized manner.
 
-* (01) A vector of SenderThreadParams is built, each item of this vector corresponding to one notification.
-* (02) pthread_create is called to create a new thread for sending of the notifications and without waiting any results, the control is returned to mongoBackend
-* (03) pthread_create spawns the new thread which has startSenderThread an starting point.
-* (04) startSenderThread loops over the SenderThreadParams vector and sends a notification per item.
-       The response from the receiver of the notification is awaited on (with a timeout), and all notifications are done in a serialized manner.
+<a name='flow-nf-03'></a>
+![Notification on entity-attribute Update/Creation with thread pool](images/Flow-NF-03.png)
 
+_NF-03: Notification on entity-attribute Update/Creation with thread pool_
 
-<a name='figure_nf03'></a>
-![NGSI10 Notification With Thread Pool](images/NF-03.png)
-
-_Figure NF-03_  
-
-Orion uses a thread pool for sending of notifications if started with the command line option -notificationMode “threadpool”.
-If so, during Orion startup, a pool of threads is created and these threads awaits new items in the notification queue and when an item is present,
-it is taken from the queue and processed, sending the notification in question.
-
-The invoking function in the case of Notification due to attribute update/creation is `processOnChangeConditionForUpdateContext` in 'lib/mongoBackend/MongoCommonUpdate.cpp`.
-The preceding (and following after returning to mongoBackend) flow is depicted in [Figure NF-03](#figure_nf03).
-
-* (01) A vector of SenderThreadParams is built, each item of this vector corresponding to one notification.
-* (02) The vector is pushed onto the Notification Message Queue and control is returned to mongoBackend.
-       The threads that receives from the queue will take care of the notification when it can.
-* (03) One of the worker threads in the thread pool pops an item from the message queue
-* (04) The worker thread loops over the SenderThreadParam vector of the popped queue item and sends one notification per SenderThreadParams item in the vector. 
-       The response from the receiver of the notification is awaited on (with a timeout), and all notifications are done in a serialized manner.
-
+* A vector of SenderThreadParams is built, each item of this vector corresponding to one notification (step 1).
+* The vector is pushed onto the Notification Message Queue and control is returned to mongoBackend (step 2). This is done using `SyncQOverflow::try_push()
+` function, which uses the notification queue semaphore to synchronize access to the queue (see [this document for more detail](semaphores.md#notification-queue-semaphore)). The threads that receives from the queue will take care of the notification when it can. 
+* One of the worker threads in the thread pool pops an item from the message queue (step 3). This is done using the `SyncQOverflow::pop()` function, which uses the notification queue semaphore to synchronize access to the queue.
+* The worker thread loops over the SenderThreadParam vector of the popped queue item and sends one notification per SenderThreadParams item in the vector (steps 4, 5 and 6). The response from the receiver of the notification is awaited on (with a timeout), and all notifications are done in a serialized manner.
+* After that, the worker thread sleeps, waiting to wake up when a new item in the queue needs to be processed.
 
 ### Notifications for Availability Subscriptions
 We have subscriptions both for context entities **and** for *Availability Registrations* and thus, there are two types of notifications.
 Context entity subscriptions are by far more important (registration subscriptions are barely used at all) and the threadpool for notifications
 is used for context entity subscriptions only. 
 
-<a name='figure_nf02'></a>
-![NGSI9 Notification](images/NF-02.png)
+<a name='flow-nf-02'></a>
+![Notification on entity-attribute availability Registration/Update](images/Flow-NF-02.png)
 
-_Figure NF-02_  
+_NF-02: Notification on entity-attribute availability Registration/Update_
 
-* (01) Extract IP, port and path from the value of the second parameter (url) to the method sendNotifyContextAvailabilityRequest.
-* (02) Create an instance of SenderThreadParams and fill it in with the data for the notification. Then create a vector of SenderThreadParams
-       and push the instance to the vector. This is the input that is expected by startSenderThread() that is shared between sendNotifyContextAvailabilityRequest
-       and sendNotifyContextRequest. In the case of sendNotifyContextAvailabilityRequest, the vector will always contain only one item.
-* (03) pthread_create is called to create a new thread for sending of the notifications and without waiting any results, the control is returned to mongoBackend
-* (04) pthread_create spawns the new thread which has startSenderThread an starting point.
-* (05) startSenderThread sends the notification described by the SenderThreadParams item in the vector. The response from the receiver of the notification is awaited on (with a timeout).
+* Extract IP, port and path from the value of the second parameter (url) to the method sendNotifyContextAvailabilityRequest (step 1).
+* Create an instance of SenderThreadParams and fill it in with the data for the notification (step 2). Then create a vector of SenderThreadParams and push the instance to the vector. This is the input that is expected by startSenderThread() that is shared between sendNotifyContextAvailabilityRequest and sendNotifyContextRequest. In the case of sendNotifyContextAvailabilityRequest, the vector will always contain only one item.
+* pthread_create is called to create a new thread for sending of the notifications and without waiting any results (step 3). The control is returned to mongoBackend.
+* pthread_create spawns the new thread which has startSenderThread an starting point (step 4).
+* startSenderThread sends the notification described by the SenderThreadParams item in the vector (step 5, 6 and 7). The response from the receiver of the notification is awaited on (with a timeout).
 
 [Top](#top)
 
@@ -552,6 +529,7 @@ The database is updated first after a period of time, called the sub-cache-inter
 Note that the NGSIv2 GET subscription requests **do not** take the subcription information from the subscription cache, but directly from the database.
 
 See full documentation on the subscription cache in its [dedicated document](subscriptionCache.md).
+
 [Top](#top)
 
 

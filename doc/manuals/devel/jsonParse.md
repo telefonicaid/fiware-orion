@@ -45,7 +45,7 @@ is output from *Boost property_tree*. See full explanation in the [dedicated sec
 The concrete example used for following image is the parsing of payload for **POST /v1/updateContextRequest**
 
 <a name='figure_pp01'></a>
-![CACHE REFRESH IMAGE](images/PP-01.png)
+![CACHE REFRESH IMAGE](images/Flow-PP-01.png)
 
 _Figure PP-01_  
 
