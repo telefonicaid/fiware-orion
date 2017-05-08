@@ -1,9 +1,9 @@
 # JSON Parse NGSIv1
 
 Orion context broker contains not one but **two** libraries for JSON parsing. The reason for this is that the external library
-that was selected for parsing of NGSIv1 JSON (we will not dwelve on **why** that particular library was selected) cannot distinguish between value
-types such as String, Number, Boolean, Null but treats all values as strings.
-This was unacceptable for NGSIv2 and so, another external JSON library was chosen.
+that was selected for parsing of NGSIv1 JSON (we will not dwelve on **why** that particular library was selected) cannot distinguish between JSON value
+types such as String, Number, Boolean, Null but **treats all values as strings**.
+This was unacceptable for NGSIv2 and so, another external JSON library (rapidjson) was chosen.
 The two json libraries of Orion implement the necessary adaption of the external libraries to be usable by Orion.
 
 **Important**: *the purpose of the parse step is to transform a text buffer, JSON is this case, to an instance of a class/struct in C++*.  
