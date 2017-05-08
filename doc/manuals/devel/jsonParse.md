@@ -1,4 +1,4 @@
-# JSON Parse V1
+# JSON Parse NGSIv1
 
 Orion context broker contains not one but **two** libraries for JSON parsing. The reason for this is that the external library
 that was selected for parsing of NGSIv1 JSON (we will not dwelve on **why** that particular library was selected) cannot distinguish between value
