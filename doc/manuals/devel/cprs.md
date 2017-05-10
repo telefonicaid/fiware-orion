@@ -33,7 +33,7 @@ The response to the initial request is not sent until each and every response fr
 
 _FW-01: Forward an Update to Context Providers_
 
-Note that there are a number of service routines that end up calling postUpdateContext (detail not included in diagram).
+Note that there are a number of service routines that end up calling `postUpdateContext()` (see detail in [the service routines mapping document](ServiceRoutines.txt)).
 
 * All attributes in the incoming payload are marked as **Not Found** (step 1).
 * mongoBackend processes the request and marks all attributes in the requests in one of three possible ways (step 2):
@@ -71,11 +71,13 @@ isn't sent until all responses to the forwarded requests have been received and 
 
 _FW-03: Forward a Query to Context Providers_
 
+Note that there are a number of service routines that end up calling `postQueryContext()` (see detail in [the service routines mapping document](ServiceRoutines.txt)).
+
 postQueryContext creates a vector of QueryContextRequest (called requestV) whose items are each to be rendered and sent to a Context Provider.
 The QueryContextRequest items are filled in based on the output of the mongoBackend function mongoQueryContext.
 
 * mongoBackend/mongoQueryContext is invoked to get the ‘map’ of where to find attributes matching the query (step 1). Note that Matching local attributes are already filled in in the response from mongoQueryContext.
-* `forwaredPending()` function is called (step 2). If it returns TRUE, the response from mongoQueryContext includes forwarding. If it returns FALSE, then we are done and postQueryContext can return to the caller. Let's assume that forwardsPending returns TRUE in the diagram.
+* `forwardPending()` function is called (step 2). If it returns TRUE, the response from mongoQueryContext includes forwarding. If it returns FALSE, then we are done and postQueryContext can return to the caller. Let's assume that forwardsPending returns TRUE in the diagram.
 * Create a vector of QueryContextRequest (each item to be forwarded to a Context Provider) and for each Attribute of each ContextElementResponse (returned by mongoQueryContext), put the attribute in the correct item of the vector of QueryContextRequest (step 3). If no item is found, create one and add it to the vector.
 * Internal Loop: actual forwarding to the Context Provider:
     * For each item of the vector of QueryContextRequest, call queryForward(), that takes care of sending the query to the Context Provider in turn

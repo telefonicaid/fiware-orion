@@ -214,7 +214,7 @@ _RQ-02: Treatment of a request_
 * `serveFunction()` calls `restService()` (step 1). Actually, `serveFunction()` is not a function but a pointer to one. By default it points to the function `serve()` from `rest.cpp`, but this can be configured by setting some function as parameter `_serveFunction` in the call to `restInit()`.
 * Also, if payload is present, `restService()` calls `payloadParse()` to parse the payload (step 2). Details are provided in PP diagrams.
 * The service function of the request takes over (step 3). Service function is choosen based on the URL path used in the request. To determine which of all the service functions (found in lib/serviceFunctions and lib/serviceFunctionV2, please see the `RestService` vector in [`contextBroker.cpp`](#srcappcontextbroker)).
-* The service function could invoke a lower level service function. See helping table for detail (step 4).
+* The service function could invoke a lower level service function. See [the service routines mapping document](ServiceRoutines.txt) for detail (step 4).
 * Finally, a function in [the **mongoBackend** library](#srclibmongobackend) is invoked (step 5). The MB diagrams provide detailed descriptions for the different cases.
 * Response string created by Service Routine and returned to `restService()` (step 6).
 * After database processing of the request, the response is returned to the client (step 7). Note that on error, e.g. parse error, or non-supported URL, etc, the flow would end long before reaching mongoBackend as the error-response would be returned from a higher layer. The response is done by the function `restReply()`, with the help of MHD functions, especially `MHD_queue_response()`.
@@ -362,7 +362,7 @@ See detailed explanation of the V2 JSON parse implementation in its [dedicated d
 ## src/lib/serviceRoutines/
 The **serviceRoutines** is especially important, as this is where the requests are treated and sent to [**mongoBackend** library](#srclibmongobackend) for final processing.
 
-Two service routines are especially important as many other service routines end up calling them:
+Two service routines are especially important as many other service routines end up calling them (see [the service routines mapping document](ServiceRoutines.txt) for details]):
 
 * `postUpdateContext()`
 * `postQueryContext()`
@@ -413,12 +413,14 @@ So, for the rest library to find the service routine of an incoming request, it 
 ## src/lib/serviceRoutinesV2/
 Similar to the **serviceRoutines** library described above, the **serviceRoutinesV2** library contains the service routines for NGSIv2 requests.
 
+Some NGSIv2 service routines invoke [**mongoBackend**](#srclibmongobackend) directly. Others rely in a lower level service routine. See [the service routines mapping document](ServiceRoutines.txt) for details.
+
 [Top](#top)
 
 
 ## src/lib/convenience/
-The **convenience** library contains top hierarchy classes for the NGSIv1 convenience operations.
-For a complete list of these requests, kindly see [the document XXX]().
+The **convenience** library contains top hierarchy classes for the NGSIv1 convenience operations. For a complete list of these requests (and the service routines in which they are based), kindly see [the service routines mapping document](ServiceRoutines.txt).
+
 This library is similar to the [**ngsi9**](#srclibngsi9) and [**ngsi10**](#srclibngsi10) libraries.
 
 [Top](#top)
