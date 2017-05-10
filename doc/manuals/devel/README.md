@@ -265,18 +265,18 @@ ContextElement in its turn contains:
 * EntityId
 * AttributeDomainName
 * ContextAttributeVector
-* MetadataVector
+* MetadataVector this element is part of NGSIv1 but Orion doesn't make use of it)
 
 Now, the methods `render()`, `check()`, `release()`, etc. are called in a tree-like fashion, starting from the top hierarchy class, e.g. UpdateContextRequest:
 
-* `UpdateContextRequest::check()` calls
-  * `ContextElementVector::check()` calls (for each item in the vector)
-      * `ContextElement::check()` calls
+* `UpdateContextRequest::check()` calls:
+  * `ContextElementVector::check()` calls (for each item in the vector):
+      * `ContextElement::check()` calls:
           * `EntityId::check()`
           * `AttributeDomainName::check()`
-          * `ContextAttributeVector::check()` calls (for each item in the vector)
-              * `ContextAttribute::check()` calls
-                  * `MetadataVector::check()` calls  (for each item in the vector)
+          * `ContextAttributeVector::check()` calls (for each item in the vector):
+              * `ContextAttribute::check()` calls:
+                  * `MetadataVector::check()` calls  (for each item in the vector):
                       * `Metadata::check()`
 
 Each class invokes the method for its underlying classes. The example above was made with the `check()` method, but the same thing is true also for `release()`, `present()`, etc.
