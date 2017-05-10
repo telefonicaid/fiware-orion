@@ -21,7 +21,7 @@ scripts used for testing and release making are found under `scripts/`.
 * **test**: contains tests. There are several subdirectories (each subdirectory corresponding to a different test 
   suite/procedure), but the most important ones for the time being are: 
   * **unittest**: contains unit tests
-  * **functionalTest**: contains functional end-to-end tests based on the “test harness” engine
+  * **functionalTest**: contains functional end-to-end tests based on the "test harness" engine
   * **acceptance**: contains functional end-to-end test based on the Behave (NGSIv2) or Lettuce (NGSIv1) Python  
     frameworks.
 * **scripts**: contains utility scripts (e.g. scripts included in the Orion RPM along with Orion binary itself,
@@ -37,7 +37,7 @@ scripts used for testing and release making are found under `scripts/`.
 
 ### Source code directory listing:
 
-* [src/app/contextBroker/ (Main program)](#src/app/contextbroker/)
+* [src/app/contextBroker/ (Main program)](#srcappcontextbroker)
 * [src/lib/logMsg/ (Logging)](#src/lib/logMsg/)
 * [src/lib/parseArgs/ (CLI argument parsing)](#src/lib/parseArgs/)
 * [src/lib/common/ (Common types and functions for all the libraries)](#src/lib/common/)
@@ -74,7 +74,7 @@ The main program is found in `contextBroker.cpp` and its purpose it to:
 
 * Parse and treat the command line parameters.
 * Initialize the libraries of the broker,
-* Especially, setup the service vector (RestService restServiceV) that defines
+* Especially, setup the service vector (`RestService restServiceV`) that defines
   the REST services that the broker supports.
 * Start the REST interface (that runs in a separate thread).
 
@@ -87,8 +87,8 @@ See the [cookbook](cookbook.md) for details about these two important topics.
 
 ## <a name='src/lib/logMsg/'></a>src/lib/logMsg/
 The log message library takes care of writing log lines to the log file, whose default location is
-`/tmp/contextBroker.log` which can be modified using the CLI `-logDir`.  
-The most important task, apart from helping in debugging the broker, are the transaction tags.
+`/tmp/contextBroker.log` which can be modified using the [CLI](../manuals/admin/cli.md) `-logDir`.   The most important task, apart from helping in debugging the broker, are the transaction tags.
+
 See `lmTransactionStart()` et al in `logMsg.cpp/h`.
 About debugging the broker, see especially the trace levels (that are set using the `-t` CLI param),
 in `traceLevels.h`.
