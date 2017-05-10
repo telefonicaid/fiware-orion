@@ -121,8 +121,7 @@ NOTE:
 * Item 4: `"*"`. An asterisc in the component vector `RestService::compV` matches ANY string, and whenever a path including entity id, attribute name, etc is defined, `"*"` must be used.
 * Item 6: `putMetadata` is the service routine for `PUT /v2/entities/*/attrs/*/metadata/*` and the function must be implemented. The directory of the library for NGSIv2 service routines is `src/lib/serviceRoutinesV2` (see [library description](README.md#srclibserviceroutinesv2)).
 
-Note also that in `contextBroker.cpp`, these `RestService` vector lines have been grouped and as the lines got really long, defines for the component vector have been created.  
-In the beginning it might be a little hard to find your way among all those defines. Sorry about that ...  
+Note also that in `contextBroker.cpp`, these `RestService` vector lines have been grouped and as the lines got really long, defines for the component vector have been created.    
 
 > Side-note: The [style guide](../contribution_guidelines.md#s9-line-length) says a source code line **shouldn't** be longer than 120 chars. These lines, before splitting into defines were well over 200 chars. Unfortunately, the new way, with shorter lines, is a lot more difficult to read.
 
@@ -348,6 +347,8 @@ dbDrop t1
 ```
 
 Note that `t1` is used and not `T1`. This is because Orion converts tenants to all lowercase.
+
+[Top](#top)
 
 ## Catching a '405 Method Not Allowed'
 Orion supports the request `GET /v2/entities/{EntityId}` AND `DELETE /v2/entities/{EntityId}`, but, what happens
