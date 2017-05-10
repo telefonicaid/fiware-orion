@@ -193,7 +193,7 @@ For detailed information about the microhttpd library, see [its dedicated page i
 ### Request Flow
 
 <a name='flow-rq-01'></a>
-![Reception of a request](images/Flow-RQ-01.png)
+![Reception of a request](https://raw.githubusercontent.com/telefonicaid/fiware-orion/hardening/design_spec_01/doc/manuals/devel/images/Flow-RQ-01.png)
 
 _RQ-01: Reception of a request_
 
