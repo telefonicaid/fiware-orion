@@ -332,7 +332,7 @@ However, as parsing of text is a very simple task, this never got its own direct
 <a name='flow-pp-02'></a>
 ![Parsing a text payload](images/Flow-PP-02.png)
 
-_PP-02: Parsing a TEXT Payload_
+_PP-02: Parsing a text payload_
 
 * `payloadParse()` calls `textRequestTreat()` (step 1) which contains a switch that calls the correct treat function depending on the type of the request (step 2). As of the moment of writing this document, Orion supports TEXT payloads only for one single type of request, so there is only one treat function to choose from (or ERROR if the request type is not `EntityAttributeValueRequest`).
 * `textParseAttributeValue()` extracts the string and checks for special strings such as true, false, and null and also examines the string to see whether it is a Number. Then this value along with the type of the value is set to the attribute that is a parameter for the function.

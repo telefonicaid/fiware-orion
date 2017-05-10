@@ -25,7 +25,7 @@ Related with forwarding (FW prefix):
 * [FW-01: Forward an update to Context Providers](cprs.md#flow-fw-01)
 	* Continues in MB-01 or MB-02
 	* Continues in FW-02
-* [FW-02: `updateForward()` function detail](crps.md#flow-fw-02)
+* [FW-02: `updateForward()` function detail](cprs.md#flow-fw-02)
 	* Continues from FW-01
 	* Continues in PP-01
 * [FW-03: Forward a query to Context Provider](cprs.md#flow-fw-03)

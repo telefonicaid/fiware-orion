@@ -29,9 +29,9 @@ split into a number of forwards to different context providers plus local update
 The response to the initial request is not sent until each and every response from context providers have arrived.
 
 <a name='flow-fw-01'></a>
-![Forward an Update to Context Providers](images/Flow-FW-01.png)
+![Forward an update to Context Providers](images/Flow-FW-01.png)
 
-_FW-01: Forward an Update to Context Providers_
+_FW-01: Forward an update to Context Providers_
 
 Note that there are a number of service routines that end up calling `postUpdateContext()` (see detail in [the service routines mapping document](ServiceRoutines.txt)).
 
@@ -49,9 +49,9 @@ Note that there are a number of service routines that end up calling `postUpdate
 * The responses from the context providers are merged into the total response to the client issuing the request that provoked the forwarding (step 7). Note that the forwards are serialized, each forward awaiting its response before continuing.
 
 <a name='flow-fw-02'></a>
-![updateForward Detail](images/Flow-FW-02.png)
+![`updateForward()` function detail](images/Flow-FW-02.png)
 
-_FW-02: updateForward Detail_
+_FW-02: `updateForward()` function detail_
 
 * Parse the context provider string to extract IP, port, URI path, etc. (step 1)
 * As forwards are done as REST requests, we need to render the object to text (JSON) to be able to send the REST request to the Context Provider (step 2).
@@ -67,9 +67,9 @@ As for Forwarding of Update requests, the query request can be split into N forw
 isn't sent until all responses to the forwarded requests have been received and merged into the final response.
 
 <a name='flow-fw-03'></a>
-![Forward an Update to Context Providers](images/Flow-FW-03.png)
+![Forward a query to Context Providers](images/Flow-FW-03.png)
 
-_FW-03: Forward a Query to Context Providers_
+_FW-03: Forward a query to Context Providers_
 
 Note that there are a number of service routines that end up calling `postQueryContext()` (see detail in [the service routines mapping document](ServiceRoutines.txt)).
 
@@ -86,9 +86,9 @@ The QueryContextRequest items are filled in based on the output of the mongoBack
 * Respond to the initiating client with a merge of all the responses from the Context Providers and the local response part (attributes found locally).
 
 <a name='flow-fw-04'></a>
-![queryForward detail](images/Flow-FW-04.png)
+![`queryForward()` function detail](images/Flow-FW-04.png)
 
-_FW-04: queryForward detail_
+_FW-04: `queryForward()` function detail_
 
 * Parse the context provider string to extract IP, port, URI path, etc. (step 1).
 * As forwards are done as REST requests, we need to render the object to text to be able to send the REST request to the Context Provider (step 2).
