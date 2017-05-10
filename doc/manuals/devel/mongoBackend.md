@@ -6,12 +6,12 @@ The **mongoBackend** library is where all the database interaction takes place. 
 
 This library entry points are:
 
-* From [serviceRoutines]() and [serviceRoutinesV2]() (the most important ones)
+* From [serviceRoutines](README.md#srclibserviceroutines) and [serviceRoutinesV2](README.md#srclibserviceroutinesv2) (the most important ones)
 * Other entry points from other places as initialization routines and helpers methods
 
-This library makes an extensive use of [MongoDB C++ driver](), for sending operations to database and dealing with BSON data (which is the basic structure datatype used by these operations). You should be familiar with this driver in order to understand how the library works.
+This library makes an extensive use of [MongoDB C++ driver](http://mongodb.github.io/mongo-cxx-driver/), for sending operations to database and dealing with BSON data (which is the basic structure datatype used by these operations). You should be familiar with this driver in order to understand how the library works.
 
-This library is also related with the [cache]() library (if cache is enabled, i.e. the global `noCache` bool variable is `false`). In two ways: 
+This library is also related with the [cache](README.md#srclibcache) library (if cache is enabled, i.e. the global `noCache` bool variable is `false`). In two ways: 
 
 * context creations/modificacion/removal modules modify cache content
 * entity creation/update logic check the cache in order to look for triggering subscriptions
@@ -541,15 +541,15 @@ Taking this into account, the main functions within the `mongoConnectionPool` mo
 
 * `connectionOperations`: wrapper for DB operations (such as insert, find, update, etc.), adding Orion specific aspects (e.g. concurrency management at the DB connection pool, error handling, logging, etc.). MongoDB driver methods to  interact with DB should not be used directly, but using this module (or expand it if you need an operation not yet covered).
 * `safeMongo`: safe methods to get fields from BSON object. Direct access to BSON object using MongoDB driver methods should be avoided, use `safeMongo` module instead (or expand it if you need another way of accessing BSON information not yet covered).
-* `dbConstants` (only `.h`): field names used at DB level (the same as described [in the administration documentation]()) are defined here. 
+* `dbConstants` (only `.h`): field names used at DB level (the same as described [in the database model documentation](../admin/database_model.md)) are defined here. 
 * `dbFieldsEncoding` (only `.h`): helper function to do encoding at DB level and metadata string splitting.
 
 ### Specific purpose modules
 
 * `MongoCommonSubscription`: common functions used by several other modules related with the subscription logic. Most of the functions this module contains are set functions to fill fields in `Subscriptions` objects.
 * `location`: functions related with location management at DB.
-* `mongoSubCache`: functions used by the [cache]()]library to interact with DB.
-* `compoundResponses` and `compoundValueBson`: they are modules that help in the conversion between BSON data and internal types (mainly in the [ngsi]() library) and viceversa.
+* `mongoSubCache`: functions used by the [cache](README.md#srclibcache)]library to interact with DB.
+* `compoundResponses` and `compoundValueBson`: they are modules that help in the conversion between BSON data and internal types (mainly in the [ngsi](README.md#srclibngsi) library) and viceversa.
 * `TriggeredSubscription`: helper class used by subscriptions logic (both context and context availability subscriptions) in order to encapsulate the information related with a triggered subscription on context or registration creation/update.
  
 ### The `MongoGlobal` module
@@ -562,7 +562,7 @@ Used by CB initialization logic (at `ContextBroker.cpp` `main()`) in order to in
 
 #### `entitiesQuery()`
 
-This function basically searches for entities in the database (`entities` collection, [described as part of the database model in the administration documentation]()). It takes into account service (also named "tenant"), service path, pagination and sorting parameters. The query for MongoDB is composed in several parts: entities, service path, attributes and scopes (filters and geo-location) 
+This function basically searches for entities in the database (`entities` collection, [described as part of the database model in the administration documentation](../admin/database_model.md#entities-collection)). It takes into account service (also named "tenant"), service path, pagination and sorting parameters. The query for MongoDB is composed in several parts: entities, service path, attributes and scopes (filters and geo-location) 
 
 It relies on the `collectionRangedQuery()` function in the `connectionOperations` module in order to do the actual query in DB. After the query at DB, a part of the function annotates results in order to help in the Context Providers search done by the calling function, using the `found` attribute flag (see details in the source code). The result is then provided in a `ContextElementResponseVector` object, as output parameters.
 
@@ -573,7 +573,7 @@ This function is called from the following places:
 
 #### `registrationsQuery()` 
 
-This function basically searches for existing registrations in the database (`registrations` collection, [described as part of the database model in the administration documentation]()). It takes into account service (also named "tenant"), service path and pagination parameters. 
+This function basically searches for existing registrations in the database (`registrations` collection, [described as part of the database model in the administration documentation](../admin/database_model.md#registrations-collection)). It takes into account service (also named "tenant"), service path and pagination parameters. 
 
 It is used from several places:
 
@@ -598,7 +598,7 @@ _MD-03: processConditionVector function_
    * The `pruneContextElements()` function is call in order to remove not found elements, as it doesn't make sense to include them in the notification (step 6).
    * If after pruning there is some entity to send, steps 7 to 11 are executed.
 	   * In the case of conditions for particular attributes (i.e. not empty condition), then a second lookup is done using `entitiesQuery()` (steps 7, 8 and 9, plus prunning in step 10).
-	   * Notification is sent (step 11) using the `Notifier` object (from [ngsiNotify]() library) in order to actually sent the notification (step 3). The detail is described elsewhere, see diagrams NF-01 or NF-03. In the case of conditions for particular attributes, notification is sent only if the previous check was ok. In the case of all-attributes notifications (i.e. empty codition) notification is always sent. 
+	   * Notification is sent (step 11) using the `Notifier` object (from [ngsiNotify]() library) in order to actually sent the notification (step 3). The detail is in diagrams [NF-01](README.md#flow-nf-01) or [NF-03](README.md#flow-nf-03). In the case of conditions for particular attributes, notification is sent only if the previous check was ok. In the case of all-attributes notifications (i.e. empty codition) notification is always sent. 
 
 Note `processOnChangeConditionForSubscription()` has a "sibling" function named `processOnChangeConditionForUpdateContext()` for non-initial notifications (see diagram MD-01).
 
@@ -617,7 +617,7 @@ _MD-04: processAvailabilitySubscription function_
 
 * `processAvailabilitySubscription()` is invoked (step 1). See diagrams MB-18, MB-20 and MB-21.
 * Check if some registration matches the subscription, using `registrationsQuery()` (step 2). This function in sequence uses `collectionRangeQuery()` in the `connectionOperations` module to check in the DB (steps 3 and 4).
-* In the case of some registration matches, the process continues. Availability notification is sent (step 5) using the `Notifier` object (from [ngsiNotify]() library). The detail is described elsewhere, see diagram NF-02.
+* In the case of some registration matches, the process continues. Availability notification is sent (step 5) using the `Notifier` object (from [ngsiNotify](README.md#srclibngsinotify) library). The detail is described elsewhere, see diagram NF-02.
 * Finally, last notification and count statistics are updated, by calling `mongoUpdateCasubNewNotification()` (step 6). This function in sequence uses `collectionUpdate()` in the `connectionOperations` module in order to update the corresponding context availability subscription document in DB (steps 7 and 8).
 
 
