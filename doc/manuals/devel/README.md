@@ -275,7 +275,7 @@ Now, the methods `render()`, `check()`, `release()`, etc. are called in a tree-l
           * `EntityId::check()`
           * `AttributeDomainName::check()`
           * `ContextAttributeVector::check()` calls (for each item in the vector)
-              * `ContextAttribute::check()`
+              * `ContextAttribute::check()` calls
                   * `MetadataVector::check()` calls  (for each item in the vector)
                       * `Metadata::check()`
 
