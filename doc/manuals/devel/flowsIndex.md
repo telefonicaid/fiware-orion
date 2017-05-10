@@ -37,11 +37,11 @@ Related with forwarding (FW prefix):
 	
 Related with mongoBackend logic (MB and MD prefixes):
 
-* [MB-01: mongoUpdate - UPDATE/REPLACE case - entity found](mongoBackend.md#flow-mb-01)
+* [MB-01: mongoUpdate - UPDATE/REPLACE - entity found](mongoBackend.md#flow-mb-01)
     * Continues from RQ-02 or FW-01
     * Continues in MD-01
     * Continues in MD-02
-* [MB-02: mongoUpdate - UPDATE/REPLACE case - entity not found](mongoBackend.md#flow-mb-02)
+* [MB-02: mongoUpdate - UPDATE/REPLACE - entity not found](mongoBackend.md#flow-mb-02)
     * Continues from RQ-02 or FW-01   
     * Continues in MD-02 
 * [MB-03: mongoUpdate - APPEND/APPEND_STRICT - existing entity](mongoBackend.md#flow-mb-03)

@@ -202,9 +202,9 @@ During the update process, either in the case of new entities or updating existi
 * `processSubscriptions()`. Apart from the `subsToNotify` map, another important parameter in this function is `notifyCerP`, which is the context element response (CER) that will be used to fill the notifications to send. In the case of new entities, this CER is build from the contents of the incoming CE in the update request. In the case of updating an existing entity, the logic start with CER and updates it at the same time the `toSet`, `toUnset`, etc. fields are build. In other words, the logic keeps always an updated CER as the CE attributes are being processed. The `updateAttrInNotifyCer()` (used in `updateContextAttributeItem()` and `updateContextAttributeItem()`) and `deleteAttrInNotifyCer()` (used in `deleteContextAttributeItem()`) are helper functions using to do this task. The detail is shown in the sequence diagram below.
 
 <a name='flow-md-01'></a>
-![processSubscriptions function](images/Flow-MD-01.png)
+![`processSubscriptions()` function detail](images/Flow-MD-01.png)
 
-_MD-01: processSubscriptions function_
+_MD-01: `processSubscriptions()` function detail_
  
 * `processSubscriptions()` is invoked (step 1). See diagrams [MB-01](#flow-mb-01), [MB-03](#flow-mb-03), [MB-04](#flow-mb-04) and [MB-05](#flow-mb-05). Then, a loop is implemented to process each individual triggered subscription.
 * The `processOnChangeConditionForUpdateContext()` function is called (step 2), which in sequence uses the `Notifier` object (from [ngsiNotify](README.md#srclibngsinotify) library) in order to actually sent the notification (step 3). The detail is described in diagrams [NF-01](README.md#flow-nf-01) or [NF-03](README.md#flow-nf-03).
@@ -215,9 +215,9 @@ _MD-01: processSubscriptions function_
 Finally, in the case of action type "UPDATE/REPLACE", the context update logic is able to "fill the gaps" for missing entities/attributes in the local database with Context Providers information. This is done by the `searchContextProviders()`. The detail is shown in the sequence diagram below.
 
 <a name='flow-md-02'></a>
-![searchContextProviders function](images/Flow-MD-02.png)
+![`searchContextProviders()` function detail](images/Flow-MD-02.png)
 
-_MD-02: searchContextProviders function_
+_MD-02: `searchContextProviders()` function detail_
 
 * `searchContextProviders()` is invoked (step 1). See diagrams [MB-01](#flow-mb-01), [MB-02](#flow-mb-02), [MB-03](#flow-mb-03) and [MB-05](#flow-mb-05). Apart from this entry points, note that `searchContextProviders()` can be also called from `updateEntity()` in the case of `processContextAttributeVector()` fail (which means that the entity wasn't actually modified locally, so it makes sense to search for Context Providers).
 * If at least some attribute has the `found` flag set to `false`, a lookup for matching registrations based on specific attributes (i.e. in the form "E-A") is done, calling the `registrationsQuery()` function in the `MongoGlobal` module (step 2). This function search in the DB using the `collectionRangedQuery()` in the `connectionOperations` module (steps 3 and 4).
@@ -659,9 +659,9 @@ It is used from several places:
 This function is called at context subscription creation/update and eventually sent an initial notification associated to such subscription.
 
 <a name='flow-md-03'></a>
-![processConditionVector function](images/Flow-MD-03.png)
+![`processConditionVector()` function detail](images/Flow-MD-03.png)
 
-_MD-03: processConditionVector function_
+_MD-03: `processConditionVector()` function detail_
 
 * `processConditionVector()` is invoked (step 1). See diagrams [MB-11](#flow-mb-11) and [MB-12](#flow-mb-12).
 * A loop iterates on each individual condition in the `NotifyConditionVector` vector (although most of the times this vector has only one item):
@@ -685,9 +685,9 @@ It is called from:
 * Register operations logic, when new (or updated) context registration matches an availability subscription
 
 <a name='flow-md-04'></a>
-![processAvailabilitySubscription function](images/Flow-MD-04.png)
+![`processAvailabilitySubscription()` function detail](images/Flow-MD-04.png)
 
-_MD-04: processAvailabilitySubscription function_
+_MD-04: `processAvailabilitySubscription()` function detail_
 
 * `processAvailabilitySubscription()` is invoked (step 1). See diagrams [MB-18](#flow-mb-18), [MB-20](#flow-mb-20) and [MB-21](#flow-mb-21).
 * Check if some registration matches the subscription, using `registrationsQuery()` (step 2). This function in sequence uses `collectionRangeQuery()` in the `connectionOperations` module to check in the DB (steps 3 and 4).
