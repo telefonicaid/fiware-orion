@@ -477,7 +477,7 @@ _MB-17: mongoUpdateContextSubscription_
 
 #### `mongoRegisterContext` (SR) and `mongoNotifyContextAvailability` (SR) 
 
-The `mongoRegisterContext` module provides the entry point for the register context operation processing logic (by means of the `mongoRegisterContext()` function defined in its header file) while `mongoNotifyContextAvailability` module provides the entry point for the context availability notification processing logic (by means of the `mongoNotifyContextAvailability()` function in its header file). However, given that a context availability notification is processed in the same way than a register context, both `mongoRegisterContext()` and `mongoNotifyContextAvailability()` are at the end basically wrappers for the `processRegisterContext()` function (single external function in the `MongoCommonRegister` module), which does the work consisting on creating a new registration or update an existing one in the `registrations` collection in the DB (([described as part of the database model in the administration documentation](../admin/database_model.md#registrations-collection))).
+The `mongoRegisterContext` module provides the entry point for the register context operation processing logic (by means of the `mongoRegisterContext()` function defined in its header file) while `mongoNotifyContextAvailability` module provides the entry point for the context availability notification processing logic (by means of the `mongoNotifyContextAvailability()` function in its header file). However, given that a context availability notification is processed in the same way than a register context, both `mongoRegisterContext()` and `mongoNotifyContextAvailability()` are at the end basically wrappers for the `processRegisterContext()` function (single external function in the `MongoCommonRegister` module), which does the work consisting on creating a new registration or update an existing one in the `registrations` collection in the DB ([described as part of the database model in the administration documentation](../admin/database_model.md#registrations-collection)).
 
 <a name='flow-mb-18'></a>
 ![mongoRegisterContext](images/Flow-MB-18.png)
@@ -490,7 +490,7 @@ _MB-18: mongoRegisterContext_
 * `processRegisterContext()` functions is called to process the registration (step 5).
 * For each registration in the request, the `addTriggeredSubscriptions()` function is called (step 6). This function in sequence uses the `collectionQuery()` function in the `connectionOperations` in order to check if the registration triggers a subscription or not (steps 7 and 8). The `subsToNotify` map is used to store the triggered subscriptions.
 * The registration document is created or updated in the DB. In order to to so the `collectionUpdate()` function in the `connectionOperations` module is used, setting the `upsert` parameter to `true` (steps 9 and 10).
-* The `processSubscriptions()` function is called in order to process triggered subscriptions (step 11). The `subsToNotify` map is iterated in order to process each one individually, by `processAvailabilitySubscription()` (step 12). This process is described in diagram [MD-04](#flow-md-01).
+* The `processSubscriptions()` function is called in order to process triggered subscriptions (step 11). The `subsToNotify` map is iterated in order to process each one individually, by `processAvailabilitySubscription()` (step 12). This process is described in diagram [MD-04](#flow-md-04).
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 13).  
 
 [Top](#top)
@@ -518,7 +518,7 @@ _MB-19: mongoDiscoverContextAvailability_
 
 Encapsulates the context availability subscription creation logic.
 
-The header file contains only a function named `mongoSubscribeContextAvailability()` which uses a `SubscribeContextAvailabilityRequest` object as input parameter and a `SubscribeContextAvailabilityResponse` as output parameter. Its work is to create a new context availability subscription in the `casubs` collection in the DB (([described as part of the database model in the administration documentation](../admin/database_model.md#casubs-collection))).
+The header file contains only a function named `mongoSubscribeContextAvailability()` which uses a `SubscribeContextAvailabilityRequest` object as input parameter and a `SubscribeContextAvailabilityResponse` as output parameter. Its work is to create a new context availability subscription in the `casubs` collection in the DB ([described as part of the database model in the administration documentation](../admin/database_model.md#casubs-collection)).
 
 <a name='flow-mb-20'></a>
 ![mongoSubscribeContextAvailability](images/Flow-MB-20.png)
@@ -528,7 +528,7 @@ _MB-20: mongoSubscribeContextAvailability_
 * `mongoSubscribeContextAvailability()` is invoked from the service routine (step 1).
 * Depending on `-reqMutexPolicy`, request semaphore could be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
 * The context availability subscription document is created in the DB. In order to to so the `collectionInsert()` function in the `connectionOperations` module is used (steps 3 and 4).
-* Eventually, some (one or more) notifications may be triggered as result of this creation. This is done by the `processAvailabilitySubscription()` function (step 5), which is described in diagram [MD-04](flow-md-04). 
+* Eventually, some (one or more) notifications may be triggered as result of this creation. This is done by the `processAvailabilitySubscription()` function (step 5), which is described in diagram [MD-04](README.md#flow-md-04).
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 6). 
 
 [Top](#top)
@@ -537,7 +537,7 @@ _MB-20: mongoSubscribeContextAvailability_
 
 Encapsulates the update context availability subscription operation logic.
 
-The header file contains only a function named `mongoUpdateContextAvailabilitySubscription()` which uses a `UpdateContextAvailabilitySubscriptionRequest` object as input parameter and a `UpdateContextAvailabilitySubscriptionResponse` as output parameter. Its work is to update the corresponding context availability subscription in the `casubs` collection in the DB (([described as part of the database model in the administration documentation](../admin/database_model.md#casubs-collection))).
+The header file contains only a function named `mongoUpdateContextAvailabilitySubscription()` which uses a `UpdateContextAvailabilitySubscriptionRequest` object as input parameter and a `UpdateContextAvailabilitySubscriptionResponse` as output parameter. Its work is to update the corresponding context availability subscription in the `casubs` collection in the DB ([described as part of the database model in the administration documentation](../admin/database_model.md#casubs-collection)).
 
 <a name='flow-mb-21'></a>
 ![mongoUpdateContextAvailabilitySubscription](images/Flow-MB-21.png)
@@ -577,7 +577,7 @@ _MB-21: mongoUnsubscribeContextAvailability_
 ### Connection pool management
 
 The module `mongoConnectionPool` manages the DB connection pool. How the pool works is important and deserves an explanation. Basically, Orion Context Broker keeps a list of connections to DB (the `connectionPool` defined at `mongoConnectionPool.cpp`). The list is sized with 
-`-dbPoolSize` CLI parameter (10 by default). Each element in the list is an object of this class:
+`-dbPoolSize` [CLI parameter](../admin/cli.md) (10 by default). Each element in the list is an object of this class:
 
 ```
 typedef struct MongoConnection
@@ -610,7 +610,7 @@ Taking this into account, the main functions within the `mongoConnectionPool` mo
 
 * `MongoCommonSubscription`: common functions used by several other modules related with the subscription logic. Most of the functions this module contains are set functions to fill fields in `Subscriptions` objects.
 * `location`: functions related with location management at DB.
-* `mongoSubCache`: functions used by the [cache](README.md#srclibcache)]library to interact with DB.
+* `mongoSubCache`: functions used by the [cache](README.md#srclibcache) library to interact with DB.
 * `compoundResponses` and `compoundValueBson`: they are modules that help in the conversion between BSON data and internal types (mainly in the [ngsi](README.md#srclibngsi) library) and viceversa.
 * `TriggeredSubscription`: helper class used by subscriptions logic (both context and context availability subscriptions) in order to encapsulate the information related with a triggered subscription on context or registration creation/update.
  
@@ -624,7 +624,7 @@ Finally, the  have the `MongoGlobal` module, which contains a set of helper func
 
 #### `mongoInit()`
 
-Used by CB initialization logic (at `ContextBroker.cpp` `main()`) in order to initialize DB pooled connection.
+Used by CB initialization logic (at [`contextBroker.cpp` `main()`](README.md#srcappcontextbroker)) in order to initialize DB pooled connection.
 
 [Top](#top)
 
