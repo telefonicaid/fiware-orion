@@ -120,4 +120,4 @@ Related with notifications (NF prefix):
 Related with subscription cache (SC prefix):
 
 * [SC-01: Subscription cache refresh](subscriptionCache.md#flow-sc-01)
-* [SC-02: Subscription propagation in active-active configuration](subscritpionCache.md#flow-sc-02) 
+* [SC-02: Subscription propagation in active-active configuration](subscriptionCache.md#flow-sc-02) 
