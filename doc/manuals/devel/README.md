@@ -64,6 +64,7 @@ scripts used for testing and release making are found under `scripts/`.
 
 ## Cross-library topics
 
+* [Flow index](flowsIndex.md). An index for all the flow diagrams described along the development documentation. A very useful "map" to have at hand.
 * [Cook book](cookbook.md). This document describes some useful development related receipts.
 * [Semaphores](semaphores.md). This document provides detailed information about the different semaphores that Orion for internal synchronization.
 
