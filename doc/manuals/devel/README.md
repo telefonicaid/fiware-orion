@@ -193,14 +193,14 @@ For detailed information about the microhttpd library, see [its dedicated page i
 ### Request Flow
 
 <a name='flow-rq-01'></a>
-![Reception of a request](https://raw.githubusercontent.com/telefonicaid/fiware-orion/hardening/design_spec_01/doc/manuals/devel/images/Flow-RQ-01.png)
+![Reception of a request](images/Flow-RQ-01.png)
 
 _RQ-01: Reception of a request_
 
 * The client sends a request (step 1).
 * connectionTreat is the brokers callback function for incoming connections from MHD (microhttpd). This callback is setup in the call to `MHD_start_daemon()` in `restStart()` in `rest.cpp` and invoked upon client request arrival (step 2 and 3).
 * As long as MHD receives payload from the client, the callback function (`connectionTreat()`) is called with a new chunk of payload (steps 4 and 5)
-* The last call to `connectionTreat()` is to inform the client callback that the entire request has been sent. This is done by setting the data length to ZERO in this last callback (step 6).
+* The last call to `connectionTreat()` is to inform the client callback that the entire request has been sent. This is done by setting the data length to zero in this last callback (step 6).
 * The entire request is read so serveFunction() takes care of serving the request, all the way until responding to the request (step 7). See diagrfam RQ-02.
 * Control is returned to MHD (step 8).
 
@@ -270,13 +270,13 @@ ContextElement in its turn contains:
 Now, the methods `render()`, `check()`, `release()`, etc. are called in a tree-like fashion, starting from the top hierarchy class, e.g. UpdateContextRequest:
 
 * `UpdateContextRequest::check()` calls
-  * `ContextElementVector::check()` that calls (for each item in the vector):
-      * `ContextElement::check()`, that calls
+  * `ContextElementVector::check()` calls (for each item in the vector)
+      * `ContextElement::check()` calls
           * `EntityId::check()`
           * `AttributeDomainName::check()`
-          * `ContextAttributeVector::check()` that calls (for each item in the vector):
+          * `ContextAttributeVector::check()` calls (for each item in the vector)
               * `ContextAttribute::check()`
-                  * `MetadataVector::check()` that calls  (for each item in the vector):
+                  * `MetadataVector::check()` calls  (for each item in the vector)
                       * `Metadata::check()`
 
 Each class invokes the method for its underlying classes. The example above was made with the `check()` method, but the same thing is true also for `release()`, `present()`, etc.
