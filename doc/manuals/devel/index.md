@@ -37,7 +37,7 @@ scripts used for testing and release making are found under `scripts/`.
 
 ### Source code directory listing:
 
-* [src/app/contextBroker/ (Main program)](#src-app-contextbroker-)
+* [src/app/contextBroker/ (Main program)](#src/app/contextbroker/)
 * [src/lib/logMsg/ (Logging)](#src/lib/logMsg/)
 * [src/lib/parseArgs/ (CLI argument parsing)](#src/lib/parseArgs/)
 * [src/lib/common/ (Common types and functions for all the libraries)](#src/lib/common/)
