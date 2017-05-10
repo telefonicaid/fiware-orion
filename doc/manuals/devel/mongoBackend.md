@@ -6,7 +6,7 @@ The **mongoBackend** library is where all the database interaction takes place. 
 
 This library entry points are:
 
-* From [serviceRoutines](README.md#srclibserviceroutines) and [serviceRoutinesV2](README.md#srclibserviceroutinesv2) (the most important ones)
+* From [serviceRoutines](README.md#srclibserviceroutines) and [serviceRoutinesV2](README.md#srclibserviceroutinesv2). Those are the most important entry points.
 * Other entry points from other places as initialization routines and helpers methods
 
 This library makes an extensive use of [MongoDB C++ driver](http://mongodb.github.io/mongo-cxx-driver/), for sending operations to database and dealing with BSON data (which is the basic structure datatype used by these operations). You should be familiar with this driver in order to understand how the library works.
@@ -59,7 +59,7 @@ _MB-01: mongoUpdate UPDATE/REPLACE case with entity found_
 * The `processContextAttributeVector()` implements a loop to call `updateContextAttributeItem()` in order to process each individual attribute in the CE (step 9). More detail regarding the strategy used to implement this processing next.
 * Once the processing of the attributes ends, `processContextAttributesVector()` calls `addTriggeredSubscriptions()` function in order to detect subscription that could be triggered by the update operation (step 10). More detail on this next.
 * Finally the control is returned to `updateEntity()` with invokes `collectionUpdate()` function in the `connectionOperations` module in order to actually update the entity at DB (steps 11 and 12).
-* Next step is to send notifications triggered by the update operation, by the means of the `processSubscriptions()` function (step 13). More detail on this next (diagram [MD-01](#flow-nf-01)).
+* Next step is to send notifications triggered by the update operation, by the means of the `processSubscriptions()` function (step 13). More detail on this next (diagram [MD-01](#flow-md-01)).
 * Finally, the `searchContextProviders()` function is called in order to try to find a suitable context provider for each attribute in the CE not found at DB (step 14). This information would be used by the calling service routine in order to potentially forward the update operation to context providers, as described in the [context providers documentation](cprs.md). More information on the `searchContextProviders()` implementation next (diagram [MD-02](#flow-md-02)).
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 15).
 
@@ -180,7 +180,7 @@ _MD-01: processSubscriptions function_
 * The `processOnChangeConditionForUpdateContext()` function is called (step 2), which in sequence uses the `Notifier` object (from [ngsiNotify](README.md#srclibngsinotify) library) in order to actually sent the notification (step 3). The detail is described in diagrams [NF-01](README.md#flow-nf-01) or [NF-03](README.md#flow-nf-03).
 * Next steps are done only in the case a notification was actually sent. Depending on cache usage:
     * If cache is not being used, then the last notification time and count in DB are updated at DB, by the means of `collectionUpdate()` in the `connectionOperations` module (steps 4 and 5).
-    * If cache is being used, then the subscription is retrieved from the cache calling `subCacehcItemLookup()` (step 7). Next, last notification time and count are modified in the subscription cache (there will be consolidated at DB in the next cache refresh, see details in [this document](subscriptionCache.md#subscription-cache-refresh). The access to cache is protected by subscription cache semaphore (see [this document for details](semaphores.md#subscription-cache-semaphore)), which is taken and released in steps 6 and 8 respectively.
+    * If cache is being used, then the subscription is retrieved from the cache calling `subCacehcItemLookup()` (step 7). Next, last notification time and count are modified in the subscription cache (there will be consolidated at DB in the next cache refresh, see details in [this document](subscriptionCache.md#subscription-cache-refresh)). The access to cache is protected by subscription cache semaphore (see [this document for details](semaphores.md#subscription-cache-semaphore)), which is taken and released in steps 6 and 8 respectively.
 
 Finally, in the case of action type "UPDATE/REPLACE", the context update logic is able to "fill the gaps" for missing entities/attributes in the local database with Context Providers information. This is done by the `searchContextProviders()`. The detail is shown in the sequence diagram below.
 
@@ -211,7 +211,7 @@ _MB-07: mongoQueryContext_
 * `mongoQueryContext()` is invoked from the service routine (step 1).
 * Depending on `-reqMutexPolicy`, request semaphore could be taken (read mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).
 * The execution flow passes to `entitiesQuery()` in the `MongoGlobal` module (step 3).
-* The `entitiesQuery()` function basically searches for entities in the database (`entities` collection, [described as part of the database model in the administration documentation]()). More information on this function can be found in the `MongoGlobal` module section. It relies on the `collectionRangedQuery()` function in the `connectionOperations` module in order to do the actual query in DB (steps 4, 5 and 6). After the query at DB, a part of the function annotates results in order to help in the Context Providers search done by the calling function, using the `found` attribute flag (see details in the source code). The result is then provided in a `ContextElementResponseVector` object, as output parameters.
+* The `entitiesQuery()` function basically searches for entities in the database (`entities` collection, [described as part of the database model in the administration documentation](../admin/database_model.md#entities-collection)). More information on this function can be found in the `MongoGlobal` module section. It relies on the `collectionRangedQuery()` function in the `connectionOperations` module in order to do the actual query in DB (steps 4, 5 and 6). After the query at DB, a part of the function annotates results in order to help in the Context Providers search done by the calling function, using the `found` attribute flag (see details in the source code). The result is then provided in a `ContextElementResponseVector` object, as output parameters.
 * Steps 7 to 11 are done only in the case no entity was found in DB and are related with context providers lookup.  
    * A lookup for matching registrations based on specific attributes (i.e. in the form "E-A") is done, calling the `registrationsQuery()` function in the `MongoGlobal` module (step 7). This function searches in the DB using the `collectionRangedQuery()` in the `connectionOperations` module (steps 8 and 9).
    * The `processGenericEntities()` function is called in order to add context providers corresponding to generic entities (step 10).
@@ -292,13 +292,13 @@ These functions use `EntityTypeVectorResponse` (two first cases) and `EntityType
 
 Note the usage of `noAttrDetails` parameter in `mongoEntityTypes()` and `mongoAttributesForEntityType()` in order to avoid a (potentially costly) process to get types of the attributes associated to an entity type (implemented by the `getAttributeTypes()` function).
 
-All the above functions heavily relies in the MongoDB aggregation framework. You should be familiar with this framework (and with the `entities` collection structure, [described as part of the database model in the administration documentation]()) in order to understand how they work.
+All the above functions heavily relies in the MongoDB aggregation framework. You should be familiar with this framework (and with the `entities` collection structure, [described as part of the database model in the administration documentation](../admin/database_model.md#entities-collection)) in order to understand how they work.
 
 #### `mongoCreateSubscription` (SR2)
 
 Encapsulates the context subscription creation logic.
 
-The header file contains only a function named `mongoCreateSubscription()` which work is basically to get the information from a `Subscription` object and insert the corresponding document at `csubs` collection at DB ([described as part of the database model in the administration documentation]()). The new subscription is also inserted in the cache (if cache is enabled).
+The header file contains only a function named `mongoCreateSubscription()` which work is basically to get the information from a `Subscription` object and insert the corresponding document at `csubs` collection at DB ([described as part of the database model in the administration documentation](../admin/database_model.md#csubs-collection)). The new subscription is also inserted in the cache (if cache is enabled).
 
 <a name='flow-mb-11'></a>
 ![mongoCreateSubscription](images/Flow-MB-11.png)
@@ -319,7 +319,7 @@ Note that potential notifications are sent before inserting the subscription at 
 
 Encapsulates the context subscription update logic.
 
-The header file contains only a function named `mongoUpdateSubscription()` which work is basically to get the information from a `mongoUpdateSubscription` object and use it to update the corresponding document at `csubs` collection at DB ([described as part of the database model in the administration documentation]()). The subscription is also updated in the cache (if cache is enabled).
+The header file contains only a function named `mongoUpdateSubscription()` which work is basically to get the information from a `mongoUpdateSubscription` object and use it to update the corresponding document at `csubs` collection at DB ([described as part of the database model in the administration documentation](../admin/database_model.md#csubs-collection)). The subscription is also updated in the cache (if cache is enabled).
 
 <a name='flow-mb-12'></a>
 ![mongoUpdateSubscription](images/Flow-MB-12.png)
@@ -345,7 +345,7 @@ Encapsulates the logic for getting subscriptions.
 
 The header file contains two functions `mongoGetSubscription()` (to get individual subscriptions,by id) or `mongoListSubscriptions()` (to get all subscriptions). They return a `Subscription` object (or a vector of `Subscription` objects, in the case of get all) with the result.
 
-In both cases the implementation is based on a query on the `csubs` collection ([described as part of the database model in the administration documentation]()).
+In both cases the implementation is based on a query on the `csubs` collection ([described as part of the database model in the administration documentation](../admin/database_model.md#csubs-collection)).
 
 Regarding `mongoGetSubscription()`:
 
@@ -401,7 +401,7 @@ Encapsulates the logic for subscribe context (NGSIv1) operation.
 
 The header file contains only a function named `mongoSubscribeContext()` which uses a `SubscribeContextRequest` object as input parameter and a `SubscribeContextResponse` as output parameter.
 
-Actually, this function is a wrapper of the NGSIv2 version of this operation, i.e. the `mongoCreateSubscription()` in the [mongoCreateSubscription module]().
+Actually, this function is a wrapper of the NGSIv2 version of this operation, i.e. the `mongoCreateSubscription()` in the [mongoCreateSubscription module](#mongocreatesubscription-sr2).
 
 <a name='flow-mb-16'></a>
 ![mongoSubscribeContext](images/Flow-MB-16.png)
@@ -417,7 +417,7 @@ Encapsulates the logic for update context subscription (NGSIv1) operation.
 
 The header file contains only a function named `mongoUpdateContextSubscription()` which uses a `UpdateContextSubscriptionRequest` object as input parameter and a `UpdateContextSubscriptionResponse` as output parameter.
 
-Actually, this function is a wrapper of the NGSIv2 version of this operation, i.e. the `mongoUpdateSubscription()` in the [mongoUpdateSubscription module]().
+Actually, this function is a wrapper of the NGSIv2 version of this operation, i.e. the `mongoUpdateSubscription()` in the [mongoUpdateSubscription module](#mongoupdatesubscription-sr2).
 
 <a name='flow-mb-17'></a>
 ![mongoSubscribeContext](images/Flow-MB-17.png)
@@ -429,7 +429,7 @@ _MB-17: mongoUpdateContextSubscription_
 
 #### `mongoRegisterContext` (SR) and `mongoNotifyContextAvailability` (SR) 
 
-The `mongoRegisterContext` module provides the entry point for the register context operation processing logic (by means of the `mongoRegisterContext()` function defined in its header file) while `mongoNotifyContextAvailability` module provides the entry point for the context availability notification processing logic (by means of the `mongoNotifyContextAvailability()` function in its header file). However, given that a context availability notification is processed in the same way than a register context, both `mongoRegisterContext()` and `mongoNotifyContextAvailability()` are at the end basically wrappers for the `processRegisterContext()` function (single external function in the `MongoCommonRegister` module), which does the work consisting on creating a new registration or update an existing one in the `registrations` collection in the DB (([described as part of the database model in the administration documentation]())).
+The `mongoRegisterContext` module provides the entry point for the register context operation processing logic (by means of the `mongoRegisterContext()` function defined in its header file) while `mongoNotifyContextAvailability` module provides the entry point for the context availability notification processing logic (by means of the `mongoNotifyContextAvailability()` function in its header file). However, given that a context availability notification is processed in the same way than a register context, both `mongoRegisterContext()` and `mongoNotifyContextAvailability()` are at the end basically wrappers for the `processRegisterContext()` function (single external function in the `MongoCommonRegister` module), which does the work consisting on creating a new registration or update an existing one in the `registrations` collection in the DB (([described as part of the database model in the administration documentation](../admin/database_model.md#registrations-collection))).
 
 <a name='flow-mb-18'></a>
 ![mongoRegisterContext](images/Flow-MB-18.png)
@@ -466,7 +466,7 @@ _MB-19: mongoDiscoverContextAvailability_
 
 Encapsulates the context availability subscription creation logic.
 
-The header file contains only a function named `mongoSubscribeContextAvailability()` which uses a `SubscribeContextAvailabilityRequest` object as input parameter and a `SubscribeContextAvailabilityResponse` as output parameter. Its work is to create a new context availability subscription in the `casubs` collection in the DB (([described as part of the database model in the administration documentation]())).
+The header file contains only a function named `mongoSubscribeContextAvailability()` which uses a `SubscribeContextAvailabilityRequest` object as input parameter and a `SubscribeContextAvailabilityResponse` as output parameter. Its work is to create a new context availability subscription in the `casubs` collection in the DB (([described as part of the database model in the administration documentation](../admin/database_model.md#casubs-collection))).
 
 <a name='flow-mb-20'></a>
 ![mongoSubscribeContextAvailability](images/Flow-MB-20.png)
@@ -483,7 +483,7 @@ _MB-20: mongoSubscribeContextAvailability_
 
 Encapsulates the update context availability subscription operation logic.
 
-The header file contains only a function named `mongoUpdateContextAvailabilitySubscription()` which uses a `UpdateContextAvailabilitySubscriptionRequest` object as input parameter and a `UpdateContextAvailabilitySubscriptionResponse` as output parameter. Its work is to update the corresponding context availability subscription in the `casubs` collection in the DB (([described as part of the database model in the administration documentation]())).
+The header file contains only a function named `mongoUpdateContextAvailabilitySubscription()` which uses a `UpdateContextAvailabilitySubscriptionRequest` object as input parameter and a `UpdateContextAvailabilitySubscriptionResponse` as output parameter. Its work is to update the corresponding context availability subscription in the `casubs` collection in the DB (([described as part of the database model in the administration documentation](../admin/database_model.md#casubs-collection))).
 
 <a name='flow-mb-21'></a>
 ![mongoUpdateContextAvailabilitySubscription](images/Flow-MB-21.png)
@@ -598,7 +598,7 @@ _MD-03: processConditionVector function_
    * The `pruneContextElements()` function is call in order to remove not found elements, as it doesn't make sense to include them in the notification (step 6).
    * If after pruning there is some entity to send, steps 7 to 11 are executed.
 	   * In the case of conditions for particular attributes (i.e. not empty condition), then a second lookup is done using `entitiesQuery()` (steps 7, 8 and 9, plus prunning in step 10).
-	   * Notification is sent (step 11) using the `Notifier` object (from [ngsiNotify]() library) in order to actually sent the notification (step 3). The detail is provided in diagrams [NF-01](README.md#flow-nf-01) or [NF-03](README.md#flow-nf-03). In the case of conditions for particular attributes, notification is sent only if the previous check was ok. In the case of all-attributes notifications (i.e. empty codition) notification is always sent.
+	   * Notification is sent (step 11) using the `Notifier` object (from [ngsiNotify](README.md#srclibngsinotify) library) in order to actually sent the notification (step 3). The detail is provided in diagrams [NF-01](README.md#flow-nf-01) or [NF-03](README.md#flow-nf-03). In the case of conditions for particular attributes, notification is sent only if the previous check was ok. In the case of all-attributes notifications (i.e. empty codition) notification is always sent.
 
 Note `processOnChangeConditionForSubscription()` has a "sibling" function named `processOnChangeConditionForUpdateContext()` for non-initial notifications (see diagram [MD-01](#flow-md-01)).
 
