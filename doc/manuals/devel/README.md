@@ -330,7 +330,7 @@ It is really a reminiscent from when the broker supported XML (nowadays removed)
 However, as parsing of text is a very simple task, this never got its own directory/library but resides here in the common part.
 
 <a name='flow-pp-02'></a>
-![Parsing a TEXT Payload](images/Flow-PP-02.png)
+![Parsing a text payload](images/Flow-PP-02.png)
 
 _PP-02: Parsing a TEXT Payload_
 
