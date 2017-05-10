@@ -35,30 +35,30 @@ scripts used for testing and release making are found under `scripts/`.
 * **archive**: contains older files that is no longer used but that we don’t want to remove yet.
 
 
-### Source code directory listing:
+### Source code directory listing
 
 * [src/app/contextBroker/ (Main program)](#srcappcontextbroker)
-* [src/lib/logMsg/ (Logging)](#srcliblogMsg)
-* [src/lib/parseArgs/ (CLI argument parsing)](#srclibparseArgs)
+* [src/lib/logMsg/ (Logging)](#srcliblogmsg)
+* [src/lib/parseArgs/ (CLI argument parsing)](#srclibparseargs)
 * [src/lib/common/ (Common types and functions for all the libraries)](#srclibcommon)
-* [src/lib/orionTypes/ (Common types)](#srcliborionTypes)
+* [src/lib/orionTypes/ (Common types)](#srcliboriontypes)
 * [src/lib/rest/ (REST interface, using external library microhttpd)](#srclibrest)
 * [src/lib/ngsi/ (Common NGSI types)](#srclibngsi)
 * [src/lib/ngsi10/ (Common NGSI10 types)](#srclibngsi10)
 * [src/lib/ngsi9/ (Common NGSI9 types)](#srclibngsi9)
-* [src/lib/apiTypesV2/ (NGSIv2 types)](#srclibapiTypesV2)
+* [src/lib/apiTypesV2/ (NGSIv2 types)](#srclibapitypesv2)
 * [src/lib/parse/ (common functions and types for payload parsing)](#srclibparse)
 * [src/lib/jsonParse/ (Parsing of JSON payload for NGSIv1 requests, using external library Boost property_tree)](#srclibjsonParse)
-* [src/lib/jsonParseV2/ (Parsing of JSON payload for NGSIv2 requests, using external library rapidjson)](#srclibjsonParseV2)
-* [src/lib/serviceRoutines/ (Service routines for NGSIv1)](#srclibserviceRoutines)
-* [src/lib/serviceRoutinesV2/ (Service routines for NGSIv2)](#srclibserviceRoutinesV2)
+* [src/lib/jsonParseV2/ (Parsing of JSON payload for NGSIv2 requests, using external library rapidjson)](#srclibjsonparsev2)
+* [src/lib/serviceRoutines/ (Service routines for NGSIv1)](#srclibserviceroutines)
+* [src/lib/serviceRoutinesV2/ (Service routines for NGSIv2)](#srclibserviceroutinesv2)
 * [src/lib/convenience/ (Convenience operations in NGSIv1)](#srclibconvenience)
-* [src/lib/mongoBackend/ (Database interface to mongodb, using external library libmongoclient)](#srclibmongoBackend)
-* [src/lib/ngsiNotify/ (NGSIv1 notifications) ](#srclibngsiNotify)
-* [src/lib/alarmMgr/ (Alarm Manager implementation)](#srclibalarmMgr)
+* [src/lib/mongoBackend/ (Database interface to mongodb, using external library libmongoclient)](#srclibmongobackend)
+* [src/lib/ngsiNotify/ (NGSIv1 notifications) ](#srclibngsinotify)
+* [src/lib/alarmMgr/ (Alarm Manager implementation)](#srclibalarmmgr)
 * [src/lib/cache/ (Subscription cache implementation)](#srclibcache)
-* [src/lib/logSummary/ (Log Summary implementation)](#srcliblogSummary)
-* [src/lib/metricsMgr/ (Metrics Manager implementation)](#srclibmetricsMgr)
+* [src/lib/logSummary/ (Log Summary implementation)](#srcliblogsummary)
+* [src/lib/metricsMgr/ (Metrics Manager implementation)](#srclibmetricsmgr)
 
 [Top](#top)
 
@@ -276,8 +276,8 @@ Now, the methods `render()`, `check()`, `release()`, etc. are called in a tree-l
           * `AttributeDomainName::check()`
           * `ContextAttributeVector::check()` that calls (for each item in the vector):
               * `ContextAttribute::check()`
-              * `MetadataVector::check()` that calls  (for each item in the vector):
-                  * `Metadata::check()`
+                  * `MetadataVector::check()` that calls  (for each item in the vector):
+                      * `Metadata::check()`
 
 Each class invokes the method for its underlying classes. The example above was made with the `check()` method, but the same thing is true also for `release()`, `present()`, etc.
 
