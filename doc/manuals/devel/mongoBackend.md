@@ -22,7 +22,7 @@
 * [The `MongoGlobal` module](#the-mongoglobal-module)
 	* [`mongoInit()`](#mongoinit)
 	* [`entitiesQuery()`](#entitiesquery)
-	* [`registrationsQuery()`](#regristrationsquery) 
+	* [`registrationsQuery()`](#registrationsquery) 
 	* [`processConditionVector()`](#processconditionvector)
 	* [`processAvailabilitySubscription()`](#processavailabilitysubscription)
 
