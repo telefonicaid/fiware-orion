@@ -37,28 +37,28 @@ scripts used for testing and release making are found under `scripts/`.
 
 ### Source code directory listing
 
-* [src/app/contextBroker/ (Main program)](#srcappcontextbroker)
-* [src/lib/logMsg/ (Logging)](#srcliblogmsg)
-* [src/lib/parseArgs/ (CLI argument parsing)](#srclibparseargs)
-* [src/lib/common/ (Common types and functions for all the libraries)](#srclibcommon)
-* [src/lib/orionTypes/ (Common types)](#srcliboriontypes)
-* [src/lib/rest/ (REST interface, using external library microhttpd)](#srclibrest)
-* [src/lib/ngsi/ (Common NGSI types)](#srclibngsi)
-* [src/lib/ngsi10/ (Common NGSI10 types)](#srclibngsi10)
-* [src/lib/ngsi9/ (Common NGSI9 types)](#srclibngsi9)
-* [src/lib/apiTypesV2/ (NGSIv2 types)](#srclibapitypesv2)
-* [src/lib/parse/ (common functions and types for payload parsing)](#srclibparse)
-* [src/lib/jsonParse/ (Parsing of JSON payload for NGSIv1 requests, using external library Boost property_tree)](#srclibjsonParse)
-* [src/lib/jsonParseV2/ (Parsing of JSON payload for NGSIv2 requests, using external library rapidjson)](#srclibjsonparsev2)
-* [src/lib/serviceRoutines/ (Service routines for NGSIv1)](#srclibserviceroutines)
-* [src/lib/serviceRoutinesV2/ (Service routines for NGSIv2)](#srclibserviceroutinesv2)
-* [src/lib/convenience/ (Convenience operations in NGSIv1)](#srclibconvenience)
-* [src/lib/mongoBackend/ (Database interface to mongodb, using external library libmongoclient)](#srclibmongobackend)
-* [src/lib/ngsiNotify/ (NGSIv1 notifications) ](#srclibngsinotify)
-* [src/lib/alarmMgr/ (Alarm Manager implementation)](#srclibalarmmgr)
-* [src/lib/cache/ (Subscription cache implementation)](#srclibcache)
-* [src/lib/logSummary/ (Log Summary implementation)](#srcliblogsummary)
-* [src/lib/metricsMgr/ (Metrics Manager implementation)](#srclibmetricsmgr)
+* [src/app/contextBroker/](#srcappcontextbroker) (Main program)
+* [src/lib/logMsg/](#srcliblogmsg) (Logging)
+* [src/lib/parseArgs/](#srclibparseargs) (CLI argument parsing)
+* [src/lib/common/](#srclibcommon) (Common types and functions for all the libraries)
+* [src/lib/orionTypes/](#srcliboriontypes) (Common types)
+* [src/lib/rest/](#srclibrest) (REST interface, using external library microhttpd)
+* [src/lib/ngsi/](#srclibngsi) (Common NGSI types)
+* [src/lib/ngsi10/](#srclibngsi10) (Common NGSI10 types)
+* [src/lib/ngsi9/](#srclibngsi9) (Common NGSI9 types)
+* [src/lib/apiTypesV2/](#srclibapitypesv2) (NGSIv2 types)
+* [src/lib/parse/](#srclibparse) (Common functions and types for payload parsing)
+* [src/lib/jsonParse/](#srclibjsonparse) (Parsing of JSON payload for NGSIv1 requests, using external library Boost property_tree)
+* [src/lib/jsonParseV2/](#srclibjsonparsev2) (Parsing of JSON payload for NGSIv2 requests, using external library rapidjson)
+* [src/lib/serviceRoutines/](#srclibserviceroutines) (Service routines for NGSIv1)
+* [src/lib/serviceRoutinesV2/](#srclibserviceroutinesv2) (Service routines for NGSIv2)
+* [src/lib/convenience/](#srclibconvenience) (Convenience operations in NGSIv1)
+* [src/lib/mongoBackend/](#srclibmongobackend) (Database interface to mongodb, using external library libmongoclient)
+* [src/lib/ngsiNotify/](#srclibngsinotify) (NGSIv1 notifications)
+* [src/lib/alarmMgr/](#srclibalarmmgr) (Alarm Manager implementation)
+* [src/lib/cache/](#srclibcache) (Subscription cache implementation)
+* [src/lib/logSummary/](#srcliblogsummary) (Log Summary implementation)
+* [src/lib/metricsMgr/](#srclibmetricsmgr) (Metrics Manager implementation)
 
 [Top](#top)
 
@@ -87,7 +87,7 @@ See the [cookbook](cookbook.md) for details about these two important topics.
 
 ## src/lib/logMsg/
 The log message library takes care of writing log lines to the log file, whose default location is
-`/tmp/contextBroker.log` which can be modified using the [CLI](../manuals/admin/cli.md) `-logDir`.   The most important task, apart from helping in debugging the broker, are the transaction tags.
+`/tmp/contextBroker.log` which can be modified using the [CLI parameter](../admin/cli.md) `-logDir`.   The most important task, apart from helping in debugging the broker, are the transaction tags.
 
 See `lmTransactionStart()` et al in `logMsg.cpp/h`.
 About debugging the broker, see especially the trace levels (that are set using the `-t` CLI param),
@@ -98,7 +98,7 @@ in `traceLevels.h`.
 
 ## src/lib/parseArgs/
 The CLI parameter parsing is taken care of by the **parseArgs** library.
-Its input is a PaArgument vector, describing all the CLI parameters, that is defined in `contextBroker.cpp`.
+Its input is a PaArgument vector, describing all the [CLI parameters](../admin/cli.md), that is defined in `contextBroker.cpp`.
 
 [Top](#top)
 
@@ -107,23 +107,23 @@ Its input is a PaArgument vector, describing all the CLI parameters, that is def
 The **common**  library contains a number of basic help modules and stuff, common for all the
 source code of the broker:
 
-* JsonHelper - helper class for rendering JSON output in NGSIv2.
-* MimeType - MimeType enum and helper functions for MimeType constant from/to string.
-* RenderFormat - RenderFormat enum and helper functions for RenderFormat constant from/to string.
-* SyncQOverflow - SyncQOverflow templates (belongs in ngsiNotify library really).
-* Timer - a class for getting the current time.
-* clockFunctions - helper functions to add and substact from/to 'struct timespec'.
-* defaultValues - definitions for default service paths.
-* errorMessages - common place for all error strings that the broker responds with.
-* globals - common definitions, variables and functions.
-* idCheck - validity check for a subscription/registration id.
-* limits - definitions for limits in string lengths etc.
-* macroSubstitute - function for variable substitution used in custom notifications (belongs in ngsiNotify library really).
-* sem - definitions of semaphores and functions to initilize/take/give semaphores.
-* statistics - time measuring macros and counters for statistics
-* string - string parsing/manipulation functions
-* tag - macros/functions for JSON rendering
-* wsStrip - function that strips a string from leading and trailing whitespace
+* JsonHelper: helper class for rendering JSON output in NGSIv2.
+* MimeType: MimeType enum and helper functions for MimeType constant from/to string.
+* RenderFormat: RenderFormat enum and helper functions for `RenderFormat` constant from/to string.
+* SyncQOverflow: SyncQOverflow templates (belongs in [**ngsiNotify** library](#srclibngsinotify) really).
+* Timer: a class for getting the current time.
+* clockFunctions: helper functions to add and substact from/to `struct timespec`.
+* defaultValues: definitions for default service paths.
+* errorMessages: common place for all error strings that the broker responds with.
+* globals: common definitions, variables and functions.
+* idCheck:  validity check for a subscription/registration id.
+* limits: definitions for limits in string lengths etc.
+* macroSubstitute: function for variable substitution used in custom notifications (belongs in [**ngsiNotify** library](#srclibngsinotify) really).
+* sem: definitions of semaphores and functions to initilize/take/give semaphores.
+* statistics: time measuring macros and counters for statistics
+* string: string parsing/manipulation functions
+* tag: macros/functions for JSON rendering
+* wsStrip: function that strips a string from leading and trailing whitespace
 
 [Top](#top)
 
@@ -435,14 +435,13 @@ The most important of all libraries of the broker, the **mongoBackend** library 
 ## src/lib/ngsiNotify/
 The **ngsiNotify** library is where notifications to subscriptions are implemented.
 When an entity is created or modified or when a subscription is created or modified, in case there is an active subscription/entity, the subscriber will be sent a notification, and it is the task of this library to make sure that happens. [**mongoBackend**](#srclibmongobackend) decides when to notify and **ngsiNotify** executes the notification, with the help of the external library [libcurl](https://curl.haxx.se/libcurl/).
-Actually, a function from the [**rest** library](#srclibrest) is used: `httpRequestSend()`.
-Another important aspect of this library is that the notifications are sent by separete threads, using a thread pool if desired.
+Actually, a function from the [**rest** library](#srclibrest) is used: `httpRequestSend()`. Another important aspect of this library is that the notifications are sent by separete threads, using a thread pool if desired.
 
 We have subscriptions both for *context entities* and for *availability registrations* and thus, there are two types of notifications. Context entity subscriptions are by far more important (registration subscriptions are barely used at all) and the threadpool for notifications is used for context entity subscriptions only.
 
 ### Context entities notifications
 
-Using the [CLI](../admin/cli.md) option `-notificationMode`, Orion can be started with a thread pool for sending of notifications (`-notificationMode threadpool`). If so, during Orion startup, a pool of threads is created and these threads awaits new items in the notification queue and when an item is present, it is taken from the queue and processed, sending the notification in question. If not used, then a thread will be created for each notification to be sent (default value of `-notificationMode` is "transient"). More information on notifications modes can be found in [this section of the Orion administration manual](../admin/perf_tuning.md#notification-modes-and-performance).
+Using the [CLI parameter](../admin/cli.md) `-notificationMode`, Orion can be started with a thread pool for sending of notifications (`-notificationMode threadpool`). If so, during Orion startup, a pool of threads is created and these threads awaits new items in the notification queue and when an item is present, it is taken from the queue and processed, sending the notification in question. If not used, then a thread will be created for each notification to be sent (default value of `-notificationMode` is "transient"). More information on notifications modes can be found in [this section of the Orion administration manual](../admin/perf_tuning.md#notification-modes-and-performance).
 
 The invoking function in the case of notification due to attribute update/creation is `processOnChangeConditionForUpdateContext()` (see MD-01 diagram at [this section](mongoBackend.md#mongoupdatecontext-sr-and-mongonotifycontext-sr)) and the invoking function in the case of notification due to subscription creation/update (what is called "initial notification" is `processOnChangeConditionForUpdateContext()` (see MD-03 diagram at [this section](mongoBackend.md#processconditionvector)).
 
@@ -509,7 +508,7 @@ See full documentation on the subscription cache in its [dedicated document](sub
 
 ## src/lib/logSummary/
 The **logSummary** library implements a thread that periodically "spits out" a summary of the alarms
-maintained by the [Alarm Manager](#srclibalarmMgr/).
+maintained by the [Alarm Manager](#srclibalarmmgr).
 
 This functionality is off by default and turned on by starting orion with the [CLI parameter](../admin/cli.md) `-logSummary <summary period in seconds>`.
 
@@ -520,3 +519,5 @@ What it does is basically to compile a summary of the current state of the Alara
 ## src/lib/metricsMgr/
 For similar metrics throughout the platform a common set of metrics were invented and in the case of Orion, a manager was implemented. This Metrics Manager resides in the library **metricsMgr**.
 For information about the metrics, see [this document](../admin/metrics_api.md).
+
+[Top](#top)
