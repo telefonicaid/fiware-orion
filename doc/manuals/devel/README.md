@@ -265,7 +265,7 @@ ContextElement in its turn contains:
 * EntityId
 * AttributeDomainName
 * ContextAttributeVector
-* MetadataVector this element is part of NGSIv1 but Orion doesn't make use of it)
+* MetadataVector (this field is part of NGSIv1 but Orion doesn't make use of it)
 
 Now, the methods `render()`, `check()`, `release()`, etc. are called in a tree-like fashion, starting from the top hierarchy class, e.g. UpdateContextRequest:
 
