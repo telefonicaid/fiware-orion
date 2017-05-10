@@ -59,8 +59,8 @@ _MB-01: mongoUpdate UPDATE/REPLACE case with entity found_
 * The `processContextAttributeVector()` implements a loop to call `updateContextAttributeItem()` in order to process each individual attribute in the CE (step 9). More detail regarding the strategy used to implement this processing next.
 * Once the processing of the attributes ends, `processContextAttributesVector()` calls `addTriggeredSubscriptions()` function in order to detect subscription that could be triggered by the update operation (step 10). More detail on this next.
 * Finally the control is returned to `updateEntity()` with invokes `collectionUpdate()` function in the `connectionOperations` module in order to actually update the entity at DB (steps 11 and 12).
-* Next step is to send notifications triggered by the update operation, by the means of the `processSubscriptions()` function (step 13). More detail on this next (diagram MD-01).
-* Finally, the `searchContextProviders()` function is called in order to try to find a suitable context provider for each attribute in the CE not found at DB (step 14). This information would be used by the calling service routine in order to potentially forward the update operation to context providers, as described elsewhere. More information on the `searchContextProviders()` implementation next (diagram MD-02).
+* Next step is to send notifications triggered by the update operation, by the means of the `processSubscriptions()` function (step 13). More detail on this next (diagram [MD-01](#flow-nf-01)).
+* Finally, the `searchContextProviders()` function is called in order to try to find a suitable context provider for each attribute in the CE not found at DB (step 14). This information would be used by the calling service routine in order to potentially forward the update operation to context providers, as described in the [context providers documentation](cprs.md). More information on the `searchContextProviders()` implementation next (diagram [MD-02](#flow-md-02)).
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 15).
 
 Case 2: action type is "UPDATE" or "REPLACE" and the entity is not found.
@@ -74,7 +74,7 @@ _MB-02: mongoUpdate UPDATE/REPLACE case with entity not found_
 * Depending on `-reqMutexPolicy`, request semaphore could be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).
 * A loop calls `processContextElement()` function for each `ContextElement` object (CE, in short) in the incoming request (step 3).
 * After some pre-conditions checking, the `processContextElement()` function processes an individual CE. First, the entity corresponding to that CE is search in the DB, by means on the `collectionQuery()` function in the `connectionOperations` module (steps 4 and 5). Let's assume that the entity is not found (step 6).
-* The `searchContextProviders()` function is called in order to try to find a suitable context provider for the entity (step 7). This information would be used by the calling service routine in order to potentially forward the update operation to context providers, as described elsewhere. More information on the `searchContextProviders()` implementation next (diagram MD-02).
+* The `searchContextProviders()` function is called in order to try to find a suitable context provider for the entity (step 7). This information would be used by the calling service routine in order to potentially forward the update operation to context providers, as described in the [context providers documentation](cprs.md). More information on the `searchContextProviders()` implementation next (diagram [MD-02](#flow-md-02)).
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 8).
 
 Case 3: action type is "APPEND" or "APPEND_STRICT" on existing entity
@@ -92,7 +92,7 @@ _MB-03: mongoUpdate APPEND/APPEND_STRICT case with existing entity_
 * The `processContextAttributeVector()` implements a loop to call `appendContextAttributeItem()` in order to process each individual attribute in the CE (step 9). More detail regarding the strategy used to implement this processing next.
 * Once the processing of the attributes ends, `processContextAttributesVector()` calls `addTriggeredSubscriptions()` function in order to detect subscription that could be triggered by the update operation (step 10). More detail on this next.
 * Finally the control is returned to `updateEntity()` with invokes `collectionUpdate()` function in the `connectionOperations` module in order to actually update the entity at DB (steps 11 and 12).
-* Next step is to send notifications triggered by the update operation, by the means of the `processSubscriptions()` function (step 13). More detail on this next (diagram MD-01).
+* Next step is to send notifications triggered by the update operation, by the means of the `processSubscriptions()` function (step 13). More detail on this next (see diagram [MD-01](#flow-md-01)).
 * Current version of the code calls `searchContextProviders()` function, as in case 1. This shouldn't be done in the "APPEND"/"APPEND_STRICT" case, as this operation is always processed locally and doesn't make sense to forward it to context providers. The fix is pending  (see [this issue](https://github.com/telefonicaid/fiware-orion/issues/2874)).
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 14).
 
@@ -109,7 +109,7 @@ _MB-04: mongoUpdate APPEND/APPEND_STRICT case with new entity_
 * After some pre-conditions checking, the `processContextElement()` function processes an individual CE. First, the entity corresponding to that CE is search in the DB, by means on the `collectionQuery()` function in the `connectionOperations` module (steps 4 and 5). Let's assume that the entity is not found (step 6).
 * The execution flow passes to the `createEntity()` in charge of creating the entity (step 7). The entity is actually created at DB by the means of `collectionInsert()` function in the `connectionOperations` module (steps 8 and 9).
 * Control is returned to `processContextElement()`, which calls `addTriggeredSubscriptions()` function in order to detect subscription that could be triggered by the update operation (step 10). More detail on this next.
-* Next step is to send notifications triggered by the update operation, by the means of the `processSubscriptions()` function (step 11). More detail on this next (diagram MD-01).
+* Next step is to send notifications triggered by the update operation, by the means of the `processSubscriptions()` function (step 11). More detail on this next (see diagram [MD-01](#flow-md-01)).
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 12). 
 
 Case 5: action type is "DELETE" to partially delete some attributes in the entity
@@ -127,7 +127,7 @@ _MB-05: mongoUpdate DELETE not remove entity_
 * The `processContextAttributeVector()` implements a loop to call `deleteContextAttributeItem()` in order to process each individual attribute in the CE (step 9). More detail regarding the strategy used to implement this processing next.
 * Once the processing of the attributes ends, `processContextAttributesVector()` calls `addTriggeredSubscriptions()` function in order to detect subscription that could be triggered by the update operation (step 10). More detail on this next.
 * Finally the control is returned to `updateEntity()` with invokes `collectionUpdate()` function in the `connectionOperations` module in order to actually update the entity at DB (steps 11 and 12).
-* Next step is to send notifications triggered by the update operation, by the means of the `processSubscriptions()` function (step 13). More detail on this next (diagram MD-01).
+* Next step is to send notifications triggered by the update operation, by the means of the `processSubscriptions()` function (step 13). More detail on this next (see diagram [MD-01](#flow-md-01)).
 * Current version of the code calls `searchContextProviders()` function, as in case 1. This shouldn't be done in the "DELETE" case, as this operation is always processed locally and doesn't make sense to forward it to context providers. The fix is pending  (see [this issue](https://github.com/telefonicaid/fiware-orion/issues/2874)).
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 14). 
 
@@ -176,8 +176,8 @@ During the update process, either in the case of new entities or updating existi
 
 _MD-01: processSubscriptions function_
  
-* `processSubscriptions()` is invoked (step 1). See diagrams MB-01, MB-03, MB-04 and MB-05. Then, a loop is implemented to process each individual triggered subscription.
-* The `processOnChangeConditionForUpdateContext()` function is called (step 2), which in sequence uses the `Notifier` object (from [ngsiNotify]() library) in order to actually sent the notification (step 3). The detail is described elsewhere, see diagrams NF-01 or NF-03.
+* `processSubscriptions()` is invoked (step 1). See diagrams [MB-01](#flow-mb-01), [MB-03](#flow-mb-03), [MB-04](#flow-mb-04) and [MB-05](#flow-mb-05). Then, a loop is implemented to process each individual triggered subscription.
+* The `processOnChangeConditionForUpdateContext()` function is called (step 2), which in sequence uses the `Notifier` object (from [ngsiNotify](README.md#srclibngsinotify) library) in order to actually sent the notification (step 3). The detail is described in diagrams [NF-01](README.md#flow-nf-01) or [NF-03](README.md#flow-nf-03).
 * Next steps are done only in the case a notification was actually sent. Depending on cache usage:
     * If cache is not being used, then the last notification time and count in DB are updated at DB, by the means of `collectionUpdate()` in the `connectionOperations` module (steps 4 and 5).
     * If cache is being used, then the subscription is retrieved from the cache calling `subCacehcItemLookup()` (step 7). Next, last notification time and count are modified in the subscription cache (there will be consolidated at DB in the next cache refresh, see details in [this document](subscriptionCache.md#subscription-cache-refresh). The access to cache is protected by subscription cache semaphore (see [this document for details](semaphores.md#subscription-cache-semaphore)), which is taken and released in steps 6 and 8 respectively.
@@ -189,7 +189,7 @@ Finally, in the case of action type "UPDATE/REPLACE", the context update logic i
 
 _MD-02: searchContextProviders function_
 
-* `searchContextProviders()` is invoked (step 1). See diagrams MB-01, MB-02, MB-03 and MB-05. Apart from this entry points, note that `searchContextProviders()` can be also called from `updateEntity()` in the case of `processContextAttributeVector()` fail (which means that the entity wasn't actually modified locally, so it makes sense to search for Context Providers).
+* `searchContextProviders()` is invoked (step 1). See diagrams [MB-01](#flow-mb-01), [MB-02](#flow-mb-02), [MB-03](#flow-mb-03) and [MB-05](#flow-mb-05). Apart from this entry points, note that `searchContextProviders()` can be also called from `updateEntity()` in the case of `processContextAttributeVector()` fail (which means that the entity wasn't actually modified locally, so it makes sense to search for Context Providers).
 * If at least some attribute has the `found` flag set to `false`, a lookup for matching registrations based on specific attributes (i.e. in the form "E-A") is done, calling the `registrationsQuery()` function in the `MongoGlobal` module (step 2). This function search in the DB using the `collectionRangedQuery()` in the `connectionOperations` module (steps 3 and 4).
 * Then, the `fillContextProviders()` function (in the `MongoGlobal` module) is called in order to attempt to fill the not found attributes with the matched registrations (step 5).
 * If at least some attribute stills with the `found` flag set to `false` a new lookup round is done. This time, searching for whole entities, (i.e. in the "E-&lt;null&gt;" form). Again, the `registrationsQuery()` function is used (step 6). This function search in the DB using the `collectionRangedQuery()` in the `connectionOperations` module (steps 7 and 8).
@@ -308,7 +308,7 @@ _MB-11: mongoCreateSubscription_
 * `mongoCreateSubscription()` is invoked from the service routine (step 1). This can be from either `postSubscriptions()` (which resides in `lib/serviceRoutinesV2/postSubscriptions.cpp`) or `mongoSubscribeContext()` (which resides in `lib/mongoBackend/mongoSubscribeContext.cpp`).
 * Depending on `-reqMutexPolicy`, request semaphore could be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).  
 * This functions builds a BSON object that will be at the end the one to be persisted at DB, using different `set*()` functions (`setExpiration()`, `setHttpInfo()`, etc.). One of such function has the "side effect" of potentially sending initial notifications corresponding to the subscription being created, i.e. the `setCondsAndInitialNotify()` function (called in step 3).
-* This function in sequence uses `processConditionVector()` to actually send notifications (step 4), which detail is described as part of `MongoGlobal` module section (diagram MD-03).
+* This function in sequence uses `processConditionVector()` to actually send notifications (step 4), which detail is described as part of `MongoGlobal` module section (see diagram [MD-03](#flow-md-03)).
 * The BSON object corresponding to the new subscription is inserted in the DB using the `collectionInsert()` function in the `connectionOperations` module (steps 5 and 6).
 * In the case cache is enabled  (i.e. `noCache` set to `false`) the new subscription is inserted in the cache (step 7). The `insertInCache()` function uses the subscription cache semaphore internally (see [this document for details](semaphores.md#subscription-cache-semaphore)).
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 8). 
@@ -331,7 +331,7 @@ _MB-12: mongoUpdateSubscription_
 * Subscription to be updated is retrieved from DB using the `collectionFindOne()` function in the `connectionOperations` module (steps 3 and 4).
 * If the cache is enabled (i.e. `noCache` set to `false`) the subscription cache object is also retrieved from cache using the `subCacheItemLoopkup()` function in the `cache` module (step 5). This should be protected by the cache semaphore, but currently it isn't (see [this issue](https://github.com/telefonicaid/fiware-orion/issues/2882) for details).
 * The BSON object of the final subscription is built, based in the BSON object of the original subscription, using different `set*()` functions similar to the ones in the create subscription case (`setExpiration()`, `setHttpInfo()`, etc.). One of such function has the "side effect" of potentially sending initial notifications corresponding to the subscription being updated, i.e. the `setCondsAndInitialNotify()` function (called in step 6).
-* This function in sequence uses `processConditionVector()` to actually send notifications (step 7), which detail is described as part of `MongoGlobal` module section (diagram MD-03).
+* This function in sequence uses `processConditionVector()` to actually send notifications (step 7), which detail is described as part of `MongoGlobal` module section (see diagram [MD-03](#flow-md-03)).
 * The update count and last notification fields are updated in the subscription cache (step 9). This operation is protected by the cache semaphore (see [this document for details](semaphores.md#subscription-cache-semaphore)) which is taken and released in steps 8 and 10 receptively.
 * The BSON object corresponding to the updated subscription is updated in the DB using the `collectionUpdate()` function in the `connectionOperations` module (steps 11 and 12).
 * In the case cache is enabled  (i.e. `noCache` set to `false`) the new subscription is updated in the cache (step 13). The `updatetInCache()` function uses the subscription cache semaphore internally.
@@ -409,7 +409,7 @@ Actually, this function is a wrapper of the NGSIv2 version of this operation, i.
 _MB-16: mongoSubscribeContext_
 
 * `mongoSubscribeContext()` is invoked from the service routine (step 1).
-* The execution flow is passed to `mongoCreateSubscription()` (setp 2). See diagram MB-11.
+* The execution flow is passed to `mongoCreateSubscription()` (setp 2). See diagram [MB-11](#flow-mb-11).
 
 #### `mongoUpdateContextSubscription` (SR)
 
@@ -425,7 +425,7 @@ Actually, this function is a wrapper of the NGSIv2 version of this operation, i.
 _MB-17: mongoUpdateContextSubscription_
 
 * `mongoUpdateContextSubscription()` is invoked from the service routine (step 1).
-* The execution flow is passed to `mongoUpdateSubscription()` (setp 2). See diagram MB-12.
+* The execution flow is passed to `mongoUpdateSubscription()` (setp 2). See diagram [MB-12](#flow-mb-12).
 
 #### `mongoRegisterContext` (SR) and `mongoNotifyContextAvailability` (SR) 
 
@@ -442,7 +442,7 @@ _MB-18: mongoRegisterContext_
 * `processRegisterContext()` functions is called to process the registration (step 5).
 * For each registration in the request, the `addTriggeredSubscriptions()` function is called (step 6). This function in sequence uses the `collectionQuery()` function in the `connectionOperations` in order to check if the registration triggers a subscription or not (steps 7 and 8). The `subsToNotify` map is used to store the triggered subscriptions.
 * The registration document is created or updated in the DB. In order to to so the `collectionUpdate()` function in the `connectionOperations` module is used, setting the `upsert` parameter to `true` (steps 9 and 10).
-* The `processSubscriptions()` function is called in order to process triggered subscriptions (step 11). The `subsToNotify` map is iterated in order to process each one individually, by `processAvailabilitySubscription()` (step 12). This process is described elsewhere (see diagram MD-04).
+* The `processSubscriptions()` function is called in order to process triggered subscriptions (step 11). The `subsToNotify` map is iterated in order to process each one individually, by `processAvailabilitySubscription()` (step 12). This process is described in diagram [MD-04](#flow-md-01).
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 13).  
 
 #### `mongoDiscoverContextAvailability` (SR)
@@ -476,7 +476,7 @@ _MB-20: mongoSubscribeContextAvailability_
 * `mongoSubscribeContextAvailability()` is invoked from the service routine (step 1).
 * Depending on `-reqMutexPolicy`, request semaphore could be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
 * The context availability subscription document is created in the DB. In order to to so the `collectionInsert()` function in the `connectionOperations` module is used (steps 3 and 4).
-* Eventually, some (one or more) notifications may be triggered as result of this creation. This is done by the `processAvailabilitySubscription()` function (step 5), which is described elsewhere (MD-04). 
+* Eventually, some (one or more) notifications may be triggered as result of this creation. This is done by the `processAvailabilitySubscription()` function (step 5), which is described in diagram [MD-04](flow-md-04). 
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 6). 
 
 #### `mongoUpdateContextAvailabilitySubscription` (SR)
@@ -494,7 +494,7 @@ _MB-21: mongoUpdateContextAvailabilitySubscription_
 * Depending on `-reqMutexPolicy`, request semaphore could be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
 * The context availability subscription document to update is retrieved from DB, by the means of the `collectionFindOne()` function in the `connectionOperations` module (steps 3 and 4).
 * The context availability subscription document is updated in the DB. In order to to so the `collectionUpdate()` function in the `connectionOperations` module is used (steps 5 and 6).
-* Eventually, some (one or more) notifications may be triggered as result of this update. This is done by the `processAvailabilitySubscription()` function (step 7), which is described elsewhere (MD-04).
+* Eventually, some (one or more) notifications may be triggered as result of this update. This is done by the `processAvailabilitySubscription()` function (step 7), which is described in diagram [MD-04](#flow-md-04).
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 8). 
 
 #### `mongoUnsubscribeContextAvailability` (SR)
@@ -591,16 +591,16 @@ This function is called at context subscription creation/update and eventually s
 
 _MD-03: processConditionVector function_
 
-* `processConditionVector()` is invoked (step 1). See diagrams MB-11 and MB-12
+* `processConditionVector()` is invoked (step 1). See diagrams [MB-11](#flow-mb-11) and [MB-12](#flow-mb-12).
 * A loop iterates on each individual condition in the `NotifyConditionVector` vector (although most of the times this vector has only one item):
    * The `processOnChangeConditionForSubscription()` is called to process the individual condition (step 2).
    * `entitiesQuery()` is called to get the entities to be included in the notification (step 3), which in sequence relies on `collectionRangedQuery()` in the `connectionOperations` module in order to get the entities from DB (steps 4 and 5).
    * The `pruneContextElements()` function is call in order to remove not found elements, as it doesn't make sense to include them in the notification (step 6).
    * If after pruning there is some entity to send, steps 7 to 11 are executed.
 	   * In the case of conditions for particular attributes (i.e. not empty condition), then a second lookup is done using `entitiesQuery()` (steps 7, 8 and 9, plus prunning in step 10).
-	   * Notification is sent (step 11) using the `Notifier` object (from [ngsiNotify]() library) in order to actually sent the notification (step 3). The detail is in diagrams [NF-01](README.md#flow-nf-01) or [NF-03](README.md#flow-nf-03). In the case of conditions for particular attributes, notification is sent only if the previous check was ok. In the case of all-attributes notifications (i.e. empty codition) notification is always sent. 
+	   * Notification is sent (step 11) using the `Notifier` object (from [ngsiNotify]() library) in order to actually sent the notification (step 3). The detail is provided in diagrams [NF-01](README.md#flow-nf-01) or [NF-03](README.md#flow-nf-03). In the case of conditions for particular attributes, notification is sent only if the previous check was ok. In the case of all-attributes notifications (i.e. empty codition) notification is always sent.
 
-Note `processOnChangeConditionForSubscription()` has a "sibling" function named `processOnChangeConditionForUpdateContext()` for non-initial notifications (see diagram MD-01).
+Note `processOnChangeConditionForSubscription()` has a "sibling" function named `processOnChangeConditionForUpdateContext()` for non-initial notifications (see diagram [MD-01](#flow-md-01)).
 
 #### `processAvailabilitySubscription()`
 
@@ -615,9 +615,9 @@ It is called from:
 
 _MD-04: processAvailabilitySubscription function_
 
-* `processAvailabilitySubscription()` is invoked (step 1). See diagrams MB-18, MB-20 and MB-21.
+* `processAvailabilitySubscription()` is invoked (step 1). See diagrams [MB-18](#flow-mb-18), [MB-20](#flow-mb-20) and [MB-21](#flow-mb-21).
 * Check if some registration matches the subscription, using `registrationsQuery()` (step 2). This function in sequence uses `collectionRangeQuery()` in the `connectionOperations` module to check in the DB (steps 3 and 4).
-* In the case of some registration matches, the process continues. Availability notification is sent (step 5) using the `Notifier` object (from [ngsiNotify](README.md#srclibngsinotify) library). The detail is described elsewhere, see diagram NF-02.
+* In the case of some registration matches, the process continues. Availability notification is sent (step 5) using the `Notifier` object (from [ngsiNotify](README.md#srclibngsinotify) library). The detail is described in diagram [NF-02](README.md#flow-nf-02).
 * Finally, last notification and count statistics are updated, by calling `mongoUpdateCasubNewNotification()` (step 6). This function in sequence uses `collectionUpdate()` in the `connectionOperations` module in order to update the corresponding context availability subscription document in DB (steps 7 and 8).
 
 
