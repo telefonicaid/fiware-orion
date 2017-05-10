@@ -3,12 +3,11 @@
 *Note: This document describes Orion Context Broker as of release 1.4.x.*
 
 
-## <a name='directory_structure'></a>Directory Structure
+## Directory Structure
 
 Orion Context Broker is divided into a number of libraries, each library
 containing a number of modules (with *module* we refer to a source code file
-and its corresponding header file).  
-Each library has its own directory under `src/lib/`.  
+and its corresponding header file). Each library has its own directory under `src/lib/`.
 
 The main program, that basically initializes the libraries and starts the
 REST interface resides in its own directory `src/app/contextBroker/`.
@@ -70,7 +69,7 @@ scripts used for testing and release making are found under `scripts/`.
 
 [Top](#top)
 
-## <a name='src/app/contextBroker/'></a>src/app/contextBroker/
+## src/app/contextBroker/
 The main program is found in `contextBroker.cpp` and its purpose it to:
 
 * Parse and treat the command line parameters.
