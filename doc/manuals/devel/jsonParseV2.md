@@ -9,7 +9,7 @@ The development team prefers this second approach however.
 To describe the flow of NGSIv2 parse, we need an example payload as the code is not generic but individual per request type.
 The request POST /v2/entities is used in this example flow:
 
-<a name='figure_pp03'></a>
+<a name='flow-pp-03'></a>
 ![CACHE REFRESH IMAGE](images/Flow-PP-03.png)
 
 _Figure PP-03_  

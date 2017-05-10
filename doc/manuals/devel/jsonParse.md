@@ -44,7 +44,7 @@ The second **jsonParse()** (invoked by the first) on the other hand is invoked r
 is output from *Boost property_tree*. See full explanation in the [dedicated section on jsonParse()](#jsonparse).  
 The concrete example used for following image is the parsing of payload for **POST /v1/updateContextRequest**
 
-<a name='figure_pp01'></a>
+<a name='flow-pp-01'></a>
 ![CACHE REFRESH IMAGE](images/Flow-PP-01.png)
 
 _Figure PP-01_  
