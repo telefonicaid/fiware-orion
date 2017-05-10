@@ -1,4 +1,30 @@
-# mongoBackend library
+# <a name="top"></a>mongoBackend library
+
+* [Introduction]()
+* [Request processing modules]()
+	* [`mongoUpdateContext` (SR) and `mongoNotifyContext` (SR)](#mongoupdatecontext-sr-and-mongonotifycontext-sr)
+	* [`mongoQueryContext` (SR)](#mongoquerycontext-sr)
+	* [`mongoQueryTypes` (SR and SR2)](#mongoquerytypes-sr-and-sr2)
+	* [`mongoCreateSubscription` (SR2)](#mongocreatesubscription-sr2)
+	* [`mongoUpdateSubscription` (SR2)](#mongoupdatesubscription-sr2)
+	* [`mongoGetSubscriptions` (SR2)](#mongogetsubscriptions-sr2)
+	* [`mongoUnsubscribeContext` (SR and SR2)](#mongounsubscribecontext-sr-and-sr2)
+	* [`mongoSubscribeContext` (SR)](#mongosubscribecontext-sr)
+	* [`mongoUpdateContextSubscription` (SR)](#mongoupdatecontextsubscription-sr)
+	* [`mongoRegisterContext` (SR) and `mongoNotifyContextAvailability` (SR)](#mongoregistercontext-sr-and-mongonotifycontextavailability-sr)
+	* [`mongoDiscoverContextAvailability` (SR)](#mongodiscovercontextavailability)
+	* [`mongoSubscribeContextAvailability` (SR)](#mongosubscribecontextavailability-sr)
+	* [`mongoUpdateContextAvailabilitySubscription` (SR)](#mongoupdatecontextavailabilitysubscription-sr)
+	* [`mongoUnsubscribeContextAvailability` (SR)](#mongounsubscribecontextAvailability-sr)
+* [Connection pool management](#connection-pool-management)
+* [Low-level modules related with DB interaction](#low-level-modules-related-with-db-interaction)
+* [Specific purpose modules](#specific-purpose-modules)
+* [The `MongoGlobal` module](#the-mongoglobal-module)
+	* [`mongoInit()`](#mongoinit)
+	* [`entitiesQuery()`](#entitiesquery)
+	* [`registrationsQuery()`](#regristrationsquery) 
+	* [`processConditionVector()`](#processconditionvector)
+	* [`processAvailabilitySubscription()`](#processavailabilitysubscription)
 
 ## Introduction
 
@@ -20,6 +46,8 @@ Note that cache only apllies to *context* subscriptions. The *context availabili
 
 Let's analyze the different modules included in this library in the following sections.
 
+[Top](#top)
+
 ### Request processing modules
 
 These modules implement the different Context Broker requests. They are called during the overall request processing flow by service routines libraries (either in the **serviceRoutines** or **serviceRoutinesV2** libraries). Next subsections describe each module (SR means the module is called from **serviceRoutines** and SR2 means the module is called from  **serviceRoutineV2**; note no module is called from *both* libraries).
@@ -28,6 +56,8 @@ This section also describes the `MongoCommonRegister` and `MongoCommonUpdate` wh
 
 * `MongoCommonRegister` provides common functionality to `mongoRegisterContext` and `mongoNotifyContextAvailability` modules.
 * `MongoCommonUpdate` provides common functionality to `mongoUpdateContext` and `mongoNotifyContext`.
+
+[Top](#top)
 
 #### `mongoUpdateContext` (SR) and `mongoNotifyContext` (SR)
 
@@ -195,6 +225,8 @@ _MD-02: searchContextProviders function_
 * If at least some attribute stills with the `found` flag set to `false` a new lookup round is done. This time, searching for whole entities, (i.e. in the "E-&lt;null&gt;" form). Again, the `registrationsQuery()` function is used (step 6). This function search in the DB using the `collectionRangedQuery()` in the `connectionOperations` module (steps 7 and 8).
 * Then, the `fillContextProviders()` function (in the `MongoGlobal` module) is called again in order to attempt to fill the not found attributes with the new matched registrations (step 9).
 
+[Top](#top)
+
 #### `mongoQueryContext` (SR)
 
 Encapsulates the logic for the query context operation.
@@ -235,6 +267,8 @@ By *generic entities* above we mean one of the following:
 1. Entities with regular id (i.e. not a pattern) and null type
 2. Entities with pattern id and not null type
 3. Entities with pattern id and null type
+
+[Top](#top)
 
 #### `mongoQueryTypes` (SR and SR2)
 
@@ -294,6 +328,8 @@ Note the usage of `noAttrDetails` parameter in `mongoEntityTypes()` and `mongoAt
 
 All the above functions heavily relies in the MongoDB aggregation framework. You should be familiar with this framework (and with the `entities` collection structure, [described as part of the database model in the administration documentation](../admin/database_model.md#entities-collection)) in order to understand how they work.
 
+[Top](#top)
+
 #### `mongoCreateSubscription` (SR2)
 
 Encapsulates the context subscription creation logic.
@@ -314,6 +350,8 @@ _MB-11: mongoCreateSubscription_
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 8). 
 
 Note that potential notifications are sent before inserting the subscription at DB/cache, so the correct information regarding last notification times and count is taken into account.
+
+[Top](#top)
 
 #### `mongoUpdateSubscription` (SR2)
 
@@ -338,6 +376,8 @@ _MB-12: mongoUpdateSubscription_
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 14). 
 
 Note that potential notifications are sent before updating the subscription at DB/cache, so the correct information regarding last notification times and count is taken into account.
+
+[Top](#top)
 
 #### `mongoGetSubscriptions` (SR2)
 
@@ -373,6 +413,8 @@ _MB-14: mongoListSubscriptions_
 * For each one of the subscriptions to return, several `set*()` functions are used in order to fill the `Subscription` objects. Among them (details in source code) we highly `setNotification()` (step 5), due to it uses the subscription cache semaphore internally (see [this document for details](semaphores.md#subscription-cache-semaphore)). 
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 6). 
 
+[Top](#top)
+
 #### `mongoUnsubscribeContext` (SR and SR2)
 
 Encapsulates the logic for unsubscribe context operation (NGSIv1) or remove subscription (NGSIv2).
@@ -395,6 +437,8 @@ _MB-15: mongoUnsubscribeContext_
 
 Note that steps 6 and 7 are done no matter the value of `noCache`. This works but it is inefficient. It should be fixed ([an issue](https://github.com/telefonicaid/fiware-orion/issues/2879) has been created about it).
 
+[Top](#top)
+
 #### `mongoSubscribeContext` (SR)
 
 Encapsulates the logic for subscribe context (NGSIv1) operation.
@@ -411,6 +455,8 @@ _MB-16: mongoSubscribeContext_
 * `mongoSubscribeContext()` is invoked from the service routine (step 1).
 * The execution flow is passed to `mongoCreateSubscription()` (setp 2). See diagram [MB-11](#flow-mb-11).
 
+[Top](#top)
+
 #### `mongoUpdateContextSubscription` (SR)
 
 Encapsulates the logic for update context subscription (NGSIv1) operation.
@@ -426,6 +472,8 @@ _MB-17: mongoUpdateContextSubscription_
 
 * `mongoUpdateContextSubscription()` is invoked from the service routine (step 1).
 * The execution flow is passed to `mongoUpdateSubscription()` (setp 2). See diagram [MB-12](#flow-mb-12).
+
+[Top](#top)
 
 #### `mongoRegisterContext` (SR) and `mongoNotifyContextAvailability` (SR) 
 
@@ -445,6 +493,8 @@ _MB-18: mongoRegisterContext_
 * The `processSubscriptions()` function is called in order to process triggered subscriptions (step 11). The `subsToNotify` map is iterated in order to process each one individually, by `processAvailabilitySubscription()` (step 12). This process is described in diagram [MD-04](#flow-md-01).
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 13).  
 
+[Top](#top)
+
 #### `mongoDiscoverContextAvailability` (SR)
 
 Encapsulates the logic for the discover context availability (NGSIv1) operation.
@@ -462,6 +512,8 @@ _MB-19: mongoDiscoverContextAvailability_
 * Registrations search is done using `registrationQuery()` function (steps 4). This function in sequence uses `collectionRangedQuery()` in order to retrieve registrations from DB (steps 5 and 6).
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 7).  
 
+[Top](#top)
+
 #### `mongoSubscribeContextAvailability` (SR)
 
 Encapsulates the context availability subscription creation logic.
@@ -478,6 +530,8 @@ _MB-20: mongoSubscribeContextAvailability_
 * The context availability subscription document is created in the DB. In order to to so the `collectionInsert()` function in the `connectionOperations` module is used (steps 3 and 4).
 * Eventually, some (one or more) notifications may be triggered as result of this creation. This is done by the `processAvailabilitySubscription()` function (step 5), which is described in diagram [MD-04](flow-md-04). 
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 6). 
+
+[Top](#top)
 
 #### `mongoUpdateContextAvailabilitySubscription` (SR)
 
@@ -497,6 +551,8 @@ _MB-21: mongoUpdateContextAvailabilitySubscription_
 * Eventually, some (one or more) notifications may be triggered as result of this update. This is done by the `processAvailabilitySubscription()` function (step 7), which is described in diagram [MD-04](#flow-md-04).
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 8). 
 
+[Top](#top)
+
 #### `mongoUnsubscribeContextAvailability` (SR)
 
 Encapsulates the logic for unsubscribe context availability operation.
@@ -515,6 +571,8 @@ _MB-21: mongoUnsubscribeContextAvailability_
 * The subscription is retrieved from DB using the `collectionFindOne()` function in the `connectionOperations` module (steps 3 and 4).
 * The subscription is removed from DB using the `collectionRemove()` function in the `connectionOperations` module (steps 5 and 6).
 * If request semaphore was taken in step 2, then it is released before returning to calling function (step 7). 
+
+[Top](#top)
 
 ### Connection pool management
 
@@ -537,12 +595,16 @@ Taking this into account, the main functions within the `mongoConnectionPool` mo
 * `mongoPoolConnectionGet()`: get a free connection from pool
 * `mongoPoolConnectionRelease()`: release a connection, so it returns to the pool and it is ready to be selected again by next call of the `mongoConnectionGet()` function.
 
+[Top](#top)
+
 ### Low-level modules related with DB interaction
 
 * `connectionOperations`: wrapper for DB operations (such as insert, find, update, etc.), adding Orion specific aspects (e.g. concurrency management at the DB connection pool, error handling, logging, etc.). MongoDB driver methods to  interact with DB should not be used directly, but using this module (or expand it if you need an operation not yet covered).
 * `safeMongo`: safe methods to get fields from BSON object. Direct access to BSON object using MongoDB driver methods should be avoided, use `safeMongo` module instead (or expand it if you need another way of accessing BSON information not yet covered).
 * `dbConstants` (only `.h`): field names used at DB level (the same as described [in the database model documentation](../admin/database_model.md)) are defined here. 
 * `dbFieldsEncoding` (only `.h`): helper function to do encoding at DB level and metadata string splitting.
+
+[Top](#top)
 
 ### Specific purpose modules
 
@@ -552,13 +614,19 @@ Taking this into account, the main functions within the `mongoConnectionPool` mo
 * `compoundResponses` and `compoundValueBson`: they are modules that help in the conversion between BSON data and internal types (mainly in the [ngsi](README.md#srclibngsi) library) and viceversa.
 * `TriggeredSubscription`: helper class used by subscriptions logic (both context and context availability subscriptions) in order to encapsulate the information related with a triggered subscription on context or registration creation/update.
  
+[Top](#top)
+
 ### The `MongoGlobal` module
 
 Finally, the  have the `MongoGlobal` module, which contains a set of helper functions, used by another **mongoBackend** modules or even other libraries. It has around 40 individual functions so it doesn't make sense to provide all the details in the present document. However, we can highlight the following ones.
 
+[Top](#top)
+
 #### `mongoInit()`
 
 Used by CB initialization logic (at `ContextBroker.cpp` `main()`) in order to initialize DB pooled connection.
+
+[Top](#top)
 
 #### `entitiesQuery()`
 
@@ -571,6 +639,8 @@ This function is called from the following places:
 * From `mongoQueryContext()` (in the `mongoQuery` module), as the "core" of the query operation.
 * `processOnChangeConditionForSubscription()`, to search the entities to "fill" initial notifications during context subscription creation/update.
 
+[Top](#top)
+
 #### `registrationsQuery()` 
 
 This function basically searches for existing registrations in the database (`registrations` collection, [described as part of the database model in the administration documentation](../admin/database_model.md#registrations-collection)). It takes into account service (also named "tenant"), service path and pagination parameters. 
@@ -581,6 +651,8 @@ It is used from several places:
 * From `processAvailabilitySubscription()` (also part of the `MongoGlobal` module) in order to detect registrations that could trigger context availability notifications.
 * From `mongoQueryContext()` in the `mongoQueryContext` module, in order to locate Context Providers that could be eventually used to forward the query. Note that the forwarding is not done within the **mongoBackend** library, but from the calling **serviceRoutine**.
 * From `searchContextProviders()` in the `MongoCommonUpdate` module, in order to locate Context Providers that could be eventually used to forward the update. Note that the forwarding is not done within the **mongoBackend** library, but from the calling **serviceRoutine**.
+
+[Top](#top)
 
 #### `processConditionVector()`
 
@@ -602,6 +674,8 @@ _MD-03: processConditionVector function_
 
 Note `processOnChangeConditionForSubscription()` has a "sibling" function named `processOnChangeConditionForUpdateContext()` for non-initial notifications (see diagram [MD-01](#flow-md-01)).
 
+[Top](#top)
+
 #### `processAvailabilitySubscription()`
 
 Similar to  `processOnChangeConditionForSubscription()` and   `processOnChangeConditionForUpdateContext()` this function is the one that effectively composes context availability notifications.
@@ -619,6 +693,8 @@ _MD-04: processAvailabilitySubscription function_
 * Check if some registration matches the subscription, using `registrationsQuery()` (step 2). This function in sequence uses `collectionRangeQuery()` in the `connectionOperations` module to check in the DB (steps 3 and 4).
 * In the case of some registration matches, the process continues. Availability notification is sent (step 5) using the `Notifier` object (from [ngsiNotify](README.md#srclibngsinotify) library). The detail is described in diagram [NF-02](README.md#flow-nf-02).
 * Finally, last notification and count statistics are updated, by calling `mongoUpdateCasubNewNotification()` (step 6). This function in sequence uses `collectionUpdate()` in the `connectionOperations` module in order to update the corresponding context availability subscription document in DB (steps 7 and 8).
+
+[Top](#top)
 
 
 
