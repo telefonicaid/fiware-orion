@@ -36,12 +36,12 @@ qprP->attributeList.push_back("temperature");
 This instance of `QueryContextRequest` is created by the **jsonParse** library and the service routine `postQueryContext()` passes it to the [**mongoBackend*](README.md#srclibmongobackend) function `mongoQueryContext()`.
 
 ## Library Functions
-The library **jsonParse** contains two overloaded functions with the name `jsonParse()`.
+The library **jsonParse** contains two overloaded functions with the name `jsonParse()`:
 
 * The first one is the toplevel function that is called only once per request.  
-* The second `jsonParse()` (invoked by the first) on the other hand is invoked recursively once per node in the parsed tree that is output from [boost property_tree](https://theboostcpplibraries.com/boost.propertytree). We will use `jsonParse()*` from now on to distinguish from the top level `jsonParse()` function. In other words, `jsonParse()*` will call to `jsonParse()*` as it processes the nodes tree. See full explanation in the [dedicated section on jsonParse()](#jsonparse).
+* The second `jsonParse()` (invoked by the first) on the other hand is invoked recursively once per node in the parsed tree that is output from [boost property_tree](https://theboostcpplibraries.com/boost.propertytree) (we will use `jsonParse()*` from now on to distinguish this second, lower level `jsonParse()` from the top level `jsonParse()` function). In other words, `jsonParse()*` will call `jsonParse()*` as it processes the node tree. See full explanation in the [dedicated section on jsonParse()](#jsonparse).
 
-The concrete example used for following image is the parsing of payload for `POST /v1/updateContextRequest`.
+The concrete example used for the following image is the parsing of payload for `POST /v1/updateContextRequest`.
 
 <a name='flow-pp-01'></a>
 ![Parsing an NGSIv1 payload](images/Flow-PP-01.png)
@@ -49,12 +49,12 @@ The concrete example used for following image is the parsing of payload for `POS
 _PP-01: Parsing an NGSIv1 payload_  
 
 * `payloadParse()` calls the NGSIv1 parse function for JSON payloads (which is one of three possible parse functions to call: parsing of NGSIv1 JSON, NGSIv2 JSON and text) (step 1).
-* `jsonTreat()` looks up the type of request by calling `jsonRequestGet()` (step 2), which returns a pointer to a `JsonRequest` struct that is needed to parse the payload.
-    * Each type of payload needs different input to the common parsing routines. A vector of `JsonRequest` structs contains this information and this function (`jsonRequestGet()`) looks up the corresponding `JsonRequest` struct in the vector and returns it. More on the `JsonRequest` struct later.
-* Knowing the specific information for the request type, `jsonTreat()` calls the toplevel `jsonParse()`, whose responsibility is to start the parsing of the payload  (step 3). `jsonParse()` reads in the payload into a `stringstream` and calls the function `read_json()` that takes care of the parsing of the payload and covert it to a property tree.
-* After that, the lower level `jsonParse()*` function is invoked on the resulting tree to convert the boost property tree into an Orion structure (step 4). In fact, `jsonParse()*` is invoked at this point as many times as top level keys in the JSON to process.
-	* Example: for `{ "a": ..., "b": ..., "c:"... }`, `jsonParse()*` will be invoked three times (one for `"a"`, other for `"b"` and other for `"c"`).
-* `jsonParse()*` calls the `treat()` function on each node (step 5) and if the node is not a leaf, does an recursive call to itself for each child of the node.
+* `jsonTreat()` looks up the type of the request by calling `jsonRequestGet()` (step 2), which returns a pointer to a `JsonRequest` struct that is needed to parse the payload.
+    * Each type of payload needs different input to the common parsing routines. A vector of `JsonRequest` structs contains this information and `jsonRequestGet()` looks up the corresponding `JsonRequest` struct in the vector and returns it. More on the `JsonRequest` struct later.
+* Knowing the specific information for the request type, `jsonTreat()` calls the toplevel `jsonParse()`, whose responsibility is to start the parsing of the payload  (step 3). `jsonParse()` reads in the payload into a `stringstream` and calls the function `read_json()` that takes care of the parsing of the payload and converts the payload into a property tree.
+* After that, `jsonParse()*` (the lower level) is invoked on the resulting tree to convert the boost property tree into an Orion structure (step 4). In fact, `jsonParse()*` is invoked at this point as many times as there are top level keys in the JSON to process.
+	* Example: for `{ "a": ..., "b": ..., "c:"... }`, `jsonParse()*` will be invoked three times (once for `"a"`, once for `"b"` and once for `"c"`).
+* `jsonParse()*` calls the `treat()` function on each node (step 5) and if the node is not a leaf, it does an recursive call to itself for each child of the node.
 * The `treat()` function checks for forbidden characters in the payload and then calls the specific Parse-Function for the node in question  (step 6). A pointer to this specific Parse-Function is found in the struct `JsonRequest`, as well as the path to each node, which is how the struct is found. 
 * The Parse-Function simply extracts the information from the tree node and adds it to the resulting Orion struct that is the result of the entire parse. Note that each node in the tree has its own Parse-Function and that in this image just a few selected Parse-Functions are shown.
 	* In fact, to parse this `UpdateContextRequest` payload, there are no less than 19 Parse-Functions (see `jsonParse/jsonUpdateContextRequest.cpp`).     
