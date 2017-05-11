@@ -86,7 +86,7 @@ function finish()
     mMsg "found $totalErrors errors ($mayorErrors mayor, $minorErrors minor errors) in $lines lines of source code in $files files ($percentage% style-guide-incompatibilities)"
     exit 1
   else
-    mMsg "found no mayor errors ($minorErrors minor errors) in $lines lines of source code in $files files ($percentage% style-guide-incompatibilities)"
+    mMsg "[$dir]: found no mayor errors ($minorErrors minor errors) in $lines lines of source code in $files files ($percentage% style-guide-incompatibilities)"
     exit 0
   fi
 }
@@ -179,10 +179,8 @@ then
 fi
 
 
-
 #
 # lint error categories
-#
 #
 declare -A cat
 

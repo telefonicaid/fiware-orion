@@ -54,7 +54,6 @@ ContextRegistration::ContextRegistration()
 std::string ContextRegistration::render(const std::string& indent, bool comma, bool isInVector)
 {
   std::string out = "";
-  std::string tag = "contextRegistration";
 
   //
   // About JSON commas;
@@ -62,7 +61,8 @@ std::string ContextRegistration::render(const std::string& indent, bool comma, b
   // the problem with the JSON commas disappear. All fields will have 'comma set to true'.
   // All, except providingApplication of course :-)
   //
-  out += startTag1(indent, tag, isInVector == false);
+
+  out += startTag(indent, !isInVector? "contextRegistration" : "");
   out += entityIdVector.render(indent + "  ", true);
   out += contextRegistrationAttributeVector.render(indent + "  ", true);
   out += registrationMetadataVector.render(indent + "  ", true);
@@ -80,7 +80,7 @@ std::string ContextRegistration::render(const std::string& indent, bool comma, b
 */
 std::string ContextRegistration::check
 (
-  ConnectionInfo*     ciP,
+  ApiVersion          apiVersion,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,
@@ -89,17 +89,17 @@ std::string ContextRegistration::check
 {
   std::string res;
 
-  if ((res = entityIdVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+  if ((res = entityIdVector.check(requestType, indent)) != "OK")
   {
     return res;
   }
 
-  if ((res = contextRegistrationAttributeVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+  if ((res = contextRegistrationAttributeVector.check(apiVersion)) != "OK")
   {
     return res;
   }
 
-  if ((res = registrationMetadataVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+  if ((res = registrationMetadataVector.check(apiVersion)) != "OK")
   {
     return res;
   }

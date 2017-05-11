@@ -38,13 +38,7 @@
 *
 * UpdateActionType::check - 
 */
-std::string UpdateActionType::check
-(
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string UpdateActionType::check(void)
 {
   if ((string == "update")        || (string == "UPDATE")        || (string == "Update")        ||
       (string == "append")        || (string == "APPEND")        || (string == "Append")        ||
@@ -60,7 +54,7 @@ std::string UpdateActionType::check
     return "empty update action type";
   }
 
-  return std::string("invalid update action type: /") + string + "/";
+  return "invalid update action type: right ones are: APPEND, APPEND_STRICT, DELETE, REPLACE, UPDATE";
 }
 
 
@@ -129,7 +123,7 @@ std::string UpdateActionType::render(const std::string& indent, bool comma)
     return "";
   }
 
-  return valueTag1(indent, "updateAction", string, comma);
+  return valueTag(indent, "updateAction", string, comma);
 }
 
 

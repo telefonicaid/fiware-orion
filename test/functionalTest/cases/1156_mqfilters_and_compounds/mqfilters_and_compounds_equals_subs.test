@@ -1,0 +1,1139 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+String filters for compound values of metadata: equals in subscriptions
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# FIXME P5: Only tests for positive outcome (notification) have been implemented.
+#           All tests about NO notification are left out.
+#           Also, tests of limits in the values should be added as well
+#           Also, NotEqual is used in ONE step only (02)
+#           Also, FALSE in never used in any Bool comparison
+#
+# 01. Create E1 with A1 with metadata M1 with compound value containing all JSON types
+# 02. Integer: Create subscription 1 for mq=A1.M1.i==10 - notification
+# 03. Dump and reset accumulator, see one notification
+# 04. String: Create subscription 2 for mq=A1.M1.s!=test_strin - notification
+# 05. Dump and reset accumulator, see one notification
+# 06. Float: Create subscription 3 for mq=A1.M1.f:3.14 - notification
+# 07. Dump and reset accumulator, see one notification
+# 08. Bool: Create subscription 4 for mq=A1.M1.T:true - notification
+# 09. Dump and reset accumulator, see one notification
+# 10. Number Range: Create subscription 5 for mq=A1.M1.i:9..10 - notification
+# 11. Dump and reset accumulator, see one notification
+# 12. Number List: Create subscription 6 for mq=A1.M1.f==3.14,3.15 - notification
+# 13. Dump and reset accumulator, see one notification
+# 14. String Range: Create subscription 7 for mq=A1.M1.s:fest_string..test_string - notification
+# 15. Dump and reset accumulator, see one notification
+# 16. String List: Create subscription 8 for mq=A1.M1.s:fest_string,uest_string,test_string - notification
+# 17. Dump and reset accumulator, see one notification
+# 18. Modify E1/A1 - provoke 8 notifications
+# 19. Dump and reset accumulator, see 8 notifications
+#
+
+echo "01. Create E1 with A1 with metadata M1 with compound value containing all JSON types"
+echo "===================================================================================="
+payload='{
+  "id": "E1",
+  "A1": {
+    "value": {
+      "i": 10,
+      "f": 3.14,
+      "s": "test_string",
+      "T": true,
+      "F": false,
+      "N": null,
+      "D": "2016-07-22T10:42:42.00Z"
+    }
+  },
+  "A2": { "value": 22 }
+}'
+orionCurl --url /v2/entities --payload "${payload}"
+echo
+echo
+
+
+echo "02. Integer: Create subscription 1 for mq=A1.M1.i==10 - notification"
+echo "===================================================================="
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "q": "A1.i==10"
+            }
+         }
+    },
+    "notification": {
+        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+
+
+echo "03. Dump and reset accumulator, see one notification"
+echo "===================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04. String: Create subscription 2 for mq=A1.M1.s!=test_strin - notification"
+echo "==========================================================================="
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "q": "A1.s!=test_strin"
+            }
+         }
+    },
+    "notification": {
+        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+
+
+echo "05. Dump and reset accumulator, see one notification"
+echo "===================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "06. Float: Create subscription 3 for mq=A1.M1.f:3.14 - notification"
+echo "==================================================================="
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "q": "A1.f:3.14"
+            }
+         }
+    },
+    "notification": {
+        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+
+
+echo "07. Dump and reset accumulator, see one notification"
+echo "===================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "08. Bool: Create subscription 4 for mq=A1.M1.T:true - notification"
+echo "=================================================================="
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "q": "A1.T:true"
+            }
+         }
+    },
+    "notification": {
+        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+
+
+echo "09. Dump and reset accumulator, see one notification"
+echo "===================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "10. Number Range: Create subscription 5 for mq=A1.M1.i:9..10 - notification"
+echo "==========================================================================="
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "q": "A1.i:9..10"
+            }
+         }
+    },
+    "notification": {
+        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+
+
+echo "11. Dump and reset accumulator, see one notification"
+echo "===================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "12. Number List: Create subscription 6 for mq=A1.M1.f==3.14,3.15 - notification"
+echo "==============================================================================="
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "q": "A1.f==3.14,3.15"
+            }
+         }
+    },
+    "notification": {
+        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+
+
+echo "13. Dump and reset accumulator, see one notification"
+echo "===================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "14. String Range: Create subscription 7 for mq=A1.M1.s:fest_string..test_string - notification"
+echo "=============================================================================================="
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "q": "A1.s:fest_string..test_string"
+            }
+         }
+    },
+    "notification": {
+        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+
+
+echo "15. Dump and reset accumulator, see one notification"
+echo "===================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "16. String List: Create subscription 8 for mq=A1.M1.s:fest_string,uest_string,test_string - notification"
+echo "========================================================================================================"
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "q": "A1.s:fest_string,uest_string,test_string"
+            }
+         }
+    },
+    "notification": {
+        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+
+
+echo "17. Dump and reset accumulator, see one notification"
+echo "===================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "18. Modify E1/A1 - provoke 8 notifications"
+echo "=========================================="
+payload='{
+  "A1": {
+    "value": {
+      "i": 10,
+      "f": 3.14,
+      "s": "test_string",
+      "T": true,
+      "F": false,
+      "N": null,
+      "D": "2017-07-22T10:42:42.00Z"
+    }
+  },
+  "A2": { "value": 23 }    
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "${payload}" -X PUT
+echo
+echo
+
+
+echo "19. Dump and reset accumulator, see 8 notifications"
+echo "==================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 with A1 with metadata M1 with compound value containing all JSON types
+====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Integer: Create subscription 1 for mq=A1.M1.i==10 - notification
+====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Dump and reset accumulator, see one notification
+====================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 277
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "StructuredValue", 
+                "value": {
+                    "D": "2016-07-22T10:42:42.00Z", 
+                    "F": false, 
+                    "N": null, 
+                    "T": true, 
+                    "f": 3.14REGEX([01]*), 
+                    "i": 10, 
+                    "s": "test_string"
+                }
+            }, 
+            "A2": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 22
+            },
+            "id": "E1", 
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+04. String: Create subscription 2 for mq=A1.M1.s!=test_strin - notification
+===========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Dump and reset accumulator, see one notification
+====================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 277
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "StructuredValue", 
+                "value": {
+                    "D": "2016-07-22T10:42:42.00Z", 
+                    "F": false, 
+                    "N": null, 
+                    "T": true, 
+                    "f": 3.14REGEX([01]*), 
+                    "i": 10, 
+                    "s": "test_string"
+                }
+            }, 
+            "A2": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 22
+            },
+            "id": "E1", 
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+06. Float: Create subscription 3 for mq=A1.M1.f:3.14 - notification
+===================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Dump and reset accumulator, see one notification
+====================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 277
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "StructuredValue", 
+                "value": {
+                    "D": "2016-07-22T10:42:42.00Z", 
+                    "F": false, 
+                    "N": null, 
+                    "T": true, 
+                    "f": 3.14REGEX([01]*), 
+                    "i": 10, 
+                    "s": "test_string"
+                }
+            }, 
+            "A2": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 22
+            },
+            "id": "E1", 
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+08. Bool: Create subscription 4 for mq=A1.M1.T:true - notification
+==================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. Dump and reset accumulator, see one notification
+====================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 277
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "StructuredValue", 
+                "value": {
+                    "D": "2016-07-22T10:42:42.00Z", 
+                    "F": false, 
+                    "N": null, 
+                    "T": true, 
+                    "f": 3.14REGEX([01]*), 
+                    "i": 10, 
+                    "s": "test_string"
+                }
+            }, 
+            "A2": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 22
+            },
+            "id": "E1", 
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+10. Number Range: Create subscription 5 for mq=A1.M1.i:9..10 - notification
+===========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+11. Dump and reset accumulator, see one notification
+====================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 277
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "StructuredValue", 
+                "value": {
+                    "D": "2016-07-22T10:42:42.00Z", 
+                    "F": false, 
+                    "N": null, 
+                    "T": true, 
+                    "f": 3.14REGEX([01]*), 
+                    "i": 10, 
+                    "s": "test_string"
+                }
+            }, 
+            "A2": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 22
+            },
+            "id": "E1", 
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+12. Number List: Create subscription 6 for mq=A1.M1.f==3.14,3.15 - notification
+===============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+13. Dump and reset accumulator, see one notification
+====================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 277
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "StructuredValue", 
+                "value": {
+                    "D": "2016-07-22T10:42:42.00Z", 
+                    "F": false, 
+                    "N": null, 
+                    "T": true, 
+                    "f": 3.14REGEX([01]*), 
+                    "i": 10, 
+                    "s": "test_string"
+                }
+            }, 
+            "A2": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 22
+            },
+            "id": "E1", 
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+14. String Range: Create subscription 7 for mq=A1.M1.s:fest_string..test_string - notification
+==============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+15. Dump and reset accumulator, see one notification
+====================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 277
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "StructuredValue", 
+                "value": {
+                    "D": "2016-07-22T10:42:42.00Z", 
+                    "F": false, 
+                    "N": null, 
+                    "T": true, 
+                    "f": 3.14REGEX([01]*), 
+                    "i": 10, 
+                    "s": "test_string"
+                }
+            }, 
+            "A2": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 22
+            },
+            "id": "E1", 
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+16. String List: Create subscription 8 for mq=A1.M1.s:fest_string,uest_string,test_string - notification
+========================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+17. Dump and reset accumulator, see one notification
+====================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 277
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "StructuredValue", 
+                "value": {
+                    "D": "2016-07-22T10:42:42.00Z", 
+                    "F": false, 
+                    "N": null, 
+                    "T": true, 
+                    "f": 3.14REGEX([01]*), 
+                    "i": 10, 
+                    "s": "test_string"
+                }
+            }, 
+            "A2": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 22
+            },
+            "id": "E1", 
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+18. Modify E1/A1 - provoke 8 notifications
+==========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+19. Dump and reset accumulator, see 8 notifications
+===================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 277
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "StructuredValue", 
+                "value": {
+                    "D": "2017-07-22T10:42:42.00Z", 
+                    "F": false, 
+                    "N": null, 
+                    "T": true, 
+                    "f": 3.14REGEX([01]*), 
+                    "i": 10, 
+                    "s": "test_string"
+                }
+            }, 
+            "A2": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 23
+            },
+            "id": "E1", 
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 277
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "StructuredValue", 
+                "value": {
+                    "D": "2017-07-22T10:42:42.00Z", 
+                    "F": false, 
+                    "N": null, 
+                    "T": true, 
+                    "f": 3.14REGEX([01]*), 
+                    "i": 10, 
+                    "s": "test_string"
+                }
+            }, 
+            "A2": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 23
+            },
+            "id": "E1", 
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 277
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "StructuredValue", 
+                "value": {
+                    "D": "2017-07-22T10:42:42.00Z", 
+                    "F": false, 
+                    "N": null, 
+                    "T": true, 
+                    "f": 3.14REGEX([01]*), 
+                    "i": 10, 
+                    "s": "test_string"
+                }
+            }, 
+            "A2": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 23
+            },
+            "id": "E1", 
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 277
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "StructuredValue", 
+                "value": {
+                    "D": "2017-07-22T10:42:42.00Z", 
+                    "F": false, 
+                    "N": null, 
+                    "T": true, 
+                    "f": 3.14REGEX([01]*), 
+                    "i": 10, 
+                    "s": "test_string"
+                }
+            }, 
+            "A2": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 23
+            },
+            "id": "E1", 
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 277
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "StructuredValue", 
+                "value": {
+                    "D": "2017-07-22T10:42:42.00Z", 
+                    "F": false, 
+                    "N": null, 
+                    "T": true, 
+                    "f": 3.14REGEX([01]*), 
+                    "i": 10, 
+                    "s": "test_string"
+                }
+            }, 
+            "A2": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 23
+            },
+            "id": "E1", 
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 277
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "StructuredValue", 
+                "value": {
+                    "D": "2017-07-22T10:42:42.00Z", 
+                    "F": false, 
+                    "N": null, 
+                    "T": true, 
+                    "f": 3.14REGEX([01]*), 
+                    "i": 10, 
+                    "s": "test_string"
+                }
+            }, 
+            "A2": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 23
+            },
+            "id": "E1", 
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 277
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "StructuredValue", 
+                "value": {
+                    "D": "2017-07-22T10:42:42.00Z", 
+                    "F": false, 
+                    "N": null, 
+                    "T": true, 
+                    "f": 3.14REGEX([01]*), 
+                    "i": 10, 
+                    "s": "test_string"
+                }
+            }, 
+            "A2": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 23
+            },
+            "id": "E1", 
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 277
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "StructuredValue", 
+                "value": {
+                    "D": "2017-07-22T10:42:42.00Z", 
+                    "F": false, 
+                    "N": null, 
+                    "T": true, 
+                    "f": 3.14REGEX([01]*), 
+                    "i": 10, 
+                    "s": "test_string"
+                }
+            }, 
+            "A2": {
+                "metadata": {}, 
+                "type": "Number", 
+                "value": 23
+            },
+            "id": "E1", 
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

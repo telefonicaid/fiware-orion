@@ -1,0 +1,273 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Sum For Same Service Path Different Tenant
+
+--SHELL-INIT--
+dbInit CB
+dbInit tenant1
+dbInit tenant2
+dbInit tenant3
+brokerStart CB
+
+--SHELL--
+
+#
+# This test sends petitions with different tenants but same service-path
+# Three tenants and three service paths, six requests:
+#   - Tenant1:   /SP1 + /SP2 + /SP3
+#   - Tenant2:   /SP1 + /SP2
+#   - Tenant3:   /SP1
+#
+# So, in the final "sum" of metrics, where Service Paths are summed regardless of tenant,
+# We should see:
+#   3 requests for sp1,
+#   2 requests for sp2,
+#   1 request  for sp3
+#
+# 01. GET /v2/entities on tenant Tenant1, service-path /SP1
+# 02. GET /v2/entities on tenant Tenant1, service-path /SP2
+# 03. GET /v2/entities on tenant Tenant1, service-path /SP3
+# 04. GET /v2/entities on tenant Tenant2, service-path /SP1
+# 05. GET /v2/entities on tenant Tenant2, service-path /SP2
+# 06. GET /v2/entities on tenant Tenant3, service-path /SP1
+# 07. Ask for Metrics
+#
+
+echo "01. GET /v2/entities on tenant Tenant1, service-path /SP1"
+echo "========================================================="
+orionCurl --url /v2/entities --tenant Tenant1 --servicePath /SP1
+echo
+echo
+
+
+echo "02. GET /v2/entities on tenant Tenant1, service-path /SP2"
+echo "========================================================="
+orionCurl --url /v2/entities --tenant Tenant1 --servicePath /SP2
+echo
+echo
+
+
+echo "03. GET /v2/entities on tenant Tenant1, service-path /SP3"
+echo "========================================================="
+orionCurl --url /v2/entities --tenant Tenant1 --servicePath /SP3
+echo
+echo
+
+
+echo "04. GET /v2/entities on tenant Tenant2, service-path /SP1"
+echo "========================================================="
+orionCurl --url /v2/entities --tenant Tenant2 --servicePath /SP1
+echo
+echo
+
+
+echo "05. GET /v2/entities on tenant Tenant2, service-path /SP2"
+echo "========================================================="
+orionCurl --url /v2/entities --tenant Tenant2 --servicePath /SP2
+echo
+echo
+
+
+echo "06. GET /v2/entities on tenant Tenant3, service-path /SP1"
+echo "========================================================="
+orionCurl --url /v2/entities --tenant Tenant3 --servicePath /SP1
+echo
+echo
+
+
+echo "07. Ask for Metrics"
+echo "==================="
+orionCurl --url /admin/metrics
+echo
+echo
+
+
+--REGEXPECT--
+01. GET /v2/entities on tenant Tenant1, service-path /SP1
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+02. GET /v2/entities on tenant Tenant1, service-path /SP2
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+03. GET /v2/entities on tenant Tenant1, service-path /SP3
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+04. GET /v2/entities on tenant Tenant2, service-path /SP1
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+05. GET /v2/entities on tenant Tenant2, service-path /SP2
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+06. GET /v2/entities on tenant Tenant3, service-path /SP1
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+07. Ask for Metrics
+===================
+HTTP/1.1 200 OK
+Content-Length: 1346
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "services": {
+        "tenant1": {
+            "subservs": {
+                "SP1": {
+                    "incomingTransactionResponseSize": 2,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                },
+                "SP2": {
+                    "incomingTransactionResponseSize": 2,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                },
+                "SP3": {
+                    "incomingTransactionResponseSize": 2,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                }
+            },
+            "sum": {
+                "incomingTransactionResponseSize": 6,
+                "incomingTransactions": 3,
+                "serviceTime": REGEX(.*)
+            }
+        },
+        "tenant2": {
+            "subservs": {
+                "SP1": {
+                    "incomingTransactionResponseSize": 2,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                },
+                "SP2": {
+                    "incomingTransactionResponseSize": 2,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                }
+            },
+            "sum": {
+                "incomingTransactionResponseSize": 4,
+                "incomingTransactions": 2,
+                "serviceTime": REGEX(.*)
+            }
+        },
+        "tenant3": {
+            "subservs": {
+                "SP1": {
+                    "incomingTransactionResponseSize": 2,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                }
+            },
+            "sum": {
+                "incomingTransactionResponseSize": 2,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            }
+        }
+    },
+    "sum": {
+        "subservs": {
+            "SP1": {
+                "incomingTransactionResponseSize": 6,
+                "incomingTransactions": 3,
+                "serviceTime": REGEX(.*)
+            },
+            "SP2": {
+                "incomingTransactionResponseSize": 4,
+                "incomingTransactions": 2,
+                "serviceTime": REGEX(.*)
+            },
+            "SP3": {
+                "incomingTransactionResponseSize": 2,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            }
+        },
+        "sum": {
+            "incomingTransactionResponseSize": 12,
+            "incomingTransactions": 6,
+            "serviceTime": REGEX(.*)
+        }
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop tenant1
+dbDrop tenant2
+dbDrop tenant3

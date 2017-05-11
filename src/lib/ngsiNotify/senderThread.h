@@ -24,6 +24,8 @@
 * Author: Fermín Galán Márquez
 */
 #include <string>
+#include <vector>
+#include <map>
 
 #include "common/MimeType.h"
 
@@ -43,21 +45,24 @@
 */
 typedef struct SenderThreadParams
 {
-  std::string     ip;
-  unsigned short  port;
-  std::string     protocol;
-  std::string     verb;
-  std::string     tenant;
-  std::string     servicePath;
-  std::string     xauthToken;
-  std::string     resource;
-  std::string     content_type;
-  std::string     content;
-  char            transactionId[64];
-  MimeType        mimeType;
-  std::string     renderFormat;
-  std::string     fiwareCorrelator;
-  struct timespec timeStamp;
+  std::string                        ip;
+  unsigned short                     port;
+  std::string                        protocol;
+  std::string                        verb;
+  std::string                        tenant;
+  std::string                        servicePath;
+  std::string                        xauthToken;
+  std::string                        resource;
+  std::string                        content_type;
+  std::string                        content;
+  char                               transactionId[64];
+  MimeType                           mimeType;
+  std::string                        renderFormat;
+  std::string                        fiwareCorrelator;
+  struct timespec                    timeStamp;
+  std::map<std::string, std::string> extraHeaders;
+  std::string                        subscriptionId;
+  bool                               registration;
 } SenderThreadParams;
 
 
@@ -66,6 +71,6 @@ typedef struct SenderThreadParams
 *
 * startSenderThread -
 */
-extern void* startSenderThread(void* params);
+extern void* startSenderThread(void* paramsV);
 
 #endif

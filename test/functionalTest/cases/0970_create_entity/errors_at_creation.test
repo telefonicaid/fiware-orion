@@ -151,13 +151,13 @@ echo
 01. POST /v2/entities without Entity::id
 ========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 61
+Content-Length: 83
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "no entity id specified", 
+    "description": "entity id length: 0, min length supported: 1", 
     "error": "BadRequest"
 }
 
@@ -165,13 +165,13 @@ Date: REGEX(.*)
 02. POST /v2/entities with empty Entity::id
 ===========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 54
+Content-Length: 83
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "empty entity id", 
+    "description": "entity id length: 0, min length supported: 1",
     "error": "BadRequest"
 }
 
@@ -185,7 +185,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for entity id", 
+    "description": "Invalid JSON type for entity id", 
     "error": "BadRequest"
 }
 
@@ -199,7 +199,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for entity id", 
+    "description": "Invalid JSON type for entity id", 
     "error": "BadRequest"
 }
 
@@ -213,7 +213,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for entity type", 
+    "description": "Invalid JSON type for entity type", 
     "error": "BadRequest"
 }
 
@@ -227,7 +227,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for entity type", 
+    "description": "Invalid JSON type for entity type", 
     "error": "BadRequest"
 }
 
@@ -235,13 +235,13 @@ Date: REGEX(.*)
 07. POST /v2/entities without Attribute::name
 =============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 69
+Content-Length: 88
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "no 'name' for ContextAttribute", 
+    "description": "attribute name length: 0, min length supported: 1",
     "error": "BadRequest"
 }
 

@@ -1,0 +1,184 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Incoming Transactions and Common Metrics
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Send a GET /v2/entities with service path /A1/#
+# 02. Send a GET /v2/entities with service path /A2,/B2
+# 03. Send a GET /v2/entities with service path /#
+# 04. Send a GET /v2/entities without service path (/# is used as service path)
+# 05. Ask for Metrics, see A1 and A2 as service paths, as well as two 'root service path'
+#
+
+echo "01. Send a GET /v2/entities with service path /A1/#"
+echo "==================================================="
+orionCurl --url /v2/entities --servicePath '/A1/#'
+echo
+echo
+
+
+echo "02. Send a GET /v2/entities with service path /A2,/B2"
+echo "====================================================="
+orionCurl --url /v2/entities --servicePath '/A2,/B2'
+echo
+echo
+
+
+echo "03. Send a GET /v2/entities with service path /#"
+echo "================================================"
+orionCurl --url /v2/entities --servicePath '/#'
+echo
+echo
+
+
+echo "04. Send a GET /v2/entities without service path (/# is used as service path)"
+echo "============================================================================="
+orionCurl --url /v2/entities
+echo
+echo
+
+
+echo "05. Ask for Metrics, see A1 and A2 as service paths, as well as two 'root service path'"
+echo "======================================================================================="
+orionCurl --url /admin/metrics
+echo
+echo
+
+
+--REGEXPECT--
+01. Send a GET /v2/entities with service path /A1/#
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+02. Send a GET /v2/entities with service path /A2,/B2
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+03. Send a GET /v2/entities with service path /#
+================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+04. Send a GET /v2/entities without service path (/# is used as service path)
+=============================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+05. Ask for Metrics, see A1 and A2 as service paths, as well as two 'root service path'
+=======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 842
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "services": {
+        "default-service": {
+            "subservs": {
+                "A1": {
+                    "incomingTransactionResponseSize": 2,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                },
+                "A2": {
+                    "incomingTransactionResponseSize": 2,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                },
+                "root-subserv": {
+                    "incomingTransactionResponseSize": 4,
+                    "incomingTransactions": 2,
+                    "serviceTime": REGEX(.*)
+                }
+            },
+            "sum": {
+                "incomingTransactionResponseSize": 8,
+                "incomingTransactions": 4,
+                "serviceTime": REGEX(.*)
+            }
+        }
+    },
+    "sum": {
+        "subservs": {
+            "A1": {
+                "incomingTransactionResponseSize": 2,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            },
+            "A2": {
+                "incomingTransactionResponseSize": 2,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            },
+            "root-subserv": {
+                "incomingTransactionResponseSize": 4,
+                "incomingTransactions": 2,
+                "serviceTime": REGEX(.*)
+            }
+        },
+        "sum": {
+            "incomingTransactionResponseSize": 8,
+            "incomingTransactions": 4,
+            "serviceTime": REGEX(.*)
+        }
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

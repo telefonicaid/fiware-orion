@@ -67,15 +67,26 @@ namespace ngsiv2
     JsonHelper jh;
 
     jh.addString("id", this->id);
+
     if (this->description != "")
     {
       jh.addString("description", this->description);
     }
+
     if (this->expires != PERMANENT_SUBS_DATETIME)
     {
       jh.addDate("expires", this->expires);
     }
-    jh.addString("status", this->status);
+
+    if ((this->notification.lastFailure > 0) && (this->notification.lastFailure > this->notification.lastSuccess))
+    {
+      jh.addString("status", "failed");
+    }
+    else
+    {
+      jh.addString("status", this->status);
+    }
+
     jh.addRaw("subject", this->subject.toJson());
     jh.addRaw("notification", this->notification.toJson(renderFormatToString(this->attrsFormat, true, true)));
 
@@ -95,7 +106,6 @@ namespace ngsiv2
   *
   * FIXME P2: we should move 'attrsFormat' from Subject class to Notification
   * class, to avoid passing attrsFormat as argument
-  *
   */
   std::string Notification::toJson(const std::string& attrsFormat)
   {
@@ -105,6 +115,7 @@ namespace ngsiv2
     {
       jh.addNumber("timesSent", this->timesSent);
     }
+
     if (this->lastNotification > 0)
     {
       jh.addDate("lastNotification", this->lastNotification);
@@ -128,6 +139,21 @@ namespace ngsiv2
     else
     {
       jh.addRaw("http", this->httpInfo.toJson());
+    }
+
+    if (this->metadata.size() > 0)
+    {
+      jh.addRaw("metadata", vectorToJson(this->metadata));
+    }
+
+    if (this->lastFailure > 0)
+    {
+      jh.addDate("lastFailure", this->lastFailure);
+    }
+
+    if (this->lastSuccess > 0)
+    {
+      jh.addDate("lastSuccess", this->lastSuccess);
     }
 
     return jh.str();
@@ -197,6 +223,10 @@ namespace ngsiv2
     if (!this->type.empty())
     {
       jh.addString("type", this->type);
+    }
+    if (!this->typePattern.empty())
+    {
+      jh.addString("typePattern", this->typePattern);
     }
 
     return jh.str();

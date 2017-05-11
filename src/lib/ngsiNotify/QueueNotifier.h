@@ -1,7 +1,6 @@
 #ifndef SRC_LIB_NGSINOTIFY_QUEUENOTIFIER_H
 #define SRC_LIB_NGSINOTIFY_QUEUENOTIFIER_H
 
-
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -53,17 +52,18 @@ public:
   QueueNotifier(size_t queueSize, int numThreads);
 
   void sendNotifyContextRequest(NotifyContextRequest*            ncr,
-                                const std::string&               url,
+                                const ngsiv2::HttpInfo&          httpInfo,
                                 const std::string&               tenant,
                                 const std::string&               xauthToken,
                                 const std::string&               fiwareCorrelator,
                                 RenderFormat                     renderFormat,
                                 const std::vector<std::string>&  attrsOrder,
-                                bool                             blacklist = false);
+                                const std::vector<std::string>&  metadataFilter,
+                                bool                             blacklist);
   int start();
 
 private:
- SyncQOverflow<SenderThreadParams*>  queue;
+ SyncQOverflow<std::vector<SenderThreadParams*>*>  queue;
  QueueWorkers                        workers;
 
 };

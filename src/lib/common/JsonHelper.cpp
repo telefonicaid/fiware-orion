@@ -25,6 +25,7 @@
 
 #include "common/JsonHelper.h"
 #include "common/string.h"
+#include "common/limits.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -161,9 +162,6 @@ std::string objectToJson(std::map<std::string, std::string>& list)
 */
 JsonHelper::JsonHelper(): empty(true)
 {
-  /* Set format  for floats (it doesn't affect integers) */
-  ss << std::fixed << std::setprecision(9);
-
   ss << '{';
 }
 
@@ -222,12 +220,19 @@ void JsonHelper::addNumber(const std::string& key, long long value)
 * JsonHelper::addFloat -
 */
 void JsonHelper::addFloat(const std::string& key, float  value)
-{
+{  
+  unsigned int oldPrecision = ss.precision();
+  ss << std::fixed << std::setprecision(decimalDigits(value));
+
   if (!empty)
   {
     ss << ',';
   }  
   ss << toJsonString(key) << ':' << value;
+
+  // Reset stream to old parameters (whichever they are...)
+  ss.unsetf(std::ios_base::fixed);
+  ss << std::setprecision(oldPrecision);
 
   empty = false;
 }

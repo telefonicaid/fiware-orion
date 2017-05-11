@@ -230,7 +230,8 @@ Date: REGEX(.*)
 07. Dump accumulator and see 3 notifications (all multi-entity)
 ===============================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 267
+Fiware-Servicepath: /
+Content-Length: 272
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -243,7 +244,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A1": {
                 "metadata": {},
-                "type": "none",
+                "type": "Boolean",
                 "value": true
             },
             "id": "E1",
@@ -252,7 +253,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A2": {
                 "metadata": {},
-                "type": "none",
+                "type": "None",
                 "value": null
             },
             "id": "E1",
@@ -261,7 +262,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A3": {
                 "metadata": {},
-                "type": "none",
+                "type": "Number",
                 "value": 3
             },
             "id": "E1",
@@ -272,7 +273,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 267
+Fiware-Servicepath: /
+Content-Length: 272
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -285,7 +287,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A1": {
                 "metadata": {},
-                "type": "none",
+                "type": "Boolean",
                 "value": true
             },
             "id": "E1",
@@ -294,7 +296,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A2": {
                 "metadata": {},
-                "type": "none",
+                "type": "None",
                 "value": null
             },
             "id": "E1",
@@ -303,7 +305,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A3": {
                 "metadata": {},
-                "type": "none",
+                "type": "Number",
                 "value": 3
             },
             "id": "E1",
@@ -314,7 +316,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 267
+Fiware-Servicepath: /
+Content-Length: 272
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -327,7 +330,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A1": {
                 "metadata": {},
-                "type": "none",
+                "type": "Boolean",
                 "value": true
             },
             "id": "E1",
@@ -336,7 +339,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A2": {
                 "metadata": {},
-                "type": "none",
+                "type": "None",
                 "value": null
             },
             "id": "E1",
@@ -345,7 +348,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A3": {
                 "metadata": {},
-                "type": "none",
+                "type": "Number",
                 "value": 3
             },
             "id": "E1",

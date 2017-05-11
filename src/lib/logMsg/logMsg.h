@@ -546,6 +546,30 @@ do                                                                     \
 #endif
 
 
+#ifdef LM_NO_TMP
+#define LM_TMP(s)
+#else
+/* ****************************************************************************
+*
+* LM_TMP - temporal log message
+*
+* LM_TMP is meant *only* for temporal logging and all occurrencies of LM_TMP
+* should be removed before creating pull requests for review.
+*/
+#define LM_TMP(s)                                                        \
+do                                                                       \
+{                                                                        \
+  char* text;                                                            \
+                                                                         \
+  if (LM_MASK(LogLevelWarning) && (text = lmTextGet s) != NULL)          \
+  {                                                                      \
+    lmOut(text, 'W', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
+    ::free(text);                                                        \
+  }                                                                      \
+} while (0)
+#endif
+
+
 #ifdef LM_NO_W
 #define LM_W(s)
 #else
@@ -1798,14 +1822,14 @@ inline void lmTransactionReset()
 *
 * lmTransactionStart -
 */
-inline void lmTransactionStart(const char* keyword, const char* ip, int port, const char* path)
+inline void lmTransactionStart(const char* keyword, const char* schema, const char* ip, int port, const char* path)
 {
   transactionIdSet();
 
   snprintf(service,    sizeof(service),    "pending");
   snprintf(subService, sizeof(subService), "pending");
   snprintf(fromIp,     sizeof(fromIp),     "pending");
-  LM_I(("Starting transaction %s %s:%d%s", keyword, ip, port, path));
+  LM_I(("Starting transaction %s %s%s:%d%s", keyword, schema, ip, port, path));
 }
 
 

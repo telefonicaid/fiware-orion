@@ -65,14 +65,20 @@ typedef enum SubCacheState
 */
 struct EntityInfo
 {
+  std::string   entityId;
   bool          isPattern;
   regex_t       entityIdPattern;
-  std::string   entityId;
-  std::string   entityType;
   bool          entityIdPatternToBeFreed;
 
+  std::string   entityType;
+  bool          isTypePattern;
+  regex_t       entityTypePattern;
+  bool          entityTypePatternToBeFreed;
+
+
   EntityInfo() {}
-  EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern);
+  EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern,
+             bool _isTypePattern);
   ~EntityInfo() { release(); }
 
   bool          match(const std::string& idPattern, const std::string& type);
@@ -90,7 +96,8 @@ struct CachedSubscription
 {
   std::vector<EntityInfo*>    entityIdInfos;
   std::vector<std::string>    attributes;
-  NotifyConditionVector       notifyConditionVector;
+  std::vector<std::string>    metadata;
+  std::vector<std::string>    notifyConditionV;
   char*                       tenant;
   char*                       servicePath;
   char*                       subscriptionId;
@@ -103,7 +110,8 @@ struct CachedSubscription
   SubscriptionExpression      expression;
   bool                        blacklist;
   ngsiv2::HttpInfo            httpInfo;
-
+  int64_t                     lastFailure;  // timestamp of last notification failure
+  int64_t                     lastSuccess;  // timestamp of last successful notification
   struct CachedSubscription*  next;
 };
 
@@ -144,6 +152,17 @@ extern void subCacheDestroy(void);
 
 /* ****************************************************************************
 *
+* subCacheDisable -
+*
+*/
+#ifdef UNIT_TEST
+void subCacheDisable(void);
+#endif
+
+
+
+/* ****************************************************************************
+*
 * subCacheItemDestroy - 
 */
 extern void subCacheItemDestroy(CachedSubscription* cSubP);
@@ -160,6 +179,14 @@ extern int subCacheItems(void);
 
 /* ****************************************************************************
 *
+* subCacheEntryPresent -
+*/
+extern void subCacheEntryPresent(CachedSubscription* cSubP);
+
+
+
+/* ****************************************************************************
+*
 * subCachePresent - 
 */
 extern void subCachePresent(const char* title);
@@ -168,39 +195,7 @@ extern void subCachePresent(const char* title);
 
 /* ****************************************************************************
 *
-* subCacheItemInsert - 
-*/
-extern void subCacheItemInsert
-(
-  const char*                   tenant,
-  const char*                   servicePath,
-  const ngsiv2::HttpInfo&       httpInfo,
-  const EntityIdVector&         entityIdVector,
-  const AttributeList&          attributeList,
-  const NotifyConditionVector&  notifyConditionVector,
-  const char*                   subscriptionId,
-  int64_t                       expiration,
-  int64_t                       throttling,
-  RenderFormat                  renderFormat,
-  bool                          notificationDone,
-  int64_t                       lastNotificationTime,
-  StringFilter*                 stringFilterP,
-  StringFilter*                 mdStringFilterP,
-  const std::string&            status,
-  const std::string&            q,
-  const std::string&            geometry,
-  const std::string&            coords,
-  const std::string&            georel,
-  bool                          blacklist = false
-);
-
-
-/* ****************************************************************************
-*
 * subCacheItemInsert -
-*
-* NGSIv2 wrapper
-*
 */
 extern void subCacheItemInsert
 (
@@ -209,13 +204,16 @@ extern void subCacheItemInsert
   const ngsiv2::HttpInfo&            httpInfo,
   const std::vector<ngsiv2::EntID>&  entities,
   const std::vector<std::string>&    attributes,
-  const std::vector<std::string>&    condAttributes,
+  const std::vector<std::string>&    metadata,
+  const std::vector<std::string>&    conditionAttrs,
   const char*                        subscriptionId,
   int64_t                            expiration,
   int64_t                            throttling,
   RenderFormat                       renderFormat,
   bool                               notificationDone,
   int64_t                            lastNotificationTime,
+  int64_t                            lastNotificationSuccessTime,
+  int64_t                            lastNotificationFailureTime,
   StringFilter*                      stringFilterP,
   StringFilter*                      mdStringFilterP,
   const std::string&                 status,
@@ -330,5 +328,18 @@ extern void subCacheUpdateStatisticsIncrement(void);
 * subCacheStatisticsReset - 
 */
 extern void subCacheStatisticsReset(const char* by);
+
+
+
+/* ****************************************************************************
+*
+* subCacheItemNotificationErrorStatus - 
+*/
+extern void subCacheItemNotificationErrorStatus
+(
+  const std::string&  tenant,
+  const std::string&  subscriptionId,
+  int                 errors
+);
 
 #endif  // SRC_LIB_CACHE_SUBCACHE_H_

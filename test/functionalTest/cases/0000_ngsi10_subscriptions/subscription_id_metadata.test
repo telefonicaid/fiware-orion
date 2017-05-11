@@ -26,7 +26,7 @@ Subscription ID metadata
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -165,6 +165,7 @@ Date: REGEX(.*)
 
 Accumulated data:
 POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 958
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
@@ -173,47 +174,47 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Room",
-        "isPattern" : "false",
-        "id" : "OfficeRoom",
-        "attributes" : [
-          {
-            "name" : "temperature",
-            "type" : "degree",
-            "value" : "23.5",
-            "metadatas" : [
-              {
-                "name" : "ID",
-                "type" : "string",
-                "value" : "floor"
-              }
-            ]
-          },
-          {
-            "name" : "temperature",
-            "type" : "degree",
-            "value" : "25.6",
-            "metadatas" : [
-              {
-                "name" : "ID",
-                "type" : "string",
-                "value" : "ceiling"
-              }
-            ]
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "ID",
+                                "type": "string",
+                                "value": "floor"
+                            }
+                        ],
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "23.5"
+                    },
+                    {
+                        "metadatas": [
+                            {
+                                "name": "ID",
+                                "type": "string",
+                                "value": "ceiling"
+                            }
+                        ],
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "25.6"
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 --TEARDOWN--

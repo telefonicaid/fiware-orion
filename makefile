@@ -106,6 +106,7 @@ prepare_unit_test: compile_info
 
 style_check_included_in_make_steps:
 	./scripts/style_check_in_makefile.sh
+	rm LINT LINT_ERRORS
 
 
 release: prepare_release

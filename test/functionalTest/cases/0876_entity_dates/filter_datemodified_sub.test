@@ -88,6 +88,7 @@ echo
 
 echo "03. At t_1: modify entity E1 (not notif)"
 echo "========================================"
+sleep 1s
 payload='{
   "A": "t_1"
 }'
@@ -98,6 +99,7 @@ echo
 
 echo "04. At t_2: modify entity E1 (not notif)"
 echo "========================================"
+sleep 1s
 payload='{
   "A": "t_2"
 }'
@@ -106,10 +108,9 @@ echo
 echo
 
 
-sleep 3s
-
 echo "05. At t_3: modify entity E1 (notif)"
 echo "===================================="
+sleep 1s
 payload='{
   "A": "t_3"
 }'
@@ -120,6 +121,7 @@ echo
 
 echo "06. At t_4: modify entity E1 (notif)"
 echo "===================================="
+sleep 1s
 payload='{
   "A": "t_4"
 }'
@@ -195,6 +197,7 @@ Date: REGEX(.*)
 07. Get accumulator dump (2 notifications), for t_3 and t_4
 ===========================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 125
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -208,7 +211,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A": {
                 "metadata": {},
-                "type": "none",
+                "type": "Text",
                 "value": "t_3"
             },
             "id": "E1",
@@ -219,6 +222,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 125
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -232,7 +236,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A": {
                 "metadata": {},
-                "type": "none",
+                "type": "Text",
                 "value": "t_4"
             },
             "id": "E1",

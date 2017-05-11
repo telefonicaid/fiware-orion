@@ -1,0 +1,173 @@
+# Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Too long service names in subscriptions
+
+--SHELL-INIT--
+dbInit CB
+dbInit ${CB_DB_NAME} t012345678901234567890123456789012345678901234
+brokerStart CB 0 IPv4 -subCacheIval 2 -multiservice
+
+--SHELL--
+
+#
+# 01. Create a subscription with a LONG tenant name (> 50 chars), see it fail
+# 02. Create a subscription with a pretty long tenant name (46 chars), see it work
+# 03. Sleep 3 seconds to let a refresh of the sub-cache take place
+# 04. grep in log file to make sure there are NO ERRORS
+# 05. GET /v2/subscriptions to see the sub from step 02
+#
+
+echo "01. Create a subscription with a LONG tenant name (> 50 chars), see it fail"
+echo "==========================================================================="
+payload='{
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    }
+  },
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*"
+      }
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload" --tenant t01234567890123456789012345678901234567890123456789
+echo
+echo
+
+
+echo "02. Create a subscription with a pretty long tenant name (46 chars), see it work"
+echo "================================================================================"
+payload='{
+  "notification": {
+    "http": {
+      "url": "http://host:6666/notify"
+    }
+  },
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*"
+      }
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload" --tenant t012345678901234567890123456789012345678901234
+echo
+echo
+
+
+echo "03. Sleep 3 seconds to let a refresh of the sub-cache take place"
+echo "================================================================"
+sleep 3
+echo
+echo
+
+
+echo "04. grep in log file to make sure there are NO ERRORS"
+echo "====================================================="
+grep ERR /tmp/contextBroker.log
+echo
+echo
+
+
+echo "05. GET /v2/subscriptions to see the sub from step 02"
+echo "====================================================="
+orionCurl --url /v2/subscriptions --tenant t012345678901234567890123456789012345678901234
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription with a LONG tenant name (> 50 chars), see it fail
+===========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 95
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "bad length - a tenant name can be max 50 characters long",
+    "error": "BadRequest"
+}
+
+
+02. Create a subscription with a pretty long tenant name (46 chars), see it work
+================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Sleep 3 seconds to let a refresh of the sub-cache take place
+================================================================
+
+
+04. grep in log file to make sure there are NO ERRORS
+=====================================================
+
+
+05. GET /v2/subscriptions to see the sub from step 02
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 218
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "http": {
+                "url": "http://host:6666/notify"
+            }
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "idPattern": ".*"
+                }
+            ]
+        }
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop ${CB_DB_NAME} t012345678901234567890123456789012345678901234

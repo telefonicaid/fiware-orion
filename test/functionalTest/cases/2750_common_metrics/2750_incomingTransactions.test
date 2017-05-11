@@ -1,0 +1,201 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Incoming Transactions and Common Metrics
+
+--SHELL-INIT--
+dbInit CB
+dbInit s1
+dbInit s2
+dbInit s3
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Send five GET /v2/entities
+# 02. Ask for Metrics, see 5 Incoming Transactions
+#
+
+echo "01. Send five GET /v2/entities"
+echo "=============================="
+orionCurl --url /v2/entities --tenant S1 --servicePath /SP/entities1
+echo
+orionCurl --url /v2/entities --tenant S1 --servicePath /SP/entities1
+echo
+orionCurl --url /v2/entities --tenant S1 --servicePath /SP/entities2
+echo
+orionCurl --url /v2/entities --tenant S2 --servicePath /SP/entities3
+echo
+orionCurl --url /v2/entities --tenant S3 --servicePath /SP/entities4
+echo
+echo
+
+
+echo "02. Ask for Metrics, see 5 Incoming Transactions"
+echo "================================================"
+orionCurl --url /admin/metrics
+echo
+echo
+
+
+--REGEXPECT--
+01. Send five GET /v2/entities
+==============================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+02. Ask for Metrics, see 5 Incoming Transactions
+================================================
+HTTP/1.1 200 OK
+Content-Length: 1308
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "services": {
+        "s1": {
+            "subservs": {
+                "SP/entities1": {
+                    "incomingTransactionResponseSize": 4,
+                    "incomingTransactions": 2,
+                    "serviceTime": REGEX(.*)
+                },
+                "SP/entities2": {
+                    "incomingTransactionResponseSize": 2,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                }
+            },
+            "sum": {
+                "incomingTransactionResponseSize": 6,
+                "incomingTransactions": 3,
+                "serviceTime": REGEX(.*)
+            }
+        },
+        "s2": {
+            "subservs": {
+                "SP/entities3": {
+                    "incomingTransactionResponseSize": 2,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                }
+            },
+            "sum": {
+                "incomingTransactionResponseSize": 2,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            }
+        },
+        "s3": {
+            "subservs": {
+                "SP/entities4": {
+                    "incomingTransactionResponseSize": 2,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                }
+            },
+            "sum": {
+                "incomingTransactionResponseSize": 2,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            }
+        }
+    },
+    "sum": {
+        "subservs": {
+            "SP/entities1": {
+                "incomingTransactionResponseSize": 4,
+                "incomingTransactions": 2,
+                "serviceTime": REGEX(.*)
+            },
+            "SP/entities2": {
+                "incomingTransactionResponseSize": 2,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            },
+            "SP/entities3": {
+                "incomingTransactionResponseSize": 2,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            },
+            "SP/entities4": {
+                "incomingTransactionResponseSize": 2,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            }
+        },
+        "sum": {
+            "incomingTransactionResponseSize": 10,
+            "incomingTransactions": 5,
+            "serviceTime": REGEX(.*)
+        }
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop s1
+dbDrop s2
+dbDrop s3

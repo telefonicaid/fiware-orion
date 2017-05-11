@@ -37,9 +37,7 @@
 #include "ngsi/ContextAttribute.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
-#include "rest/ConnectionInfo.h"
 #include "convenience/UpdateContextAttributeRequest.h"
-
 
 
 /* ****************************************************************************
@@ -68,16 +66,15 @@ UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, 
 *
 * UpdateContextRequest::render - 
 */
-std::string UpdateContextRequest::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent)
+std::string UpdateContextRequest::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
 {
   std::string  out = "";
-  std::string  tag = "updateContextRequest";
 
   // JSON commas:
   // Both fields are MANDATORY, so, comma after "contextElementVector"
-  //
-  out += startTag1(indent, tag, false);
-  out += contextElementVector.render(ciP, UpdateContext, indent + "  ", true);
+  //  
+  out += startTag(indent);
+  out += contextElementVector.render(apiVersion, asJsonObject, UpdateContext, indent + "  ", true);
   out += updateActionType.render(indent + "  ", false);
   out += endTag(indent, false);
 
@@ -90,7 +87,7 @@ std::string UpdateContextRequest::render(ConnectionInfo* ciP, RequestType reques
 *
 * UpdateContextRequest::check - 
 */
-std::string UpdateContextRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject,  const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string            res;
   UpdateContextResponse  response;
@@ -98,14 +95,14 @@ std::string UpdateContextRequest::check(ConnectionInfo* ciP, RequestType request
   if (predetectedError != "")
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
-    return response.render(ciP, UpdateContext, indent);
+    return response.render(apiVersion, asJsonObject, indent);
   }
 
-  if (((res = contextElementVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK") ||
-      ((res = updateActionType.check(requestType,     indent, predetectedError, counter)) != "OK"))
+  if (((res = contextElementVector.check(apiVersion, UpdateContext, indent, predetectedError, counter)) != "OK") ||
+      ((res = updateActionType.check()) != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
-    return response.render(ciP, UpdateContext, indent);
+    return response.render(apiVersion, asJsonObject, indent);
   }
 
   return "OK";

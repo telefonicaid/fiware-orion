@@ -18,6 +18,7 @@ When starting the Orion context broker, if a previous log file exists:
 The `-logLevel` option allows to choose which error messages are printed in the log:
 
 - NONE: no log at all
+- FATAL: only FATAL ERROR messages are logged
 - ERROR: only ERROR messages are logged
 - WARN (default): WARN and ERROR messages are logged
 - INFO: INFO, WARN and ERROR messages are logged
@@ -62,12 +63,12 @@ The different fields in each line are as follows:
 -   **time**. A timestamp corresponding to the moment in which the log
     line was generated in [ISO8601](https://es.wikipedia.org/wiki/ISO_8601) format.
     Orion prints timestamps in UTC format.
--   **lvl (level)**. There are five levels:
-    -   ERROR: This level designates error events. There is a severe
-        problem that should be fixed. A subclass of ERROR is FATAL,
-        which designates very severe error events that will
-        presumably lead the application to abort. The process can no
-        longer work.
+-   **lvl (level)**. There are six levels:
+    -   FATAL: This level designates severe error events
+        that lead the application to exit.
+        The process can no longer work.
+    -   ERROR: This level designates error events.
+        There is a severe problem that must be fixed.
     -   WARN: This level designates potentially harmful situations.
         There is a minor problem that should be fixed.
     -   INFO: This level designates informational messages that

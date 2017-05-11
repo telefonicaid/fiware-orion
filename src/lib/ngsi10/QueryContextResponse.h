@@ -31,7 +31,6 @@
 
 #include "ngsi/ContextElementResponseVector.h"
 #include "ngsi/StatusCode.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -53,12 +52,8 @@ typedef struct QueryContextResponse
   QueryContextResponse(StatusCode& _errorCode);
   ~QueryContextResponse();
 
-  std::string            render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
-  std::string            check(ConnectionInfo*     ciP,
-                               RequestType         requestType,
-                               const std::string&  indent,
-                               const std::string&  predetectedError,
-                               int                 counter);
+  std::string            render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent);
+  std::string            check(ApiVersion apiVersion, bool asJsonObject, const std::string&  indent, const std::string&  predetectedError);
   void                   present(const std::string& indent, const std::string& caller);
   void                   release(void);  
   void                   fill(QueryContextResponse* qcrsP);

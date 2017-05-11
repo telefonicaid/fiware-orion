@@ -26,7 +26,7 @@ Update attribute type
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0-255
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -188,6 +188,7 @@ Date: REGEX(.*)
 05. Check that 2 notification arrived (initial one an the one due to step 3)
 ============================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 458
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
@@ -196,31 +197,32 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "TEnt",
-        "isPattern" : "false",
-        "id" : "E",
-        "attributes" : [
-          {
-            "name" : "A",
-            "type" : "T",
-            "value" : "V"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "T",
+                        "value": "V"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "TEnt"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 459
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
@@ -229,28 +231,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "TEnt",
-        "isPattern" : "false",
-        "id" : "E",
-        "attributes" : [
-          {
-            "name" : "A",
-            "type" : "T2",
-            "value" : "V"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "T2",
+                        "value": "V"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "TEnt"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 

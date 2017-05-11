@@ -370,35 +370,36 @@ function localBrokerStart()
     IPvOption="-ipv6"
   fi
 
+  CB_START_CMD_PREFIX="contextBroker -harakiri"
   if [ "$role" == "CB" ]
   then
     port=$CB_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CB_PORT  -pidpath $CB_PID_FILE  -dbhost $dbHost:$dbPort -db $CB_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption $extraParams"
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CB_PORT  -pidpath $CB_PID_FILE  -dbhost $dbHost:$dbPort -db $CB_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption $extraParams"
   elif [ "$role" == "CP1" ]
   then
     mkdir -p $CP1_LOG_DIR
     port=$CP1_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP1_PORT -pidpath $CP1_PID_FILE -dbhost $dbHost:$dbPort -db $CP1_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP1_LOG_DIR $extraParams"
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP1_PORT -pidpath $CP1_PID_FILE -dbhost $dbHost:$dbPort -db $CP1_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP1_LOG_DIR $extraParams"
   elif [ "$role" == "CP2" ]
   then
     mkdir -p $CP2_LOG_DIR
     port=$CP2_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP2_PORT -pidpath $CP2_PID_FILE -dbhost $dbHost:$dbPort -db $CP2_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP2_LOG_DIR $extraParams"
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP2_PORT -pidpath $CP2_PID_FILE -dbhost $dbHost:$dbPort -db $CP2_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP2_LOG_DIR $extraParams"
   elif [ "$role" == "CP3" ]
   then
     mkdir -p $CP3_LOG_DIR
     port=$CP3_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP3_PORT -pidpath $CP3_PID_FILE -dbhost $dbHost:$dbPort -db $CP3_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP3_LOG_DIR $extraParams"
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP3_PORT -pidpath $CP3_PID_FILE -dbhost $dbHost:$dbPort -db $CP3_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP3_LOG_DIR $extraParams"
   elif [ "$role" == "CP4" ]
   then
     mkdir -p $CP4_LOG_DIR
     port=$CP4_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP4_PORT -pidpath $CP4_PID_FILE -dbhost $dbHost:$dbPort -db $CP4_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP4_LOG_DIR $extraParams"
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP4_PORT -pidpath $CP4_PID_FILE -dbhost $dbHost:$dbPort -db $CP4_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP4_LOG_DIR $extraParams"
   elif [ "$role" == "CP5" ]
   then
     mkdir -p $CP5_LOG_DIR
     port=$CP5_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP5_PORT -pidpath $CP5_PID_FILE -dbhost $dbHost:$dbPort -db $CP5_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP5_LOG_DIR $extraParams"
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP5_PORT -pidpath $CP5_PID_FILE -dbhost $dbHost:$dbPort -db $CP5_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP5_LOG_DIR $extraParams"
   fi
 
 
@@ -518,6 +519,8 @@ function brokerStart()
   shift
   shift
 
+  notificationModeGiven=FALSE
+
   # Check for --noCache and --cache options in 'extraParams'
   xParams=""
   while [ "$#" != 0 ]
@@ -526,6 +529,11 @@ function brokerStart()
     elif [ "$1" == "--cache" ];              then noCache=OFF;
     elif [ "$1" == "-noCache" ];             then noCache=ON;
     elif [ "$1" == "-cache" ];               then noCache=OFF;
+    elif [ "$1" == "-notificationMode" ] || [ "$1" == "--notificationMode" ]
+    then
+        notificationModeGiven=TRUE
+        xParams="$xParams $1 $2"
+        shift
     else xParams=$xParams' '$1
     fi
     shift
@@ -539,19 +547,32 @@ function brokerStart()
     fi
   fi
 
-  if [ "$role" == "" ]
-  then
+ # Not given notificationMode but not forbidden, use default
+ if [ "$notificationModeGiven" == "FALSE" ]  &&  [ "$CB_THREADPOOL" == "ON" ]
+ then
+    xParams=$xParams' -notificationMode threadpool:200:20'
+ fi
+
+ if [ "$role" == "" ]
+ then
     echo "No role given as first parameter for brokerStart"
     return
-  fi
+ fi
 
   if [ "$traceLevels" == "" ]
   then
     traceLevels=0-255
   fi
 
+  if [ "$ipVersion" == "" ]
+  then
+    ipVersion=BOTH
+  fi
+
+
   localBrokerStop $role
   localBrokerStart $role $traceLevels $ipVersion $xParams
+
 }
 
 
@@ -655,9 +676,32 @@ function accumulatorStop()
 #
 function accumulatorStart()
 {
+  # FIXME P6: note that due to the way argument processing work, the arguments have to be
+  # in a fixed order in the .test, i.e.: --pretty-print, --https, --key, --cert
+
   if [ "$1" = "--pretty-print" ]
   then
     pretty="$1"
+    shift
+  fi
+
+  if [ "$1" = "--https" ]
+  then
+    https="$1"
+    shift
+  fi
+
+  if [ "$1" = "--key" ]
+  then
+    key="$1 $2"
+    shift
+    shift
+  fi
+
+  if [ "$1" = "--cert" ]
+  then
+    cert="$1 $2"
+    shift
     shift
   fi
 
@@ -677,7 +721,7 @@ function accumulatorStart()
 
   accumulatorStop $port
 
-  accumulator-server.py --port $port --url /notify --host $bindIp $pretty > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+  accumulator-server.py --port $port --url /notify --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
   echo accumulator running as PID $$
 
   # Wait until accumulator has started or we have waited a given maximum time
@@ -708,14 +752,27 @@ function accumulatorStart()
 #
 function accumulatorDump()
 {
+  # FIXME P6: Argument processing in this is ugly... needs a cleanup
+
   valgrindSleep 2
 
   if [ "$1" == "IPV6" ]
   then
-    curl -g [::1]:${LISTENER_PORT}/dump -s -S 2> /dev/null
+    url="[::1]:${LISTENER_PORT}/dump"
+    g_flag="-g"
   else
-    curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+    url="localhost:${LISTENER_PORT}/dump"
   fi
+
+  if [ "$2" == "HTTPS" ]
+  then
+    schema="https://"
+    k_flag="-k"
+  else
+    schema="http://"
+  fi
+
+  curl $k_flag $g_flag $schema$url -s -S 2> /dev/null
 }
 
 
@@ -1129,7 +1186,12 @@ function orionCurl()
       if [ "$payloadCheckFormat" == json ] || [ "$payloadCheckFormat" == "" ]
       then
         vMsg Running python tool for $_response
-        echo $_response | python -mjson.tool
+        #
+        # We need to apply pretty-print on _response. Otherwise positional processing used in .test
+        # (e.g. to get SUB_ID typically grep and awk are used) will break
+        #
+        _response=$(echo $_response | python -mjson.tool)
+        echo "$_response"
       else
         dMsg Unknown payloadCheckFormat
       fi

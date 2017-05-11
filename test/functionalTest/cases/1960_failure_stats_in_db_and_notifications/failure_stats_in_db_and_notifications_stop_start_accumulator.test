@@ -1,0 +1,313 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+failure stats in db and notifications
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 -subCacheIval 3
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create entity E1
+# 02. Create sub (with valid url), matching E1
+#     Sleep 3.5 seconds to get a sub-cache-refresh
+# 03. GET subscription, see lastSuccess but not lastFailure and status==active
+# 04. Stop accumulator
+# 05. Update E1, to provoke notification that now fails
+#     Sleep 3.5 seconds to get a sub-cache-refresh
+# 06. GET subscription, see lastFailure GT lastSuccess and status==failed
+# 07. Start accumulator again
+# 08. Update E1, to provoke notification that now works
+#     Sleep 3.5 seconds to get a sub-cache-refresh
+# 09. GET subscription, see lastSuccess GT lastFailure and status==active
+#
+
+echo "01. Create entity E1"
+echo "===================="
+payload='{
+  "id": "E1",
+  "type": "T1",
+  "A1": 1
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "02. Create sub (with valid url), matching E1"
+echo "============================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [ ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+# Sleep > 3 seconds to get a cache refresh
+sleep 3.5
+
+
+echo "03. GET subscription, see lastSuccess but not lastFailure and status==active"
+echo "============================================================================"
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "04. Stop accumulator"
+echo "===================="
+accumulatorStop
+echo
+echo
+
+
+echo "05. Update E1, to provoke notification that now fails"
+echo "====================================================="
+payload='{
+  "A1": 6
+}'
+orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+
+# Await sub-cache contents to be dumped into database
+sleep 3.5
+
+
+echo "06. GET subscription, see lastFailure GT lastSuccess and status==failed"
+echo "======================================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+echo "07. Start accumulator again"
+echo "==========================="
+accumulatorStart --pretty-print
+sleep 0.5
+echo
+echo
+
+
+echo "08. Update E1, to provoke notification that now works"
+echo "====================================================="
+payload='{
+  "A1": 8
+}'
+orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+
+# Await sub-cache contents to be dumped into database
+sleep 3.5
+
+echo "09. GET subscription, see lastSuccess GT lastFailure and status==active"
+echo "======================================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+--REGEXPECT--
+01. Create entity E1
+====================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create sub (with valid url), matching E1
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. GET subscription, see lastSuccess but not lastFailure and status==active
+============================================================================
+HTTP/1.1 200 OK
+Content-Length: 315
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/notify"
+            },
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "timesSent": 1
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1"
+                }
+            ]
+        }
+    }
+]
+
+
+04. Stop accumulator
+====================
+
+
+05. Update E1, to provoke notification that now fails
+=====================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. GET subscription, see lastFailure GT lastSuccess and status==failed
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 355
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/notify"
+            },
+            "lastFailure": "REGEX(.*)",
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "timesSent": 2
+        },
+        "status": "failed",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1"
+                }
+            ]
+        }
+    }
+]
+
+
+07. Start accumulator again
+===========================
+accumulator running as PID REGEX(\d+)
+Connection to REGEX(.*)
+
+
+08. Update E1, to provoke notification that now works
+=====================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. GET subscription, see lastSuccess GT lastFailure and status==active
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 355
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/notify"
+            },
+            "lastFailure": "REGEX(.*)",
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "timesSent": 3
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1"
+                }
+            ]
+        }
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

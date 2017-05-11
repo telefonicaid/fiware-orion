@@ -1,0 +1,256 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Filter with attr dateModified in subscriptions
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# Same steps than filter_datemodified.test but using dateModified at attribute level
+#
+# 01. Create entity E1
+# 02. At t_0: Create subscription with mq: A.dateModified>t_2
+# 03. At t_1: modify entity E1 (not notif)
+# 04. At t_2: modify entity E1 (not notif)
+# 05. At t_3: modify entity E1 (notif)
+# 06. At t_4: modify entity E1 (notif)
+# 07. Get accumulator dump (2 notifications), for t_3 and t_4
+#
+
+echo "01. Create entity E1"
+echo "===================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A": ""
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+T_2=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z" --date="2seconds")
+
+
+echo "02. At t_0: Create subscription with mq: dateModified>t_2"
+echo "========================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": "E.*",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "mq": "A.dateModified>'$T_2'"
+            }
+         }
+    },
+    "notification": {
+        "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"},
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. At t_1: modify entity E1 (not notif)"
+echo "========================================"
+sleep 1s
+payload='{
+  "A": "t_1"
+}'
+orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "04. At t_2: modify entity E1 (not notif)"
+echo "========================================"
+sleep 1s
+payload='{
+  "A": "t_2"
+}'
+orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "05. At t_3: modify entity E1 (notif)"
+echo "===================================="
+sleep 1s
+payload='{
+  "A": "t_3"
+}'
+orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "06. At t_4: modify entity E1 (notif)"
+echo "===================================="
+sleep 1s
+payload='{
+  "A": "t_4"
+}'
+orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "07. Get accumulator dump (2 notifications), for t_3 and t_4"
+echo "==========================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1
+====================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. At t_0: Create subscription with mq: dateModified>t_2
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. At t_1: modify entity E1 (not notif)
+========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. At t_2: modify entity E1 (not notif)
+========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. At t_3: modify entity E1 (notif)
+====================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. At t_4: modify entity E1 (notif)
+====================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Get accumulator dump (2 notifications), for t_3 and t_4
+===========================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 125
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Text",
+                "value": "t_3"
+            },
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 125
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Text",
+                "value": "t_4"
+            },
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop $LISTENER_PORT
+dbDrop CB

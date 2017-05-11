@@ -1,0 +1,344 @@
+# Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Quotes in RHS of String Filters
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create E1 with attr A1=='10'
+# 02. Create E2 with attr A1==10
+# 03. Query using q=A1=='10', see E1
+# 04. Query using q=A1==10, see E2
+# 05. Create E3 with attr A1=='null'
+# 06. Create E4 with attr A1==null
+# 07. Query using q=A1=='null', see E3
+# 08. Query using q=A1==null, see E4
+# 09. Create E5 with attr A1=='true'
+# 10. Create E6 with attr A1==true
+# 11. Query using q=A1=='true', see E5
+# 12. Query using q=A1==true, see E6
+#
+
+echo "01. Create E1 with attr A1=='10'"
+echo "================================"
+payload='{
+  "id": "E1",
+  "A1": "10"
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E2 with attr A1==10"
+echo "=============================="
+payload='{
+  "id": "E2",
+  "A1": 10
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "03. Query using q=A1=='10', see E1"
+echo "=================================="
+orionCurl --url "/v2/entities?q=A1=='10'"
+echo
+echo
+
+
+echo "04. Query using q=A1==10, see E2"
+echo "================================"
+orionCurl --url "/v2/entities?q=A1==10"
+echo
+echo
+
+
+echo "05. Create E3 with attr A1=='null'"
+echo "=================================="
+payload='{
+  "id": "E3",
+  "A1": "null"
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "06. Create E4 with attr A1==null"
+echo "================================"
+payload='{
+  "id": "E4",
+  "A1": null
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "07. Query using q=A1=='null', see E3"
+echo "===================================="
+orionCurl --url "/v2/entities?q=A1=='null'"
+echo
+echo
+
+
+echo "08. Query using q=A1==null, see E4"
+echo "=================================="
+orionCurl --url "/v2/entities?q=A1==null"
+echo
+echo
+
+
+echo "09. Create E5 with attr A1=='true'"
+echo "=================================="
+payload='{
+  "id": "E5",
+  "A1": "true"
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "10. Create E6 with attr A1==true"
+echo "================================"
+payload='{
+  "id": "E6",
+  "A1": true
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "11. Query using q=A1=='true', see E5"
+echo "===================================="
+orionCurl --url "/v2/entities?q=A1=='true'"
+echo
+echo
+
+
+echo "12. Query using q=A1==true, see E6"
+echo "=================================="
+orionCurl --url "/v2/entities?q=A1==true"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 with attr A1=='10'
+================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create E2 with attr A1==10
+==============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Query using q=A1=='10', see E1
+==================================
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Text",
+            "value": "10"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+04. Query using q=A1==10, see E2
+================================
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 10
+        },
+        "id": "E2",
+        "type": "Thing"
+    }
+]
+
+
+05. Create E3 with attr A1=='null'
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Create E4 with attr A1==null
+================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Query using q=A1=='null', see E3
+====================================
+HTTP/1.1 200 OK
+Content-Length: 78
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Text",
+            "value": "null"
+        },
+        "id": "E3",
+        "type": "Thing"
+    }
+]
+
+
+08. Query using q=A1==null, see E4
+==================================
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "None",
+            "value": null
+        },
+        "id": "E4",
+        "type": "Thing"
+    }
+]
+
+
+09. Create E5 with attr A1=='true'
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E5?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. Create E6 with attr A1==true
+================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E6?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+11. Query using q=A1=='true', see E5
+====================================
+HTTP/1.1 200 OK
+Content-Length: 78
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Text",
+            "value": "true"
+        },
+        "id": "E5",
+        "type": "Thing"
+    }
+]
+
+
+12. Query using q=A1==true, see E6
+==================================
+HTTP/1.1 200 OK
+Content-Length: 79
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Boolean",
+            "value": true
+        },
+        "id": "E6",
+        "type": "Thing"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -125,7 +125,7 @@ echo
 ===================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -134,7 +134,7 @@ Date: REGEX(.*)
 02. True Equal to True: GET /v2/entities?q=A1.T:true, see E1
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 210
+Content-Length: 224
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -143,7 +143,7 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "StructuredValue",
             "value": {
                 "D": "2016-07-22T10:42:42.00Z",
                 "F": false,
@@ -156,11 +156,11 @@ Date: REGEX(.*)
         },
         "A2": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 22
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -168,7 +168,7 @@ Date: REGEX(.*)
 03. True Equal to True: GET /v2/entities?q=A1.T==true, see E1
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 210
+Content-Length: 224
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -177,7 +177,7 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "StructuredValue",
             "value": {
                 "D": "2016-07-22T10:42:42.00Z",
                 "F": false,
@@ -190,11 +190,11 @@ Date: REGEX(.*)
         },
         "A2": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 22
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -246,7 +246,7 @@ Date: REGEX(.*)
 08. False Equal to False: GET /v2/entities?q=A1.F:false, see E1
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 210
+Content-Length: 224
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -255,7 +255,7 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "StructuredValue",
             "value": {
                 "D": "2016-07-22T10:42:42.00Z",
                 "F": false,
@@ -268,11 +268,11 @@ Date: REGEX(.*)
         },
         "A2": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 22
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -280,7 +280,7 @@ Date: REGEX(.*)
 09. False Equal to False: GET /v2/entities?q=A1.F==false, see E1
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 210
+Content-Length: 224
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -289,7 +289,7 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "StructuredValue",
             "value": {
                 "D": "2016-07-22T10:42:42.00Z",
                 "F": false,
@@ -302,11 +302,11 @@ Date: REGEX(.*)
         },
         "A2": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 22
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 

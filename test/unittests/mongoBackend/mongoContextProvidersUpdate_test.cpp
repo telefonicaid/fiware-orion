@@ -465,9 +465,9 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsAll)
   /* Forge the request (from "inside" to "outside") */
   /* Note that although it is a bit weird having an updateContext without attributes to update,
    * it is legal from the point of view of OMA spec */
-  ContextElement ce;
-  ce.entityId.fill("E3", "T3", "false");
-  req.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("E3", "T3", "false");
+  req.contextElementVector.push_back(ceP);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
@@ -511,11 +511,11 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneSingle)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E1", "T1", "false");
-  ContextAttribute ca("A4", "TA4", "new_val");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("E1", "T1", "false");
+  ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
+  ceP->contextAttributeVector.push_back(caP);
+  req.contextElementVector.push_back(ceP);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
@@ -574,11 +574,11 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneMulti)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E1", "T1", "false");
-  ContextAttribute ca("A1", "TA1", "new_val");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("E1", "T1", "false");
+  ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+  ceP->contextAttributeVector.push_back(caP);
+  req.contextElementVector.push_back(ceP);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
@@ -633,13 +633,13 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsSubset)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E3", "T3", "false");
-  ContextAttribute ca1("A1", "TA1", "new_val");
-  ContextAttribute ca2("A2", "TA2", "new_val");
-  ce.contextAttributeVector.push_back(&ca1);
-  ce.contextAttributeVector.push_back(&ca2);
-  req.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("E3", "T3", "false");
+  ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
+  ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val");
+  ceP->contextAttributeVector.push_back(ca1P);
+  ceP->contextAttributeVector.push_back(ca2P);
+  req.contextElementVector.push_back(ceP);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
@@ -702,11 +702,11 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E1", "T1", "false");
-  ContextAttribute ca("A5", "TA5", "new_val");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("E1", "T1", "false");
+  ContextAttribute* caP = new ContextAttribute("A5", "TA5", "new_val");
+  ceP->contextAttributeVector.push_back(caP);
+  req.contextElementVector.push_back(ceP);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
@@ -767,11 +767,12 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntity)
   /* Forge the request (from "inside" to "outside") */
   /* Note that although it is a bit weird having an updateContext without attributes to update,
      * it is legal from the point of view of OMA spec */
-  ContextElement ce1, ce2;
-  ce1.entityId.fill("E1", "T1", "false");
-  ce2.entityId.fill("E2", "T2", "false");
-  req.contextElementVector.push_back(&ce1);
-  req.contextElementVector.push_back(&ce2);
+  ContextElement* ce1P = new ContextElement();
+  ContextElement* ce2P = new ContextElement();
+  ce1P->entityId.fill("E1", "T1", "false");
+  ce2P->entityId.fill("E2", "T2", "false");
+  req.contextElementVector.push_back(ce1P);
+  req.contextElementVector.push_back(ce2P);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
@@ -826,15 +827,15 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E1", "T1", "false");
-  ContextAttribute ca1("A3", "TA3", "new_val");
-  ContextAttribute ca2("A4", "TA4", "new_val");
-  ContextAttribute ca3("A5", "TA5", "new_val");
-  ce.contextAttributeVector.push_back(&ca1);
-  ce.contextAttributeVector.push_back(&ca2);
-  ce.contextAttributeVector.push_back(&ca3);
-  req.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("E1", "T1", "false");
+  ContextAttribute* ca1P = new ContextAttribute("A3", "TA3", "new_val");
+  ContextAttribute* ca2P = new ContextAttribute("A4", "TA4", "new_val");
+  ContextAttribute* ca3P = new ContextAttribute("A5", "TA5", "new_val");
+  ceP->contextAttributeVector.push_back(ca1P);
+  ceP->contextAttributeVector.push_back(ca2P);
+  ceP->contextAttributeVector.push_back(ca3P);
+  req.contextElementVector.push_back(ceP);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
@@ -913,23 +914,24 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce1, ce2;
-  ce1.entityId.fill("E1", "T1", "false");
-  ce2.entityId.fill("E2", "T2", "false");
-  ContextAttribute ca1("A3", "TA3", "new_val");
-  ContextAttribute ca2("A4", "TA4", "new_val");
-  ContextAttribute ca3("A5", "TA5", "new_val");
-  ContextAttribute ca4("A3", "TA3", "new_val");
-  ContextAttribute ca5("A4", "TA4", "new_val");
-  ContextAttribute ca6("A5", "TA5", "new_val");
-  ce1.contextAttributeVector.push_back(&ca1);
-  ce1.contextAttributeVector.push_back(&ca2);
-  ce1.contextAttributeVector.push_back(&ca3);
-  ce2.contextAttributeVector.push_back(&ca4);
-  ce2.contextAttributeVector.push_back(&ca5);
-  ce2.contextAttributeVector.push_back(&ca6);
-  req.contextElementVector.push_back(&ce1);
-  req.contextElementVector.push_back(&ce2);
+  ContextElement* ce1P = new ContextElement();
+  ContextElement* ce2P = new ContextElement();
+  ce1P->entityId.fill("E1", "T1", "false");
+  ce2P->entityId.fill("E2", "T2", "false");
+  ContextAttribute* ca1P = new ContextAttribute("A3", "TA3", "new_val");
+  ContextAttribute* ca2P = new ContextAttribute("A4", "TA4", "new_val");
+  ContextAttribute* ca3P = new ContextAttribute("A5", "TA5", "new_val");
+  ContextAttribute* ca4P = new ContextAttribute("A3", "TA3", "new_val");
+  ContextAttribute* ca5P = new ContextAttribute("A4", "TA4", "new_val");
+  ContextAttribute* ca6P = new ContextAttribute("A5", "TA5", "new_val");
+  ce1P->contextAttributeVector.push_back(ca1P);
+  ce1P->contextAttributeVector.push_back(ca2P);
+  ce1P->contextAttributeVector.push_back(ca3P);
+  ce2P->contextAttributeVector.push_back(ca4P);
+  ce2P->contextAttributeVector.push_back(ca5P);
+  ce2P->contextAttributeVector.push_back(ca6P);
+  req.contextElementVector.push_back(ce1P);
+  req.contextElementVector.push_back(ce2P);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
@@ -1048,11 +1050,11 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoType)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E1", "", "false");
-  ContextAttribute ca("A1", "TA1", "new_val");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("E1", "", "false");
+  ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+  ceP->contextAttributeVector.push_back(caP);
+  req.contextElementVector.push_back(ceP);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
@@ -1115,9 +1117,9 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern0Attr)
   /* Forge the request (from "inside" to "outside") */
   /* Note that although it is a bit weird having an updateContext without attributes to update,
      * it is legal from the point of view of OMA spec */
-  ContextElement ce;
-  ce.entityId.fill("E[2-3]", "T", "true");
-  req.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("E[2-3]", "T", "true");
+  req.contextElementVector.push_back(ceP);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
@@ -1151,11 +1153,11 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern1AttrSingle)
   prepareDatabasePatternTrue();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E[1-3]", "T", "true");
-  ContextAttribute ca("A4", "TA4", "new_val");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("E[1-3]", "T", "true");
+  ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
+  ceP->contextAttributeVector.push_back(caP);
+  req.contextElementVector.push_back(ceP);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
@@ -1191,11 +1193,11 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern1AttrMulti)
   prepareDatabasePatternTrue();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E[1-2]", "T", "true");
-  ContextAttribute ca("A1", "TA1", "new_val");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("E[1-2]", "T", "true");
+  ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+  ceP->contextAttributeVector.push_back(caP);
+  req.contextElementVector.push_back(ceP);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
@@ -1231,13 +1233,13 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternNAttr)
   prepareDatabasePatternTrue();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E[1-2]", "T", "true");
-  ContextAttribute ca1("A1", "TA1", "new_val");
-  ContextAttribute ca2("A2", "TA2", "new_val");
-  ce.contextAttributeVector.push_back(&ca1);
-  ce.contextAttributeVector.push_back(&ca2);
-  req.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("E[1-2]", "T", "true");
+  ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
+  ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val");
+  ceP->contextAttributeVector.push_back(ca1P);
+  ceP->contextAttributeVector.push_back(ca2P);
+  req.contextElementVector.push_back(ceP);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
@@ -1273,9 +1275,9 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternFail)
   /* Forge the request (from "inside" to "outside") */
   /* Note that although it is a bit weird having an updateContext without attributes to update,
      * it is legal from the point of view of OMA spec */
-  ContextElement ce;
-  ce.entityId.fill("R.*", "T", "true");
-  req.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("R.*", "T", "true");
+  req.contextElementVector.push_back(ceP);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
@@ -1315,11 +1317,11 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternNoType)
   prepareDatabasePatternTrue();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E[2-3]", "", "true");
-  ContextAttribute ca("A2", "TA2", "new_val");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("E[2-3]", "", "true");
+  ContextAttribute* caP = new ContextAttribute("A2", "TA2", "new_val");
+  ceP->contextAttributeVector.push_back(caP);
+  req.contextElementVector.push_back(ceP);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
@@ -1358,11 +1360,12 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, mixPatternAndNotPattern)
   /* Forge the request (from "inside" to "outside") */
   /* Note that although it is a bit weird having an updateContext without attributes to update,
      * it is legal from the point of view of OMA spec */
-  ContextElement ce1, ce2;
-  ce1.entityId.fill("E[2-3]", "T", "true");
-  ce2.entityId.fill("E1", "T", "false");
-  req.contextElementVector.push_back(&ce1);
-  req.contextElementVector.push_back(&ce2);
+  ContextElement* ce1P = new ContextElement();
+  ContextElement* ce2P = new ContextElement();
+  ce1P->entityId.fill("E[2-3]", "T", "true");
+  ce2P->entityId.fill("E1", "T", "false");
+  req.contextElementVector.push_back(ce1P);
+  req.contextElementVector.push_back(ce2P);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
@@ -1403,29 +1406,33 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   prepareDatabaseSeveralCprs();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce1, ce2, ce3, ce4;
-  ce1.entityId.fill("E1", "T", "false");
-  ContextAttribute ca1("A1", "T", "10");
-  ContextAttribute ca2("A2", "T", "20");
-  ce1.contextAttributeVector.push_back(&ca1);
-  ce1.contextAttributeVector.push_back(&ca2);
-  ce2.entityId.fill("E2", "T", "false");
-  ContextAttribute ca3("A4", "T", "40");
-  ContextAttribute ca4("A3", "T", "30");
-  ce2.contextAttributeVector.push_back(&ca3);
-  ce2.contextAttributeVector.push_back(&ca4);
-  ce3.entityId.fill("E3", "T", "false");
-  ContextAttribute ca5("A5", "T", "50");
-  ContextAttribute ca6("A6", "T", "60");
-  ce3.contextAttributeVector.push_back(&ca5);
-  ce3.contextAttributeVector.push_back(&ca6);
-  ce4.entityId.fill("E4", "T", "false");
-  ContextAttribute ca7("A7", "T", "70");
-  ce4.contextAttributeVector.push_back(&ca7);
-  req.contextElementVector.push_back(&ce1);
-  req.contextElementVector.push_back(&ce2);
-  req.contextElementVector.push_back(&ce3);
-  req.contextElementVector.push_back(&ce4);
+  ContextElement* ce1P = new ContextElement();
+  ContextElement* ce2P = new ContextElement();
+  ContextElement* ce3P = new ContextElement();
+  ContextElement* ce4P = new ContextElement();
+
+  ce1P->entityId.fill("E1", "T", "false");
+  ContextAttribute* ca1P = new ContextAttribute("A1", "T", "10");
+  ContextAttribute* ca2P = new ContextAttribute("A2", "T", "20");
+  ce1P->contextAttributeVector.push_back(ca1P);
+  ce1P->contextAttributeVector.push_back(ca2P);
+  ce2P->entityId.fill("E2", "T", "false");
+  ContextAttribute* ca3P = new ContextAttribute("A4", "T", "40");
+  ContextAttribute* ca4P = new ContextAttribute("A3", "T", "30");
+  ce2P->contextAttributeVector.push_back(ca3P);
+  ce2P->contextAttributeVector.push_back(ca4P);
+  ce3P->entityId.fill("E3", "T", "false");
+  ContextAttribute* ca5P = new ContextAttribute("A5", "T", "50");
+  ContextAttribute* ca6P = new ContextAttribute("A6", "T", "60");
+  ce3P->contextAttributeVector.push_back(ca5P);
+  ce3P->contextAttributeVector.push_back(ca6P);
+  ce4P->entityId.fill("E4", "T", "false");
+  ContextAttribute* ca7P = new ContextAttribute("A7", "T", "70");
+  ce4P->contextAttributeVector.push_back(ca7P);
+  req.contextElementVector.push_back(ce1P);
+  req.contextElementVector.push_back(ce2P);
+  req.contextElementVector.push_back(ce3P);
+  req.contextElementVector.push_back(ce4P);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
@@ -1598,11 +1605,11 @@ TEST(mongoContextProvidersUpdateRequest, notFoundUpdate)
   /* empty database, no preparation step */
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E1", "T1", "false");
-  ContextAttribute ca("A1", "TA1", "new_val");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("E1", "T1", "false");
+  ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+  ceP->contextAttributeVector.push_back(caP);
+  req.contextElementVector.push_back(ceP);
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
@@ -1653,11 +1660,11 @@ TEST(mongoContextProvidersUpdateRequest, notFoundDelete)
   /* empty database, no preparation step */
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E1", "T1", "false");
-  ContextAttribute ca("A1", "TA1", "new_val");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
+  ContextElement* ceP = new ContextElement();
+  ceP->entityId.fill("E1", "T1", "false");
+  ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+  ceP->contextAttributeVector.push_back(caP);
+  req.contextElementVector.push_back(ceP);
   req.updateActionType.set("DELETE");
 
   /* Invoke the function in mongoBackend library */

@@ -174,7 +174,7 @@ Date: REGEX(.*)
 ====================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -184,7 +184,7 @@ Date: REGEX(.*)
 ==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2?type=none
+Location: /v2/entities/E2?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -193,7 +193,8 @@ Date: REGEX(.*)
 04. See notification of E1 in accumulator
 =========================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 125
+Fiware-Servicepath: /
+Content-Length: 128
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -206,11 +207,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A1": {
                 "metadata": {},
-                "type": "none",
+                "type": "Number",
                 "value": 9
             },
             "id": "E1",
-            "type": "none"
+            "type": "Thing"
         }
     ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
@@ -231,7 +232,7 @@ Date: REGEX(.*)
 ============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E3?type=none
+Location: /v2/entities/E3?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -240,7 +241,8 @@ Date: REGEX(.*)
 07. See no new notification in accumulator (only E1)
 ====================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 125
+Fiware-Servicepath: /
+Content-Length: 128
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -253,11 +255,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A1": {
                 "metadata": {},
-                "type": "none",
+                "type": "Number",
                 "value": 9
             },
             "id": "E1",
-            "type": "none"
+            "type": "Thing"
         }
     ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
@@ -269,7 +271,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 ====================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E4?type=none
+Location: /v2/entities/E4?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -278,7 +280,8 @@ Date: REGEX(.*)
 09. See two notifications in accumulator (E1 and E4)
 ====================================================
 POST http://localhost:9997/notify
-Content-Length: 125
+Fiware-Servicepath: /
+Content-Length: 128
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:9997
@@ -291,18 +294,19 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A1": {
                 "metadata": {},
-                "type": "none",
+                "type": "Number",
                 "value": 9
             },
             "id": "E1",
-            "type": "none"
+            "type": "Thing"
         }
     ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:9997/notify
-Content-Length: 126
+Fiware-Servicepath: /
+Content-Length: 129
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:9997
@@ -315,11 +319,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
         {
             "A1": {
                 "metadata": {},
-                "type": "none",
+                "type": "Number",
                 "value": 11
             },
             "id": "E4",
-            "type": "none"
+            "type": "Thing"
         }
     ],
     "subscriptionId": "REGEX([0-9a-f]{24})"

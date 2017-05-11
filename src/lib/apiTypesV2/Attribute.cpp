@@ -28,6 +28,7 @@
 #include "common/tag.h"
 #include "common/errorMessages.h"
 #include "common/RenderFormat.h"
+#include "common/string.h"
 #include "apiTypesV2/Attribute.h"
 #include "ngsi10/QueryContextResponse.h"
 
@@ -37,9 +38,20 @@
 *
 * Attribute::render -
 */
-std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
+std::string Attribute::render
+(
+  ApiVersion          apiVersion,          // in parameter (pass-through)
+  bool                acceptedTextPlain,   // in parameter (pass-through)
+  bool                acceptedJson,        // in parameter (pass-through)
+  MimeType            outFormatSelection,  // in parameter (pass-through)
+  MimeType*           outMimeTypeP,        // out parameter (pass-through)
+  HttpStatusCode*     scP,                 // out parameter (pass-through)
+  bool                keyValues,           // in parameter
+  const std::string&  metadataList,        // in parameter
+  RequestType         requestType,         // in parameter
+  bool                comma                // in parameter
+)
 {
-  bool          keyValues  = ciP->uriParamOptions[OPT_KEY_VALUES];
   RenderFormat  renderFormat = (keyValues == true)? NGSI_V2_KEYVALUES : NGSI_V2_NORMALIZED;
 
   if (pcontextAttribute)
@@ -48,12 +60,19 @@ std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool
 
     if (requestType == EntityAttributeValueRequest)
     {
-      out = pcontextAttribute->toJsonAsValue(ciP);
+      out = pcontextAttribute->toJsonAsValue(apiVersion, acceptedTextPlain, acceptedJson, outFormatSelection, outMimeTypeP, scP);
     }
     else
     {
+      std::vector<std::string> metadataFilter;
+
+      if (metadataList != "")
+      {
+        stringSplit(metadataList, ',', metadataFilter);
+      }
+
       out = "{";
-      out += pcontextAttribute->toJson(true, renderFormat, requestType);  // param 1 'true' as it is the last and only element
+      out += pcontextAttribute->toJson(true, renderFormat, metadataFilter, requestType);  // param 1 'true' as it is the last and only element
       out += "}";
     }
 
@@ -84,7 +103,7 @@ void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
 {
   if (qcrsP->errorCode.code == SccContextElementNotFound)
   {
-    oe.fill(SccContextElementNotFound, "The requested entity has not been found. Check type and id", "NotFound");
+    oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
   }
   else if (qcrsP->errorCode.code != SccOk)
   {
@@ -98,7 +117,7 @@ void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
     //
     // If there are more than one entity, we return an error
     //
-    oe.fill(SccConflict, MORE_MATCHING_ENT, "TooManyResults");
+    oe.fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
   }
   else
   {
@@ -115,7 +134,7 @@ void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
 
     if (pcontextAttribute == NULL)
     {
-      oe.fill(SccContextElementNotFound, "The entity does not have such an attribute", "NotFound");
+      oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
     }
   }
 }

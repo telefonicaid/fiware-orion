@@ -435,7 +435,7 @@ payload='{
         "temperature",
         "lightstatus"
     ],
-    "reference": "http://127.0.0.1:${LISTENER_PORT}/notify",
+    "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
     "duration": "PT5H",
     "notifyConditions": [
         {

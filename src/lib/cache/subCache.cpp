@@ -30,10 +30,11 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
 #include "common/sem.h"
 #include "common/string.h"
 #include "apiTypesV2/HttpInfo.h"
-#include "apiTypesV2/ngsiWrappers.h"
+#include "apiTypesV2/Subscription.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/SubscribeContextRequest.h"
@@ -74,9 +75,15 @@ volatile SubCacheState subCacheState = ScsIdle;
 *
 * EntityInfo::EntityInfo -
 */
-EntityInfo::EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern)
+EntityInfo::EntityInfo
+(
+  const std::string&  _entityId,
+  const std::string&  _entityType,
+  const std::string&  _isPattern,
+  bool                _isTypePattern
+)
 :
-entityId(_entityId), entityType(_entityType)
+entityId(_entityId), entityType(_entityType), isTypePattern(_isTypePattern)
 {
   isPattern    = (_isPattern == "true") || (_isPattern == "TRUE") || (_isPattern == "True");
 
@@ -89,6 +96,7 @@ entityId(_entityId), entityType(_entityType)
       alarmMgr.badInput(clientIp, "invalid regular expression for idPattern");
       isPattern = false;  // FIXME P6: this entity should not be let into the system. Must be stopped before.
                           //           Right here, best thing to do is simply to say it is not a regex
+      entityIdPatternToBeFreed = false;
     }
     else
     {
@@ -98,6 +106,27 @@ entityId(_entityId), entityType(_entityType)
   else
   {
     entityIdPatternToBeFreed = false;
+  }
+
+  if (isTypePattern)
+  {
+    // FIXME P5: recomp error should be captured? have a look to other usages of regcomp()
+    // in order to see how it works
+    if (regcomp(&entityTypePattern, _entityType.c_str(), REG_EXTENDED) != 0)
+    {
+      alarmMgr.badInput(clientIp, "invalid regular expression for typePattern");
+      isTypePattern = false;  // FIXME P6: this entity should not be let into the system. Must be stopped before.
+                          //           Right here, best thing to do is simply to say it is not a regex
+      entityTypePatternToBeFreed = false;
+    }
+    else
+    {
+      entityTypePatternToBeFreed = true;
+    }
+  }
+  else
+  {
+    entityTypePatternToBeFreed = false;
   }
 }
 
@@ -113,22 +142,44 @@ bool EntityInfo::match
   const std::string&  type
 )
 {
-  //
-  // If type non-empty - perfect match is mandatory
-  // If type is empty - always matches
-  //
-  if ((type != "") && (entityType != type) && (entityType != ""))
-  {
-    return false;
-  }
+  bool matchedType = false;
+  bool matchedId   = false;
 
+  // Check id
   if (isPattern)
   {
     // REGEX-comparison this->entityIdPattern VS id
-    return regexec(&entityIdPattern, id.c_str(), 0, NULL, 0) == 0;
+    matchedId =  (regexec(&entityIdPattern, id.c_str(), 0, NULL, 0) == 0);
+  }
+  else if (id == entityId)
+  {
+    matchedId =  true;
+  }
+  else
+  {
+    matchedId = false;
   }
 
-  return (id == entityId);
+  // short-circuit, optimization
+  if (matchedId)
+  {
+    // Check type
+    if (isTypePattern)
+    {
+      // REGEX-comparison this->entityTypePattern VS type
+      matchedType = (regexec(&entityTypePattern, type.c_str(), 0, NULL, 0) == 0);
+    }
+    else if ((type != "")  && (entityType != "") && (entityType != type))
+    {
+      matchedType = false;
+    }
+    else
+    {
+      matchedType = true;
+    }
+  }
+
+  return matchedId && matchedType;
 }
 
 
@@ -141,8 +192,14 @@ void EntityInfo::release(void)
 {
   if (entityIdPatternToBeFreed)
   {
-    regfree(&entityIdPattern);
+    regfree(&entityIdPattern);  // If regcomp fails it frees up itself (see glibc sources for details)
     entityIdPatternToBeFreed = false;
+  }
+
+  if (entityTypePatternToBeFreed)
+  {
+    regfree(&entityTypePattern);  // If regcomp fails it frees up itself (see glibc sources for details)
+    entityTypePatternToBeFreed = false;
   }
 }
 
@@ -157,6 +214,7 @@ void EntityInfo::present(const std::string& prefix)
   LM_T(LmtPresent, ("%sid:        %s", prefix.c_str(), entityId.c_str()));
   LM_T(LmtPresent, ("%sisPattern: %s", prefix.c_str(), FT(isPattern)));
   LM_T(LmtPresent, ("%stype:      %s", prefix.c_str(), entityType.c_str()));
+  LM_T(LmtPresent, ("%sisTypePattern: %s", prefix.c_str(), FT(isTypePattern)));
 }
 
 
@@ -183,7 +241,7 @@ typedef struct SubCache
 *
 * subCache -
 */
-static SubCache  subCache            = { NULL, NULL, 0 };
+static SubCache  subCache            = { NULL, NULL, 0, 0, 0, 0 };
 bool             subCacheActive      = false;
 bool             subCacheMultitenant = false;
 
@@ -196,7 +254,6 @@ bool             subCacheMultitenant = false;
 void subCacheInit(bool multitenant)
 {
   LM_T(LmtSubCache, ("Initializing subscription cache"));
-
   subCacheMultitenant = multitenant;
 
   subCache.head   = NULL;
@@ -206,6 +263,20 @@ void subCacheInit(bool multitenant)
 
   subCacheActive = true;
 }
+
+
+
+/* ****************************************************************************
+*
+* subCacheDisable -
+*
+*/
+#ifdef UNIT_TEST
+void subCacheDisable(void)
+{
+  subCacheActive = false;
+}
+#endif
 
 
 
@@ -235,23 +306,18 @@ int subCacheItems(void)
 */
 static bool attributeMatch(CachedSubscription* cSubP, const std::vector<std::string>& attrV)
 {
-  for (unsigned int ncvIx = 0; ncvIx < cSubP->notifyConditionVector.size(); ++ncvIx)
+  if (cSubP->notifyConditionV.size() == 0)
   {
-    NotifyCondition* ncP = cSubP->notifyConditionVector[ncvIx];
+    return true;
+  }
 
-    if (ncP->condValueList.size() == 0)
+  for (unsigned int ncvIx = 0; ncvIx < cSubP->notifyConditionV.size(); ++ncvIx)
+  {
+    for (unsigned int aIx = 0; aIx < attrV.size(); ++aIx)
     {
-      return true;
-    }
-
-    for (unsigned int cvIx = 0; cvIx < ncP->condValueList.size(); ++cvIx)
-    {
-      for (unsigned int aIx = 0; aIx < attrV.size(); ++aIx)
+      if (cSubP->notifyConditionV[ncvIx] == attrV[aIx])
       {
-        if (ncP->condValueList[cvIx] == attrV[aIx])
-        {
-          return true;
-        }
+        return true;
       }
     }
   }
@@ -515,8 +581,7 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
   }
   cSubP->attributes.clear();
 
-  cSubP->notifyConditionVector.release();
-  cSubP->notifyConditionVector.vec.clear();
+  cSubP->notifyConditionV.clear();
 
   cSubP->next = NULL;
 }
@@ -676,63 +741,41 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 */
 void subCacheItemInsert
 (
-  const char*                   tenant,
-  const char*                   servicePath,
-  const ngsiv2::HttpInfo&       httpInfo,
-  const EntityIdVector&         entityIdVector,
-  const AttributeList&          attributeList,
-  const NotifyConditionVector&  notifyConditionVector,
-  const char*                   subscriptionId,
-  int64_t                       expirationTime,
-  int64_t                       throttling,
-  RenderFormat                  renderFormat,
-  bool                          notificationDone,
-  int64_t                       lastNotificationTime,
-  StringFilter*                 stringFilterP,
-  StringFilter*                 mdStringFilterP,
-  const std::string&            status,
-  const std::string&            q,
-  const std::string&            geometry,
-  const std::string&            coords,
-  const std::string&            georel,
-  bool                          blacklist
+  const char*                        tenant,
+  const char*                        servicePath,
+  const ngsiv2::HttpInfo&            httpInfo,
+  const std::vector<ngsiv2::EntID>&  entIdVector,
+  const std::vector<std::string>&    attributes,
+  const std::vector<std::string>&    metadata,
+  const std::vector<std::string>&    conditionAttrs,
+  const char*                        subscriptionId,
+  int64_t                            expirationTime,
+  int64_t                            throttling,
+  RenderFormat                       renderFormat,
+  bool                               notificationDone,
+  int64_t                            lastNotificationTime,
+  int64_t                            lastNotificationSuccessTime,
+  int64_t                            lastNotificationFailureTime,
+  StringFilter*                      stringFilterP,
+  StringFilter*                      mdStringFilterP,
+  const std::string&                 status,
+  const std::string&                 q,
+  const std::string&                 geometry,
+  const std::string&                 coords,
+  const std::string&                 georel,
+  bool                               blacklist
 )
 {
   //
   // Add the subscription to the subscription cache.
-  // But only if any of the entities in entityIdVector is pattern based -
-  // AND it is a subscription of type ONCHANGE
   //
 
-  //
-  // 00. Check that the subscription is pattern based an ONCHANGE
-  //
-  bool onchange = false;
-
-  for (unsigned int ix = 0; ix < notifyConditionVector.size(); ++ix)
-  {
-    if (strcasecmp(notifyConditionVector[ix]->type.c_str(), ON_CHANGE_CONDITION) == 0)
-    {
-      onchange = true;
-      break;
-    }
-  }
-
-  if (!onchange)
-  {
-    return;
-  }
-
-
-  //
-  // Now allocate the subscription
-  //
   CachedSubscription* cSubP = new CachedSubscription();
   LM_T(LmtSubCache,  ("allocated CachedSubscription at %p", cSubP));
 
 
   //
-  // 1. First the non-complex values
+  // First the non-complex values
   //
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->servicePath           = strdup(servicePath);
@@ -740,6 +783,8 @@ void subCacheItemInsert
   cSubP->expirationTime        = expirationTime;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
+  cSubP->lastFailure           = lastNotificationFailureTime;
+  cSubP->lastSuccess           = lastNotificationSuccessTime;
   cSubP->renderFormat          = renderFormat;
   cSubP->next                  = NULL;
   cSubP->count                 = (notificationDone == true)? 1 : 0;
@@ -750,8 +795,14 @@ void subCacheItemInsert
   cSubP->expression.georel     = georel;
   cSubP->blacklist             = blacklist;
   cSubP->httpInfo              = httpInfo;
+  cSubP->notifyConditionV      = conditionAttrs;
+  cSubP->attributes            = attributes;
+  cSubP->metadata              = metadata;
 
 
+  //
+  // String filters
+  //
   std::string  errorString;
   if (stringFilterP != NULL)
   {
@@ -772,112 +823,32 @@ void subCacheItemInsert
     cSubP->expression.mdStringFilter.fill(mdStringFilterP, &errorString);
   }
 
-  LM_T(LmtSubCache, ("inserting a new sub in cache (%s). lastNotifictionTime: %lu",
-                     cSubP->subscriptionId, cSubP->lastNotificationTime));
 
 
   //
-  // 2. Then the values that have functions/methods for filling/parsing
+  // Convert all EntIds to EntityInfo
   //
-  cSubP->notifyConditionVector.fill(notifyConditionVector);
-
-
-  //
-  // 3. Convert all EntityIds to EntityInfo
-  //
-  for (unsigned int ix = 0; ix < entityIdVector.vec.size(); ++ix)
+  for (unsigned int ix = 0; ix < entIdVector.size(); ++ix)
   {
-    EntityId* eIdP;
+    const ngsiv2::EntID* eIdP = &entIdVector[ix];
+    std::string          isPattern      = (eIdP->id   == "")? "true" : "false";
+    bool                 isTypePattern  = (eIdP->type == "");
+    std::string          id             = (eIdP->id   == "")? eIdP->idPattern   : eIdP->id;
+    std::string          type           = (eIdP->type == "")? eIdP->typePattern : eIdP->type;
 
-    eIdP = entityIdVector.vec[ix];
-
-    EntityInfo* eP = new EntityInfo(eIdP->id, eIdP->type, eIdP->isPattern);
+    EntityInfo* eP = new EntityInfo(id, type, isPattern, isTypePattern);
 
     cSubP->entityIdInfos.push_back(eP);
   }
 
 
   //
-  // 4. Insert all attributes
-  //
-  for (unsigned int ix = 0; ix < attributeList.attributeV.size(); ++ix)
-  {
-    cSubP->attributes.push_back(attributeList.attributeV[ix]);
-  }
-
-
-  //
-  // 5. Now, insert the subscription in the cache
+  // Insert the subscription in the cache
   //
   LM_T(LmtSubCache, ("Inserting NEW sub '%s', lastNotificationTime: %lu",
                      cSubP->subscriptionId, cSubP->lastNotificationTime));
+
   subCacheItemInsert(cSubP);
-}
-
-
-
-/* ****************************************************************************
-*
-* subCacheItemInsert -
-*
-* NGSIv2 wrapper
-*
-*/
-void subCacheItemInsert
-(
-  const char*                        tenant,
-  const char*                        servicePath,
-  const ngsiv2::HttpInfo&            httpInfo,
-  const std::vector<ngsiv2::EntID>&  entities,
-  const std::vector<std::string>&    notifAttributes,
-  const std::vector<std::string>&    condAttributes,
-  const char*                        subscriptionId,
-  int64_t                            expiration,
-  int64_t                            throttling,
-  RenderFormat                       renderFormat,
-  bool                               notificationDone,
-  int64_t                            lastNotificationTime,
-  StringFilter*                      stringFilterP,
-  StringFilter*                      mdStringFilterP,
-  const std::string&                 status,
-  const std::string&                 q,
-  const std::string&                 geometry,
-  const std::string&                 coords,
-  const std::string&                 georel,
-  bool                               blacklist
-)
-{
-  NotifyConditionVector ncV;
-  EntityIdVector        enV;
-  AttributeList         attrL;
-
-  attrsStdVector2NotifyConditionVector(condAttributes, &ncV);
-  entIdStdVector2EntityIdVector(entities, &enV);
-  attrL.fill(notifAttributes);
-
-  subCacheItemInsert(tenant,
-                     servicePath,
-                     httpInfo,
-                     enV,
-                     attrL,
-                     ncV,
-                     subscriptionId,
-                     expiration,
-                     throttling,
-                     renderFormat,
-                     notificationDone,
-                     lastNotificationTime,
-                     stringFilterP,
-                     mdStringFilterP,
-                     status,
-                     q,
-                     geometry,
-                     coords,
-                     georel,
-                     blacklist);
-
-  enV.release();
-  ncV.release();
 }
 
 
@@ -978,6 +949,71 @@ void subCacheStatisticsReset(const char* by)
 }
 
 
+/* ****************************************************************************
+*
+* subCacheEntryPresent -
+*/
+void subCacheEntryPresent(CachedSubscription* cSubP)
+{
+  // FIXME P4: complete with the rest of fields in CachedSubscription
+
+  std::string entityIdInfo;
+  std::string attributes;
+  std::string metadata;
+  std::string notifyCondition;
+
+  for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
+  {
+    entityIdInfo +=  cSubP->entityIdInfos[ix]->entityId + "-" + cSubP->entityIdInfos[ix]->entityType;
+    if (ix != cSubP->entityIdInfos.size() -1)
+    {
+      entityIdInfo += ",";
+    }
+  }
+
+  for (unsigned int ix = 0; ix < cSubP->attributes.size(); ++ix)
+  {
+    attributes += cSubP->attributes[ix];
+    if (ix != cSubP->attributes.size() -1)
+    {
+      attributes += ",";
+    }
+  }
+
+  for (unsigned int ix = 0; ix < cSubP->metadata.size(); ++ix)
+  {
+    metadata += cSubP->metadata[ix];
+    if (ix != cSubP->metadata.size() -1)
+    {
+      metadata += ",";
+    }
+  }
+
+  for (unsigned int ix = 0; ix < cSubP->notifyConditionV.size(); ++ix)
+  {
+    notifyCondition += cSubP->notifyConditionV[ix];
+    if (ix != cSubP->notifyConditionV.size() -1)
+    {
+      notifyCondition += ",";
+    }
+  }
+
+  LM_T(LmtSubCache, ("o %s (tenant: %s, subservice: %s, entities: <%s>, attributes: <%s>, metadata: <%s>, "
+                     "notifyCondition: <%s>, LNT: %lu, count: %lu, status: %s, expiration: %lu, THR: %d)",
+                     cSubP->subscriptionId,
+                     cSubP->tenant,
+                     cSubP->servicePath,
+                     entityIdInfo.c_str(),
+                     attributes.c_str(),
+                     metadata.c_str(),
+                     notifyCondition.c_str(),
+                     cSubP->lastNotificationTime,
+                     cSubP->count,
+                     cSubP->status.c_str(),
+                     cSubP->expirationTime,
+                     cSubP->throttling));
+}
+
 
 /* ****************************************************************************
 *
@@ -991,12 +1027,7 @@ void subCachePresent(const char* title)
 
   while (cSubP != NULL)
   {
-    LM_T(LmtSubCache, ("o %s (tenant: %s, LNT: %lu, THR: %d)",
-                       cSubP->subscriptionId,
-                       cSubP->tenant,
-                       cSubP->lastNotificationTime,
-                       cSubP->throttling));
-
+    subCacheEntryPresent(cSubP);
     cSubP = cSubP->next;
   }
 
@@ -1019,9 +1050,23 @@ int subCacheItemRemove(CachedSubscription* cSubP)
   {
     if (current == cSubP)
     {
-      if (cSubP == subCache.head)  { subCache.head = cSubP->next; }
-      if (cSubP == subCache.tail)  { subCache.tail = prev;        }
-      if (prev != NULL)                 { prev->next         = cSubP->next; }
+      // Removing first item ?
+      if (cSubP == subCache.head)
+      {
+        subCache.head = cSubP->next;
+      }
+
+      // Removing last item?
+      if (cSubP == subCache.tail)
+      {
+        subCache.tail = prev;
+      }
+
+      // Removing middle item?
+      if (prev != NULL)
+      {
+        prev->next = cSubP->next;
+      }
 
       LM_T(LmtSubCache, ("in subCacheItemRemove, REMOVING '%s'", cSubP->subscriptionId));
       ++subCache.noOfRemoves;
@@ -1091,6 +1136,8 @@ typedef struct CachedSubSaved
 {
   int64_t  lastNotificationTime;
   int64_t  count;
+  int64_t  lastFailure;
+  int64_t  lastSuccess;
 } CachedSubSaved;
 
 
@@ -1099,14 +1146,15 @@ typedef struct CachedSubSaved
 *
 * subCacheSync -
 *
-* 1. Save subscriptionId, lastNotificationTime, and count for all items in cache (savedSubV)
+* 1. Save subscriptionId, lastNotificationTime, count, lastFailure, and lastSuccess for all items in cache (savedSubV)
 * 2. Refresh cache (count set to 0)
-* 3. Compare lastNotificationTime in savedSubV with the new cache-contents and:
+* 3. Compare lastNotificationTime/lastFailure/lastSuccess in savedSubV with the new cache-contents and:
 *    3.1 Update cache-items where 'saved lastNotificationTime' > 'cached lastNotificationTime'
 *    3.2 Remember this more correct lastNotificationTime (must be flushed to mongo) -
 *        by clearing out (set to 0) those lastNotificationTimes that are newer in cache
-* 4. Update 'count' for each item in savedSubV where count != 0
-* 5. Update 'lastNotificationTime' foreach item in savedSubV where lastNotificationTime != 0
+*    Same same with lastFailure and lastSuccess.
+* 4. Update 'count' for each item in savedSubV where non-zero
+* 5. Update 'lastNotificationTime/lastFailure/lastSuccess' for each item in savedSubV where non-zero
 * 6. Free the vector created in step 1 - savedSubV
 *
 * NOTE
@@ -1119,7 +1167,7 @@ typedef struct CachedSubSaved
 *   To fix this little problem, we have created a variable 'subCacheState' that is set to ScsSynchronizing while
 *   the sub-cache synchronization is working.
 *   In serviceRoutines/exitTreat.cpp this variable is checked and if iot is set to ScsSynchronizing, then a
-*   sleep for a few seconds is performed beofre the broker exits (this is only for DEBUG compilations).
+*   sleep for a few seconds is performed before the broker exits (this is only for DEBUG compilations).
 */
 void subCacheSync(void)
 {
@@ -1130,7 +1178,7 @@ void subCacheSync(void)
 
 
   //
-  // 1. Save subscriptionId, lastNotificationTime, and count for all items in cache
+  // 1. Save subscriptionId, lastNotificationTime, count, lastFailure, and lastSuccess for all items in cache
   //
   CachedSubscription* cSubP = subCache.head;
 
@@ -1150,6 +1198,8 @@ void subCacheSync(void)
 
     cssP->lastNotificationTime = cSubP->lastNotificationTime;
     cssP->count                = cSubP->count;
+    cssP->lastFailure          = cSubP->lastFailure;
+    cssP->lastSuccess          = cSubP->lastSuccess;
 
     savedSubV[cSubP->subscriptionId] = cssP;
     cSubP = cSubP->next;
@@ -1165,39 +1215,63 @@ void subCacheSync(void)
 
 
   //
-  // 3. Compare lastNotificationTime in savedSubV with the new cache-contents
+  // 3. Compare lastNotificationTime/lastFailure/lastSuccess in savedSubV with the new cache-contents
   //
   cSubP = subCache.head;
   while (cSubP != NULL)
   {
     CachedSubSaved* cssP = savedSubV[cSubP->subscriptionId];
-    if ((cssP != NULL) && (cssP->lastNotificationTime <= cSubP->lastNotificationTime))
+
+    if (cssP != NULL)
     {
-      // cssP->lastNotificationTime older than what's currently in DB => throw away
-      cssP->lastNotificationTime = 0;
+      if (cssP->lastNotificationTime <= cSubP->lastNotificationTime)
+      {
+        // cssP->lastNotificationTime is older than what's currently in DB => throw away
+        cssP->lastNotificationTime = 0;
+      }
+
+      if (cssP->lastFailure < cSubP->lastFailure)
+      {
+        // cssP->lastFailure is older than what's currently in DB => throw away
+        cssP->lastFailure = 0;
+      }
+
+      if (cssP->lastSuccess < cSubP->lastSuccess)
+      {
+        // cssP->lastSuccess is older than what's currently in DB => throw away
+        cssP->lastSuccess = 0;
+      }
     }
+
     cSubP = cSubP->next;
   }
 
 
   //
-  // 4. Update 'count' for each item in savedSubV where count != 0
-  // 5. Update 'lastNotificationTime' foreach item in savedSubV where lastNotificationTime != 0
+  // 4. Update 'count' for each item in savedSubV where non-zero
+  // 5. Update 'lastNotificationTime/lastFailure/lastSuccess' for each item in savedSubV where non-zero
   //
   cSubP = subCache.head;
   while (cSubP != NULL)
   {
     CachedSubSaved* cssP = savedSubV[cSubP->subscriptionId];
 
-    if (cssP == NULL)
+    if (cssP != NULL)
     {
-      cSubP = cSubP->next;
-      continue;
+      std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
+
+      mongoSubCountersUpdate(tenant,
+                             cSubP->subscriptionId,
+                             cssP->count,
+                             cssP->lastNotificationTime,
+                             cssP->lastFailure,
+                             cssP->lastSuccess);
+
+      // Keeping lastFailure and lastSuccess in sub cache
+      cSubP->lastFailure = cssP->lastFailure;
+      cSubP->lastSuccess = cssP->lastSuccess;
     }
 
-    std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
-
-    mongoSubCacheUpdate(tenant, cSubP->subscriptionId, cssP->count, cssP->lastNotificationTime);
     cSubP = cSubP->next;
   }
 
@@ -1257,4 +1331,65 @@ void subCacheStart(void)
     return;
   }
   pthread_detach(tid);
+}
+
+
+
+extern bool noCache;
+/* ****************************************************************************
+*
+* subCacheItemNotificationErrorStatus - 
+*
+* This function marks a subscription to be erroneous, i.e. notifications are
+* not working.
+* A timestamp for this last failure is set for the sub-item in the sub-cache  and
+* the consecutive number of notification errors for the subscription is incremented.
+*
+* If 'errors' == 0, then the subscription is marked as non-erroneous.
+*/
+void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::string& subscriptionId, int errors)
+{
+  if (noCache)
+  {
+    // The field 'count' has already been taken care of. Set to 0 in the calls to mongoSubCountersUpdate()
+
+    time_t now = time(NULL);
+
+    if (errors == 0)
+    {
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, -1, now);  // lastFailure == -1
+    }
+    else
+    {
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, now, -1);  // lastSuccess == -1, count == 0
+    }
+
+    return;
+  }
+
+  time_t now = time(NULL);
+
+  cacheSemTake(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
+
+  CachedSubscription* subP = subCacheItemLookup(tenant.c_str(), subscriptionId.c_str());
+
+  if (subP == NULL)
+  {
+    cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
+    const char* errorString = "intent to update error status of non-existing subscription";
+
+    alarmMgr.badInput(clientIp, errorString);
+    return;
+  }
+
+  if (errors == 0)
+  {
+    subP->lastSuccess  = now;
+  }
+  else
+  {
+    subP->lastFailure  = now;
+  }
+
+  cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
 }

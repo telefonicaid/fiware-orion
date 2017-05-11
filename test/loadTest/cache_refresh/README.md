@@ -68,13 +68,25 @@ These tests are used to verify the cache refresh in a balanced system.
   
   Parameters:
   ```
-     <url>: host and port used by requests_listener.py script (MANDATORY)
-     -reset: it is used to reset the listener before starting the test (total requests and TPS)  (Optional)
+     --listener <endpoint> : host and port used by requests_listener.py script [OPTIONAL] (default: localhost:8090)
+     --cb <endpoint> : host and port of CB used [OPTIONAL] (default: None)
+     -reset: it is used to reset the listener before starting the test (total requests and TPS)  [OPTIONAL]
+     -u show the usage [OPTIONAL]
+  ```
+  
+  Dependency:
+  ```
+  jq is a lightweight and flexible command-line JSON processor. It is used for the json with statistics returned from ContextBroker.
+       steps to install jq:
+      ---------------------
+           wget http://stedolan.github.io/jq/download/linux64/jq
+           chmod +x ./jq
+           sudo cp jq /usr/local/bin
   ```
   
   Example:
   ```
-     ./reqs_x_secs..sh localhost:4567 -reset  
+     ./reqs_x_secs..sh --listener localhost:4567 --cb localhost:1026 -reset  
   ```
   
 - **subscription_manager.py**: create, update or delete a subscription associated to appends generated with Jmeter script `append_entities_long_time_v1.0.jmx`.

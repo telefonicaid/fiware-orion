@@ -1,0 +1,310 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Get entity dates using options parameter
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01.  Create entity at t_0
+# 02a. Get entity with dates
+# 02b. Get entity with dates keyValues
+# 02c. Get entity with dates values
+# 03.  Check dateCreate == t_0 and dateModified == t_0
+# 04.  Modify entity at t_1
+# 05a. Get entity with dates
+# 05b. Get entity with dates keyValues
+# 05c. Get entity with dates values
+# 06.  Check dateCreate == t_0 and dateModified == t_1
+#
+
+echo "01. Create entity at t_0"
+echo "========================"
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": "foo"
+}'
+T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "02a. Get entity with dates"
+echo "=========================="
+orionCurl --url /v2/entities/E?options=dateCreated,dateModified
+echo
+echo
+
+
+echo "02b. Get entity with dates keyValues"
+echo "===================================="
+orionCurl --url /v2/entities/E?options=dateCreated,dateModified,keyValues
+CRE_DATE=$(echo "$_response" | python -mjson.tool | grep dateCreated | awk -F '"' '{print $4}')
+MOD_DATE=$(echo "$_response" | python -mjson.tool | grep dateModified | awk -F '"' '{print $4}')
+echo
+echo
+
+
+echo "02c. Get entity with dates values"
+echo "================================="
+orionCurl --url '/v2/entities/E?options=dateCreated,dateModified,values&attrs=dateCreated,dateModified,A'
+echo
+echo
+
+
+echo "03. Check dateCreate == t_0 and dateModified == t_0"
+echo "==================================================="
+if [ "$CRE_DATE" == "$T_0" ]
+then
+  echo "dateCreated: t_0"
+else
+  echo "dateCreated: not t_0 ($CRE_DATE != $T_0)"
+fi
+if [ "$MOD_DATE" == "$T_0" ]
+then
+  echo "dateModified: t_0"
+else
+  echo "dateModified: not t_0 ($MOD_DATE != $T_0)"
+fi
+echo
+echo
+
+
+sleep 2s
+
+
+echo "04. Modify entity at t_1"
+echo "========================"
+payload='{
+  "value": "bar"
+}'
+T_1=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+orionCurl --url '/v2/entities/E/attrs/A' -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "05a. Get entity with dates"
+echo "=========================="
+orionCurl --url /v2/entities/E?options=dateCreated,dateModified
+echo
+echo
+
+
+echo "05b. Get entity with dates keyValues"
+echo "===================================="
+orionCurl --url /v2/entities/E?options=dateCreated,dateModified,keyValues
+CRE_DATE=$(echo "$_response" | python -mjson.tool | grep dateCreated | awk -F '"' '{print $4}')
+MOD_DATE=$(echo "$_response" | python -mjson.tool | grep dateModified | awk -F '"' '{print $4}')
+echo
+echo
+
+
+echo "05c. Get entity with dates values"
+echo "================================="
+orionCurl --url '/v2/entities/E?options=dateCreated,dateModified,values&attrs=dateCreated,dateModified,A'
+echo
+echo
+
+
+echo "06. Check dateCreate == t_0 and dateModified == t_1"
+echo "==================================================="
+if [ "$CRE_DATE" == "$T_0" ]
+then
+  echo "dateCreated: t_0"
+else
+  echo "dateCreated: not t_0 ($CRE_DATE != $T_0)"
+fi
+if [ "$MOD_DATE" == "$T_1" ]
+then
+  echo "dateModified: t_1"
+else
+  echo "dateModified: not t_1 ($MOD_DATE != $T_1)"
+fi
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity at t_0
+========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02a. Get entity with dates
+==========================
+HTTP/1.1 200 OK
+Content-Length: 234
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Text",
+        "value": "foo"
+    },
+    "dateCreated": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(.*)"
+    },
+    "dateModified": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(.*)"
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+02b. Get entity with dates keyValues
+====================================
+HTTP/1.1 200 OK
+Content-Length: 112
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": "foo",
+    "dateCreated": "REGEX(.*)",
+    "dateModified": "REGEX(.*)",
+    "id": "E",
+    "type": "T"
+}
+
+
+02c. Get entity with dates values
+=================================
+HTTP/1.1 200 OK
+Content-Length: 59
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    "REGEX(.*)",
+    "REGEX(.*)",
+    "foo"
+]
+
+
+03. Check dateCreate == t_0 and dateModified == t_0
+===================================================
+dateCreated: t_0
+dateModified: t_0
+
+
+04. Modify entity at t_1
+========================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05a. Get entity with dates
+==========================
+HTTP/1.1 200 OK
+Content-Length: 234
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Text",
+        "value": "bar"
+    },
+    "dateCreated": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(.*)"
+    },
+    "dateModified": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(.*)"
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+05b. Get entity with dates keyValues
+====================================
+HTTP/1.1 200 OK
+Content-Length: 112
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": "bar",
+    "dateCreated": "REGEX(.*)",
+    "dateModified": "REGEX(.*)",
+    "id": "E",
+    "type": "T"
+}
+
+
+05c. Get entity with dates values
+=================================
+HTTP/1.1 200 OK
+Content-Length: 59
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    "REGEX(.*)",
+    "REGEX(.*)",
+    "bar"
+]
+
+
+06. Check dateCreate == t_0 and dateModified == t_1
+===================================================
+dateCreated: t_0
+dateModified: t_1
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

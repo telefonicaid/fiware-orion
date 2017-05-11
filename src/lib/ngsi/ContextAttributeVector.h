@@ -30,7 +30,6 @@
 
 #include "common/RenderFormat.h"
 #include "ngsi/ContextAttribute.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -56,24 +55,21 @@ typedef struct ContextAttributeVector
   ContextAttribute*  operator[](unsigned int ix) const;
 
 
-  std::string        check(ConnectionInfo* ciP,
-                           RequestType          requestType,
-                           const std::string&   indent,
-                           const std::string&   predetectedError,
-                           int                  counter);
+  std::string        check(ApiVersion apiVersion, RequestType requestType);
 
-  std::string        render(ConnectionInfo*     ciP,
+  std::string        render(ApiVersion          apiVersion,
+                            bool                asJsonObject,
                             RequestType         requestType,
                             const std::string&  indent,
                             bool                comma       = false,
                             bool                omitValue   = false,
                             bool                attrsAsName = false);
 
-  std::string        toJson(bool                             isLastElement,
-                            RenderFormat                     renderFormat,
+  std::string        toJson(RenderFormat                     renderFormat,
                             const std::vector<std::string>&  attrsFilter,
-                            bool                             blacklist = false) const;
-  std::string        toJsonTypes();
+                            const std::vector<std::string>&  metadataV,
+                            bool                             blacklist) const;
+  std::string        toJsonTypes(void);
 
 } ContextAttributeVector;
 

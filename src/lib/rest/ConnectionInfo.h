@@ -30,6 +30,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <sys/time.h>
 
 #include "logMsg/logMsg.h"
 
@@ -58,14 +59,13 @@ public:
     inMimeType             (JSON),
     outMimeType            (JSON),
     tenant                 (""),
-    servicePath            (""),
     payload                (NULL),
     payloadSize            (0),
     callNo                 (1),
     parseDataP             (NULL),
     port                   (0),
     ip                     (""),
-    apiVersion             ("v1"),
+    apiVersion             (V1),
     inCompoundValue        (false),
     compoundValueP         (NULL),
     compoundValueRoot      (NULL),
@@ -80,14 +80,13 @@ public:
     inMimeType             (JSON),
     outMimeType            (_outMimeType),
     tenant                 (""),
-    servicePath            (""),
     payload                (NULL),
     payloadSize            (0),
     callNo                 (1),
     parseDataP             (NULL),
     port                   (0),
     ip                     (""),
-    apiVersion             ("v1"),
+    apiVersion             (V1),
     inCompoundValue        (false),
     compoundValueP         (NULL),
     compoundValueRoot      (NULL),
@@ -105,14 +104,13 @@ public:
     method                 (_method),
     version                (_version),
     tenant                 (""),
-    servicePath            (""),
     payload                (NULL),
     payloadSize            (0),
     callNo                 (1),
     parseDataP             (NULL),
     port                   (0),
     ip                     (""),
-    apiVersion             ("v1"),
+    apiVersion             (V1),
     inCompoundValue        (false),
     compoundValueP         (NULL),
     compoundValueRoot      (NULL),
@@ -148,7 +146,6 @@ public:
   std::string                charset;
   std::string                tenantFromHttpHeader;
   std::string                tenant;
-  std::string                servicePath;
   std::vector<std::string>   servicePathV;
   HttpHeaders                httpHeaders;
   char*                      payload;
@@ -159,9 +156,10 @@ public:
   ParseData*                 parseDataP;
   unsigned short             port;
   std::string                ip;
-  std::string                apiVersion;
+  ApiVersion                 apiVersion;
   RequestType                requestType;
   std::string                acceptHeaderError;
+  struct timeval             transactionStart;  // For metrics
 
   std::map<std::string, std::string>   uriParam;
   std::map<std::string, bool>          uriParamOptions;

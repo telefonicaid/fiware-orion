@@ -27,7 +27,10 @@
 */
 #include <string>
 #include <sstream>
+#include <iomanip>
 #include <vector>
+
+#include "common/limits.h"
 
 // the same macro in parseArg library
 #define FT(x) (x == true)? "true" : "false"
@@ -51,7 +54,6 @@ extern int stringSplit(const std::string& in, char delimiter, std::vector<std::s
 /* ****************************************************************************
 *
 * parseUrl -
-*
 */
 extern bool parseUrl
 (
@@ -61,6 +63,14 @@ extern bool parseUrl
   std::string&        path,
   std::string&        protocol
 );
+
+
+
+/* ****************************************************************************
+*
+* validUrl - check validity of a URL
+*/
+extern bool validUrl(const std::string& url);
 
 
 
@@ -159,11 +169,24 @@ extern bool str2double(const char* s, double* dP = NULL);
 
 /* ****************************************************************************
 *
+* decimalDigits
+*
+*/
+extern unsigned int decimalDigits(double d);
+
+
+
+/* ****************************************************************************
+*
 * toString -
 *
 * If the generic ostringstream-based implementation would have performance
 * problems in the future, a set of per-type specialized functions could be
 * used without changing the toString() usage interface from existing callers
+*
+* In fact, we currently have an specialized function for float, although not
+* due to performance (but due to special treatment of decimal numbers in the
+* float case)
 *
 */
 template <typename T> std::string toString(T t)
@@ -175,6 +198,8 @@ template <typename T> std::string toString(T t)
   return ss.str();
 }
 
+template <> std::string toString(float f);
+
 
 
 /*****************************************************************************
@@ -184,5 +209,12 @@ template <typename T> std::string toString(T t)
 */
 extern std::string isodate2str(long long timestamp);
 
+
+
+/* ****************************************************************************
+*
+* toLowercase - convert string to lowercase
+*/
+extern void toLowercase(char* s);
 
 #endif  // SRC_LIB_COMMON_STRING_H_

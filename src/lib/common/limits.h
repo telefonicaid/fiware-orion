@@ -64,10 +64,37 @@
 * Others -
 *
 */
-#define IP_LENGTH_MAX           15    // Based on xxx.xxx.xxx.xxx
-#define STRING_SIZE_FOR_INT     16    // Room enough for an integer
-#define STRING_SIZE_FOR_DOUBLE  64    // Room enough for a double
-#define CORRELATOR_ID_SIZE      36    // Max size of a UUIDv4 string
+#define IP_LENGTH_MAX           15     // Based on xxx.xxx.xxx.xxx
+#define STRING_SIZE_FOR_INT     16     // Room enough for an integer
+#define STRING_SIZE_FOR_DOUBLE  64     // Room enough for a double
+#define CORRELATOR_ID_SIZE      36     // Max size of a UUIDv4 string
+#define MAX_PORT                65535  // Max port number (== 0xFFFF)
+
+
+
+/* *****************************************************************************
+*
+* DB_AND_SERVICE_NAME_MAX_LEN - 
+*
+* Max name length of a database name for a tenant:
+* Remember the database name is created like this:
+*   orion-<tenant>
+*
+* 'orion' is the default database name prefix, but this
+* string is configurable via CLI.
+* However, its maximum allowed length is SERVICE_NAME_MAX_LEN, so
+* this we can always use.
+*
+* Now:
+*   DB_NAME_MAX_LEN + 1 + SERVICE_NAME_MAX_LEN + 1:
+*
+*     DB_NAME_MAX_LEN:      'orion'
+*     1:                    '-'
+*     SERVICE_NAME_MAX_LEN: tenant name, via HTTP header 'Fiware-Service' 
+*     1:                    zero-termination of the string
+* 
+*/
+#define DB_AND_SERVICE_NAME_MAX_LEN     (DB_NAME_MAX_LEN + 1 + SERVICE_NAME_MAX_LEN + 1)
 
 
 
@@ -102,16 +129,6 @@
 * STATIC_BUFFER_SIZE - to avoid mallocs for "smaller" requests
 */
 #define STATIC_BUFFER_SIZE (32 * 1024) // 32 KB 
-
-
-
-/* ****************************************************************************
-*
-* CONSTANTS RESTINIT - 
-*/ 
-#define   DEFAULT_CONNECTION_MEM        64
-#define   DEFAULT_MAX_CONNECTIONS       128
-#define   DEFAULT_MHD_THREAD_POOLSIZE   128
 
 
 
@@ -191,5 +208,15 @@
 * MAX_DESCRIPTION_LENGTH -
 */
 #define MAX_DESCRIPTION_LENGTH  1024
+
+
+
+/* ****************************************************************************
+*
+* Precision constants -
+*/
+#define PRECISION_DIGITS  9
+#define PRECISION         0.000000001  // it corresponds to 9 digits
+
 
 #endif  // SRC_LIB_COMMON_LIMITS_H_

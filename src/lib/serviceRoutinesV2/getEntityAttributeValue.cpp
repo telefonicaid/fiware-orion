@@ -39,6 +39,7 @@
 #include "serviceRoutinesV2/getEntityAttribute.h"
 #include "parse/forbiddenChars.h"
 #include "rest/OrionError.h"
+#include "rest/uriParamNames.h"
 
 
 
@@ -46,7 +47,7 @@
 *
 * getEntityAttributeValue -
 *
-* GET /v2/entities/<id>/attrs/<attrName>
+* GET /v2/entities/<id>/attrs/<attrName>/value
 *
 * Payload In:  None
 * Payload Out: Entity Attribute
@@ -69,7 +70,7 @@ std::string getEntityAttributeValue
 
   if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL) || (forbiddenIdChars(ciP->apiVersion, compV[4].c_str() , NULL)))
   {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
+    OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
     return oe.toJson();
   }
@@ -103,13 +104,22 @@ std::string getEntityAttributeValue
       // Do not use attribute name, change to 'value'
       attribute.pcontextAttribute->name = "value";
 
-      TIMED_RENDER(answer = attribute.render(ciP, EntityAttributeValueRequest, false));
+      TIMED_RENDER(answer = attribute.render(ciP->apiVersion,
+                                             ciP->httpHeaders.accepted("text/plain"),
+                                             ciP->httpHeaders.accepted("application/json"),
+                                             ciP->httpHeaders.outformatSelect(),
+                                             &(ciP->outMimeType),
+                                             &(ciP->httpStatusCode),
+                                             ciP->uriParamOptions[OPT_KEY_VALUES],
+                                             ciP->uriParam[URI_PARAM_METADATA],
+                                             EntityAttributeValueRequest,
+                                             false));
     }
     else
     {
       if (attribute.pcontextAttribute->compoundValueP != NULL)
       {
-        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->render(ciP, ""));
+        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->render(ciP->apiVersion, ""));
 
         if (attribute.pcontextAttribute->compoundValueP->isObject())
         {
@@ -122,7 +132,7 @@ std::string getEntityAttributeValue
       }
       else
       {
-        if (attributeType == DATE_TYPE)
+        if ((attributeType == DATE_TYPE) || (attributeType == DATE_TYPE_ALT))
         {
           TIMED_RENDER(answer = isodate2str(attribute.pcontextAttribute->numberValue));
         }

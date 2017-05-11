@@ -21,7 +21,7 @@
 # ------------------------------------------------------------------------------
 #
 # Example execution:
-#   scripts/build/release.sh 0.4.0 4 2.3.3 4 changelog
+#   scripts/build/release.sh 0.4.0 1 changelog
 #
 progName=$0
 
@@ -38,7 +38,7 @@ function usage
 
 
 #
-# Chewcking command line parameters
+# Checking command line parameters
 #
 if [ "$1" == "-u" ]
 then
@@ -49,6 +49,22 @@ if [ $# != 3 ]
 then
   usage
 fi
+
+
+#
+# Make sure there are no occurrences of LM_TMP in the source code
+#
+find . -name "*.cpp" -exec grep LM_TMP {} /dev/null \; | grep -v '// LM_TMP'              > /tmp/LM_TMP
+find . -name "*.h"   -exec grep LM_TMP {} /dev/null \; | grep -v src/lib/logMsg/logMsg.h >> /tmp/LM_TMP
+lines=$(wc -l /tmp/LM_TMP)
+\rm -f /tmp/LM_TMP
+
+if [ "$lines" != "0 /tmp/LM_TMP" ]
+then
+  echo "occurrences of LM_TMP found - release aborted"
+  exit 1
+fi
+
 
 
 #
@@ -140,13 +156,8 @@ echo "new version:     $NEW_VERSION"
 #
 # Edit files that depend on the current version (which just changed)
 #
-sed "s/$currentVersion/$NEW_VERSION/" test/functionalTest/cases/0000_version_operation/version_via_rest.test > /tmp/version_via_rest.test
-sed "s/$currentVersion/$NEW_VERSION/" test/functionalTest/cases/0000_cli/version.test                        > /tmp/version.test
-sed "s/$currentVersion/$NEW_VERSION/" src/app/contextBroker/version.h        > /tmp/version.h
-
-mv /tmp/version_via_rest.test  test/functionalTest/cases/0000_version_operation/version_via_rest.test
-mv /tmp/version.test           test/functionalTest/cases/0000_cli/version.test
-mv /tmp/version.h              src/app/contextBroker/version.h
+sed "s/$currentVersion/$NEW_VERSION/" src/app/contextBroker/version.h > /tmp/version.h
+mv /tmp/version.h src/app/contextBroker/version.h
 
 
 # Clean the inter-release changes file
@@ -157,44 +168,38 @@ touch CHANGES_NEXT_RELEASE
 # dev release sets 'latest' and not 'X.Y.Z-next"
 if [ "$BROKER_RELEASE" != "dev" ]
 then
-  sed "s/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=latest)](http:\/\/fiware-orion.readthedocs.org\/en\/latest\/?badge=latest)/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=$NEW_VERSION)](http:\/\/fiware-orion.readthedocs.org\/en\/$NEW_VERSION\/?badge=$NEW_VERSION)/" README.md > /tmp/README.md
+  sed "s/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=latest)](http:\/\/fiware-orion.readthedocs.io\/en\/latest\/?badge=latest)/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=$NEW_VERSION)](http:\/\/fiware-orion.readthedocs.io\/en\/$NEW_VERSION\/?badge=$NEW_VERSION)/" README.md > /tmp/README.md
 else
-  sed "s/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=$currentVersion)](http:\/\/fiware-orion.readthedocs.org\/en\/$currentVersion\/?badge=$currentVersion)/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=latest)](http:\/\/fiware-orion.readthedocs.org\/en\/latest\/?badge=latest)/" README.md > /tmp/README.md
+  sed "s/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=$currentVersion)](http:\/\/fiware-orion.readthedocs.io\/en\/$currentVersion\/?badge=$currentVersion)/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=latest)](http:\/\/fiware-orion.readthedocs.io\/en\/latest\/?badge=latest)/" README.md > /tmp/README.md
 fi
 mv /tmp/README.md README.md
 
 # Adjust Dockerfile GIT_REV_ORION. Note that the procedure is not symmetric (like in version.h), as
-# dev release sets 'develop' and not 'X.Y.Z-next"
+# dev release sets 'master' and not 'X.Y.Z-next"
 if [ "$BROKER_RELEASE" != "dev" ]
 then
-  sed "s/ENV GIT_REV_ORION develop/ENV GIT_REV_ORION $NEW_VERSION/" docker/Dockerfile > /tmp/Dockerfile
+  sed "s/ENV GIT_REV_ORION master/ENV GIT_REV_ORION $NEW_VERSION/" docker/Dockerfile > /tmp/Dockerfile
 else
-  sed "s/ENV GIT_REV_ORION $currentVersion/ENV GIT_REV_ORION develop/" docker/Dockerfile > /tmp/Dockerfile
+  sed "s/ENV GIT_REV_ORION $currentVersion/ENV GIT_REV_ORION master/" docker/Dockerfile > /tmp/Dockerfile
 fi
 mv /tmp/Dockerfile docker/Dockerfile
 
 #
-# Do the git stuff only if we are in develop branch
+# Do the git stuff only if we are in master branch
 #
 CURRENT_BRANCH=$(git branch | grep '^*' | cut -c 3-10)
-if [ "$CURRENT_BRANCH" == "develop" ]
+if [ "$CURRENT_BRANCH" == "master" ]
 then
     git add rpm/SPECS/contextBroker.spec
     git add src/app/contextBroker/version.h
-    git add test/functionalTest/cases/0000_cli/version.test
-    git add test/functionalTest/cases/0000_version_operation/version_via_rest.test
     git add CHANGES_NEXT_RELEASE
     git add README.md
     git add docker/Dockerfile
     git commit -m "Step: $currentVersion -> $NEW_VERSION"
-    git push origin develop
+    git push origin master
     # We do the tag only and merge to master only in the case of  non "dev" release
     if [ "$BROKER_RELEASE" != "dev" ]
     then
-       git checkout master
-       git pull
-       git merge develop
-       git push origin master
        git checkout -b release/$NEW_VERSION
        git tag $NEW_VERSION
        git push --tags origin release/$NEW_VERSION
@@ -207,5 +212,5 @@ then
        git checkout $CURRENT_BRANCH
     fi
 else
-    echo "Your current branch is $CURRENT_BRANCH. You need to be at develop branch to do the final part of the process"
+    echo "Your current branch is $CURRENT_BRANCH. You need to be at master branch to do the final part of the process"
 fi

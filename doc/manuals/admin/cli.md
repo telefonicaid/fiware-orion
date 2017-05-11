@@ -76,17 +76,18 @@ The list of available options is the following:
 -   **-https**. Work in secure HTTP mode (See also `-cert` and `-key`).
 -   **-cert**. Certificate file for https. Use an absolute
     file path. Have a look at [this
-    script](https://github.com/telefonicaid/fiware-orion/blob/master/scripts/httpsPrepare.sh)
+    script](https://github.com/telefonicaid/fiware-orion/blob/master/test/functionalTest/httpsPrepare.sh)
     for an example on how to generate this file.
 -   **-key**. Private server key file for https. Use an absolute
     file path. Have a look at [this
-    script](https://github.com/telefonicaid/fiware-orion/blob/master/scripts/httpsPrepare.sh)
+    script](https://github.com/telefonicaid/fiware-orion/blob/master/test/functionalTest/httpsPrepare.sh)
     for an example on how to generate this file.
 -   **-logDir <dir\>**. Specifies the directory to use for the contextBroker log file.
 -   **-logAppend**. If used, the log lines are appended to the existing
     contextBroker log file, instead of starting with an empty log file.
 -   **-logLevel**. Select initial logging level, supported levels:
-    - NONE    (suppress ALL log output, including errors),
+    - NONE    (suppress ALL log output, including fatal error messages),
+    - FATAL   (show only fatal error messages),
     - ERROR   (show only error messages),
     - WARN    (show error and warning messages - this is the default setting),
     - INFO    (show error, warning and informational messages),
@@ -100,7 +101,7 @@ The list of available options is the following:
     be changed dynamically using the [management REST
     interface](management_api.md). Details of the
     available tracelevels and their values can be found
-    [here](https://github.com/telefonicaid/fiware-orion/blob/develop/src/lib/logMsg/traceLevels.h)
+    [here](https://github.com/telefonicaid/fiware-orion/blob/master/src/lib/logMsg/traceLevels.h)
     (as a C struct).
 -   **-fg**. Runs broker in foreground (useful for debugging). Log output is printed on standard output
     (in addition to the log file, but using a simplified format).
@@ -110,6 +111,8 @@ The list of available options is the following:
     broker process.
 -   **-httpTimeout <interval>**. Specifies the timeout in milliseconds
     for forwarding messages and for notifications.
+-   **-reqTimeout <interval>**. Specifies the timeout in seconds
+    for REST connections. Note that the default value is zero, i.e., no timeout (wait forever).
 -   **-cprForwardLimit**. Maximum number of forwarded requests to Context Providers for a single client request
     (default is no limit). Use 0 to disable Context Providers forwarding completely.
 -   **-corsOrigin <domain>**. Configures CORS for GET requests,
@@ -130,15 +133,15 @@ The list of available options is the following:
       URL path will reuse the connection, saving HTTP connection time.
     * In threadpool mode, notifications are enqueued into a queue of size `q` and `n` threads take the notifications
       from the queue and perform the outgoing requests asynchronously. Please have a look at the
-      [threadpool considerations](perf_tuning.md#thread-pool-considerations) section if you want to use this mode.
+      [thread model](perf_tuning.md#orion-thread-model-and-its-implications) section if you want to use this mode.
 -   **-simulatedNotification**. Notifications are not sent, but recorded internally and shown in the 
     [statistics](statistics.md) operation (`simulatedNotifications` counter). This is not aimed for production
     usage, but it is useful for debugging to calculate a maximum upper limit in notification rate from a CB
     internal logic point of view.
 -   **-connectionMemory**. Sets the size of the connection memory buffer (in kB) per connection used internally
     by the HTTP server library. Default value is 64 kB.
--   **-maxConnections**. Maximum number of simultaneous connections. Default value is "unlimited" (limited by 
-    max file descriptors of operating system).
+-   **-maxConnections**. Maximum number of simultaneous connections. Default value is 1020, for legacy reasons,
+    while the lower limit is 1 and there is no upper limit (limited by max file descriptors of the operating system).
 -   **-reqPoolSize**. Size of thread pool for incoming connections. Default value is 0, meaning *no thread pool*.
 -   **-statCounters**, **-statSemWait**, **-statTiming** and **-statNotifQueue**. Enable statistics
     generation. See [statistics documentation](statistics.md).
@@ -151,3 +154,8 @@ The list of available options is the following:
 -   **-disableCustomNotifications**. Disabled NGSIv2 custom notifications. In particular:
     * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
     * No `${...}` macro substitution is performed.
+-   **-logForHumans**. To make the traces to standard out formated for humans (note that the traces in the log file are not affected)
+-   **-disableMetrics**. To turn off the 'metrics' feature. Gathering of metrics is a bit costly, as system calls and semaphores are involved.
+    Use this parameter to start the broker without metrics overhead.
+-   **-insecureNotif**. Allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates. This is similar
+    to the `-k` or `--insecure` parameteres of the curl command.

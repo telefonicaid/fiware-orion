@@ -81,7 +81,7 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>/att
     Then verify that receive an "OK" http code
     And verify headers in response
       | parameter         | value      |
-      | fiware-correlator | [a-f0-9-]* |
+      | Fiware-Correlator | [a-f0-9-]* |
     And verify that attributes in an entity by ID are returned
 
   # --- attrs query parameter ---

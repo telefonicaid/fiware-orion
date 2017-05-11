@@ -62,12 +62,11 @@ SubscribeContextResponse::SubscribeContextResponse(StatusCode& errorCode)
 *
 * SubscribeContextResponse::render - 
 */
-std::string SubscribeContextResponse::render(RequestType requestType, const std::string& indent)
+std::string SubscribeContextResponse::render(const std::string& indent)
 {
   std::string out     = "";
-  std::string tag     = "subscribeContextResponse";
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent);
 
   if (subscribeError.errorCode.code == SccNone)
   {

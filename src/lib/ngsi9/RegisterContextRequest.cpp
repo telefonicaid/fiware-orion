@@ -42,7 +42,7 @@
 *
 * RegisterContextRequest::render - 
 */
-std::string RegisterContextRequest::render(RequestType requestType, const std::string& indent)
+std::string RegisterContextRequest::render(const std::string& indent)
 {
   std::string  out                                 = "";
   bool         durationRendered                    = duration.get() != "";
@@ -51,7 +51,7 @@ std::string RegisterContextRequest::render(RequestType requestType, const std::s
   bool         commaAfterDuration                  = registrationIdRendered;
   bool         commaAfterContextRegistrationVector = registrationIdRendered || durationRendered;
 
-  out += startTag2(indent, "", false, false);
+  out += startTag(indent);
 
   out += contextRegistrationVector.render(      indent + "  ", commaAfterContextRegistrationVector);
   out += duration.render(                       indent + "  ", commaAfterDuration);
@@ -68,7 +68,7 @@ std::string RegisterContextRequest::render(RequestType requestType, const std::s
 *
 * RegisterContextRequest::check - 
 */
-std::string RegisterContextRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::string& indent, const std::string& predetectedError, int counter)
 {
   RegisterContextResponse  response(this);
   std::string              res;
@@ -82,8 +82,8 @@ std::string RegisterContextRequest::check(ConnectionInfo* ciP, RequestType reque
   {
     alarmMgr.badInput(clientIp, "empty contextRegistration list");
     response.errorCode.fill(SccBadRequest, "Empty Context Registration List");
-  }
-  else if (((res = contextRegistrationVector.check(ciP, RegisterContext, indent, predetectedError, counter)) != "OK") ||
+  } 
+  else if (((res = contextRegistrationVector.check(apiVersion, RegisterContext, indent, predetectedError, counter)) != "OK") ||
            ((res = duration.check(RegisterContext, indent, predetectedError, counter))                  != "OK") ||
            ((res = registrationId.check(RegisterContext, indent, predetectedError, counter))            != "OK"))
   {
@@ -95,7 +95,7 @@ std::string RegisterContextRequest::check(ConnectionInfo* ciP, RequestType reque
     return "OK";
   }
 
-  return response.render(RegisterContext, indent);
+  return response.render(indent);
 }
 
 

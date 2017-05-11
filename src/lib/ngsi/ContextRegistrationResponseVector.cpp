@@ -52,14 +52,13 @@ void ContextRegistrationResponseVector::push_back(ContextRegistrationResponse* i
 std::string ContextRegistrationResponseVector::render(const std::string& indent, bool comma)
 {
   std::string  out = "";
-  std::string  key = "contextRegistrationResponses";
 
   if (vec.size() == 0)
   {
     return "";
   }
 
-  out += startTag2(indent, key, true, true);
+  out += startTag(indent, "contextRegistrationResponses", true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -138,7 +137,7 @@ unsigned int ContextRegistrationResponseVector::size(void)
 */
 std::string ContextRegistrationResponseVector::check
 (
-  ConnectionInfo*     ciP,
+  ApiVersion          apiVersion,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,
@@ -149,7 +148,7 @@ std::string ContextRegistrationResponseVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType, indent, predetectedError, counter)) != "OK")
     {
       return res;
     }

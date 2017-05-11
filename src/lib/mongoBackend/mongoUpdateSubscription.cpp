@@ -202,7 +202,7 @@ static void setEntities(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
   if (subUp.subjectProvided && !subUp.fromNgsiv1)
   {
     // NGSIv1 doesn't allow to change entities,
-    // see https://fiware-orion.readthedocs.io/en/develop/user/updating_regs_and_subs/index.html
+    // see https://fiware-orion.readthedocs.io/en/master/user/updating_regs_and_subs/index.html
     setEntities(subUp, b);
   }
   else
@@ -286,18 +286,20 @@ static void setCondsAndInitialNotifyNgsiv1
   }
 
   std::vector<std::string> attributes;
-  std::vector<BSONElement> attrs = getFieldF(subOrig, CSUB_ATTRS).Array();
-  for (unsigned int ix = 0; ix < attrs.size(); ++ix)
-  {
-    attributes.push_back(attrs[ix].String());
-  }
+  setStringVectorF(subOrig, CSUB_ATTRS, &attributes);
 
+  std::vector<std::string> metadata;
+  if (subOrig.hasField(CSUB_METADATA))
+  {
+    setStringVectorF(subOrig, CSUB_METADATA, &metadata);
+  }
 
   /* Conds vector (and maybe an initial notification) */
   *notificationDone = false;
   BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             entities,
                                             attributes,
+                                            metadata,
                                             subId,
                                             url,
                                             notificationDone,
@@ -348,14 +350,26 @@ static void setCondsAndInitialNotify
       status = subOrig.hasField(CSUB_STATUS)? getStringFieldF(subOrig, CSUB_STATUS) : STATUS_ACTIVE;
     }
 
-    HttpInfo httpInfo;
+    HttpInfo                  httpInfo;
+    bool                      blacklist;
+    std::vector<std::string>  notifAttributesV;
+    std::vector<std::string>  metadataV;
     if (subUp.notificationProvided)
     {
-      httpInfo = subUp.notification.httpInfo;
+      httpInfo         = subUp.notification.httpInfo;
+      blacklist        = subUp.notification.blacklist;
+      metadataV        = subUp.notification.metadata;
+      notifAttributesV = subUp.notification.attributes;
     }
     else
     {
       httpInfo.fill(subOrig);
+      blacklist = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(subOrig, CSUB_BLACKLIST) : false;
+      setStringVectorF(subOrig, CSUB_ATTRS, &notifAttributesV);
+      if (subOrig.hasField(CSUB_METADATA))
+      {
+        setStringVectorF(subOrig, CSUB_METADATA, &metadataV);
+      }
     }
 
     RenderFormat attrsFormat;
@@ -373,22 +387,21 @@ static void setCondsAndInitialNotify
       // In NGSIv1 is legal updating conditions without updating entities, which is not possible
       // in NGSIv2 (as both entities and coditions are part of 'subject' and they are updated as
       // a whole). In addition, NGSIv1 doesn't allow to update notification attributes. Both
-      // (entities and notification attributes) are pased in subOrig
+      // (entities and notification attributes) are passed in subOrig.
       //
-      // See: https://fiware-orion.readthedocs.io/en/develop/user/updating_regs_and_subs/index.html
+      // See: https://fiware-orion.readthedocs.io/en/master/user/updating_regs_and_subs/index.html
       setCondsAndInitialNotifyNgsiv1(subUp, subOrig, subUp.id, status, httpInfo.url, attrsFormat,
                                      tenant, servicePathV, xauthToken, fiwareCorrelator,
                                      b, notificationDone);
     }
     else
     {
-      setCondsAndInitialNotify(subUp, subUp.id, status, httpInfo, attrsFormat,
-                               tenant, servicePathV, xauthToken, fiwareCorrelator,
-                               b, notificationDone);
+      setCondsAndInitialNotify(subUp, subUp.id, status, notifAttributesV, metadataV, httpInfo, blacklist,
+                               attrsFormat, tenant, servicePathV, xauthToken, fiwareCorrelator, b, notificationDone);
     }
   }
   else
-  {    
+  {
     BSONArray conds = getArrayFieldF(subOrig, CSUB_CONDITIONS);
     b->append(CSUB_CONDITIONS, conds);
     LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
@@ -423,6 +436,13 @@ static void setCount(long long inc, const BSONObj& subOrig, BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setLastNotification -
+*
+* NOTE
+*   Unlike setLastFailure() and setLastSucces(), this function doesn't return any value.
+*   This is due to the fact that lastNotification is added to before sending the notification
+*   while the other two (lastSuccess/lastFailure) need to wait until after - to know the status
+*   of the notification and the resulting values are stored in the sub-cache only,
+*   to be added to mongo when a sub cache refresh is performed.
 */
 static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
@@ -450,6 +470,55 @@ static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subC
 }
 
 
+
+/* ****************************************************************************
+*
+* setLastFailure -
+*/
+static long long setLastFailure(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
+{
+  long long lastFailure = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTFAILURE);
+
+  //
+  // Compare with 'lastFailure' from the sub-cache.
+  // If the cached value of lastFailure is higher, then use it.
+  //
+  if ((subCacheP != NULL) && (subCacheP->lastFailure > lastFailure))
+  {
+    lastFailure = subCacheP->lastFailure;
+  }
+
+  setLastFailure(lastFailure, b);
+
+  return lastFailure;
+}
+
+
+
+/* ****************************************************************************
+*
+* setLastSuccess -
+*/
+static long long setLastSuccess(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
+{
+  long long lastSuccess = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESS);
+
+  //
+  // Compare with 'lastSuccess' from the sub-cache.
+  // If the cached value of lastSuccess is higher, then use it.
+  //
+  if ((subCacheP != NULL) && (subCacheP->lastSuccess > lastSuccess))
+  {
+    lastSuccess = subCacheP->lastSuccess;
+  }
+
+  setLastSuccess(lastSuccess, b);
+
+  return lastSuccess;
+}
+
+
+
 /* ****************************************************************************
 *
 * setExpression -
@@ -462,7 +531,22 @@ static void setExpression(const SubscriptionUpdate& subUp, const BSONObj& subOri
   }
   else
   {
-    BSONObj expression = getObjectFieldF(subOrig, CSUB_EXPR);
+    BSONObj expression;
+    if (subOrig.hasField(CSUB_EXPR))
+    {
+      expression = getObjectFieldF(subOrig, CSUB_EXPR);
+    }
+    else
+    {
+      /* This part of the if clause corresponds to csub that were created before expression was invented
+       * (using an old Orion version) which are now being updated. In this case, we introduce an empty
+       * expression, but with all the expected fiedls */
+      expression = BSON(CSUB_EXPR_Q      << "" <<
+                        CSUB_EXPR_MQ     << "" <<
+                        CSUB_EXPR_GEOM   << "" <<
+                        CSUB_EXPR_COORDS << "" <<
+                        CSUB_EXPR_GEOREL << "");
+    }
     b->append(CSUB_EXPR, expression);
     LM_T(LmtMongo, ("Subscription expression: %s", expression.toString().c_str()));
   }
@@ -506,16 +590,46 @@ static void setBlacklist(const SubscriptionUpdate& subUp, const BSONObj& subOrig
   }
 }
 
+
+
+/* ****************************************************************************
+*
+* setMetadata -
+*/
+static void setMetadata(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
+{
+  if (subUp.notificationProvided)
+  {
+    setMetadata(subUp, b);
+  }
+  else
+  {
+    // Note that if subOrig doesn't have CSUB_METADATA (e.g. old subscription in the DB created before
+    // this feature) BSONArray constructor ensures an empty array
+    BSONArray metadata;
+    if (subOrig.hasField(CSUB_METADATA))
+    {
+      metadata = getArrayFieldF(subOrig, CSUB_METADATA);
+    }
+    b->append(CSUB_METADATA, metadata);
+    LM_T(LmtMongo, ("Subscription metadata: %s", metadata.toString().c_str()));
+  }
+}
+
+
+
 /* ****************************************************************************
 *
 * updateInCache -
 */
 void updateInCache
 (
-  const BSONObj& doc,
-  const SubscriptionUpdate& subUp,
-  const std::string& tenant,
-  long long lastNotification
+  const BSONObj&             doc,
+  const SubscriptionUpdate&  subUp,
+  const std::string&         tenant,
+  long long                  lastNotification,
+  long long                  lastFailure,
+  long long                  lastSuccess
 )
 {
   // StringFilter in Scope?
@@ -576,31 +690,43 @@ void updateInCache
 
   LM_T(LmtSubCache, ("update: %s", doc.toString().c_str()));
 
+  std::string q;
+  std::string mq;
+  std::string geom;
+  std::string coords;
+  std::string georel;
+  if (doc.hasField(CSUB_EXPR))
+  {
+    BSONObj expr = getObjectFieldF(doc, CSUB_EXPR);
+    q      = expr.hasField(CSUB_EXPR_Q)?      getStringFieldF(expr, CSUB_EXPR_Q)      : "";
+    mq     = expr.hasField(CSUB_EXPR_MQ)?     getStringFieldF(expr, CSUB_EXPR_MQ)     : "";
+    geom   = expr.hasField(CSUB_EXPR_GEOM)?   getStringFieldF(expr, CSUB_EXPR_GEOM)   : "";
+    coords = expr.hasField(CSUB_EXPR_COORDS)? getStringFieldF(expr, CSUB_EXPR_COORDS) : "";
+    georel = expr.hasField(CSUB_EXPR_GEOREL)? getStringFieldF(expr, CSUB_EXPR_GEOREL) : "";
+  }
+
   int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
                                           doc,
                                           subUp.id.c_str(),
                                           servicePathCache,
                                           lastNotification,
+                                          lastFailure,
+                                          lastSuccess,
                                           doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
                                           doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_STATUS) : STATUS_ACTIVE,
-                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_Q) : "",
-                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_MQ) : "",
-                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_GEOM) : "",
-                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_COORDS) : "",
-                                          doc.hasField(CSUB_EXPR)? getStringFieldF(getObjectFieldF(doc, CSUB_EXPR), CSUB_EXPR_GEOREL) : "",
+                                          q, mq, geom, coords, georel,
                                           stringFilterP,
                                           mdStringFilterP,
                                           doc.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(doc, CSUB_FORMAT)) : NGSI_V2_NORMALIZED);
 
-  if (subCacheP != NULL)
-  {
-    LM_T(LmtSubCache, ("Calling subCacheItemRemove"));
-    subCacheItemRemove(subCacheP);
-  }
-
   if (mscInsert == 0)  // 0: Insertion was really made
   {
     subCacheUpdateStatisticsIncrement();
+    if (subCacheP != NULL)
+    {
+      LM_T(LmtSubCache, ("Calling subCacheItemRemove"));
+      subCacheItemRemove(subCacheP);
+    }
   }
 
   cacheSemGive(__FUNCTION__, "Updating cached subscription");
@@ -673,9 +799,11 @@ std::string mongoUpdateSubscription
 
   // Build the BSON object (using subOrig as starting point plus some info from cache)
   BSONObjBuilder b;
-  std::string         servicePath  = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];  
+  std::string         servicePath      = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];  
   bool                notificationDone = false;
   long long           lastNotification = 0;
+  long long           lastFailure      = 0;
+  long long           lastSuccess      = 0;
 
   CachedSubscription* subCacheP = NULL;
   if (!noCache)
@@ -691,7 +819,8 @@ std::string mongoUpdateSubscription
   setStatus(subUp, subOrig, &b);
   setEntities(subUp, subOrig, &b);
   setAttrs(subUp, subOrig, &b);
-  setBlacklist(subUp, subOrig, &b);
+  setMetadata(subUp, subOrig, &b);
+  setBlacklist(subUp, subOrig, &b);  
   setCondsAndInitialNotify(subUp, subOrig, tenant, servicePathV, xauthToken, fiwareCorrelator,
                            &b, &notificationDone);
 
@@ -722,6 +851,9 @@ std::string mongoUpdateSubscription
     setCount(0, subOrig, &b);
   }
 
+  lastFailure = setLastFailure(subOrig, subCacheP, &b);
+  lastSuccess = setLastSuccess(subOrig, subCacheP, &b);
+
   setExpression(subUp, subOrig, &b);
   setFormat(subUp, subOrig, &b);
 
@@ -738,7 +870,7 @@ std::string mongoUpdateSubscription
   // Update in cache
   if (!noCache)
   {
-    updateInCache(doc, subUp, tenant, lastNotification);
+    updateInCache(doc, subUp, tenant, lastNotification, lastFailure, lastSuccess);
   }
 
 

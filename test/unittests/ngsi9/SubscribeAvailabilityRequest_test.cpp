@@ -28,7 +28,6 @@
 #include "common/globals.h"
 #include "jsonParse/jsonRequest.h"
 #include "ngsi/ParseData.h"
-#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 

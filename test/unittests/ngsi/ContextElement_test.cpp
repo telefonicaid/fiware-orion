@@ -37,60 +37,56 @@
 */
 TEST(ContextElement, check)
 {
-  ContextElement ce;
-  ConnectionInfo               ci;
+  ContextElement* ceP = new ContextElement();
 
   utInit();
 
-  ce.entityId.id = "";
-  EXPECT_EQ(ce.check(&ci, UpdateContext, "", "", 0), "empty entityId:id");
+  ceP->entityId.id = "";
+  EXPECT_EQ(ceP->check(V1, UpdateContext, "", "", 0), "empty entityId:id");
 
-  ce.entityId.id = "id";
-  EXPECT_EQ(ce.check(&ci, UpdateContext, "", "", 0), "OK");
+  ceP->entityId.id = "id";
+  EXPECT_EQ(ceP->check(V1, UpdateContext, "", "", 0), "OK");
 
-  ContextAttribute a;
-  a.name  = "";
-  a.stringValue = "V";
-  ce.contextAttributeVector.push_back(&a);
-  EXPECT_EQ(ce.check(&ci, UpdateContext, "", "", 0), "missing attribute name");
-  a.name = "name";
+  ContextAttribute* aP = new ContextAttribute();
+  aP->name  = "";
+  aP->stringValue = "V";
+  ceP->contextAttributeVector.push_back(aP);
+  EXPECT_EQ(ceP->check(V1, UpdateContext, "", "", 0), "missing attribute name");
+  aP->name = "name";
   
-  Metadata m;
-  m.name  = "";
-  m.stringValue = "V";
-  ce.domainMetadataVector.push_back(&m);
-  EXPECT_EQ(ce.check(&ci, UpdateContext, "", "", 0), "missing metadata name");
-  m.name = "NAME";
-  EXPECT_EQ(ce.check(&ci, UpdateContext, "", "", 0), "OK");
+  Metadata* mP = new Metadata();
+  mP->name  = "";
+  mP->stringValue = "V";
+  ceP->domainMetadataVector.push_back(mP);
+  EXPECT_EQ(ceP->check(V1, UpdateContext, "", "", 0), "missing metadata name");
+  mP->name = "NAME";
+  EXPECT_EQ(ceP->check(V1, UpdateContext, "", "", 0), "OK");
 
-  ContextElement ce2;
-  ce2.entityId.id = "id";
+  ContextElement* ce2P = new ContextElement();
+  ce2P->entityId.id = "id";
 
-  ContextElementVector ceVector;
+  ContextElementVector* ceVectorP = new ContextElementVector();
 
-  EXPECT_EQ(ceVector.check(&ci, UpdateContext, "", "", 0), "No context elements");
+  EXPECT_EQ(ceVectorP->check(V1, UpdateContext, "", "", 0), "No context elements");
 
-  ceVector.push_back(&ce);
-  ceVector.push_back(&ce2);
-  EXPECT_EQ(ceVector.check(&ci, UpdateContext, "", "", 0), "OK");
+  ceVectorP->push_back(ceP);
+  ceVectorP->push_back(ce2P);
+  EXPECT_EQ(ceVectorP->check(V1, UpdateContext, "", "", 0), "OK");
 
   // render
   const char*     outfile1 = "ngsi.contextelement.check.middle.json";
   std::string     out;
 
-  ci = ConnectionInfo(JSON);
-
-  ci.outMimeType = JSON;
-  out = ce2.render(&ci, UpdateContextElement, "", false);
+  out = ce2P->render(V1, false, UpdateContextElement, "", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // present
-  ce2.present("", -1);
-  ce2.present("", 1);
+  ce2P->present("", -1);
+  ce2P->present("", 1);
 
-  m.name  = "";
-  EXPECT_EQ("missing metadata name", ceVector.check(&ci, UpdateContext, "", "", 0));
+  mP->name  = "";
+  EXPECT_EQ("missing metadata name", ceVectorP->check(V1, UpdateContext, "", "", 0));
 
   utExit();
 }

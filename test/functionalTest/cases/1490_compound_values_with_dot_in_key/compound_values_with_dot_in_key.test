@@ -69,7 +69,7 @@ echo
 ================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -87,7 +87,7 @@ Date: REGEX(.*)
 03. GET E1/A1
 =============
 HTTP/1.1 200 OK
-Content-Length: 85
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -95,13 +95,13 @@ Date: REGEX(.*)
 {
     "A1": {
         "metadata": {},
-        "type": "none",
+        "type": "StructuredValue",
         "value": {
             "rt.ty": "5678"
         }
     },
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 

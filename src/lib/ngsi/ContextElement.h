@@ -33,7 +33,6 @@
 #include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/MetadataVector.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -48,17 +47,17 @@ typedef struct ContextElement
   ContextAttributeVector   contextAttributeVector;  // Optional
   MetadataVector           domainMetadataVector;    // Optional
 
-  double creDate;   // Needed for subscription filter evaluation
-  double modDate;   // Neeeed for subscription filter evaluation
-
   std::vector<ProvidingApplication> providingApplicationList;    // Not part of NGSI, used internally for CPr forwarding functionality
 
   ContextElement();
   ContextElement(const std::string& id, const std::string& type, const std::string& isPattern);
   ContextElement(EntityId* eP);
 
-  std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues = false);
-  std::string  toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist = false) const;
+  std::string  render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues = false);
+  std::string  toJson(RenderFormat                     renderFormat,
+                      const std::vector<std::string>&  attrsFilter,
+                      const std::vector<std::string>&  metadataFilter,
+                      bool                             blacklist = false) const;
   void         present(const std::string& indent, int ix);
   void         release(void);
   void         fill(const struct ContextElement& ce);
@@ -66,7 +65,7 @@ typedef struct ContextElement
 
   ContextAttribute* getAttribute(const std::string& attrName);
 
-  std::string  check(ConnectionInfo* ciP,
+  std::string  check(ApiVersion          apiVersion,
                      RequestType         requestType,
                      const std::string&  indent,
                      const std::string&  predetectedError,

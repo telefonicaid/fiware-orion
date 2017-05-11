@@ -54,8 +54,8 @@ static void getAttributeTypes
 {
   std::string  idType         = std::string("_id.")    + ENT_ENTITY_TYPE;
   std::string  idServicePath  = std::string("_id.")    + ENT_SERVICE_PATH;
+  BSONObj      query;
 
-  BSONObj query;
   if (entityType == "")
   {
     query = BSON("$or"         << BSON_ARRAY(BSON(idType << entityType) << BSON(idType << BSON("$exists" << false)) ) <<
@@ -96,15 +96,15 @@ static void getAttributeTypes
 
     /* Previous versions of this function used a simpler approach:
      *
-     *   BSONObj attrs = getFieldF(r, ENT_ATTRS).embeddedObject();
-     *   BSONObj attr  = getFieldF(attrs, attrName).embeddedObject();
+     *   BSONObj attrs = getObjectFieldF(r, ENT_ATTRS);
+     *   BSONObj attr  = getObjectFieldF(attrs, attrName);
      *   attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
      *
-     * However, it doesn't work when the attribute used metadata ID
+     * However, it doesn't work when the attribute uses metadata ID
      *
      */
 
-    BSONObj                attrs = getFieldF(r, ENT_ATTRS).embeddedObject();
+    BSONObj                attrs = getObjectFieldF(r, ENT_ATTRS);
     std::set<std::string>  attrsSet;
 
     attrs.getFieldNames(attrsSet);
@@ -113,7 +113,7 @@ static void getAttributeTypes
       std::string currentAttr = *i;
       if (basePart(currentAttr) == attrName)
       {
-        BSONObj attr = getFieldF(attrs, currentAttr).embeddedObject();
+        BSONObj attr = getObjectFieldF(attrs, currentAttr);
         attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
       }
     }
@@ -277,8 +277,9 @@ HttpStatusCode mongoEntityTypes
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
-  const std::string&                   apiVersion,
-  unsigned int*                        totalTypesP
+  ApiVersion                           apiVersion,
+  unsigned int*                        totalTypesP,
+  bool                                 noAttrDetail
 )
 {
   unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
@@ -434,27 +435,38 @@ HttpStatusCode mongoEntityTypes
         }
 
         /* Note that we need and extra query() to the database (inside attributeType() function) to get each attribute type.
-         * This could be unefficient, specially if the number of attributes is large */
-        std::vector<std::string> attrTypes;
-        getAttributeTypes(tenant, servicePathV, entityType->type , attrsArray[jx].str(), &attrTypes);
-
-        for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
+         * This could be inefficient, especially if the number of attributes is large */
+        if (!noAttrDetail)
         {
-          ContextAttribute* ca = new ContextAttribute(attrsArray[jx].str(), attrTypes[kx], "");
-          entityType->contextAttributeVector.push_back(ca);
+          std::vector<std::string> attrTypes;
+          getAttributeTypes(tenant, servicePathV, entityType->type , attrsArray[jx].str(), &attrTypes);
 
-          // For backward compability, NGSIv1 only accepts one element
-          if (apiVersion == "v1")
+          for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
           {
-            break;
+            ContextAttribute* ca = new ContextAttribute(attrsArray[jx].str(), attrTypes[kx], "");
+            entityType->contextAttributeVector.push_back(ca);
+
+            // For backward compability, NGSIv1 only accepts one element
+            if (apiVersion == V1)
+            {
+              break;
+            }
           }
+        }
+        else
+        {
+          //
+          // NOTE: here we add a ContextAttribute with empty type, as a marker for
+          //       this special condition of 'No Attribute Detail'
+          //
+          ContextAttribute* caP = new ContextAttribute(attrsArray[jx].str(), "", "");
+          entityType->contextAttributeVector.push_back(caP);
         }
       }
     }
-
     // entityType corresponding to nullId case is skipped, as it is (eventually) added outside the for loop
     if (!nullId)
-    {      
+    {
       responseP->entityTypeVector.push_back(entityType);
     }
   }
@@ -484,7 +496,7 @@ HttpStatusCode mongoEntityTypes
   else
   {
     if (totalTypesP != NULL)
-    {      
+    {
       snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %zu. Offset is %u", resultsArray.size(), offset);
       responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
     }
@@ -512,7 +524,8 @@ HttpStatusCode mongoAttributesForEntityType
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams,
-  const std::string&                    apiVersion
+  bool                                  noAttrDetail,
+  ApiVersion                            apiVersion
 )
 {  
   unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
@@ -521,7 +534,7 @@ HttpStatusCode mongoAttributesForEntityType
   bool           count          = false;
 
   // Count only makes sense for this operation in the case of NGSIv1
-  if (apiVersion == "v1")
+  if (apiVersion == V1)
   {
     std::string    detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
     count = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
@@ -607,19 +620,31 @@ HttpStatusCode mongoAttributesForEntityType
 
     /* Note that we need and extra query() to the database (inside attributeType() function) to get each attribute type.
      * This could be unefficient, specially if the number of attributes is large */
-    std::vector<std::string> attrTypes;
-    getAttributeTypes(tenant, servicePathV, entityType , idField.str(), &attrTypes);
-
-    for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
+    if (!noAttrDetail)
     {
-      ContextAttribute*  ca = new ContextAttribute(idField.str(), attrTypes[kx], "");
-      responseP->entityType.contextAttributeVector.push_back(ca);
+      std::vector<std::string> attrTypes;
+      getAttributeTypes(tenant, servicePathV, entityType , idField.str(), &attrTypes);
 
-      // For backward compability, NGSIv1 only accepts one element
-      if (apiVersion == "v1")
+      for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
       {
-        break;
+        ContextAttribute*  ca = new ContextAttribute(idField.str(), attrTypes[kx], "");
+        responseP->entityType.contextAttributeVector.push_back(ca);
+
+        // For backward compability, NGSIv1 only accepts one element
+        if (apiVersion == V1)
+        {
+          break;
+        }
       }
+    }
+    else
+    {
+      //
+      // NOTE: here we add a ContextAttribute with empty type, as a marker for
+      //       this special condition of 'No Attribute Detail'
+      //
+      ContextAttribute* caP = new ContextAttribute(idField.str(), "", "");
+      responseP->entityType.contextAttributeVector.push_back(caP);      
     }
   }
 

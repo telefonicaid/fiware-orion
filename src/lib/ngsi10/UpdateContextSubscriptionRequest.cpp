@@ -54,7 +54,7 @@ UpdateContextSubscriptionRequest::UpdateContextSubscriptionRequest()
 *
 * UpdateContextSubscriptionRequest::check - 
 */
-std::string UpdateContextSubscriptionRequest::check(RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateContextSubscriptionRequest::check(const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string                       res;
   UpdateContextSubscriptionResponse response;
@@ -76,7 +76,7 @@ std::string UpdateContextSubscriptionRequest::check(RequestType requestType, con
   else
     return "OK";
 
-  return response.render(UpdateContextSubscription, indent);
+  return response.render(indent);
 }
 
 
@@ -126,7 +126,7 @@ void UpdateContextSubscriptionRequest::toNgsiv2Subscription(SubscriptionUpdate* 
   subUp->fromNgsiv1 = true;
 
   // Fields that can be modified in a NGSIv1 subscription
-  // (See https://fiware-orion.readthedocs.io/en/develop/user/updating_regs_and_subs/index.html)
+  // (See https://fiware-orion.readthedocs.io/en/master/user/updating_regs_and_subs/index.html)
   //
   //  * notifyConditions (within subject in NGSIv2)
   //  * throttling       (root field in NGSIv2)
@@ -136,7 +136,7 @@ void UpdateContextSubscriptionRequest::toNgsiv2Subscription(SubscriptionUpdate* 
   subUp->subjectProvided      = (notifyConditionVector.size() > 0);
   subUp->expiresProvided      = !duration.isEmpty();
   subUp->statusProvided       = false;  // not supported in NGSIv1
-  subUp->notificationProvided = false;  // NGSIv1 doesn's allow changes in that parte
+  subUp->notificationProvided = false;  // NGSIv1 doesn's allow changes in that part
   subUp->attrsFormatProvided  = true;   // updating in NGSIv1 involves and implicit change to NGSIv1 legacy format
   subUp->throttlingProvided   = !throttling.isEmpty();
 

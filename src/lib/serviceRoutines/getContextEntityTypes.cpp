@@ -39,8 +39,10 @@
 *
 * getContextEntityTypes -
 *
-* POST /v1/registry/contextEntityTypes/{entityId::type}
-* POST /ngsi9/contextEntityTypes/{entityId::type}
+* GET /v1/registry/contextEntityTypes/{entityId::type}
+* GET /v1/registry/contextEntityTypes/{entityId::type}/attributes
+* GET /ngsi9/contextEntityTypes/{entityId::type}
+* GET /ngsi9/contextEntityTypes/{entityId::type}/attributes
 *
 * Payload In:  None
 * Payload Out: DiscoverContextAvailabilityResponse
@@ -56,6 +58,8 @@ std::string getContextEntityTypes
   ParseData*                 parseDataP
 )
 {
+  // Other similar functions use a condition based on compV.size(), but in this
+  // case is ambiguous so we use compV[0]
   std::string  typeName     = (compV[0] == "v1")? compV[3] : compV[2];
   std::string  answer;
 

@@ -99,13 +99,12 @@ RegisterContextResponse::RegisterContextResponse(const std::string& _registratio
 *
 * RegisterContextResponse::render - 
 */
-std::string RegisterContextResponse::render(RequestType requestType, const std::string& indent)
+std::string RegisterContextResponse::render(const std::string& indent)
 {
   std::string  out = "";
-  std::string  tag = "registerContextResponse";
   bool         errorCodeRendered = (errorCode.code != SccNone) && (errorCode.code != SccOk);
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent);
 
   if (!errorCodeRendered)
   {
@@ -130,7 +129,7 @@ std::string RegisterContextResponse::render(RequestType requestType, const std::
 *
 * RegisterContextResponse::check - 
 */
-std::string RegisterContextResponse::check(RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string RegisterContextResponse::check(const std::string& indent, const std::string& predetectedError, int counter)
 {
   RegisterContextResponse  response;
   std::string              res;
@@ -147,7 +146,7 @@ std::string RegisterContextResponse::check(RequestType requestType, const std::s
   else
     return "OK";
 
-  return response.render(RegisterContext, indent);
+  return response.render(indent);
 }
 
 

@@ -10,7 +10,8 @@ You can use any name for your custom metadata except for a few reserved names, u
 for special metadata that are interpreted by Orion:
 
 -   [ID](#metadata-id-for-attributes)
--   [location], which is currently [deprecated](../deprecated.md), but still supported
+-   location, which is currently [deprecated](../deprecated.md), but still supported
+-   The ones defined in "System/builtin in metadata" section in the NGSIv2 spec
 
 Its management is slightly different in NGSIv1 and NGSIv2, so it is
 described in different sections.
@@ -224,10 +225,8 @@ Note that, from the point of view of [subscriptions](walkthrough_apiv1.md#contex
 attribute or adding a new metadata element is considered a change even
 if attribute value itself hasn't changed. Metadata elements cannot be
 deleted once introduced: in order to delete metadata elements you have
-to remove the entity attribute (using [updateContext
-DELETE](append_and_delete.md#adding-and-removing-attributes-with-append-and-delete-in-updatecontext)),
-then re-create it ([using updateContext
-APPEND](append_and_delete.md#adding-and-removing-attributes-with-append-and-delete-in-updatecontext)).
+to remove the entity attribute (see [DELETE action type](update_action_types.md#delete)),
+then re-create it (see [APPEND action type](update_action_types.md#append)).
 
 ## Metadata ID for attributes
 
@@ -401,4 +400,37 @@ attributes using ID metadata:
 -   DELETE /v1/contextEntities/Room1/attributes/temperature/ground: to
     remove an specific attribute identified by ID (see DELETE attribute
     semantics [described in a previous
-    section](append_and_delete.md#adding-and-removing-attributes-with-append-and-delete-in-updatecontext)).
+    section](update_action_types.md#delete)).
+
+
+## Metadata in notifications
+
+By default, all custom (user) metadata are included in notifications. However, the field `metadata`
+can be used to filter the list. In addition, it can be used to specify that the following special
+metadata (not included by default) must be included.
+
+* previousValue
+* actionType
+
+Details about their meaning can be found in the ""System/builtin in metadata"" section in
+the NGSIv2 specification.
+
+Note that using the following
+
+```
+"metadata": [ "previousValue" ]
+```
+
+will cause to include `previousValue` but will exclude user metadata that
+attributes in the notification may have. If you want to get `previousValue`
+*and* any other "regular" metadata then use:
+
+```
+"metadata": [ "previousValue", "*" ]
+```
+
+Note that you can also use `"metadata": [ "*" ]` although it doesn't make much sense, as
+it gives the same result as not including `metadata` at all (remember that the default
+behaviour is to include all user metadata).
+
+See details in "Filtering out attributes and metadata" section in the NGSIv2 specification.

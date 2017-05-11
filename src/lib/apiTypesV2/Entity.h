@@ -43,6 +43,7 @@ public:
   std::string             id;               // Mandatory
   std::string             type;             // Optional
   std::string             isPattern;        // Optional
+  bool                    isTypePattern;
   ContextAttributeVector  attributeVector;  // Optional
   OrionError              oe;               // Optional - mandatory if not 200-OK
 
@@ -50,14 +51,24 @@ public:
   bool                    typeGiven;        // Was 'type' part of the incoming payload?
   bool                    renderId;         // Should id and type be rendered in JSON?
 
+  double                  creDate;          // used by dateCreated functionality in NGSIv2
+  double                  modDate;          // used by dateModified functionality in NGSIv2
+
   Entity();
   ~Entity();
 
-  std::string  render(ConnectionInfo* ciP, RequestType requestType, bool comma = false);
-  std::string  check(ConnectionInfo*  ciP, RequestType requestType);
+  std::string  render(std::map<std::string, bool>&         uriParamOptions,
+                      std::map<std::string, std::string>&  uriParam,
+                      bool                                 comma = false);
+  std::string  check(ApiVersion apiVersion, RequestType requestType);
   void         present(const std::string& indent);
   void         release(void);
-  void         fill(const std::string& id, const std::string& type, const std::string& isPattern, ContextAttributeVector* aVec);
+  void         fill(const std::string&       id,
+                    const std::string&       type,
+                    const std::string&       isPattern,
+                    ContextAttributeVector*  aVec,
+                    double                   creDate,
+                    double                   modDate);
   void         fill(QueryContextResponse* qcrsP);
   void         hideIdAndType(bool hide = true);
 };

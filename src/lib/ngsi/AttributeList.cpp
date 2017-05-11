@@ -31,6 +31,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/string.h"
 #include "ngsi/AttributeList.h"
 
 
@@ -51,23 +52,33 @@ void AttributeList::fill(const std::vector<std::string>& aVec)
 
 /* ****************************************************************************
 *
+* AttributeList::fill - 
+*/
+void AttributeList::fill(const std::string& commaSeparatedList)
+{
+  stringSplit(commaSeparatedList, ',', attributeV);
+}
+
+
+
+/* ****************************************************************************
+*
 * render - 
 */
 std::string AttributeList::render(const std::string& indent, bool comma)
 {
   std::string  out = "";
-  std::string  key = "attributes";
 
   if (attributeV.size() == 0)
   {
     return "";
   }
 
-  out += startTag2(indent, key, true, true);
+  out += startTag(indent, "attributes", true);
 
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
   {
-    out += valueTag1(indent + "  ", "attribute", attributeV[ix], ix != attributeV.size() - 1, true);
+    out += valueTag(indent + "  ", "attribute", attributeV[ix], ix != attributeV.size() - 1, true);
   }
 
   out += endTag(indent, comma, true);
@@ -133,7 +144,7 @@ void AttributeList::release(void)
 *
 * lookup - 
 */
-bool AttributeList::lookup(const std::string& attributeName)
+bool AttributeList::lookup(const std::string& attributeName) const
 {
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
   {
@@ -196,4 +207,25 @@ void AttributeList::clone(const AttributeList& aList)
   {
     push_back(aList[ix]);
   }
+}
+
+
+/* ****************************************************************************
+*
+* AttributeList::toString - 
+*/
+std::string AttributeList::toString(void)
+{
+  std::string out;
+
+  for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
+  {
+    out += attributeV[ix];
+    if (ix < attributeV.size() - 1)
+    {
+      out += ",";
+    }
+  }
+
+  return out;
 }

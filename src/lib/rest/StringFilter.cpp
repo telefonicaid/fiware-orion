@@ -43,27 +43,6 @@ using namespace mongo;
 
 
 
-// FIXME PR: Temporary debug function
-const char* opName(StringFilterOp op)
-{
-  switch (op)
-  {
-  case SfopExists:              return "Exists";
-  case SfopNotExists:           return "NotExists";
-  case SfopEquals:              return "Equals";
-  case SfopDiffers:             return "Differs";
-  case SfopGreaterThan:         return "GreaterThan";
-  case SfopGreaterThanOrEqual:  return "GreaterThanOrEqual";
-  case SfopLessThan:            return "LessThan";
-  case SfopLessThanOrEqual:     return "LessThanOrEqual";
-  case SfopMatchPattern:        return "MatchPattern";
-  }
-
-  return "InvalidOperator";
-}
-
-
-
 /* ****************************************************************************
 *
 * StringFilterItem::StringFilterItem -
@@ -127,7 +106,7 @@ StringFilterItem::~StringFilterItem()
 
   if (compiledPattern == true)
   {
-    regfree(&patternValue);
+    regfree(&patternValue);  // If regcomp fails it frees up itself (see glibc sources for details)
     compiledPattern = false;
   }
 }
@@ -368,6 +347,7 @@ bool StringFilterItem::listParse(char* s, std::string* errorStringP)
     {
       *cP = 0;
 
+      // forbiddenChars check is done inside listItemAdd
       if (listItemAdd(itemStart, errorStringP) == false)
       {
         return false;
@@ -462,7 +442,83 @@ bool StringFilterItem::valueGet
     *stringP = s;
   }
 
+  if ((*valueTypeP == SfvtString) && (op != SfopMatchPattern))
+  {
+    if (forbiddenChars(s, ""))
+    {
+      *errorStringP = std::string("forbidden characters in String Filter");
+      return false;
+    }
+  }
+
   return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* opFind - return the operator of the expression (and LHS + RHS as well)
+*
+* PARAMETERS:
+*   expression:   (input)  the expression to parse (e.g. A==7  or  !a1  or  'b.c'.a>14)
+*   lhsP:         (output) pointer to the string (char*) that references the Left Hand Side
+*   rhsP:         (output) pointer to the string (char*) that references the Right Hand Side
+*
+* RETURN VALUE
+*   The operator is returned. If 'no operator is found', then it is a unary expression for
+*   existence and 'SfopExists' is returned.
+*/
+static StringFilterOp opFind(char* expression, char** lhsP, char** rhsP)
+{
+  char*           eP           = expression;
+  bool            insideQuotes = false;
+  StringFilterOp  op           = SfopExists;  // No operator found => SfopExists
+
+  if (*eP == '!')  // Unary negation?
+  {
+    *lhsP = &eP[1];  // !a: a is LHS ...
+    *rhsP = &eP[1];  // !a: a is RHS ... FIXME P1: Funny? yeah, a little. This is how it works
+
+    return SfopNotExists;
+  }
+
+  *lhsP = expression;  // For all ops != Unary negation, LHS is the beginning of expression
+
+  while (*eP != 0)
+  {
+    if (*eP == '\'')
+    {
+      insideQuotes = insideQuotes? false : true;
+    }
+    else if (!insideQuotes)
+    {
+      if (eP[1] == '=')
+      {
+        if      (*eP == '=') { *rhsP = &eP[2]; op = SfopEquals;             }
+        else if (*eP == '~') { *rhsP = &eP[2]; op = SfopMatchPattern;       }
+        else if (*eP == '!') { *rhsP = &eP[2]; op = SfopDiffers;            }
+        else if (*eP == '>') { *rhsP = &eP[2]; op = SfopGreaterThanOrEqual; }
+        else if (*eP == '<') { *rhsP = &eP[2]; op = SfopLessThanOrEqual;    }
+      }
+      else   if (*eP == '<') { *rhsP = &eP[1]; op = SfopLessThan;           }
+      else   if (*eP == '>') { *rhsP = &eP[1]; op = SfopGreaterThan;        }
+      else   if (*eP == ':') { *rhsP = &eP[1]; op = SfopEquals;             }
+
+      if (op != SfopExists)  // operator found, RHS already set
+      {
+        // Mark the end of LHS - but not if op is Exists, where expression == LHS == RHS 
+        *eP = 0;
+
+        return op;
+      }
+    }
+    
+    ++eP;
+  }
+
+  *rhsP = expression;
+  return SfopExists; 
 }
 
 
@@ -490,7 +546,6 @@ bool StringFilterItem::valueGet
 *       !          Translates to DOES NOT EXIST (the string that comes after is the name of an attribute)
 *       NOTHING:   Translates to EXISTS (the string is the name of an attribute)
 *
-* 
 */
 bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilterType _type)
 {
@@ -509,31 +564,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     return false;
   }
 
-  //
-  // If string starts with single-quote it must also end with single-quote and it is
-  // a string, of course.
-  // Also, the resulting string after removing the quotes cannot contain any quotes ... ?
-  //
-  if (*s == '\'')
-  {
-    ++s;
-
-    if (s[strlen(s) - 1] != '\'')
-    {
-      free(toFree);
-      *errorStringP = "non-terminated forced string";
-      return false;
-    }
-    s[strlen(s) - 1] = 0;
-
-    if (strchr(s, '\'') != NULL)
-    {
-      free(toFree);
-      *errorStringP = "quote in forced string";
-      return false;
-    }
-  }
-
 
   //
   // The start of left-hand-side is already found
@@ -550,30 +580,12 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   //
 
   //
-  // 1. Find operator
+  // 1. Find operator (which also gives up LHS and RHS)
   //
-  // if 'No-Operator-Found' => Test for EXISTENCE of an attribute
-  //
-  char* opP = NULL;
-
-  if      ((opP = strstr(s, "==")) != NULL)  { op  = SfopEquals;              rhs = &opP[2];        }
-  else if ((opP = strstr(s, "~=")) != NULL)  { op  = SfopMatchPattern;        rhs = &opP[2];        }
-  else if ((opP = strstr(s, "!=")) != NULL)  { op  = SfopDiffers;             rhs = &opP[2];        }
-  else if ((opP = strstr(s, "<=")) != NULL)  { op  = SfopLessThanOrEqual;     rhs = &opP[2];        }
-  else if ((opP = strstr(s, "<"))  != NULL)  { op  = SfopLessThan;            rhs = &opP[1];        }
-  else if ((opP = strstr(s, ">=")) != NULL)  { op  = SfopGreaterThanOrEqual;  rhs = &opP[2];        }
-  else if ((opP = strstr(s, ">"))  != NULL)  { op  = SfopGreaterThan;         rhs = &opP[1];        }
-  else if ((opP = strstr(s, ":"))  != NULL)  { op  = SfopEquals;              rhs = &opP[1];        }
-  else if (*s == '!')                        { op  = SfopNotExists;           rhs = &s[1]; lhs = rhs; opP = s; }
-  else                                       { op  = SfopExists;              rhs = s;              }
-
-  // Mark the end of LHS
-  if (opP != NULL)
-  {
-    *opP = 0;
-  }
+  op   = opFind(s, &lhs, &rhs);
   lhs  = wsStrip(lhs);
   rhs  = wsStrip(rhs);
+
 
   //
   // Check for invalid LHS
@@ -586,7 +598,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     return false;
   }
 
-  if (forbiddenChars(lhs, ""))
+  if (forbiddenChars(lhs, "'"))
   {
     if (type == SftQ)
     {
@@ -611,6 +623,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   //
   lhsParse();
 
+
   //
   // Check for empty RHS
   //
@@ -621,7 +634,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     return false;
   }
 
-
   //
   // Now, the right-hand-side, is it a RANGE, a LIST, a SIMPLE VALUE, or an attribute name?
   // And, what type of values?
@@ -629,6 +641,13 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   bool b = true;
   if ((op == SfopNotExists) || (op == SfopExists))
   {
+    if (forbiddenQuotes(rhs))
+    {
+      *errorStringP = std::string("forbidden characters in String Filter");
+      free(toFree);
+      return false;
+    }
+
     if (type == SftMq)
     {
       if (metadataName == "")
@@ -639,37 +658,98 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
       }
     }
   }
+  else if (op == SfopMatchPattern)
+  {
+    //
+    // RHS is a forced string for ~=
+    // forbiddenChars to run over the entire RHS, no exceptions
+    //
+    if (forbiddenChars(rhs, ""))
+    {
+      *errorStringP = std::string("forbidden characters in String Filter");
+      free(toFree);
+      return false;
+    }
+
+    valueType   = SfvtString;
+    stringValue = rhs;
+
+    //
+    // Can't call valueParse here, as the forced valueType 'SfvtString' will be knocked back to its 'default'.
+    // So, instead we just perform the part of SfopMatchPattern of valueParse
+    //
+    if (regcomp(&patternValue, stringValue.c_str(), REG_EXTENDED) != 0)
+    {
+      *errorStringP = std::string("error compiling filter regex: '") + stringValue + "'";
+      return false;
+    }
+    compiledPattern = true;
+  }
   else
   {
+    //
+    // Forbidden char check is performed inside rangeParse, listParse, and valueParse
+    // as only there the component of RHS are known
+    //
     if      (strstr(rhs, "..") != NULL)   b = rangeParse(rhs, errorStringP);
     else if (strstr(rhs, ",")  != NULL)   b = listParse(rhs, errorStringP);
     else                                  b = valueParse(rhs, errorStringP);
   }
 
-  //
-  // If this filter item belongs to a metadata string filter, split the
-  // left hand side info attrName and mdName, if not a unary operator.
-  //
-  if ((type == SftMq) && (op != SfopNotExists) && (op != SfopExists))
-  {
-    std::string lside  = std::string(lhs);
-    char*       start  = (char*) lside.c_str();
-    char*       dotP   = strchr(start, '.');
-
-    if (dotP == NULL)
-    {
-      *errorStringP = "no metadata in left-hand-side of q-item";
-      free(toFree);
-      return false;
-    }
-    *dotP = 0;
-    ++dotP;
-    attributeName = start;
-    metadataName  = dotP;
-  }
-
   free(toFree);
   return b;
+}
+
+
+
+/* ****************************************************************************
+*
+* lhsDotToEqualIfInsideQuote - change dots for equals, then remove all quotes
+*/
+static char* lhsDotToEqualIfInsideQuote(char* s)
+{
+  char* scopyP        = strdup(s);
+  char* dotP          = scopyP;
+  bool  insideQuotes  = false;
+  
+  //
+  // Replace '.' for '=' if inside quotes
+  //
+  while (*dotP != 0)
+  {
+    if (*dotP == '\'')
+    {
+      insideQuotes = (insideQuotes == false)? true : false;
+    }
+    else if ((insideQuotes == true) && (*dotP == '.'))
+    {
+      *dotP = '=';
+    }
+
+    ++dotP;
+  }
+
+  //
+  // Now that all '.' inside quotes are changed to '=', we can remove the quotes
+  // As the resulting string is always smaller than the initial string (or equal if no quotes are present)
+  // It is safe to use the inital buffer 's' to save the resulting string
+  //
+  int sIx = 0;  // Index of 's'
+  int iIx = 0;  // Index of 'initial buffer', which is 'scopyP'
+
+  while (scopyP[iIx] != 0)
+  {
+    if (scopyP[iIx] != '\'')
+    {
+      s[sIx] = scopyP[iIx];
+      ++sIx;
+    }
+    ++iIx;
+  }
+  s[sIx] = 0;
+
+  free(scopyP);
+  return s;
 }
 
 
@@ -681,8 +761,15 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
 void StringFilterItem::lhsParse(void)
 {
   char* start = (char*) left.c_str();
-  char* dotP  = strchr(start, '.');
+  char* dotP  = start;
 
+  start = lhsDotToEqualIfInsideQuote(start);
+
+  attributeName = "";
+  metadataName  = "";
+  compoundPath  = "";
+
+  dotP = strchr(start, '.');
   if (dotP == NULL)
   {
     attributeName = start;
@@ -692,35 +779,35 @@ void StringFilterItem::lhsParse(void)
   }
   
   *dotP = 0;
+  ++dotP;  // Step over the dot
   
   attributeName = start;
 
   // If MQ, a second dot must be found in order for LHS to be about compounds
   if (type == SftMq)
   {
-    ++dotP;  // Step over the first dot
     char* dot2P = strchr(dotP, '.');
-
-    metadataName  = dotP;
 
     if (dot2P == NULL)
     {
+      metadataName  = dotP;
       compoundPath  = "";
       return;
     }
 
     *dot2P = 0;
-    compoundPath = dotP;
-    dotP = dot2P;
+    ++dot2P;
+    metadataName  = dotP;
+    compoundPath  = dot2P;
   }
-
-  //
-  // So, now 'dotP' is pointing to the dot after attribute/metadata.
-  // The rest of the 'path' in lhs is about an item in a compound value
-  //
-  *dotP = 0;
-  ++dotP;
-  compoundPath = dotP;
+  else
+  {
+    //
+    // So, now 'dotP' is pointing to the dot after attribute/metadata.
+    // The rest of the 'path' in lhs is about an item in a compound value
+    //
+    compoundPath = dotP;
+  }
 }
 
 
@@ -781,6 +868,23 @@ const char* StringFilterItem::valueTypeName(void)
 */
 bool StringFilterItem::matchEquals(Metadata* mdP)
 {
+  //
+  // First of all, are we treating with a compound?
+  // If so, check for errors and if all OK, delegate to other function
+  //
+  if (compoundPath.size() != 0)
+  {
+    orion::CompoundValueNode* compoundValueP;
+
+    if (mdP->compoundItemExists(compoundPath, &compoundValueP) == false)
+    {
+      return false;
+    }
+
+    return matchEquals(compoundValueP);
+  }
+
+
   if ((valueType == SfvtNumberRange) || (valueType == SfvtDateRange))
   {
     if ((mdP->numberValue < numberRangeFrom) || (mdP->numberValue > numberRangeTo))
@@ -1140,6 +1244,24 @@ bool StringFilterItem::matchPattern(orion::CompoundValueNode* cvP)
 */
 bool StringFilterItem::matchPattern(Metadata* mdP)
 {
+  //
+  // First of all, are we treating with a compound?
+  // If so, check for errors and if all OK, delegate to other function
+  //
+  if (compoundPath.size() != 0)
+  {
+    orion::CompoundValueNode* compoundValueP;
+
+    if (mdP->compoundItemExists(compoundPath, &compoundValueP) == false)
+    {
+      return false;
+    }
+
+    return matchPattern(compoundValueP);
+  }
+
+
+
   // pattern evaluation only makes sense for metadatas of type 'string'
   if (mdP->valueType != orion::ValueTypeString)
   {
@@ -1298,6 +1420,22 @@ bool StringFilterItem::matchGreaterThan(orion::CompoundValueNode* cvP)
 */
 bool StringFilterItem::matchGreaterThan(Metadata* mdP)
 {
+  //
+  // First of all, are we treating with a compound?
+  // If so, check for errors and if all OK, delegate to other function
+  //
+  if (compoundPath.size() != 0)
+  {
+    orion::CompoundValueNode* compoundValueP;
+
+    if (mdP->compoundItemExists(compoundPath, &compoundValueP) == false)
+    {
+      return false;
+    }
+
+    return matchGreaterThan(compoundValueP);
+  }
+
   if (!compatibleType(mdP))
   {
     return false;
@@ -1407,6 +1545,22 @@ bool StringFilterItem::matchLessThan(orion::CompoundValueNode* cvP)
 */
 bool StringFilterItem::matchLessThan(Metadata* mdP)
 {
+  //
+  // First of all, are we treating with a compound?
+  // If so, check for errors and if all OK, delegate to other function
+  //
+  if (compoundPath.size() != 0)
+  {
+    orion::CompoundValueNode* compoundValueP;
+
+    if (mdP->compoundItemExists(compoundPath, &compoundValueP) == false)
+    {
+      return false;
+    }
+
+    return matchLessThan(compoundValueP);
+  }
+
   if (!compatibleType(mdP))
   {
     return false;
@@ -1594,7 +1748,6 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       left = itemP->attributeName;
     }
 
- 
     //
     // Also, if the left hand side contains a compound path, then we are
     // dealing with matching of a compound item.
@@ -1606,6 +1759,16 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
         left = std::string(ENT_ATTRS) + "." + itemP->attributeName + "." + ENT_ATTRS_VALUE + "." + itemP->compoundPath;
         k = left;
       }
+      else if (itemP->type == SftMq)
+      {
+        left = std::string(ENT_ATTRS) + "." +
+               itemP->attributeName   + "." + 
+               ENT_ATTRS_MD           + "." + 
+               itemP->metadataName    + "." + 
+               ENT_ATTRS_MD_VALUE     + "." +
+               itemP->compoundPath;
+        k = left;
+      }
     }
     else if (left == DATE_CREATED)
     {
@@ -1614,6 +1777,14 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     else if (left == DATE_MODIFIED)
     {
       k = ENT_MODIFICATION_DATE;
+    }
+    else if (left == itemP->attributeName + "." + ENT_ATTRS_MD "." + NGSI_MD_DATECREATED)
+    {
+      k = std::string(ENT_ATTRS) + "." + itemP->attributeName + "." + ENT_ATTRS_CREATION_DATE;
+    }
+    else if (left == itemP->attributeName + "." + ENT_ATTRS_MD "." + NGSI_MD_DATEMODIFIED)
+    {
+      k = std::string(ENT_ATTRS) + "." + itemP->attributeName + "." + ENT_ATTRS_MODIFICATION_DATE;
     }
     else
     {
@@ -1668,8 +1839,11 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
         break;
 
       case SfvtNull:
-        *errorStringP = "null values not supported";
-        return false;
+        //
+        // NOTE: $type 10 corresponds to NULL value
+        // SEE:  https://docs.mongodb.com/manual/reference/bson-types/
+        //
+        bb.append("$exists", true).append("$type", 10);
         break;
 
       case SfvtNumber:
@@ -1736,8 +1910,13 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       }
       else if (itemP->valueType == SfvtNull)
       {
-        *errorStringP = "null values not supported";
-        return false;
+        //
+        // NOTE: $type 10 corresponds to NULL value
+        // SEE:  https://docs.mongodb.com/manual/reference/bson-types/
+        //
+        bb.append("$exists", true).append("$not", BSON("$type" << 10));
+        bob.append(k, bb.obj());
+        f = bob.obj();
       }
       else if ((itemP->valueType == SfvtNumber) || (itemP->valueType == SfvtDate))
       {
@@ -1866,17 +2045,65 @@ bool StringFilter::mqMatch(ContextElementResponse* cerP)
   {
     StringFilterItem*  itemP = filters[ix];
     ContextAttribute*  caP   = cerP->contextElement.getAttribute(itemP->attributeName);
-    Metadata*          mdP   = (caP == NULL)? NULL : caP->metadataVector.lookupByName(itemP->metadataName);
 
-    if ((itemP->op == SfopExists) && (mdP == NULL))
+    if ((itemP->op == SfopExists) || (itemP->op == SfopNotExists))
     {
-      return false;
-    }        
-    else if ((itemP->op == SfopNotExists) && (mdP != NULL))
+
+      Metadata*  mdP = (caP == NULL)? NULL : caP->metadataVector.lookupByName(itemP->metadataName);
+
+      if (itemP->compoundPath.size() == 0)
+      {
+        if ((itemP->op == SfopExists) && (mdP == NULL))
+        {
+          return false;
+        }
+        else if ((itemP->op == SfopNotExists) && (mdP != NULL))
+        {
+          return false;
+        }
+      }
+      else  // compare with an item in the compound value
+      {
+        bool exists = (mdP != NULL) && (mdP->compoundItemExists(itemP->compoundPath) == true);
+
+        if ((itemP->op == SfopExists) && (exists == false))
+        {
+          return false;
+        }
+        else if ((itemP->op == SfopNotExists) && (exists == true))
+        {
+          return false;
+        }
+      }
+    }
+
+    /* From here, the approach is very similar to the one used in qMatch() function */
+    if (caP == NULL)
     {
       return false;
     }
-    else if ((itemP->op == SfopEquals) && (itemP->matchEquals(mdP) == false))
+
+    Metadata*  mdP = NULL;
+    Metadata   md;
+
+    if ((itemP->metadataName == NGSI_MD_DATECREATED) || (itemP->metadataName == NGSI_MD_DATEMODIFIED))
+    {
+      mdP            = &md;
+      md.valueType   = orion::ValueTypeNumber;
+      md.numberValue = (itemP->metadataName == NGSI_MD_DATECREATED)? caP->creDate : caP->modDate;
+    }
+    else if (itemP->op != SfopNotExists)
+    {
+      mdP = caP->metadataVector.lookupByName(itemP->metadataName);
+
+      // If the metadata doesn't exist, no need to go further: filter fails
+      if (mdP == NULL)
+      {
+        return false;
+      }
+    }
+
+    if ((itemP->op == SfopEquals) && (itemP->matchEquals(mdP) == false))
     {
       return false;
     }
@@ -1972,7 +2199,7 @@ bool StringFilter::qMatch(ContextElementResponse* cerP)
     {
       caP            = &ca;
       ca.valueType   = orion::ValueTypeNumber;
-      ca.numberValue = (itemP->left == DATE_CREATED)? cerP->contextElement.creDate : cerP->contextElement.modDate;
+      ca.numberValue = (itemP->left == DATE_CREATED)? cerP->contextElement.entityId.creDate : cerP->contextElement.entityId.modDate;
     }
     else if (itemP->op != SfopNotExists)
     {

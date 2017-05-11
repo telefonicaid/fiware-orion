@@ -26,7 +26,7 @@ notifyFormat_ngsi10
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 38,101,102 IPv4 -subCacheIval 8 --cache
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -202,7 +202,7 @@ echo
 ===================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E10?type=none
+Location: /v2/entities/E10?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -351,6 +351,41 @@ Date: REGEX(.*)
 13. Dump accumulator - see four notifications
 =============================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 476
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "Text",
+                        "value": "01. Creation"
+                    }
+                ],
+                "id": "E10",
+                "isPattern": "false",
+                "type": "Thing"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 475
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
@@ -359,32 +394,33 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "none",
-        "isPattern" : "false",
-        "id" : "E10",
-        "attributes" : [
-          {
-            "name" : "A1",
-            "type" : "none",
-            "value" : "01. Creation"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "Text",
+                        "value": "09. Updated"
+                    }
+                ],
+                "id": "E10",
+                "isPattern": "false",
+                "type": "Thing"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 474
+Fiware-Servicepath: /
+Content-Length: 475
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -392,32 +428,33 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "none",
-        "isPattern" : "false",
-        "id" : "E10",
-        "attributes" : [
-          {
-            "name" : "A1",
-            "type" : "none",
-            "value" : "09. Updated"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "Text",
+                        "value": "10. Updated"
+                    }
+                ],
+                "id": "E10",
+                "isPattern": "false",
+                "type": "Thing"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 474
+Fiware-Servicepath: /
+Content-Length: 475
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
@@ -425,61 +462,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "none",
-        "isPattern" : "false",
-        "id" : "E10",
-        "attributes" : [
-          {
-            "name" : "A1",
-            "type" : "none",
-            "value" : "10. Updated"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
-}
-=======================================
-POST http://localhost:REGEX(\d+)/notify
-Content-Length: 474
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "none",
-        "isPattern" : "false",
-        "id" : "E10",
-        "attributes" : [
-          {
-            "name" : "A1",
-            "type" : "none",
-            "value" : "11. Updated"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "Text",
+                        "value": "11. Updated"
+                    }
+                ],
+                "id": "E10",
+                "isPattern": "false",
+                "type": "Thing"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 

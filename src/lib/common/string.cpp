@@ -27,12 +27,14 @@
 #include <string.h>
 #include <string>
 #include <vector>
+#include <math.h>    // modf
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "common/string.h"
 #include "common/wsStrip.h"
+#include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 
 
@@ -212,6 +214,104 @@ int stringSplit(const std::string& in, char delimiter, std::vector<std::string>&
 
 
 
+/* *****************************************************************************
+*
+* hostnameIsValid - check a hostname for validity
+*
+* See https://tools.ietf.org/html/rfc1034#section-3.1
+*/
+static bool hostnameIsValid(const char* hostname)
+{
+  if (strchr(hostname, ':') != NULL)  // hostname contains a ':' ?
+  {
+    //
+    // Looks like a numerical IPv6 address.
+    // That requires a different approach for validity check
+    //
+    // FIXME P4: Implement validity check of numerical IPv6 addresses.
+    //
+    return true;
+  }
+
+  int len = strlen(hostname);
+
+  if (len > 253)  // Max length is 253 chars
+  {
+    return false;
+  }
+
+  if (*hostname == '.')  // Cannot start with a dot
+  {
+    return false;
+  }
+
+  if (hostname[len - 1] == '.')  // Cannot end in a dot
+  {
+    return false;
+  }
+
+  if (strstr(hostname, "..") != NULL)  // Cannot contain two consecutive dots
+  {
+    return false;
+  }
+
+
+  //
+  // Now split hostname into labels: . label . label . label ... 
+  //
+  // We've already seen that no '..' exists and also that 'hostname' doesn't start nor end in a dot.
+  // This means we have no empty labels, and that is good :-)
+  //
+  std::vector<std::string> labelV;
+  
+  stringSplit(hostname, '.', labelV);
+
+  for (unsigned int ix = 0; ix < labelV.size(); ++ix)
+  {
+    char* label    = (char*) labelV[ix].c_str();
+    int   labelLen = strlen(label);
+
+    //
+    // Maximum allowed length of a label is 63 characters (and min is 1)
+    // [ that the label is not empty we have checked already. Let's do it again! :-) ]
+    //
+    if ((labelLen > 63) || (labelLen <= 0))
+    {
+      return false;
+    }
+
+    //
+    // A label cannot start nor end with a hyphen
+    //
+    if ((*label == '-') || (label[labelLen - 1] == '-'))
+    {
+      return false;
+    }
+
+    //
+    // Labels can only contain the characters [a-z], [A-Z], [0-9] and hyphen
+    // Labels CAN start with [0-9] - this saves us, as NUMERICAL IPs pass the check as well ... :-)
+    //
+    while (*label != 0)
+    {
+      if      ((*label >= '0') && (*label <= '9'))  {}    // OK: 0-9
+      else if ((*label >= 'a') && (*label <= 'z'))  {}    // OK: a-c
+      else if ((*label >= 'A') && (*label <= 'Z'))  {}    // OK: A-C
+      else if (*label == '-')                       {}    // OK: hyphen (not first nor last char)
+      else                                                // NOT OK - forbidden char
+      {
+        return false;
+      }
+
+      ++label;
+    }
+  }
+
+  return true;
+}
+
+
+
 /* ****************************************************************************
 *
 * parseUrl - parse a URL and return its pieces
@@ -280,8 +380,8 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
   path = "";
   //
-  // Note that components could be 3, in which case we don't enter in the for. This is
-  // the case of URL without '/' like eg. "http://www.google.com"
+  // Note that components could be 3, in which case we don't enter the for-loop. This is
+  // the case of URL without '/' like "http://www.google.com"
   //
   for (int ix = 3; ix < components; ++ix)
   {
@@ -344,7 +444,38 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
     }
   }
 
+  //
+  // Is 'port' a valid number?
+  // MAX_PORT is the maximum number that a port can have.
+  // Negative port numbers cannot exist and 0 is reserved.
+  //
+  if ((port > MAX_PORT) || (port <= 0))
+  {
+    return false;
+  }
+
+  if (hostnameIsValid(host.c_str()) == false)
+  {
+    return false;
+  }
+
   return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* validUrl - check validity of a URL
+*/
+bool validUrl(const std::string& url)
+{
+  std::string  host;
+  int          port;
+  std::string  path;
+  std::string  protocol;
+
+  return parseUrl(url, host, port, path, protocol);
 }
 
 
@@ -358,6 +489,7 @@ char* i2s(int i, char* placeholder, int placeholderSize)
   snprintf(placeholder, placeholderSize, "%d", i);
   return placeholder;
 }
+
 
 
 /* ****************************************************************************
@@ -791,6 +923,121 @@ bool str2double(const char* s, double* dP)
 
 
 
+/* ****************************************************************************
+*
+* decimalDigits
+*
+* This function counts the number of decimal digits of a given float, to a maximum of
+* PRECISION_DIGITS. The algorithm is inspired in http://stackoverflow.com/a/1083316/1485926
+* but with a "cutting condition" needed due to float representation may have an infinite
+* number of decimals, e.g. 3.14 could be internally coded as 3.1399999.
+*
+* FIXME #2425: this function is not perfect and could be improved. For example,
+* considering the following
+*
+*   "A1":  42.9,
+*   "A2":  42.99,
+*   "A3":  42.999,
+*   "A4":  42.9999,
+*   "A5":  42.99999,
+*   "A6":  42.999999,
+*   "A7":  42.9999999,
+*   "A8":  42.99999999,
+*   "A9":  42.999999999,
+*   "A10": 42.9999999999,,
+*
+*   "A1":  42.1,
+*   "A2":  42.01,
+*   "A3":  42.001,
+*   "A4":  42.0001,
+*   "A5":  42.00001,
+*   "A6":  42.000001,
+*   "A7":  42.0000001,
+*   "A8":  42.00000001,
+*   "A9":  42.000000001,
+*   "A10": 42.0000000001,
+*
+* what we get is:
+*
+*   "A1":  42.9,
+*   "A2":  42.99,
+*   "A3":  42.999,
+*   "A4":  42.9999,
+*   "A5":  42.99999,
+*   "A6":  42.999999000, (fail)
+*   "A7":  42.999999900, (fail)
+*   "A8":  42.999999990, (fail)
+*   "A9":  42.999999999,
+*   "A10": 43.000000000, (fail, although probably not due to this function but the caller)
+*
+*   "A1":  42.1,
+*   "A2":  42.01,
+*   "A3":  42.001,
+*   "A4":  42.0001,
+*   "A5":  42.00001,
+*   "A6":  42.000001000, (fail)
+*   "A7":  42.000000100, (fail)
+*   "A8":  42.000000010, (fail)
+*   "A9":  42,           (fail)
+*   "A10": 42,
+*
+*/
+unsigned int decimalDigits(double d)
+{
+  unsigned int digits = 0;
+
+  double intPart;
+  double decimalPart = fabs(modf(d, &intPart));
+
+  while (decimalPart > PRECISION)
+  {
+    digits++;
+    decimalPart *= 10;
+    decimalPart = modf(decimalPart, &intPart);
+    if (fabs(1 - decimalPart ) < PRECISION)
+    {
+      // Using a greater threshold (e.g. 0.01) would cause rounding errors,
+      // e.g. 42.9999 -> 43. This can be easily checked with the
+      // cases/2176_not_print_spurious_decimals/one_to_nine_decimals.test test
+      // (try to use PRECISION * 10 and check how the test fails).
+      //
+      break;
+    }
+  }
+
+  if (digits > PRECISION_DIGITS)
+  {
+    return PRECISION_DIGITS;
+  }
+  else
+  {
+    return digits;
+  }
+}
+
+
+/* ****************************************************************************
+*
+* toString
+*
+* Specialized version of the template for the double type
+*/
+template <> std::string toString(double f)
+{
+  std::ostringstream ss;
+
+  unsigned int digits = decimalDigits(f);
+  if (digits > 0)
+  {
+    ss << std::fixed << std::setprecision(digits);
+  }
+
+  ss << f;
+
+  return ss.str();
+}
+
+
 /*****************************************************************************
 *
 * isodate2str -
@@ -807,4 +1054,31 @@ std::string isodate2str(long long timestamp)
   time_t rawtime = (time_t) timestamp;
   strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S.00Z", gmtime(&rawtime));
   return std::string(buffer);
+}
+
+
+
+/* ****************************************************************************
+*
+* toLowercase - convert string to lowercase
+*
+* This function modifies the actual string.
+* See also the function 'strToLower', that converts one string to another, with all uppercase
+* changed to lowercase.
+*
+* This approach is faster as no copy is done.
+*/
+void toLowercase(char* s)
+{
+  int toLowerOffset = 'a' - 'A';
+
+  while (*s != 0)
+  {
+    if ((*s >= 'A') && (*s <= 'Z'))
+    {
+      *s += toLowerOffset;
+    }
+
+    ++s;
+  }
 }

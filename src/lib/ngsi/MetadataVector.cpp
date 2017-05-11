@@ -39,21 +39,9 @@
 *
 * MetadataVector::MetadataVector -
 */
-MetadataVector::MetadataVector(const std::string& _keyName)
+MetadataVector::MetadataVector(void)
 {
   vec.clear();
-  keyNameSet(_keyName);
-}
-
-
-
-/* ****************************************************************************
-*
-* MetadataVector::keyNameSet -
-*/
-void MetadataVector::keyNameSet(const std::string& _keyName)
-{
-  keyName = _keyName;
 }
 
 
@@ -65,14 +53,13 @@ void MetadataVector::keyNameSet(const std::string& _keyName)
 std::string MetadataVector::render(const std::string& indent, bool comma)
 {
   std::string out = "";
-  std::string key = "metadatas";
 
   if (vec.size() == 0)
   {
     return "";
   }
 
-  out += startTag2(indent, key, true);
+  out += startTag(indent, "metadatas", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);
@@ -81,6 +68,24 @@ std::string MetadataVector::render(const std::string& indent, bool comma)
 
 
   return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* MetadataVector::matchFilter -
+*
+*/
+bool MetadataVector::matchFilter(const std::string& mdName, const std::vector<std::string>& metadataFilter)
+{
+  /* Metadata filtering only in the case of actual metadata vector not containing "*" */
+  if ((metadataFilter.size() == 0) || (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_ALL) != metadataFilter.end()))
+  {
+    return true;
+  }
+
+  return std::find(metadataFilter.begin(), metadataFilter.end(), mdName) != metadataFilter.end();
 }
 
 
@@ -96,7 +101,7 @@ std::string MetadataVector::render(const std::string& indent, bool comma)
 * If anybody needs a metadata named 'value' or 'type', then API v1
 * will have to be used to retreive that information.
 */
-std::string MetadataVector::toJson(bool isLastElement)
+std::string MetadataVector::toJson(bool isLastElement, const std::vector<std::string>& metadataFilter)
 {
   if (vec.size() == 0)
   {
@@ -119,7 +124,7 @@ std::string MetadataVector::toJson(bool isLastElement)
   int validMetadatas = 0;
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    if ((vec[ix]->name == "value") || (vec[ix]->name == "type"))
+    if ((vec[ix]->name == "value") || (vec[ix]->name == "type") || !(matchFilter(vec[ix]->name, metadataFilter)))
     {
       continue;
     }
@@ -135,7 +140,7 @@ std::string MetadataVector::toJson(bool isLastElement)
   int          renderedMetadatas = 0;
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    if ((vec[ix]->name == "value") || (vec[ix]->name == "type"))
+    if ((vec[ix]->name == "value") || (vec[ix]->name == "type") || !(matchFilter(vec[ix]->name, metadataFilter)))
     {
       continue;
     }
@@ -158,20 +163,13 @@ std::string MetadataVector::toJson(bool isLastElement)
 *
 * MetadataVector::check -
 */
-std::string MetadataVector::check
-(
-  ConnectionInfo*     ciP,
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string MetadataVector::check(ApiVersion apiVersion)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion)) != "OK")
     {
       return res;
     }

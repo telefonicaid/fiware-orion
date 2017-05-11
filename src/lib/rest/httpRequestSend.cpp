@@ -23,6 +23,7 @@
 * Author: developer
 */
 #include <unistd.h>                             // close()
+#include <string.h>                             // strchr()
 #include <sys/types.h>                          // system types ...
 #include <sys/socket.h>                         // socket, bind, listen
 #include <sys/un.h>                             // sockaddr_un
@@ -43,7 +44,9 @@
 #include "common/string.h"
 #include "common/sem.h"
 #include "common/limits.h"
+#include "common/defaultValues.h"
 #include "alarmMgr/alarmMgr.h"
+#include "metricsMgr/metricsMgr.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"
 #include "rest/rest.h"
@@ -180,6 +183,34 @@ static void httpHeaderAdd
 }
 
 
+/* ****************************************************************************
+*
+* contentLenParse - extract content length fromn HTTP header string
+*
+* To get the size of the payload, simply search for "Content-Length"
+* inside the HTTP headers and extract the number.
+*/
+static int contentLenParse(char* s)
+{
+  char* contentLenP  = strstr(s, "Content-Length:");             // Point to beginning of 'Content-Length:'
+
+  if (contentLenP == NULL)
+  {
+    return 0;
+  }
+
+  int offset = strlen("Content-Length:");
+
+  while ((contentLenP[offset] == ' ') || (contentLenP[offset] == '\t'))        // Step over spaces and tabs ...
+  {
+    ++offset;
+  }
+
+
+  return atoi(&contentLenP[offset]);  // ... and get the number
+}
+
+
 
 /* ****************************************************************************
 *
@@ -189,7 +220,7 @@ static void httpHeaderAdd
 * before return. If this argument is false, the return string is ""
 *
 * NOTE
-* We are using a hybrid approach, consisting in a static thread-local buffer of a
+* We are using a hybrid approach, consisting of a static thread-local buffer of a
 * small size that copes with most notifications to avoid expensive
 * calloc/free syscalls if the notification payload is not very large.
 *
@@ -209,7 +240,7 @@ int httpRequestSendWithCurl
    CURL*                                      curl,
    const std::string&                         _ip,
    unsigned short                             port,
-   const std::string&                         protocol,
+   const std::string&                         _protocol,
    const std::string&                         verb,
    const std::string&                         tenant,
    const std::string&                         servicePath,
@@ -229,7 +260,6 @@ int httpRequestSendWithCurl
 {
   char                            portAsString[STRING_SIZE_FOR_INT];
   static unsigned long long       callNo             = 0;
-  std::string                     result;
   std::string                     ip                 = _ip;
   struct curl_slist*              headers            = NULL;
   MemoryStruct*                   httpResponse       = NULL;
@@ -237,6 +267,11 @@ int httpRequestSendWithCurl
   int                             outgoingMsgSize       = 0;
   std::string                     content_type(orig_content_type);
   std::map<std::string, bool>     usedExtraHeaders;
+  char                            servicePath0[SERVICE_PATH_MAX_COMPONENT_LEN + 1];  // +1 for zero termination
+
+  firstServicePath(servicePath.c_str(), servicePath0, sizeof(servicePath0));
+
+  metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT, 1);
 
   ++callNo;
 
@@ -251,11 +286,13 @@ int httpRequestSendWithCurl
     timeoutInMilliseconds = defaultTimeout;
   }
 
-  lmTransactionStart("to", ip.c_str(), port, resource.c_str());
+  std::string protocol = _protocol + "//";
+  lmTransactionStart("to", protocol.c_str(), + ip.c_str(), port, resource.c_str());
 
   // Preconditions check
   if (port == 0)
   {
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (port is ZERO)"));
     lmTransactionEnd();
 
@@ -265,6 +302,7 @@ int httpRequestSendWithCurl
 
   if (ip.empty())
   {
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (ip is empty)"));
     lmTransactionEnd();
 
@@ -274,6 +312,7 @@ int httpRequestSendWithCurl
 
   if (verb.empty())
   {
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (verb is empty)"));
     lmTransactionEnd();
 
@@ -283,6 +322,7 @@ int httpRequestSendWithCurl
 
   if (resource.empty())
   {
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (resource is empty)"));
     lmTransactionEnd();
 
@@ -292,6 +332,7 @@ int httpRequestSendWithCurl
 
   if ((content_type.empty()) && (!content.empty()))
   {
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
     lmTransactionEnd();
 
@@ -301,6 +342,7 @@ int httpRequestSendWithCurl
 
   if ((!content_type.empty()) && (content.empty()))
   {
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
     lmTransactionEnd();
 
@@ -351,8 +393,10 @@ int httpRequestSendWithCurl
                   extraHeaders,
                   usedExtraHeaders);
 
-    if (protocol == "https:")
+    if (protocol == "https://")
     {
+      // "Switching" protocol https -> http is needed in this case, as CB->Rush request will use HTTP
+      protocol = "http://";
       headerRushHttp = "X-relayer-protocol: https";
       LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerRushHttp.c_str()));
       httpHeaderAdd(&headers, "X-relayer-protocol", headerRushHttp, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
@@ -384,11 +428,8 @@ int httpRequestSendWithCurl
   }
 
   // ----- Service-Path
-  if (servicePath != "")
-  {
-    std::string fiwareServicePath = std::string("Fiware-ServicePath: ") + servicePath;
-    httpHeaderAdd(&headers, "Fiware-ServicePath", fiwareServicePath, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
-  }
+  std::string fiwareServicePath = std::string("Fiware-ServicePath: ") + ((servicePath.empty())? "/" : servicePath);
+  httpHeaderAdd(&headers, "Fiware-ServicePath", fiwareServicePath, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- X-Auth-Token
   if (xauthToken != "")
@@ -417,8 +458,16 @@ int httpRequestSendWithCurl
   LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerContentLength.c_str()));
   httpHeaderAdd(&headers, "Content-length", headerContentLength, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
+  //
   // Add the size of the actual payload
-  outgoingMsgSize += content.size();
+  //
+  // Note that 'outgoingMsgSize' is the TOTAL size of the outgoing message,
+  // including HTTP headers etc, while 'payloadSize' is the size of just
+  // the payload of the message.
+  //
+  unsigned long long payloadSize = content.size();
+  outgoingMsgSize += payloadSize;
+
 
   // ----- Content-type
   std::string contentTypeString = std::string("Content-type: ") + content_type;
@@ -455,6 +504,7 @@ int httpRequestSendWithCurl
   // Check if total outgoing message size is too big
   if (outgoingMsgSize > MAX_DYN_MSG_SIZE)
   {
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", outgoingMsgSize));
 
     curl_slist_free_all(headers);
@@ -474,10 +524,20 @@ int httpRequestSendWithCurl
   // Set up URL
   std::string url;
   if (isIPv6(ip))
+  {
     url = "[" + ip + "]";
+  }
   else
+  {
     url = ip;
-  url = url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
+  }
+  url = protocol + url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
+
+  if (insecureNotif)
+  {
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); // ignore self-signed certificates for SSL end-points
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+  }
 
   // Prepare CURL handle with obtained options
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -508,11 +568,15 @@ int httpRequestSendWithCurl
   }
 
 
+  //
   // Synchronous HTTP request
-  // This was previously a LM_T trace, but we have "promoted" it to INFO due to it is needed to check logs in a .test case (case 000 notification_different_sizes.test)
+  //
+  // This was previously an LM_T trace, but we have "promoted" it to INFO due to it is needed 
+  // to check logs in a .test case (case 000 notification_different_sizes.test)
+  //
   LM_I(("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
-  res = curl_easy_perform(curl);
 
+  res = curl_easy_perform(curl);
   if (res != CURLE_OK)
   {
     //
@@ -521,12 +585,25 @@ int httpRequestSendWithCurl
     //    
     alarmMgr.notificationError(url, "(curl_easy_perform failed: " + std::string(curl_easy_strerror(res)) + ")");
     *outP = "notification failure";
+
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
   }
   else
   {
+    //
     // The Response is here
+    //
+    int   payloadLen  = contentLenParse(httpResponse->memory);
+
     LM_I(("Notification Successfully Sent to %s", url.c_str()));
     outP->assign(httpResponse->memory, httpResponse->size);
+
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_RESP_SIZE, payloadLen);
+  }
+
+  if (payloadSize > 0)
+  {
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_REQ_SIZE, payloadSize);
   }
 
   // Cleanup curl environment
@@ -589,6 +666,13 @@ int httpRequestSend
   get_curl_context(_ip, &cc);
   if (cc.curl == NULL)
   {
+    char servicePath0[SERVICE_PATH_MAX_COMPONENT_LEN + 1];  // +1 for zero termination
+
+    firstServicePath(servicePath.c_str(), servicePath0, sizeof(servicePath0));
+
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT,        1);
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
+
     release_curl_context(&cc);
     LM_E(("Runtime Error (could not init libcurl)"));
     lmTransactionEnd();

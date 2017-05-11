@@ -44,14 +44,14 @@ typedef struct UpdateContextElementRequest
   ContextAttributeVector     contextAttributeVector;     // Optional
   MetadataVector             domainMetadataVector;       // Optional
 
-  std::string  render(ConnectionInfo* ciP, RequestType requestType, std::string indent);
+  std::string  render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, std::string indent);
   void         present(std::string indent);
   void         release(void);
-  std::string  check(ConnectionInfo*  ciP,
-                     RequestType      requestType,
-                     std::string      indent,
-                     std::string      predetectedError,
-                     int              counter);
+  std::string  check(ApiVersion          apiVersion,
+                     bool                asJsonObject,
+                     RequestType         requestType,
+                     std::string         indent,
+                     const std::string&  predetectedError);
 } UpdateContextElementRequest;
 
 #endif  // SRC_LIB_CONVENIENCE_UPDATECONTEXTELEMENTREQUEST_H_

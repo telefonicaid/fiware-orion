@@ -67,7 +67,7 @@ std::string putEntityAttributeValue
 
   if (forbiddenIdChars(ciP->apiVersion, entityId.c_str() , NULL) || forbiddenIdChars(ciP->apiVersion, attributeName.c_str() , NULL))
   {
-    OrionError oe(SccBadRequest, INVAL_CHAR_URI, "BadRequest");
+    OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
     return oe.toJson();
   }
@@ -75,8 +75,9 @@ std::string putEntityAttributeValue
   // 01. Fill in UpdateContextRequest with data from URI and payload
   parseDataP->av.attribute.name = attributeName;
   parseDataP->av.attribute.type = "";  // Overwrite 'none', as no type can be given in 'value' payload
+  parseDataP->av.attribute.onlyValue = true;
 
-  std::string err = parseDataP->av.attribute.check(ciP,ciP->requestType,"","", 0);
+  std::string err = parseDataP->av.attribute.check(ciP->apiVersion, ciP->requestType);
   if (err != "OK")
   {
     OrionError oe(SccBadRequest, err, "BadRequest");

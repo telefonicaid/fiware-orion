@@ -71,10 +71,25 @@
 
 /* ****************************************************************************
 *
-* other special types
+* metadata ID separator
 */
-#define DATE_TYPE     "DateTime"
-#define DEFAULT_TYPE  "none"
+#define MD_ID_SEPARATOR "()"
+
+
+
+/* ****************************************************************************
+*
+* Default Types for entities, attributes and metadata
+*/
+#define DEFAULT_ENTITY_TYPE       "Thing"
+#define DEFAULT_ATTR_STRING_TYPE  "Text"
+#define DEFAULT_ATTR_NUMBER_TYPE  "Number"
+#define DEFAULT_ATTR_BOOL_TYPE    "Boolean"
+#define DEFAULT_ATTR_ARRAY_TYPE   "StructuredValue"
+#define DEFAULT_ATTR_OBJECT_TYPE  "StructuredValue"
+#define DEFAULT_ATTR_NULL_TYPE    "None"
+#define DATE_TYPE                 "DateTime"
+#define DATE_TYPE_ALT             "ISO8601"
 
 
 
@@ -84,6 +99,7 @@
 */
 #define DATE_CREATED   "dateCreated"
 #define DATE_MODIFIED  "dateModified"
+#define ALL_ATTRS      "*"
 
 
 
@@ -110,7 +126,7 @@
 #define OPT_UNIQUE_VALUES   "unique"
 #define OPT_DATE_CREATED    DATE_CREATED
 #define OPT_DATE_MODIFIED   DATE_MODIFIED
-
+#define OPT_NO_ATTR_DETAIL  "noAttrDetail"
 
  
 /* ****************************************************************************
@@ -132,6 +148,20 @@ typedef enum Ngsiv2Flavour
   NGSIV2_FLAVOUR_ONAPPEND         = 2,
   NGSIV2_FLAVOUR_ONUPDATE         = 3
 } Ngsiv2Flavour;
+
+
+
+/* ****************************************************************************
+*
+*  NGSI API version -
+*/
+typedef enum ApiVersion
+{
+  NO_VERSION  = -1,
+  ADMIN_API   = 0,
+  V1          = 1,
+  V2          = 2
+} ApiVersion;
 
 
 
@@ -188,6 +218,8 @@ extern bool               notifQueueStatistics;
 
 extern bool               checkIdv1;
 extern bool               disableCusNotif;
+
+extern bool               insecureNotif;
 
 
 
@@ -268,7 +300,7 @@ extern int64_t parse8601(const std::string& s);
 * This is common code for Duration and Throttling (at least)
 *
 */
-int64_t parse8601Time(const std::string& s);
+extern int64_t parse8601Time(const std::string& s);
 
 
 
@@ -282,7 +314,7 @@ int64_t parse8601Time(const std::string& s);
 * Unless readonly, add one to the transactionId and return it.
 * If readonly - just return the current transactionId.
 */
-int transactionIdGet(bool readonly = true);
+extern int transactionIdGet(bool readonly = true);
 
 
 
@@ -308,7 +340,7 @@ extern void transactionIdSet(void);
 *
 * correlatorIdSet - 
 */
-void correlatorIdSet(const char* corrId);
+extern void correlatorIdSet(const char* corrId);
 
 
 

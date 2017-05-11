@@ -32,6 +32,7 @@
 #include "common/sem.h"
 #include "common/statistics.h"
 #include "common/idCheck.h"
+#include "common/errorMessages.h"
 #include "mongoBackend/mongoGetSubscriptions.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
@@ -75,10 +76,12 @@ static void setSubject(Subscription* s, const BSONObj& r)
   std::vector<BSONElement> ents = getFieldF(r, CSUB_ENTITIES).Array();
   for (unsigned int ix = 0; ix < ents.size(); ++ix)
   {
-    BSONObj ent           = ents[ix].embeddedObject();
-    std::string id        = getStringFieldF(ent, CSUB_ENTITY_ID);
-    std::string type      = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
-    std::string isPattern = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
+    BSONObj ent               = ents[ix].embeddedObject();
+    std::string id            = getStringFieldF(ent, CSUB_ENTITY_ID);
+    std::string type          = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
+    std::string isPattern     = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
+    bool        isTypePattern = ent.hasField(CSUB_ENTITY_ISTYPEPATTERN)?
+                                  getBoolFieldF(ent, CSUB_ENTITY_ISTYPEPATTERN) : false;
 
     EntID en;
     if (isFalse(isPattern))
@@ -89,27 +92,32 @@ static void setSubject(Subscription* s, const BSONObj& r)
     {
       en.idPattern = id;
     }
-    en.type = type;
+
+    if (!isTypePattern)
+    {
+      en.type = type;
+    }
+    else // isTypePattern
+    {
+      en.typePattern = type;
+    }
+
 
     s->subject.entities.push_back(en);
   }
 
   // Condition
-  std::vector<BSONElement> conds = getFieldF(r, CSUB_CONDITIONS).Array();
-  for (unsigned int ix = 0; ix < conds.size(); ++ix)
-  {
-    std::string attr = conds[ix].String();
-    s->subject.condition.attributes.push_back(attr);
-  }
+  setStringVectorF(r, CSUB_CONDITIONS, &(s->subject.condition.attributes));
 
   if (r.hasField(CSUB_EXPR))
   {
-    mongo::BSONObj expression = getFieldF(r, CSUB_EXPR).Obj();
-    std::string    q          = getFieldF(expression, CSUB_EXPR_Q).String();
-    std::string    mq         = getFieldF(expression, CSUB_EXPR_MQ).String();
-    std::string    geo        = getFieldF(expression, CSUB_EXPR_GEOM).String();
-    std::string    coords     = getFieldF(expression, CSUB_EXPR_COORDS).String();
-    std::string    georel     = getFieldF(expression, CSUB_EXPR_GEOREL).String();
+    mongo::BSONObj expression = getObjectFieldF(r, CSUB_EXPR);
+
+    std::string    q          = expression.hasField(CSUB_EXPR_Q)      ? getStringFieldF(expression, CSUB_EXPR_Q)      : "";
+    std::string    mq         = expression.hasField(CSUB_EXPR_MQ)     ? getStringFieldF(expression, CSUB_EXPR_MQ)     : "";
+    std::string    geo        = expression.hasField(CSUB_EXPR_GEOM)   ? getStringFieldF(expression, CSUB_EXPR_GEOM)   : "";
+    std::string    coords     = expression.hasField(CSUB_EXPR_COORDS) ? getStringFieldF(expression, CSUB_EXPR_COORDS) : "";
+    std::string    georel     = expression.hasField(CSUB_EXPR_GEOREL) ? getStringFieldF(expression, CSUB_EXPR_GEOREL) : "";
 
     s->subject.condition.expression.q        = q;
     s->subject.condition.expression.mq       = mq;
@@ -128,12 +136,12 @@ static void setSubject(Subscription* s, const BSONObj& r)
 static void setNotification(Subscription* subP, const BSONObj& r, const std::string& tenant)
 {
   // Attributes
-  std::vector<BSONElement> attrs = getFieldF(r, CSUB_ATTRS).Array();
-  for (unsigned int ix = 0; ix < attrs.size(); ++ix)
-  {
-    std::string attr = attrs[ix].String();
+  setStringVectorF(r, CSUB_ATTRS, &(subP->notification.attributes));
 
-    subP->notification.attributes.push_back(attr);
+  // Metadata
+  if (r.hasField(CSUB_METADATA))
+  {
+    setStringVectorF(r, CSUB_METADATA, &(subP->notification.metadata));
   }
 
   subP->notification.httpInfo.fill(r);
@@ -142,6 +150,8 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
   subP->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(r, CSUB_LASTNOTIFICATION) : -1;
   subP->notification.timesSent        = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : -1;
   subP->notification.blacklist        = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(r, CSUB_BLACKLIST)                   : false;
+  subP->notification.lastFailure      = r.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(r, CSUB_LASTFAILURE)      : -1;
+  subP->notification.lastSuccess      = r.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongF(r, CSUB_LASTSUCCESS)      : -1;
 
   // Attributes format
   subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(r, CSUB_FORMAT)) : NGSI_V1_LEGACY;
@@ -172,6 +182,16 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
       }
 
       subP->notification.timesSent += cSubP->count;
+    }
+
+    if (cSubP->lastFailure > subP->notification.lastFailure)
+    {
+      subP->notification.lastFailure = cSubP->lastFailure;
+    }
+
+    if (cSubP->lastSuccess > subP->notification.lastSuccess)
+    {
+      subP->notification.lastSuccess = cSubP->lastSuccess;
     }
   }
   cacheSemGive(__FUNCTION__, "get lastNotification and count");
@@ -371,7 +391,7 @@ void mongoGetSubscription
     releaseMongoConnection(connection);
     LM_T(LmtMongo, ("subscription not found: '%s'", idSub.c_str()));
     reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
-    *oe = OrionError(SccContextElementNotFound, "subscriptionId does not correspond to an active subscription", "NotFound");
+    *oe = OrionError(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
     return;
   }
   releaseMongoConnection(connection);

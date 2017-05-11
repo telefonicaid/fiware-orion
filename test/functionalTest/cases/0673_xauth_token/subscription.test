@@ -26,7 +26,7 @@ X-Auth-Token In Notifications
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0-255
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -141,6 +141,7 @@ Date: REGEX(.*)
 03. Check that the X-Auth-Token was propagated to accumulator
 =============================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 459
 X-Auth-Token: kz
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -150,28 +151,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})"
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "ET",
-        "isPattern" : "false",
-        "id" : "E1",
-        "attributes" : [
-          {
-            "name" : "A1",
-            "type" : "AT",
-            "value" : "V"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "AT",
+                        "value": "V"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "ET"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 

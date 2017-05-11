@@ -1,11 +1,10 @@
 FORMAT: 1A
 HOST: http://orion.lab.fiware.org
-TITLE: FIWARE-NGSI v2 Specification
+TITLE: FIWARE-NGSI v2 Specification RC-2016_05
 DATE: 31 May 2016
-VERSION: 2.0-rc-2016_05
-PREVIOUS_VERSION: 2.0-latest
-APIARY_PROJECT: fiware-ngsi-v2
-SPEC_URL: https://telefonicaid.github.io/fiware-orion/api/v2/stable
+VERSION: stable
+APIARY_PROJECT: orioncontextbroker
+SPEC_URL: https://telefonicaid.github.io/fiware-orion/api/v2/
 GITHUB_SOURCE: http://github.com/telefonicaid/fiware-orion.git
 
 # FIWARE-NGSI v2 Specification
@@ -52,9 +51,12 @@ The work in progress draft of the specification can be found at
 
 ## Copyright
 
+Copyright (c) 2011-2016 Telecom Italia, Telefónica I+D and NEC. 
+
+## License
+
 This specification is licensed under the
-[FIWARE Open Specification License (implicit patent license)]
-(http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_Open_Specification_Legal_Notice_(implicit_patents_license)).
+[FIWARE Open Specification License (implicit patent license)](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Implicit_Patents_License).
 
 ## Conformance
 
@@ -72,7 +74,7 @@ the suffix `_url` is added.
 ## Reference Implementations
 
 * NGISv2 servers
-  * [Orion Context Broker](http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker) - [Implementation Notes](https://fiware-orion.readthedocs.io/en/develop/user/ngsiv2_implementation_notes/index.html)
+  * [Orion Context Broker](http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker) - [Implementation Notes](https://fiware-orion.readthedocs.io/en/master/user/ngsiv2_implementation_notes/index.html)
 
 # Specification
 
@@ -94,7 +96,7 @@ The FIWARE NGSI (Next Generation Service Interface) API defines
 The main elements in the NGSI data model are context entities, attributes and metadata,
 as shown in the figure below.
 
-![NGSI data model](https://raw.githubusercontent.com/telefonicaid/fiware-orion/develop/doc/apiary/v2/Ngsi-data-model.png)
+![NGSI data model](https://raw.githubusercontent.com/telefonicaid/fiware-orion/master/doc/apiary/v2/Ngsi-data-model.png)
 
 #### Context Entities
 
@@ -901,7 +903,7 @@ Response code:
 
 + Response 200 (application/json)
 
-       [
+        [
          {
            "type": "Room",
            "id": "DC_S1-D41",
@@ -938,7 +940,7 @@ Response code:
              }
            }
          }
-       ]
+        ]
 
 ### Create entity [POST /v2/entities{?options}]
 
@@ -1251,7 +1253,7 @@ representation for attributes (described in "JSON Attribute Representation" sect
 
 Response:
 
-* Successful operation uses 20O OK.
+* Successful operation uses 200 OK.
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
@@ -1340,7 +1342,7 @@ This operation returns the `value` property with the value of the attribute.
 
 Response:
 
-* Successful operation uses 20O OK.
+* Successful operation uses 200 OK.
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
@@ -1348,7 +1350,7 @@ Response:
     + entityId: Bcn_Welt (required, string) - Id of the entity in question
     + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
       entities with the same entity id.
-    + attrName: temperature (required, string) - Name of the attribute to be retrieved.
+    + attrName: address (required, string) - Name of the attribute to be retrieved.
 
 + Response 200 (application/json)
 
@@ -1387,7 +1389,7 @@ Response:
     + entityId: Bcn_Welt (required, string) - Id of the entity to be updated.
     + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
       entities with the same entity id.
-    + attrName: temperature (required, string) - Attribute name.
+    + attrName: address (required, string) - Attribute name.
 
 + Request (application/json)
 
@@ -1591,7 +1593,7 @@ Notification rules are as follow:
 
 ## Subscription List [/v2/subscriptions]
 
-### Retrieve subscriptions [GET /v2/subscriptions]
+### Retrieve subscriptions [GET /v2/subscriptions{?limit,offset,options}]
 
 Returns a list of all the subscriptions present in the system.
 
@@ -1742,7 +1744,7 @@ Response:
           },
           "expires": "2016-04-05T14:00:00.00Z",
           "status": "active",
-          "throttling": 5,
+          "throttling": 5
         }
 
 

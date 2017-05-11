@@ -125,6 +125,20 @@ def init_feature():
     scenarios_status = {"untested": 0, "skipped": 0, "passed": 0, "failed": 0}
 
 
+def __add_chars(text, before, after, char_to_add=" "):
+    """
+    append chars before or/and after in a text
+    :param text: text to modify
+    :param before: number of chars added to the beginning of the text
+    :param after: number of chars added to the end of the text
+    :param char_to_add: char used to append (blank space by default)
+    :return: String (text)
+    """
+    text += char_to_add * after
+    text = char_to_add * before + text
+    return text
+
+
 def process_scenario(scenario):
     """
     determine the status in each scenario
@@ -157,17 +171,37 @@ def after_all(context):
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
     if SHOW_SUMMARY:
+        # Show a features summary
         summary_color = u'yellow'
+        max_length = 0
+        for item in features_list: # determine the maximum length of the files name
+            if len(item["file_name"]) > max_length:
+                max_length = len(item["file_name"])
+        # headers
         print colored("                    SUMMARY:", summary_color)
-        print colored("-------------------------------------------------", summary_color)
+        print colored(__add_chars(" ", 0, max_length+54, "-"), summary_color)
+        print colored("| %s | passed | failed | skipped |  total  | duration(s) |" % __add_chars("name", (max_length/2)-4, max_length/2), summary_color)
+        print colored(__add_chars(" ", 0, max_length+54, "-"), summary_color)
+        # features
         for item in features_list:
             status = item["scenario_status"]
-            print colored("  - %s >> passed: %s, failed: %s, skipped: %s and total: %s with duration: %.3f seconds."
-                          % (item["file_name"], status["passed"], status["failed"], status["skipped"], str(item["total"]),
-                             item["duration"]), summary_color)
-        print colored("-------------------------------------------------", summary_color)
-        print colored("  Date: %s" % str(time.strftime("%A, %B %d, %Y %H:%M:%S")), summary_color)
-        print colored("-------------------------------------------------", summary_color)
+            file_name = item["file_name"]
+            passed = str(status["passed"])
+            failed = str(status["failed"])
+            skipped = str(status["skipped"])
+            total = str(item["total"])
+            duration = str("%.3f" % item["duration"])
+            print colored("| %s | %s | %s | %s | %s | %s |"
+                          % (__add_chars(file_name, 0, max_length-len(file_name)),
+                             __add_chars(passed, 6 - len(passed), 0),
+                             __add_chars(failed, 6 - len(failed), 0),
+                             __add_chars(skipped, 7 -len(skipped), 0),
+                             __add_chars(total, 7 - len(total), 0),
+                             __add_chars(duration, 11 - len(duration), 0)), summary_color)
+        # footer
+        print colored(__add_chars(" ", 0, max_length+54, "-"), summary_color)
+        print colored("|  Date: %s" % str(time.strftime("%A, %B %d, %Y %H:%M:%S")), summary_color)
+        print colored(" -------------------------------------------------", summary_color)
 
 
 def before_feature(context, feature):

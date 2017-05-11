@@ -69,28 +69,12 @@ extern std::string jsonInvalidCharsTransformation(const std::string& input);
 *
 * startTag -  
 *
-* FIXME P3: in the past, this entire family of functions was named just startTag().
-* However, changes in the function signature due to XML format removal have caused
-* that different startTag() instances end with the same (or conflicting, due to
-* optional parameters) signatures. Thus, we use startTag1() and startTag2() to
-* distinguish. I know they are awful names :), we should find better ones, but given
-* this is NGSIv1 functionality that will be deprecated in the future, the priority
-* to do this is low.
 */
-extern std::string startTag1
+extern std::string startTag
 (
   const std::string&  indent,
-  const std::string&  key,
-  bool                showKey    = true,
-  bool                isToplevel = false
-);
-
-extern std::string startTag2
-(
-  const std::string&  indent,
-  const std::string&  key,
-  bool                isVector         = false,
-  bool                showKey          = true
+  const std::string&  key      = "",
+  bool                isVector = false
 );
 
 
@@ -103,9 +87,7 @@ extern std::string endTag
 (
   const std::string&  indent,
   bool                comma      = false,
-  bool                isVector   = false,
-  bool                nl         = true,
-  bool                isToplevel = false
+  bool                isVector   = false
 );
 
 
@@ -114,15 +96,8 @@ extern std::string endTag
 *
 * valueTag -  
 *
-* FIXME P3: in the past, this entire family of functions was named just valueTag().
-* However, changes in the function signature due to XML format removal have caused
-* that different valueTag() instances end with the same (or conflicting, due to
-* optional parameters) signatures. Thus, we use valueTag() and valueTag() to
-* distinguish. I know they are awful names :), we should find better ones, but given
-* this is NGSIv1 functionality that will be deprecated in the future, the priority
-* to do this is low.
 */
-extern std::string valueTag1
+extern std::string valueTag
 (
   const std::string&  indent,
   const std::string&  key,
@@ -138,15 +113,6 @@ extern std::string valueTag
   const std::string&  key,
   int                 value,
   bool                showComma     = false
-);
-
-extern std::string valueTag2
-(
-  const std::string&  indent,
-  const std::string&  key,
-  const std::string&  value,
-  bool                showComma     = false,
-  bool                withoutQuotes = false
 );
 
 

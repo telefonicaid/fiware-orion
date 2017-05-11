@@ -57,14 +57,14 @@ echo
 
 echo "02a. Get entity with dates"
 echo "=========================="
-orionCurl --url /v2/entities/E?options=dateCreated,dateModified
+orionCurl --url '/v2/entities/E?attrs=dateCreated,dateModified,*'
 echo
 echo
 
 
 echo "02b. Get entity with dates keyValues"
 echo "===================================="
-orionCurl --url /v2/entities/E?options=dateCreated,dateModified,keyValues
+orionCurl --url '/v2/entities/E?options=keyValues&attrs=dateCreated,dateModified,*'
 CRE_DATE=$(echo "$_response" | python -mjson.tool | grep dateCreated | awk -F '"' '{print $4}')
 MOD_DATE=$(echo "$_response" | python -mjson.tool | grep dateModified | awk -F '"' '{print $4}')
 echo
@@ -73,7 +73,7 @@ echo
 
 echo "02c. Get entity with dates values"
 echo "================================="
-orionCurl --url '/v2/entities/E?options=dateCreated,dateModified,values&attrs=dateCreated,dateModified,A'
+orionCurl --url '/v2/entities/E?options=values&attrs=dateCreated,dateModified,A'
 echo
 echo
 
@@ -112,24 +112,23 @@ echo
 
 echo "05a. Get entity with dates"
 echo "=========================="
-orionCurl --url /v2/entities/E?options=dateCreated,dateModified
+orionCurl --url '/v2/entities/E?attrs=dateCreated,dateModified,*'
 echo
 echo
 
 
 echo "05b. Get entity with dates keyValues"
 echo "===================================="
-orionCurl --url /v2/entities/E?options=dateCreated,dateModified,keyValues
+orionCurl --url '/v2/entities/E?options=keyValues&attrs=dateCreated,dateModified,*'
 CRE_DATE=$(echo "$_response" | python -mjson.tool | grep dateCreated | awk -F '"' '{print $4}')
 MOD_DATE=$(echo "$_response" | python -mjson.tool | grep dateModified | awk -F '"' '{print $4}')
-#echo "$_response" | python -mjson.tool | grep dateCreated
 echo
 echo
 
 
 echo "05c. Get entity with dates values"
 echo "================================="
-orionCurl --url '/v2/entities/E?options=dateCreated,dateModified,values&attrs=dateCreated,dateModified,A'
+orionCurl --url '/v2/entities/E?options=values&attrs=dateCreated,dateModified,A'
 echo
 echo
 
@@ -174,18 +173,18 @@ Date: REGEX(.*)
 {
     "A": {
         "metadata": {},
-        "type": "none",
+        "type": "Text",
         "value": "foo"
     },
     "dateCreated": {
         "metadata": {},
         "type": "DateTime",
-        "value": "REGEX(.*)"
+        "value": "REGEX(2\d\d\d\-.*)"
     },
     "dateModified": {
         "metadata": {},
         "type": "DateTime",
-        "value": "REGEX(.*)"
+        "value": "REGEX(2\d\d\d\-.*)"
     },
     "id": "E",
     "type": "T"
@@ -250,18 +249,18 @@ Date: REGEX(.*)
 {
     "A": {
         "metadata": {},
-        "type": "none",
+        "type": "Text",
         "value": "bar"
     },
     "dateCreated": {
         "metadata": {},
         "type": "DateTime",
-        "value": "REGEX(.*)"
+        "value": "REGEX(2\d\d\d\-.*)"
     },
     "dateModified": {
         "metadata": {},
         "type": "DateTime",
-        "value": "REGEX(.*)"
+        "value": "REGEX(2\d\d\d\-.*)"
     },
     "id": "E",
     "type": "T"

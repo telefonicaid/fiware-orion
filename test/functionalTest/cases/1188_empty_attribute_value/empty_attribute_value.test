@@ -36,6 +36,8 @@ brokerStart CB
 # 04. GET /v2/entities/E1 to see A1==""
 # 05. PUT /v2/entities/E1/attrs/A1/value (=5)
 # 06. GET /v2/entities/E1 to see A1==5
+# 07. PUT /v2/entities/E1/attrs/A1/value (="")
+# 08. GET /v2/entities/E1 to see A1==""
 #
 
 
@@ -121,7 +123,7 @@ Date: REGEX(.*)
 {
     "A1": {
         "metadata": {},
-        "type": "none",
+        "type": "Text",
         "value": "1"
     },
     "id": "E1",
@@ -149,7 +151,7 @@ Date: REGEX(.*)
 {
     "A1": {
         "metadata": {},
-        "type": "none",
+        "type": "Text",
         "value": ""
     },
     "id": "E1",
@@ -177,7 +179,7 @@ Date: REGEX(.*)
 {
     "A1": {
         "metadata": {},
-        "type": "none",
+        "type": "Text",
         "value": 5
     },
     "id": "E1",
@@ -205,7 +207,7 @@ Date: REGEX(.*)
 {
     "A1": {
         "metadata": {},
-        "type": "none",
+        "type": "Text",
         "value": ""
     },
     "id": "E1",

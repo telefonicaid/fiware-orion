@@ -115,7 +115,7 @@ echo
 ================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -124,7 +124,7 @@ Date: REGEX(.*)
 02. List entities with q=A2~=st, see E1
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 226
+Content-Length: 233
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -134,29 +134,29 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 1
                 }
             },
-            "type": "none",
+            "type": "Number",
             "value": 1
         },
         "A2": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "Text",
                     "value": "m_string"
                 },
                 "M2": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 2
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "a_string"
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -164,7 +164,7 @@ Date: REGEX(.*)
 03. List entities with q=A2~=st;A1==1, see E1
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 226
+Content-Length: 233
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -174,29 +174,29 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 1
                 }
             },
-            "type": "none",
+            "type": "Number",
             "value": 1
         },
         "A2": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "Text",
                     "value": "m_string"
                 },
                 "M2": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 2
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "a_string"
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -215,7 +215,7 @@ Date: REGEX(.*)
 05. List entities with mq=A2.M1~=st, see E1
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 226
+Content-Length: 233
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -225,29 +225,29 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 1
                 }
             },
-            "type": "none",
+            "type": "Number",
             "value": 1
         },
         "A2": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "Text",
                     "value": "m_string"
                 },
                 "M2": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 2
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "a_string"
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -255,7 +255,7 @@ Date: REGEX(.*)
 06. List entities with mq=A2.M1~=st;A2.M2==2, see E1
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 226
+Content-Length: 233
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -265,29 +265,29 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 1
                 }
             },
-            "type": "none",
+            "type": "Number",
             "value": 1
         },
         "A2": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "Text",
                     "value": "m_string"
                 },
                 "M2": {
-                    "type": "none",
+                    "type": "Number",
                     "value": 2
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "a_string"
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 

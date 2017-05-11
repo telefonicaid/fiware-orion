@@ -1,0 +1,264 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Cache sub behaviour for type pattern susbcriptions
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 -subCacheIval 1
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# Note we use sleep in some point to let time the DB to sync with regards to
+# cache timeSent value (WAIT_TIME = 1.5 * subCacheIval)
+#
+WAIT_TIME=1.5s
+#
+# 01. Create subscription
+# 02. Create entity (triggers notification)
+# 03. Check subscription timesSent value (1)
+# 04. Subcription update not involving actual update
+# 05. Update entity (triggers notification)
+# 10. Accumulator dump
+
+
+echo "01. Create subscription"
+echo "======================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": ".*",
+                "typePattern": "T.*"
+            }
+        ],
+        "condition": {
+            "attrs": [ "A" ]
+         }
+    },
+    "notification": {
+        "http": {"url": "http://localhost:'${LISTENER_PORT}'/notify"},
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z",
+    "status": "active"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+id1=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo '02. Create entity (triggers notification)'
+echo "========================================="
+payload='
+{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": "foo"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+sleep $WAIT_TIME
+
+
+echo '03. Check subscription timesSent value (1)'
+echo "=========================================="
+orionCurl --url /v2/subscriptions/$id1
+echo
+echo
+
+
+echo '04. Subcription update not involving actual update'
+echo "=================================================="
+payload='
+{
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions/$id1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo '05. Update entity (triggers notification)'
+echo "========================================="
+payload='
+{
+  "A": {
+    "value": "bar"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload"
+echo
+echo
+sleep $WAIT_TIME
+
+
+echo "09. Accumulator dump"
+echo "===================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription
+=======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity (triggers notification)
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Check subscription timesSent value (1)
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 379
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "expires": "2050-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:9997/notify"
+        },
+        "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [
+                "A"
+            ]
+        },
+        "entities": [
+            {
+                "idPattern": ".*",
+                "typePattern": "T.*"
+            }
+        ]
+    }
+}
+
+
+04. Subcription update not involving actual update
+==================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Update entity (triggers notification)
+=========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. Accumulator dump
+====================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 124
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Text",
+                "value": "foo"
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 124
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Text",
+                "value": "bar"
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+accumulatorStop
+brokerStop CB
+dbDrop CB

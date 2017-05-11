@@ -91,8 +91,7 @@ tutorials.
 ### Starting the broker for the tutorials
 
 Before starting, you need to install the broker as described in the
-[Installation and Administration
-Guide](../../../README.md#installation).
+[Installation and Administration Guide](../admin/install.md).
 
 The tutorials assume that you don't have any previous content in the
 Orion Context Broker database. In order to do so, follow the [delete
@@ -121,7 +120,8 @@ application able to receive notifications. To that end, please download the
 accumulator script, available [in
 GitHub](https://github.com/telefonicaid/fiware-orion/blob/master/scripts/accumulator-server.py).
 It is a very simple "dummy" application that simply listens to a given URL
-(let's use localhost:1028/accumulate) and prints whatever it gets in the
+(the example below uses localhost:1028/accumulate, but a different
+host and/or port can be specified) and echoes whatever it receives in the
 terminal window where it is executed. Run it using the following
 command:
 
@@ -629,7 +629,7 @@ use complex structures or custom metadata. These are advanced topics, described 
 [this section](structured_attribute_valued.md#structured-attribute-values ) and
 [this other](metadata.md#custom-attribute-metadata ), respectively.
 
-More details on adding/removing attributes can be found in [this section](append_and_delete.md)
+More details on adding/removing attributes can be found in [this section](update_action_types.md)
 of the manual.
 
 [Top](#top)
@@ -708,6 +708,7 @@ Let's examine in detail the different elements included in the payload:
     described [in this document](duration.md#extending-duration).
     We are using a date far enough away in time (year 2040) hoping the subscription
     will not expire while you run this tutorial :).
+-   You can also have permanent subscriptions. Just omit the `expires` field.
 -   The `conditions` element defines the "trigger" for the subscription. The
     `attrs` field contains a list of attribute names. These names define the
     "triggering attributes", i.e. attributes that upon creation/change
@@ -725,6 +726,13 @@ Let's examine in detail the different elements included in the payload:
     way only to show the enormous flexibility of subscriptions.
 -   You can leave `conditions.attrs` empty to make a notification
     trigger on any entity attribute change (regardless of the name of the attribute).
+-   Notifications include the attribute values *after* processing the update operation
+    triggering the notification. However, you can make Orion to include also the
+    *previous* value. This is achieved using metadata. Have a look to
+    [the following piece of documentation](metadata.md#metadata-in-notifications).
+-   You can also set "notify all attributes except some ones" subscriptions (a kind of
+    "blacklist" functionality). In this case, use `exceptAttrs` instead of `attrs`
+    within `notifications`.
 -   You can include filtering expressions in `conditions`. For example, to get notified
     not only if pressure changes, but if it changes within the range 700-800. This
     is an advanced topic, see the "Subscriptions" section in the
@@ -738,7 +746,7 @@ Let's examine in detail the different elements included in the payload:
     that update attribute values too frequently. In multi-CB configurations, take
     into account that the last-notification measure is local to each CB node. Although
     each node periodically synchronizes with the DB in order to get potencially newer
-    values (more on this [here](perf_tuning.md#subscription-cache) it may happen that
+    values (more on this [here](perf_tuning.md#subscription-cache)) it may happen that
     a particular node has an old value, so throttling is not 100% accurate.
 
 The response corresponding to that request uses 201 Created as HTTP response code.
@@ -1039,9 +1047,8 @@ curl -v localhost:1026/v2/op/update -s -S --header 'Content-Type: application/js
 EOF
 ```
 
-Apart from APPEND and UPDATE, there are other action types: DELETE, APPEND_STRICT, etc. Check out the 
-[NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable)
-for details.
+Apart from APPEND and UPDATE, there are other action types: DELETE, APPEND_STRICT, etc. Check out
+[this section](update_action_types.md) for details.
 
 Finally, the `POST /v2/op/query` allows to retrieve entities matching a query condition
 specified in the payload. It is very similar to `GET /v2/entities` (in fact, the response

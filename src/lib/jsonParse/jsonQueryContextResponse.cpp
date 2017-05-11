@@ -39,6 +39,7 @@
 #include "parse/nullTreat.h"
 
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
 
 using namespace orion;
 
@@ -444,11 +445,8 @@ void jsonQcrsRelease(ParseData* reqDataP)
 */
 std::string jsonQcrsCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-  return reqDataP->qcrs.res.check(ciP,
-                                 RtQueryContextResponse,
-                                 "",
-                                 reqDataP->errorString,
-                                 0);
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+  return reqDataP->qcrs.res.check(ciP->apiVersion,asJsonObject, "", reqDataP->errorString);
 }
 
 

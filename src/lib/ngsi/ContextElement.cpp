@@ -34,7 +34,6 @@
 #include "ngsi/ContextElement.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/Request.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -75,10 +74,9 @@ ContextElement::ContextElement(const std::string& id, const std::string& type, c
 *
 * ContextElement::render - 
 */
-std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues)
+std::string ContextElement::render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues)
 {
   std::string  out                              = "";
-  std::string  key                              = "contextElement";
   bool         attributeDomainNameRendered      = attributeDomainName.get() != "";
   bool         contextAttributeVectorRendered   = contextAttributeVector.size() != 0;
   bool         domainMetadataVectorRendered     = domainMetadataVector.size() != 0;
@@ -88,18 +86,11 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
   bool         commaAfterAttributeDomainName    = domainMetadataVectorRendered  || contextAttributeVectorRendered;
   bool         commaAfterEntityId               = commaAfterAttributeDomainName || attributeDomainNameRendered;
 
-  if (requestType == UpdateContext)
-  {
-    out += startTag2(indent, key, false, false);
-  }
-  else
-  {
-    out += startTag2(indent, key, false, true);
-  }
+  out += startTag(indent, requestType != UpdateContext? "contextElement" : "");
 
   out += entityId.render(indent + "  ", commaAfterEntityId, false);
   out += attributeDomainName.render(indent + "  ", commaAfterAttributeDomainName);
-  out += contextAttributeVector.render(ciP, requestType, indent + "  ", commaAfterContextAttributeVector, omitAttributeValues);
+  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType, indent + "  ", commaAfterContextAttributeVector, omitAttributeValues);
   out += domainMetadataVector.render(indent + "  ", commaAfterDomainMetadataVector);
 
   out += endTag(indent, comma, false);
@@ -113,7 +104,13 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
 *
 * ContextElement::toJson - 
 */
-std::string ContextElement::toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist) const
+std::string ContextElement::toJson
+(
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter,
+  const std::vector<std::string>&  metadataFilter,
+  bool                             blacklist
+) const
 {
   std::string out;
 
@@ -128,7 +125,7 @@ std::string ContextElement::toJson(RenderFormat renderFormat, const std::vector<
 
   if (contextAttributeVector.size() != 0)
   {
-    out += contextAttributeVector.toJson(true, renderFormat, attrsFilter, blacklist);
+    out += contextAttributeVector.toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
   }
 
   return out;
@@ -163,7 +160,7 @@ ContextAttribute* ContextElement::getAttribute(const std::string& attrName)
 */
 std::string ContextElement::check
 (
-  ConnectionInfo*     ciP,
+  ApiVersion          apiVersion,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,
@@ -172,7 +169,7 @@ std::string ContextElement::check
 {
   std::string res;
 
-  if ((res = entityId.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+  if ((res = entityId.check(requestType, indent)) != "OK")
   {
     return res;
   }
@@ -182,12 +179,12 @@ std::string ContextElement::check
     return res;
   }
 
-  if ((res = contextAttributeVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+  if ((res = contextAttributeVector.check(apiVersion, requestType)) != "OK")
   {
     return res;
   }
 
-  if ((res = domainMetadataVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+  if ((res = domainMetadataVector.check(apiVersion)) != "OK")
   {
     return res;
   }

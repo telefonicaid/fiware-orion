@@ -1,0 +1,406 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+previousValue with compound cases
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# Same script as previous_value_with_compounds.test but using "legacy" as attrsFormat
+#
+# 01. Create subscription with previousValue as metadata
+# 02. Create E1 with attributes A: 1
+# 03. Dump and reset: see notification A:1 and no previousValue
+# 04. Update A: [1, {b: foo} ]
+# 05. Dump and reset: see notification A: [1, {b: foo} ], previousValue: 1
+# 06. Update A: {x: 1, y: [true, foo] }
+# 07. Dump and reset: see notification A: {x: 1, y: [true: foo] }, previousValue: [1, {b: foo} ]
+# 08. Update A: x
+# 09. Dump and reset: see notification A: x, previousValue: {x: 1, y: [true, foo] }
+#
+
+echo "01. Create subscription with previousValue as metadata"
+echo "======================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T"
+      }
+    ],
+    "condition": {
+      "attrs": [ ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [ ],
+    "attrsFormat": "legacy",
+    "metadata": [ "previousValue" ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E1 with attributes A: 1"
+echo "=================================="
+payload='{
+  "type": "T",
+  "id": "E1",
+  "A": {
+    "type": "Number",
+    "value": 1
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Dump and reset: see notification A:1 and no previousValue"
+echo "============================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04. Update A: [1, {b: foo} ]"
+echo "============================"
+payload='{
+  "A": {
+    "type": "ComplexVector",
+    "value": [1, {"b": "foo"} ]
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. Dump and reset: see notification A: [1, {b: foo} ], previousValue: 1"
+echo "========================================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "06. Update A: {x: 1, y: [true, foo] }"
+echo "====================================="
+payload='{
+  "A": {
+    "type": "ComplexObject",
+    "value": {"x": 1, "y": [true, "foo"] }
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "07. Dump and reset: see notification A: {x: 1, y: [true: foo] }, previousValue: [1, {b: foo} ]"
+echo "=============================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+echo "08. Update A: x"
+echo "==============="
+payload='{
+  "A": {
+    "type": "Text",
+    "value": "x"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "09. Dump and reset: see notification A: x, previousValue: {x: 1, y: [true, foo] }"
+echo "================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription with previousValue as metadata
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create E1 with attributes A: 1
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Dump and reset: see notification A:1 and no previousValue
+=============================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 459
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "Number",
+                        "value": 1
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+04. Update A: [1, {b: foo} ]
+============================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Dump and reset: see notification A: [1, {b: foo} ], previousValue: 1
+========================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 735
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "previousValue",
+                                "type": "Number",
+                                "value": 1
+                            }
+                        ],
+                        "name": "A",
+                        "type": "ComplexVector",
+                        "value": [
+                            1,
+                            {
+                                "b": "foo"
+                            }
+                        ]
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+06. Update A: {x: 1, y: [true, foo] }
+=====================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Dump and reset: see notification A: {x: 1, y: [true: foo] }, previousValue: [1, {b: foo} ]
+==============================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 768
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "previousValue",
+                                "type": "ComplexVector",
+                                "value": [
+                                    1,
+                                    {
+                                        "b": "foo"
+                                    }
+                                ]
+                            }
+                        ],
+                        "name": "A",
+                        "type": "ComplexObject",
+                        "value": {
+                            "x": 1,
+                            "y": [
+                                true,
+                                "foo"
+                            ]
+                        }
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+08. Update A: x
+===============
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. Dump and reset: see notification A: x, previousValue: {x: 1, y: [true, foo] }
+=================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 650
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "previousValue",
+                                "type": "ComplexObject",
+                                "value": {
+                                    "x": 1,
+                                    "y": [
+                                        true,
+                                        "foo"
+                                    ]
+                                }
+                            }
+                        ],
+                        "name": "A",
+                        "type": "Text",
+                        "value": "x"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop $LISTENER_PORT
+dbDrop CB

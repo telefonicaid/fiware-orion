@@ -24,6 +24,8 @@
 NGSIv2 notification formats (different from values)
 
 --SHELL-INIT--
+# Note that accumulatorStart doesn't use --pretty-print as the purpose of the
+# test is to check attribute ordering and the pretty print changes that order
 dbInit CB
 brokerStart CB 0
 accumulatorStart
@@ -145,7 +147,8 @@ Date: REGEX(.*)
 04. Dump accumulator to see the notifications
 =============================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 215
+Fiware-Servicepath: /
+Content-Length: 221
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -153,8 +156,9 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
-{"subscriptionId":"REGEX([0-9a-f]{24})","data":[{"id":"E1","type":"none","A3":{"type":"none","value":3,"metadata":{}},"A1":{"type":"none","value":1,"metadata":{}},"A2":{"type":"none","value":2,"metadata":{}}}]}=======================================
+{"subscriptionId":"REGEX([0-9a-f]{24})","data":[{"id":"E1","type":"none","A3":{"type":"Number","value":3,"metadata":{}},"A1":{"type":"Number","value":1,"metadata":{}},"A2":{"type":"Number","value":2,"metadata":{}}}]}=======================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 101
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: keyValues

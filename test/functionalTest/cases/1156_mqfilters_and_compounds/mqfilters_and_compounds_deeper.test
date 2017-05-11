@@ -1,0 +1,755 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+String filters for compound values of metadata: deeper level in compound
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create E1 with A1 having a metadata M1 with compound value containing all JSON types in deeper levels than one
+# 02. EQ match with Bool: A1.M1.L1.L2.T==true: see E1
+# 03. NEQ match with Float: A1.M1.L1.L2.f!=3.15: see E1
+# 04. LT match with String: A1.M1.L1.L2.s<uest_string: See E1
+# 05. LE match with Integer: A1.M1.L1.L2.i<=10: see E1
+# 06. GT match with Float: A1.M1.L1.L2.f>3.13: see E1
+# 07. GE match with String: A1.M1.L1.L2.s>=test_string: see E1
+# 08. String match: A1.M1.L1.L2.s~=t_str: see E1
+# 09. String no-match: A1.M1.L1.L2.s~=f_str: see nothing
+# 10. Existence: A1.M1.L1.L2.F: see E1
+# 11. Existence: A1.M1.L1.L2: see E1
+# 12. Non Existence: A1.M1.L1.L3: see E1
+# 13. Non Existence: A1.M1.L1.L2.Not: see E1
+# 14. Existence: A1.M1.L1.L2.Not: see nothing
+# 15. Create subscription for A1.M1.L1.L2.T==true, giving a notification
+# 16. Dump and reset accumulator, see one notification
+# 17. Create subscription for A1.M1.L1.L2.i!=10, giving NO notification
+# 18. Dump accumulator, see nothing
+#
+
+echo "01. Create E1 with A1 having a metadata M1 with compound value containing all JSON types in deeper levels than one"
+echo "=================================================================================================================="
+payload='{
+  "id": "E1",
+  "A1": {
+    "value": "not important",
+    "metadata": {
+      "M1": {
+        "value": {
+          "L1": {
+            "L2": {
+              "i": 10,
+              "f": 3.14,
+              "s": "test_string",
+              "T": true,
+              "F": false,
+              "N": null
+            }
+          }
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "${payload}"
+echo
+echo
+
+
+echo "02. EQ match with Bool: A1.M1.L1.L2.T==true: see E1"
+echo "==================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.T==true'
+echo
+echo
+
+
+echo "03. NEQ match with Float: A1.M1.L1.L2.f!=3.15: see E1"
+echo "====================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.f!=3.15'
+echo
+echo
+
+
+echo "04. LT match with String: A1.M1.L1.L2.s<uest_string: See E1"
+echo "==========================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.s<uest_string'
+echo
+echo
+
+
+echo "05. LE match with Integer: A1.M1.L1.L2.i<=10: see E1"
+echo "===================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.i<=10'
+echo
+echo
+
+
+echo "06. GT match with Float: A1.M1.L1.L2.f>3.13: see E1"
+echo "==================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.f>3.13'
+echo
+echo
+
+
+echo "07. GE match with String: A1.M1.L1.L2.s>=test_string: see E1"
+echo "============================================================"
+orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.s>=test_string'
+echo
+echo
+
+
+echo "08. String match: A1.M1.L1.L2.s~=t_str: see E1"
+echo "=============================================="
+orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.s~=t_str'
+echo
+echo
+
+
+echo "09. String no-match: A1.M1.L1.L2.s~=f_str: see nothing"
+echo "======================================================"
+orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.s~=f_str'
+echo
+echo
+
+
+echo "10. Existence: A1.M1.L1.L2.F: see E1"
+echo "================================="
+orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.F'
+echo
+echo
+
+
+echo "11. Existence: A1.M1.L1.L2: see E1"
+echo "==============================="
+orionCurl --url '/v2/entities?mq=A1.M1.L1.L2'
+echo
+echo
+
+
+echo "12. Non Existence: A1.M1.L1.L3: see E1"
+echo "==================================="
+orionCurl --url '/v2/entities?mq=!A1.M1.L1.L3'
+echo
+echo
+
+
+echo "13. Non Existence: A1.M1.L1.L2.Not: see E1"
+echo "=========================================="
+orionCurl --url '/v2/entities?mq=!A1.M1.L1.L2.Not'
+echo
+echo
+
+
+echo "14. Existence: A1.M1.L1.L2.Not: see nothing"
+echo "==========================================="
+orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.Not'
+echo
+echo
+
+
+echo "15. Create subscription for A1.M1.L1.L2.T==true, giving a notification"
+echo "======================================================================"
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "mq": "A1.M1.L1.L2.T==true"
+            }
+         }
+    },
+    "notification": {
+        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+
+
+echo "16. Dump accumulator, see one notification"
+echo "=========================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "17. Create subscription for A1.M1.L1.L2.i!=10, giving NO notification"
+echo "====================================================================="
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "mq": "A1.M1.L1.L2.i!=10"
+            }
+         }
+    },
+    "notification": {
+        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+
+
+echo "18. Dump accumulator, see nothing"
+echo "================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 with A1 having a metadata M1 with compound value containing all JSON types in deeper levels than one
+==================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. EQ match with Bool: A1.M1.L1.L2.T==true: see E1
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 204
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "L1": {
+                            "L2": {
+                                "F": false,
+                                "N": null,
+                                "T": true,
+                                "f": 3.14,
+                                "i": 10,
+                                "s": "test_string"
+                            }
+                        }
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+03. NEQ match with Float: A1.M1.L1.L2.f!=3.15: see E1
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 204
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "L1": {
+                            "L2": {
+                                "F": false,
+                                "N": null,
+                                "T": true,
+                                "f": 3.14,
+                                "i": 10,
+                                "s": "test_string"
+                            }
+                        }
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+04. LT match with String: A1.M1.L1.L2.s<uest_string: See E1
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 204
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "L1": {
+                            "L2": {
+                                "F": false,
+                                "N": null,
+                                "T": true,
+                                "f": 3.14,
+                                "i": 10,
+                                "s": "test_string"
+                            }
+                        }
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+05. LE match with Integer: A1.M1.L1.L2.i<=10: see E1
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 204
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "L1": {
+                            "L2": {
+                                "F": false,
+                                "N": null,
+                                "T": true,
+                                "f": 3.14,
+                                "i": 10,
+                                "s": "test_string"
+                            }
+                        }
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+06. GT match with Float: A1.M1.L1.L2.f>3.13: see E1
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 204
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "L1": {
+                            "L2": {
+                                "F": false,
+                                "N": null,
+                                "T": true,
+                                "f": 3.14,
+                                "i": 10,
+                                "s": "test_string"
+                            }
+                        }
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+07. GE match with String: A1.M1.L1.L2.s>=test_string: see E1
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 204
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "L1": {
+                            "L2": {
+                                "F": false,
+                                "N": null,
+                                "T": true,
+                                "f": 3.14,
+                                "i": 10,
+                                "s": "test_string"
+                            }
+                        }
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+08. String match: A1.M1.L1.L2.s~=t_str: see E1
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 204
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "L1": {
+                            "L2": {
+                                "F": false,
+                                "N": null,
+                                "T": true,
+                                "f": 3.14,
+                                "i": 10,
+                                "s": "test_string"
+                            }
+                        }
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+09. String no-match: A1.M1.L1.L2.s~=f_str: see nothing
+======================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+10. Existence: A1.M1.L1.L2.F: see E1
+=================================
+HTTP/1.1 200 OK
+Content-Length: 204
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "L1": {
+                            "L2": {
+                                "F": false,
+                                "N": null,
+                                "T": true,
+                                "f": 3.14,
+                                "i": 10,
+                                "s": "test_string"
+                            }
+                        }
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+11. Existence: A1.M1.L1.L2: see E1
+===============================
+HTTP/1.1 200 OK
+Content-Length: 204
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "L1": {
+                            "L2": {
+                                "F": false,
+                                "N": null,
+                                "T": true,
+                                "f": 3.14,
+                                "i": 10,
+                                "s": "test_string"
+                            }
+                        }
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+12. Non Existence: A1.M1.L1.L3: see E1
+===================================
+HTTP/1.1 200 OK
+Content-Length: 204
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "L1": {
+                            "L2": {
+                                "F": false,
+                                "N": null,
+                                "T": true,
+                                "f": 3.14,
+                                "i": 10,
+                                "s": "test_string"
+                            }
+                        }
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+13. Non Existence: A1.M1.L1.L2.Not: see E1
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 204
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "L1": {
+                            "L2": {
+                                "F": false,
+                                "N": null,
+                                "T": true,
+                                "f": 3.14,
+                                "i": 10,
+                                "s": "test_string"
+                            }
+                        }
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+14. Existence: A1.M1.L1.L2.Not: see nothing
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+15. Create subscription for A1.M1.L1.L2.T==true, giving a notification
+======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+16. Dump accumulator, see one notification
+==========================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 257
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "L1": {
+                                "L2": {
+                                    "F": false, 
+                                    "N": null, 
+                                    "T": true, 
+                                    "f": 3.14REGEX([01]*), 
+                                    "i": 10, 
+                                    "s": "test_string"
+                                }
+                            }
+                        }
+                    }
+                }, 
+                "type": "Text", 
+                "value": "not important"
+            },
+            "id": "E1", 
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+17. Create subscription for A1.M1.L1.L2.i!=10, giving NO notification
+=====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+18. Dump accumulator, see nothing
+=================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

@@ -60,6 +60,7 @@
 #include <sys/stat.h>
 #include <signal.h>
 #include <curl/curl.h>
+#include <openssl/ssl.h>
 #include <string>
 #include <vector>
 #include <limits.h>
@@ -200,10 +201,13 @@
 #include "serviceRoutinesV2/postBatchUpdate.h"
 #include "serviceRoutinesV2/logLevelTreat.h"
 #include "serviceRoutinesV2/semStateTreat.h"
+#include "serviceRoutinesV2/getMetrics.h"
+#include "serviceRoutinesV2/deleteMetrics.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
 #include "alarmMgr/alarmMgr.h"
+#include "metricsMgr/metricsMgr.h"
 #include "logSummary/logSummary.h"
 
 using namespace orion;
@@ -271,7 +275,10 @@ int             lsPeriod;
 bool            relogAlarms;
 bool            strictIdv1;
 bool            disableCusNotif;
-
+bool            logForHumans;
+bool            disableMetrics;
+int             reqTimeout;
+bool            insecureNotif;
 
 
 
@@ -324,7 +331,11 @@ bool            disableCusNotif;
 #define RELOGALARMS_DESC       "log messages for existing alarms beyond the raising alarm log message itself"
 #define CHECK_v1_ID_DESC       "additional checks for id fields in the NGSIv1 API"
 #define DISABLE_CUSTOM_NOTIF   "disable NGSIv2 custom notifications"
-
+#define LOG_TO_SCREEN_DESC     "log to screen"
+#define LOG_FOR_HUMANS_DESC    "human readible log to screen"
+#define METRICS_DESC           "turn off the 'metrics' feature"
+#define REQ_TMO_DESC           "connection timeout for REST requests (in seconds)"
+#define INSECURE_NOTIF         "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
 
 
 
@@ -332,16 +343,10 @@ bool            disableCusNotif;
 *
 * paArgs - option vector for the Parse CLI arguments library
 *
-* NOTE
-*   A note about 'FD_SETSIZE - 4', the default and max value for '-maxConnections':
-*   [ taken from https://www.gnu.org/software/libmicrohttpd/manual/libmicrohttpd.html ]
-*
-*   MHD_OPTION_CONNECTION_LIMIT
-*     Maximum number of concurrent connections to accept.
-*     The default is FD_SETSIZE - 4 (the maximum number of file descriptors supported by 
-*     select minus four for stdin, stdout, stderr and the server socket). In other words,
-*    the default is as large as possible.
-*
+* A note about the default value of -maxConnections.
+* In older implementations of the broker, select was used in MHD and not poll/epoll.
+* The old default value (1024 - 4), that was a recommendation by MHD, has been kept.
+* More info about this can be found in the documentation of MHD.
 */
 PaArgument paArgs[] =
 {
@@ -370,6 +375,7 @@ PaArgument paArgs[] =
   { "-multiservice",  &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
 
   { "-httpTimeout",   &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
+  { "-reqTimeout",    &reqTimeout,   "REQ_TIMEOUT",    PaLong,   PaOpt,  0,          0,     PaNL,  REQ_TMO_DESC       },
   { "-reqMutexPolicy",reqMutexPolicy,"MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },  
   { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
 
@@ -378,7 +384,7 @@ PaArgument paArgs[] =
   { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 60,             0,     3600,     SUB_CACHE_IVAL_DESC    },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
   { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     1024,     CONN_MEMORY_DESC       },  
-  { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, FD_SETSIZE - 4, 0,     FD_SETSIZE - 4, MAX_CONN_DESC    },
+  { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, 1020,           1,     PaNL,     MAX_CONN_DESC          },
   { "-reqPoolSize",      &reqPoolSize,      "TRQ_POOL_SIZE",     PaUInt,   PaOpt, 0,              0,     1024,     REQ_POOL_SIZE          },
 
   { "-notificationMode",      &notificationMode,      "NOTIF_MODE", PaString, PaOpt, _i "transient", PaNL,  PaNL, NOTIFICATION_MODE_DESC },
@@ -389,11 +395,16 @@ PaArgument paArgs[] =
   { "-statTiming",     &statTiming,     "STAT_TIMING",      PaBool, PaOpt, false, false, true, STAT_TIMING       },
   { "-statNotifQueue", &statNotifQueue, "STAT_NOTIF_QUEUE", PaBool, PaOpt, false, false, true, STAT_NOTIF_QUEUE  },
 
-  { "-logSummary",     &lsPeriod,       "LOG_SUMMARY_PERIOD", PaInt,PaOpt,   0,     0,     ONE_MONTH_PERIOD, LOG_SUMMARY_DESC },
+  { "-logSummary",     &lsPeriod,       "LOG_SUMMARY_PERIOD", PaInt,  PaOpt, 0,     0,     ONE_MONTH_PERIOD, LOG_SUMMARY_DESC },
   { "-relogAlarms",    &relogAlarms,    "RELOG_ALARMS",       PaBool, PaOpt, false, false, true,             RELOGALARMS_DESC },
 
   { "-strictNgsiv1Ids",             &strictIdv1,      "CHECK_ID_V1",           PaBool, PaOpt, false, false, true, CHECK_v1_ID_DESC      },
   { "-disableCustomNotifications",  &disableCusNotif, "DISABLE_CUSTOM_NOTIF",  PaBool, PaOpt, false, false, true, DISABLE_CUSTOM_NOTIF  },
+
+  { "-logForHumans",   &logForHumans,    "LOG_FOR_HUMANS",     PaBool, PaOpt, false, false, true,             LOG_FOR_HUMANS_DESC },
+  { "-disableMetrics", &disableMetrics,  "DISABLE_METRICS",    PaBool, PaOpt, false, false, true,             METRICS_DESC        },
+
+  { "-insecureNotif", &insecureNotif, "INSECURE_NOTIF", PaBool, PaOpt, false, false, true, INSECURE_NOTIF },
 
   PA_END_OF_ARGS
 };
@@ -407,6 +418,7 @@ PaArgument paArgs[] =
 static const char* validLogLevels[] = 
 {
   "NONE",
+  "FATAL",
   "ERROR",
   "WARN",
   "INFO",
@@ -722,11 +734,20 @@ static const char* validLogLevels[] =
 #define LOGLEVEL_COMPS_V2  2, { "admin", "log"                           }
 
 
+
 //
 // Semaphore state
 //
 #define SEM_STATE          SemStateRequest
 #define SEM_STATE_COMPS    2, { "admin", "sem"                         }
+
+
+
+//
+// Metrics
+//
+#define METRICS            MetricsRequest
+#define METRICS_COMPS      2, { "admin", "metrics"                       }
 
 
 //
@@ -1133,6 +1154,11 @@ static const char* validLogLevels[] =
   { "GET",   SEM_STATE, SEM_STATE_COMPS,   "", semStateTreat                      }, \
   { "*",     SEM_STATE, SEM_STATE_COMPS,   "", badVerbGetOnly                     }
 
+#define METRICS_REQUESTS                                                             \
+  { "GET",    METRICS, METRICS_COMPS,   "", getMetrics                            }, \
+  { "DELETE", METRICS, METRICS_COMPS,   "", deleteMetrics                         }, \
+  { "*",      METRICS, METRICS_COMPS,   "", badVerbGetDeleteOnly                  }
+
 
 
 /* ****************************************************************************
@@ -1171,6 +1197,7 @@ RestService restServiceV[] =
   VERSION_REQUESTS,
   LOGLEVEL_REQUESTS_V2,
   SEM_STATE_REQUESTS,
+  METRICS_REQUESTS,
 
 #ifdef DEBUG
   EXIT_REQUESTS,
@@ -1325,6 +1352,8 @@ void exitFunc(void)
   LM_T(LmtSubCache, ("calling subCacheDestroy"));
   subCacheDestroy();
 #endif
+
+  metricsMgr.release();
 
   curl_context_cleanup();
   curl_global_cleanup();
@@ -1619,7 +1648,15 @@ int main(int argC, char* argV[])
   if (paIsSet(argC, argV, "-fg"))
   {
     paConfig("log to screen",                 (void*) true);
-    paConfig("screen line format",            (void*) "TYPE@TIME  FILE[LINE]: TEXT");
+
+    if (paIsSet(argC, argV, "-logForHumans"))
+    {
+      paConfig("screen line format", (void*) "TYPE@TIME  FILE[LINE]: TEXT");
+    }
+    else
+    {
+      paConfig("screen line format", LOG_FILE_LINE_FORMAT);
+    }
   }
 
   paParse(paArgs, argC, (char**) argV, 1, false);
@@ -1705,10 +1742,19 @@ int main(int argC, char* argV[])
   SemOpType policy = policyGet(reqMutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
   mongoInit(dbHost, rplSet, dbName, user, pwd, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
-  contextBrokerInit(dbName, mtenant);
-  curl_global_init(CURL_GLOBAL_NOTHING);
   alarmMgr.init(relogAlarms);
+  metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
+
+  // According to http://stackoverflow.com/questions/28048885/initializing-ssl-and-libcurl-and-getting-out-of-memory/37295100,
+  // openSSL library needs to be initialized with SSL_library_init() before any use of it by any other libraries
+  SSL_library_init();
+
+  // Startup libcurl
+  if (curl_global_init(CURL_GLOBAL_SSL) != 0)
+  {
+    LM_X(1, ("Fatal Error (could not initialize libcurl)"));
+  }
 
   if (rush[0] != 0)
   {
@@ -1736,6 +1782,11 @@ int main(int argC, char* argV[])
     LM_T(LmtSubCache, ("noCache == false"));
   }
 
+  // Given that contextBrokerInit() may create thread (in the threadpool notification mode,
+  // it has to be done before curl_global_init(), see https://curl.haxx.se/libcurl/c/threaded-ssl.html
+  // Otherwise, we have empirically checked that CB may randomly crash
+  contextBrokerInit(dbName, mtenant);
+
   if (https)
   {
     char* httpsPrivateServerKey = (char*) malloc(2048);
@@ -1753,14 +1804,38 @@ int main(int argC, char* argV[])
     LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
 
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin, httpsPrivateServerKey, httpsCertificate);
+    restInit(rsP,
+             ipVersion,
+             bindAddress,
+             port,
+             mtenant,
+             connectionMemory,
+             maxConnections,
+             reqPoolSize,
+             rushHost,
+             rushPort,
+             allowedOrigin,
+             reqTimeout,
+             httpsPrivateServerKey,
+             httpsCertificate);
 
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
   else
   {
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin);
+    restInit(rsP,
+             ipVersion,
+             bindAddress,
+             port,
+             mtenant,
+             connectionMemory,
+             maxConnections,
+             reqPoolSize,
+             rushHost,
+             rushPort,
+             allowedOrigin,
+             reqTimeout);
   }
 
   LM_I(("Startup completed"));

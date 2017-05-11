@@ -169,7 +169,7 @@ Date: REGEX(.*)
 06. Query: URI param q=temperature<60;humidity==61..83 => E1+E2
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 366
+Content-Length: 374
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -178,18 +178,18 @@ Date: REGEX(.*)
     {
         "humidity": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 80
         },
         "id": "E1",
         "status": {
             "metadata": {},
-            "type": "none",
+            "type": "Text",
             "value": "OK"
         },
         "temperature": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 20
         },
         "type": "T"
@@ -197,18 +197,18 @@ Date: REGEX(.*)
     {
         "humidity": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 70
         },
         "id": "E2",
         "status": {
             "metadata": {},
-            "type": "none",
+            "type": "Text",
             "value": "ERR"
         },
         "temperature": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 30
         },
         "type": "T"

@@ -26,7 +26,7 @@ Subscription sequence wildcards ONCHANGE append
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -149,6 +149,7 @@ Date: REGEX(.*)
 03. Get accumulated data
 ========================
 POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 480
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
@@ -157,28 +158,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Room",
-        "isPattern" : "false",
-        "id" : "OfficeRoom",
-        "attributes" : [
-          {
-            "name" : "pressure",
-            "type" : "clima",
-            "value" : "p23"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": "p23"
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 

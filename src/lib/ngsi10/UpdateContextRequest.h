@@ -30,7 +30,6 @@
 
 #include "ngsi/ContextElementVector.h"
 #include "ngsi/UpdateActionType.h"
-#include "rest/ConnectionInfo.h"
 #include "apiTypesV2/Entity.h"
 #include "apiTypesV2/Entities.h"
 
@@ -60,8 +59,8 @@ typedef struct UpdateContextRequest
   UpdateContextRequest();
   UpdateContextRequest(const std::string& _contextProvider, EntityId* eP);
 
-  std::string        render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
-  std::string        check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
+  std::string        render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent);
+  std::string        check(ApiVersion apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError, int counter);
   void               release(void);
   ContextAttribute*  attributeLookup(EntityId* eP, const std::string& attributeName);
 

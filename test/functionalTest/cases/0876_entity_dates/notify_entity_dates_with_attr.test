@@ -1,0 +1,963 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Notify entity dates as attributes
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01a. Create sub1 for E1 with attrs: dateCreated
+# 01b. Create entity E1 with attribute A and B
+# 01c. Update entity to trigger a second notification
+# 01d. Dump and reset: see E1 with attribute dateCreated (2 notifications)
+#
+# 02a. Create sub2 for E2 with attrs: dateModified
+# 02b. Create entity E2 with attribute A and B
+# 02c. Update entity to trigger a second notification
+# 02d. Dump and reset: see E2 with attribute dateModified (2 notifications)
+#
+# 03a. Create sub3 for E3 with attrs: dateCreated,dateModified
+# 03b. Create entity E3 with attribute A and B
+# 03c. Update entity to trigger a second notification
+# 03d. Dump and reset: see E3 with attributes dateCreated and dateModified (2 notifications)
+#
+# 04a. Create sub4 for E4 with attrs: dateModified,dateCreated,*
+# 04b. Create entity E4 with attribute A and B
+# 04c. Update entity to trigger a second notification
+# 04d. Dump and reset: see E4 with attributes A, B, dateCreated, dateModified (2 notifications)
+#
+# 05a. Create sub5 for E5 with attrs: dateModified,dateCreated,A
+# 05b. Create entity E5 with attribute A and B
+# 05c. Update entity to trigger a second notification
+# 05d. Dump and reset: see E5 with attributes A, dateCreated, dateModified (2 notifications)
+#
+# 06a. Create sub6 for E6 with attrs: B
+# 06b. Create entity E6 with attribute A and B
+# 06c. Update entity to trigger a second notification
+# 06d. Dump and reset: see E6 with attribute B (2 notifications)
+#
+
+echo "01a. Create sub1 for E1 with attrs: dateCreated"
+echo "==============================================="
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attrs": [ ]
+         }
+    },
+    "notification": {
+        "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"},
+        "attrs": [ "dateCreated" ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "01b. Create entity E1 with attribute A and B"
+echo "============================================"
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A": 1,
+  "B": 10
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "01c. Update entity to trigger a second notification"
+echo "==================================================="
+payload='{
+  "value": 100
+}'
+orionCurl --url /v2/entities/E1/attrs/A -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "01d. Dump and reset: see E1 with attribute dateCreated (2 notifications)"
+echo "========================================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "02a. Create sub2 for E2 with attrs: dateModified"
+echo "================================================"
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "id": "E2",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attrs": [ ]
+         }
+    },
+    "notification": {
+        "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"},
+        "attrs": [ "dateModified" ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02b. Create entity E2 with attribute A and B"
+echo "============================================"
+payload='{
+  "id": "E2",
+  "type": "T",
+  "A": 2,
+  "B": 20
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "02c. Update entity to trigger a second notification"
+echo "==================================================="
+payload='{
+  "value": 200
+}'
+orionCurl --url /v2/entities/E2/attrs/A -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "02d. Dump and reset: see E2 with attribute dateModified (2 notifications)"
+echo "========================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "03a. Create sub3 for E3 with attrs: dateCreated,dateModified"
+echo "============================================================"
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "id": "E3",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attrs": [ ]
+         }
+    },
+    "notification": {
+        "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"},
+        "attrs": [ "dateCreated", "dateModified" ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03b. Create entity E3 with attribute A and B"
+echo "============================================"
+payload='{
+  "id": "E3",
+  "type": "T",
+  "A": 3,
+  "B": 30
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "03c. Update entity to trigger a second notification"
+echo "==================================================="
+payload='{
+  "value": 300
+}'
+orionCurl --url /v2/entities/E3/attrs/A -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "03d. Dump and reset: see E3 with attributes dateCreated and dateModified (2 notifications)"
+echo "=========================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04a. Create sub4 for E4 with attrs: dateModified,dateCreated,*"
+echo "=============================================================="
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "id": "E4",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attrs": [ ]
+         }
+    },
+    "notification": {
+        "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"},
+        "attrs": [ "dateModified", "dateCreated", "*" ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04b. Create entity E4 with attribute A and B"
+echo "============================================"
+payload='{
+  "id": "E4",
+  "type": "T",
+  "A": 4,
+  "B": 40
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "04c. Update entity to trigger a second notification"
+echo "==================================================="
+payload='{
+  "value": 400
+}'
+orionCurl --url /v2/entities/E4/attrs/A -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "04d. Dump and reset: see E4 with attributes A, B, dateCreated, dateModified (2 notifications)"
+echo "============================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "05a. Create sub5 for E5 with attrs: dateModified,dateCreated,A"
+echo "=============================================================="
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "id": "E5",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attrs": [ ]
+         }
+    },
+    "notification": {
+        "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"},
+        "attrs": [ "dateModified", "dateCreated", "A" ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05b. Create entity E5 with attribute A and B"
+echo "============================================"
+payload='{
+  "id": "E5",
+  "type": "T",
+  "A": 5,
+  "B": 50
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "05c. Update entity to trigger a second notification"
+echo "==================================================="
+payload='{
+  "value": 500
+}'
+orionCurl --url /v2/entities/E5/attrs/A -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "05d. Dump and reset: see E5 with attributes A, dateCreated, dateModified (2 notifications)"
+echo "=========================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "06a. Create sub6 for E6 with attrs: B"
+echo "====================================="
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "id": "E6",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attrs": [ ]
+         }
+    },
+    "notification": {
+        "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"},
+        "attrs": [ "B" ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "06b. Create entity E6 with attributes A and B"
+echo "============================================="
+payload='{
+  "id": "E6",
+  "type": "T",
+  "A": 6,
+  "B": 60
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "06c. Update entity to trigger a second notification"
+echo "==================================================="
+payload='{
+  "value": 600
+}'
+orionCurl --url /v2/entities/E6/attrs/A -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "06d. Dump and reset: see E6 with attribute B (2 notifications)"
+echo "=============================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01a. Create sub1 for E1 with attrs: dateCreated
+===============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+01b. Create entity E1 with attribute A and B
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+01c. Update entity to trigger a second notification
+===================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+01d. Dump and reset: see E1 with attribute dateCreated (2 notifications)
+========================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 159
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "dateCreated": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "REGEX(2\d\d\d\-.*)"
+            },
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 159
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "dateCreated": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "REGEX(2\d\d\d\-.*)"
+            },
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+02a. Create sub2 for E2 with attrs: dateModified
+================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02b. Create entity E2 with attribute A and B
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02c. Update entity to trigger a second notification
+===================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02d. Dump and reset: see E2 with attribute dateModified (2 notifications)
+=========================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 160
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "dateModified": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "REGEX(2\d\d\d\-.*)"
+            },
+            "id": "E2",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 160
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "dateModified": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "REGEX(2\d\d\d\-.*)"
+            },
+            "id": "E2",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+03a. Create sub3 for E3 with attrs: dateCreated,dateModified
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03b. Create entity E3 with attribute A and B
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03c. Update entity to trigger a second notification
+===================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03d. Dump and reset: see E3 with attributes dateCreated and dateModified (2 notifications)
+==========================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 242
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "dateCreated": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "REGEX(2\d\d\d\-.*)"
+            },
+            "dateModified": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "REGEX(2\d\d\d\-.*)"
+            },
+            "id": "E3",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 242
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "dateCreated": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "REGEX(2\d\d\d\-.*)"
+            },
+            "dateModified": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "REGEX(2\d\d\d\-.*)"
+            },
+            "id": "E3",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+04a. Create sub4 for E4 with attrs: dateModified,dateCreated,*
+==============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04b. Create entity E4 with attribute A and B
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04c. Update entity to trigger a second notification
+===================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04d. Dump and reset: see E4 with attributes A, B, dateCreated, dateModified (2 notifications)
+=============================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 335
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Number",
+                "value": 4
+            },
+            "B": {
+                "metadata": {},
+                "type": "Number",
+                "value": 40
+            },
+            "dateCreated": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "REGEX(2\d\d\d\-.*)"
+            },
+            "dateModified": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "REGEX(2\d\d\d\-.*)"
+            },
+            "id": "E4",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 337
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Number",
+                "value": 400
+            },
+            "B": {
+                "metadata": {},
+                "type": "Number",
+                "value": 40
+            },
+            "dateCreated": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "REGEX(2\d\d\d\-.*)"
+            },
+            "dateModified": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "REGEX(2\d\d\d\-.*)"
+            },
+            "id": "E4",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+05a. Create sub5 for E5 with attrs: dateModified,dateCreated,A
+==============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05b. Create entity E5 with attribute A and B
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E5?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05c. Update entity to trigger a second notification
+===================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05d. Dump and reset: see E5 with attributes A, dateCreated, dateModified (2 notifications)
+==========================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 288
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Number",
+                "value": 5
+            },
+            "dateCreated": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "REGEX(2\d\d\d\-.*)"
+            },
+            "dateModified": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "REGEX(2\d\d\d\-.*)"
+            },
+            "id": "E5",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 290
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Number",
+                "value": 500
+            },
+            "dateCreated": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "REGEX(2\d\d\d\-.*)"
+            },
+            "dateModified": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "REGEX(2\d\d\d\-.*)"
+            },
+            "id": "E5",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+06a. Create sub6 for E6 with attrs: B
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06b. Create entity E6 with attributes A and B
+=============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E6?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06c. Update entity to trigger a second notification
+===================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06d. Dump and reset: see E6 with attribute B (2 notifications)
+==============================================================
+POST http://localhost:9997/notify
+Fiware-Servicepath: /
+Content-Length: 124
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:9997
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "B": {
+                "metadata": {},
+                "type": "Number",
+                "value": 60
+            },
+            "id": "E6",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 124
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "B": {
+                "metadata": {},
+                "type": "Number",
+                "value": 60
+            },
+            "id": "E6",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop $LISTENER_PORT
+dbDrop CB

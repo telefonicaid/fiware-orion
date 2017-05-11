@@ -48,7 +48,7 @@ public:
     DBClientConnectionMock() {
         /* By default, all methods are redirected to the parent ones. We use the
          * technique described at
-         * http://code.google.com/p/googlemock/wiki/CookBook#Delegating_Calls_to_a_Parent_Class */
+         * https://github.com/google/googletest/blob/master/googlemock/docs/CookBook.md#delegating-calls-to-a-parent-class */
         ON_CALL(*this, count(_,_,_,_,_))
                 .WillByDefault(Invoke(this, &DBClientConnectionMock::parent_count));
         ON_CALL(*this, findOne(_,_,_,_))
@@ -163,13 +163,21 @@ public:
          * actually created/sent */
     }
 
-    MOCK_METHOD8(sendNotifyContextRequest, void(NotifyContextRequest* ncr, const ngsiv2::HttpInfo& httpInfo, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, RenderFormat renderFormat, const std::vector<std::string>&  attrsFilter, bool blacklist));
+    MOCK_METHOD9(sendNotifyContextRequest, void(NotifyContextRequest* ncr, const ngsiv2::HttpInfo& httpInfo, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, RenderFormat renderFormat, const std::vector<std::string>&  attrsFilter, const std::vector<std::string>&  metadataFilter, bool blacklist));
     MOCK_METHOD5(sendNotifyContextAvailabilityRequest, void(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, const std::string& fiwareCorrelator, RenderFormat renderFormat));
 
     /* Wrappers for parent methods (used in ON_CALL() defaults set in the constructor) */
-    void parent_sendNotifyContextRequest(NotifyContextRequest* ncr, const ngsiv2::HttpInfo& httpInfo, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, RenderFormat renderFormat, const std::vector<std::string>&  attrsFilter)
+    void parent_sendNotifyContextRequest(NotifyContextRequest*            ncr,
+                                         const ngsiv2::HttpInfo&          httpInfo,
+                                         const std::string&               tenant,
+                                         const std::string&               xauthToken,
+                                         const std::string&               fiwareCorrelator,
+                                         RenderFormat                     renderFormat,
+                                         const std::vector<std::string>&  attrsFilter,
+                                         const std::vector<std::string>&  metadataFilter,
+                                         bool                             blacklist = false)
     {
-      Notifier::sendNotifyContextRequest(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsFilter);
+      Notifier::sendNotifyContextRequest(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsFilter, metadataFilter, blacklist);
     }
     void parent_sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, const std::string& fiwareCorrelator, RenderFormat renderFormat)
     {

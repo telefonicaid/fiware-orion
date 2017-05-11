@@ -43,6 +43,8 @@
 */
 static std::string parseMetadataObject(const Value& start, Metadata* mdP)
 {
+  bool  compoundVector = false;
+
   for (Value::ConstMemberIterator iter = start.MemberBegin(); iter != start.MemberEnd(); ++iter)
   {
     std::string name   = iter->name.GetString();
@@ -87,8 +89,10 @@ static std::string parseMetadataObject(const Value& start, Metadata* mdP)
       }
       else if ((type == "Array") || (type == "Object"))
       {
+        compoundVector = (type == "Array")? true : false;
         mdP->valueType = orion::ValueTypeObject;  // Used both for Array and Object ...
-        std::string r = parseMetadataCompoundValue(iter, mdP, NULL);
+        std::string r  = parseMetadataCompoundValue(iter, mdP, NULL);
+
         if (r != "OK")
         {
           alarmMgr.badInput(clientIp, "json parse error in Metadata compound value");
@@ -109,10 +113,25 @@ static std::string parseMetadataObject(const Value& start, Metadata* mdP)
     }
   }
 
+  // Is it a date?
+  if ((mdP->type == DATE_TYPE) || (mdP->type == DATE_TYPE_ALT))
+  {
+    mdP->numberValue =  parse8601Time(mdP->stringValue);
+
+    if (mdP->numberValue == -1)
+    {
+      alarmMgr.badInput(clientIp, "date has invalid format");
+      return "date has invalid format";
+    }
+
+    // Probably reseting stringValue is not needed, but let's do it for cleanliness
+    mdP->stringValue = "";
+    mdP->valueType   = orion::ValueTypeNumber;
+  }
 
   if (!mdP->typeGiven)
   {
-    mdP->type = DEFAULT_TYPE;
+    mdP->type = (compoundVector)? defaultType(orion::ValueTypeVector) : defaultType(mdP->valueType);
   }
 
   return "OK";
@@ -134,7 +153,6 @@ std::string parseMetadata(const Value& val, Metadata* mdP)
     return "metadata must be a JSON object";
   }
 
-  mdP->type = DEFAULT_TYPE;
   s = parseMetadataObject(val, mdP);
 
   return s;

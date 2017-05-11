@@ -182,13 +182,13 @@ Date: REGEX(.*)
 02. POST /v2/entities (empty payload)
 =====================================
 HTTP/1.1 400 Bad Request
-Content-Length: 61
+Content-Length: 83
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "no entity id specified",
+    "description": "entity id length: 0, min length supported: 1",
     "error": "BadRequest"
 }
 
@@ -304,14 +304,14 @@ Date: REGEX(.*)
 11. GET /v2/entities/E1/attrs/A1
 =================================
 HTTP/1.1 200 OK
-Content-Length: 39
+Content-Length: 41
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "Number",
     "value": 0
 }
 
@@ -335,7 +335,7 @@ Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "none",
+    "type": "None",
     "value": null
 }
 

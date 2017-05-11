@@ -24,8 +24,12 @@
 */
 #include <string>
 
-#include "ngsi/ContextElement.h"
+#include "logMsg/logMsg.h"
+
+#include "common/string.h"
 #include "common/macroSubstitute.h"
+
+#include "ngsi/ContextElement.h"
 
 
 
@@ -48,10 +52,7 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
     }
     else if (vec[ix]->valueType == orion::ValueTypeNumber)
     {
-      char i[STRING_SIZE_FOR_INT];
-
-      snprintf(i, sizeof(i), "%f", vec[ix]->numberValue);
-      *valueP = i;
+      *valueP = toString(vec[ix]->numberValue);
     }
     else if (vec[ix]->valueType == orion::ValueTypeBoolean)
     {

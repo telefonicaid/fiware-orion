@@ -563,6 +563,7 @@ void ensureLocationIndex(const std::string& tenant)
 }
 
 
+
 /* ****************************************************************************
 *
 * matchEntity -
@@ -588,9 +589,9 @@ bool matchEntity(const EntityId* en1, const EntityId* en2)
     else
     {
       idMatch = (regexec(&regex, en1->id.c_str(), 0, NULL, 0) == 0);
-    }
 
-    regfree(&regex);
+      regfree(&regex);  // If regcomp fails it frees up itself (see glibc sources for details)
+    }
   }
   else  /* isPattern == false */
   {
@@ -600,6 +601,7 @@ bool matchEntity(const EntityId* en1, const EntityId* en2)
   // Note that type == "" is like a * wildcard for type
   return idMatch && (en1->type == "" || en2->type == "" || en2->type == en1->type);
 }
+
 
 
 /* ****************************************************************************
@@ -667,7 +669,14 @@ static void fillQueryEntity(BSONArrayBuilder& ba, const EntityId* enP)
 
   if (enP->type != "")
   {
-    ent.append(typeString, enP->type);
+    if (enP->isTypePattern)
+    {
+      ent.appendRegex(typeString, enP->type);
+    }
+    else
+    {
+      ent.append(typeString, enP->type);
+    }
   }
 
   BSONObj entObj = ent.obj();
@@ -994,6 +1003,51 @@ bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
 
 /* ****************************************************************************
 *
+* addDatesForAttrs -
+*/
+static void addDatesForAttrs(ContextElementResponse* cerP, bool includeCreDate, bool includeModDate)
+{
+  for (unsigned int ix = 0; ix < cerP->contextElement.contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = cerP->contextElement.contextAttributeVector[ix];
+    if (includeCreDate && caP->creDate != 0)
+    {
+      Metadata*   mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, caP->creDate);
+      caP->metadataVector.push_back(mdP);
+    }
+
+    if (includeModDate && caP->modDate != 0)
+    {
+      Metadata*   mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, caP->modDate);
+      caP->metadataVector.push_back(mdP);
+    }
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* isCustomAttr -
+*
+* Check that the parameter is a not custom attr, e.g. dateCreated
+*
+* FIXME P2: this function probably could be moved to another place "closer" to attribute classes
+*/
+static bool isCustomAttr(std::string attrName)
+{
+  if ((attrName != DATE_CREATED) && (attrName != DATE_MODIFIED) && (attrName != ALL_ATTRS))
+  {
+    return false;
+  }
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
 * entitiesQuery -
 *
 * This method is used by queryContext and subscribeContext (ONCHANGE conditions). It takes
@@ -1010,6 +1064,7 @@ bool entitiesQuery
 (
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
+  const AttributeList&             metadataList,
   const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
@@ -1020,11 +1075,8 @@ bool entitiesQuery
   int                              limit,
   bool*                            limitReached,
   long long*                       countP,
-  bool*                            badInputP,
   const std::string&               sortOrderList,
-  bool                             includeCreDate,
-  bool                             includeModDate,
-  const std::string&               apiVersion
+  ApiVersion                       apiVersion
 )
 {
   /* Query structure is as follows
@@ -1061,8 +1113,13 @@ bool entitiesQuery
   {
     std::string attrName = attrL[ix];
 
-    attrs.append(attrName);
-    LM_T(LmtMongo, ("Attribute query token: '%s'", attrName.c_str()));
+    /* Custom metadata (e.g. dateCreated) are not "real" attributes in the DB, so they cannot
+     * be included in the search query */
+    if (!isCustomAttr(attrName))
+    {
+      attrs.append(attrName);
+      LM_T(LmtMongo, ("Attribute query token: '%s'", attrName.c_str()));
+    }
   }
 
   if (attrs.arrSize() > 0)
@@ -1082,7 +1139,7 @@ bool entitiesQuery
 
     if (scopeP->type.find(SCOPE_FILTER) == 0)
     {
-      // FIXME P5: NGSI "v1" filter, probably to be removed in the future
+      // FIXME P5: NGSIv1 filter, probably to be removed in the future
       addFilterScope(scopeP, filters);
     }
     else if (scopeP->type == FIWARE_LOCATION || scopeP->type == FIWARE_LOCATION_DEPRECATED || scopeP->type == FIWARE_LOCATION_V2)
@@ -1219,6 +1276,7 @@ bool entitiesQuery
       // So, we can just match the error and send a less descriptive text.
       //
       const char* invalidPolygon      = "Exterior shell of polygon is invalid";
+      const char* sortError           = "nextSafe(): { $err: \"Executor error: OperationFailed Sort operation used more than the maximum";
       const char* defaultErrorString  = "Error at querying MongoDB";
 
       alarmMgr.dbError(exErr);
@@ -1226,6 +1284,10 @@ bool entitiesQuery
       if (strncmp(exErr.c_str(), invalidPolygon, strlen(invalidPolygon)) == 0)
       {
         exErr = invalidPolygon;
+      }
+      else if (strncmp(exErr.c_str(), sortError, strlen(sortError)) == 0)
+      {
+        exErr = "Sort operation used more than the maximum RAM. You should create an index. Check the Database Administration section in Orion documentation.";
       }
       else
       {
@@ -1250,6 +1312,7 @@ bool entitiesQuery
 
       cer->statusCode.fill(SccReceiverInternalError, exErr);
       cerV->push_back(cer);
+      releaseMongoConnection(connection);
       return true;
     }
     catch (const std::exception &e)
@@ -1272,14 +1335,21 @@ bool entitiesQuery
     // Build CER from BSON retrieved from DB
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
-    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, includeCreDate, includeModDate, apiVersion);
-    cer->statusCode.fill(SccOk);
+    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, apiVersion);
+
+    addDatesForAttrs(cer, metadataList.lookup(NGSI_MD_DATECREATED), metadataList.lookup(NGSI_MD_DATEMODIFIED));
 
     /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
     for (unsigned int ix = 0; ix < attrL.size(); ++ix)
     {
       bool         found     = false;
       std::string  attrName  = attrL[ix];
+
+      /* The special case "*" is not taken into account*/
+      if (attrName == ALL_ATTRS)
+      {
+        continue;
+      }
 
       for (unsigned int jx = 0; jx < cer->contextElement.contextAttributeVector.size(); ++jx)
       {
@@ -1809,6 +1879,30 @@ AttributeList subToAttributeList(const BSONObj& sub)
 }
 
 
+#if 0
+/* ****************************************************************************
+*
+* setOnSubscriptionMetadata -
+*
+* FIXME #920: disabled by the moment, maybe removed at the end
+*/
+static void setOnSubscriptionMetadata(ContextElementResponseVector* cerVP)
+{
+  for (unsigned int ix = 0; ix < cerVP->size(); ix++)
+  {
+    ContextElementResponse* cerP = (*cerVP)[ix];
+
+    for (unsigned int jx = 0; jx < cerP->contextElement.contextAttributeVector.size(); jx++)
+    {
+      ContextAttribute* caP = cerP->contextElement.contextAttributeVector[jx];
+      Metadata* newMdP = new Metadata(NGSI_MD_NOTIF_ONSUBCHANGE, DEFAULT_ATTR_BOOL_TYPE, true);
+      caP->metadataVector.push_back(newMdP);
+    }
+  }
+}
+#endif
+
+
 /* ****************************************************************************
 *
 * processOnChangeConditionForSubscription -
@@ -1832,6 +1926,7 @@ static bool processOnChangeConditionForSubscription
 (
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
+  const std::vector<std::string>&  metadataV,
   ConditionValueList*              condValues,
   const std::string&               subId,
   const HttpInfo&                  notifyHttpInfo,
@@ -1842,22 +1937,24 @@ static bool processOnChangeConditionForSubscription
   const Restriction*               resP,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist = false
+  bool                             blacklist
 )
 {
   std::string                   err;
   NotifyContextRequest          ncr;
   ContextElementResponseVector  rawCerV;
   AttributeList                 emptyList;
+  AttributeList                 metadataList;
 
-  if (!blacklist && !entitiesQuery(enV, attrL, *resP, &rawCerV, &err, true, tenant, servicePathV))
+  metadataList.fill(metadataV);
+  if (!blacklist && !entitiesQuery(enV, attrL, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
 
     return false;
   }
-  else if (blacklist && !entitiesQuery(enV, emptyList, *resP, &rawCerV, &err, true, tenant, servicePathV))
+  else if (blacklist && !entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
@@ -1868,6 +1965,15 @@ static bool processOnChangeConditionForSubscription
   /* Prune "not found" CERs */
   pruneContextElements(rawCerV, &ncr.contextElementResponseVector);
   rawCerV.release();
+
+#if 0
+  // FIXME #920: disabled for the moment, maybe to be removed in the end
+  /* Append notification metadata */
+  if (metadataFlags)
+  {
+    setOnSubscriptionMetadata(&ncr.contextElementResponseVector);
+  }
+#endif
 
   if (ncr.contextElementResponseVector.size() > 0)
   {
@@ -1883,7 +1989,7 @@ static bool processOnChangeConditionForSubscription
       ContextElementResponseVector  allCerV;
 
 
-      if (!entitiesQuery(enV, emptyList, *resP, &rawCerV, &err, false, tenant, servicePathV))
+      if (!entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, false, tenant, servicePathV))
       {
         rawCerV.release();
         ncr.contextElementResponseVector.release();
@@ -1898,7 +2004,7 @@ static bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
-        getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, blacklist);
+        getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataV, blacklist);
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
@@ -1909,7 +2015,7 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
-      getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, blacklist);
+      getNotifier()->sendNotifyContextRequest(&ncr, notifyHttpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsOrder, metadataV, blacklist);
       ncr.contextElementResponseVector.release();
 
       return true;
@@ -1927,11 +2033,12 @@ static bool processOnChangeConditionForSubscription
 * processConditionVector -
 *
 */
-BSONArray processConditionVector
+static BSONArray processConditionVector
 (
   NotifyConditionVector*           ncvP,
   const EntityIdVector&            enV,
   const AttributeList&             attrL,
+  const std::vector<std::string>&  metadataV,
   const std::string&               subId,
   const HttpInfo&                  httpInfo,
   bool*                            notificationDone,
@@ -1965,6 +2072,7 @@ BSONArray processConditionVector
       if ((status == STATUS_ACTIVE) &&
           (processOnChangeConditionForSubscription(enV,
                                                    attrL,
+                                                   metadataV,
                                                    &(nc->condValueList),
                                                    subId,
                                                    httpInfo,
@@ -2005,6 +2113,7 @@ BSONArray processConditionVector
   const std::vector<std::string>&  condAttributesV,
   const std::vector<EntID>&        entitiesV,
   const std::vector<std::string>&  notifAttributesV,
+  const std::vector<std::string>&  metadataV,
   const std::string&               subId,
   const HttpInfo&                  httpInfo,
   bool*                            notificationDone,
@@ -2030,6 +2139,7 @@ BSONArray processConditionVector
   BSONArray arr = processConditionVector(&ncV,
                                          enV,
                                          attrL,
+                                         metadataV,
                                          subId,
                                          httpInfo,
                                          notificationDone,

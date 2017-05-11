@@ -20,6 +20,7 @@
  For those usages not covered by this license please contact with
  iot_support at tid dot es
 """
+import time
 
 __author__ = 'Ivan Arias Leon (ivan dot ariasleon at telefonica dot com)'
 
@@ -49,8 +50,9 @@ def start_the_subscription_listener_as_a_daemon(context, port):
     __logger__.info("Starting the notification listener using the port: %s" % port)
     context.notification_endpoint = NOTIFICATION_ENDPOINT % port
     __logger__.info("notification endpoint: %s" % context.notification_endpoint)
-    d = Daemon(port=port, verbose=False)
-    assert d.is_alive_and_is_a_daemon(), "ERROR - the notification listener is not alive or it is not a daemon in the port: %s..." % port
+    context.d = Daemon(port=port, verbose=False)
+
+    assert context.d.is_alive_and_is_a_daemon(), "ERROR - the notification listener is not alive or it is not a daemon in the port: %s..." % port
 
 
 @step(u'get notification sent to listener')
@@ -59,9 +61,17 @@ def get_notification_sent_to_listener(context):
     get notification sent to listener
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
+    retry = 10
+    delay_to_retry = 1
     url = "%s/last_notification" % context.notification_endpoint
     __logger__.debug("url: %s" % url)
-    context.resp = requests.get(url)
+    # if the notification is not received in the listener, it is applied a policy of retries
+    for i in range(retry):
+        context.resp = requests.get(url)
+        if context.resp.text.find("without notification received") < 0:
+            break
+        time.sleep(delay_to_retry)
+        __logger__.debug("number of retries (%s) to catch notification from the listener" % str(i+1))
     __logger__.debug("notification received:")
     __logger__.debug("   headers")
     for h in context.resp.headers:
@@ -116,4 +126,40 @@ def verify_the_notification_in_a_given_format(context, notif_format):
     __logger__.debug("...verified the notification in \"%s\" format" % notif_format)
 
 
+@step(u'verify the custom notification')
+def verify_the_custom_notification(context):
+    """
+    verify the custom notification
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.debug("verifying the notification received with custom template...")
 
+    __logger__.debug("notification received")
+    __logger__.debug("headers: \n   %s" % context.resp.headers )
+    __logger__.debug("payload: \n   %s" % context.resp.text )
+
+    entity_context = context.cb.get_entity_context()
+    subsc_context = context.cb.get_subscription_context()
+    payload = context.resp.text
+    headers = context.resp.headers
+    ngsi = NGSI()
+    ngsi.verify_custom_notification(payload, headers, entity_context, subsc_context)
+    __logger__.info("...verified the notification received with custom template")
+
+@step(u'verify metadata in notification without special metadata')
+@step(u'verify metadata in notification with "([^"]*)"')
+def verify_metadata_in_notification(context, metadata_flags="*"):
+    """
+    verify metadata in notification
+    :param metadata_flags: metadata notified
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.debug("verifying metadata in the notification (custom user or special)...")
+    entity_context = context.cb.get_entity_context()
+    subsc_context = context.cb.get_subscription_context()
+    action_type = context.cb.get_action_type()
+    previous_value = context.cb.get_previous_value()
+    payload = context.resp.text
+    ngsi = NGSI()
+    ngsi.verify_metadata_notification(metadata_flags, payload, entity_context, subsc_context, action_type, previous_value)
+    __logger__.info("...verified metadata in the notification")

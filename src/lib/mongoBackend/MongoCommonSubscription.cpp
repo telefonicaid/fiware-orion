@@ -202,33 +202,46 @@ void setEntities(const Subscription& sub, BSONObjBuilder* b)
   BSONArrayBuilder entities;
   for (unsigned int ix = 0; ix < sub.subject.entities.size(); ++ix)
   {
-    EntID en = sub.subject.entities[ix];
+    EntID       en        = sub.subject.entities[ix];
+    std::string finalId;
+    std::string finalType;
+    std::string isIdPattern;
+    bool        isTypePattern = false;
 
-    if (en.type == "")
+    // Note that, due to legacy reasons, isPattern may be "true" or "false" (text)
+    // while isTypePattern may be true or false (boolean).
+
+    if (en.idPattern != "")
     {
-      if (en.id != "")
-      {
-        entities.append(BSON(CSUB_ENTITY_ID << en.id << CSUB_ENTITY_ISPATTERN << "false"));
-      }
-      else // idPattern
-      {
-        entities.append(BSON(CSUB_ENTITY_ID << en.idPattern << CSUB_ENTITY_ISPATTERN << "true"));
-      }
+      finalId = en.idPattern;
+      isIdPattern = "true";
     }
-    else // type != ""
+    else if (en.id != "")
     {
-      if (en.id != "")
-      {
-        entities.append(BSON(CSUB_ENTITY_ID << en.id <<
-                             CSUB_ENTITY_TYPE << en.type <<
-                             CSUB_ENTITY_ISPATTERN << "false"));
-      }
-      else // idPattern
-      {
-        entities.append(BSON(CSUB_ENTITY_ID << en.idPattern <<
-                             CSUB_ENTITY_TYPE << en.type <<
-                             CSUB_ENTITY_ISPATTERN << "true"));
-      }
+      finalId = en.id;
+      isIdPattern = "false";
+    }
+
+    if (en.typePattern != "")
+    {
+      finalType = en.typePattern;
+      isTypePattern = true;
+    }
+    else if (en.type != "")
+    {
+      finalType = en.type;
+      isTypePattern = false;
+    }
+
+    if (finalType.empty()) // no type provided
+    {
+      entities.append(BSON(CSUB_ENTITY_ID << finalId << CSUB_ENTITY_ISPATTERN << isIdPattern));
+    }
+    else // type provided
+    {
+      entities.append(BSON(   CSUB_ENTITY_ID   << finalId   << CSUB_ENTITY_ISPATTERN << isIdPattern
+                           << CSUB_ENTITY_TYPE << finalType << CSUB_ENTITY_ISTYPEPATTERN << isTypePattern
+                           ));
     }
   }
   BSONArray entitiesArr = entities.arr();
@@ -267,7 +280,10 @@ void setCondsAndInitialNotify
   const Subscription&              sub,
   const std::string&               subId,
   const std::string&               status,
+  const std::vector<std::string>&  notifAttributesV,
+  const std::vector<std::string>&  metadataV,
   const HttpInfo&                  httpInfo,
+  bool                             blacklist,
   RenderFormat                     attrsFormat,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,
@@ -283,9 +299,11 @@ void setCondsAndInitialNotify
 
   /* Conds vector (and maybe an initial notification) */
   *notificationDone = false;
+
   BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             sub.subject.entities,
-                                            sub.notification.attributes,
+                                            notifAttributesV,
+                                            metadataV,
                                             subId,
                                             httpInfo,
                                             notificationDone,
@@ -296,8 +314,8 @@ void setCondsAndInitialNotify
                                             &(sub.restriction),
                                             status,
                                             fiwareCorrelator,
-                                            sub.notification.attributes,
-                                            sub.notification.blacklist);
+                                            notifAttributesV,
+                                            blacklist);
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
@@ -321,12 +339,35 @@ void setLastNotification(long long lastNotification, BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setCount -
-*
 */
 void setCount(long long count, BSONObjBuilder* b)
 {
   b->append(CSUB_COUNT, count);
   LM_T(LmtMongo, ("Subscription count: %lu", count));
+}
+
+
+
+/* ****************************************************************************
+*
+* setLastFailure -
+*/
+void setLastFailure(long long lastFailure, BSONObjBuilder* b)
+{
+  b->append(CSUB_LASTFAILURE, lastFailure);
+  LM_T(LmtMongo, ("Subscription lastFailure: %lu", lastFailure));
+}
+
+
+
+/* ****************************************************************************
+*
+* setLastSuccess -
+*/
+void setLastSuccess(long long lastSuccess, BSONObjBuilder* b)
+{
+  b->append(CSUB_LASTSUCCESS, lastSuccess);
+  LM_T(LmtMongo, ("Subscription lastSuccess: %lu", lastSuccess));
 }
 
 
@@ -362,6 +403,8 @@ void setFormat(const Subscription& sub, BSONObjBuilder* b)
   LM_T(LmtMongo, ("Subscription format: %s", format.c_str()));
 }
 
+
+
 /* ****************************************************************************
 *
 * setBlacklist -
@@ -372,4 +415,23 @@ void setBlacklist(const Subscription& sub, BSONObjBuilder* b)
   bool bl = sub.notification.blacklist;
   b->append(CSUB_BLACKLIST, bl);
   LM_T(LmtMongo, ("Subscription blacklist: %s", bl ? "true" : "false"));
+}
+
+
+
+/* ****************************************************************************
+*
+* setMetadata -
+*
+*/
+void setMetadata(const Subscription& sub, BSONObjBuilder* b)
+{
+  BSONArrayBuilder metadata;
+  for (unsigned int ix = 0; ix < sub.notification.metadata.size(); ++ix)
+  {
+    metadata.append(sub.notification.metadata[ix]);
+  }
+  BSONArray metadataArr = metadata.arr();
+  b->append(CSUB_METADATA, metadataArr);
+  LM_T(LmtMongo, ("Subscription metadata: %s", metadataArr.toString().c_str()));
 }

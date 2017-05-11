@@ -29,6 +29,7 @@
 
 #include "alarmMgr/alarmMgr.h"
 #include "common/globals.h"
+#include "common/errorMessages.h"
 #include "common/RenderFormat.h"
 #include "common/string.h"
 #include "rest/ConnectionInfo.h"
@@ -70,7 +71,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
 
   if (document.HasParseError())
   {
-    OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
+    OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     alarmMgr.badInput(clientIp, "JSON parse error");
     ciP->httpStatusCode = SccBadRequest;
     return oe.toJson();
@@ -78,7 +79,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
 
   if (!document.IsObject())
   {
-    OrionError oe(SccBadRequest, "Error parsing incoming JSON buffer", ERROR_STRING_PARSERROR);
+    OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     alarmMgr.badInput(clientIp, "JSON parse error");
     ciP->httpStatusCode = SccBadRequest;
     return oe.toJson();
@@ -91,7 +92,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     // research was made and "ObjectEmpty" was found. As the broker stopped crashing and complaints
     // about crashes with small docs and "Empty()" were found on the internet, we opted to use ObjectEmpty
     //
-    return badInput(ciP, "empty payload");
+    return badInput(ciP, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD);
   }
 
 
@@ -307,9 +308,16 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
       return badInput(ciP, "subject entities element has id and idPattern");
     }
 
+    if (iter->HasMember("type") && iter->HasMember("typePattern"))
+    {
+      return badInput(ciP, "subject entities element has type and typePattern");
+    }
+
+
     std::string  id;
     std::string  idPattern;
     std::string  type;
+    std::string  typePattern;
 
     {
       Opt<std::string> idOpt = getStringOpt(*iter, "id", "subject entities element id");
@@ -354,31 +362,63 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
         regex_t re;
         if (regcomp(&re, idPattern.c_str(), REG_EXTENDED) != 0)
         {
-          return badInput(ciP, "Invalid regex for entity id pattern");
+          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTIDPATTERN);
         }
-        regfree(&re);  // As the regex is not yet propagated ...
+        regfree(&re);  // If regcomp fails it frees up itself
       }
     }
 
-    Opt<std::string> typeOpt = getStringOpt(*iter, "type", "subject entities element type");
-    if (!typeOpt.ok())
     {
-      return badInput(ciP, typeOpt.error);
-    }
-    else if (typeOpt.given)
-    {
-      if (forbiddenIdCharsV2(typeOpt.value.c_str()))
+      Opt<std::string> typeOpt = getStringOpt(*iter, "type", "subject entities element type");
+      if (!typeOpt.ok())
       {
-        return badInput(ciP, "forbidden characters in subject entities element type");
+        return badInput(ciP, typeOpt.error);
       }
-      if (typeOpt.value.length() > MAX_ID_LEN)
+      else if (typeOpt.given)
       {
-        return badInput(ciP, "max type length exceeded");
+        if (forbiddenIdCharsV2(typeOpt.value.c_str()))
+        {
+          return badInput(ciP, "forbidden characters in subject entities element type");
+        }
+        if (typeOpt.value.length() > MAX_ID_LEN)
+        {
+          return badInput(ciP, "max type length exceeded");
+        }
+        if (typeOpt.value.empty())
+        {
+          return badInput(ciP, ERROR_DESC_BAD_REQUEST_EMPTY_ENTTYPE);
+        }
+        type = typeOpt.value;
       }
-      type = typeOpt.value;
     }
 
-    EntID  eid(id, idPattern, type);
+    {
+      Opt<std::string> typePatOpt = getStringOpt(*iter, "typePattern", "subject entities element typePattern");
+      if (!typePatOpt.ok())
+      {
+        return badInput(ciP, typePatOpt.error);
+      }
+      else if (typePatOpt.given)
+      {
+        if (typePatOpt.value.empty())
+        {
+          return badInput(ciP, "subject entities element typePattern is empty");
+        }
+
+        typePattern = typePatOpt.value;
+
+        // FIXME P5: Keep the regex and propagate to sub-cache
+        regex_t re;
+        if (regcomp(&re, typePattern.c_str(), REG_EXTENDED) != 0)
+        {
+          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTTYPEPATTERN);
+        }
+        regfree(&re);  // If regcomp fails it frees up itself
+      }
+    }
+
+
+    EntID  eid(id, idPattern, type, typePattern);
 
     if (std::find(eivP->begin(), eivP->end(), eid) == eivP->end()) // if not already included
     {
@@ -433,17 +473,11 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
         return badInput(ciP, "forbidden characters in http field /url/");
       }
 
+      if (!validUrl(urlOpt.value))
       {
-        std::string  host;
-        int          port;
-        std::string  path;
-        std::string  protocol;
-
-        if (parseUrl(urlOpt.value, host, port, path, protocol) == false)
-        {
-          return badInput(ciP, "Invalid URL parsing notification url");
-        }
+        return badInput(ciP, "Invalid URL parsing notification url");
       }
+
       subsP->notification.httpInfo.url    = urlOpt.value;
       subsP->notification.httpInfo.custom = false;
     }
@@ -469,6 +503,20 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       if (forbiddenChars(urlOpt.value.c_str()))
       {
         return badInput(ciP, "forbidden characters in custom /url/");
+      }
+
+      //
+      // Sanity check for custom url:
+      // If the url contains custom stuff (any ${xxx}), there is not
+      // much we can do.
+      // But if not, then the same check as for non-custom url can be used.
+      //
+      if (strstr(urlOpt.value.c_str(), "${") == NULL)
+      {
+        if (!validUrl(urlOpt.value))
+        {
+          return badInput(ciP, "invalid custom /url/");
+        }
       }
 
       subsP->notification.httpInfo.url = urlOpt.value;
@@ -582,6 +630,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     subsP->notification.blacklist = false;
+    subsP->blacklistProvided      = true;
   }
   else if (notification.HasMember("exceptAttrs"))
   {
@@ -598,6 +647,18 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     subsP->notification.blacklist = true;
+    subsP->blacklistProvided      = true;
+  }
+
+  // metadata
+  if (notification.HasMember("metadata"))
+  {
+    std::string r = parseAttributeList(ciP, &subsP->notification.metadata, notification["metadata"]);
+
+    if (r != "")
+    {
+      return r;
+    }
   }
 
   // attrsFormat field
@@ -802,7 +863,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
     {
       Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
       std::string  err;
-      if (scopeP->fill("v2", subExpr.geometry, subExpr.coords, subExpr.georel, &err) != 0)
+      if (scopeP->fill(V2, subExpr.geometry, subExpr.coords, subExpr.georel, &err) != 0)
       {
         delete scopeP;
         return badInput(ciP, "error parsing geo-query fields: " + err);
@@ -836,18 +897,22 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
     }
 
     std::string attrName = iter->GetString();
+
     if (attrName.empty())
     {
       return badInput(ciP, "attrs element is empty");
     }
+
     if (forbiddenIdCharsV2(attrName.c_str()))
     {
       return badInput(ciP, "attrs element has forbidden char");
     }
+
     if (attrName.length() > MAX_ID_LEN)
     {
       return badInput(ciP, "max attribute length exceeded");
     }
+
     vec->push_back(attrName);
   }
 

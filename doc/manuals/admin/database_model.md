@@ -39,9 +39,9 @@ Fields:
 -   **attrs** is an keymap of the different attributes that have been
     created for that entity. The key is generated with the attribute
     name (changing "." for "=", as "." is not a valid character in
-    MongoDB document keys), appending '\_\_<id>' in the case of having
+    MongoDB document keys), appending `()<id>` in the case of having
     and ID. For example, the attribute with name "my.attr" with ID "id1"
-    will use the following key: "my=attr\_\_id2". Each one of the
+    will use the following key: `my=attr()id2`. Each one of the
     elements in the map has the following information:
     -   **type**: the attribute type
     -   **value**: the attribute value (for those attribute that has
@@ -149,7 +149,7 @@ Example document:
            },
            "mdNames": [ "customMD1", "customMD2" ]
        },
-       "A2_ID101": {
+       "A2()ID101": {
            "type": "TA2",
            "value": "176",
            "creDate" : 1389376244,
@@ -277,16 +277,18 @@ Fields:
     guide](../user/duration.md)). For permanent subscriptions (allowed in NGSIv2)
     an absurdly high value is used (see PERMANENT_SUBS_DATETIME in the source code).
 -   **lastNotification**: the time when last notification was sent. This
-    is updated each time a notification is sent, to avoid
-    violating throttling.
+    is updated each time a notification is sent, to avoid violating throttling.
 -   **throttling**: minimum interval between notifications. 0 or -1 means no throttling.
 -   **reference**: the URL for notifications
 -   **entities**: an array of entities (mandatory). The JSON for each
-    entity contains **id**, **type** and **isPattern**.
+    entity contains **id**, **type**, **isPattern** and **isTypePattern**. Note that,
+    due to legacy reasons, **isPattern** may be `"true"` or `"false"` (text) while
+    **isTypePattern** may be `true` or `false` (boolean).
 -   **attrs**: an array of attribute names (strings) (optional).
--   **blacklist**: a boolean field that expecifies if `attrs` has to be interpreted
-    as a whitelist (if `blacklist` is equal to "false" or doesn't exist) or a
-    blacklist (if `blacklist` is equal to "true").
+-   **blacklist**: a boolean field that specifies if `attrs` has to be interpreted
+    as a whitelist (if `blacklist` is equal to `false` or doesn't exist) or a
+    blacklist (if `blacklist` is equal to `true`).
+-   **metadata**: an array of metadata names (strings) (optional).
 -   **conditions**: a list of attributes that trigger notifications.
 -   **expression**: an expression used to evaluate if notifications has
     to be sent or not when updates come. It may be composed of the following
@@ -304,6 +306,10 @@ Fields:
 -   **qs**: optional field to store the query parameters keymap for notification customization functionality in NGSIv2.
 -   **method**: optional field to store the HTTP method for notification customization functionality in NGSIv2.
 -   **payload**: optional field to store the payload for notification customization functionality in NGSIv2.
+-   **lastFailure**: the time when last notification failure occurred.
+    Not present if the subscription has never failed.
+-   **lastSuccess**: the time when last successful notification occurred.
+    Not present if the subscription has never provoked a successful notification.
 
 Example document:
 
@@ -317,7 +323,8 @@ Example document:
                 {
                         "id" : ".*",
                         "type" : "Room",
-                        "isPattern" : "true"
+                        "isPattern" : "true",
+                        "isTypePattern": false
                 }
         ],
         "attrs" : [
@@ -374,7 +381,7 @@ Example document:
  {
    "_id": ObjectId("51756c2220be8dc1b5f415ff"),
    "expiration": 1360236300,
-   "reference": "`[`http://notify.me`](http://notify.me)`",
+   "reference": "http://notify.me",
    "entities": [
        {
            "id": "E5",

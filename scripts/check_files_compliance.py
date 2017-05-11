@@ -27,7 +27,7 @@ import re
 from sys import argv
 
 header = []
-header.append('\s*Copyright( \(c\))? 201[3|4|5|6] Telefonica Investigacion y Desarrollo, S.A.U$')
+header.append('\s*Copyright( \(c\))? 201[3|4|5|6|7] Telefonica Investigacion y Desarrollo, S.A.U$')
 header.append('\s*$')
 header.append('\s*This file is part of Orion Context Broker.$')
 header.append('\s*$')
@@ -151,7 +151,7 @@ def supported_extension(root, file):
     :return:
     """
     extensions = ['py', 'cpp', 'h', 'xml', 'json', 'test', 'vtest', 'txt', 'sh', 'spec', 'cfg', 'DISABLED', 'xtest',
-                  'centos', 'js', 'jmx', 'vtestx', 'feature']
+                  'centos', 'js', 'jmx', 'vtestx', 'feature', 'go']
     names = ['makefile', 'Makefile']
 
     # Check extensions

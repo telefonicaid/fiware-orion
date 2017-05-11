@@ -63,7 +63,7 @@ TEST(exitTreat, error)
   utInit();
 
   harakiri = true;
-  ci1.apiVersion = "v1";
+  ci1.apiVersion = V1;
 
   out = restService(&ci1, rs);
   EXPECT_STREQ("DIE", out.c_str());

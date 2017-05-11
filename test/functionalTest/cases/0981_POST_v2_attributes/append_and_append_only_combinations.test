@@ -121,7 +121,7 @@ echo
 ========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -130,7 +130,7 @@ Date: REGEX(.*)
 02. Get E1 (only attr1)
 =======================
 HTTP/1.1 200 OK
-Content-Length: 73
+Content-Length: 76
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -138,11 +138,11 @@ Date: REGEX(.*)
 {
     "attr1": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 1
     },
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 
@@ -158,7 +158,7 @@ Date: REGEX(.*)
 04. Get E1 (attr1, attr2)
 =========================
 HTTP/1.1 200 OK
-Content-Length: 121
+Content-Length: 126
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -166,16 +166,16 @@ Date: REGEX(.*)
 {
     "attr1": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 1
     },
     "attr2": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 2
     },
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 
@@ -191,7 +191,7 @@ Date: REGEX(.*)
 06. Get E1 (attr1, attr2, attr3)
 ================================
 HTTP/1.1 200 OK
-Content-Length: 169
+Content-Length: 176
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -199,21 +199,21 @@ Date: REGEX(.*)
 {
     "attr1": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 1
     },
     "attr2": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 2
     },
     "attr3": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 3
     },
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 
@@ -229,7 +229,7 @@ Date: REGEX(.*)
 08. Get E1 (attr1, attr2, attr3, att4)
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 218
+Content-Length: 227
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -237,26 +237,26 @@ Date: REGEX(.*)
 {
     "attr1": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 1
     },
     "attr2": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 2
     },
     "attr3": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 33
     },
     "attr4": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 4
     },
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 
@@ -277,7 +277,7 @@ Date: REGEX(.*)
 10. Get E1 (attr1, attr2, attr3, attr4, attr5)
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 266
+Content-Length: 277
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -285,31 +285,31 @@ Date: REGEX(.*)
 {
     "attr1": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 1
     },
     "attr2": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 2
     },
     "attr3": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 33
     },
     "attr4": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 4
     },
     "attr5": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 5
     },
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 

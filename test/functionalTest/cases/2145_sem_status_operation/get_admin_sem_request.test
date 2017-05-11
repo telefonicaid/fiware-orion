@@ -44,7 +44,7 @@ echo
 01. Ask for the list of semaphores, using GET /admin/sem
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 323
+Content-Length: 354
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -66,6 +66,9 @@ Date: REGEX(.*)
         "status": "free"
     },
     "logMsg": {
+        "status": "free"
+    },
+    "metricsMgr": {
         "status": "free"
     },
     "request": {

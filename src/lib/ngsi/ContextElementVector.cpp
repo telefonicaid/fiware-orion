@@ -31,7 +31,6 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/ContextElementVector.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -52,25 +51,25 @@ void ContextElementVector::push_back(ContextElement* item)
 */
 std::string ContextElementVector::render
 (
-  ConnectionInfo*     ciP,
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
   RequestType         requestType,
   const std::string&  indent,
   bool                comma
 )
 {
   std::string  out = "";
-  std::string  key = "contextElements";
 
   if (vec.size() == 0)
   {
     return "";
   }
 
-  out += startTag2(indent, key, true, true);
+  out += startTag(indent, "contextElements", true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(ciP, requestType, indent + "  ", ix != vec.size() - 1);
+    out += vec[ix]->render(apiVersion, asJsonObject, requestType, indent + "  ", ix != vec.size() - 1);
   }
 
   out += endTag(indent, comma, true);
@@ -144,7 +143,7 @@ unsigned int ContextElementVector::size(void)
 */
 std::string ContextElementVector::check
 (
-  ConnectionInfo*     ciP,
+  ApiVersion          apiVersion,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,
@@ -163,7 +162,7 @@ std::string ContextElementVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType, indent, predetectedError, counter)) != "OK")
     {
       return res;
     }

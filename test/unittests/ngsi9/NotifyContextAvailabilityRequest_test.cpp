@@ -28,7 +28,6 @@
 #include "ngsi/ParseData.h"
 #include "common/globals.h"
 #include "jsonParse/jsonRequest.h"
-#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 
@@ -61,7 +60,7 @@ TEST(NotifyContextAvailabilityRequest, ok_json)
 
   const char*     outfile = "ngsi9.notifyContextAvailabilityRequest.ok.valid.json";
 
-  out = ncarP->render(NotifyContext, "");
+  out = ncarP->render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -81,11 +80,10 @@ TEST(NotifyContextAvailabilityRequest, check)
 {
   NotifyContextAvailabilityRequest  ncr;
   std::string                       out;
-  ConnectionInfo                    ci;
 
   utInit();
 
-  out = ncr.check(&ci, NotifyContextAvailability, "", "", 0);
+  out = ncr.check(V1, "", "", 0);
   EXPECT_EQ("OK", out);
    
   utExit();
@@ -128,7 +126,7 @@ TEST(NotifyContextAvailabilityRequest, json_render)
 
   // Test 1. contextRegistrationResponseVector with ONE contextRegistrationResponse instance
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  rendered = ncarP->render(QueryContext, "");
+  rendered = ncarP->render("");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   
 
@@ -149,7 +147,7 @@ TEST(NotifyContextAvailabilityRequest, json_render)
   crrP->contextRegistration.providingApplication.set("http://www.tid.es/NotifyContextAvailabilityRequestTest2");
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  rendered = ncarP->render(QueryContext, "");
+  rendered = ncarP->render("");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   
   utExit();

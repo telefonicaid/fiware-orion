@@ -36,7 +36,6 @@
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/UpdateContextResponse.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -71,7 +70,6 @@ UpdateContextResponse::UpdateContextResponse(StatusCode& _errorCode)
 UpdateContextResponse::~UpdateContextResponse()
 {
   errorCode.release();
-//  errorCode.keyNameSet("errorCode");
   contextElementResponseVector.release();
   LM_T(LmtDestructor, ("destroyed"));
 }
@@ -82,12 +80,11 @@ UpdateContextResponse::~UpdateContextResponse()
 *
 * UpdateContextResponse::render - 
 */
-std::string UpdateContextResponse::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent)
+std::string UpdateContextResponse::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
 {
   std::string out = "";
-  std::string tag = "updateContextResponse";
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent);
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
@@ -101,7 +98,9 @@ std::string UpdateContextResponse::render(ConnectionInfo* ciP, RequestType reque
       out += errorCode.render(indent + "  ");
     }
     else
-      out += contextElementResponseVector.render(ciP, RtUpdateContextResponse, indent + "  ", false);
+    {
+      out += contextElementResponseVector.render(apiVersion, asJsonObject, RtUpdateContextResponse, indent + "  ", false);
+    }
   }
   
   out += endTag(indent);
@@ -117,11 +116,10 @@ std::string UpdateContextResponse::render(ConnectionInfo* ciP, RequestType reque
 */
 std::string UpdateContextResponse::check
 (
-  ConnectionInfo*     ciP,
-  RequestType         requestType,
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
   const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
+  const std::string&  predetectedError
 )
 {
   std::string  res;
@@ -129,8 +127,8 @@ std::string UpdateContextResponse::check
   if (predetectedError != "")
   {
     errorCode.fill(SccBadRequest, predetectedError);
-  }
-  else if (contextElementResponseVector.check(ciP, UpdateContext, indent, predetectedError, 0) != "OK")
+  }  
+  else if (contextElementResponseVector.check(apiVersion, UpdateContext, indent, predetectedError, 0) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     errorCode.fill(SccBadRequest, res);
@@ -140,7 +138,7 @@ std::string UpdateContextResponse::check
     return "OK";
   }
 
-  return render(ciP, UpdateContext, indent);
+  return render(apiVersion, asJsonObject, indent);
 }
 
 

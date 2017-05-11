@@ -34,7 +34,6 @@
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/Request.h"
-#include "rest/uriParamNames.h"
 #include "orionTypes/EntityTypeVectorResponse.h"
 
 
@@ -43,16 +42,22 @@
 *
 * EntityTypeVectorResponse::render -
 */
-std::string EntityTypeVectorResponse::render(ConnectionInfo* ciP, const std::string& indent)
+std::string EntityTypeVectorResponse::render
+(
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
+  bool                asJsonOut,
+  bool                collapsed,
+  const std::string&  indent
+)
 {
-  std::string out                 = "";
-  std::string tag                 = "entityTypesResponse";
+  std::string out  = "";
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent);
 
   if (entityTypeVector.size() > 0)
   {
-    out += entityTypeVector.render(ciP, indent + "  ", true);
+    out += entityTypeVector.render(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", true);
   }
 
   out += statusCode.render(indent + "  ");
@@ -70,10 +75,11 @@ std::string EntityTypeVectorResponse::render(ConnectionInfo* ciP, const std::str
 */
 std::string EntityTypeVectorResponse::check
 (
-  ConnectionInfo*     ciP,
-  const std::string&  indent,
-  const std::string&  predetectedError
-)
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
+  bool                asJsonOut,
+  bool                collapsed,
+  const std::string&  predetectedError)
 {
   std::string res;
 
@@ -81,7 +87,7 @@ std::string EntityTypeVectorResponse::check
   {
     statusCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = entityTypeVector.check(ciP, indent, predetectedError)) != "OK")
+  else if ((res = entityTypeVector.check(apiVersion, predetectedError)) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     statusCode.fill(SccBadRequest, res);
@@ -91,7 +97,7 @@ std::string EntityTypeVectorResponse::check
     return "OK";
   }
 
-  return render(ciP, "");
+  return render(apiVersion, asJsonObject, asJsonOut, collapsed, "");
 }
 
 
@@ -127,19 +133,19 @@ void EntityTypeVectorResponse::release(void)
 *
 * EntityTypeVectorResponse::toJson - 
 */
-std::string EntityTypeVectorResponse::toJson(ConnectionInfo* ciP)
+std::string EntityTypeVectorResponse::toJson(bool values)
 {
   std::string  out = "[";
 
   for (unsigned int ix = 0; ix < entityTypeVector.vec.size(); ++ix)
   {
-    if (ciP->uriParamOptions["values"])
+    if (values)
     {
       out += JSON_STR(entityTypeVector.vec[ix]->type);
     }
     else  // default
     {
-      out += entityTypeVector.vec[ix]->toJson(ciP, true);
+      out += entityTypeVector.vec[ix]->toJson(true);
     }
 
     if (ix != entityTypeVector.vec.size() - 1)

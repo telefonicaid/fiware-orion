@@ -275,6 +275,7 @@ static void prepareDatabase(bool useSubCache = true)
   /* Given that preparation including csubs, we have to init cache */
   if (useSubCache == true)
   {
+    noCache = false;
     subCacheInit();
     subCacheRefresh();
   }
@@ -371,38 +372,34 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch)
     /* Prepare mock */
     NotifyContextRequest expectedNcr;      
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
@@ -421,7 +418,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
 
     utExit();
 }
@@ -436,50 +432,47 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;    
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    ContextAttribute ca4("A4", "TA4", "new_val");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    cerP->contextElement.contextAttributeVector.push_back(ca4P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A4", "TA4", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();   
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -491,7 +484,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch)
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -504,46 +498,43 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca2("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca2P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -556,7 +547,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -569,23 +561,26 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr1, expectedNcr2;
     expectedNcr1.originator.set("localhost");
     expectedNcr2.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr1.contextElementResponseVector.push_back(&cer);
-    expectedNcr2.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr1.contextElementResponseVector.push_back(cerP);
+    expectedNcr2.contextElementResponseVector.push_back(cerP);
     expectedNcr1.subscriptionId.set("51307b66f481db11bf860001");
     expectedNcr2.subscriptionId.set("51307b66f481db11bf860004");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
     ngsiv2::HttpInfo             httpInfo2("http://notify4.me");
 
@@ -593,30 +588,24 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2), MatchHttpInfo(&httpInfo2), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2), MatchHttpInfo(&httpInfo2), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -635,7 +624,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -648,25 +638,28 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr1, expectedNcr2;
     expectedNcr1.originator.set("localhost");
     expectedNcr2.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    ContextAttribute ca4("A4", "TA4", "new_val");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
-    expectedNcr1.contextElementResponseVector.push_back(&cer);
-    expectedNcr2.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    cerP->contextElement.contextAttributeVector.push_back(ca4P);
+    expectedNcr1.contextElementResponseVector.push_back(cerP);
+    expectedNcr2.contextElementResponseVector.push_back(cerP);
     expectedNcr1.subscriptionId.set("51307b66f481db11bf860001");
     expectedNcr2.subscriptionId.set("51307b66f481db11bf860004");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
     ngsiv2::HttpInfo             httpInfo2("http://notify4.me");
 
@@ -674,30 +667,24 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2), MatchHttpInfo(&httpInfo2), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2), MatchHttpInfo(&httpInfo2), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A4", "TA4", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();   
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -716,7 +703,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -729,21 +717,24 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr1, expectedNcr2;
     expectedNcr1.originator.set("localhost");
     expectedNcr2.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca2("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    expectedNcr1.contextElementResponseVector.push_back(&cer);
-    expectedNcr2.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca2P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    expectedNcr1.contextElementResponseVector.push_back(cerP);
+    expectedNcr2.contextElementResponseVector.push_back(cerP);
     expectedNcr1.subscriptionId.set("51307b66f481db11bf860001");
     expectedNcr2.subscriptionId.set("51307b66f481db11bf860004");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
     ngsiv2::HttpInfo             httpInfo2("http://notify4.me");
 
@@ -752,30 +743,24 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
     attrsFilter.push_back("A4");
 
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2), MatchHttpInfo(&httpInfo2), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2), MatchHttpInfo(&httpInfo2), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -793,7 +778,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -806,20 +792,23 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1;
-    cer1.contextElement.entityId.fill("E1", "T", "false");
-    ContextAttribute ca11("A1", "TA1", "new_val");
-    ContextAttribute ca13("A3", "TA3", "W");
-    cer1.contextElement.contextAttributeVector.push_back(&ca11);
-    cer1.contextElement.contextAttributeVector.push_back(&ca13);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    cer1P->contextElement.entityId.fill("E1", "T", "false");
+    ContextAttribute* ca11P = new ContextAttribute("A1", "TA1", "new_val");
+    ContextAttribute* ca13P = new ContextAttribute("A3", "TA3", "W");
+    cer1P->contextElement.contextAttributeVector.push_back(ca11P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca13P);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify3.me");
 
     attrsFilter.push_back("A1");
@@ -827,28 +816,22 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
     attrsFilter.push_back("A4");
 
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -863,7 +846,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -876,50 +860,47 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1;
-    cer1.contextElement.entityId.fill("E1", "T", "false");
-    ContextAttribute ca11("A1", "TA1", "X");
-    ContextAttribute ca13("A3", "TA3", "W");
-    ContextAttribute ca14("A4", "TA4", "new_val");
-    cer1.contextElement.contextAttributeVector.push_back(&ca11);
-    cer1.contextElement.contextAttributeVector.push_back(&ca13);
-    cer1.contextElement.contextAttributeVector.push_back(&ca14);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    cer1P->contextElement.entityId.fill("E1", "T", "false");
+    ContextAttribute* ca11P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca13P = new ContextAttribute("A3", "TA3", "W");
+    ContextAttribute* ca14P = new ContextAttribute("A4", "TA4", "new_val");
+    cer1P->contextElement.contextAttributeVector.push_back(ca11P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca13P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca14P);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify3.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T", "false");
-    ContextAttribute ca("A4", "TA4", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T", "false");
+    ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -931,10 +912,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -947,46 +928,43 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1;
-    cer1.contextElement.entityId.fill("E1", "T", "false");
-    ContextAttribute ca12("A3", "TA3", "W");
-    cer1.contextElement.contextAttributeVector.push_back(&ca12);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    cer1P->contextElement.entityId.fill("E1", "T", "false");
+    ContextAttribute* ca12P = new ContextAttribute("A3", "TA3", "W");
+    cer1P->contextElement.contextAttributeVector.push_back(ca12P);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify3.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T", "false");
-    ContextAttribute ca("A1", "TA1", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1000,7 +978,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1013,48 +992,45 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1;
-    cer1.contextElement.entityId.fill("E3", "T3", "false");
-    ContextAttribute ca11("A1", "TA1", "new_val");
-    ContextAttribute ca13("A3", "TA3", "W");
-    cer1.contextElement.contextAttributeVector.push_back(&ca11);
-    cer1.contextElement.contextAttributeVector.push_back(&ca13);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    cer1P->contextElement.entityId.fill("E3", "T3", "false");
+    ContextAttribute* ca11P = new ContextAttribute("A1", "TA1", "new_val");
+    ContextAttribute* ca13P = new ContextAttribute("A3", "TA3", "W");
+    cer1P->contextElement.contextAttributeVector.push_back(ca11P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca13P);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860005");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify5.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E3", "T3", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1068,7 +1044,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1081,50 +1058,47 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1;
-    cer1.contextElement.entityId.fill("E3", "T3", "false");
-    ContextAttribute ca11("A1", "TA1", "X");
-    ContextAttribute ca13("A3", "TA3", "W");
-    ContextAttribute ca14("A4", "TA4", "new_val");
-    cer1.contextElement.contextAttributeVector.push_back(&ca11);
-    cer1.contextElement.contextAttributeVector.push_back(&ca13);
-    cer1.contextElement.contextAttributeVector.push_back(&ca14);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    cer1P->contextElement.entityId.fill("E3", "T3", "false");
+    ContextAttribute* ca11P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca13P = new ContextAttribute("A3", "TA3", "W");
+    ContextAttribute* ca14P = new ContextAttribute("A4", "TA4", "new_val");
+    cer1P->contextElement.contextAttributeVector.push_back(ca11P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca13P);
+    cer1P->contextElement.contextAttributeVector.push_back(ca14P);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860005");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify5.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
-    ContextAttribute ca("A4", "TA4", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E3", "T3", "false");
+    ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1138,7 +1112,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1151,46 +1126,43 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1;
-    cer1.contextElement.entityId.fill("E3", "T3", "false");
-    ContextAttribute ca12("A3", "TA3", "W");
-    cer1.contextElement.contextAttributeVector.push_back(&ca12);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    cer1P->contextElement.entityId.fill("E3", "T3", "false");
+    ContextAttribute* ca12P = new ContextAttribute("A3", "TA3", "W");
+    cer1P->contextElement.contextAttributeVector.push_back(ca12P);
+    expectedNcr.contextElementResponseVector.push_back(cer1P);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860005");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify5.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
-    ContextAttribute ca("A1", "TA1", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E3", "T3", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1204,7 +1176,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1217,48 +1190,45 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchDisjoint)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A2", "TA2", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A2", "TA2", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1272,7 +1242,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchDisjoint)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1285,48 +1256,45 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatchDisjoint)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A5", "TA5", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A5", "TA5", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1340,7 +1308,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatchDisjoint)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1353,48 +1322,45 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A2", "TA2", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A2", "TA2", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1408,7 +1374,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1421,33 +1388,30 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateNoMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(0);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A3", "TA3", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A3", "TA3", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();   
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1461,7 +1425,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateNoMatch)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1474,33 +1439,30 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendNoMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(0);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A6", "TA6", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A6", "TA6", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1513,7 +1475,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendNoMatch)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1526,33 +1489,30 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(0);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */    
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A3", "TA3", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A3", "TA3", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1565,7 +1525,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1578,33 +1539,30 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchWithoutChang
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(0);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "X");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "X");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1617,7 +1575,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchWithoutChang
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1630,50 +1589,47 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val1");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val1");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute caa1("A1", "TA1", "new_val1");   // match
-    ContextAttribute caa2("A7", "TA7", "new_val7");   // no match
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A1", "TA1", "new_val1");   // match
+    ContextAttribute* caa2P = new ContextAttribute("A7", "TA7", "new_val7");   // no match
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1685,10 +1641,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1701,52 +1657,49 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMixMatchNoMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;    
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    ContextAttribute ca4("A4", "TA4", "new_val4");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val4");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    cerP->contextElement.contextAttributeVector.push_back(ca4P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */    
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute caa1("A4", "TA4", "new_val4");   // match
-    ContextAttribute caa2("A6", "TA6", "new_val6");   // no match
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A4", "TA4", "new_val4");   // match
+    ContextAttribute* caa2P = new ContextAttribute("A6", "TA6", "new_val6");   // no match
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1758,10 +1711,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMixMatchNoMatch)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1774,48 +1727,45 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute caa1("A3", "TA3", "");    // no match
-    ContextAttribute caa2("A2", "TA2", "");    // match
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A3", "TA3", "");    // no match
+    ContextAttribute* caa2P = new ContextAttribute("A2", "TA2", "");    // match
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1830,7 +1780,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1843,50 +1794,47 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notifica
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val1");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val1");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    setNotifier(notifierMock);  
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute caa1("A1", "TA1", "new_val1");
-    ContextAttribute caa2("A2", "TA2", "new_val2");
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A1", "TA1", "new_val1");
+    ContextAttribute* caa2P = new ContextAttribute("A2", "TA2", "new_val2");
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1902,7 +1850,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notifica
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1915,52 +1864,49 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notifica
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;   
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    ContextAttribute ca4("A4", "TA4", "new_val4");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val4");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    cerP->contextElement.contextAttributeVector.push_back(ca4P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */    
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute caa1("A4", "TA4", "new_val4");
-    ContextAttribute caa2("A5", "TA5", "new_val5");
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A4", "TA4", "new_val4");
+    ContextAttribute* caa2P = new ContextAttribute("A5", "TA5", "new_val5");
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1973,10 +1919,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notifica
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
     EXPECT_EQ(1, subP->count);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1989,46 +1935,43 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notifica
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(caP);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute caa1("A1", "TA1", "");
-    ce.contextAttributeVector.push_back(&caa1);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A1", "TA1", "");
+    ceP->contextAttributeVector.push_back(caa1P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2040,10 +1983,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notifica
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2056,49 +1999,46 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */    
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
 
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2110,10 +2050,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatch)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2126,50 +2066,47 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;    
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    ContextAttribute ca4("A4", "TA4", "new_val");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    cerP->contextElement.contextAttributeVector.push_back(ca4P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A4", "TA4", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2181,10 +2118,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatch)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2197,46 +2134,43 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca2("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca2P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca2P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */    
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A1", "TA1", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2248,10 +2182,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2264,48 +2198,45 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchDisjoint)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;    
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A2", "TA2", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A2", "TA2", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2320,7 +2251,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchDisjoint)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2333,48 +2265,45 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatchDisjoint)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;    
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A5", "TA5", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A5", "TA5", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2386,10 +2315,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatchDisjoint)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2402,48 +2331,45 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;    
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A2", "TA2", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A2", "TA2", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2455,10 +2381,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2471,33 +2397,30 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateNoMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock*                notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(0);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A3", "TA3", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A3", "TA3", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2510,7 +2433,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateNoMatch)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2523,33 +2447,30 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendNoMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(0);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A6", "TA6", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A6", "TA6", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2562,7 +2483,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendNoMatch)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2575,33 +2497,30 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(0);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */    
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A3", "TA3", "");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A3", "TA3", "");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2614,7 +2533,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2627,33 +2547,30 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchWithoutChang
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(0);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A1", "TA1", "X");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "X");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2666,7 +2583,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchWithoutChang
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2679,50 +2597,47 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMixMatchNoMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr; 
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val1");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val1");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */    
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute caa1("A1", "TA1", "new_val1");   // match
-    ContextAttribute caa2("A7", "TA7", "new_val7");   // no match
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A1", "TA1", "new_val1");   // match
+    ContextAttribute* caa2P = new ContextAttribute("A7", "TA7", "new_val7");   // no match
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2734,10 +2649,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMixMatchNoMatch)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2750,52 +2665,49 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMixMatchNoMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;   
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    ContextAttribute ca4("A4", "TA4", "new_val4");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val4");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    cerP->contextElement.contextAttributeVector.push_back(ca4P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */    
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute caa1("A4", "TA4", "new_val4");   // match
-    ContextAttribute caa2("A6", "TA6", "new_val6");    // no match
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A4", "TA4", "new_val4");   // match
+    ContextAttribute* caa2P = new ContextAttribute("A6", "TA6", "new_val6");    // no match
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2807,10 +2719,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMixMatchNoMatch)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2823,48 +2735,45 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute caa1("A3", "TA3", "");   // no match
-    ContextAttribute caa2("A2", "TA2", "");   // match
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A3", "TA3", "");   // no match
+    ContextAttribute* caa2P = new ContextAttribute("A2", "TA2", "");   // match
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2876,10 +2785,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2892,50 +2801,47 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notifica
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val1");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val1");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute caa1("A1", "TA1", "new_val1");
-    ContextAttribute caa2("A2", "TA2", "new_val2");
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A1", "TA1", "new_val1");
+    ContextAttribute* caa2P = new ContextAttribute("A2", "TA2", "new_val2");
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2948,10 +2854,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notifica
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
     EXPECT_EQ(1, subP->count);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2964,52 +2870,49 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notifica
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca3("A3", "TA3", "W");
-    ContextAttribute ca4("A4", "TA4", "new_val4");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
+    ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val4");
+    cerP->contextElement.contextAttributeVector.push_back(ca1P);
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
+    cerP->contextElement.contextAttributeVector.push_back(ca4P);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */    
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute caa1("A4", "TA4", "new_val4");
-    ContextAttribute caa2("A5", "TA5", "new_val5");
-    ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A4", "TA4", "new_val4");
+    ContextAttribute* caa2P = new ContextAttribute("A5", "TA5", "new_val5");
+    ceP->contextAttributeVector.push_back(caa1P);
+    ceP->contextAttributeVector.push_back(caa2P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("APPEND");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -3022,10 +2925,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notifica
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
     EXPECT_EQ(1, subP->count);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -3038,46 +2941,43 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
+    ContextElementResponse* cerP = new ContextElementResponse();
+    cerP->contextElement.entityId.fill("E2", "T2", "false");
+    ContextAttribute* caP = new ContextAttribute("A3", "TA3", "W");
+    cerP->contextElement.contextAttributeVector.push_back(caP);
+    expectedNcr.contextElementResponseVector.push_back(cerP);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
     std::vector<std::string>     attrsFilter;
+    std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
     attrsFilter.push_back("A1");
     attrsFilter.push_back("A3");
     attrsFilter.push_back("A4");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, false))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
             .Times(1);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute caa1("A1", "TA1", "");
-    ce.contextAttributeVector.push_back(&caa1);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E2", "T2", "false");
+    ContextAttribute* caa1P = new ContextAttribute("A1", "TA1", "");
+    ceP->contextAttributeVector.push_back(caa1P);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("DELETE");
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -3089,10 +2989,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(1360232700, subP->lastNotificationTime);
 
-
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -3111,17 +3011,19 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbQueryFail)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, _query("utest.csubs",_,_,_,_,_,_))
+    ON_CALL(*connectionMock, _query("utest.csubs", _, _, _, _, _, _))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -3130,15 +3032,14 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbQueryFail)
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
+    ContextElement* ceP = new ContextElement();
+    ceP->entityId.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    ceP->contextAttributeVector.push_back(caP);
+    req.contextElementVector.push_back(ceP);
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -3164,12 +3065,13 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbQueryFail)
     ASSERT_TRUE(subP != NULL);
     EXPECT_EQ(20000000, subP->lastNotificationTime);
 
-
     /* Restore real DB connection */
     setMongoConnectionForUnitTest(connectionDb);
 
     /* Release mock */
     delete notifierMock;
+
+    utExit();
 }
 
 /* ****************************************************************************

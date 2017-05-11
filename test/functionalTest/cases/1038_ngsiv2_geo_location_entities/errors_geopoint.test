@@ -256,7 +256,7 @@ Date: REGEX(.*)
 ==================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -265,7 +265,7 @@ Date: REGEX(.*)
 02b. Check entity
 =================
 HTTP/1.1 200 OK
-Content-Length: 85
+Content-Length: 86
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -277,7 +277,7 @@ Date: REGEX(.*)
         "value": "10, 10"
     },
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 
@@ -293,7 +293,7 @@ Date: REGEX(.*)
 03b. Check entity
 =================
 HTTP/1.1 200 OK
-Content-Length: 85
+Content-Length: 86
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -305,7 +305,7 @@ Date: REGEX(.*)
         "value": "20, 20"
     },
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 
@@ -326,7 +326,7 @@ Date: REGEX(.*)
 04b. Check entity
 =================
 HTTP/1.1 200 OK
-Content-Length: 85
+Content-Length: 86
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -338,7 +338,7 @@ Date: REGEX(.*)
         "value": "20, 20"
     },
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 
@@ -354,14 +354,14 @@ Date: REGEX(.*)
 05b. Check entity
 =================
 HTTP/1.1 200 OK
-Content-Length: 25
+Content-Length: 26
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 
@@ -377,7 +377,7 @@ Date: REGEX(.*)
 06b. Check entity
 =================
 HTTP/1.1 200 OK
-Content-Length: 85
+Content-Length: 86
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -389,7 +389,7 @@ Date: REGEX(.*)
         "value": "20, 20"
     },
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 
@@ -405,7 +405,7 @@ Date: REGEX(.*)
 07b. Check entity
 =================
 HTTP/1.1 200 OK
-Content-Length: 87
+Content-Length: 88
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -417,7 +417,7 @@ Date: REGEX(.*)
         "value": "20, 20"
     },
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 
@@ -433,7 +433,7 @@ Date: REGEX(.*)
 08b. Check entity
 =================
 HTTP/1.1 200 OK
-Content-Length: 147
+Content-Length: 148
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -450,7 +450,7 @@ Date: REGEX(.*)
         "value": "20, 20"
     },
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 
@@ -471,7 +471,7 @@ Date: REGEX(.*)
 09b. Check entity
 =================
 HTTP/1.1 200 OK
-Content-Length: 147
+Content-Length: 148
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -488,7 +488,7 @@ Date: REGEX(.*)
         "value": "20, 20"
     },
     "id": "E1",
-    "type": "none"
+    "type": "Thing"
 }
 
 

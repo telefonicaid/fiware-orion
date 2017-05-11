@@ -49,7 +49,7 @@ payload='{
 }'
 orionCurl --url ${url} --payload "${payload}"
 
-REG_ID=$(echo "$_response" | grep -Po '(?<="registrationId" : ")[^"]*')
+REG_ID=$(echo "$_response" | grep registrationId | awk -F\" '{ print $4}')
 
 # Make a discovery to see that the registration went OK
 echo "2: ++++++++++++++++++++"

@@ -30,7 +30,6 @@
 
 #include "ngsi/ContextElementResponse.h"
 #include "common/RenderFormat.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -42,23 +41,27 @@ typedef struct ContextElementResponseVector
 {
   std::vector<ContextElementResponse*>  vec;
 
-  std::string              render(ConnectionInfo*     ciP,
+  std::string              render(ApiVersion          apiVersion,
+                                  bool                asJsonObject,
                                   RequestType         requestType,
                                   const std::string&  indent,
                                   bool                comma               = false,
                                   bool                omitAttributeValues = false);
 
-  std::string              toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist = false);
+  std::string              toJson(RenderFormat                     renderFormat,
+                                  const std::vector<std::string>&  attrsFilter,
+                                  const std::vector<std::string>&  metadataFilter,
+                                  bool                             blacklist = false);
   void                     present(const std::string& indent);
   void                     push_back(ContextElementResponse* item);
-  unsigned int             size(void);
+  unsigned int             size(void) const;
   ContextElementResponse*  lookup(EntityId* eP, HttpStatusCode code = SccNone);
   void                     release();
   void                     fill(ContextElementResponseVector& cerV);
   ContextElementResponse*  operator[] (unsigned int ix) const;
   
 
-  std::string              check(ConnectionInfo*     ciP,
+  std::string              check(ApiVersion          apiVersion,
                                  RequestType         requestType,
                                  const std::string&  indent,
                                  const std::string&  predetectedError,

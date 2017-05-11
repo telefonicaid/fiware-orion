@@ -43,7 +43,6 @@
 */
 UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 {
-  metadataVector.keyNameSet("metadata");
   compoundValueP = NULL;
   valueType = orion::ValueTypeNone;
 }
@@ -54,19 +53,18 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 *
 * render - 
 */
-std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, std::string indent)
+std::string UpdateContextAttributeRequest::render(ApiVersion apiVersion, std::string indent)
 {
-  std::string tag = "updateContextAttributeRequest";
   std::string out = "";
   std::string indent2 = indent + "  ";
   bool        commaAfterContextValue = metadataVector.size() != 0;
 
-  out += startTag1(indent, tag, false);
-  out += valueTag1(indent2, "type", type, true);
+  out += startTag(indent);
+  out += valueTag(indent2, "type", type, true);
 
   if (compoundValueP == NULL)
   {
-    out += valueTag1(indent2, "contextValue", contextValue, true);
+    out += valueTag(indent2, "contextValue", contextValue, true);
   }
   else
   {
@@ -77,8 +75,8 @@ std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, std::stri
       isCompoundVector = true;
     }
 
-    out += startTag2(indent + "  ", "value", isCompoundVector, true);
-    out += compoundValueP->render(ciP, indent + "    ");
+    out += startTag(indent + "  ", "value", isCompoundVector);
+    out += compoundValueP->render(apiVersion, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
 
@@ -96,11 +94,9 @@ std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, std::stri
 */
 std::string UpdateContextAttributeRequest::check
 (
-  ConnectionInfo* ciP,
-  RequestType     requestType,
-  std::string     indent,
-  std::string     predetectedError,
-  int             counter
+  ApiVersion          apiVersion,
+  std::string         indent,
+  const std::string&  predetectedError
 )
 {
   StatusCode       response;
@@ -112,7 +108,7 @@ std::string UpdateContextAttributeRequest::check
   {
     response.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = metadataVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+  else if ((res = metadataVector.check(apiVersion)) != "OK")
   {
     response.fill(SccBadRequest, res);
   }

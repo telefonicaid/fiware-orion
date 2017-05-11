@@ -88,13 +88,13 @@ void OrionError::fill(HttpStatusCode _code, const std::string& _details, const s
 *
 * OrionError::smartRender -
 */
-std::string OrionError::smartRender(const std::string& apiVersion)
+std::string OrionError::smartRender(ApiVersion apiVersion)
 {
-  if (apiVersion == "v1")
+  if (apiVersion == V1 || apiVersion == NO_VERSION)
   {
     return render();
   }
-  else // v2
+  else // admin or v2
   {
     shrinkReasonPhrase();
     return toJson();
@@ -107,14 +107,14 @@ std::string OrionError::smartRender(const std::string& apiVersion)
 *
 * OrionError::setStatusCodeAndSmartRender -
 */
-std::string OrionError::setStatusCodeAndSmartRender(ConnectionInfo* ciP)
+std::string OrionError::setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpStatusCode* scP)
 {
-  if (ciP->apiVersion == "v2")
+  if ((apiVersion == V2) || (apiVersion == ADMIN_API))
   {
-    ciP->httpStatusCode = code;
+    *scP = code;
   }
 
-  return smartRender(ciP->apiVersion);
+  return smartRender(apiVersion);
 }
 
 
@@ -139,18 +139,17 @@ std::string OrionError::render(void)
 {
   std::string  out           = "{\n";
   std::string  indent        = "  ";
-  std::string  tag           = "orionError";
 
   //
   // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here
   //
-  out += startTag1(indent, tag);
-  out += valueTag(indent  + "  ", "code",          code,         true);
-  out += valueTag1(indent + "  ", "reasonPhrase",  reasonPhrase, details != "");
+  out += startTag(indent, "orionError", false);
+  out += valueTag(indent + "  ", "code",          code,         true);
+  out += valueTag(indent + "  ", "reasonPhrase",  reasonPhrase, details != "");
 
   if (details != "")
   {
-    out += valueTag1(indent + "  ", "details",       details);
+    out += valueTag(indent + "  ", "details",       details);
   }
 
   out += endTag(indent);

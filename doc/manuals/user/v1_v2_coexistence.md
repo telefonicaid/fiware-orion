@@ -1,4 +1,4 @@
-# Considerations on NGSIv1 and NGSIv2 coexistence
+#<a name="top"></a>Considerations on NGSIv1 and NGSIv2 coexistence
 
 NGSIv1 is the API offered by Orion Context Broker from its very first version. 
 [NGSIv2](http://telefonicaid.github.io/fiware-orion/api/v2/stable) development started 
@@ -7,6 +7,14 @@ removed from the code in some future Orion version (so only NGSIv2 will remain)
 this is a big work and both API versions will be coexisting during some time. 
 
 This document explains some consideration to take into account regarding such coexistence.
+
+* [Native JSON types](#native-json-types)
+* [Filtering](#filtering)
+* [Differences in the support to `DateTime` attribute type](#differences-in-the-support-to-datetime-attribute-type)
+* [Checking ID fields](#checking-id-fields)
+* [`orderBy` parameter](#orderby-parameter)
+* [NGSIv1 notification with NGSIv2 subscriptions](#ngsiv1-notification-with-ngsiv2-subscriptions)
+* [NGSIv2 query update forwarding to Context Providers](#ngsiv2-query-update-forwarding-to-context-providers)
 
 ## Native JSON types
 
@@ -18,6 +26,8 @@ setting `A=2` using NGSIv1 will actually store `A="2"` in the Orion database.
 However, NGSIv1 rendering is able to correctly retrieve attribute values stored using 
 non-string JSON native types. Thus, if you set `A=2` using NGSIv2 and retrieve that 
 attribute using NGSIv1, you will get `A=2`.
+
+[Top](#top)
 
 ## Filtering
 
@@ -32,6 +42,26 @@ for numeric values. Thus, in order to work properly, these filters (although usi
 In addition, note that NGSIv2 geo-query filters can be used also in NGSIv1. See
 [the following section](geolocation.md#geo-located-queries-ngsiv2) for details
 
+[Top](#top)
+
+## Differences in the support to `DateTime` attribute type
+
+NGSIv2 supports the `DateTime` attribute type to identify dates. These attributes can be used with the query operators
+greater-than, less-than, greater-or-equal, less-or-equal and range. See "Special Attribute Types" section at
+[NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable)) and ["DateTime support"  section
+in the NGSIv2 implementation notes](ngsiv2_implementation_notes.md#datetime-support).
+
+However, note that `DateTime` attribute type has *not* any special interpretation in the NGSIv1 API, i.e. the
+attribute value is treated as any other string without any special meaning. That has two implications:
+
+* Attributes created/updated using the NGSIv1 with type `DateTime` are treated as normal strings.
+* Attributes created using NGSIv2 (or which last update has been using NGSIv2) with type `DateTime`, then
+  updated using NGSIv1 will "lose" their date nature and they are treated as normal string.
+* Attributes created using NGSIv1 (or which last update has been using NGSIv1) with type `DateTime`, then
+  updated using NGSIv2 will "gain" their date nature so they can be used in date filters, etc.
+
+[Top](#top)
+
 ## Checking ID fields
 
 NGSIv2 introduces syntax restrictions for ID fields (such as entity id/type, attribute name/type
@@ -40,10 +70,20 @@ or metadata name/type) which are described in the "Field syntax restrictions" se
 keep backward compatibility, these restrictions are not used in the NGSIv1 API by default, but
 you can enable them using the `-strictNgsiv1Ids` [CLI parameter](../admin/cli.md).
 
-Related with this topic, note that NGSIv1 allows entities/attributes/metadatas without types
-and with types equal to the empty string (`""`). However, NGSIv2 ID fields (including types) have
-a minimum length of 1 character. Thus, entities created with NGSIv1 but rendered using NGSIv2 operation
-will automatically replace these cases with the string value `none` (which is the default type in NGSIv2).
+Note that even when `-strictNgsiv1Ids` is used the Orion DB may contain entities/attributes/medatada
+that don't conform with NGSIv2 ID rules. This may happen if such entities/attributes/metadata have
+been created by Orion in moments in which it has run without `-strictNgsiv1Ids` enabled (maybe an old
+version previous to the implementation of this feature). In that case, getting such
+entities/attributes/metadata using NGSIv2 API may result in inconstent results (e.g. to use `GET /v2/entities`
+and get entities with whitespaces in some entity ids).
+
+The following [issue at github](https://github.com/telefonicaid/fiware-orion/issues/1733) has been created
+to cope with this situation in the future. However, in general it is as good practise to follow always the
+"Field sysntax restrictions" for IDs even if you are not forced to do so in NGSIv1. Doing so you would avoid
+any problem when managing context information, no matter which version of the API (either NGSIv1 or NGSIv2)
+you use.
+
+[Top](#top)
 
 ## `orderBy` parameter
 
@@ -51,12 +91,17 @@ The `orderBy` parameter defined for NGSIv2 can be used also in NGSIv1 queryConte
 details in the [pagination documentation](pagination.md). However, note that the "geo:distance"
 order can be used only in NGSIv2.
 
+[Top](#top)
+
 ## NGSIv1 notification with NGSIv2 subscriptions
 
 NGSIv2 allows several notification modes depending on the `attrsFormat` field associated to the
 subscription. Apart from the values described in the NGSIv2 specification, Orion also support
 `legacy` value in order to send notifications in NGSIv1 format. This way, users can have the
-enhancements of NGSIv2 subscriptions (e.g. filtering) with NGSIv1 legacy notifications receivers.
+enhancements of NGSIv2 subscriptions (e.g. filtering or system/builtin metadata in notifications) with
+NGSIv1 legacy notifications receivers.
+
+[Top](#top)
 
 ## NGSIv2 query update forwarding to Context Providers
 
@@ -78,4 +123,6 @@ However, the following considerations have to be taken into account:
   other entities/attributes not being updated due to failing or missing CPrs), 404 Not Found is returned to the client.
   The `error` field in this case is `PartialUpdate` and the `description` field contains information about which entity
   attributes failed to update.
+
+[Top](#top)
 

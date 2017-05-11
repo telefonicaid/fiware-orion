@@ -38,23 +38,25 @@
 *
 * ContextAttributeResponseVector::render - 
 */
-std::string ContextAttributeResponseVector::render(ConnectionInfo* ciP, RequestType request, std::string indent)
+std::string ContextAttributeResponseVector::render
+(
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
+  RequestType         request,
+  const std::string&  indent)
 {
   std::string out = "";
   std::string key = "contextResponses";
 
   if (vec.size() == 0)
   {
-    if (request == IndividualContextEntityAttributes)
-      return indent + "<contextAttributeList></contextAttributeList>\n";
-
     return "";
   }
 
-  out += startTag2(indent, key, true);
+  out += startTag(indent, key, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(ciP, request, indent + "  ");
+    out += vec[ix]->render(apiVersion, asJsonObject, request, indent + "  ");
   }
   out += endTag(indent, false, true);
 
@@ -69,18 +71,18 @@ std::string ContextAttributeResponseVector::render(ConnectionInfo* ciP, RequestT
 */
 std::string ContextAttributeResponseVector::check
 (
-  ConnectionInfo*  ciP,
-  RequestType      request,
-  std::string      indent,
-  std::string      predetectedError,
-  int              counter
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
+  RequestType         request,
+  std::string         indent,
+  const std::string&  predetectedError
 )
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, request, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, asJsonObject, request, indent, predetectedError)) != "OK")
     {
       return res;
     }

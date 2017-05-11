@@ -49,11 +49,7 @@ TEST(EntityTypeVector, present)
 */
 TEST(EntityTypeVector, check)
 {
-  ConnectionInfo ci;
-
   utInit();
-
-  ci.outMimeType = JSON;
 
   EntityType et1("myType");
   EntityType et2("");
@@ -66,11 +62,11 @@ TEST(EntityTypeVector, check)
   EntityTypeVector etV2;
   etV2.push_back(&et2);
 
-  EXPECT_EQ("OK", etV1.check(&ci, "", ""));
+  EXPECT_EQ("OK", etV1.check(V1, ""));
 
-  EXPECT_EQ("foo", etV1.check(&ci, "", "foo"));
+  EXPECT_EQ("foo", etV1.check(V1, "foo"));
 
-  EXPECT_EQ("Empty Type", etV2.check(&ci, "", ""));
+  EXPECT_EQ("Empty Type", etV2.check(V1, ""));
 
   utExit();
 }

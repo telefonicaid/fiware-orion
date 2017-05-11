@@ -3,7 +3,7 @@ FROM centos:centos6.6
 MAINTAINER FIWARE Orion Context Broker Team. Telefónica I+D
 
 ENV ORION_USER orion
-ENV GIT_REV_ORION develop
+ENV GIT_REV_ORION master
 ENV CLEAN_DEV_TOOLS 1
 
 WORKDIR /opt
@@ -19,6 +19,7 @@ RUN \
       gnutls-devel \
       libgcrypt-devel \
       libcurl-devel \
+      openssl-devel \
       libuuid-devel \
       make \
       nc \
@@ -36,23 +37,14 @@ RUN \
     make install && \
     ldconfig && \
     # Install mongodb driver from source
-    curl -kOL https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.0.7.tar.gz && \
-    tar xfz legacy-1.0.7.tar.gz && \
-    cd mongo-cxx-driver-legacy-1.0.7 && \
+    curl -kOL https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz && \
+    tar xfz legacy-1.1.2.tar.gz && \
+    cd mongo-cxx-driver-legacy-1.1.2 && \
     scons install --prefix=/usr/local && \
     # Install rapidjson from source
     curl -kOL https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz && \
     tar xfz v1.0.2.tar.gz && \
     mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include && \
-    # Install Google Test/Mock from source
-    curl -kOL http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 && \
-    tar xfj gmock-1.5.0.tar.bz2 && \
-    cd gmock-1.5.0 && \
-    ./configure && \
-    make && \
-    make install && \
-    ldconfig && \
-    cd /opt && \
     # Install orion from source
     git clone https://github.com/telefonicaid/fiware-orion && \
     cd fiware-orion && \
@@ -73,22 +65,13 @@ RUN \
            /usr/local/include/microhttpd.h \
            /usr/local/lib/libmicrohttpd.* \
            /opt/libmicrohttpd-0.9.48 \
-           /opt/legacy-1.0.7.tar.gz \
-           /opt/mongo-cxx-driver-legacy-1.0.7 \
+           /opt/legacy-1.1.2.tar.gz \
+           /opt/mongo-cxx-driver-legacy-1.1.2 \
            /usr/local/include/mongo \
            /usr/local/lib/libmongoclient.a \
            /opt/rapidjson-1.0.2 \
            /opt/v1.0.2.tar.gz \
            /usr/local/include/rapidjson \
-           /opt/gmock-1.5.0.tar.bz2 \
-           /opt/gmock-1.5.0 \
-           /usr/local/bin/gmock* \
-           /usr/local/bin/gtest* \
-           /usr/local/include/gmock \
-           /usr/local/include/gtest \
-           /usr/local/lib/libgmock* \
-           /usr/local/lib/libgtest* \
-           /usr/local/share/aclocal/gtest* \
            /opt/fiware-orion \
            # We don't need to manage Linux account passwords requisites: lenght, mays/mins, etc.
            # This cannot be removed using yum as yum uses hard dependencies and doing so will 

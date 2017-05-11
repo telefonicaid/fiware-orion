@@ -86,7 +86,7 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 68
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -94,7 +94,7 @@ Date: REGEX(.*)
 {
     "A1": {
         "metadata": {},
-        "type": "none",
+        "type": "Number",
         "value": 0
     },
     "id": "E1",

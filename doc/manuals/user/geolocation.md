@@ -51,8 +51,8 @@ Additional comments:
 -   In order to avoid inconsistencies, only one attribute at a time can
     be defined as location. If you want to redefine the attribute of an
     entity used for location, first you have to DELETE it, then APPEND
-    the new one (check the section about [adding and removing attributes
-    dynamically](append_and_delete.md#adding-and-removing-attributes-with-append-and-delete-in-updatecontext)).
+    the new one (check the section about [APPEND and DELETE to add and remove
+    attributes dynamically](update_action_types.md)).
 -   The value of the location attribute is a string with two numbers
     separated by a comma (","): the first number is the latitude and the
     second is the longitude. Only decimal notation is allowed (e.g.

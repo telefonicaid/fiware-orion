@@ -42,9 +42,18 @@
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/compoundResponses.h"
 
-#include "rest/ConnectionInfo.h"
-
 using namespace mongo;
+
+
+
+/* ****************************************************************************
+*
+* Metadata::~Metadata -
+*/
+Metadata::~Metadata()
+{
+  release();
+}
 
 
 
@@ -67,7 +76,6 @@ Metadata::Metadata()
 /* ****************************************************************************
 *
 * Metadata::Metadata -
-*
 */
 Metadata::Metadata(Metadata* mP, bool useDefaultType)
 {
@@ -80,11 +88,18 @@ Metadata::Metadata(Metadata* mP, bool useDefaultType)
   numberValue     = mP->numberValue;
   boolValue       = mP->boolValue;
   typeGiven       = mP->typeGiven;
-  compoundValueP  = mP->compoundValueP;
+  compoundValueP  = (mP->compoundValueP != NULL)? mP->compoundValueP->clone() : NULL;
 
   if (useDefaultType && !typeGiven)
   {
-    type = DEFAULT_TYPE;
+    if ((compoundValueP == NULL) || (compoundValueP->valueType != orion::ValueTypeVector))
+    {
+      type = defaultType(valueType);
+    }
+    else
+    {
+      type = defaultType(orion::ValueTypeVector);
+    }
   }
 }
 
@@ -96,11 +111,12 @@ Metadata::Metadata(Metadata* mP, bool useDefaultType)
 */
 Metadata::Metadata(const std::string& _name, const std::string& _type, const char* _value)
 {
-  name         = _name;
-  type         = _type;
-  valueType    = orion::ValueTypeString;
-  stringValue  = std::string(_value);
-  typeGiven    = false;
+  name            = _name;
+  type            = _type;
+  valueType       = orion::ValueTypeString;
+  stringValue     = std::string(_value);
+  typeGiven       = false;
+  compoundValueP  = NULL;
 }
 
 
@@ -111,11 +127,12 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const cha
 */
 Metadata::Metadata(const std::string& _name, const std::string& _type, const std::string& _value)
 {
-  name         = _name;
-  type         = _type;
-  valueType    = orion::ValueTypeString;
-  stringValue  = _value;
-  typeGiven    = false;
+  name            = _name;
+  type            = _type;
+  valueType       = orion::ValueTypeString;
+  stringValue     = _value;
+  typeGiven       = false;
+  compoundValueP  = NULL;
 }
 
 
@@ -126,11 +143,12 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const std
 */
 Metadata::Metadata(const std::string& _name, const std::string& _type, double _value)
 {
-  name         = _name;
-  type         = _type;
-  valueType    = orion::ValueTypeNumber;
-  numberValue  = _value;
-  typeGiven    = false;
+  name            = _name;
+  type            = _type;
+  valueType       = orion::ValueTypeNumber;
+  numberValue     = _value;
+  typeGiven       = false;
+  compoundValueP  = NULL;
 }
 
 
@@ -141,12 +159,15 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, double _v
 */
 Metadata::Metadata(const std::string& _name, const std::string& _type, bool _value)
 {
-  name         = _name;
-  type         = _type;
-  valueType    = orion::ValueTypeBoolean;
-  boolValue    = _value;
-  typeGiven    = false;
+  name            = _name;
+  type            = _type;
+  valueType       = orion::ValueTypeBoolean;
+  boolValue       = _value;
+  typeGiven       = false;
+  compoundValueP  = NULL;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -154,10 +175,10 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, bool _val
 */
 Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 {
-  name = _name;
-  type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringFieldF(mdB, ENT_ATTRS_MD_TYPE) : "";
-
-  typeGiven = (type == "")? false : true;
+  name            = _name;
+  type            = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringFieldF(mdB, ENT_ATTRS_MD_TYPE) : "";
+  typeGiven       = (type == "")? false : true;
+  compoundValueP  = NULL;
 
   BSONType bsonType = getFieldF(mdB, ENT_ATTRS_MD_VALUE).type();
   switch (bsonType)
@@ -169,7 +190,7 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 
   case NumberDouble:
     valueType   = orion::ValueTypeNumber;
-    numberValue = getFieldF(mdB, ENT_ATTRS_MD_VALUE).Number();
+    numberValue = getNumberFieldF(mdB, ENT_ATTRS_MD_VALUE);
     break;
 
   case Bool:
@@ -207,16 +228,15 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 std::string Metadata::render(const std::string& indent, bool comma)
 {
   std::string out     = "";
-  std::string tag     = "contextMetadata";
   std::string xValue  = toStringValue();
 
-  out += startTag2(indent, tag, false, false);
-  out += valueTag1(indent + "  ", "name", name, true);
-  out += valueTag1(indent + "  ", "type", type, true);
+  out += startTag(indent);
+  out += valueTag(indent + "  ", "name", name, true);
+  out += valueTag(indent + "  ", "type", type, true);
 
   if (valueType == orion::ValueTypeString)
   {
-    out += valueTag1(indent + "  ", "value", xValue, false);
+    out += valueTag(indent + "  ", "value", xValue, false);
   }
   else if (valueType == orion::ValueTypeNumber)
   {
@@ -236,11 +256,19 @@ std::string Metadata::render(const std::string& indent, bool comma)
 
     if (compoundValueP->isObject())
     {
-      part = compoundValueP->toJson(true);
+      //
+      // Note in this case we don't add the "value" key, the toJson()
+      // method does it for toplevel compound (a bit crazy... this deserves a FIXME mark)
+      // FIXME P4: modify/simplify the rendering of compound values. Too many if/else ...
+      //
+      compoundValueP->renderName = true;
+      compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
+      part = compoundValueP->toJson(true, false);
     }
     else if (compoundValueP->isVector())
     {
-      part = "[" + compoundValueP->toJson(true) + "]";
+      compoundValueP->container = compoundValueP;  // To mark as TOPLEVEL
+      part = JSON_STR("value") + ": [" + compoundValueP->toJson(true, false) + "]";
     }    
 
     out += part;
@@ -261,17 +289,17 @@ std::string Metadata::render(const std::string& indent, bool comma)
 *
 * Metadata::check -
 */
-std::string Metadata::check
-(
-  ConnectionInfo*     ciP,
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string Metadata::check(ApiVersion apiVersion)
 {
   size_t len;
   char   errorMsg[128];
+
+  if (apiVersion == V2 && (len = strlen(name.c_str())) < MIN_ID_LEN)
+  {
+    snprintf(errorMsg, sizeof errorMsg, "metadata name length: %zd, min length supported: %d", len, MIN_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
 
   if (name == "")
   {
@@ -286,7 +314,7 @@ std::string Metadata::check
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdChars(ciP->apiVersion , name.c_str()))
+  if (forbiddenIdChars(apiVersion , name.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the name of a Metadata");
     return "Invalid characters in metadata name";
@@ -300,14 +328,14 @@ std::string Metadata::check
   }
 
 
-  if (ciP->apiVersion == "v2" && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  if (apiVersion == V2 && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdChars(ciP->apiVersion, type.c_str()))
+  if (forbiddenIdChars(apiVersion, type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of a Metadata");
     return "Invalid characters in metadata type";
@@ -362,6 +390,11 @@ void Metadata::present(const std::string& metadataType, int ix, const std::strin
 */
 void Metadata::release(void)
 {
+  if (compoundValueP != NULL)
+  {
+    delete compoundValueP;
+    compoundValueP = NULL;
+  }
 }
 
 
@@ -377,14 +410,14 @@ void Metadata::fill(const struct Metadata& md)
   stringValue  = md.stringValue;
 }
 
+
+
 /* ****************************************************************************
 *
 * toStringValue -
 */
 std::string Metadata::toStringValue(void) const
 {
-  char buffer[64];
-
   switch (valueType)
   {
   case orion::ValueTypeString:
@@ -392,8 +425,14 @@ std::string Metadata::toStringValue(void) const
     break;
 
   case orion::ValueTypeNumber:
-    snprintf(buffer, sizeof(buffer), "%f", numberValue);
-    return std::string(buffer);
+    if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
+    {
+      return JSON_STR(isodate2str(numberValue));
+    }
+    else // regular number
+    {
+      return toString(numberValue);
+    }    
     break;
 
   case orion::ValueTypeBoolean:
@@ -426,7 +465,14 @@ std::string Metadata::toJson(bool isLastElement)
   out = JSON_STR(name) + ":{";
 
   /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
-  out += (type != "")? JSON_VALUE("type", type) : JSON_VALUE("type", DEFAULT_TYPE);
+  std::string defType = defaultType(valueType);
+
+  if (compoundValueP && compoundValueP->isVector())
+  {
+    defType = defaultType(orion::ValueTypeVector);
+  }
+
+  out += (type != "")? JSON_VALUE("type", type) : JSON_VALUE("type", defType);
   out += ",";
 
   if (valueType == orion::ValueTypeString)
@@ -435,7 +481,17 @@ std::string Metadata::toJson(bool isLastElement)
   }
   else if (valueType == orion::ValueTypeNumber)
   {
-    out += JSON_VALUE_NUMBER("value", toString(numberValue));
+    std::string effectiveValue;
+
+    if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
+    {
+      effectiveValue = JSON_STR(isodate2str(numberValue));
+    }
+    else // regular number
+    {
+      effectiveValue = toString(numberValue);
+    }
+    out += JSON_VALUE_NUMBER("value", effectiveValue);
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
@@ -447,14 +503,11 @@ std::string Metadata::toJson(bool isLastElement)
   }
   else if (valueType == orion::ValueTypeObject)
   {
-    if (compoundValueP->isObject())
+    if ((compoundValueP->isObject()) || (compoundValueP->isVector()))
     {
-      out += compoundValueP->toJson(true);
+      compoundValueP->renderName = true;
+      out += compoundValueP->toJson(isLastElement, false);
     }
-    else if (compoundValueP->isVector())
-    {
-      out += std::string("\"value\"") + ":[" + compoundValueP->toJson(true) + "]";
-    }    
   }
   else
   {
@@ -470,4 +523,61 @@ std::string Metadata::toJson(bool isLastElement)
   }
 
   return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* Metadata::compoundItemExists - 
+*/
+bool Metadata::compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP)
+{
+  std::vector<std::string>   compoundPathV;
+  orion::CompoundValueNode*  current = compoundValueP;
+  int                        levels;
+
+  if (compoundPath == "")
+  {
+    return false;
+  }
+
+  if (compoundValueP == NULL)
+  {
+    return false;
+  }
+
+  levels = stringSplit(compoundPath, '.', compoundPathV);
+
+  if ((compoundPathV.size() == 0) || (levels == 0))
+  {
+    return false;
+  }
+
+  for (int ix = 0; ix < levels; ++ix)
+  {
+    bool found = false;
+
+    for (unsigned int cIx = 0; cIx < current->childV.size(); ++cIx)
+    {
+      if (current->childV[cIx]->name == compoundPathV[ix])
+      {
+        current = current->childV[cIx];
+        found   = true;
+        break;
+      }
+    }
+
+    if (found == false)
+    {
+      return false;
+    }
+  }
+
+  if (compoundItemPP != NULL)
+  {
+    *compoundItemPP = current;
+  }
+
+  return true;
 }

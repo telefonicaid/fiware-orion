@@ -54,9 +54,9 @@ int  QueueStatistics::getIn()
 *
 * incIn -
 */
-void QueueStatistics::incIn()
+void QueueStatistics::incIn(int n)
 {
-  __sync_fetch_and_add(&noOfNotificationsQueueIn, 1);
+  __sync_fetch_and_add(&noOfNotificationsQueueIn, n);
 }
 
 /* ****************************************************************************
@@ -72,9 +72,9 @@ int  QueueStatistics::getOut()
 *
 * incOut -
 */
-void QueueStatistics::incOut()
+void QueueStatistics::incOut(int n)
 {
-  __sync_fetch_and_add(&noOfNotificationsQueueOut, 1);
+  __sync_fetch_and_add(&noOfNotificationsQueueOut, n);
 }
 
 /* ****************************************************************************
@@ -90,9 +90,9 @@ int  QueueStatistics::getReject()
 *
 * incReject -
 */
-void QueueStatistics::incReject()
+void QueueStatistics::incReject(int n)
 {
-  __sync_fetch_and_add(&noOfNotificationsQueueReject ,1);
+  __sync_fetch_and_add(&noOfNotificationsQueueReject ,n);
 }
 
 /* ****************************************************************************

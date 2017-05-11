@@ -120,7 +120,7 @@ Date: REGEX(.*)
 =============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -128,25 +128,25 @@ Date: REGEX(.*)
 
 04. Dump accumulator to see the notification
 ============================================
-PATCH http://127.0.0.1:REGEX(\d+)/notify?a1=a1&a3=13.000000&a2=a2&type=none&id=E1
+PATCH http://127.0.0.1:REGEX(\d+)/notify?a1=a1&a3=13&a2=a2&type=Thing&id=E1
 Fiware-Servicepath: /
 Ngsiv2-Attrsformat: custom
 Entity-Id: E1
-Content-Length: 45
+Content-Length: 38
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Accept: application/json
 Host: 127.0.0.1:REGEX(\d+)
-A3: 13.000000
+A3: 13
 A2: a2
 A1: a1
-Entity-Type: none
+Entity-Type: Thing
 Content-Type: text/plain; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "A1": "a1", 
     "A2": "a2", 
-    "A3": "13.000000"
+    "A3": "13"
 }
 =======================================
 

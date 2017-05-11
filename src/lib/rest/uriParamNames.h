@@ -47,6 +47,8 @@
 #define URI_PARAM_SORTED                  "orderBy"
 #define URI_PARAM_Q                       "q"
 #define URI_PARAM_MQ                      "mq"
+#define URI_PARAM_METADATA                "metadata"
+#define URI_PARAM_ATTRIBUTES              "attrs"
 
 
 // URI parameters for 'admin' requests

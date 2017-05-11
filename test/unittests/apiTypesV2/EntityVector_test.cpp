@@ -57,8 +57,6 @@ TEST(EntityVector, present)
 */
 TEST(EntityVector, check)
 {
-  ConnectionInfo ci;
-
   utInit();
 
   Entity* enP;
@@ -79,8 +77,8 @@ TEST(EntityVector, check)
   EntityVector enV2;
   enV2.push_back(enP);
 
-  EXPECT_EQ("OK", enV1.check(&ci, EntitiesRequest));
-  EXPECT_EQ("No Entity ID", enV2.check(&ci, EntitiesRequest));
+  EXPECT_EQ("OK", enV1.check(V1, EntitiesRequest));
+  EXPECT_EQ("No Entity ID", enV2.check(V1, EntitiesRequest));
 
   utExit();
 }

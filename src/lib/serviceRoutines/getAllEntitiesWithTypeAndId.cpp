@@ -83,6 +83,8 @@ std::string getAllEntitiesWithTypeAndId
   EntityTypeInfo          typeInfo                = EntityTypeEmptyOrNotEmpty;
   ContextElementResponse  response;
 
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+
   // 00. Default value for response: OK
   response.statusCode.fill(SccOk);
 
@@ -134,7 +136,7 @@ std::string getAllEntitiesWithTypeAndId
 
   // 06. Translate QueryContextResponse to ContextElementResponse
   response.fill(&parseDataP->qcrs.res, entityId, entityType);
-  TIMED_RENDER(answer = response.render(ciP, RtContextElementResponse, ""));
+  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, RtContextElementResponse, ""));
 
   // 07. Cleanup and return result
   parseDataP->qcr.res.release();

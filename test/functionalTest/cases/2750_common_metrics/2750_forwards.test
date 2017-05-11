@@ -1,0 +1,402 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Forwards and Common Metrics
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+brokerStart CB
+brokerStart CP1
+
+--SHELL--
+
+#
+# 01. Register E1 of CP1 in CB
+# 02. Query CB for E1, query is forwarded but E1 is not found
+# 03. Create E1 in CP1
+# 04. Query CB for E1, query is forwarded and E1 is found
+# 05. Update E1 in CB, update is forwarded and it works
+# 06. Ask for metrics, see 3 outgoing transactions
+# 07. Register E2 of CP2 in CB - note that CP2 is not running
+# 08. Query CB for E2, query is attempted to be forwarded but fails
+# 09. Ask for metrics, see 1 error in outgoing transactions
+#
+
+echo "01. Register E1 of CP1 in CB"
+echo "============================"
+payload='{
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+          "isPattern": "false",
+          "id": "E1"
+        }
+      ],
+      "providingApplication": "http://localhost:'$CP1_PORT'/v1"
+    }
+  ]
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --servicePath /SP
+echo
+echo
+
+
+echo "02. Query CB for E1, query is forwarded but E1 is not found"
+echo "==========================================================="
+orionCurl --url /v2/entities/E1 --servicePath /SP
+echo
+echo
+
+
+echo "03. Create E1 in CP1"
+echo "===================="
+payload='{
+  "id": "E1",
+  "A1": {
+    "value": 3,
+    "type": "a1"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --servicePath /SP --port $CP1_PORT
+echo
+echo
+
+
+echo "04. Query CB for E1, query is forwarded and E1 is found"
+echo "======================================================="
+orionCurl --url /v2/entities/E1 --servicePath /SP
+echo
+echo
+
+
+echo "05. Update E1 in CB, update is forwarded and it works"
+echo "====================================================="
+payload='{
+  "A1": {
+    "value": 5
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH --servicePath /SP
+echo
+echo
+
+
+echo "06. Ask for metrics, see 3 outgoing transactions"
+echo "================================================"
+orionCurl --url /admin/metrics
+echo
+echo
+
+
+echo "07. Register E2 of CP2 in CB - note that CP2 is not running"
+echo "==========================================================="
+payload='{
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+          "isPattern": "false",
+          "id": "E2"
+        }
+      ],
+      "providingApplication": "http://localhost:'$CP2_PORT'/v1"
+    }
+  ]
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --servicePath /SP2
+echo
+echo
+
+
+echo "08. Query CB for E2, query is attempted to be forwarded but fails"
+echo "================================================================="
+orionCurl --url /v2/entities/E2 --servicePath /SP2
+echo
+echo
+
+
+echo "09. Ask for metrics, see 1 error in outgoing transactions"
+echo "========================================================="
+orionCurl --url /admin/metrics
+echo
+echo
+
+
+--REGEXPECT--
+01. Register E1 of CP1 in CB
+============================
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "PT24H",
+    "registrationId": "REGEX([0-9a-f\-]{24})"
+}
+
+
+02. Query CB for E1, query is forwarded but E1 is not found
+===========================================================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+03. Create E1 in CP1
+====================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Query CB for E1, query is forwarded and E1 is found
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 71
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "a1",
+        "value": "3"
+    },
+    "id": "E1",
+    "type": "Thing"
+}
+
+
+05. Update E1 in CB, update is forwarded and it works
+=====================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Ask for metrics, see 3 outgoing transactions
+================================================
+HTTP/1.1 200 OK
+Content-Length: 1122
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "services": {
+        "default-service": {
+            "subservs": {
+                "SP": {
+                    "incomingTransactionErrors": 1,
+                    "incomingTransactionRequestSize": 164,
+                    "incomingTransactionResponseSize": 242,
+                    "incomingTransactions": 4,
+                    "outgoingTransactionRequestSize": 473,
+                    "outgoingTransactionResponseSize": 861,
+                    "outgoingTransactions": 3,
+                    "serviceTime": REGEX(.*)
+                }
+            },
+            "sum": {
+                "incomingTransactionErrors": 1,
+                "incomingTransactionRequestSize": 164,
+                "incomingTransactionResponseSize": 242,
+                "incomingTransactions": 4,
+                "outgoingTransactionRequestSize": 473,
+                "outgoingTransactionResponseSize": 861,
+                "outgoingTransactions": 3,
+                "serviceTime": REGEX(.*)
+            }
+        }
+    },
+    "sum": {
+        "subservs": {
+            "SP": {
+                "incomingTransactionErrors": 1,
+                "incomingTransactionRequestSize": 164,
+                "incomingTransactionResponseSize": 242,
+                "incomingTransactions": 4,
+                "outgoingTransactionRequestSize": 473,
+                "outgoingTransactionResponseSize": 861,
+                "outgoingTransactions": 3,
+                "serviceTime": REGEX(.*)
+            }
+        },
+        "sum": {
+            "incomingTransactionErrors": 1,
+            "incomingTransactionRequestSize": 164,
+            "incomingTransactionResponseSize": 242,
+            "incomingTransactions": 4,
+            "outgoingTransactionRequestSize": 473,
+            "outgoingTransactionResponseSize": 861,
+            "outgoingTransactions": 3,
+            "serviceTime": REGEX(.*)
+        }
+    }
+}
+
+
+07. Register E2 of CP2 in CB - note that CP2 is not running
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "PT24H",
+    "registrationId": "REGEX([0-9a-f\-]{24})"
+}
+
+
+08. Query CB for E2, query is attempted to be forwarded but fails
+=================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+09. Ask for metrics, see 1 error in outgoing transactions
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 1910
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "services": {
+        "default-service": {
+            "subservs": {
+                "SP": {
+                    "incomingTransactionErrors": 1,
+                    "incomingTransactionRequestSize": 164,
+                    "incomingTransactionResponseSize": 242,
+                    "incomingTransactions": 4,
+                    "outgoingTransactionRequestSize": 473,
+                    "outgoingTransactionResponseSize": 861,
+                    "outgoingTransactions": 3,
+                    "serviceTime": REGEX(.*)
+                },
+                "SP2": {
+                    "incomingTransactionErrors": 1,
+                    "incomingTransactionRequestSize": 140,
+                    "incomingTransactionResponseSize": 171,
+                    "incomingTransactions": 2,
+                    "outgoingTransactionErrors": 1,
+                    "outgoingTransactionRequestSize": 103,
+                    "outgoingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                },
+                "root-subserv": {
+                    "incomingTransactionResponseSize": 1122,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                }
+            },
+            "sum": {
+                "incomingTransactionErrors": 2,
+                "incomingTransactionRequestSize": 304,
+                "incomingTransactionResponseSize": 1535,
+                "incomingTransactions": 7,
+                "outgoingTransactionErrors": 1,
+                "outgoingTransactionRequestSize": 576,
+                "outgoingTransactionResponseSize": 861,
+                "outgoingTransactions": 4,
+                "serviceTime": REGEX(.*)
+            }
+        }
+    },
+    "sum": {
+        "subservs": {
+            "SP": {
+                "incomingTransactionErrors": 1,
+                "incomingTransactionRequestSize": 164,
+                "incomingTransactionResponseSize": 242,
+                "incomingTransactions": 4,
+                "outgoingTransactionRequestSize": 473,
+                "outgoingTransactionResponseSize": 861,
+                "outgoingTransactions": 3,
+                "serviceTime": REGEX(.*)
+            },
+            "SP2": {
+                "incomingTransactionErrors": 1,
+                "incomingTransactionRequestSize": 140,
+                "incomingTransactionResponseSize": 171,
+                "incomingTransactions": 2,
+                "outgoingTransactionErrors": 1,
+                "outgoingTransactionRequestSize": 103,
+                "outgoingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            },
+            "root-subserv": {
+                "incomingTransactionResponseSize": 1122,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            }
+        },
+        "sum": {
+            "incomingTransactionErrors": 2,
+            "incomingTransactionRequestSize": 304,
+            "incomingTransactionResponseSize": 1535,
+            "incomingTransactions": 7,
+            "outgoingTransactionErrors": 1,
+            "outgoingTransactionRequestSize": 576,
+            "outgoingTransactionResponseSize": 861,
+            "outgoingTransactions": 4,
+            "serviceTime": REGEX(.*)
+        }
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1

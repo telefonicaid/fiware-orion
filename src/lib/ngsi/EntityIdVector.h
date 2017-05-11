@@ -60,11 +60,7 @@ typedef struct EntityIdVector
 
   EntityId* operator[](unsigned int ix) const;
 
-  std::string  check(ConnectionInfo*     ciP,
-                     RequestType         requestType,
-                     const std::string&  indent,
-                     const std::string&  predetectedError,
-                     int                 counter);
+  std::string  check(RequestType requestType, const std::string&  indent);
 } EntityIdVector;
 
 #endif  // SRC_LIB_NGSI_ENTITYIDVECTOR_H_

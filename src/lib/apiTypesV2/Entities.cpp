@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "logMsg/traceLevels.h"
+#include "logMsg/logMsg.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "apiTypesV2/Entities.h"
 
@@ -58,9 +59,13 @@ Entities::~Entities()
 * Entities::render - 
 *
 */
-std::string Entities::render(ConnectionInfo* ciP, RequestType requestType)
+std::string Entities::render
+(
+  std::map<std::string, bool>&         uriParamOptions,
+  std::map<std::string, std::string>&  uriParam
+)
 {
-  return vec.render(ciP, requestType, false);
+  return vec.render(uriParamOptions, uriParam);
 } 
 
 
@@ -73,9 +78,9 @@ std::string Entities::render(ConnectionInfo* ciP, RequestType requestType)
 *   The 'check' method is normally only used to check that incoming payload is correct.
 *   For now (at least), the Entities type is only used as outgoing payload ...
 */
-std::string Entities::check(ConnectionInfo* ciP, RequestType requestType)
+std::string Entities::check(ApiVersion apiVersion, RequestType requestType)
 {
-  return vec.check(ciP, requestType);
+  return vec.check(apiVersion, requestType);
 }
 
 
@@ -140,13 +145,30 @@ void Entities::fill(QueryContextResponse* qcrsP)
   for (unsigned int ix = 0; ix < qcrsP->contextElementResponseVector.size(); ++ix)
   {
     ContextElement* ceP = &qcrsP->contextElementResponseVector[ix]->contextElement;
-    Entity*         eP  = new Entity();
+    StatusCode* scP = &qcrsP->contextElementResponseVector[ix]->statusCode;
 
-    eP->id        = ceP->entityId.id;
-    eP->type      = ceP->entityId.type;
-    eP->isPattern = ceP->entityId.isPattern;
+    if (scP->code == SccReceiverInternalError)
+    {
+      // FIXME P4: Do we need to release the memory allocated in 'vec' before returning? I don't
+      // think so, as the releasing logic in the upper layer will deal with that but
+      // let's do anyway just in case... (we don't have a ft covering this, so valgrind suite
+      // cannot help here and it is better to ensure)
+      oe.fill(SccReceiverInternalError, scP->details, "InternalServerError");
+      vec.release();
+      return;
+    }
+    else
+    {
+      Entity*         eP  = new Entity();
 
-    eP->attributeVector.fill(&ceP->contextAttributeVector);
-    vec.push_back(eP);
+      eP->id        = ceP->entityId.id;
+      eP->type      = ceP->entityId.type;
+      eP->isPattern = ceP->entityId.isPattern;
+      eP->creDate   = ceP->entityId.creDate;
+      eP->modDate   = ceP->entityId.modDate;
+
+      eP->attributeVector.fill(&ceP->contextAttributeVector);
+      vec.push_back(eP);
+    }
   }
 }

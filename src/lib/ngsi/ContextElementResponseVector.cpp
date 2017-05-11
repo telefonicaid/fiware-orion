@@ -33,7 +33,6 @@
 #include "common/tag.h"
 #include "common/RenderFormat.h"
 #include "ngsi/ContextElementResponseVector.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -43,14 +42,14 @@
 */
 std::string ContextElementResponseVector::render
 (
-  ConnectionInfo*     ciP,
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
   RequestType         requestType,
   const std::string&  indent,
   bool                comma,
   bool                omitAttributeValues
 )
 {
-  std::string key = "contextResponses";
   std::string out = "";
 
   if (vec.size() == 0)
@@ -58,11 +57,11 @@ std::string ContextElementResponseVector::render
     return "";
   }
 
-  out += startTag2(indent, key, true, true);
+  out += startTag(indent, "contextResponses", true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(ciP, requestType, indent + "  ", ix < (vec.size() - 1), omitAttributeValues);
+    out += vec[ix]->render(apiVersion, asJsonObject, requestType, indent + "  ", ix < (vec.size() - 1), omitAttributeValues);
   }
 
   out += endTag(indent, comma, true);
@@ -76,14 +75,20 @@ std::string ContextElementResponseVector::render
 *
 * ContextElementResponseVector::toJson - 
 */
-std::string ContextElementResponseVector::toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist)
+std::string ContextElementResponseVector::toJson
+(
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter,
+  const std::vector<std::string>&  metadataFilter,
+  bool                             blacklist
+)
 {
   std::string out;
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     out += (renderFormat == NGSI_V2_VALUES)? "[": "{";
-    out += vec[ix]->toJson(renderFormat, attrsFilter, blacklist);
+    out += vec[ix]->toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
     out += (renderFormat == NGSI_V2_VALUES)? "]": "}";
 
     if (ix != vec.size() - 1)
@@ -103,7 +108,7 @@ std::string ContextElementResponseVector::toJson(RenderFormat renderFormat, cons
 */
 std::string ContextElementResponseVector::check
 (
-  ConnectionInfo*     ciP,
+  ApiVersion          apiVersion,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,
@@ -114,7 +119,7 @@ std::string ContextElementResponseVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType, indent, predetectedError, counter)) != "OK")
     {
       return res;
     }
@@ -156,7 +161,7 @@ void ContextElementResponseVector::push_back(ContextElementResponse* item)
 *
 * ContextElementResponseVector::size -
 */
-unsigned int ContextElementResponseVector::size(void)
+unsigned int ContextElementResponseVector::size(void) const
 {
     
   return vec.size();

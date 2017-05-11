@@ -146,6 +146,7 @@ SET (ORION_LIBS
     orionTypes
     common
     alarmMgr
+    metricsMgr
     logSummary
     lm
     pa
@@ -176,6 +177,7 @@ SET (DYNAMIC_LIBS
     gnutls
     pthread
     gcrypt
+    ssl
     uuid
 )
 
@@ -241,6 +243,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/mongoBackend)
   ADD_SUBDIRECTORY(src/lib/cache)
   ADD_SUBDIRECTORY(src/lib/alarmMgr)
+  ADD_SUBDIRECTORY(src/lib/metricsMgr)
   ADD_SUBDIRECTORY(src/lib/logSummary)
   ADD_SUBDIRECTORY(src/app/contextBroker)
 else ()

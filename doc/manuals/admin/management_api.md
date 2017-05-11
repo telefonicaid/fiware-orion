@@ -8,7 +8,7 @@ API for management that allows to change the log level and the trace levels
 To change the log level:
 
 ```
-curl -X PUT <host>:<port>/admin/log?level=<FATAL|ERROR|WARN|INFO|DEBUG|NONE>
+curl -X PUT <host>:<port>/admin/log?level=<NONE|FATAL|ERROR|WARN|INFO|DEBUG>
 ```
 
 To retrieve the log level:
@@ -76,6 +76,9 @@ The response is a listing of information of all the broker's semaphores:
     "logMsg": {
         "status": "free"
     },
+    "metrics": {
+        "status": "free"
+     },
     "request": {
         "status": "free"
     },
@@ -98,6 +101,7 @@ Short explanation of the semaphores:
 * **dbConnectionPool**, protects mongo connection pool
 * **dbConnection**, protects the set of connections of the mongo connection pool
 * **logMsg**, makes sure that not two messages are written simultaneously to the log-file
+* **metrics**, protects internal data of the Metrics Manager
 * **request**, makes sure there are not two simultaneous requests to mongodb 
 * **subCache**, protects the Subscription Cache
 * **timeStat**, protects the data for timing statistics

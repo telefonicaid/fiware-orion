@@ -33,7 +33,6 @@
 #include "rest/HttpStatusCode.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/QueryContextResponse.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -95,10 +94,9 @@ QueryContextResponse::~QueryContextResponse()
 *
 * QueryContextResponse::render - 
 */
-std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent)
+std::string QueryContextResponse::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
 {
   std::string  out               = "";
-  std::string  tag               = "queryContextResponse";
   bool         errorCodeRendered = false;
   
   //
@@ -126,11 +124,11 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
   //
   // 02. render 
   //
-  out += startTag1(indent, tag, false);
+  out += startTag(indent);
 
   if (contextElementResponseVector.size() > 0)
   {
-    out += contextElementResponseVector.render(ciP, QueryContext, indent + "  ", errorCodeRendered);
+    out += contextElementResponseVector.render(apiVersion, asJsonObject, QueryContext, indent + "  ", errorCodeRendered);
   }
 
   if (errorCodeRendered == true)
@@ -163,7 +161,7 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
 *
 * QueryContextResponse::check -
 */
-std::string QueryContextResponse::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string QueryContextResponse::check(ApiVersion apiVersion, bool asJsonObject, const std::string& indent, const std::string& predetectedError)
 {
   std::string  res;
 
@@ -171,7 +169,7 @@ std::string QueryContextResponse::check(ConnectionInfo* ciP, RequestType request
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextElementResponseVector.check(ciP, QueryContext, indent, predetectedError, 0)) != "OK")
+  else if ((res = contextElementResponseVector.check(apiVersion, QueryContext, indent, predetectedError, 0)) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     errorCode.fill(SccBadRequest, res);
@@ -181,7 +179,7 @@ std::string QueryContextResponse::check(ConnectionInfo* ciP, RequestType request
     return "OK";
   }
 
-  return render(ciP, QueryContext, indent);
+  return render(apiVersion, asJsonObject, indent);
 }
 
 

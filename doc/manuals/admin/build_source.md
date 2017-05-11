@@ -9,8 +9,9 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * boost: 1.41 (the one that comes in EPEL6 repository)
 * libmicrohttpd: 0.9.48 (from source)
 * libcurl: 7.19.7
+* openssl: 1.0.1e
 * libuuid: 2.17.2
-* Mongo Driver: legacy-1.0.7 (from source)
+* Mongo Driver: legacy-1.1.2 (from source)
 * rapidjson: 1.0.2 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
@@ -27,13 +28,13 @@ commands that require root privilege):
 
 * Install the required libraries (except what needs to be taken from source, described in following steps).
 
-        sudo yum install boost-devel libcurl-devel gnutls-devel libgcrypt-devel libuuid-devel
+        sudo yum install boost-devel libcurl-devel gnutls-devel libgcrypt-devel openssl-devel libuuid-devel
 
 * Install the Mongo Driver from source:
 
-        wget https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.0.7.tar.gz
-        tar xfvz legacy-1.0.7.tar.gz
-        cd mongo-cxx-driver-legacy-1.0.7
+        wget https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz
+        tar xfvz legacy-1.1.2.tar.gz
+        cd mongo-cxx-driver-legacy-1.1.2
         scons                                         # The build/linux2/normal/libmongoclient.a library is generated as outcome
         sudo scons install --prefix=/usr/local        # This puts .h files in /usr/local/include/mongo and libmongoclient.a in /usr/local/lib
 
@@ -53,9 +54,9 @@ commands that require root privilege):
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-* Install Google Test/Mock from sources (there are RPM pacakges for this, but they don't seem to be working with the current CMakeLists.txt configuration)
+* Install Google Test/Mock from sources (there are RPM pacakges for this, but they don't seem to be working with the current CMakeLists.txt configuration). Previously the URL was http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 but google removed that package in late August 2016 and it is no longer working.
 
-        wget http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2
+        wget https://www.fiware.org/shared-content/public/gmock-1.5.0.tar.bz2
         tar xfvj gmock-1.5.0.tar.bz2
         cd gmock-1.5.0
         ./configure

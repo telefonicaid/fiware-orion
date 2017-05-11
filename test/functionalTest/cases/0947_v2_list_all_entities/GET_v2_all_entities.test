@@ -170,7 +170,7 @@ Date: REGEX(.*)
         },
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Text",
             "value": "E1/T1/A1"
         },
         "A2": {
@@ -181,7 +181,7 @@ Date: REGEX(.*)
         "A3": {
             "metadata": {
                 "m1": {
-                    "type": "none",
+                    "type": "Text",
                     "value": "M1"
                 }
             },
@@ -191,7 +191,7 @@ Date: REGEX(.*)
         "A4": {
             "metadata": {
                 "m1": {
-                    "type": "none",
+                    "type": "Text",
                     "value": "M1"
                 },
                 "m2": {
@@ -247,7 +247,7 @@ Date: REGEX(.*)
 06. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 515
+Content-Length: 526
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -261,7 +261,7 @@ Date: REGEX(.*)
         },
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "Text",
             "value": "E1/T1/A1"
         },
         "A2": {
@@ -272,7 +272,7 @@ Date: REGEX(.*)
         "A3": {
             "metadata": {
                 "m1": {
-                    "type": "none",
+                    "type": "Text",
                     "value": "M1"
                 }
             },
@@ -282,7 +282,7 @@ Date: REGEX(.*)
         "A4": {
             "metadata": {
                 "m1": {
-                    "type": "none",
+                    "type": "Text",
                     "value": "M1"
                 },
                 "m2": {
@@ -303,7 +303,7 @@ Date: REGEX(.*)
     {
         "A0": {
             "metadata": {},
-            "type": "none",
+            "type": "StructuredValue",
             "value": {
                 "i1": "1",
                 "s1": "s"

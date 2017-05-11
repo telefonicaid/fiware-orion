@@ -31,7 +31,6 @@
 #include "ngsi/UpdateActionType.h"
 #include "ngsi/Request.h"
 #include "apiTypesV2/Entities.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -48,7 +47,6 @@ public:
   BatchUpdate();
   ~BatchUpdate();
 
-  std::string    check(ConnectionInfo* ciP, RequestType requestType);
   void           present(const std::string& indent);
   void           release(void);
 };

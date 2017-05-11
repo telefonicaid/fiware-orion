@@ -83,4 +83,12 @@ extern std::string payloadParse
   std::vector<std::string>&  compV
 );
 
+
+
+/* ****************************************************************************
+*
+* tenantCheck - 
+*/
+extern std::string tenantCheck(const std::string& tenant);
+
 #endif

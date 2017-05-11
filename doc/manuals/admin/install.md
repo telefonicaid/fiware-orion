@@ -3,7 +3,7 @@
 * [Introduction](#introduction)
 * [Requirements](#requirements)
 * [Installation](#installation)
-    * [Using yum (recommended)](#using-yum-(recommended))
+    * [Using yum (recommended)](#using-yum-recommended)
     * [Using RPM file](#using-rpm-file)
     * [Optional packages](#optional-packages)
 * [Upgrading from a previous version](#upgrading-from-a-previous-version)
@@ -91,6 +91,7 @@ You only need to pay attention to this if your upgrade path crosses 0.14.1, 0.19
 * [Upgrading to 0.19.0 and beyond from a pre-0.19.0 version](upgrading_crossing_0-19-0.md)
 * [Upgrading to 0.21.0 and beyond from a pre-0.21.0 version](upgrading_crossing_0-21-0.md)
 * [Upgrading to 1.3.0 and beyond from a pre-1.3.0 version](upgrading_crossing_1-3-0.md)
+* [Upgrading to 1.5.0 and beyond from a pre-1.5.0 version](upgrading_crossing_1-5-0.md)
 
 If your upgrade cover several segments (e.g. you are using 0.13.0 and
 want to upgrade to 0.19.0, so both "upgrading to 0.14.1 and beyond from

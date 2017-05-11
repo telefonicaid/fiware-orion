@@ -36,6 +36,7 @@
 #include "ngsi9/RegisterContextRequest.h"
 #include "parse/nullTreat.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
 
 
 
@@ -384,7 +385,8 @@ void jsonUpcrRelease(ParseData* reqDataP)
 */
 std::string jsonUpcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->upcr.res.check(ciP, UpdateContext, "", reqData->errorString, 0);
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+  return reqData->upcr.res.check(ciP->apiVersion, asJsonObject, "", reqData->errorString, 0);
 }
 
 

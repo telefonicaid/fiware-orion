@@ -36,6 +36,7 @@
 #include "parse/nullTreat.h"
 #include "ngsi/Request.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
 
 
 
@@ -184,7 +185,7 @@ void jsonRprRelease(ParseData* reqData)
 */
 std::string jsonRprCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->rpr.res.check(ciP, ContextEntitiesByEntityId, "", reqData->errorString, 0);
+  return reqData->rpr.res.check(ciP->apiVersion, ContextEntitiesByEntityId, "", reqData->errorString);
 }
 
 

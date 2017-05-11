@@ -29,7 +29,6 @@
 #include <vector>
 
 #include "ngsi/ContextElement.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -43,13 +42,13 @@ typedef struct ContextElementVector
 
   void             push_back(ContextElement* item);
   unsigned int     size(void);
-  std::string      render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma);
+  std::string      render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, const std::string& indent, bool comma);
   void             present(const std::string& indent);
   void             release(void);
   ContextElement*  lookup(EntityId* eP);
   ContextElement*  operator[](unsigned int ix) const;
 
-  std::string      check(ConnectionInfo*     ciP,
+  std::string      check(ApiVersion          apiVersion,
                          RequestType         requestType,
                          const std::string&  indent,
                          const std::string&  predetectedError,

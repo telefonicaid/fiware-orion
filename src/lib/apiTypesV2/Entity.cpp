@@ -26,9 +26,12 @@
 #include <vector>
 
 #include "logMsg/traceLevels.h"
+#include "logMsg/logMsg.h"
 #include "common/tag.h"
 #include "common/string.h"
+#include "common/globals.h"
 #include "common/errorMessages.h"
+#include "rest/uriParamNames.h"
 #include "alarmMgr/alarmMgr.h"
 #include "parse/forbiddenChars.h"
 #include "apiTypesV2/Entity.h"
@@ -40,7 +43,7 @@
 *
 * Entity::Entity - 
 */
-Entity::Entity(): typeGiven(false), renderId(true)
+Entity::Entity(): typeGiven(false), renderId(true), creDate(0), modDate(0)
 {
 
 }
@@ -67,77 +70,103 @@ Entity::~Entity()
 *   o 'keyValues'  (less verbose, only name and values shown for attributes - no type, no metadatas)
 *   o 'values'     (only the values of the attributes are printed, in a vector)
 */
-std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
+std::string Entity::render
+(
+  std::map<std::string, bool>&         uriParamOptions,
+  std::map<std::string, std::string>&  uriParam,
+  bool                                 comma
+)
 {
-  RenderFormat  renderFormat = NGSI_V2_NORMALIZED;
-
-  if      (ciP->uriParamOptions[OPT_KEY_VALUES]    == true)  { renderFormat = NGSI_V2_KEYVALUES;     }
-  else if (ciP->uriParamOptions[OPT_VALUES]        == true)  { renderFormat = NGSI_V2_VALUES;        }
-  else if (ciP->uriParamOptions[OPT_UNIQUE_VALUES] == true)  { renderFormat = NGSI_V2_UNIQUE_VALUES; }
-
-  if ((oe.details == "") && ((oe.reasonPhrase == "OK") || (oe.reasonPhrase == "")))
+  if ((oe.details != "") || ((oe.reasonPhrase != "OK") && (oe.reasonPhrase != "")))
   {
-    std::string out;
-
-    if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
-    {
-      out = "[";
-      if (attributeVector.size() != 0)
-      {
-        std::vector<std::string> attrsFilter;
-        stringSplit(ciP->uriParam["attrs"], ',', attrsFilter);
-        out += attributeVector.toJson(true, renderFormat, attrsFilter);
-      }
-      out += "]";        
-    }
-    else
-    {
-      out = "{";
-
-      if (renderId)
-      {
-        out += JSON_VALUE("id", id);
-        out += ",";
-
-        /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
-        out += JSON_STR("type") + ":" + ((type != "")? JSON_STR(type) : JSON_STR(DEFAULT_TYPE));
-      }
-
-      std::string attrsOut;
-      if (attributeVector.size() != 0)
-      {
-        std::vector<std::string> attrsFilter;
-        stringSplit(ciP->uriParam["attrs"], ',', attrsFilter);
-
-        attrsOut += attributeVector.toJson(true, renderFormat, attrsFilter);
-      }
-
-      // Note that just attributeVector.size() != 0 (used in previous versions) cannot be used
-      // as ciP->uriParam["attrs"] filter could remove all the attributes
-      if (attrsOut != "")
-      {
-        if (renderId)
-        {
-          out +=  "," + attrsOut;
-        }
-        else
-        {
-          out += attrsOut;
-        }
-      }
-
-      out += "}";
-    }
-
-    if (comma)
-    {
-      out += ",";
-    }
-
-    return out;
+    return oe.toJson();
   }
 
-  return oe.toJson();
+  RenderFormat  renderFormat = NGSI_V2_NORMALIZED;
+
+  if      (uriParamOptions[OPT_KEY_VALUES]    == true)  { renderFormat = NGSI_V2_KEYVALUES;     }
+  else if (uriParamOptions[OPT_VALUES]        == true)  { renderFormat = NGSI_V2_VALUES;        }
+  else if (uriParamOptions[OPT_UNIQUE_VALUES] == true)  { renderFormat = NGSI_V2_UNIQUE_VALUES; }
+
+  std::string out;
+  std::vector<std::string> metadataFilter;
+  std::vector<std::string> attrsFilter;
+
+  if (uriParam[URI_PARAM_METADATA] != "")
+  {
+    stringSplit(uriParam[URI_PARAM_METADATA], ',', metadataFilter);
+  }
+
+  if (uriParam[URI_PARAM_ATTRIBUTES] != "")
+  {
+    stringSplit(uriParam[URI_PARAM_ATTRIBUTES], ',', attrsFilter);
+  }
+
+  // Add special attributes representing entity dates
+  if ((creDate != 0) && (uriParamOptions[DATE_CREATED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end())))
+  {
+    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, creDate);
+    attributeVector.push_back(caP);
+  }
+  if ((modDate != 0) && (uriParamOptions[DATE_MODIFIED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_MODIFIED) != attrsFilter.end())))
+  {
+    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, modDate);
+    attributeVector.push_back(caP);
+  }
+
+  if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
+  {
+    out = "[";
+    if (attributeVector.size() != 0)
+    {
+      out += attributeVector.toJson(renderFormat, attrsFilter, metadataFilter, false);
+    }
+    out += "]";
+  }
+  else
+  {
+    out = "{";
+
+    if (renderId)
+    {
+      out += JSON_VALUE("id", id);
+      out += ",";
+
+      /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
+      out += JSON_STR("type") + ":" + ((type != "")? JSON_STR(type) : JSON_STR(DEFAULT_ENTITY_TYPE));
+    }
+
+    std::string attrsOut;
+    if (attributeVector.size() != 0)
+    {
+      attrsOut += attributeVector.toJson(renderFormat, attrsFilter, metadataFilter, false);
+    }
+
+    //
+    // Note that just attributeVector.size() != 0 (used in previous versions) cannot be used
+    // as ciP->uriParam["attrs"] filter could remove all the attributes
+    //
+    if (attrsOut != "")
+    {
+      if (renderId)
+      {
+        out +=  "," + attrsOut;
+      }
+      else
+      {
+        out += attrsOut;
+      }
+    }
+
+    out += "}";
+  }
+
+  if (comma)
+  {
+    out += ",";
+  }
+
+  return out;
 }
 
 
@@ -146,12 +175,19 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
 *
 * Entity::check - 
 */
-std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
+std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
 {
-  ssize_t len;
-  char errorMsg[128];
+  ssize_t  len;
+  char     errorMsg[128];
 
-  if ((requestType == EntitiesRequest) && (id == ""))
+  if (((apiVersion == V2) && (len = strlen(id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
+  {
+    snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, min length supported: %d", len, MIN_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+  if ((requestType == EntitiesRequest) && (id.empty()))
   {
     return "No Entity ID";
   }
@@ -163,10 +199,26 @@ std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdChars(ciP->apiVersion, id.c_str()))
+  if (isPattern.empty())
   {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the id of an entity");
-    return "Invalid characters in entity id";
+    isPattern = "false";
+  }
+
+  // isPattern MUST be either "true" or "false" (or empty => "false")
+  if ((isPattern != "true") && (isPattern != "false"))
+  {
+    alarmMgr.badInput(clientIp, "invalid value for isPattern");
+    return "Invalid value for isPattern";
+  }
+
+  // Check for forbidden chars for "id", but not if "id" is a pattern
+  if (isPattern == "false")
+  {
+    if (forbiddenIdChars(apiVersion, id.c_str()))
+    {
+      alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID);
+      return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
+    }
   }
 
   if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
@@ -176,26 +228,28 @@ std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
     return std::string(errorMsg);
   }
 
-  if (ciP->apiVersion == "v2" && (len = strlen(type.c_str())) < MIN_ID_LEN)
+
+  if (!((requestType == BatchQueryRequest) || (requestType == BatchUpdateRequest && !typeGiven)))
   {
-    snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
-    return std::string(errorMsg);
+    if ((apiVersion == V2) && ((len = strlen(type.c_str())) < MIN_ID_LEN))
+    {
+      snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
+      alarmMgr.badInput(clientIp, errorMsg);
+      return std::string(errorMsg);
+    }
   }
 
-  if (forbiddenIdChars(ciP->apiVersion, type.c_str()))
+  // Check for forbidden chars for "type", but not if "type" is a pattern
+  if (isTypePattern == false)
   {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the type of an entity");
-    return "Invalid characters in entity type";
+    if (forbiddenIdChars(apiVersion, type.c_str()))
+    {
+      alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE);
+      return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
+    }
   }
 
-  if (forbiddenChars(isPattern.c_str()))
-  {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the pattern of an entity");
-    return "Invalid characters in entity isPattern";
-  }
-
-  return attributeVector.check(ciP, requestType, "", "", 0);
+  return attributeVector.check(apiVersion, requestType);
 }
 
 
@@ -225,11 +279,22 @@ void Entity::present(const std::string& indent)
 *
 * Entity::fill - 
 */
-void Entity::fill(const std::string& _id, const std::string& _type, const std::string& _isPattern, ContextAttributeVector* aVec)
+void Entity::fill
+(
+  const std::string&       _id,
+  const std::string&       _type,
+  const std::string&       _isPattern,
+  ContextAttributeVector*  aVec,
+  double                   _creDate,
+  double                   _modDate
+)
 {
   id         = _id;
   type       = _type;
   isPattern  = _isPattern;
+
+  creDate    = _creDate;
+  modDate    = _modDate;
 
   attributeVector.fill(aVec);
 }
@@ -239,7 +304,7 @@ void Entity::fill(QueryContextResponse* qcrsP)
 
   if (qcrsP->errorCode.code == SccContextElementNotFound)
   {
-    oe.fill(SccContextElementNotFound, "The requested entity has not been found. Check type and id", "NotFound");
+    oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
   }
   else if (qcrsP->errorCode.code != SccOk)
   {
@@ -253,12 +318,13 @@ void Entity::fill(QueryContextResponse* qcrsP)
       //
       // If there are more than one entity, we return an error
       //
-      oe.fill(SccConflict, MORE_MATCHING_ENT, "TooManyResults");
+      oe.fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
   }
   else
   {
     ContextElement* ceP = &qcrsP->contextElementResponseVector[0]->contextElement;
-    fill(ceP->entityId.id, ceP->entityId.type, ceP->entityId.isPattern, &ceP->contextAttributeVector);
+    fill(ceP->entityId.id, ceP->entityId.type, ceP->entityId.isPattern, &ceP->contextAttributeVector,
+         ceP->entityId.creDate, ceP->entityId.modDate);
   }
 }
 

@@ -28,9 +28,9 @@
 #include <string>
 #include <vector>
 
-#include "orionTypes/OrionValueType.h"
+#include "common/globals.h"
 
-struct ConnectionInfo;
+#include "orionTypes/OrionValueType.h"
 
 
 namespace orion
@@ -93,6 +93,7 @@ class CompoundValueNode
 
   // Needed for JSON rendering
   int                                siblingNo;
+  bool                               renderName;
 
   // Fields that may not be necessary
   // FIXME P4: when finally sure, remove the unnecessary fields
@@ -159,8 +160,8 @@ class CompoundValueNode
   CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, bool _value);
   std::string         check(void);
   std::string         finish(void);
-  std::string         render(ConnectionInfo* ciP, const std::string& indent);
-  std::string         toJson(bool isLastElement);
+  std::string         render(ApiVersion apiVersion, const std::string& indent);
+  std::string         toJson(bool isLastElement, bool comma = true);
 
   void                shortShow(const std::string& indent);
   void                show(const std::string& indent);

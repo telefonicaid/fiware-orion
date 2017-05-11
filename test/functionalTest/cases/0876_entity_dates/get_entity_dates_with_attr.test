@@ -1,0 +1,878 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Check attrs param with dates in all retrieve operations where it makes sense
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# NOTE: don't pay attention to attribute order in results (JSON pretty print sorts keys)
+#
+# 01.  Create entity E1 with atribute A and B
+#
+# 02a. GET /v2/entities?attrs=dateCreated
+# 02b. GET /v2/entities?attrs=dateModified
+# 02c. GET /v2/entities?attrs=dateCreated,dateModified
+# 02d. GET /v2/entities?attrs=dateModified,dateCreated,*
+# 02e. GET /v2/entities?attrs=dateCreated,dateModified,A
+# 02f. GET /v2/entities?attrs=B
+#
+# 03a. GET /v2/entities/E1?attrs=dateCreated
+# 03b. GET /v2/entities/E1?attrs=dateModified
+# 03c. GET /v2/entities/E1?attrs=dateCreated,dateModified
+# 03d. GET /v2/entities/E1?attrs=dateModified,dateCreated,*
+# 03e. GET /v2/entities/E1?attrs=dateCreated,dateModified,A
+# 03f. GET /v2/entities/E1?attrs=B
+#
+# 04a. GET /v2/entities/E1/attrs?attrs=dateCreated
+# 04b. GET /v2/entities/E1/attrs?attrs=dateModified
+# 04c. GET /v2/entities/E1/attrs?attrs=dateCreated,dateModified
+# 04d. GET /v2/entities/E1/attrs?attrs=dateModified,dateCreated,*
+# 04e. GET /v2/entities/E1/attrs?attrs=dateCreated,dateModified,A
+# 04f. GET /v2/entities/E1/attrs?attrs=B
+#
+# 05a. POST /v2/op/query with attributes: dateCreated
+# 05b. POST /v2/op/query with attributes: dateModified
+# 05c. POST /v2/op/query with attributes: dateCreated,dateModified
+# 05d. POST /v2/op/query with attributes: dateModified,dateCreated,*
+# 05e. POST /v2/op/query with attributes: dateCreated,dateModified,A
+# 05f. POST /v2/op/query with attributes: B
+#
+
+echo "01. Create entity E1 with atribute A and B"
+echo "=========================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A": "foo",
+  "B": "bar"
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "02a. GET /v2/entities?attrs=dateCreated"
+echo "======================================="
+orionCurl --url '/v2/entities?attrs=dateCreated'
+echo
+echo
+
+
+echo "02b. GET /v2/entities?attrs=dateModified"
+echo "======================================="
+orionCurl --url '/v2/entities?attrs=dateModified'
+echo
+echo
+
+
+echo "02c. GET /v2/entities?attrs=dateCreated,dateModified"
+echo "===================================================="
+orionCurl --url '/v2/entities?attrs=dateCreated,dateModified'
+echo
+echo
+
+
+echo "02d. GET /v2/entities?attrs=dateModified,dateCreated,*"
+echo "======================================================"
+orionCurl --url '/v2/entities?attrs=dateModified,dateCreated,*'
+echo
+echo
+
+
+echo "02e. GET /v2/entities?attrs=dateCreated,dateModified,A"
+echo "======================================================"
+orionCurl --url '/v2/entities?attrs=dateCreated,dateModified,A'
+echo
+echo
+
+
+echo "02f. GET /v2/entities?attrs=B"
+echo "============================="
+orionCurl --url '/v2/entities?attrs=B'
+echo
+echo
+
+
+echo "03a. GET /v2/entities/E1?attrs=dateCreated"
+echo "=========================================="
+orionCurl --url '/v2/entities/E1?attrs=dateCreated'
+echo
+echo
+
+
+echo "03b. GET /v2/entities/E1?attrs=dateModified"
+echo "==========================================="
+orionCurl --url '/v2/entities/E1?attrs=dateModified'
+echo
+echo
+
+
+echo "03c. GET /v2/entities/E1?attrs=dateCreated,dateModified"
+echo "======================================================="
+orionCurl --url '/v2/entities/E1?attrs=dateCreated,dateModified'
+echo
+echo
+
+
+echo "03d. GET /v2/entities/E1?attrs=dateModified,dateCreated,*"
+echo "========================================================="
+orionCurl --url '/v2/entities/E1?attrs=dateModified,dateCreated,*'
+echo
+echo
+
+
+echo "03e. GET /v2/entities/E1?attrs=dateCreated,dateModified,A"
+echo "========================================================="
+orionCurl --url '/v2/entities/E1?attrs=dateCreated,dateModified,A'
+echo
+echo
+
+
+echo "03f. GET /v2/entities/E1?attrs=B"
+echo "================================"
+orionCurl --url '/v2/entities/E1?attrs=B'
+echo
+echo
+
+
+echo "04a. GET /v2/entities/E1/attrs?attrs=dateCreated"
+echo "================================================"
+orionCurl --url '/v2/entities/E1/attrs?attrs=dateCreated'
+echo
+echo
+
+
+echo "04b. GET /v2/entities/E1/attrs?attrs=dateModified"
+echo "================================================="
+orionCurl --url '/v2/entities/E1/attrs?attrs=dateModified'
+echo
+echo
+
+
+echo "04c. GET /v2/entities/E1/attrs?attrs=dateCreated,dateModified"
+echo "============================================================="
+orionCurl --url '/v2/entities/E1/attrs?attrs=dateCreated,dateModified'
+echo
+echo
+
+
+echo "04d. GET /v2/entities/E1/attrs?attrs=dateModified,dateCreated,*"
+echo "==============================================================="
+orionCurl --url '/v2/entities/E1/attrs?attrs=dateModified,dateCreated,*'
+echo
+echo
+
+
+echo "04e. GET /v2/entities/E1/attrs?attrs=dateCreated,dateModified,A"
+echo "==============================================================="
+orionCurl --url '/v2/entities/E1/attrs?attrs=dateCreated,dateModified,A'
+echo
+echo
+
+
+echo "04f. GET /v2/entities/E1/attrs?attrs=B"
+echo "======================================"
+orionCurl --url '/v2/entities/E1/attrs?attrs=B'
+echo
+echo
+
+
+echo "05a. POST /v2/op/query with attributes: dateCreated"
+echo "FIXME: this is not behaving as expect and would need a future change (see issue 2604)"
+echo "==================================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": "E1",
+      "type": "T"
+    }
+  ],
+  "attributes": [
+    "dateCreated"
+  ]
+}'
+orionCurl --url '/v2/op/query' --payload "$payload"
+echo
+echo
+
+
+echo "05b. POST /v2/op/query with attributes: dateModified"
+echo "FIXME: this is not behaving as expect and would need a future change (see issue 2604)"
+echo "===================================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": "E1",
+      "type": "T"
+    }
+  ],
+  "attributes": [
+    "dateModified"
+  ]
+}'
+orionCurl --url '/v2/op/query' --payload "$payload"
+echo
+echo
+
+
+echo "05c. POST /v2/op/query with attributes: dateCreated,dateModified"
+echo "FIXME: this is not behaving as expect and would need a future change (see issue 2604)"
+echo "================================================================"
+payload='{
+  "entities": [
+    {
+      "idPattern": "E1",
+      "type": "T"
+    }
+  ],
+  "attributes": [
+    "dateCreated",
+    "dateModified"
+  ]
+}'
+orionCurl --url '/v2/op/query' --payload "$payload"
+echo
+echo
+
+
+echo "05d. POST /v2/op/query with attributes: dateModified,dateCreated,*"
+echo "FIXME: this is not behaving as expect and would need a future change (see issue 2604)"
+echo "=================================================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": "E1",
+      "type": "T"
+    }
+  ],
+  "attributes": [
+    "dateModified",
+    "dateCreated"
+  ]
+}'
+orionCurl --url '/v2/op/query' --payload "$payload"
+echo
+echo
+
+
+echo "05e. POST /v2/op/query with attributes: dateCreated,dateModified,A"
+echo "FIXME: this is not behaving as expect and would need a future change (see issue 2604)"
+echo "=================================================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": "E1",
+      "type": "T"
+    }
+  ],
+  "attributes": [
+    "dateCreated",
+    "dateModified",
+    "A"
+  ]
+}'
+orionCurl --url '/v2/op/query' --payload "$payload"
+echo
+echo
+
+
+echo "05f. POST /v2/op/query with attributes: B"
+echo "========================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": "E1",
+      "type": "T"
+    }
+  ],
+  "attributes": [
+    "B"
+  ]
+}'
+orionCurl --url '/v2/op/query' --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with atribute A and B
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02a. GET /v2/entities?attrs=dateCreated
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 106
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "dateCreated": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "REGEX(2\d\d\d\-.*)"
+        },
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+02b. GET /v2/entities?attrs=dateModified
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 107
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "dateModified": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "REGEX(2\d\d\d\-.*)"
+        },
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+02c. GET /v2/entities?attrs=dateCreated,dateModified
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 189
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "dateCreated": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "REGEX(2\d\d\d\-.*)"
+        },
+        "dateModified": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "REGEX(2\d\d\d\-.*)"
+        },
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+02d. GET /v2/entities?attrs=dateModified,dateCreated,*
+======================================================
+HTTP/1.1 200 OK
+Content-Length: 285
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A": {
+            "metadata": {},
+            "type": "Text",
+            "value": "foo"
+        },
+        "B": {
+            "metadata": {},
+            "type": "Text",
+            "value": "bar"
+        },
+        "dateCreated": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "REGEX(2\d\d\d\-.*)"
+        },
+        "dateModified": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "REGEX(2\d\d\d\-.*)"
+        },
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+02e. GET /v2/entities?attrs=dateCreated,dateModified,A
+======================================================
+HTTP/1.1 200 OK
+Content-Length: 237
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A": {
+            "metadata": {},
+            "type": "Text",
+            "value": "foo"
+        },
+        "dateCreated": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "REGEX(2\d\d\d\-.*)"
+        },
+        "dateModified": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "REGEX(2\d\d\d\-.*)"
+        },
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+02f. GET /v2/entities?attrs=B
+=============================
+HTTP/1.1 200 OK
+Content-Length: 72
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "B": {
+            "metadata": {},
+            "type": "Text",
+            "value": "bar"
+        },
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+03a. GET /v2/entities/E1?attrs=dateCreated
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 104
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "dateCreated": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(2\d\d\d\-.*)"
+    },
+    "id": "E1",
+    "type": "T"
+}
+
+
+03b. GET /v2/entities/E1?attrs=dateModified
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 105
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "dateModified": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(2\d\d\d\-.*)"
+    },
+    "id": "E1",
+    "type": "T"
+}
+
+
+03c. GET /v2/entities/E1?attrs=dateCreated,dateModified
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 187
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "dateCreated": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(2\d\d\d\-.*)"
+    },
+    "dateModified": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(2\d\d\d\-.*)"
+    },
+    "id": "E1",
+    "type": "T"
+}
+
+
+03d. GET /v2/entities/E1?attrs=dateModified,dateCreated,*
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 283
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Text",
+        "value": "foo"
+    },
+    "B": {
+        "metadata": {},
+        "type": "Text",
+        "value": "bar"
+    },
+    "dateCreated": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(2\d\d\d\-.*)"
+    },
+    "dateModified": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(2\d\d\d\-.*)"
+    },
+    "id": "E1",
+    "type": "T"
+}
+
+
+03e. GET /v2/entities/E1?attrs=dateCreated,dateModified,A
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 235
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Text",
+        "value": "foo"
+    },
+    "dateCreated": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(2\d\d\d\-.*)"
+    },
+    "dateModified": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(2\d\d\d\-.*)"
+    },
+    "id": "E1",
+    "type": "T"
+}
+
+
+03f. GET /v2/entities/E1?attrs=B
+================================
+HTTP/1.1 200 OK
+Content-Length: 70
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "B": {
+        "metadata": {},
+        "type": "Text",
+        "value": "bar"
+    },
+    "id": "E1",
+    "type": "T"
+}
+
+
+04a. GET /v2/entities/E1/attrs?attrs=dateCreated
+================================================
+HTTP/1.1 200 OK
+Content-Length: 83
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "dateCreated": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(2\d\d\d\-.*)"
+    }
+}
+
+
+04b. GET /v2/entities/E1/attrs?attrs=dateModified
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 84
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "dateModified": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(2\d\d\d\-.*)"
+    }
+}
+
+
+04c. GET /v2/entities/E1/attrs?attrs=dateCreated,dateModified
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 166
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "dateCreated": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(2\d\d\d\-.*)"
+    },
+    "dateModified": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(2\d\d\d\-.*)"
+    }
+}
+
+
+04d. GET /v2/entities/E1/attrs?attrs=dateModified,dateCreated,*
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 262
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Text",
+        "value": "foo"
+    },
+    "B": {
+        "metadata": {},
+        "type": "Text",
+        "value": "bar"
+    },
+    "dateCreated": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(2\d\d\d\-.*)"
+    },
+    "dateModified": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(2\d\d\d\-.*)"
+    }
+}
+
+
+04e. GET /v2/entities/E1/attrs?attrs=dateCreated,dateModified,A
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 214
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Text",
+        "value": "foo"
+    },
+    "dateCreated": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(2\d\d\d\-.*)"
+    },
+    "dateModified": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "REGEX(2\d\d\d\-.*)"
+    }
+}
+
+
+04f. GET /v2/entities/E1/attrs?attrs=B
+======================================
+HTTP/1.1 200 OK
+Content-Length: 49
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "B": {
+        "metadata": {},
+        "type": "Text",
+        "value": "bar"
+    }
+}
+
+
+05a. POST /v2/op/query with attributes: dateCreated
+FIXME: this is not behaving as expect and would need a future change (see issue 2604)
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 24
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+05b. POST /v2/op/query with attributes: dateModified
+FIXME: this is not behaving as expect and would need a future change (see issue 2604)
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 24
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+05c. POST /v2/op/query with attributes: dateCreated,dateModified
+FIXME: this is not behaving as expect and would need a future change (see issue 2604)
+================================================================
+HTTP/1.1 200 OK
+Content-Length: 24
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+05d. POST /v2/op/query with attributes: dateModified,dateCreated,*
+FIXME: this is not behaving as expect and would need a future change (see issue 2604)
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 24
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+05e. POST /v2/op/query with attributes: dateCreated,dateModified,A
+FIXME: this is not behaving as expect and would need a future change (see issue 2604)
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 72
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A": {
+            "metadata": {},
+            "type": "Text",
+            "value": "foo"
+        },
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+05f. POST /v2/op/query with attributes: B
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 72
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "B": {
+            "metadata": {},
+            "type": "Text",
+            "value": "bar"
+        },
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

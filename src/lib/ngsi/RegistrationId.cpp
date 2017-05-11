@@ -131,7 +131,7 @@ std::string RegistrationId::render(RequestType requestType, const std::string& i
     }
   }
 
-  return valueTag1(indent, "registrationId", string, comma);
+  return valueTag(indent, "registrationId", string, comma);
 }
 
 

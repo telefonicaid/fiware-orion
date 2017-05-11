@@ -1,0 +1,576 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Errors In Incoming Transactions and Common Metrics
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# In case we need to complete this test-case in the future:
+# Some of the many many reasons for the broker to detect an error:
+#   - parse error in payload
+#   - Invalid URL
+#   - Invalid Service Path
+#   - Invalid Content-Type
+#   - ciP->httpStatusCode != SccOk (seems not needed)
+#   - No accept header
+#   - Content-Length > PAYLOAD_MAX_SIZE
+#   - no acceptable mime-type in accept header
+#   - contentType != "" for GET request
+#   - contentType != "" for DLETE request
+#   - PUT/POST/PATCH without payload
+#   - Empty right-hand-side for URI param
+#   - Bad pagination offset - must be a decimal number
+#   - Bad pagination limit - must be a decimal number
+#   - Bad pagination limit > 1000 (MAX_PAGINATION_LIMIT)
+#   - Bad pagination limit == 0
+#   - Bad value for /details/   (details=badValueForDetails)
+#   - q missing in accept header
+#   - missing equal-sign after q in accept header
+#   - qvalue in accept header is missing
+#   - qvalue in accept header is not a number
+#   - Invalid mediaRange (see acceptHeadersAcceptable)
+#   - Invalid out-format (see ciP->httpHeaders.outformatSelect())
+#   - Invalid value for URI param /options/
+#   - invalid character in URI parameter
+#   - Only /absolute/ Service Paths allowed [a service path must begin with /]
+#   - too many components in ServicePath
+#   - component-name too long in ServicePath
+#   - a component of ServicePath contains an illegal character
+#   - too many service paths - a maximum of ten service paths is allowed
+#   - Content-Type header not used, default application/octet-stream is not supported
+#   - api V1 && contentType != "application/json"
+#   - api V2 && contentType != "application/json" && contentType != "text/plain"
+#   - forbiddenChars in URI
+#
+#   + all service routines that sets a ciP->httpStatusCode >= 300 ... Puhhhh!
+#     Probably thousands of possibler causes for errors. Impossible to test each and every one. Lets pick ONE serviceRoutine only
+#     [ PUT /v2/entities/<id>/attrs/<attrName>/value]:
+#
+#   - forbiddenChars in entityId
+#   - forbiddenChars in attributeName
+#   - attribute name length is ZERO
+#   - attribute name length > MAX_ID_LEN
+#   - error in compound value
+#   - forbiddenChars in string value (if a string ...)
+#   - more than one service path
+#   - other errors in service path
+#  
+
+#
+# 00. GET /v2/entities
+# 01. Ask for metrics and see no errors
+# 02. Send a request with an invalid JSON payload
+# 03. Ask for metrics and see one error
+# 04. Send a request with an Invalid URL
+# 05. Send a request with an Invalid Service Path
+# 06. Send a request with an Invalid Content-Type
+# 07. Send a request with invalid value for URI param /options/
+# 08. Send a request with a component-name too long in ServicePath
+# 09. Send a request with no acceptable mime-type in accept header
+# 10. Send a request with an invalid character in a URI parameter
+# 11. Send a request with too many components in ServicePath
+# 12. Send a PUT /v2/entities/<id>/attrs/<attrName>/value for an non-existing entity E_NOPE
+# 13. Send a request with an Invalid Tenant
+# 14. Ask for metrics and see 7 errors (as Service Path and Tenant errors are ignored in metrics)
+#
+
+
+echo "00. GET /v2/entities"
+echo "===================="
+orionCurl --url /v2/entities --servicePath /SP/get/entities
+echo
+echo
+
+
+echo "01. Ask for metrics and see no errors"
+echo "====================================="
+orionCurl --url /admin/metrics --servicePath /SP/get/metrics
+echo
+echo
+
+
+echo "02. Send a request with an invalid JSON payload"
+echo "==============================================="
+payload='[ "error": "in vector" ]'
+orionCurl --url /v2/entities --payload "$payload" --servicePath /SP/error
+echo
+echo
+
+
+echo "03. Ask for metrics and see one error"
+echo "====================================="
+orionCurl --url /admin/metrics --servicePath /SP/get/metrics
+echo
+echo
+
+
+echo "04. Send a request with an Invalid URL"
+echo "======================================"
+orionCurl --url /admin/invalid/url --servicePath /SP/error
+echo
+echo
+
+echo "05. Send a request with an Invalid Service Path"
+echo "==============================================="
+orionCurl --url /v2/entities --servicePath SPX
+echo
+echo
+
+
+echo "06. Send a request with an Invalid Content-Type"
+echo "==============================================="
+payload='{ "id": "E1", "type": "T1" }'
+orionCurl --url /v2/entities --payload "$payload" --in "Invalid-Content-Type" --servicePath /SP/error
+echo
+echo
+
+
+echo "07. Send a request with invalid value for URI param /options/"
+echo "============================================================="
+payload='{ "id": "E1", "type": "T1" }'
+orionCurl --url '/v2/entities?options=notValid' --payload "$payload" --servicePath /SP/error
+echo
+echo
+
+
+echo "08. Send a request with a component-name too long in ServicePath"
+echo "================================================================"
+payload='{ "id": "E1", "type": "T1" }'
+orionCurl --url /v2/entities --payload "$payload" --servicePath /SP/b12345678901234567890123456789012345678901234567890/c
+echo
+echo
+
+
+echo "09. Send a request with no acceptable mime-type in accept header"
+echo "================================================================"
+payload='"a string"'
+orionCurl --url /v2/entities --payload "$payload" --out "bad-mime-type"  --servicePath /SP/error
+echo
+echo
+
+
+echo "10. Send a request with an invalid character in a URI parameter"
+echo "==============================================================="
+payload='{ "id": "E1", "type": "T1" }'
+orionCurl --url '/v2/entities?ic====' --payload "$payload"
+echo
+echo
+
+
+echo "11. Send a request with too many components in ServicePath"
+echo "=========================================================="
+payload='{ "id": "E1", "type": "T1"}'
+orionCurl --url /v2/entities --payload "$payload" --servicePath /SP/L1/L2/L3/L4/L5/L6/L7/L8/L9/L10
+echo
+echo
+
+
+echo "12. Send a PUT /v2/entities/<id>/attrs/<attrName>/value for an non-existing entity E_NOPE"
+echo "========================================================================================="
+payload='{ "value": 12 }'
+orionCurl --url /v2/entities/E_NOPE/attrs/A1/value --payload "$payload" -X PUT --servicePath /SP/error
+echo
+echo
+
+
+echo "13. Send a request with an Invalid Tenant"
+echo "========================================="
+orionCurl --url /v2/entities --tenant 'a.b'
+echo
+echo
+
+echo "14. Ask for metrics and see 7 errors (as Service Path and Tenant errors are ignored in metrics)"
+echo "==============================================================================================="
+orionCurl --url /admin/metrics --servicePath /SP/get/metrics
+echo
+echo
+
+
+--REGEXPECT--
+00. GET /v2/entities
+====================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+01. Ask for metrics and see no errors
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 472
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "services": {
+        "default-service": {
+            "subservs": {
+                "SP/get/entities": {
+                    "incomingTransactionResponseSize": 2,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                }
+            },
+            "sum": {
+                "incomingTransactionResponseSize": 2,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            }
+        }
+    },
+    "sum": {
+        "subservs": {
+            "SP/get/entities": {
+                "incomingTransactionResponseSize": 2,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            }
+        },
+        "sum": {
+            "incomingTransactionResponseSize": 2,
+            "incomingTransactions": 1,
+            "serviceTime": REGEX(.*)
+        }
+    }
+}
+
+
+02. Send a request with an invalid JSON payload
+===============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Errors found in incoming JSON buffer",
+    "error": "ParseError"
+}
+
+
+03. Ask for metrics and see one error
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 1160
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "services": {
+        "default-service": {
+            "subservs": {
+                "SP/error": {
+                    "incomingTransactionErrors": 1,
+                    "incomingTransactionRequestSize": 24,
+                    "incomingTransactionResponseSize": 150,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                },
+                "SP/get/entities": {
+                    "incomingTransactionResponseSize": 2,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                },
+                "SP/get/metrics": {
+                    "incomingTransactionResponseSize": 472,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                }
+            },
+            "sum": {
+                "incomingTransactionErrors": 1,
+                "incomingTransactionRequestSize": 24,
+                "incomingTransactionResponseSize": 624,
+                "incomingTransactions": 3,
+                "serviceTime": REGEX(.*)
+            }
+        }
+    },
+    "sum": {
+        "subservs": {
+            "SP/error": {
+                "incomingTransactionErrors": 1,
+                "incomingTransactionRequestSize": 24,
+                "incomingTransactionResponseSize": 150,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            },
+            "SP/get/entities": {
+                "incomingTransactionResponseSize": 2,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            },
+            "SP/get/metrics": {
+                "incomingTransactionResponseSize": 472,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            }
+        },
+        "sum": {
+            "incomingTransactionErrors": 1,
+            "incomingTransactionRequestSize": 24,
+            "incomingTransactionResponseSize": 624,
+            "incomingTransactions": 3,
+            "serviceTime": REGEX(.*)
+        }
+    }
+}
+
+
+04. Send a request with an Invalid URL
+======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+05. Send a request with an Invalid Service Path
+===============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 111
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Only /absolute/ Service Paths allowed [a service path must begin with /]",
+    "error": "BadRequest"
+}
+
+
+06. Send a request with an Invalid Content-Type
+===============================================
+HTTP/1.1 415 Unsupported Media Type
+Content-Length: 97
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "not supported content type: Invalid-Content-Type",
+    "error": "UnsupportedMediaType"
+}
+
+
+07. Send a request with invalid value for URI param /options/
+=============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid value for URI param /options/",
+    "error": "BadRequest"
+}
+
+
+08. Send a request with a component-name too long in ServicePath
+================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 77
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "component-name too long in ServicePath",
+    "error": "BadRequest"
+}
+
+
+09. Send a request with no acceptable mime-type in accept header
+================================================================
+HTTP/1.1 406 Not Acceptable
+Content-Length: 82
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "no acceptable mime-type in accept header",
+    "error": "NotAcceptable"
+}
+
+
+10. Send a request with an invalid character in a URI parameter
+===============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "invalid character in URI parameter",
+    "error": "BadRequest"
+}
+
+
+11. Send a request with too many components in ServicePath
+==========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "too many components in ServicePath",
+    "error": "BadRequest"
+}
+
+
+12. Send a PUT /v2/entities/<id>/attrs/<attrName>/value for an non-existing entity E_NOPE
+=========================================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+13. Send a request with an Invalid Tenant
+=========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 125
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "bad character in tenant name - only underscore and alphanumeric characters are allowed",
+    "error": "BadRequest"
+}
+
+
+14. Ask for metrics and see 7 errors (as Service Path and Tenant errors are ignored in metrics)
+===============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 1436
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "services": {
+        "default-service": {
+            "subservs": {
+                "SP/error": {
+                    "incomingTransactionErrors": 6,
+                    "incomingTransactionRequestSize": 39,
+                    "incomingTransactionResponseSize": 556,
+                    "incomingTransactions": 6,
+                    "serviceTime": REGEX(.*)
+                },
+                "SP/get/entities": {
+                    "incomingTransactionResponseSize": 2,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                },
+                "SP/get/metrics": {
+                    "incomingTransactionResponseSize": 1632,
+                    "incomingTransactions": 2,
+                    "serviceTime": REGEX(.*)
+                },
+                "root-subserv": {
+                    "incomingTransactionErrors": 1,
+                    "incomingTransactionResponseSize": 73,
+                    "incomingTransactions": 1,
+                    "serviceTime": REGEX(.*)
+                }
+            },
+            "sum": {
+                "incomingTransactionErrors": 7,
+                "incomingTransactionRequestSize": 39,
+                "incomingTransactionResponseSize": 2263,
+                "incomingTransactions": 10,
+                "serviceTime": REGEX(.*)
+            }
+        }
+    },
+    "sum": {
+        "subservs": {
+            "SP/error": {
+                "incomingTransactionErrors": 6,
+                "incomingTransactionRequestSize": 39,
+                "incomingTransactionResponseSize": 556,
+                "incomingTransactions": 6,
+                "serviceTime": REGEX(.*)
+            },
+            "SP/get/entities": {
+                "incomingTransactionResponseSize": 2,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            },
+            "SP/get/metrics": {
+                "incomingTransactionResponseSize": 1632,
+                "incomingTransactions": 2,
+                "serviceTime": REGEX(.*)
+            },
+            "root-subserv": {
+                "incomingTransactionErrors": 1,
+                "incomingTransactionResponseSize": 73,
+                "incomingTransactions": 1,
+                "serviceTime": REGEX(.*)
+            }
+        },
+        "sum": {
+            "incomingTransactionErrors": 7,
+            "incomingTransactionRequestSize": 39,
+            "incomingTransactionResponseSize": 2263,
+            "incomingTransactions": 10,
+            "serviceTime": REGEX(.*)
+        }
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

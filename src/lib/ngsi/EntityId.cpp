@@ -38,8 +38,9 @@
 *
 * EntityId::EntityId -
 */
-EntityId::EntityId() : keyName("entityId")
+EntityId::EntityId(): creDate(0), modDate(0)
 {
+  isTypePattern = false;
 }
 
 
@@ -48,7 +49,7 @@ EntityId::EntityId() : keyName("entityId")
 *
 * EntityId::EntityId -
 */
-EntityId::EntityId(EntityId* eP) : keyName("entityId")
+EntityId::EntityId(EntityId* eP)
 {
   fill(eP);
 }
@@ -63,23 +64,14 @@ EntityId::EntityId
   const std::string&  _id,
   const std::string&  _type,
   const std::string&  _isPattern,
-  const std::string&  _keyName
+  bool                _isTypePattern
 ) : id(_id),
     type(_type),
     isPattern(_isPattern),
-    keyName(_keyName)
+    isTypePattern(_isTypePattern),
+    creDate(0),
+    modDate(0)
 {
-}
-
-
-
-/* ****************************************************************************
-*
-* keyNameSet -
-*/
-void EntityId::keyNameSet(const std::string& _keyName)
-{
-  keyName = _keyName;
 }
 
 
@@ -162,11 +154,8 @@ std::string EntityId::toJson(void) const
 */
 std::string EntityId::check
 (
-  ConnectionInfo* ciP,
   RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
+  const std::string&  indent
 )
 {
   if (id == "")
@@ -191,7 +180,7 @@ std::string EntityId::check
     {
       return "invalid regex for entity id pattern";
     }
-    regfree(&re);
+    regfree(&re);  // If regcomp fails it frees up itself (see glibc sources for details)
   }
   return "OK";
 }
@@ -202,11 +191,12 @@ std::string EntityId::check
 *
 * EntityId::fill -
 */
-void EntityId::fill(const std::string& _id, const std::string& _type, const std::string& _isPattern)
+void EntityId::fill(const std::string& _id, const std::string& _type, const std::string& _isPattern, bool _isTypePattern)
 {
-  id        = _id;
-  type      = _type;
-  isPattern = _isPattern;
+  id            = _id;
+  type          = _type;
+  isPattern     = _isPattern;
+  isTypePattern = _isTypePattern;
 }
 
 
@@ -217,14 +207,17 @@ void EntityId::fill(const std::string& _id, const std::string& _type, const std:
 */
 void EntityId::fill(const struct EntityId* eidP, bool useDefaultType)
 {
-  id          = eidP->id;
-  type        = eidP->type;
-  isPattern   = eidP->isPattern;
-  servicePath = eidP->servicePath;
+  id            = eidP->id;
+  type          = eidP->type;
+  isPattern     = eidP->isPattern;
+  isTypePattern = eidP->isTypePattern;
+  servicePath   = eidP->servicePath;
+  creDate       = eidP->creDate;
+  modDate       = eidP->modDate;
 
   if (useDefaultType && (type == ""))
   {
-    type = DEFAULT_TYPE;
+    type = DEFAULT_ENTITY_TYPE;
   }
 }
 
@@ -256,6 +249,9 @@ void EntityId::present(const std::string& indent, int ix)
   LM_T(LmtPresent, ("%s  isPattern:  '%s'", 
 		    indent.c_str(), 
 		    isPattern.c_str()));
+  LM_T(LmtPresent, ("%s  isTypePttern:  '%s'",
+            indent.c_str(),
+            isTypePattern? "true" : "false"));
 }
 
 
@@ -297,22 +293,10 @@ std::string EntityId::toString(bool useIsPattern, const std::string& delimiter)
 */
 bool EntityId::equal(EntityId* eP)
 {
-  if (eP->id != id)
-  {
-    return false;
-  }
-
-  if (eP->type != type)
-  {
-    return false;
-  }
-
-  if (eP->isPatternIsTrue() == isPatternIsTrue())
-  {
-    return true;
-  }
-
-  return false;
+  return ((eP->id                == id)                &&
+          (eP->type              == type)              &&
+          (eP->isPatternIsTrue() == isPatternIsTrue()) &&
+          (eP->isTypePattern     == isTypePattern));
 }
 
 

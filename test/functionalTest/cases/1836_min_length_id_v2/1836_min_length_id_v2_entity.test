@@ -31,7 +31,7 @@ brokerStart CB
 
 #
 # 01. Create entity E without type
-# 02. Check entity E has type none
+# 02. Check entity E has type Thing
 # 03. Create entity E with type empty string
 #
 
@@ -48,8 +48,8 @@ orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
-echo "02. Check entity E has type none"
-echo "================================"
+echo "02. Check entity E has type Thing"
+echo "================================="
 orionCurl --url /v2/entities/E
 echo
 echo
@@ -73,16 +73,16 @@ echo
 ================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E?type=none
+Location: /v2/entities/E?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-02. Check entity E has type none
-================================
+02. Check entity E has type Thing
+=================================
 HTTP/1.1 200 OK
-Content-Length: 68
+Content-Length: 69
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -94,7 +94,7 @@ Date: REGEX(.*)
         "value": 1
     },
     "id": "E",
-    "type": "none"
+    "type": "Thing"
 }
 
 

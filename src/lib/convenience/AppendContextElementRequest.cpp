@@ -49,12 +49,11 @@ AppendContextElementRequest::AppendContextElementRequest()
 *
 * render - 
 */
-std::string AppendContextElementRequest::render(ConnectionInfo* ciP, RequestType requestType, std::string indent)
+std::string AppendContextElementRequest::render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType, std::string indent)
 {
-  std::string tag = "appendContextElementRequest";
   std::string out = "";
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent);
 
   if (entity.id != "")
   {
@@ -62,7 +61,7 @@ std::string AppendContextElementRequest::render(ConnectionInfo* ciP, RequestType
   }
 
   out += attributeDomainName.render(indent + "  ", true);
-  out += contextAttributeVector.render(ciP, requestType, indent + "  ");
+  out += contextAttributeVector.render(apiVersion, asJsonObject, requestType, indent + "  ");
   out += domainMetadataVector.render(indent + "  ");
   out += endTag(indent);
 
@@ -86,11 +85,11 @@ std::string AppendContextElementRequest::render(ConnectionInfo* ciP, RequestType
 */
 std::string AppendContextElementRequest::check
 (
-  ConnectionInfo*  ciP,
-  RequestType      requestType,
-  std::string      indent,
-  std::string      predetectedError,     // Predetected Error, normally during parsing
-  int              counter
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
+  RequestType         requestType,
+  std::string         indent,
+  const std::string&  predetectedError     // Predetected Error, normally during parsing
 )
 {
   AppendContextElementResponse  response;
@@ -100,11 +99,11 @@ std::string AppendContextElementRequest::check
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeVector.check(ciP, AppendContextElement, indent, predetectedError, counter)) != "OK")
+  else if ((res = contextAttributeVector.check(apiVersion, AppendContextElement)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }
-  else if ((res = domainMetadataVector.check(ciP, AppendContextElement, indent, predetectedError, counter)) != "OK")
+  else if ((res = domainMetadataVector.check(apiVersion)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }
@@ -113,7 +112,7 @@ std::string AppendContextElementRequest::check
     return "OK";
   }
 
-  return response.render(ciP, requestType, indent);
+  return response.render(apiVersion, asJsonObject, requestType, indent);
 }
 
 

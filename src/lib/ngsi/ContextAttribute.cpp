@@ -37,8 +37,7 @@
 #include "orionTypes/OrionValueType.h"
 #include "parse/forbiddenChars.h"
 #include "ngsi/ContextAttribute.h"
-#include "rest/ConnectionInfo.h"
-#include "rest/uriParamNames.h"
+#include "rest/HttpStatusCode.h"
 #include "rest/OrionError.h"
 #include "parse/CompoundValueNode.h"
 
@@ -145,6 +144,7 @@ void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr) const
 */
 ContextAttribute::~ContextAttribute()
 {
+  release();
 }
 
 
@@ -164,6 +164,11 @@ ContextAttribute::ContextAttribute()
   found                 = false;
   skip                  = false;
   typeGiven             = false;
+  onlyValue             = false;
+  previousValue         = NULL;
+
+  creDate = 0;
+  modDate = 0;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -198,6 +203,11 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
   found                 = caP->found;
   skip                  = false;
   typeGiven             = caP->typeGiven;
+  onlyValue             = caP->onlyValue;
+  previousValue         = NULL;
+
+  creDate = caP->creDate;
+  modDate = caP->modDate;
 
   providingApplication.set(caP->providingApplication.get());
   providingApplication.setMimeType(caP->providingApplication.getMimeType());
@@ -217,7 +227,20 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
 
   if (useDefaultType && !typeGiven)
   {
-    type = DEFAULT_TYPE;
+    //
+    // NOTE:
+    //   Compound values all have attribute type == orion::ValueTypeObject.
+    //   So, if compound, we need to step down into the compound to see whether it is 
+    //   an object or a vector.
+    //
+    if ((valueType != orion::ValueTypeObject) || (compoundValueP == NULL) || (compoundValueP->valueType != orion::ValueTypeVector))
+    {
+      type = defaultType(valueType);
+    }
+    else
+    {
+      type = defaultType(orion::ValueTypeVector);
+    }
   }
 }
 
@@ -248,6 +271,11 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  onlyValue             = false;
+  previousValue         = NULL;
+
+  creDate = 0;
+  modDate = 0;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -280,6 +308,11 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  onlyValue             = false;
+  previousValue         = NULL;
+
+  creDate = 0;
+  modDate = 0;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -312,6 +345,11 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  onlyValue             = false;
+  previousValue         = NULL;
+
+  creDate = 0;
+  modDate = 0;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -344,6 +382,10 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  previousValue         = NULL;
+
+  creDate = 0;
+  modDate = 0;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -372,6 +414,10 @@ ContextAttribute::ContextAttribute
   valueType             = orion::ValueTypeObject;  // FIXME P6: Could be ValueTypeVector ...
   skip                  = false;
   typeGiven             = false;
+  previousValue         = NULL;
+
+  creDate = 0;
+  modDate = 0;
 
   providingApplication.set("");
   providingApplication.setMimeType(NOMIMETYPE);
@@ -402,9 +448,9 @@ std::string ContextAttribute::getId(void) const
 *
 * ContextAttribute::getLocation() -
 */
-std::string ContextAttribute::getLocation(const std::string& apiVersion) const
+std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
 {
-  if (apiVersion == "v1")
+  if (apiVersion == V1)
   {
     // Deprecated way, but still supported
     for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
@@ -441,7 +487,7 @@ std::string ContextAttribute::getLocation(const std::string& apiVersion) const
 */
 std::string ContextAttribute::renderAsJsonObject
 (
-  ConnectionInfo*     ciP,
+  ApiVersion          apiVersion,
   RequestType         request,
   const std::string&  indent,
   bool                comma,
@@ -449,12 +495,11 @@ std::string ContextAttribute::renderAsJsonObject
 )
 {
   std::string  out                    = "";
-  std::string  key                    = name;
   bool         commaAfterContextValue = metadataVector.size() != 0;
   bool         commaAfterType         = !omitValue || commaAfterContextValue;
 
-  out += startTag2(indent, key, false, true);
-  out += valueTag1(indent + "  ", "type",         type,  commaAfterType);
+  out += startTag(indent, name, false);
+  out += valueTag(indent + "  ", "type",         type,  commaAfterType);
 
   if (compoundValueP == NULL)
   {
@@ -475,7 +520,7 @@ std::string ContextAttribute::renderAsJsonObject
         break;
 
       case ValueTypeNumber:
-        if (type == DATE_TYPE)
+        if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
         {
           effectiveValue = isodate2str(numberValue);
         }
@@ -500,7 +545,7 @@ std::string ContextAttribute::renderAsJsonObject
       // renderAsJsonObject is used in v1 only.
       // => we only need to care about stringValue (not boolValue, numberValue nor nullValue)
       //
-      out += valueTag1(indent + "  ", "value",
+      out += valueTag(indent + "  ", "value",
                             (request != RtUpdateContextResponse)? effectiveValue : "",
                             commaAfterContextValue, false, withoutQuotes);
     }
@@ -514,8 +559,8 @@ std::string ContextAttribute::renderAsJsonObject
       isCompoundVector = true;
     }
 
-    out += startTag2(indent + "  ", "value", isCompoundVector, true);
-    out += compoundValueP->render(ciP, indent + "    ");
+    out += startTag(indent + "  ", "value", isCompoundVector);
+    out += compoundValueP->render(apiVersion, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
 
@@ -533,15 +578,9 @@ std::string ContextAttribute::renderAsJsonObject
 *
 * renderAsNameString -
 */
-std::string ContextAttribute::renderAsNameString
-(
-  ConnectionInfo*     ciP,
-  RequestType         request,
-  const std::string&  indent,
-  bool                comma
-)
+std::string ContextAttribute::renderAsNameString(const std::string& indent, bool comma)
 {
-  std::string  out                    = "";
+  std::string  out = "";
 
   if (comma)
   {
@@ -562,7 +601,8 @@ std::string ContextAttribute::renderAsNameString
 */
 std::string ContextAttribute::render
 (
-  ConnectionInfo*     ciP,
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
   RequestType         request,
   const std::string&  indent,
   bool                comma,
@@ -570,21 +610,18 @@ std::string ContextAttribute::render
 )
 {
   std::string  out                    = "";
-  std::string  key                    = "attribute";
   bool         valueRendered          = (compoundValueP != NULL) || (omitValue == false) || (request == RtUpdateContextResponse);
   bool         commaAfterContextValue = metadataVector.size() != 0;
   bool         commaAfterType         = valueRendered;
 
-  metadataVector.keyNameSet("metadata");
-
-  if ((ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (ciP->outMimeType == JSON))
+  if (asJsonObject)
   {
-    return renderAsJsonObject(ciP, request, indent, comma, omitValue);
+    return renderAsJsonObject(apiVersion, request, indent, comma, omitValue);
   }
 
-  out += startTag2(indent, key, false, false);
-  out += valueTag1(indent + "  ", "name", name,  true);  // attribute.type is always rendered
-  out += valueTag1(indent + "  ", "type", type,  commaAfterType);
+  out += startTag(indent);
+  out += valueTag(indent + "  ", "name", name,  true);  // attribute.type is always rendered
+  out += valueTag(indent + "  ", "type", type,  commaAfterType);
 
   if (compoundValueP == NULL)
   {
@@ -605,7 +642,7 @@ std::string ContextAttribute::render
         break;
 
       case ValueTypeNumber:
-        if (type == DATE_TYPE)
+        if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
         {
           effectiveValue = isodate2str(numberValue);
         }
@@ -625,14 +662,17 @@ std::string ContextAttribute::render
         LM_E(("Runtime Error (unknown value type: %d)", valueType));
       }
 
-      out += valueTag2(indent + "  ", "value",
-                              (request != RtUpdateContextResponse)? effectiveValue : "",
-                              commaAfterContextValue, withoutQuotes);
+      out += valueTag(indent + "  ",
+                      "value",
+                      (request != RtUpdateContextResponse)? effectiveValue : "",
+                      commaAfterContextValue,
+                      false,
+                      withoutQuotes);
 
     }
     else if (request == RtUpdateContextResponse)
     {
-      out += valueTag1(indent + "  ", "value", "", commaAfterContextValue);
+      out += valueTag(indent + "  ", "value", "", commaAfterContextValue);
     }
   }
   else
@@ -644,8 +684,8 @@ std::string ContextAttribute::render
       isCompoundVector = true;
     }
 
-    out += startTag2(indent + "  ", "value", isCompoundVector, true);
-    out += compoundValueP->render(ciP, indent + "    ");
+    out += startTag(indent + "  ", "value", isCompoundVector);
+    out += compoundValueP->render(apiVersion, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
 
@@ -665,9 +705,27 @@ std::string ContextAttribute::render
 *        the code paths of the rendering process
 *
 */
-std::string ContextAttribute::toJson(bool isLastElement, RenderFormat renderFormat, RequestType requestType)
+std::string ContextAttribute::toJson
+(
+  bool                             isLastElement,
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  metadataFilter,
+  RequestType                      requestType
+)
 {
   std::string  out;
+
+  // Add special metadata representing attribute dates
+  if ((creDate != 0) && (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_DATECREATED) != metadataFilter.end()))
+  {
+    Metadata* mdP = new Metadata(NGSI_MD_DATECREATED, DATE_TYPE, creDate);
+    metadataVector.push_back(mdP);
+  }
+  if ((modDate != 0) && (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_DATEMODIFIED) != metadataFilter.end()))
+  {
+    Metadata* mdP = new Metadata(NGSI_MD_DATEMODIFIED, DATE_TYPE, modDate);
+    metadataVector.push_back(mdP);
+  }
 
   if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_KEYVALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
   {
@@ -686,7 +744,7 @@ std::string ContextAttribute::toJson(bool isLastElement, RenderFormat renderForm
     }
     else if (valueType == orion::ValueTypeNumber)
     {
-      if (type == DATE_TYPE)
+      if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
       {
         out += JSON_STR(isodate2str(numberValue));
       }
@@ -718,8 +776,16 @@ std::string ContextAttribute::toJson(bool isLastElement, RenderFormat renderForm
     //
     // type
     //
-    /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
-    out += (type != "")? JSON_VALUE("type", type) : JSON_VALUE("type", DEFAULT_TYPE);
+    // This is needed for entities coming from NGSIv1 (which allows empty or missing types)
+    //
+    std::string defType = defaultType(valueType);
+
+    if (compoundValueP && compoundValueP->isVector())
+    {
+      defType = defaultType(orion::ValueTypeVector);
+    }
+
+    out += (type != "")? JSON_VALUE("type", type) : JSON_VALUE("type", defType);
     out += ",";
 
 
@@ -739,7 +805,7 @@ std::string ContextAttribute::toJson(bool isLastElement, RenderFormat renderForm
     }
     else if (valueType == orion::ValueTypeNumber)
     {
-      if (type == DATE_TYPE)
+      if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
       {
         out += JSON_VALUE("value", isodate2str(numberValue));;
       }
@@ -769,7 +835,7 @@ std::string ContextAttribute::toJson(bool isLastElement, RenderFormat renderForm
     //
     // metadata
     //
-    out += JSON_STR("metadata") + ":" + "{" + metadataVector.toJson(true) + "}";
+    out += JSON_STR("metadata") + ":" + "{" + metadataVector.toJson(true, metadataFilter) + "}";
 
     if (requestType != EntityAttributeResponse)
     {
@@ -791,22 +857,30 @@ std::string ContextAttribute::toJson(bool isLastElement, RenderFormat renderForm
 *
 * toJsonAsValue -
 */
-std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
+std::string ContextAttribute::toJsonAsValue
+(
+  ApiVersion       apiVersion,          // in parameter
+  bool             acceptedTextPlain,   // in parameter
+  bool             acceptedJson,        // in parameter
+  MimeType         outFormatSelection,  // in parameter
+  MimeType*        outMimeTypeP,        // out parameter
+  HttpStatusCode*  scP                  // out parameter
+)
 {
   std::string  out;
 
   if (compoundValueP == NULL)  // Not a compound - text/plain must be accepted
   {
-    if (ciP->httpHeaders.accepted("text/plain"))
+    if (acceptedTextPlain)
     {
       char buf[64];
 
-      ciP->outMimeType = TEXT;
+      *outMimeTypeP = TEXT;
 
       switch (valueType)
       {
       case orion::ValueTypeString:
-        if (ciP->apiVersion == "v2")
+        if (apiVersion == V2)
         { 
           out = '"' + stringValue + '"';
         }
@@ -817,14 +891,13 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
         break;
 
       case orion::ValueTypeNumber:
-        if (type == DATE_TYPE)
+        if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
         {
           out = isodate2str(numberValue);
         }
         else // regular number
         {
-          snprintf(buf, sizeof(buf), "%f", numberValue);
-          out = buf;
+          out = toString(numberValue);
         }
         break;
 
@@ -846,23 +919,23 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
     else
     {
       OrionError oe(SccNotAcceptable, "accepted MIME types: text/plain", "NotAcceptable");
-      ciP->httpStatusCode = SccNotAcceptable;
+      *scP = SccNotAcceptable;
 
       out = oe.toJson();
     }
   }
-  else if (compoundValueP != NULL)  /// Compound: application/json OR text/plain must be accepted
+  else if (compoundValueP != NULL)  // Compound: application/json OR text/plain must be accepted
   {
-    if (!ciP->httpHeaders.accepted("application/json") && !ciP->httpHeaders.accepted("text/plain"))
+    if (!acceptedJson && !acceptedTextPlain)
     {
       OrionError oe(SccNotAcceptable, "accepted MIME types: application/json, text/plain", "NotAcceptable");
-      ciP->httpStatusCode = SccNotAcceptable;
+      *scP = SccNotAcceptable;
 
       out = oe.toJson();
     }
     else
     {
-      ciP->outMimeType = ciP->httpHeaders.outformatSelect();
+      *outMimeTypeP = outFormatSelection;
 
       if (compoundValueP->isVector())
       {
@@ -884,17 +957,17 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
 *
 * ContextAttribute::check - 
 */
-std::string ContextAttribute::check
-(
-  ConnectionInfo*     ciP,
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestType)
 {
   size_t len;
   char errorMsg[128];
+
+  if (((apiVersion == V2) && (len = strlen(name.c_str())) < MIN_ID_LEN) && (requestType != EntityAttributeValueRequest))
+  {
+    snprintf(errorMsg, sizeof errorMsg, "attribute name length: %zd, min length supported: %d", len, MIN_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
 
   if ((name == "") && (requestType != EntityAttributeValueRequest))
   {
@@ -908,7 +981,7 @@ std::string ContextAttribute::check
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdChars(ciP->apiVersion, name.c_str()))
+  if (forbiddenIdChars(apiVersion, name.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the name of an attribute");
     return "Invalid characters in attribute name";
@@ -922,14 +995,14 @@ std::string ContextAttribute::check
   }
 
 
-  if (ciP->apiVersion == "v2" && (requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  if (apiVersion == V2 && (requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
-  if ((requestType != EntityAttributeValueRequest) && forbiddenIdChars(ciP->apiVersion, type.c_str()))
+  if ((requestType != EntityAttributeValueRequest) && forbiddenIdChars(apiVersion, type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute");
     return "Invalid characters in attribute type";
@@ -949,7 +1022,7 @@ std::string ContextAttribute::check
     }
   }
 
-  return metadataVector.check(ciP, requestType, indent + "  ", predetectedError, counter);
+  return metadataVector.check(apiVersion);
 }
 
 
@@ -969,6 +1042,12 @@ void ContextAttribute::present(const std::string& indent, int ix)
   LM_T(LmtPresent, ("%s  Type:      %s", 
 		    indent.c_str(), 
 		    type.c_str()));
+  LM_T(LmtPresent, ("%s  creDate:   %f",
+        creDate,
+        type.c_str()));
+  LM_T(LmtPresent, ("%s  modDate:   %f",
+        modDate,
+        type.c_str()));
 
   if (compoundValueP == NULL)
   {
@@ -1035,6 +1114,13 @@ void ContextAttribute::release(void)
   }
 
   metadataVector.release();
+
+  if (previousValue != NULL)
+  {
+    previousValue->release();
+    delete previousValue;
+    previousValue = NULL;
+  }
 }
 
 
@@ -1054,8 +1140,6 @@ std::string ContextAttribute::getName(void)
 */
 std::string ContextAttribute::getValue(void) const
 {
-  char buffer[64];
-
   switch (valueType)
   {
   case orion::ValueTypeString:
@@ -1063,8 +1147,7 @@ std::string ContextAttribute::getValue(void) const
     break;
 
   case orion::ValueTypeNumber:
-    snprintf(buffer, sizeof(buffer), "%f", numberValue);
-    return std::string(buffer);
+    return toString(numberValue);
     break;
 
   case orion::ValueTypeBoolean:

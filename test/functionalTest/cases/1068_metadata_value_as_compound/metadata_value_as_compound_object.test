@@ -55,7 +55,7 @@ echo
 
 echo "02. GET /v2/entities, to see the entity"
 echo "======================================="
-orionCurl --url /v2/entities  # --noPayloadCheck
+orionCurl --url /v2/entities
 echo
 echo
 
@@ -65,7 +65,7 @@ echo
 ===============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -74,7 +74,7 @@ Date: REGEX(.*)
 02. GET /v2/entities, to see the entity
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 122
+Content-Length: 134
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -84,22 +84,22 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {
                 "M1": {
-                    "type": "none",
+                    "type": "StructuredValue",
                     "value": {
                         "a": 1,
                         "b": "beee"
                     }
                 }
             },
-            "type": "none",
+            "type": "Text",
             "value": "01"
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
 
 --TEARDOWN--
 brokerStop CB
-#dbDrop CB
+dbDrop CB

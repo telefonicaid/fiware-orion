@@ -246,7 +246,7 @@ echo
 ======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -415,12 +415,12 @@ Date: REGEX(.*)
 16. GET /v2/entities/E1/attrs/A1/value as text: OK
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 10
+Content-Length: 3
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-123.000000
+123
 
 
 17. PUT /v2/entities/E1/attrs/A1/value with TEXT Float payload 3.14
@@ -449,12 +449,12 @@ Date: REGEX(.*)
 19. GET /v2/entities/E1/attrs/A1/value as text: OK
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 8
+Content-Length: 4
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-3.140000
+3.14
 
 
 20. PUT /v2/entities/E1/attrs/A1/value with TEXT Float payload -12.1
@@ -483,12 +483,12 @@ Date: REGEX(.*)
 22. GET /v2/entities/E1/attrs/A1/value as text: OK
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 10
+Content-Length: 5
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
--12.100000
+-12.1
 
 
 23. PUT /v2/entities/E1/attrs/A1/value with TEXT Float payload 3.2e2
@@ -517,12 +517,12 @@ Date: REGEX(.*)
 25. GET /v2/entities/E1/attrs/A1/value as text: OK
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 10
+Content-Length: 3
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-320.000000
+320
 
 
 --TEARDOWN--

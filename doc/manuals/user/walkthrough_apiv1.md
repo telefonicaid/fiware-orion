@@ -8,31 +8,31 @@
     * [Issuing commands to the broker](#issuing-commands-to-the-broker)
 * [Context management using NGSI10](#context-management-using-ngsi10)
     * [NGSI10 standard operations](#ngsi10-standard-operations)
-	  * [Entity Creation](#entity-creation)
-	  * [Query Context operation](#query-context-operation)
-	  * [Update Context elements](#update-context-elements)
-          * [Context Subscriptions](#context-subscriptions)
-	  * [Summary of NGSI10 standard operations URLs](#summary-of-ngsi10-standard-operations-urls)
+	    * [Entity Creation](#entity-creation)
+	    * [Query Context operation](#query-context-operation)
+	    * [Update Context elements](#update-context-elements)
+            * [Context Subscriptions](#context-subscriptions)
+	    * [Summary of NGSI10 standard operations URLs](#summary-of-ngsi10-standard-operations-urls)
     * [NGSI10 convenience operations](#ngsi10-convenience-operations)
-	  * [Convenience Entity Creation](#convenience-entity-creation)
-	  * [Convenience Query Context](#convenience-query-context)
-	  * [Getting all entities](#getting-all-entities)
-	  * [Browsing all types and detailed information on a type](#browsing-all-types-and-detailed-information-on-a-type)
-	  * [Convenience Update Context](#convenience-update-context)
-	  * [Convenience operations for context subscriptions](#convenience-operations-for-context-subscriptions)
-	  * [Summary of NGSI10 convenience operations URLs](#summary-of-ngsi10-convenience-operations-urls)
+	    * [Convenience Entity Creation](#convenience-entity-creation)
+	    * [Convenience Query Context](#convenience-query-context)
+	    * [Getting all entities](#getting-all-entities)
+	    * [Browsing all types and detailed information on a type](#browsing-all-types-and-detailed-information-on-a-type)
+	    * [Convenience Update Context](#convenience-update-context)
+	    * [Convenience operations for context subscriptions](#convenience-operations-for-context-subscriptions)
+	    * [Summary of NGSI10 convenience operations URLs](#summary-of-ngsi10-convenience-operations-urls)
 * [Context availability management using NGSI9](#context-availability-management-using-ngsi9)
     * [NGSI9 standard operations](#ngsi9-standard-operations)
-	  * [Register Context operation](#register-context-operation)
-	  * [Discover Context Availability operation](#discover-context-availability-operation)
-	  * [Context availability subscriptions](#context-availability-subscriptions)
-	  * [Summary of NGSI9 standard operations URLs](#summary-of-ngsi9-standard-operations-urls)
+	    * [Register Context operation](#register-context-operation)
+	    * [Discover Context Availability operation](#discover-context-availability-operation)
+	    * [Context availability subscriptions](#context-availability-subscriptions)
+	    * [Summary of NGSI9 standard operations URLs](#summary-of-ngsi9-standard-operations-urls)
     * [NGSI9 convenience operations](#ngsi9-convenience-operations)
-	  * [Convenience Register Context](#convenience-register-context)
-	  * [Only-type entity registrations using convenience operations](#only-type-entity-registrations-using-convenience-operations)
-	  * [Convenience Discover Context Availability](#convenience-discover-context-availability)
-	  * [Convenience operations for context availability subscriptions](#convenience-operations-for-context-availability-subscriptions)
-	  * [Summary of NGSI9 convenience operations URLs](#summary-of-ngsi9-convenience-operations-urls) 
+	    * [Convenience Register Context](#convenience-register-context)
+	    * [Only-type entity registrations using convenience operations](#only-type-entity-registrations-using-convenience-operations)
+	    * [Convenience Discover Context Availability](#convenience-discover-context-availability)
+	    * [Convenience operations for context availability subscriptions](#convenience-operations-for-context-availability-subscriptions)
+	    * [Summary of NGSI9 convenience operations URLs](#summary-of-ngsi9-convenience-operations-urls) 
 
 ## Introduction
 
@@ -117,8 +117,7 @@ tutorials.
 ### Starting the broker for the tutorials
 
 Before starting, you need to install the broker as described in the
-[Installation and Administration
-Guide](../../../README.md#installation).
+[Installation and Administration Guide](../admin/install.md).
 
 The tutorials assume that you don't have any previous content in the
 Orion Context Broker database. In order to do so, follow the [delete
@@ -147,7 +146,8 @@ application able to receive notifications. To that end, download the
 accumulator script, available [at
 GitHub](https://github.com/telefonicaid/fiware-orion/blob/master/scripts/accumulator-server.py).
 It is a very simple "dummy" application that just listens to a given URL
-(let's use localhost:1028/accumulate) and prints whatever it gets in the
+(the example below uses localhost:1028/accumulate, but a different
+host and/or port can be specified) and echoes whatever it receives in the
 terminal window where it is executed. Run it using the following
 command:
 
@@ -723,7 +723,7 @@ operation with UPDATE action type. The basic rule to take into account
 with updateContext is that APPEND creates new context elements, while
 UPDATE updates already existing context elements (however, Orion
 interprets APPEND as UPDATE if the entity already
-exists; you can avoid that using [APPEND_STRICT](append_and_delete.md)).
+exists; you can avoid that using [APPEND_STRICT](update_action_types.md#append_strict)).
 
 Now we will play the role of a context producer application, i.e. a
 source of context information. Let's assume that this application in a
@@ -922,11 +922,12 @@ Apart from simple values (i.e. strings) for attribute values, you can
 also use complex structures. This is an advance topic, described in
 [this section](structured_attribute_valued.md#structured-attribute-values).
 
-Finally, you can use REPLACE as updateAction. In that case, the entity
-attributes are replaced by the ones in the request. For example, if your
+Apart from APPEND or UPDATE there are additional possibilities for the
+`actionType` field, e.g. REPLACE to replace entity attributes (if your
 entity has the attributes A and B and you send an updateContext REPLACE
-request with A, then the entity at the end will have A (i.e. B attribute
-is removed).
+request with A, then the entity at the end will have only A, i.e., the attribute B
+has been removed). Have a look at [the section about action types](update_action_types.md)
+for the complete list.
 
 [Top](#top)
 
@@ -1034,7 +1035,7 @@ Let's examine in detail the different elements included in the payload:
     that update attribute values too frequently. In multi-CB configurations, take
     into account that the last-notification measure is local to each CB node. Although
     each node periodically synchronizes with DB in order to get potencially newer
-    values (more on this [here](perf_tuning.md#subscription-cache) it may happen that
+    values (more on this [here](perf_tuning.md#subscription-cache)) it may happen that
     a particular node has an old value, so throttling is not 100% accurate.
 
 The response corresponding to that request contains a subscription ID (a
@@ -1342,7 +1343,7 @@ which response is:
 You can also create an attribute (and the containing entity along the
 way) in the following way (additional attributes could be added after
 that, as described in [this
-section](append_and_delete.md#adding-and-removing-attributes-with-append-and-delete-in-updatecontext)):
+section](update_action_types.md#append)):
 
 ```
 (curl localhost:1026/v1/contextEntities/Room3/attributes/temperature -s -S \

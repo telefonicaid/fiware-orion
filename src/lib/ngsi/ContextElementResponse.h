@@ -28,10 +28,10 @@
 #include <string>
 
 #include "common/RenderFormat.h"
+#include "common/globals.h"
 #include "ngsi/ContextElement.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/AttributeList.h"
-#include "rest/ConnectionInfo.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -62,21 +62,23 @@ typedef struct ContextElementResponse
   ContextElementResponse(const mongo::BSONObj&  entityDoc,
                          const AttributeList&   attrL,
                          bool                   includeEmpty = true,
-                         bool                   includeCreDate = false,
-                         bool                   includeModDate = false,
-                         const std::string&     apiVersion   = "v1");
+                         ApiVersion             apiVersion   = V1);
   ContextElementResponse(ContextElement* ceP, bool useDefaultType = false);
 
-  std::string  render(ConnectionInfo*     ciP,
+  std::string  render(ApiVersion          apiVersion,
+                      bool                asJsonObject,
                       RequestType         requestType,
                       const std::string&  indent,
                       bool                comma               = false,
                       bool                omitAttributeValues = false);
-  std::string  toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist = false);
+  std::string  toJson(RenderFormat                     renderFormat,
+                      const std::vector<std::string>&  attrsFilter,
+                      const std::vector<std::string>&  metadataFilter,
+                      bool blacklist = false);
   void         present(const std::string& indent, int ix);
   void         release(void);
 
-  std::string  check(ConnectionInfo*     ciP,
+  std::string  check(ApiVersion          apiVersion,
                      RequestType         requestType,
                      const std::string&  indent,
                      const std::string&  predetectedError,

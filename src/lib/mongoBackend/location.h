@@ -43,7 +43,7 @@ extern bool processLocationAtEntityCreation
   std::string*                   locAttr,
   mongo::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
-  const std::string&             apiVersion,
+  ApiVersion                     apiVersion,
   OrionError*                    oe
 );
 
@@ -58,7 +58,7 @@ extern bool processLocationAtUpdateAttribute
   const ContextAttribute*        targetAttr,
   mongo::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
-  const std::string&             apiVersion,
+  ApiVersion                     apiVersion,
   OrionError*                    oe
 );
 
@@ -74,7 +74,7 @@ extern bool processLocationAtAppendAttribute
   bool                           actualAppend,
   mongo::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
-  const std::string&             apiVersion,
+  ApiVersion                     apiVersion,
   OrionError*                    oe
 );
 

@@ -50,20 +50,17 @@ TEST(EntityTypeResponse, present)
 */
 TEST(EntityTypeResponse, check)
 {
-  ConnectionInfo ci;
-
   utInit();
 
-  ci.outMimeType = JSON;
   EntityTypeResponse etR1;
   EntityTypeResponse etR2;
 
   etR1.entityType.type = "myType";
   etR2.entityType.type = "";
 
-  EXPECT_EQ("OK", etR1.check(&ci, "", ""));
-  EXPECT_NE("OK", etR2.check(&ci, "", ""));
-  EXPECT_NE("OK", etR1.check(&ci, "", "foo"));
+  EXPECT_EQ("OK", etR1.check(V1, false, false, false, ""));
+  EXPECT_NE("OK", etR2.check(V1, false, false, false, ""));
+  EXPECT_NE("OK", etR1.check(V1, false, false, false, "foo"));
 
   utExit();
 }

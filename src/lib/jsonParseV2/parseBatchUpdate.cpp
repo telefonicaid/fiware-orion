@@ -24,6 +24,7 @@
 */
 #include "rapidjson/document.h"
 
+#include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
@@ -51,7 +52,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
   if (document.HasParseError())
   {
     alarmMgr.badInput(clientIp, "JSON Parse Error");
-    oe.fill(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
+    oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -60,7 +61,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
   if (!document.IsObject())
   {
     alarmMgr.badInput(clientIp, "JSON Parse Error");
-    oe.fill(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
+    oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -68,7 +69,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
   else if (document.ObjectEmpty())
   {
     alarmMgr.badInput(clientIp, "Empty JSON payload");
-    oe.fill(SccBadRequest, "empty payload", "BadRequest");
+    oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -108,12 +109,21 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
-        return oe.toJson();
+        r = oe.toJson();
+        return r;
       }
     }
     else if (name == "actionType")
     {
       burP->updateActionType.set(iter->value.GetString());
+      std::string err = burP->updateActionType.check();
+      if (err != "OK")
+      {
+        alarmMgr.badInput(clientIp, err);
+        oe.fill(SccBadRequest, err, "BadRequest");
+        ciP->httpStatusCode = SccBadRequest;
+        return oe.toJson();
+      }     
     }
     else
     {

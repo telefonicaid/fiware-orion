@@ -114,10 +114,6 @@ TEST(CompoundValueNode, vectorInvalidAndOk)
 
   utInit();
 
-  ConnectionInfo ci;
-
-  ci.apiVersion = "v1";
-
   tree->add(vec);
   vec->add(item1);
   vec->add(orion::ValueTypeString, "vecitem", "a");
@@ -132,7 +128,7 @@ TEST(CompoundValueNode, vectorInvalidAndOk)
   std::string rendered;
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
-  rendered = tree->render(&ci, "");
+  rendered = tree->render(V1, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   tree->shortShow("");
@@ -164,9 +160,6 @@ TEST(CompoundValueNode, structInvalidAndOk)
 
   utInit();
 
-  ConnectionInfo ci;
-  ci.apiVersion = "v1";
-
   tree->add(str);
   str->add(item1);
   str->add(item2);
@@ -181,7 +174,7 @@ TEST(CompoundValueNode, structInvalidAndOk)
   std::string rendered;
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
-  rendered = tree->render(&ci, "");
+  rendered = tree->render(V1, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   tree->shortShow("");

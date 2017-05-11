@@ -15,6 +15,8 @@ not mantained or evolved any longer. In particular:
 
 A list of deprecated features and the version in which they were deprecated follows:
 
+* The usage of `options` URL parameter in order to include `dateCreated` and/or `dateModified`
+  attributes in NGSIv2 is deprecated in Orion 1.5.0. Please use `attrs` URI parameter instead.
 * `/ngsi10` and `/ngsi9` as URL path prefixes are deprecated in Orion 1.2.0. Please,
   use `/v1` and `/v1/registry` instead.
 * `location` metadata to specify entity location is deprecated in Orion 1.1.0. The new way
@@ -53,7 +55,7 @@ information in the case you want to use old versions:
 * Documentation corresponding to old versions can be found:
   * For 0.23.0 and before: documentation is available at FIWARE public wiki ([user manual](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide)
     and [admin manual](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide)).
-  * For 0.24.0 or newer: documentation is available at [readthedocs.org](https://fiware-orion.readthedocs.org).
+  * For 0.24.0 or newer: documentation is available at [readthedocs.io](https://fiware-orion.readthedocs.io).
     Use the panel in the left bottom corner to navigate to the right version.
 * Docker images corresponding to Orion 0.24.0 and newer can be found at [Dockerhub](https://hub.docker.com/r/fiware/orion/tags/).
 
@@ -61,6 +63,7 @@ The following table provides information about the last Orion version supporting
 
 | **Removed feature**                                                        | **Last Orion version supporting feature** | **That version release date**   |
 |----------------------------------------------------------------------------|-------------------------------------------|---------------------------------|
+| `dateCreated` and `dateModified` in `options` URI parameter                | Not yet defined                           | Not yet defined                 |
 | `/ngsi10` and `/ngsi9` URL prefixes                                        | Not yet defined                           | Not yet defined                 |
 | `location` metadata to specify entity location                             | Not yet defined                           | Not yet defined                 |
 | XML API                                                                    | 0.28.0                                    | February 29th, 2016             |

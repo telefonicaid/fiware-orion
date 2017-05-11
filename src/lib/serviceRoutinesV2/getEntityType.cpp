@@ -46,6 +46,10 @@
 *
 * Payload In:  None
 * Payload Out: EntityTypeResponse
+*
+* URI parameters:
+*   - options=noAttrDetail
+*
 */
 std::string getEntityType
 (
@@ -58,25 +62,26 @@ std::string getEntityType
   EntityTypeResponse  response;
   std::string         entityTypeName = compV[2];
   std::string         answer;
+  bool                noAttrDetail   = ciP->uriParamOptions[OPT_NO_ATTR_DETAIL];
 
   if (entityTypeName == "")
   {
-    OrionError oe(SccBadRequest, EMPTY_ENTITY_TYPE, "BadRequest");
+    OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_TYPE, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
     return oe.toJson();
   }
 
-  TIMED_MONGO(mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion));
+  TIMED_MONGO(mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam, noAttrDetail, ciP->apiVersion));
 
   if (response.entityType.count == 0)
   {
-    OrionError oe(SccContextElementNotFound, "Entity type not found", "NotFound");
+    OrionError oe(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY_TYPE, ERROR_NOT_FOUND);
     TIMED_RENDER(answer = oe.toJson());
     ciP->httpStatusCode = oe.code;
   }
   else
   {
-    TIMED_RENDER(answer = response.toJson(ciP));
+    TIMED_RENDER(answer = response.toJson());
   }
 
   response.release();

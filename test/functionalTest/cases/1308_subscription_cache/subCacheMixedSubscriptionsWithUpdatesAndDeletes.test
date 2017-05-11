@@ -25,8 +25,8 @@ Subscription Cache Mixed wildcard and not and removes and updates
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 38,101
-accumulatorStart
+brokerStart CB 38,101 IPv4 --cache
+accumulatorStart --pretty-print
 
 --SHELL--
 

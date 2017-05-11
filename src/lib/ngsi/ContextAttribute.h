@@ -29,12 +29,13 @@
 #include <vector>
 
 #include "common/RenderFormat.h"
+#include "common/globals.h"
 #include "orionTypes/OrionValueType.h"
 #include "ngsi/MetadataVector.h"
 #include "ngsi/Request.h"
 #include "ngsi/ProvidingApplication.h"
 #include "parse/CompoundValueNode.h"
-#include "rest/ConnectionInfo.h"
+#include "rest/HttpStatusCode.h"
 
 
 
@@ -67,6 +68,17 @@ public:
   orion::CompoundValueNode*  compoundValueP;
   bool                       typeGiven;               // Was 'type' part of the incoming payload?
 
+  double                     creDate;                 // used by dateCreated functionality in NGSIv2
+  double                     modDate;                 // used by dateModified functionality in NGSIv2
+
+  std::string                actionType;              // Used by special metadata in notifications functionality
+  ContextAttribute*          previousValue;           // Used by special metadata in notifications functionality
+                                                      // (Note we are forced to use a pointer for this, as we are using
+                                                      // ContextAttribute field in the ContextAttribute type declaration)
+
+
+  bool                      onlyValue;                // Used when ony the value is meaningful in v2 updates of value, without regarding metadata
+
   ~ContextAttribute();
   ContextAttribute();
   ContextAttribute(ContextAttribute* caP, bool useDefaultType = false);
@@ -78,13 +90,26 @@ public:
 
   /* Grabbers for metadata to which CB gives a special semantic */
   std::string  getId() const;
-  std::string  getLocation(const std::string& apiValue ="v1") const;
+  std::string  getLocation(ApiVersion apiVersion = V1) const;
 
-  std::string  render(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false, bool omitValue = false);
-  std::string  renderAsJsonObject(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma, bool omitValue = false);
-  std::string  renderAsNameString(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false);
-  std::string  toJson(bool isLastElement, RenderFormat renderFormat, RequestType requestType = NoRequest);
-  std::string  toJsonAsValue(ConnectionInfo* ciP);
+  std::string  render(ApiVersion          apiVersion,
+                      bool                asJsonObject,
+                      RequestType         request,
+                      const std::string&  indent,
+                      bool                comma = false,
+                      bool                omitValue = false);
+  std::string  renderAsJsonObject(ApiVersion apiVersion, RequestType request, const std::string& indent, bool comma, bool omitValue = false);
+  std::string  renderAsNameString(const std::string& indent, bool comma = false);
+  std::string  toJson(bool                             isLastElement,
+                      RenderFormat                     renderFormat,
+                      const std::vector<std::string>&  metadataFilter,
+                      RequestType                      requestType = NoRequest);
+  std::string  toJsonAsValue(ApiVersion       apiVersion,
+                             bool             acceptedTextPlain,
+                             bool             acceptedJson,
+                             MimeType         outFormatSelection,
+                             MimeType*        outMimeTypeP,
+                             HttpStatusCode*  scP);
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  getName(void);
@@ -92,14 +117,10 @@ public:
   /* Used to render attribute value to BSON */
   void valueBson(mongo::BSONObjBuilder& bsonAttr) const;
 
-  /* Helper method to be use in some places wher '%s' is needed. Maybe could be merged with toString? FIXME P2 */
+  /* Helper method to be use in some places wher '%s' is needed */
   std::string  getValue(void) const;
 
-  std::string  check(ConnectionInfo*     ciP,
-                     RequestType         requestType,
-                     const std::string&  indent,
-                     const std::string&  predetectedError,
-                     int                 counter);
+  std::string  check(ApiVersion apiVersion, RequestType requestType);
   ContextAttribute* clone();
   bool              compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 

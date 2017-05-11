@@ -31,6 +31,7 @@
 #include "common/string.h"
 #include "common/defaultValues.h"
 #include "common/globals.h"
+#include "common/errorMessages.h"
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "alarmMgr/alarmMgr.h"
@@ -42,6 +43,7 @@
 #include "orionTypes/UpdateContextRequestVector.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"
+#include "rest/uriParamNames.h"
 #include "serviceRoutines/postUpdateContext.h"
 
 
@@ -106,6 +108,8 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   int              port;
   std::string      prefix;
 
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+
   //
   // 1. Parse the providing application to extract IP, port and URI-path
   //
@@ -133,7 +137,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   ciP->outMimeType  = JSON;
 
-  TIMED_RENDER(payload = upcrP->render(ciP, UpdateContext, ""));
+  TIMED_RENDER(payload = upcrP->render(ciP->apiVersion, asJsonObject, ""));
 
   ciP->outMimeType  = outMimeType;
   cleanPayload      = (char*) payload.c_str();
@@ -440,6 +444,7 @@ std::string postUpdateContext
   UpdateContextRequest*   upcrP  = &parseDataP->upcr.res;
   std::string             answer;
 
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
 
   //
   // 01. Check service-path consistency
@@ -454,8 +459,8 @@ std::string postUpdateContext
     upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
     alarmMgr.badInput(clientIp, "more than one service path for an update request");
 
-    TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
-
+    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject, ""));
+    upcrP->release();
     return answer;
   }
   else if (ciP->servicePathV[0] == "")
@@ -468,8 +473,9 @@ std::string postUpdateContext
   {
     upcrsP->errorCode.fill(SccBadRequest, res);
 
-    TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
+    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject, ""));
 
+    upcrP->release();
     return answer;
   }
 
@@ -500,7 +506,7 @@ std::string postUpdateContext
   bool forwarding = forwardsPending(upcrsP);
   if (forwarding == false)
   {
-    TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
+    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject, ""));
 
     upcrP->release();
     return answer;
@@ -653,7 +659,7 @@ std::string postUpdateContext
   // Note this is a slight break in the separation of concerns among the different layers (i.e.
   // serviceRoutine/ logic should work in a "NGSIv1 isolated context"). However, it seems to be
   // a smart way of dealing with partial update situations
-  if (ciP->apiVersion == "v2")
+  if (ciP->apiVersion == V2)
   {
     // Adjust OrionError response in the case of partial updates. This may happen in CPr forwarding
     // scenarios. Note that mongoBackend logic "splits" successfull updates and failing updates in
@@ -690,13 +696,13 @@ std::string postUpdateContext
     if (fails == response.contextElementResponseVector.size())
     {
       // If all CER result in error, then it isn't a partial update, but a regular NotFound
-      if (ciP->apiVersion == "v1")
+      if (ciP->apiVersion == V1)
       {
-        parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "No context element found", "NotFound");
+        parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_CONTEXT_ELEMENT, ERROR_NOT_FOUND);
       }
       else
       {
-        parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "The requested entity has not been found. Check type and id", "NotFound");
+        parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
       }
     }
     else if (fails > 0)
@@ -713,7 +719,7 @@ std::string postUpdateContext
   {
     // Note that v2 case doesn't use an actual response (so no need to waste time rendering it).
     // We render in the v1 case only
-    TIMED_RENDER(answer = response.render(ciP, UpdateContext, ""));
+    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, ""));
   }
 
   //

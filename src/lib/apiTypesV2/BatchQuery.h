@@ -32,7 +32,6 @@
 #include "ngsi/Request.h"
 #include "ngsi/ScopeVector.h"
 #include "apiTypesV2/Entities.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -46,11 +45,11 @@ public:
   Entities       entities;
   AttributeList  attributeV;
   ScopeVector    scopeV;
+  AttributeList  metadataV;  // FIXME P2: Change name of AttributeList to StringVector/StringList
 
   BatchQuery();
   ~BatchQuery();
 
-  std::string    check(ConnectionInfo* ciP, RequestType requestType);
   void           present(const std::string& indent);
   void           release(void);
 };

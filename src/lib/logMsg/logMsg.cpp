@@ -173,7 +173,8 @@ do                                         \
                                            \
   xin[0] = c;                              \
   xin[1] = 0;                              \
-  strncat(line, xin, sizeof(xin) - 1);     \
+  strncat(line, xin,                       \
+          lineLen - strlen(line) - 1);     \
                                            \
   fi += l;                                 \
 } while (0)
@@ -189,11 +190,11 @@ do                                                \
 {                                                 \
   if (s != NULL)                                  \
   {                                               \
-    strncat(line, s, lineLen - 1);                \
+    strncat(line, s, lineLen - strlen(line) - 1); \
   }                                               \
   else                                            \
   {                                               \
-    strncat(line, "noprogname", lineLen - 1);     \
+    strncat(line, "noprogname", lineLen - strlen(line) - 1); \
   }                                               \
                                                   \
   fi += l;                                        \
@@ -211,7 +212,8 @@ do                                         \
   char xin[20];                            \
                                            \
   snprintf(xin, sizeof(xin), "%d", i);     \
-  strncat(line, xin, lineLen - 1);         \
+  strncat(line, xin,                       \
+          lineLen - strlen(line) - 1);     \
                                            \
   fi += l;                                 \
 } while (0)
@@ -236,7 +238,7 @@ do                                                \
     snprintf(xin, sizeof(xin), "%03d", tLev);     \
   }                                               \
                                                   \
-  strncat(line, xin, lineLen - 1);                \
+  strncat(line, xin, lineLen - strlen(line) - 1); \
   fi += 4;                                        \
 } while (0)
 
@@ -519,14 +521,14 @@ char* lmProgName(char* pn, int levels, bool pid, const char* extra)
   if (pid == true)
   {
     char  pid[8];
-    strncat(pName, "_", sizeof(pName) - 1);
+    strncat(pName, "_", sizeof(pName) - strlen(pName) - 1);
     snprintf(pid, sizeof(pid), "%d", (int) getpid());
-    strncat(pName, pid, sizeof(pName) - 1);
+    strncat(pName, pid, sizeof(pName) - strlen(pName) - 1);
   }
 
   if (extra != NULL)
   {
-    strncat(pName, extra, sizeof(pName) - 1);
+    strncat(pName, extra, sizeof(pName) - strlen(pName) - 1);
   }
 
   printf("pName: %s\n", pName);
@@ -556,6 +558,10 @@ void lmLevelMaskSetString(char* level)
   if (strcasecmp(level, "NONE") == 0)
   {
     lmLevelMask = 0;
+  }
+  else if (strcasecmp(level, "FATAL") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
   }
   else if (strcasecmp(level, "ERROR") == 0)
   {
@@ -648,6 +654,10 @@ std::string lmLevelMaskStringGet(void)
   else if (lmLevelMask & LogLevelError)
   {
     return "ERROR";
+  }
+  else if (lmLevelMask & LogLevelExit)
+  {
+    return "FATAL";
   }
   else
   {
@@ -1111,9 +1121,6 @@ static char* lmLineFix
   fLen = strlen(format);
   while (fi < fLen)
   {
-    pid_t tid;
-
-    tid = syscall(SYS_gettid);
     if (strncmp(&format[fi], "TYPE", 4) == 0)
     {
       STRING_ADD(longTypeName(type), 4);
@@ -1132,6 +1139,8 @@ static char* lmLineFix
     }
     else if (strncmp(&format[fi], "TID", 3) == 0)
     {
+      pid_t tid;
+      tid = syscall(SYS_gettid);
       INT_ADD((int) tid, 3);
     }
     else if (strncmp(&format[fi], "TRANS_ID", 8) == 0)
@@ -1201,7 +1210,7 @@ static char* lmLineFix
     strncpy(xin, "\n", sizeof(xin));
   }
 
-  strncat(line, xin, lineLen - 1);
+  strncat(line, xin, lineLen - strlen(line) - 1);
 
   return line;
 }
@@ -1281,7 +1290,7 @@ static void asciiToLeft
 
   while (offset-- >= 0)
   {
-    strncat(line, " ", lineLen - 1);
+    strncat(line, " ", lineLen - strlen(line) - 1);
   }
 
   for (i = 0; i < size; i++)
@@ -1299,7 +1308,7 @@ static void asciiToLeft
       strncpy(tmp, ".", sizeof(tmp));
     }
 
-    strncat(line, tmp, lineLen - 1);
+    strncat(line, tmp, lineLen - strlen(line) - 1);
   }
 }
 
@@ -1565,17 +1574,17 @@ char* lmTraceGet(char* levelString, int levelStringSize)
     else if (before && !after)
     {
       snprintf(str, sizeof(str), "-%d", diss);
-      strncat(levelString, str, levelStringSize - 1);
+      strncat(levelString, str, levelStringSize - strlen(levelString) - 1);
     }
     else if (!before && after)
     {
       snprintf(str, sizeof(str), ", %d", diss);
-      strncat(levelString, str, levelStringSize - 1);
+      strncat(levelString, str, levelStringSize - strlen(levelString) - 1);
     }
     else if (!before && !after)
     {
       snprintf(str, sizeof(str), ", %d", diss);
-      strncat(levelString, str, levelStringSize - 1);
+      strncat(levelString, str, levelStringSize - strlen(levelString) - 1);
     }
   }
 
@@ -1639,17 +1648,17 @@ char* lmTraceGet(char* levelString, int levelStringSize, char* traceV)
     else if (before && !after)
     {
       snprintf(str, sizeof(str), "-%d", diss);
-      strncat(levelString, str, levelStringSize - 1);
+      strncat(levelString, str, levelStringSize - strlen(levelString) - 1);
     }
     else if (!before && after)
     {
       snprintf(str, sizeof(str), ", %d", diss);
-      strncat(levelString, str, levelStringSize - 1);
+      strncat(levelString, str, levelStringSize - strlen(levelString) - 1);
     }
     else if (!before && !after)
     {
       snprintf(str, sizeof(str), ", %d", diss);
-      strncat(levelString, str, levelStringSize - 1);
+      strncat(levelString, str, levelStringSize - strlen(levelString) - 1);
     }
   }
 
@@ -2366,7 +2375,7 @@ LmStatus lmOut
 
     if (stre != NULL)
     {
-      strncat(line, stre, LINE_MAX - 1);
+      strncat(line, stre, LINE_MAX - strlen(stre) - 1);
     }
 
     sz = strlen(line);
@@ -2640,14 +2649,14 @@ int lmBufferPresent
       if (bIndex + 4 <= size)
       {
         snprintf(tmp, sizeof(tmp), "%.8x ", *((int*) &buffer[bIndex]));
-        strncat(line, tmp, sizeof(line) - 1);
+        strncat(line, tmp, sizeof(line) - strlen(line) - 1);
         bIndex += 4;
       }
       else if (bIndex + 1 == size)
       {
         snprintf(tmp, sizeof(tmp), "%.2xxxxxxx",
                  (*((int*) &buffer[bIndex]) & 0xFF000000) >> 24);
-        strncat(line, tmp, sizeof(line) - 1);
+        strncat(line, tmp, sizeof(line) - strlen(line) - 1);
         bIndex += 1;
         xx      = 1;
       }
@@ -2655,14 +2664,14 @@ int lmBufferPresent
       {
         snprintf(tmp, sizeof(tmp), "%.4xxxxx",
                  (*((int*) &buffer[bIndex]) & 0xFFFF0000) >> 16);
-        strncat(line, tmp, sizeof(line) - 1);
+        strncat(line, tmp, sizeof(line) - strlen(line) - 1);
         bIndex += 2;
         xx      = 2;
       }
       else if (bIndex + 3 == size)
       {
         snprintf(tmp, sizeof(tmp), "%.6xxx", (*((int*) &buffer[bIndex]) & 0xFFFFFF00) >> 8);
-        strncat(line, tmp, sizeof(line) - 1);
+        strncat(line, tmp, sizeof(line) - strlen(line) - 1);
         bIndex += 3;
         xx      = 3;
       }
@@ -2672,13 +2681,13 @@ int lmBufferPresent
       if (bIndex + 2 <= size)
       {
         snprintf(tmp, sizeof(tmp), "%.4x ", *((int16_t*) &buffer[bIndex]) & 0xFFFF);
-        strncat(line, tmp, sizeof(line) - 1);
+        strncat(line, tmp, sizeof(line) - strlen(line) - 1);
         bIndex += 2;
       }
       else
       {
         snprintf(tmp, sizeof(tmp), "%.2xxx", (*((int16_t*) &buffer[bIndex]) & 0xFF00) >> 8);
-        strncat(line, tmp, sizeof(line) - 1);
+        strncat(line, tmp, sizeof(line) - strlen(line) - 1);
         bIndex += 1;
         xx      = 1;
       }
@@ -2686,7 +2695,7 @@ int lmBufferPresent
 
     case LmfByte:
       snprintf(tmp, sizeof(tmp), "%.2x ", buffer[bIndex] & 0xFF);
-      strncat(line, tmp, sizeof(line) - 1);
+      strncat(line, tmp, sizeof(line) - strlen(line) - 1);
       bIndex += 1;
       break;
     }

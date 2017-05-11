@@ -36,8 +36,6 @@
 #include "common/RenderFormat.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/Request.h"
-#include "rest/ConnectionInfo.h"
-#include "rest/uriParamNames.h"
 
 
 
@@ -74,9 +72,8 @@ static std::string addedLookup(const std::vector<std::string>& added, std::strin
 /* ****************************************************************************
 *
 * ContextAttributeVector::toJsonTypes -
-*
 */
-std::string ContextAttributeVector::toJsonTypes()
+std::string ContextAttributeVector::toJsonTypes(void)
 {
   // Pass 1 - get per-attribute types
   std::map<std::string, std::map<std::string, int> > perAttrTypes;
@@ -101,10 +98,23 @@ std::string ContextAttributeVector::toJsonTypes()
 
     std::map<std::string, int>::iterator jt;
     unsigned int                         jx;
+
     for (jt = attrTypes.begin(), jx = 0; jt != attrTypes.end(); ++jt, ++jx)
     {
       std::string type = jt->first;
-      out += JSON_STR(type);
+      
+      //
+      // Special condition for 'options=noAttrDetail':
+      //   When the 'options' URI parameter contains 'noAttrDetail',
+      //   mongoBackend fills the attribute type vector with *just one item* (that is an empty string).
+      //   This special condition is checked for here, to produce a [] for the vector for the response.
+      //
+      // See the origin of this in mongoQueryTypes.cpp. Look for "NOTE: here we add", in two locations.
+      //
+      if ((type != "") || (attrTypes.size() != 1))
+      {
+        out += JSON_STR(type);
+      }
 
       if (jx != attrTypes.size() - 1)
       {
@@ -136,7 +146,13 @@ std::string ContextAttributeVector::toJsonTypes()
 * If anybody needs an attribute named 'id' or 'type', then API v1
 * will have to be used to retrieve that information.
 */
-std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist) const
+std::string ContextAttributeVector::toJson
+(
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter,
+  const std::vector<std::string>&  metadataFilter,
+  bool                             blacklist
+) const
 {
   if (vec.size() == 0)
   {
@@ -158,7 +174,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat rend
   //
   int validAttributes = 0;
   std::map<std::string, bool>  uniqueMap;
-  if (attrsFilter.size() == 0)
+  if ((attrsFilter.size() == 0) || (std::find(attrsFilter.begin(), attrsFilter.end(), ALL_ATTRS) != attrsFilter.end()))
   {
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
@@ -212,7 +228,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat rend
 
   uniqueMap.clear();
 
-  if (attrsFilter.size() == 0)
+  if (attrsFilter.size() == 0 || (std::find(attrsFilter.begin(), attrsFilter.end(), ALL_ATTRS) != attrsFilter.end()))
   {
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
@@ -231,7 +247,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat rend
         }
       }
 
-      out += vec[ix]->toJson(renderedAttributes == validAttributes, renderFormat);
+      out += vec[ix]->toJson(renderedAttributes == validAttributes, renderFormat, metadataFilter);
 
       if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
@@ -247,7 +263,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat rend
       if (caP != NULL)
       {
         ++renderedAttributes;
-        out += caP->toJson(renderedAttributes == validAttributes, renderFormat);
+        out += caP->toJson(renderedAttributes == validAttributes, renderFormat, metadataFilter);
       }
     }
   }
@@ -258,10 +274,11 @@ std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat rend
       if (std::find(attrsFilter.begin(), attrsFilter.end(), vec[ix]->name) == attrsFilter.end())
       {
         ++renderedAttributes;
-        out += vec[ix]->toJson(renderedAttributes == validAttributes, renderFormat);
+        out += vec[ix]->toJson(renderedAttributes == validAttributes, renderFormat, metadataFilter);
       }
     }
   }
+
   return out;
 }
 
@@ -273,7 +290,8 @@ std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat rend
 */
 std::string ContextAttributeVector::render
 (
-  ConnectionInfo*     ciP,
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
   RequestType         request,
   const std::string&  indent,
   bool                comma,
@@ -282,7 +300,6 @@ std::string ContextAttributeVector::render
 )
 {
   std::string out = "";
-  std::string key = "attributes";
 
   if (vec.size() == 0)
   {
@@ -297,7 +314,7 @@ std::string ContextAttributeVector::render
   // only one of them should be included in the vector. Any one of them.
   // So, step 1 is to purge the context attribute vector from 'copies'.
   //
-  if ((ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (ciP->outMimeType == JSON))
+  if (asJsonObject)
   {
     std::vector<std::string> added;
 
@@ -321,32 +338,32 @@ std::string ContextAttributeVector::render
     // 2. Now it's time to render
     // Note that in the case of attribute as name, we have to use a vector, thus using
     // attrsAsName variable as value for isVector parameter
-    out += startTag2(indent, key, attrsAsName, true);
+    out += startTag(indent, "attributes", attrsAsName);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       if (attrsAsName)
       {
-        out += vec[ix]->renderAsNameString(ciP, request, indent + "  ", ix != vec.size() - 1);
+        out += vec[ix]->renderAsNameString(indent + "  ", ix != vec.size() - 1);
       }
       else
       {
-        out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
+        out += vec[ix]->render(apiVersion, asJsonObject, request, indent + "  ", ix != vec.size() - 1, omitValue);
       }
     }
     out += endTag(indent, comma, attrsAsName);
   }
   else
   {
-    out += startTag2(indent, key, true, true);
+    out += startTag(indent, "attributes", true);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       if (attrsAsName)
       {
-        out += vec[ix]->renderAsNameString(ciP, request, indent + "  ", ix != vec.size() - 1);
+        out += vec[ix]->renderAsNameString(indent + "  ", ix != vec.size() - 1);
       }
       else
       {
-        out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
+        out += vec[ix]->render(apiVersion, asJsonObject, request, indent + "  ", ix != vec.size() - 1, omitValue);
       }
     }
     out += endTag(indent, comma, true);
@@ -361,20 +378,13 @@ std::string ContextAttributeVector::render
 *
 * ContextAttributeVector::check - 
 */
-std::string ContextAttributeVector::check
-(
-  ConnectionInfo*     ciP,
-  RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string ContextAttributeVector::check(ApiVersion apiVersion, RequestType requestType)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, 0)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType)) != "OK")
       return res;
   }
 

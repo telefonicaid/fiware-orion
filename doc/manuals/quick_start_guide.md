@@ -7,13 +7,17 @@ Orion Context Broker implements the [FIWARE NGSI version 2](http://fiware.github
 A good learning resource for such API is the
 [NGSI version 2 Cookbook](http://fiware.github.io/context.Orion/api/v2/stable/cookbook/).
 
-First of all, you need an account in FIWARE Lab, so register for one in [the following link](https://account.lab.fiware.org/users/sign_up) if you don't have one (it's free, all you need is a valid email adress :). With that account you can obtain a valid authentication token to use in the REST API calls to Orion. To get that token, get and run the `token_script.sh` script. Introduce your FIWARE Lab user and password when the scripts ask for it (**note you have to use the complete username, including email domain**, e.g. if you email were "foo@gmail.com" you have to use "foo@gmail.com", not just "foo"):
+First of all, you need an account in FIWARE Lab, so register for one in [the following link](https://account.lab.fiware.org/sign_up) if you don't have one (it's free, all you need is a valid email adress :). With that account you can obtain a valid authentication token to use in the REST API calls to Orion. To get that token, get and run the `token_script.sh` script. Introduce your FIWARE Lab user and password when the scripts ask for it (**note you have to use the complete username, including email domain**, e.g. if you email were "foo@gmail.com" you have to use "foo@gmail.com", not just "foo"):
 
     # wget --no-check-certificate https://raw.githubusercontent.com/fgalan/oauth2-example-orion-client/master/token_script.sh
     # bash token_script.sh
     Username: your_email@example.com
     Password:
     Token: <this is the token you need>
+
+(Take into account that tokens generated in this way
+[will expire after 1 hour](http://stackoverflow.com/questions/39835218/orion-context-broker-global-instance-token),
+time enough to complete the rest of the steps in this guide ;)
 
 Let's assume that the authentication token you got is in the AUTH_TOKEN shell variable. Now, let's start querying some real-time information from the city sensors of Santander (in particular, a sound level meter):
 ``` 

@@ -26,8 +26,10 @@
 
 #include "logMsg/logMsg.h"
 
+#include "common/errorMessages.h"
 #include "ngsi/ContextAttribute.h"
 #include "parse/CompoundValueNode.h"
+#include "parse/forbiddenChars.h"
 #include "alarmMgr/alarmMgr.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseContextAttribute.h"
@@ -44,7 +46,7 @@ using namespace rapidjson;
 *
 * parseContextAttributeObject - 
 */
-static std::string parseContextAttributeObject(const Value& start, ContextAttribute* caP)
+static std::string parseContextAttributeObject(const Value& start, ContextAttribute* caP, bool* compoundVector)
 {
   int members = 0;
 
@@ -97,9 +99,19 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
       }
       else if (type == "Array")
       {
-        caP->valueType    = orion::ValueTypeVector;
-
-        std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
+        //
+        // FIXME P4: Here the attribute's valueType is set to ValueTypeVector, but normally all compounds have the
+        //           valueType set as Object in the attribute ... to later find its real type in compoundValueP->valueType.
+        //           This seems to be needed later, so no 'fix' for now.
+        //           However, this should be looked into, and probably the attributes with coupound values should have the 
+        //           real type of its compound (Object|Vector), not always Object.
+        //           This is really confusing ...
+        //           I guess this was to be able to easily compare for compound by checking "caP->valueType == orion::ValueTypeObject",
+        //           but it is equally easy to compare "caP->compoundValueP != NULL" instead.
+        //
+        caP->valueType  = orion::ValueTypeVector;
+        *compoundVector = true;
+        std::string r   = parseContextAttributeCompoundValue(iter, caP, NULL);
         if (r != "OK")
         {
           alarmMgr.badInput(clientIp, "json error in ContextAttributeObject::Vector");
@@ -142,7 +154,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
   }
 
   // Is it a date?
-  if (caP->type == DATE_TYPE)
+  if ((caP->type == DATE_TYPE) || (caP->type == DATE_TYPE_ALT))
   {
     caP->numberValue =  parse8601Time(caP->stringValue);
 
@@ -151,7 +163,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
       return "date has invalid format";
     }
 
-    // Probably reseting stringValue is not needed, but let's do it for cleanness
+    // Probably reseting stringValue is not needed, but let's do it for cleanliness
     caP->stringValue = "";
     caP->valueType   = orion::ValueTypeNumber;
 
@@ -168,9 +180,10 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
 */
 std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberIterator& iter, ContextAttribute* caP)
 {
-  std::string name      = iter->name.GetString();
-  std::string type      = jsonParseTypeNames[iter->value.GetType()];
-  bool        keyValues = ciP->uriParamOptions[OPT_KEY_VALUES];
+  std::string  name           = iter->name.GetString();
+  std::string  type           = jsonParseTypeNames[iter->value.GetType()];
+  bool         keyValues      = ciP->uriParamOptions[OPT_KEY_VALUES];
+  bool         compoundVector = false;
 
   caP->name = name;
 
@@ -207,8 +220,10 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     }
     else if (type == "Array")
     {
-      caP->valueType = orion::ValueTypeObject;
-      std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
+      compoundVector  = true;
+      caP->valueType  = orion::ValueTypeObject;
+      std::string r   = parseContextAttributeCompoundValue(iter, caP, NULL);
+
       if (r != "OK")
       {
         alarmMgr.badInput(clientIp, "json error in ContextAttribute::Vector");
@@ -241,9 +256,9 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     }
 
     // Attribute has a regular structure, in which 'value' is mandatory (except in v2)
-    if (iter->value.HasMember("value") || ciP->apiVersion == "v2")
+    if (iter->value.HasMember("value") || ciP->apiVersion == V2)
     {
-      std::string r = parseContextAttributeObject(iter->value, caP);
+      std::string r = parseContextAttributeObject(iter->value, caP, &compoundVector);
       if (r != "OK")
       {
         alarmMgr.badInput(clientIp, "JSON parse error in ContextAttribute::Object");
@@ -259,16 +274,17 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     }
   }
 
-  if (caP->name == "")
-  {
-    alarmMgr.badInput(clientIp, "no 'name' for ContextAttribute");
-    ciP->httpStatusCode = SccBadRequest;
-    return "no 'name' for ContextAttribute";
-  }
-
   if (!caP->typeGiven)
   {
-    caP->type = DEFAULT_TYPE;
+    caP->type = (compoundVector)? defaultType(orion::ValueTypeVector) : defaultType(caP->valueType);
+  }
+
+  std::string r = caP->check(ciP->apiVersion, ciP->requestType);
+  if (r != "OK")
+  {
+    alarmMgr.badInput(clientIp, r);
+    ciP->httpStatusCode = SccBadRequest;
+    return r;
   }
 
   return "OK";
@@ -288,7 +304,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
 
   if (document.HasParseError())
   {
-    OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
+    OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
     alarmMgr.badInput(clientIp, "JSON parse error");
     ciP->httpStatusCode = SccBadRequest;
@@ -299,7 +315,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
 
   if (!document.IsObject())
   {
-    OrionError oe(SccBadRequest, "Error parsing incoming JSON buffer", ERROR_STRING_PARSERROR);
+    OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
     alarmMgr.badInput(clientIp, "JSON Parse Error");
     ciP->httpStatusCode = SccBadRequest;
@@ -307,7 +323,9 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
     return oe.toJson();
   }
 
-  std::string  r = parseContextAttributeObject(document, caP);
+  bool         compoundVector = false;
+  std::string  r = parseContextAttributeObject(document, caP, &compoundVector);
+
   if (r != "OK")
   {
     OrionError oe(SccBadRequest, r, "BadRequest");
@@ -317,9 +335,10 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
 
     return oe.toJson();
   }
+
   if (!caP->typeGiven)
   {
-    caP->type = DEFAULT_TYPE;
+    caP->type = (compoundVector)? defaultType(orion::ValueTypeVector) : defaultType(caP->valueType);
   }
 
   return r;

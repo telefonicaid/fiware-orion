@@ -1,0 +1,210 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Support partial date time filters (only date, not time)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# This test is not exahustive, i.e. more cases similar to steps 3-4 or 5-6 could be included
+# to cover all the posibilities detailed at partial_datetime_creation.test. However, we
+# think that with a couple of them is enough
+#
+# 01. Creating entity E1 at 2016-09-30T22:48:51.00Z
+# 02. Creating entity E2 at 2016-10-01T01:23:45.00Z
+# 03. Get entities after 2016-10-01, get E2
+# 04. Get entities before 2016-10-01, get E1
+# 05. Get entities after 2016-10-01T0000Z, get E2
+# 06. Get entities before 2016-10-01T0000Z, get E1
+#
+
+echo "01. Creating entity E1 at 2016-09-30T22:48:51.00Z"
+echo "================================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "D": {
+    "value": "2016-09-30T22:48:51.00Z",
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Creating entity E2 at 2016-10-01T01:23:45.00Z"
+echo "================================================="
+payload='{
+  "id": "E2",
+  "type": "T",
+  "D": {
+    "value": "2016-10-01T01:23:45.00Z",
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Get entities after 2016-10-01, get E2"
+echo "========================================="
+orionCurl --url '/v2/entities?q=D>2016-10-01'
+echo
+echo
+
+
+echo "04. Get entities before 2016-10-01, get E1"
+echo "=========================================="
+orionCurl --url '/v2/entities?q=D<2016-10-01'
+echo
+echo
+
+
+echo "05. Get entities after 2016-10-01T0000Z, get E2"
+echo "==============================================="
+orionCurl --url '/v2/entities?q=D>2016-10-01T0000Z'
+echo
+echo
+
+
+echo "06. Get entities before 2016-10-01T0000Z, get E1"
+echo "================================================"
+orionCurl --url '/v2/entities?q=D<2016-10-01T0000Z'
+echo
+echo
+
+
+--REGEXPECT--
+01. Creating entity E1 at 2016-09-30T22:48:51.00Z
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Creating entity E2 at 2016-10-01T01:23:45.00Z
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Get entities after 2016-10-01, get E2
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 96
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "D": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2016-10-01T01:23:45.00Z"
+        },
+        "id": "E2",
+        "type": "T"
+    }
+]
+
+
+04. Get entities before 2016-10-01, get E1
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 96
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "D": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2016-09-30T22:48:51.00Z"
+        },
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+05. Get entities after 2016-10-01T0000Z, get E2
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 96
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "D": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2016-10-01T01:23:45.00Z"
+        },
+        "id": "E2",
+        "type": "T"
+    }
+]
+
+
+06. Get entities before 2016-10-01T0000Z, get E1
+================================================
+HTTP/1.1 200 OK
+Content-Length: 96
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "D": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2016-09-30T22:48:51.00Z"
+        },
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

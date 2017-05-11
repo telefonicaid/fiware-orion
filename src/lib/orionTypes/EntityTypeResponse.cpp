@@ -35,7 +35,6 @@
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/Request.h"
-#include "rest/uriParamNames.h"
 #include "orionTypes/EntityTypeResponse.h"
 
 
@@ -44,14 +43,20 @@
 *
 * EntityTypeResponse::render -
 */
-std::string EntityTypeResponse::render(ConnectionInfo* ciP, const std::string& indent)
+std::string EntityTypeResponse::render
+(
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
+  bool                asJsonOut,
+  bool                collapsed,
+  const std::string&  indent
+)
 {
-  std::string out                 = "";
-  std::string tag                 = "entityTypeAttributesResponse";
+  std::string out = "";
 
-  out += startTag1(indent, tag, false);
+  out += startTag(indent);
 
-  out += entityType.render(ciP, indent + "  ", true, true);
+  out += entityType.render(apiVersion, asJsonObject, asJsonOut, collapsed, indent + "  ", true, true);
   out += statusCode.render(indent + "  ");
 
   out += endTag(indent);
@@ -67,8 +72,10 @@ std::string EntityTypeResponse::render(ConnectionInfo* ciP, const std::string& i
 */
 std::string EntityTypeResponse::check
 (
-  ConnectionInfo*     ciP,
-  const std::string&  indent,
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
+  bool                asJsonOut,
+  bool                collapsed,  
   const std::string&  predetectedError
 )
 {
@@ -77,8 +84,8 @@ std::string EntityTypeResponse::check
   if (predetectedError != "")
   {
     statusCode.fill(SccBadRequest, predetectedError);
-  }
-  else if ((res = entityType.check(ciP, indent, predetectedError)) != "OK")
+  }  
+  else if ((res = entityType.check(apiVersion, predetectedError)) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     statusCode.fill(SccBadRequest, res);
@@ -86,7 +93,7 @@ std::string EntityTypeResponse::check
   else
     return "OK";
 
-  return render(ciP, "");
+  return render(apiVersion, asJsonObject, asJsonOut, collapsed, "");
 }
 
 
@@ -120,7 +127,7 @@ void EntityTypeResponse::release(void)
 *
 * EntityTypeResponse::toJson -
 */
-std::string EntityTypeResponse::toJson(ConnectionInfo* ciP)
+std::string EntityTypeResponse::toJson(void)
 {
   std::string  out = "{";
   char         countV[STRING_SIZE_FOR_INT];

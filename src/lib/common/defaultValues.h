@@ -28,8 +28,7 @@
 
 
 
-#define  DEFAULT_SERVICE_PATH_UPDATES  "/"
-#define  DEFAULT_SERVICE_PATH_QUERIES  "/#"
-
+#define  DEFAULT_SERVICE_PATH_UPDATES         "/"
+#define  DEFAULT_SERVICE_PATH_QUERIES         "/#"
 
 #endif  // SRC_LIB_COMMON_DEFAULTVALUES_H_

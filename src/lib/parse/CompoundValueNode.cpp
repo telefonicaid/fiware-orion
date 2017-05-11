@@ -34,7 +34,6 @@
 #include "parse/forbiddenChars.h"
 
 #include "orionTypes/OrionValueType.h"
-#include "rest/ConnectionInfo.h"
 #include "parse/CompoundValueNode.h"
 
 
@@ -53,6 +52,7 @@ CompoundValueNode::CompoundValueNode():
   container   (NULL),
   rootP       (NULL),
   siblingNo   (0),
+  renderName  (false),
   path        ("Unset"),
   level       (0)
 {
@@ -73,6 +73,7 @@ CompoundValueNode::CompoundValueNode(orion::ValueType _type):
   container   (this),
   rootP       (this),
   siblingNo   (0),
+  renderName  (false),
   path        ("/"),
   level       (0)
 {
@@ -103,6 +104,7 @@ CompoundValueNode::CompoundValueNode
   container   (_container),
   rootP       (container->rootP),
   siblingNo   (_siblingNo),
+  renderName  (false),
   path        (_path),
   level       (container->level + 1)
 {
@@ -115,11 +117,11 @@ CompoundValueNode::CompoundValueNode
 }
 
 
+
 /* ****************************************************************************
 *
 * CompoundValueNode - constructor for all nodes except toplevel (char*)
 */
-
 CompoundValueNode::CompoundValueNode
 (
   CompoundValueNode*  _container,
@@ -138,6 +140,7 @@ CompoundValueNode::CompoundValueNode
   container   (_container),
   rootP       (container->rootP),
   siblingNo   (_siblingNo),
+  renderName  (false),
   path        (_path),
   level       (container->level + 1)
 {
@@ -173,6 +176,7 @@ CompoundValueNode::CompoundValueNode
   container   (_container),
   rootP       (container->rootP),
   siblingNo   (_siblingNo),
+  renderName  (false),
   path        (_path),
   level       (container->level + 1)
 {
@@ -183,6 +187,8 @@ CompoundValueNode::CompoundValueNode
                           orion::valueTypeName(valueType),
                           this));
 }
+
+
 
 /* ****************************************************************************
 *
@@ -206,6 +212,7 @@ CompoundValueNode::CompoundValueNode
   container   (_container),
   rootP       (container->rootP),
   siblingNo   (_siblingNo),
+  renderName  (false),
   path        (_path),
   level       (container->level + 1)
 {
@@ -647,13 +654,13 @@ std::string CompoundValueNode::check(void)
 *
 * render -
 */
-std::string CompoundValueNode::render(ConnectionInfo* ciP, const std::string& indent)
+std::string CompoundValueNode::render(ApiVersion apiVersion, const std::string& indent)
 {
   std::string  out       = "";
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
   std::string  key       = (container->valueType == orion::ValueTypeVector)? "item" : name;
 
-  if (ciP->apiVersion == "v2")
+  if (apiVersion == V2)
   {
     return toJson(true); // FIXME P8: The info on comma-after-or-not is not available here ...
   }
@@ -661,73 +668,117 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, const std::string& in
   if (valueType == orion::ValueTypeString)
   {
     LM_T(LmtCompoundValueRender, ("I am a String (%s)", name.c_str()));
-    out = valueTag1(indent, key, stringValue, jsonComma, container->valueType == orion::ValueTypeVector);
+    out = valueTag(indent, key, stringValue, jsonComma, container->valueType == orion::ValueTypeVector);
   }
   else if (valueType == orion::ValueTypeNumber)
   {
     LM_T(LmtCompoundValueRender, ("I am a number (%s)", name.c_str()));
-    out = valueTag1(indent, key, toString(numberValue), jsonComma, container->valueType == orion::ValueTypeVector, true);
+    out = valueTag(indent, key, toString(numberValue), jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
     LM_T(LmtCompoundValueRender, ("I am a bool (%s)", name.c_str()));
-    out = valueTag1(indent, key, boolValue? "true" : "false", jsonComma, container->valueType == orion::ValueTypeVector, true);
+    out = valueTag(indent, key, boolValue? "true" : "false", jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
   else if (valueType == orion::ValueTypeNone)
   {
     LM_T(LmtCompoundValueRender, ("I am NULL (%s)", name.c_str()));
-    out = valueTag1(indent, key, "null", jsonComma, container->valueType == orion::ValueTypeVector, true);
+    out = valueTag(indent, key, "null", jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
+
+#if 0
+  //
+  // FIXME P5: code to be used when refactoring rendering of compounds
+  //   Three cases:
+  //   01. Toplevel      (only content of the vector to be included)
+  //   02. Inside vector (the name of the vector is omitted - doesn't even exist)
+  //   03. Inside object (the name of the vector is rendered)
+  //
+  // Similar change for Objects and also in CompoundValueNode::toJson()
+  //
+  else if (valueType == orion::ValueTypeVector)
+  {
+    out = "";
+
+    if (container == this)  // 01. Toplevel
+    {
+      for (uint64_t ix = 0; ix < childV.size(); ++ix)
+      {
+        out += childV[ix]->render(apiVersion, indent);
+      }
+    }
+    else   // 02/03. Not toplevel
+    {
+      if (container->valueType == orion::ValueTypeObject)  // 03. Inside object
+      {
+        out = indent + "\"" + name + "\" : [\n";
+      }
+      else  // 02. Inside vector
+      {
+        out += indent + "  " + "[\n";
+      }
+
+      for (uint64_t ix = 0; ix < childV.size(); ++ix)
+      {
+        out += childV[ix]->render(apiVersion, indent + "  ");
+      }
+
+      out += indent + "  ]\n";
+    }
+    
+  }
+#endif  // FIXME P5: code to be used when refactoring rendering of compounds
+
   else if ((valueType == orion::ValueTypeVector) && (container != this))
   {
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));
-    out += startTag2(indent, key, true, container->valueType == orion::ValueTypeObject);
+    out += startTag(indent, container->valueType == orion::ValueTypeObject ? key : "", true);
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
-      out += childV[ix]->render(ciP, indent + "  ");
+      out += childV[ix]->render(apiVersion, indent + "  ");
     }
 
-    out += endTag(indent, jsonComma, true, true);
+    out += endTag(indent, jsonComma, true);
   }
   else if ((valueType == orion::ValueTypeVector) && (container == this))
   {
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s) and my container is TOPLEVEL", name.c_str()));
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
-      out += childV[ix]->render(ciP, indent);
+      out += childV[ix]->render(apiVersion, indent);
     }
   }
   else if ((valueType == orion::ValueTypeObject) && (container->valueType == orion::ValueTypeVector))
   {
     LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is a Vector", name.c_str()));
-    out += startTag2(indent, "", false, false);
+    out += startTag(indent);
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
-      out += childV[ix]->render(ciP, indent + "  ");
+      out += childV[ix]->render(apiVersion, indent + "  ");
     }
 
-    out += endTag(indent, jsonComma, false, true);
+    out += endTag(indent, jsonComma, false);
   }
   else if (valueType == orion::ValueTypeObject)
   {
     if (rootP != this)
     {
       LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is NOT a Vector", name.c_str()));     
-      out += startTag2(indent, key, false, true);
+      out += startTag(indent, key);
 
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
       {
-        out += childV[ix]->render(ciP, indent + "  ");
+        out += childV[ix]->render(apiVersion, indent + "  ");
       }
 
-      out += endTag(indent, jsonComma, false, true);
+      out += endTag(indent, jsonComma, false);
     }
     else
     {
       LM_T(LmtCompoundValueRender, ("I am the TREE ROOT (%s)", name.c_str()));
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
       {
-        out += childV[ix]->render(ciP, indent);
+        out += childV[ix]->render(apiVersion, indent);
       }
     }
   }
@@ -740,15 +791,17 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, const std::string& in
 /* ****************************************************************************
 *
 * toJson -
+*
+* FIXME P3: isLastElement is not used and should be removed
 */
-std::string CompoundValueNode::toJson(bool isLastElement)
+std::string CompoundValueNode::toJson(bool isLastElement, bool comma)
 {
   std::string  out       = "";
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
   std::string  key       = (container->valueType == orion::ValueTypeVector)? "item" : name;
 
   // No "comma after" if toplevel
-  if (container == this)
+  if ((container == this) || (comma == false))
   {
     jsonComma = false;
   }
@@ -803,6 +856,16 @@ std::string CompoundValueNode::toJson(bool isLastElement)
       out = JSON_STR(key) + ":" + "null";
     }
   }
+  else if ((valueType == orion::ValueTypeVector) && (renderName == true))
+  {
+    out += JSON_STR(name) + ":[";
+    for (uint64_t ix = 0; ix < childV.size(); ++ix)
+    {
+      out += childV[ix]->toJson(false);
+    }
+
+    out += "]";
+  }
   else if ((valueType == orion::ValueTypeVector) && (container == this))
   {
     //
@@ -835,6 +898,22 @@ std::string CompoundValueNode::toJson(bool isLastElement)
     }
 
     out += "]";
+  }
+  else if ((valueType == orion::ValueTypeObject) && (renderName == true))
+  {
+    if (name == "toplevel")
+    {
+      name ="value";
+    }
+
+    out += JSON_STR(name) + ":{";
+
+    for (uint64_t ix = 0; ix < childV.size(); ++ix)
+    {
+      out += childV[ix]->toJson(ix == childV.size() - 1);
+    }
+
+    out += "}";
   }
   else if ((valueType == orion::ValueTypeObject) && (container->valueType == orion::ValueTypeVector))
   {

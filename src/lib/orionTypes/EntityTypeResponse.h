@@ -44,9 +44,17 @@ class EntityTypeResponse
   EntityType    entityType;
   StatusCode    statusCode;
 
-  std::string   render(ConnectionInfo* ciP, const std::string& indent);
-  std::string   toJson(ConnectionInfo* ciP);
-  std::string   check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
+  std::string   render(ApiVersion          apiVersion,
+                       bool                asJsonObject,
+                       bool                asJsonOut,
+                       bool                collapsed,
+                       const std::string&  indent);
+  std::string   toJson(void);
+  std::string   check(ApiVersion          apiVersion,
+                      bool                asJsonObject,
+                      bool                asJsonOut,
+                      bool                collapsed,
+                      const std::string&  predetectedError);
   void          present(const std::string& indent);
   void          release(void);
 };

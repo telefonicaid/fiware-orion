@@ -46,14 +46,13 @@
 std::string EntityIdVector::render(const std::string& indent, bool comma)
 {
   std::string out = "";
-  std::string key = "entities";
 
   if (vec.size() == 0)
   {
     return "";
   }
 
-  out += startTag2(indent, key, true, true);
+  out += startTag(indent, "entities", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     out += vec[ix]->render(indent + "  ", ix != vec.size() - 1, true);
@@ -72,11 +71,8 @@ std::string EntityIdVector::render(const std::string& indent, bool comma)
 */
 std::string EntityIdVector::check
 (
-  ConnectionInfo*     ciP,
-  RequestType         requestType,  
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
+  RequestType         requestType,
+  const std::string&  indent
 )
 {
   // Only OK to be empty if part of a ContextRegistration
@@ -97,7 +93,7 @@ std::string EntityIdVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(requestType, indent)) != "OK")
     {
       alarmMgr.badInput(clientIp, "invalid vector of EntityIds");
       return res;
@@ -244,7 +240,7 @@ void EntityIdVector::fill(EntityVector& _vec)
   for (unsigned int ix = 0; ix < _vec.size(); ++ix)
   {
     Entity*   entityP   = _vec[ix];
-    EntityId* entityIdP = new EntityId(entityP->id, entityP->type, entityP->isPattern);
+    EntityId* entityIdP = new EntityId(entityP->id, entityP->type, entityP->isPattern, entityP->isTypePattern);
 
     vec.push_back(entityIdP);
   }

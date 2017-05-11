@@ -28,8 +28,8 @@ dbInit CB
 dbInit ${CB_DB_NAME} t_01
 dbInit ${CB_DB_NAME} t_02
 brokerStart CB 0-255 IPV4 -multiservice
-accumulatorStart 
-accumulatorStart 127.0.0.1 $LISTENER2_PORT
+accumulatorStart  --pretty-print
+accumulatorStart 127.0.0.1 $LISTENER2_PORT --pretty-print
 
 --SHELL--
 
@@ -243,6 +243,7 @@ Date: REGEX(.*)
 5. Dump accumulator t_01
 +++++++++++++++++++++++++
 POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 470
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
@@ -252,34 +253,35 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Test",
-        "isPattern" : "false",
-        "id" : "E",
-        "attributes" : [
-          {
-            "name" : "att",
-            "type" : "test",
-            "value" : "accu_t01"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "att",
+                        "type": "test",
+                        "value": "accu_t01"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "Test"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 
 6. Dump accumulator t_02
 +++++++++++++++++++++++++
 POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 470
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
@@ -289,28 +291,28 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Test",
-        "isPattern" : "false",
-        "id" : "E",
-        "attributes" : [
-          {
-            "name" : "att",
-            "type" : "test",
-            "value" : "accu_t02"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "att",
+                        "type": "test",
+                        "value": "accu_t02"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "Test"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 

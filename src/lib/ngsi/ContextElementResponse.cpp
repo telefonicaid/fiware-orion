@@ -33,7 +33,6 @@
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi/AttributeList.h"
 #include "ngsi10/QueryContextResponse.h"
-#include "rest/ConnectionInfo.h"
 
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
@@ -103,7 +102,7 @@ static bool includedAttribute(const ContextAttribute& attr, const AttributeList&
   // This is the case in which the queryContextRequest doesn't include attributes,
   // so all the attributes are included in the response
   //
-  if (attrsV.size() == 0)
+  if (attrsV.size() == 0 || attrsV.lookup(ALL_ATTRS))
   {
     return true;
   }
@@ -135,9 +134,7 @@ ContextElementResponse::ContextElementResponse
   const mongo::BSONObj&  entityDoc,
   const AttributeList&   attrL,
   bool                   includeEmpty,
-  bool                   includeCreDate,
-  bool                   includeModDate,
-  const std::string&     apiVersion
+  ApiVersion             apiVersion
 )
 {
   prune = false;
@@ -163,14 +160,14 @@ ContextElementResponse::ContextElementResponse
   // Attribute vector
   // FIXME P5: constructor for BSONObj could be added to ContextAttributeVector/ContextAttribute classes, to make building more modular
   //
-  BSONObj                attrs = getFieldF(entityDoc, ENT_ATTRS).embeddedObject();
+  BSONObj                attrs = getObjectFieldF(entityDoc, ENT_ATTRS);
   std::set<std::string>  attrNames;
 
   attrs.getFieldNames(attrNames);
   for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
     std::string        attrName = *i;
-    BSONObj            attr     = getFieldF(attrs, attrName).embeddedObject();
+    BSONObj            attr     = getObjectFieldF(attrs, attrName);
     ContextAttribute*  caP      = NULL;
     ContextAttribute   ca;
 
@@ -179,7 +176,7 @@ ContextElementResponse::ContextElementResponse
     std::string mdId  = idPart(attrName);
     ca.type           = getStringFieldF(attr, ENT_ATTRS_TYPE);
 
-    // Skip attribute if the attribute is in the list (or attrL is empty)
+    // Skip attribute if the attribute is in the list (or attrL is empty or includes "*")
     if (!includedAttribute(ca, attrL))
     {
       continue;
@@ -205,7 +202,7 @@ ContextElementResponse::ContextElementResponse
         break;
 
       case NumberDouble:
-        ca.numberValue = getFieldF(attr, ENT_ATTRS_VALUE).Number();
+        ca.numberValue = getNumberFieldF(attr, ENT_ATTRS_VALUE);
         caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
         break;
 
@@ -227,12 +224,17 @@ ContextElementResponse::ContextElementResponse
       case Object:
         caP = new ContextAttribute(ca.name, ca.type, "");
         caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
+        caP->valueType = orion::ValueTypeObject;
         compoundObjectResponse(caP->compoundValueP, getFieldF(attr, ENT_ATTRS_VALUE));
         break;
 
       case Array:
         caP = new ContextAttribute(ca.name, ca.type, "");
         caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
+        // FIXME P7: next line is counterintuitive. If the object is a vector, why
+        // we need to use ValueTypeObject here? Because otherwise Metadata::toJson()
+        // method doesn't work. A littely crazy... it should be fixed.
+        caP->valueType = orion::ValueTypeObject;
         compoundVectorResponse(caP->compoundValueP, getFieldF(attr, ENT_ATTRS_VALUE));
         break;
 
@@ -248,7 +250,7 @@ ContextElementResponse::ContextElementResponse
       caP->metadataVector.push_back(md);
     }
 
-    if (apiVersion == "v1")
+    if (apiVersion == V1)
     {
       /* Setting location metadata (if found) */
       if ((locAttr == ca.name) && (ca.type != GEO_POINT))
@@ -263,34 +265,41 @@ ContextElementResponse::ContextElementResponse
     /* Setting custom metadata (if any) */
     if (attr.hasField(ENT_ATTRS_MD))
     {
-
-      BSONObj                mds = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
+      BSONObj                mds = getObjectFieldF(attr, ENT_ATTRS_MD);
       std::set<std::string>  mdsSet;
 
       mds.getFieldNames(mdsSet);
       for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
       {
         std::string currentMd = *i;
-        Metadata*   md = new Metadata(dbDotDecode(currentMd), getFieldF(mds, currentMd).embeddedObject());
+        Metadata*   md = new Metadata(dbDotDecode(currentMd), getObjectFieldF(mds, currentMd));
         caP->metadataVector.push_back(md);
       }
+    }
+
+    /* Set creDate and modDate at attribute level */
+    if (attr.hasField(ENT_ATTRS_CREATION_DATE))
+    {
+      caP->creDate = (double) getIntOrLongFieldAsLongF(attr, ENT_ATTRS_CREATION_DATE);
+    }
+
+    if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
+    {
+      caP->modDate = (double) getIntOrLongFieldAsLongF(attr, ENT_ATTRS_MODIFICATION_DATE);
     }
 
     contextElement.contextAttributeVector.push_back(caP);
   }
 
-  /* creDate and modDate as "virtual" attributes. The entityDoc.hasField(...) part is a safety meassure to prevent entities created with
-   * very old Orion version which didn't implement creation/modification date */
-  if (includeCreDate && entityDoc.hasField(ENT_CREATION_DATE))
+  /* Set creDate and modDate at entity level */
+  if (entityDoc.hasField(ENT_CREATION_DATE))
   {
-    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, (double) getIntOrLongFieldAsLongF(entityDoc, ENT_CREATION_DATE));
-    contextElement.contextAttributeVector.push_back(caP);
+    contextElement.entityId.creDate = (double) getIntOrLongFieldAsLongF(entityDoc, ENT_CREATION_DATE);
   }
 
-  if (includeModDate && entityDoc.hasField(ENT_MODIFICATION_DATE))
+  if (entityDoc.hasField(ENT_MODIFICATION_DATE))
   {
-    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, (double) getIntOrLongFieldAsLongF(entityDoc, ENT_MODIFICATION_DATE));
-    contextElement.contextAttributeVector.push_back(caP);
+    contextElement.entityId.modDate = (double) getIntOrLongFieldAsLongF(entityDoc, ENT_MODIFICATION_DATE);
   }
 }
 
@@ -315,18 +324,18 @@ ContextElementResponse::ContextElementResponse(ContextElement* ceP, bool useDefa
 */
 std::string ContextElementResponse::render
 (
-  ConnectionInfo*     ciP,
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
   RequestType         requestType,
   const std::string&  indent,
   bool                comma,
   bool                omitAttributeValues
 )
 {
-  std::string key = "contextElement";
   std::string out = "";
 
-  out += startTag2(indent, key, false, false);
-  out += contextElement.render(ciP, requestType, indent + "  ", true, omitAttributeValues);
+  out += startTag(indent);
+  out += contextElement.render(apiVersion, asJsonObject, requestType, indent + "  ", true, omitAttributeValues);
   out += statusCode.render(indent + "  ", false);
   out += endTag(indent, comma, false);
 
@@ -339,11 +348,17 @@ std::string ContextElementResponse::render
 *
 * ContextElementResponse::toJson - 
 */
-std::string ContextElementResponse::toJson(RenderFormat renderFormat, const std::vector<std::string>& attrsFilter, bool blacklist)
+std::string ContextElementResponse::toJson
+(
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter,
+  const std::vector<std::string>&  metadataFilter,
+  bool                             blacklist
+)
 {
   std::string out;
 
-  out = contextElement.toJson(renderFormat, attrsFilter, blacklist);
+  out = contextElement.toJson(renderFormat, attrsFilter, metadataFilter, blacklist);
 
   return out;
 }
@@ -368,7 +383,7 @@ void ContextElementResponse::release(void)
 */
 std::string ContextElementResponse::check
 (
-  ConnectionInfo*     ciP,
+  ApiVersion          apiVersion,
   RequestType         requestType,
   const std::string&  indent,
   const std::string&  predetectedError,
@@ -377,7 +392,7 @@ std::string ContextElementResponse::check
 {
   std::string res;
 
-  if ((res = contextElement.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
+  if ((res = contextElement.check(apiVersion, requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }

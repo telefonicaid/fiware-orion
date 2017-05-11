@@ -28,7 +28,10 @@
 
 #include <string>
 #include <vector>
+
 #include "common/string.h"
+#include "common/globals.h"
+#include "logMsg/logMsg.h"
 #include "ngsi/ContextAttribute.h"
 #include "parse/CompoundValueNode.h"
 
@@ -100,7 +103,7 @@ static bool getGeoJson
   const ContextAttribute*  caP,
   BSONObjBuilder*          geoJson,
   std::string*             errDetail,
-  const std::string        apiVersion
+  ApiVersion               apiVersion
 )
 {
   double               aLat;
@@ -109,7 +112,7 @@ static bool getGeoJson
   std::vector<double>  coordLong;
   BSONArrayBuilder     ba;
 
-  if ((apiVersion == "v1") || (caP->type == GEO_POINT))
+  if ((apiVersion == V1) || (caP->type == GEO_POINT))
   {
     if (!string2coords(caP->stringValue, aLat, aLong))
     {
@@ -256,7 +259,7 @@ bool processLocationAtEntityCreation
   std::string*                   locAttr,
   BSONObjBuilder*                geoJson,
   std::string*                   errDetail,
-  const std::string&             apiVersion,
+  ApiVersion                     apiVersion,
   OrionError*                    oe
 )
 {
@@ -311,7 +314,7 @@ bool processLocationAtUpdateAttribute
   const ContextAttribute*        targetAttr,
   mongo::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
-  const std::string&             apiVersion,
+  ApiVersion                     apiVersion,
   OrionError*                    oe
 )
 {
@@ -378,7 +381,7 @@ bool processLocationAtUpdateAttribute
    * The behaviour is differenet depending on NGSI version */
   else if (*currentLocAttrName == targetAttr->name)
   {
-    if (apiVersion == "v1")
+    if (apiVersion == V1)
     {
       /* In this case, no-location means that the target attribute doesn't have the "location" metadata. In order
        * to mantain backwards compabitibility, this is interpreted as a location update */
@@ -411,7 +414,7 @@ bool processLocationAtAppendAttribute
   bool                           actualAppend,
   mongo::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
-  const std::string&             apiVersion,
+  ApiVersion                     apiVersion,
   OrionError*                    oe
 )
 {
@@ -473,6 +476,15 @@ bool processLocationAtAppendAttribute
       }
       *currentLocAttrName = targetAttr->name;
     }
+
+    /* Case 2c: all pre-conditions ok -> update location with the new value */
+    if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
+    {
+      *errDetail = "error parsing location attribute: " + subErr;
+      oe->fill(SccBadRequest, *errDetail, "BadRequest");
+      return false;
+    }
+    return true;
   }
   /* Check 3: in the case of append-as-update, type changes from location -> no-location for the current location
    * attribute, then remove location attribute */

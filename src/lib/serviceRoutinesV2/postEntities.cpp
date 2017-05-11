@@ -81,7 +81,7 @@ std::string postEntities
 {
   Entity*  eP = &parseDataP->ent.res;
 
-  if (!legalEntityLength(eP, ciP->servicePath))
+  if (!legalEntityLength(eP, ciP->httpHeaders.servicePath))
   {
     OrionError oe(SccBadRequest, "Too long entity id/type/servicePath combination", "BadRequest");
     eP->release();
@@ -100,12 +100,21 @@ std::string postEntities
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP, NGSIV2_FLAVOUR_ONCREATE);
 
-  // 03. Check error
+  //
+  // 03. Check error - 3 different ways to get an error from postUpdateContext ... :-(
+  //     FIXME P4: make postUpdateContext have ONE way to return errors. See github issue #2763
+  //
   std::string  answer = "";
-  if (parseDataP->upcrs.res.oe.code != SccNone )
+  if (parseDataP->upcrs.res.oe.code != SccNone)
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
     ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+  }
+  else if (parseDataP->upcrs.res.errorCode.code != SccOk)
+  {
+    ciP->httpStatusCode = parseDataP->upcrs.res.errorCode.code;
+    TIMED_RENDER(answer = parseDataP->upcrs.res.errorCode.toJson(true));
+    ciP->answer         = answer;
   }
   else
   {

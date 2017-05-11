@@ -1,10 +1,10 @@
 FORMAT: 1A
 HOST: http://orion.lab.fiware.org
-TITLE: FIWARE-NGSI v2 Specification
-DATE: 30 September 2015
-VERSION: 2.0-latest
-PREVIOUS_VERSION: <placeholder>
-APIARY_PROJECT: fiware-ngsi-v2
+TITLE: FIWARE-NGSI v2 Specification (WIP)
+DATE: to be fixed upon next RC production
+VERSION: latest
+PREVIOUS_VERSION: stable
+APIARY_PROJECT: orioncontextbroker
 SPEC_URL: https://telefonicaid.github.io/fiware-orion/api/v2/
 GITHUB_SOURCE: http://github.com/telefonicaid/fiware-orion.git
 
@@ -45,9 +45,12 @@ In addition, note that a list of currently open discussions is available at
 
 ## Copyright
 
+Copyright (c) 2011-2016 Telecom Italia, Telefónica I+D and NEC. 
+
+## License
+
 This specification is licensed under the
-[FIWARE Open Specification License (implicit patent license)]
-(http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_Open_Specification_Legal_Notice_(implicit_patents_license)).
+[FIWARE Open Specification License (implicit patent license)](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Implicit_Patents_License).
 
 ## Conformance
 
@@ -83,7 +86,7 @@ The FIWARE NGSI (Next Generation Service Interface) API defines
 The main elements in the NGSI data model are context entities, attributes and metadata,
 as shown in the figure below.
 
-![NGSI data model](https://raw.githubusercontent.com/telefonicaid/fiware-orion/develop/doc/apiary/v2/Ngsi-data-model.png)
+![NGSI data model](https://raw.githubusercontent.com/telefonicaid/fiware-orion/master/doc/apiary/v2/Ngsi-data-model.png)
 
 #### Context Entities
 
@@ -338,22 +341,52 @@ meaning:
 }
 ```
 
-## Virtual Attributes
+* `geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`. They have special semantics
+  related with entity location. See "Geospatial properties of entities" section.
+
+## System/builtin Attributes
 
 There are entity properties that are not directly modifiable by NGSIv2 clients, but that can be
 rendered by NGSIv2 servers to provide extra information. From a representation point of view, they
 are just like regular attributes, with name, value and type.
 
-Virtual attributes are not rendered by default. In order to render a specific attribute, add its
-name to the `options` URL parameter.
+System/builtin attributes are not rendered by default. In order to render a specific attribute, add its
+name to the `attrs` parameter in URLs (or payload field in POST /v2/op/query operation) or
+subscription (`attrs` sub-field within `notification`).
 
-The list of virtual attributes is as follows:
+The list of system/builtin attributes is as follows:
 * `dateCreated` (type: `DateTime`): entity creation date as an ISO 8601 string.
 * `dateModified` (type: `DateTime`): entity modification date as an ISO 8601 string.
 
-
-Like regular attributes, they can be  used in `attrs`, `q` filters and `orderBy`.
+Like regular attributes, they can be  used in `q` filters and in `orderBy`.
 However, they cannot be used in resource URLs.
+
+## System/builtin Metadata
+
+Some attribute properties are not directly modifiable by NGSIv2 clients, but they can be
+rendered by NGSIv2 servers to provide extra information. From a representational point of view, they
+are just like regular metadata, with name, value, and type.
+
+System/builtin metadata are not rendered by default. In order to render a specific metadata, add its
+name to the `metadata` URL parameter (or payload field in POST /v2/op/query operation) or
+subscription (`metadata` sub-field within `notification`).
+
+The list of system/builtin metadata is as follows:
+
+* `dateCreated` (type: `DateTime`): attribute creation date as an ISO 8601 string.
+
+* `dateModified` (type: `DateTime`): attribute modification date as an ISO 8601 string.
+
+* `previousValue` (type: any): only in notifications. The value of this metadata is the previous
+  value (to the request triggering the notification) of the associated attribute. The type of this metadata
+  must be the previous type of the associated attribute. If the type/value of `previousValue` is the same
+  type/value as in the associated attribute, then the attribute has not actually changed its value.
+
+* `actionType` (type: `Text`): only in notifications.  It is included if the attribute to which it is attached
+  was included in the request that triggered the notification. Its value depends on the request operation
+  type: `update` for updates, `append` for creation and `delete` for deletion. Its type is always `Text`.
+
+Like regular metadata, they can be  used in `mq` filters. However, they cannot be used in resource URLs.
 
 ## Field syntax restrictions
 
@@ -391,7 +424,19 @@ The following strings must not be used as attribute names:
 * `geo:distance`, as it would conflict with the string used in `orderBy` for proximity to
   center point.
 
-* Virtual attribute names (see specific section on "Virtual Attributes")
+* System/builtin attribute names (see specific section on "System/builtin Attributes")
+
+* `*`, as it has a special meaning as "all the custom/user attributes" (see section on
+  "Filtering out attributes and metadata").
+
+## Metadata names restrictions
+
+The following strings must not be used as metadata names:
+
+* System/builtin metadata names (see specific section on "System/builtin Metadata")
+
+* `*`, as it has a special meaning as "all the custom/user metadata" (see section on
+  "Filtering out attributes and metadata").
 
 ## Ordering Results
 
@@ -402,7 +447,7 @@ The value of `orderBy` can be:
 * The keyword `geo:distance` to order results by distance to a reference geometry when a "near"
   (`georel=near`) spatial relationship is used. 
 
-* A comma-separated list of attributes (including virtual attributes), e.g. `temperature,!humidity`.
+* A comma-separated list of attributes (including system/builtin attributes), e.g. `temperature,!humidity`.
   Results are ordered by the first attribute. On ties, the results are ordered by the second
   attribute and so on. A "!" before the attribute name means that the order is reversed.
 
@@ -428,7 +473,8 @@ Error list (HTTP response code in parenthesis):
   identification
   used in the request.
 * ContentLengthRequired (`411`). Zero/No Content-Length in PUT/POST/PATCH request.
-* RequestEntityTooLarge (`413`). Payload is too large.
+* RequestEntityTooLarge (`413`). Payload is too large. The specific limit to consider a payload too large depends
+                                 on the particular implementation.
 * UnsupportedMediaType  (`415`). Request content type is not supported.
 * InvalidModification   (`422`). Some piece of information is missing in payload.
 * NotSupportedQuery     (`422`). The implementation does not support the query issued.
@@ -665,13 +711,15 @@ The symbol `:` can be used instead of `==`.
 
 In the case of equal or unequal, if s string to match includes a `,`, you can use simple quote
 (`'`) to disable the special meaning of the comma,  e.g: `color=='light,green','deep,blue'`.
-The first example would match a color with the exact value 'light,green' OR 'deep,blue'.
+The first example would match a color with the exact value 'light,green' OR 'deep,blue'. The
+simple quote syntax can be also used to force string interpretation in filters, e.g.
+`q=title=='20'` will match string "20" but not number 20.
 
 Unary negatory statements use the unary operator `!`, while affirmative unary statements use no
 operator at all.
 The unary statements are used to check for the existence of the *target property*.
 E.g. `temperature` matches entities that have an attribute called 'temperature' (no matter its
-value), while `!temperature` matches entities that do not have a temperature called 'attribute'.
+value), while `!temperature` matches entities that do not have an attribute called 'temperature'.
  
 ## Geographical Queries
 
@@ -756,6 +804,35 @@ must be sent.
 
 * If there is more than one attribute exposing location labeled as *default location*, then the
   query is declared ambiguous and an HTTP error response with a ``409`` code must be sent. 
+
+## Filtering out attributes and metadata
+
+The `attrs` URL parameter (or field in POST /v2/op/query) can be used in retrieve operations
+to specify the list of attributes that must be included in the response. In a similar way, the
+`metadata` URL parameter (or field in POST /v2/op/query) can be used to specify the list of metadata
+that must be included in the response.
+
+By default, if `attrs` is omitted (or `metadata` is omitted) then all the attributes (all the
+metadata) are included, except system/builtin attributes (metadata). In order to include
+system/builtin attributes (metadata) they have to be explicitly included in `attrs` (`metadata`).
+
+E.g. to include only attributes A and B:
+
+`attrs=A,B`
+
+Note that including *only* system/builtin attributes (metadata) will avoid any user-defined
+attribute (metadata). If you want to include system/builtin attributes (metadata) *and* user-defined
+attributes (metadata) at the same time then
+
+* The user-defined attributes (metadata) have to be explictly included, e.g. to include the user-defined
+  attributes A and B along with the system/builtin attribute `dateModified`, use: `attrs=dateModified,A,B`.
+* The special value `*` can be used as an alias meaning "all user-defined attributes (metadata)", e.g.,
+  to include all the user-defined attributes along with the system/builtin attribute `dateModified`
+  use: `attrs=dateModified,*`.
+
+Note that the `attrs` and `metadata` fields can be used also in subscriptions (as sub-fields of `notification`)
+with the same meaning to specify which attributes (metadata) to include in notifications associated
+to that subscription.
 
 ## Notification Messages
 
@@ -931,10 +1008,11 @@ to keep your client decoupled from implementation details.
 
 # Group Entities
 
-### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,orderBy}]
+### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]
 
 Retrieves a list of entities that match different criteria by id, type, pattern matching (either id or type)
-and/or those which match a query or geographical query. A given entity has to match all the criteria to be retrieved
+and/or those which match a query or geographical query (see [Simple Query Language](#simple_query_language) and 
+[Geographical Queries](#geographical_queries)). A given entity has to match all the criteria to be retrieved
 (i.e., the criteria is combined in a logical AND way). Note that pattern matching query parameters are incompatible
 (i.e. mutually exclusive) with their corresponding exact matching parameters, i.e. `idPattern` with `id` and
 `typePattern` with `type`.
@@ -988,6 +1066,10 @@ Response code:
       are to be included in the response.
       The attributes are retrieved in the order specified by this parameter. If this parameter is
       not included, the attributes are retrieved in arbitrary order.
+      See "Filtering out attributes and metadata" section for more detail.
+
+    + metadata: accuracy (optional, string) - A list of metadata names to include in the response.
+      See "Filtering out attributes and metadata" section for more detail.
 
     + orderBy: temperature,!speed (optional, string) - Criteria for ordering results.
       See "Ordering Results" section for details.
@@ -1007,7 +1089,7 @@ Response code:
 
 + Response 200 (application/json)
 
-       [
+        [
          {
            "type": "Room",
            "id": "DC_S1-D41",
@@ -1044,7 +1126,7 @@ Response code:
              }
            }
          }
-       ]
+        ]
 
 ### Create entity [POST /v2/entities{?options}]
 
@@ -1095,7 +1177,7 @@ Response:
 
 ## Entity by ID [/v2/entities/{entityId}{?type,attrs,options}]
 
-### Retrieve entity [GET /v2/entities/{entityId}{?type,attrs,options}]
+### Retrieve entity [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]
 
 The response is an object representing the entity identified by the ID. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section).
@@ -1115,9 +1197,11 @@ Response:
       entities with the same entity id.
     + attrs: temperature,humidity (optional, string) - Comma-separated list of attribute names whose
       data must be included in the response. The attributes are retrieved in the order specified by
-      this parameter.
+      this parameter. See "Filtering out attributes and metadata" section for more detail.
       If this parameter is not included, the attributes are retrieved in arbitrary order, and all
       the attributes of the entity are included in the response.
+    + metadata: accuracy (optional, string) - A list of metadata names to include in the response.
+      See "Filtering out attributes and metadata" section for more detail.
     + options (optional, string) - Options dictionary
       + Members
           + keyValues - when used, the response payload uses the `keyValues` simplified entity
@@ -1153,7 +1237,7 @@ Response:
           }
         }
 
-### Retrieve entity attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,options}]
+### Retrieve entity attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]
 
 This request is similar to retreiving the whole entity, however this one omits the `id` and `type`
 fields.
@@ -1178,6 +1262,9 @@ Response:
       by this parameter.
       If this parameter is not included, the attributes are retrieved in arbitrary order, and all
       the attributes of the entity are included in the response.
+      See "Filtering out attributes and metadata" section for more detail.
+    + metadata: accuracy (optional, string) - A list of metadata names to include in the response.
+      See "Filtering out attributes and metadata" section for more detail.
     + options (optional, string) - Options dictionary
       + Members
           + keyValues - when used, the response payload uses the `keyValues` simplified entity
@@ -1205,7 +1292,7 @@ Response:
             "metadata": {
               "crs": {
                 "value": "WGS84",
-                "type": "String"
+                "type": "Text"
               }
             }
           }
@@ -1350,14 +1437,14 @@ Response:
 
 ## Attribute by Entity ID [/v2/entities/{entityId}/attrs/{attrName}{?type}]
 
-### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}{?type}]
+### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}{?type,metadata}]
 
 Returns a JSON object with the attribute data of the attribute. The object follows the JSON
 representation for attributes (described in "JSON Attribute Representation" section).
 
 Response:
 
-* Successful operation uses 20O OK.
+* Successful operation uses 200 OK.
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
@@ -1366,6 +1453,8 @@ Response:
     + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
       entities with the same entity id.
     + attrName: temperature (required, string) - Name of the attribute to be retrieved.
+    + metadata: accuracy (optional, string) - A list of metadata names to include in the response.
+      See "Filtering out attributes and metadata" section for more detail.
 
 + Response 200 (application/json)
 
@@ -1446,7 +1535,7 @@ This operation returns the `value` property with the value of the attribute.
 
 Response:
 
-* Successful operation uses 20O OK.
+* Successful operation uses 200 OK.
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
@@ -1454,7 +1543,7 @@ Response:
     + entityId: Bcn_Welt (required, string) - Id of the entity in question
     + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
       entities with the same entity id.
-    + attrName: temperature (required, string) - Name of the attribute to be retrieved.
+    + attrName: address (required, string) - Name of the attribute to be retrieved.
 
 + Response 200 (application/json)
 
@@ -1493,7 +1582,7 @@ Response:
     + entityId: Bcn_Welt (required, string) - Id of the entity to be updated.
     + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
       entities with the same entity id.
-    + attrName: temperature (required, string) - Attribute name.
+    + attrName: address (required, string) - Attribute name.
 
 + Request (application/json)
 
@@ -1630,6 +1719,8 @@ A subscription is represented by a JSON object with the following fields:
   If this field is not provided at subscription creation time, new subscriptions are created with
   the `active` status, which can be changed by clients afterwards. For expired subscriptions, this
   attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`).
+  Also, for subscriptions experiencing problems with notifications, the status is set to `failed`.
+  As soon as the notifications start working again, the status is changed back to `active`.
 + `throttling`: Minimal period of time in seconds which must elapse between two consecutive
   notifications. It is optional.
 
@@ -1652,7 +1743,7 @@ A `notification` object contains the following subfields:
   + `attrs`: List of attributes to be included in notification messages. It also defines the
     order in which attributes must appear in notifications when `attrsFormat` `value` is used
     (see "Notification Messages" section). An empty list means that all attributes are to be
-    included in notifications.
+    included in notifications. See "Filtering out attributes and metadata" section for more detail.
   + `exceptAttrs`: List of attributes to be excluded from the notification message, i.e.
      a notification message includes all entity attributes except the ones listed in this field.
   + If neither `attrs` nor `exceptAttrs` is specified, all attributes are included in
@@ -1663,9 +1754,15 @@ A `notification` object contains the following subfields:
   Accepted values are `normalized` (default), `keyValues` or `values`.
   If `attrsFormat` takes any value different
   than those, an error is raised. See detail in "Notification Messages" section.
++ `metadata` (optional): List of metadata to be included in notification messages.
+  See "Filtering out attributes and metadata" section for more detail.
 + `timesSent` (not editable, only present in GET operations): Number of notifications sent due to
    this subscription.
-+ `lastNotification` (not editable, only present in GET operations): Last notification date in ISO8601 format.
++ `lastNotification` (not editable, only present in GET operations): Last notification timestamp in ISO8601 format.
++ `lastFailure` (not editable, only present in GET operations): Last failure timestamp in ISO8601 format.
+  Not present if subscription has never had a problem with notifications.
++ `lastSuccess` (not editable, only present in GET operations): Timestamp in ISO8601 format for last successful notification.
+  Not present if subscription has never had a successful notification.
 
 An `http` object contains the following subfields:
 
@@ -1698,7 +1795,7 @@ Notification rules are as follow:
 
 ## Subscription List [/v2/subscriptions]
 
-### Retrieve subscriptions [GET /v2/subscriptions]
+### Retrieve subscriptions [GET /v2/subscriptions{?limit,offset,options}]
 
 Returns a list of all the subscriptions present in the system.
 
@@ -1749,10 +1846,11 @@ Response:
               "attrsFormat": "keyValues",
               "attrs": ["temperature", "humidity"],
               "timesSent": 12,
-              "lastNotification": "2015-10-05T16:00:00.00Z"
+              "lastNotification": "2015-10-05T16:00:00.00Z",
+              "lastFailure": "2015-10-06T16:00:00.00Z"
             },
             "expires": "2016-04-05T14:00:00.00Z",
-            "status": "active",
+            "status": "failed",
             "throttling": 5
           }
         ]
@@ -1846,10 +1944,11 @@ Response:
             "attrs": ["temperature", "humidity"],
             "timesSent": 12,
             "lastNotification": "2015-10-05T16:00:00.00Z"
+            "lastSuccess": "2015-10-05T16:00:00.00Z"
           },
           "expires": "2016-04-05T14:00:00.00Z",
           "status": "active",
-          "throttling": 5,
+          "throttling": 5
         }
 
 
@@ -2079,9 +2178,22 @@ This operation allows to create, update and/or delete several entities in a sing
 The payload is an object with two properties:
 
 + `actionType`, to specify the kind of update action to do: either APPEND, APPEND_STRICT, UPDATE,
-  DELETE.
-+ `entities`, an array of entities, each one specified using the JSON entity representation format
+  DELETE, or REPLACE.
++ `entities`, an array of entities, each entity specified using the JSON entity representation format
   (described in the section "JSON Entity Representation").
+
+This operation is split in as many individual operations as entities in the `entities` vector, so
+the `actionType` is executed for each one of them. Depending on the `actionType`, a mapping with
+regular non-batch operations can be done:
+
+* APPEND: maps to `POST /v2/entities` (if the entity does not already exist) or `POST /v2/entities/<id>/attrs`
+  (if the entity already exists).
+* APPEND_STRICT: maps to `POST /v2/entities` (if the entity does not already exist) or
+  `POST /v2/entities/<id>/attrs?options=append` (if the entity already exists).
+* UPDATE: maps to `PATCH /v2/entities/<id>/attrs`.
+* DELETE: maps to `DELETE /v2/entities/<id>/attrs/<attrName>` on every attribute included in the entity or
+  to `DELETE /v2/entities/<id>` if no attribute were included in the entity.
+* REPLACE: maps to `PUT /v2/entities/<id>/attrs`.
 
 Response:
 
@@ -2146,6 +2258,8 @@ The payload may contain the following elements (all of them optional):
    JSON object with a `type` (a JSON string) and `value` (whose type depends on the `type`
    property).
    The different available scopes are described elsewhere.
++ `metadata`: a list of metadata names to include in the response.
+   See "Filtering out attributes and metadata" section for more detail.
 
 Response code:
 
@@ -2192,6 +2306,10 @@ Response code:
               "type": "FIWARE::...",
               "value": "..."
             }
+          ],
+          "metadata": [
+            "accuracy",
+            "timestamp"
           ]
         }
 

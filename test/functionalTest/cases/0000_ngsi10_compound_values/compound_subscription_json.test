@@ -26,7 +26,7 @@ Subscription sequence ONCHANGE with compound values JSON
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 echo "1: +++++++++ Prepare subscription +++++++++++"
@@ -185,6 +185,7 @@ Date: REGEX(.*)
     ]
 }
 POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 720
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
@@ -193,44 +194,45 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "T",
-        "isPattern" : "false",
-        "id" : "E",
-        "attributes" : [
-          {
-            "name" : "att",
-            "type" : "compound",
-            "value" : [
-              "22",
-              {
-                "x" : [
-                  "x1",
-                  "x2"
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "att",
+                        "type": "compound",
+                        "value": [
+                            "22",
+                            {
+                                "x": [
+                                    "x1",
+                                    "x2"
+                                ],
+                                "y": "3"
+                            },
+                            [
+                                "z1",
+                                "z2"
+                            ]
+                        ]
+                    }
                 ],
-                "y" : "3"
-              },
-              [
-                "z1",
-                "z2"
-              ]
-            ]
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 651
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
@@ -239,37 +241,37 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "T",
-        "isPattern" : "false",
-        "id" : "E",
-        "attributes" : [
-          {
-            "name" : "att",
-            "type" : "compound",
-            "value" : {
-              "x" : {
-                "x1" : "a",
-                "x2" : "b"
-              },
-              "y" : [
-                "y1",
-                "y2"
-              ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "att",
+                        "type": "compound",
+                        "value": {
+                            "x": {
+                                "x1": "a",
+                                "x2": "b"
+                            },
+                            "y": [
+                                "y1",
+                                "y2"
+                            ]
+                        }
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
             }
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 --TEARDOWN--

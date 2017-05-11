@@ -1,0 +1,245 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Bugfix for the subscription PATCH bug in notifications (from attrs to exceptAttrs)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create subscription
+# 02. Get subscription, see notification.attrs
+# 03. Patch subscription
+# 04. Get subscription again, see notification.exceptAttrs
+#
+
+echo "01. Create subscription"
+echo "======================="
+payload='{
+  "description": "One subscription to rule them all",
+  "subject": {
+    "entities": [
+      {
+        "id": "Room_3",
+        "type": "house"
+      },
+      {
+        "id": "Room_2",
+        "type": "house"
+      }
+    ],
+    "condition": {
+      "attrs": [ "temperature", "humidity" ],
+      "expression": {
+        "q": "temperature>40",
+        "mq": "temperature.accur<0.9",
+        "georel": "near;maxDistance:1000",
+        "geometry": "point",
+        "coords": "25.774,-80.190"
+      }
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1234"
+    },
+    "attrs": ["temperature", "humidity"],
+    "metadata": [ "previousValue", "actionType" , "*"],
+    "attrsFormat": "legacy"
+  },
+  "throttling": 5,
+  "expires": "2016-04-05T14:00:00.00Z",
+  "status": "inactive"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. Get subscription, see notification.attrs"
+echo "============================================"
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "03. Patch subscription"
+echo "======================"
+payload='
+{
+  "notification": {
+    "http": {
+      "url": "http://127.0.0.1:5678"
+    },
+    "exceptAttrs": ["tato", "ququ"]
+  }
+}'
+orionCurl -X PATCH --url /v2/subscriptions/$SUB_ID --payload "$payload"
+echo
+echo
+
+
+echo "04. Get subscription again, see notification.exceptAttrs"
+echo "========================================================"
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription
+=======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Get subscription, see notification.attrs
+============================================
+HTTP/1.1 200 OK
+Content-Length: 592
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "One subscription to rule them all",
+    "expires": "2016-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [
+            "temperature",
+            "humidity"
+        ],
+        "attrsFormat": "legacy",
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "metadata": [
+            "previousValue",
+            "actionType",
+            "*"
+        ]
+    },
+    "status": "expired",
+    "subject": {
+        "condition": {
+            "attrs": [
+                "temperature",
+                "humidity"
+            ],
+            "expression": {
+                "coords": "25.774,-80.190",
+                "geometry": "point",
+                "georel": "near;maxDistance:1000",
+                "mq": "temperature.accur<0.9",
+                "q": "temperature>40"
+            }
+        },
+        "entities": [
+            {
+                "id": "Room_3",
+                "type": "house"
+            },
+            {
+                "id": "Room_2",
+                "type": "house"
+            }
+        ]
+    },
+    "throttling": 5
+}
+
+
+03. Patch subscription
+======================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Get subscription again, see notification.exceptAttrs
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 545
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "One subscription to rule them all",
+    "expires": "2016-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrsFormat": "normalized",
+        "exceptAttrs": [
+            "tato",
+            "ququ"
+        ],
+        "http": {
+            "url": "http://127.0.0.1:5678"
+        }
+    },
+    "status": "expired",
+    "subject": {
+        "condition": {
+            "attrs": [
+                "temperature",
+                "humidity"
+            ],
+            "expression": {
+                "coords": "25.774,-80.190",
+                "geometry": "point",
+                "georel": "near;maxDistance:1000",
+                "mq": "temperature.accur<0.9",
+                "q": "temperature>40"
+            }
+        },
+        "entities": [
+            {
+                "id": "Room_3",
+                "type": "house"
+            },
+            {
+                "id": "Room_2",
+                "type": "house"
+            }
+        ]
+    },
+    "throttling": 5
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
