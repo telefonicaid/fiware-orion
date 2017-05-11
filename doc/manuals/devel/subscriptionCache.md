@@ -186,6 +186,15 @@ The second instance of Orion (*Orion 2* in figure [SC-02](#figure_sc02) below) k
 
 _Figure SC-02_  
 
+* Incoming request in Orion **Instance 1** (Orion 1) for a subscription creation/update (step 1). Let's call this subscription "Sub-X".
+* **Orion 1** stores "Sub-X" in the database (step 2).
+* **Orion 1** adds/updates "Sub-X" in its sub-cache (step 3).
+* `subCacheRefresh()` in **Orion 2** (when the next sleep ends in `subCacheRefresherThread()`), refreshes its sub-cache in step 4 by:
+    * emptying the sub-cache (after saving the special fields)
+    * reading in the subscriptions from the database (which is **when Orion 2 gets knowledge of "Sub-X"**)
+    * and in step 5:
+* In step 5, the sub-cache of **Orion 2** is merged with the database content and so "Sub-X" is now part of the sub-cache of **Orion 2**
+
 
 The case of the four special fields (lastNotificationTime, count, lastFailure, and lastSuccess) is a bit more complex as the *most recent* information of these fields lives **only** in the sub-cache. So, to propagate `lastNotificationTime` from one Orion (Orion1) to another (Orion2), first Orion1 needs to refresh its sub-cache and **after that**, Orion2 must refresh its sub-cache. Not before this happens, in that order, Orion2 will be aware of the `lastNotificationTime` coming from Orion1.
 
