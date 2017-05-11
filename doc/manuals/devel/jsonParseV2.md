@@ -1,33 +1,31 @@
 # JSON Parse NGSIv2
 
-NGSIv2 payloads are parsed in a very different manner than NGSIv1 payloads.  
+NGSIv2 payloads are parsed in a very different manner than NGSIv1 payloads. This document describes NGSIv2 parsing details. NGSIv1 parsing details are described in a [separate document](jsonParse.md).
+
 Instead of the centralized approach of NGSIv1 parse, an individual approach is used.
-The advantage of this approach is that the code is much easier to understand and to reuse, while the inconvenience is that some tasks,
-e.g. checks for unsupported fields are spread out in many different functions and this way it is easy for some of these checks to be forgotten.
+The advantage of this approach is that the code is much easier to understand and to reuse, while the inconvenience is that some tasks, e.g. checks for unsupported fields are spread out in many different functions and this way it is easy for some of these checks to be forgotten.
 The development team prefers this second approach however.  
 
-## Program Flow During NGSIv2 Parse
+## Parsing process
 To describe the flow of NGSIv2 parse, we need an example payload as the code is not generic but individual per request type.
-The request POST /v2/entities is used in this example flow:
+
+The request `POST /v2/entities` is used in this example flow:
 
 <a name='flow-pp-03'></a>
-![CACHE REFRESH IMAGE](images/Flow-PP-03.png)
+![Parsing an NGSIv2 payload](images/Flow-PP-03.png)
 
-_Figure PP-03_  
+_PP-03: Parsing an NGSIv2 payload_
 
-* payloadParse calls the NGSIv2 parse function for JSON payloads `jsonRequestTreat()` (Point 1).
-    jsonRequestTreat contains a switch on request types and calls the initial parse function for the type of the request.
-* In this example, the request type is EntitiesRequest and the initial parse function is parseEntity (Point 2).
-* In **Point 3**. rapidjson is invoked to parse the entire payload and return a tree of nodes that is now to be converted into an NGSI structure that Orion understands.  
-    The method used for parsing is: `rapidjson::Document::Parse()`.
-* parseEntity extracts the `Entity::Id`, `Entity::Type`, etc and then calls the underlying function for each attribute: `parseContextAttribute()` in **Point 4**.
-    `parseContextAttribute()` extracts `Attribute::name`, type, etc and then:
-* calls the underlying function `parseMetadataVector()` if any metadata are present (Point 5).
-* `parseMetadataVector()` calls `parseMetadata()` once for each metadata found in the vector (Point 6)
-* After the parse is ready, the NGSI object is verified to be correct by calling the `check()` method for the object (Point 7)
+* `payloadParse()` calls the NGSIv2 parse function for JSON payloads `jsonRequestTreat()` (step 1).
+* `jsonRequestTreat()` contains a switch on request types and calls the initial parse function for the type of the request. In this example, the request type is `EntitiesRequest` and the initial parse function is `parseEntity()` (step 2).
+* [rapidjson](http://rapidjson.org) is invoked to parse the entire payload and return a tree of nodes that is now to be converted into an NGSI structure that Orion understands.  The method used for parsing is: `rapidjson::Document::Parse()` (step 3).
+* `parseEntity()` extracts the `Entity::Id`, `Entity::Type`, etc. and then calls the underlying function for each attribute: `parseContextAttribute()` (step 4).
+* `parseContextAttribute()` extracts `Attribute::name`, type, etc and then calls the underlying function `parseMetadataVector()` if any metadata are present (step 5).
+* `parseMetadataVector()` calls `parseMetadata()` once for each metadata found in the vector (step 6).
+* After the parse is ready, the NGSI object is verified to be correct by calling the `check()` method for the object (step 7).
 
-Lets dive into the source code of one important function `parseEntity()`.
-To make the example shorter, a fictive function/macro `ERROR` is used here, but the full function can be viewed in `src/lib/jsonParseV2/parseEntity.cpp`.
+Lets dive into the source code of one important function `parseEntity()`. To make the example shorter, a fictive function/macro `ERROR` is used here, but the full function can be viewed in `src/lib/jsonParseV2/parseEntity.cpp`.
+
 Comments have been inserted to explain each step in the function.
 
 ```
@@ -98,24 +96,21 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 }
 ```
 
-`parseEntity()` is a toplevel parse function so it must call **rapidjson** to create the tree in RAM.
-*Lowlevel* parse functions don't actually parse anything as that is done by the toplevel parse function.
-Instead the lowlevel functions just examine the tree, which is passed to the functions as a rapidjson::Value, a node in the parsed tree.
+`parseEntity()` is a toplevel parse function so it must call **rapidjson** to create the tree in RAM.  *Lowlevel* parse functions (`parseContextAttribute()`, `parseMetadataVector()`, etc.)don't actually parse anything as that is done by the toplevel parse function. Instead the lowlevel functions just examine the tree, which is passed to the functions as a `rapidjson::Value`, a node in the parsed tree.
 
-Under `src/lib/jsonParseV2` there are a number (16 as of the time of writing this document) of modules that each take care
-of a part of the parsing of an entire request, such as `parseAttributeList.h/cpp` that parses a vector of strings.
+Under `src/lib/jsonParseV2` there are a number (16 as of the time of writing this document) of modules that each take care of a part of the parsing of an entire request, such as `parseAttributeList.h/cpp` that parses a vector of strings.
 
 ## jsonRequestTreat()
 The function `jsonRequestTreat()` is the entry point of NGSIv2 parsing and this function, examining the type of the payload calls one toplevel parse function or another.
-After parsing, the `check()` method of the resulting instance is invoked.
-All parse functions called by `jsonRequestTreat()` are, of course, toplevel parse functions:
 
-* parseEntity()
-* parseContextAttribute()
-* parseAttributeValue()
-* parseSubscription()
-* parseBatchQuery()
-* parseBatchUpdate()
+After parsing, the `check()` method of the resulting instance is invoked. All parse functions called by `jsonRequestTreat()` are, of course, toplevel parse functions:
+
+* `parseEntity()`
+* `parseContextAttribute()`
+* `parseAttributeValue()`
+* `parseSubscription()`
+* `parseBatchQuery()`
+* `parseBatchUpdate()`
 
 All parse functions called by any of these functions are, of course, lowlevel parse	functions.
 
