@@ -595,6 +595,8 @@ Taking this into account, the main functions within the `mongoConnectionPool` mo
 * `mongoPoolConnectionGet()`: get a free connection from pool
 * `mongoPoolConnectionRelease()`: release a connection, so it returns to the pool and it is ready to be selected again by next call of the `mongoConnectionGet()` function.
 
+A semaphore system is used to protect connection usage. You can have a look to [this separate document](semaphores.md#mongo-connection-pool-semaphores) for the details.
+
 [Top](#top)
 
 ### Low-level modules related with DB interaction

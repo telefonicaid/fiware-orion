@@ -10,7 +10,7 @@
 * [Identifying bootlenecks looking at semWait statistics](#identifying-bootlenecks-looking-at-semwait-statistics)
 * [Log impact in performance](#log-impact-in-performance)
 * [Metrics impact in performance](#metrics-impact-in-performance)
-* [Mutex policy impact in performance](#mutex-policy-impact-in-performance)
+* [Mutex policy impact on performance](#mutex-policy-impact-on-performance)
 * [Outgoing HTTP connections timeout](#outgoing-http-connections-timeout)
 * [Subscription cache](#subscription-cache)
 * [Geo-subscription performance considerations](#geo-subscription-performance-considerations)

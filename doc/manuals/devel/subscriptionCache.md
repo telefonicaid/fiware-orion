@@ -161,7 +161,14 @@ After having saved that important information in a vector, the entire sub-cache 
 
 After repopulation of the sub cache, the saved information in the `CachedSubSaved` vector is merged into the sub-cache and finally, the `CachedSubSaved` vector is merged into the database, using the function `mongoSubCountersUpdate`, see [special subscription fields](#special-subscription-fields).  
 
-This is a costly operation and the semaphore that protects the sub-cache must be taken during the entire process to guarantee a successful outcome.
+This is a costly operation and the semaphore that protects the sub-cache must be taken during the entire process to guarantee a successful outcome. As `subCacheSync()` calls a few function, these functions **must not** take the semaphore, but in case they are used separately, the caller must ensure the semaphore is taken before usage. Underlying functions may also **not** take the semaphore.
+
+The functions in question are:
+
+* `subCacheRefresh()`
+* `mongoSubCountersUpdate()`
+* `subCacheDestroy()` (used by `subCacheRefresh())`
+* `mongoSubCacheRefresh()` (used by `subCacheRefresh()`)
 
 See steps 3 to 5 and 15 to 16 in [diagram SC-01](#flow-sc-01).
 
