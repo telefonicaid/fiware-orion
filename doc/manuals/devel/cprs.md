@@ -5,7 +5,7 @@
 
 The Orion Context Broker, as explained in [the User & Programmers Manual](../user/context_providers.md), supports the concept of Context Providers. In short, when for an update/query, an entity/attribute is not found, Orion checks its list of registrations (NGSI9) and if found there, a request is forwarded to a Context Provider. The IP, port and path of the Context Provider is found in the field `providingApplication` of the `struct ContextRegistration` that is part of the registration request `RegisterContextRequest`.
 
-## Forwarding of Update Requests
+## Forwarding of update requests
 
 In NGSIv1, the request `POST /v1/updateContext` has a field called `updateActionType`. This field can take on five different values:
 
