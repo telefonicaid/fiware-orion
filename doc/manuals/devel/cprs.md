@@ -1,7 +1,7 @@
 # <a name="top"></a>Context Providers
 
 * [Forwarding of update requests](#forwarding-of-update-requests)
-* [Forwarding of query requests](#forwarding-of-query Requests)
+* [Forwarding of query requests](#forwarding-of-query-requests)
 
 The Orion Context Broker, as explained in [the User & Programmers Manual](../user/context_providers.md), supports the concept of Context Providers. In short, when for an update/query, an entity/attribute is not found, Orion checks its list of registrations (NGSI9) and if found there, a request is forwarded to a Context Provider. The IP, port and path of the Context Provider is found in the field `providingApplication` of the `struct ContextRegistration` that is part of the registration request `RegisterContextRequest`.
 
@@ -33,7 +33,7 @@ _FW-01: Forward an update to Context Providers_
 Note that there are a number of service routines that end up calling `postUpdateContext()` (see detail in [the service routines mapping document](ServiceRoutines.txt)).
 
 * All attributes in the incoming payload are marked as **Not Found** (step 1).
-* [**mongoBackend** library](README.md#srclibmongobackend) processes the request (see diagramas [MB-01](mongoBackend.md#flow-mb-01) or [MB-02](mongoBackend.md#flow-mb-02)) and marks all attributes in the requests in one of three possible ways (step 2):
+* [**mongoBackend** library](README.md#srclibmongobackend) processes the request (see diagrams [MB-01](mongoBackend.md#flow-mb-01) or [MB-02](mongoBackend.md#flow-mb-02)) and marks all attributes in the requests in one of three possible ways (step 2):
        * Not Found
        * Found in Local Broker
        * Found in Remote Context Provider
@@ -69,9 +69,9 @@ _FW-03: Forward a query to Context Providers_
 Note that there are a number of service routines that end up calling `postQueryContext()` (see detail in [the service routines mapping document](ServiceRoutines.txt)).
 
 `postQueryContext()` creates a vector of `QueryContextRequest` (called `requestV`) whose items are each to be rendered and sent to a Context Provider.
-The `QueryContextRequest` items are filled in based on the output of the [mongoBackend](README.md#srclibmongobackend) function `mongoQueryContext()`.
+The `QueryContextRequest` items are filled in based on the output of the [**mongoBackend**](README.md#srclibmongobackend) function `mongoQueryContext()`.
 
-* `mongoQueryContext()` is invoked to get the "map" of where to find attributes matching the query (step 1). Note that Matching local attributes are already filled in in the response from `mongoQueryContext()`.
+* `mongoQueryContext()` is invoked to get the "map" of where to find attributes matching the query (see diagram [MB-07](mongoBackend.md#flow-mb-07)) (step 1). Note that Matching local attributes are already filled in in the response from `mongoQueryContext()`.
 * `forwardPending()` function is called (step 2). If it returns `true`, the response from `mongoQueryContext()` includes forwarding. If it returns `false`, then we are done and `postQueryContext()` can return to the caller. Let's assume that `forwardsPending()` returns `true` in the diagram.
 * Create a vector of `QueryContextRequest` (each item to be forwarded to a Context Provider) and for each `Attribute` of each `ContextElementResponse` (returned by `mongoQueryContext()`), put the attribute in the correct item of the vector of `QueryContextRequest` (step 3). If no item is found, create one and add it to the vector.
 * Internal Loop: actual forwarding to the Context Provider:
@@ -88,6 +88,6 @@ _FW-04: `queryForward()` function detail_
 * Parse the context provider string to extract IP, port, URI path, etc. (step 1).
 * As forwards are done as REST requests, we need to render the object to text to be able to send the REST request to the Context Provider (step 2).
 * The request to forward is sent with the help of `httpRequestSend()` (step 3) which uses [libcurl](https://curl.haxx.se/libcurl/) to forward the request (step 4). libcurl sends in sequence the request to the Context Provider (step 5).
-* The textual response from the Context Provider is parsed and an `QueryContextResponse` object is created (step 6). Parsing details are provided in diagram PP-01.
+* The textual response from the Context Provider is parsed and an `QueryContextResponse` object is created (step 6). Parsing details are provided in diagram [PP-01](jsonParse.md#flow-pp-01).
 
 [Top](#top)
