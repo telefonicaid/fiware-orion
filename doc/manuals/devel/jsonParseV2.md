@@ -2,10 +2,11 @@
 
 NGSIv2 payloads are parsed in a very different manner than NGSIv1 payloads.  
 Instead of the centralized approach of NGSIv1 parse, an individual approach is used.
-The advantage of this approach is that the code is much easier to understand and to reuse, while the inconvenient is that some tasks,
-e.g. checks for unsupported fields is spread out in many different functions and this way it is easy for some of these checks to be forgotten.
+The advantage of this approach is that the code is much easier to understand and to reuse, while the inconvenience is that some tasks,
+e.g. checks for unsupported fields are spread out in many different functions and this way it is easy for some of these checks to be forgotten.
 The development team prefers this second approach however.  
 
+## Program Flow During NGSIv2 Parse
 To describe the flow of NGSIv2 parse, we need an example payload as the code is not generic but individual per request type.
 The request POST /v2/entities is used in this example flow:
 
@@ -25,14 +26,14 @@ _Figure PP-03_
 * `parseMetadataVector()` calls `parseMetadata()` once for each metadata found in the vector (Point 6)
 * After the parse is ready, the NGSI object is verified to be correct by calling the `check()` method for the object (Point 7)
 
-Lets dive into the source code of the important function `parseEntity()`.
+Lets dive into the source code of one important function `parseEntity()`.
 To make the example shorter, a fictive function/macro `ERROR` is used here, but the full function can be viewed in `src/lib/jsonParseV2/parseEntity.cpp`.
 Comments have been inserted to explain each step in the function.
 
 ```
 std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 {
-  // 1. Parse the incoming payload to convert the textual payload to a tree in RAM
+  // 1. Parse the incoming payload to convert the textual payload into a tree in RAM - this is **rapidjson**
   document.Parse(ciP->payload);
 
   // 2. Error checks
@@ -43,7 +44,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
   if ((eidInURL == true)  && (document.HasMember("type")))  ERROR("Entity Type in Payload when Entity ID as URI parameter"));
   if (document.ObjectEmpty())                               ERROR("Empty entity");
 
-  // 3. loop over the first level members of the payload
+  // 3. loop over the first level members of the payload (id, type, and attributes)
   for (Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
   {
     std::string name = iter->name.GetString();
@@ -80,13 +81,13 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       
       eP->attributeVector.push_back(caP);
 
-      // 7. Extract the attribute from the parsed tree by calling 'inferior' parse function
+      // 7. Extract the attribute from the parsed tree by calling lowlevel parse function 'parseContextAttribute()'
       if (parseContextAttribute(ciP, iter, caP) != "OK")
         ERROR("Error parsing attribute");
     }
   }
 
-  // 8. More checks: Entity::id present but empty [ should be part of step 4 - like for Entity::type ]
+  // 8. More checks: Entity::id present but empty
   if ((eidInURL == false) && (eP->id == ""))    ERROR("Empty Entity ID");
 
   // 9. Set default value for entity type ("Thing")
@@ -97,6 +98,24 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 }
 ```
 
-`parseEntity()` is a top-level parse function so it must call **rapidjson** to create the tree in RAM.
-*"Inferior"* parse functions don't actually parse anything as that is done by the top-level parse function.
-Instead the inferior functions just examine the tree, which is passed to the functions as a rapidjson::Value, a node in the parsed tree.
+`parseEntity()` is a toplevel parse function so it must call **rapidjson** to create the tree in RAM.
+*Lowlevel* parse functions don't actually parse anything as that is done by the toplevel parse function.
+Instead the lowlevel functions just examine the tree, which is passed to the functions as a rapidjson::Value, a node in the parsed tree.
+
+Under `src/lib/jsonParseV2` there are a number (16 as of the time of writing this document) of modules that each take care
+of a part of the parsing of an entire request, such as `parseAttributeList.h/cpp` that parses a vector of strings.
+
+## jsonRequestTreat()
+The function `jsonRequestTreat()` is the entry point of NGSIv2 parsing and this function, examining the type of the payload calls one toplevel parse function or another.
+After parsing, the `check()` method of the resulting instance is invoked.
+All parse functions called by `jsonRequestTreat()` are, of course, toplevel parse functions:
+
+* parseEntity()
+* parseContextAttribute()
+* parseAttributeValue()
+* parseSubscription()
+* parseBatchQuery()
+* parseBatchUpdate()
+
+All parse functions called by any of these functions are, of course, lowlevel parse	functions.
+
