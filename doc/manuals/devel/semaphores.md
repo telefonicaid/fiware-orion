@@ -17,15 +17,15 @@ Of these semaphores, the first four use helper functions in `lib/common/sem.[cpp
 Let's analyze them in detail.
 
 * [Mongo request semaphore](#mongo-request-semaphore)
-* [Transaction ID Semaphore](#transaction-id-semaphore)
+* [Transaction ID semaphore](#transaction-id-semaphore)
 * [Subscription cache semaphore](#subscription-cache-semaphore)
-* [Timing Statistics Semaphore](#timing-statistics-semaphore)
-* [Mongo Connection Pool Semaphores](#mongo-connection-pool-semaphores)
-* [Metrics Manager Semaphore](#metrics-manager-semaphore)
-* [Alarm Manager Semaphore](#alarm-manager-semaphore)
-* [Log File Semaphore](#log-file-semaphore)
-* [Notification Queue Semaphore](#notification-queue-semaphore)
-* [Notification Queue Statistics Semaphore](#notification-queue-statistics-semaphore)
+* [Timing statistics semaphore](#timing-statistics-semaphore)
+* [Mongo connection pool semaphores](#mongo-connection-pool-semaphores)
+* [Metrics Manager semaphore](#metrics-manager-semaphore)
+* [Alarm Manager semaphore](#alarm-manager-semaphore)
+* [Log file semaphore](#log-file-semaphore)
+* [Notification queue semaphore](#notification-queue-semaphore)
+* [Notification queue statistics Semaphore](#notification-queue-statistics-semaphore)
 
 ## Mongo request semaphore
 The *Mongo request semaphore* resides in `lib/common/sem.cpp` and its semaphore variable is `reqSem`. The functions to take/give the semaphore are `reqSemTake()` and `reqSemGive()`.
@@ -58,7 +58,7 @@ Imagine that the start time of the broker is XXXXXXXXX.123:
 * XXXXXXXXX.123.1 -> the VERY first transaction
 * XXXXXXXXX.124.1 -> the first transaction after running number overflow
 
-The whole thing is stored in the thread variable `transactionId`, supported by the [**logMsg** library](README.md#srcliblogmgs) logging library.
+The whole thing is stored in the thread variable `transactionId`, supported by the [**logMsg** library](README.md#srcliblogmsg) logging library.
 
 Now, the **running number** needs to be protected when incremented and this semaphore is used for that purpose.
 
@@ -75,7 +75,7 @@ The *subscription cache semaphore* resides in `lib/common/sem.cpp` and its semap
 Due to the implementation of the subscription cache, especially how it is refreshed, this semaphore cannot be used in low level functions of the cache library, as one would suspect, but rather in higher level functions, which makes the implementation a little bit tricky.
 Any changes in where this semaphore is taken/given needs careful consideration.
 
-Details on this semaphore is already present in the [dedicated document of the Subscription Cache](subscriptionCache.md). Pay special attention to the semaphore considerations explained in the [section devoted to `subCacheSync()` function](subscriptionCache.md#subcachesync).
+Details on this semaphore is already present in the [dedicated document of the subscription cache](subscriptionCache.md). Pay special attention to the semaphore considerations explained in the [section devoted to `subCacheSync()` function](subscriptionCache.md#subcachesync).
 
 [Top](#top)
 
@@ -158,7 +158,7 @@ The semaphore protects the list of alarms and is accessed by the following metho
 
 [Top](#top)
 
-## Log File Semaphore
+## Log file semaphore
 Orion keeps a log file and a semaphore is needed to protect the log file from two threads writing to it at the same time. The variable holding this semaphore is called `sem` and it resides in `lib/logMsg/logMsg.cpp`. It is a static variable so it is not visible outside this file.
 
 The semaphore is initialized in the function `lmSemInit()` and used in the two static functions `semTake()` and `semGive()`, which in their turn are used in:
@@ -168,7 +168,7 @@ The semaphore is initialized in the function `lmSemInit()` and used in the two s
 
 [Top](#top)
 
-## Notification Queue Semaphore
+## Notification queue semaphore
 When a thread pool is selected (using the [CLI parameter](../admin/cli.md) `-notificationMode`), for sending of notifications, a queue is used to feed the notifications to the workers in the thread pool. This queue is protected by a semaphore. 
 
 The semaphore, of type `boost::mutex` is called `mtx` and is a private member of the class `SyncQOverflow`, found in `src/lib/common/SyncQOverflow.h`:
@@ -199,7 +199,7 @@ This semaphore protects pushing and popping to the notification queue. However, 
 
 [Top](#top)
 
-## Notification Queue Statistics Semaphore
+## Notification queue statistics semaphore
 The statistics of the Notification Queue is protected by the semaphore `mtxTimeInQ` in `lib/ngsiNotify/QueueStatistics.cpp`. This semaphore is of the type `boost::mutex` and it is used whenever the timing statistics of the Notification Queue is modified/queried:
 
 * `QueueStatistics::getTimeInQ()`
