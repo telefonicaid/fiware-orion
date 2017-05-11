@@ -1,6 +1,6 @@
 # <a name="top"></a>JSON Parse NGSIv1
 
-* [Introduction](#introction)
+* [Introduction](#introduction)
 * [Parsing process](#parsing-process)
 	* [Implementation details](#implementation-details)
 * [Top-level `jsonParse()`](#top-level-jsonparse)
@@ -41,7 +41,7 @@ qprP->entityIdVector.push_back(eP);
 qprP->attributeList.push_back("temperature");
 ```
 
-This instance of `QueryContextRequest` is created by the **jsonParse** library and the service routine `postQueryContext()` passes it to the [**mongoBackend*](README.md#srclibmongobackend) function `mongoQueryContext()`.
+This instance of `QueryContextRequest` is created by the **jsonParse** library and the service routine `postQueryContext()` passes it to the [**mongoBackend**](README.md#srclibmongobackend) function `mongoQueryContext()`.
 
 [Top](#top)
 
@@ -114,7 +114,7 @@ After returning from the service routine, the result of the parse can be release
 
 [Top](#top)
 
-## Toplevel `jsonParse()`
+## Top-level `jsonParse()`
 As mentioned, there are two different functions called `jsonParse()` in `src/lib/jsonParse/jsonParse.cpp`. One top level and one lower level. The top level `jsonParse()` is the entry function and it is visible from outside of `src/lib/jsonParse/jsonParse.cpp`:
 
 ```
