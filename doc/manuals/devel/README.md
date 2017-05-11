@@ -64,6 +64,7 @@ scripts used for testing and release making are found under `scripts/`.
 
 ## Cross-library topics
 
+* [Flow index](flowsIndex.md). An index for all the flow diagrams described along the development documentation. A very useful "map" to have at hand.
 * [Cook book](cookbook.md). This document describes some useful development related receipts.
 * [Semaphores](semaphores.md). This document provides detailed information about the different semaphores that Orion for internal synchronization.
 
@@ -329,9 +330,9 @@ It is really a reminiscent from when the broker supported XML (nowadays removed)
 However, as parsing of text is a very simple task, this never got its own directory/library but resides here in the common part.
 
 <a name='flow-pp-02'></a>
-![Parsing a TEXT Payload](images/Flow-PP-02.png)
+![Parsing a text payload](images/Flow-PP-02.png)
 
-_PP-02: Parsing a TEXT Payload_
+_PP-02: Parsing a text payload_
 
 * `payloadParse()` calls `textRequestTreat()` (step 1) which contains a switch that calls the correct treat function depending on the type of the request (step 2). As of the moment of writing this document, Orion supports TEXT payloads only for one single type of request, so there is only one treat function to choose from (or ERROR if the request type is not `EntityAttributeValueRequest`).
 * `textParseAttributeValue()` extracts the string and checks for special strings such as true, false, and null and also examines the string to see whether it is a Number. Then this value along with the type of the value is set to the attribute that is a parameter for the function.
@@ -445,7 +446,7 @@ We have subscriptions both for *context entities* and for *availability registra
 
 Using the [CLI parameter](../admin/cli.md) `-notificationMode`, Orion can be started with a thread pool for sending of notifications (`-notificationMode threadpool`). If so, during Orion startup, a pool of threads is created and these threads awaits new items in the notification queue and when an item is present, it is taken from the queue and processed, sending the notification in question. If not used, then a thread will be created for each notification to be sent (default value of `-notificationMode` is "transient"). More information on notifications modes can be found in [this section of the Orion administration manual](../admin/perf_tuning.md#notification-modes-and-performance).
 
-The invoking function in the case of notification due to attribute update/creation is `processOnChangeConditionForUpdateContext()` (see MD-01 diagram at [this section](mongoBackend.md#mongoupdatecontext-sr-and-mongonotifycontext-sr)) and the invoking function in the case of notification due to subscription creation/update (what is called "initial notification" is `processOnChangeConditionForUpdateContext()` (see MD-03 diagram at [this section](mongoBackend.md#processconditionvector)).
+The invoking function in the case of notification due to attribute update/creation is `processOnChangeConditionForUpdateContext()` (see [MD-01 diagram](mongoBackend.md#flow-md-01)) and the invoking function in the case of notification due to subscription creation/update (what is called "initial notification" is `processOnChangeConditionForUpdateContext()` (see [MD-03 diagram](mongoBackend.md#flow-md-03)).
 
 The following two images demonstrate the program flow for context entity notifications without and with thread pool.
 

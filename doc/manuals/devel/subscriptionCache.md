@@ -101,7 +101,7 @@ The start function calls `subCacheRefresh()` to initially populate the sub cache
 ### Subscription Cache Refresh
 The following figure shows graphically the program flow during a refresh of the sub-cache.
 
-<a name='figure_sc01'></a>
+<a name='flow-sc-01'></a>
 ![CACHE REFRESH IMAGE](images/Flow-SC-01.png)
 
 _Figure SC-01_  
@@ -181,7 +181,7 @@ A subscription is created/updated in **one** instance of Orion (*Orion 1* in fig
 This subscription in inserted/modified in the sub-cache and in the datadase.
 The second instance of Orion (*Orion 2* in figure [SC-02](#figure_sc02) below) knows nothing of the new/modified subscription until its `subCacheRefresh()` executes and merges the database content with its sub-cache contents.
 
-<a name='figure_sc02'></a>
+<a name='flow-sc-02'></a>
 ![SUBSCRIPTION PROPAGATION IMAGE](images/Flow-SC-02.png)
 
 _Figure SC-02_  
