@@ -5,7 +5,7 @@
 * [Active-active configurations](#active-active-configurations)
 * [Subscription cache fields](#subscription-cache-fields)
 	*  [Special subscription fields](#special-subscription-fields)
-* [Services/tentants](#servicestenant)
+* [Services/tentants](#servicestenants)
 * [Initialization](#initialization)
 * [Subscription cache refresh](#subscription-cache-refresh)
 * [Propagation of subscriptions in active-active configurations](#propagation-of-subscriptions-in-active-active-configurations)
@@ -13,7 +13,7 @@
 * [Subscription lookup on entity/attribute creation/modification](#subscription-lookup-on-entityattribute-creationmodification)
 
 ## Introduction
-To gain performance, the NGSI10 context subscriptions (not NGSI9 registration subscriptions) are kept in a list in RAM. Please refer to [this section in the Orion administration manual](admin/perf_tuning.md#subscription-cache) for an user-perspective of the cache.
+To gain performance, the NGSI10 context subscriptions (not NGSI9 registration subscriptions) are kept in a list in RAM. Please refer to [this section in the Orion administration manual](../admin/perf_tuning.md#subscription-cache) for an user-perspective of the cache.
 
 The implementation of the subscription cache in found in src/lib/cache/subCache.cpp, and the cache is initialized from the main program, i.e. `subCacheInit()` in `lib/cache/subCache.cpp` is called from `main()`in `app/contextBroker/contextBroker.cpp`. 
 
@@ -25,8 +25,8 @@ If the broker is started with the [CLI option](../admin/cli.md) `-noCache`, then
 The interval of refreshing the subscription cache is determined by the CLI option `-subCacheIval`.
 The default value is 60 seconds, which will make the broker refresh the subscription cache every 60 seconds.
 
-To turn off the sub-cache refresh completely (the subscription cache is still in use, it is just never refreshed), the broker must be started with a value of 0 for -subCacheIval.
-However, this is not recommended (see  [this section in the Orion administration manual](admin/perf_tuning.md#subscription-cache) for details).
+To turn off the sub-cache refresh completely (the subscription cache is still in use, it is just never refreshed), the broker must be started with a value of 0 for `-subCacheIval`.
+However, this is not recommended (see  [this section in the Orion administration manual](../admin/perf_tuning.md#subscription-cache) for details).
 
 [Top](#top)
 
@@ -129,12 +129,12 @@ _SC-01: Subscription cache refresh_
 
 * To respect the interval between sub-cache refreshs, a simple `sleep()` with the amount of seconds taken from the CLI parameter `-subCacheIval` (that defaults to 60 seconds) is the first thing in the loop (step 1). Remember that before entering this loop, when Orion starts, the sub-cache is populated from the database contents. 
 * `subCacheSync()` in step 2 synchronizes the sub-cache with the contents in the database
-* The [semaphore protecting the sub-cache](#subscription-cache-semaphore) is taken using the function `cacheSemTake()` (step 3).
-* In step 4, [the special fields](#special-subscription-fields) that live in the sub-cache are saved before the cub-cache is emptied. See more about this in the section [Special Subscription Fields](#special-subscription-fields).
+* The [semaphore protecting the sub-cache](semaphores.md#subscription-cache-semaphore) is taken using the function `cacheSemTake()` (step 3).
+* In step 4, the special fields that live in the sub-cache are saved before the cub-cache is emptied. See more about this in the section on [special subscription fields](#special-subscription-fields).
 * When subscriptions are created or modified, apart from modifying the sub-cache, the changes are saved to the database, so it is safe to completely clear the subscription cache, once the special fields are saved and this is the first step in `subCacheRefresh()`, step 6 in the figure.
 * To populate the sub-cache again, the first thing needed is a list of all services (tenants) in the system. `getOrionDatabases()` offers that service (step 7-9)
 * Steps 10 to 14 are about filling the sub-cache wit the contents from the database (from the collection with context subscriptions, called [`csub`](../admin/database_model.md#csubs-collection)). This is a loop that is executed once per service (tenant) in the system.
-* After populating the sub-cache from the database content, the special fields are restored to the sub-cache **and** to the database (again, see [Special Subscription Fields](#special-subscription-fields) for more info). This is steps 15 and 16 in the figure.
+* After populating the sub-cache from the database content, the special fields are restored to the sub-cache **and** to the database (again, see [special subscription fields](#special-subscription-fields) for more info). This is steps 15 and 16 in the figure.
 * Finally, in step 17 and the end of the figure, the sub-cache semaphore is released and the flow goes back to the beginning of the loop (which is a `while (TRUE)`).
 
 The next sub-chapters intend to spread some light on the more significant functions in the image.
