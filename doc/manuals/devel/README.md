@@ -2,6 +2,21 @@
 
 *Note: This document describes Orion Context Broker as of release 1.7.x.*
 
+## Intended audience
+The intended audience of this document is developers that need to understand the internals of the Orion context broker
+because they are to modify or add features of Orion.
+Or, readers that simply have an interest in how the Orion context broker is implemented.  
+
+Orion is written in C/C++ and previous knowledge of these programming languages will definitely help to understand this document.  
+
+Previous knowledge of the external libraries that Orion depends on also helps the understanding. Namely:
+
+* Microhttpd
+* Rapidjson (NGSIv2 JSON parsing)
+* Mongodb
+* Boost property tree (NGSIv1 JSON parsing)
+
+Also, as NGSI is used for the payload of the requests, some previous knowledge of NGSI would also help.
 
 ## Directory Structure
 
