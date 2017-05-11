@@ -12,9 +12,12 @@ Orion is written in C/C++ and previous knowledge of these programming languages 
 Previous knowledge of the external libraries that Orion depends on also helps the understanding. Namely:
 
 * Microhttpd
+* Libcurl
 * Rapidjson (NGSIv2 JSON parsing)
-* Mongodb
+* MongoMB C++ driver
 * Boost property tree (NGSIv1 JSON parsing)
+
+In the case of MongoDB, not only knowledge on the driver is recommended, but also in MongoDB technology in general.
 
 Also, as NGSI is used for the payload of the requests, some previous knowledge of NGSI would also help.
 
