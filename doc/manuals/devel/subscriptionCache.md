@@ -112,10 +112,10 @@ The corresponding collection in MongoDB database is [`csub`](../admin/database_m
 If sub-cache-refresh is *turned on*, then a separate thread is started, by calling the function `subCacheStart()`. This thread periodically (depending on the value of `subCacheInterval` which holds the seconds for the periodicity of sub-cache refreshes) refreshes the sub-cache. It starts by populating the cache from the database.
 
 ### `subCacheInit()`
-The initialization function just sets a few variables to prepare the sub cache for usage.
+The initialization function just sets a few variables to prepare the subscription cache for usage.
 
 ### `subCacheStart()`
-The start function calls `subCacheRefresh()` to initially populate the sub cache from the database and then a thread is spawned, with the entry point being the function `subCacheRefresherThread()`. Finally the thread is detached.
+The start function calls `subCacheRefresh()` to initially populate the subscription cache from the database and then a thread is spawned, with the entry point being the function `subCacheRefresherThread()`. Finally the thread is detached.
 
 [Top](#top)
 
@@ -159,7 +159,7 @@ typedef struct CachedSubSaved
 
 After having saved that important information in a vector, the entire sub-cache is wiped out and populated from the database, by calling `subCacheRefresh()`.
 
-After repopulation of the sub cache, the saved information in the `CachedSubSaved` vector is merged into the sub-cache and finally, the `CachedSubSaved` vector is merged into the database, using the function `mongoSubCountersUpdate`, see [special subscription fields](#special-subscription-fields).  
+After repopulation of the subscription cache, the saved information in the `CachedSubSaved` vector is merged into the sub-cache and finally, the `CachedSubSaved` vector is merged into the database, using the function `mongoSubCountersUpdate`, see [special subscription fields](#special-subscription-fields).  
 
 This is a costly operation and the semaphore that protects the sub-cache must be taken during the entire process to guarantee a successful outcome.
 
@@ -173,7 +173,7 @@ The simplest approach is used, which is to:
 
 *Note that the sub-cache refresher thread saves the values of the four special fields before calling `subCacheRefresh()`*
 
-A faster approach would be to compare the content of the sub cache to the content in the database during the refresh, but this would mean a lot more time spent implementing the sub cache refreshing algorithm and this simpler (and slower) approach was chosen. 
+A faster approach would be to compare the content of the subscription cache to the content in the database during the refresh, but this would mean a lot more time spent implementing the subscription cache refreshing algorithm and this simpler (and slower) approach was chosen. 
 
 Now, `subCacheRefresh()` does the following:
 

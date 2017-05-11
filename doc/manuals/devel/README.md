@@ -3,9 +3,9 @@
 *Note: This document describes Orion Context Broker as of release 1.7.x.*
 
 ## Intended audience
-The intended audience of this document is developers that need to understand the internals of the Orion context broker
+The intended audience of this document is developers that need to understand the internals of the Orion Context Broker
 because they are to modify or add features of Orion.
-Or, readers that simply have an interest in how the Orion context broker is implemented.  
+Or, readers that simply have an interest in how the Orion Context Broker is implemented.  
 
 Orion is written in C/C++ and previous knowledge of these programming languages will definitely help to understand this document.  
 
@@ -25,21 +25,20 @@ containing a number of modules (with *module* we refer to a source code file
 and its corresponding header file). Each library has its own directory under `src/lib/`.
 
 The main program, that basically initializes the libraries and starts the
-REST interface resides in its own directory `src/app/contextBroker/`.
+REST interface resides in `contextBroker.cpp` in its own directory `src/app/contextBroker/`.
 
 Unit tests and functional tests reside under the `test/` directory while
 scripts used for testing and release making are found under `scripts/`.
 
 * **src**: contains the source code, with the following subdirectories:
-  * **app**: contains the code for applications (each application in a separate subdirectory). The main application, the Orion context broker, resides in the **contextBroker** directory.
+  * **app**: contains the code for applications (each application in a separate subdirectory). The main application, the Orion Context Broker, resides in the **contextBroker** directory
   * **lib**: contains code libraries (each library in a separate subdirectory)
 * **test**: contains tests. There are several subdirectories (each subdirectory corresponding to a different test 
-  suite/procedure), but the most important ones for the time being are: 
+  suite/procedure), but the most important ones are: 
   * **unittest**: contains unit tests
   * **functionalTest**: contains functional end-to-end tests based on the "test harness" engine
-  * **acceptance**: contains functional end-to-end test based on the Behave (NGSIv2) or Lettuce (NGSIv1) Python  
-    frameworks.
-* **scripts**: contains utility scripts (e.g. scripts included in the Orion RPM along with Orion binary itself,
+  * **acceptance**: contains functional end-to-end test based on the Behave (NGSIv2) or Lettuce (NGSIv1) Python frameworks
+* **scripts**: contains utility scripts (e.g. scripts included in the Orion RPM along with the Orion binary itself,
   scripts used by the test frameworks, etc.)
 * **doc**: contains documentation, with the following subdirectories:
   * **apiary**: for apiary-based documentation
@@ -47,7 +46,7 @@ scripts used for testing and release making are found under `scripts/`.
 * **rpm**: contains files for RPM building
 * **etc**: scripts that are installed under etc/ (typically, included in RPM package)
 * **docker**: contains the docker files
-* **archive**: contains older files that is no longer used but that we don’t want to remove yet.
+* **archive**: contains older files that is no longer in use but that we don't feel comfortable removing just yet
 
 
 ### Source code directory listing
@@ -80,8 +79,8 @@ scripts used for testing and release making are found under `scripts/`.
 ## Cross-library topics
 
 * [Flow index](flowsIndex.md). An index for all the flow diagrams described along the development documentation. A very useful "map" to have at hand.
-* [Cook book](cookbook.md). This document describes some useful development related receipts.
-* [Semaphores](semaphores.md). This document provides detailed information about the different semaphores that Orion for internal synchronization.
+* [Cookbook](cookbook.md). This document describes some useful development related recipes.
+* [Semaphores](semaphores.md). This document provides detailed information about the different semaphores that Orion uses for internal synchronization.
 
 [Top](#top)
 
@@ -89,9 +88,8 @@ scripts used for testing and release making are found under `scripts/`.
 The main program is found in `contextBroker.cpp` and its purpose it to:
 
 * Parse and treat the command line parameters.
-* Initialize the libraries of the broker,
-* Especially, setup the service vector (`RestService restServiceV`) that defines
-  the REST services that the broker supports.
+* Initialize the libraries of the broker.
+* Especially, setup the service vector (`RestService restServiceV`) that defines the REST services that the broker supports.
 * Start the REST interface (that runs in a separate thread).
 
 This is the file to go to when adding a command line parameter and when adding
@@ -106,10 +104,10 @@ The log message library takes care of writing log lines to the log file, whose d
 `/tmp/contextBroker.log` which can be modified using the [CLI parameter](../admin/cli.md) `-logDir`.   The most important task, apart from helping in debugging the broker, are the transaction tags.
 
 See `lmTransactionStart()` et al in `logMsg.cpp/h`.
-About debugging the broker, see especially the trace levels (that are set using the `-t` CLI param),
-in `traceLevels.h`.
+About debugging the broker, see especially the trace levels (that are set using the `-t` CLI param), in `traceLevels.h`.
+And. to turn on traces, remember that it is not enough to set the trace levels. The option `-logLevel DEBUG` must be used as well.  
 
-[Top](#top)
+[Topl](#top)
 
 
 ## src/lib/parseArgs/
@@ -173,7 +171,7 @@ incoming REST connections and their responses.
 
 ### `restInit()`
 The function `restInit()` in `rest.cpp` is the function that receives the extremely important vector
-of REST services from the main program - the vector that defines the services that the broker supports.
+of REST services from the main program - the vector that defines the set of services that the broker supports.
 
 ### `restStart()`
 `restStart()` starts the microhttpd deamon (calling `MHD_start_daemon()`), for IPv4 or IPv6, or both.
@@ -184,29 +182,29 @@ upon reception of connections. This function is called `connectionTreat()` and i
 ### `connectionTreat()`
 `connectionTreat()` is called a number of times from microhttpd. This is very important as it is the heart of the entire REST module.
 
-The first time microhttpd calls connectionTreat is when a connection has been accepted (from a client
-that wishes to send a REST request to the broker) and the first part of the request has been read,
-including the HTTP headers.
+The first time microhttpd calls `connectionTreat()` is when a connection has been accepted (from a client
+that wishes to send a REST request to the broker) and the first part of the request has been read (which includes the HTTP headers).
 
-The second call to connectionTreat is with payload data, and there may be a third, fourth, fifth, etc, call  with payload data. The last call to connectionTreat is with zero data length.
+The second call to `connectionTreat()` is with payload data, and there may be a third, fourth, fifth, etc, call  with payload data.
+The last call to `connectionTreat()` is with zero data length (see its seventh parameter `size_t* upload_data_size`).
 
 If no payload is present in the request, there will be only two calls to connectionTreat.
 
 The seventh parameter of connectionTreat is a pointer to `size_t` and in the last call to connectionTreat, this pointer points to a size_t variable that contains the value zero.
 
-After receiving this last callback, the payload can be parsed and treated, which is taken care of by
-the function `serveFunction`, at the end of `connectionTreat`, after quite a lot of checks.
+After receiving this last callback, the payload can be parsed and treated, which is taken care of by `serveFunction()`,
+invoked at the end of `connectionTreat()`, after quite a lot of checks.
 
-The URI parameters of the request are ready from the very first call of connectionTreat and they are
-collected using the MHD function `MHD_get_connection_values` with a second parameter with the
-value `MHD_GET_ARGUMENT_KIND`. The HTTP headers are collected the very same way, calling `MHD_get_connection_values`, but using `MHD_HEADER_KIND` as second parameter.
+The URI parameters of the request are ready from the very first call of `connectionTreat()` and they are
+collected using the MHD function `MHD_get_connection_values()` with a second parameter with the
+value `MHD_GET_ARGUMENT_KIND`. The HTTP headers are collected the very same way, calling `MHD_get_connection_values()`, but using `MHD_HEADER_KIND` as second parameter.
 
 Internally, the broker keeps a vector inside a struct of the type `ConnectionInfo` for the HTTP headers
 and another vector for the URI parameters.
 
 For detailed information about the microhttpd library, see [its dedicated page in gnu.org](https://www.gnu.org/software/libmicrohttpd/).
 
-### Request Flow
+### Request flow
 
 <a name='flow-rq-01'></a>
 ![Reception of a request](images/Flow-RQ-01.png)
@@ -214,13 +212,13 @@ For detailed information about the microhttpd library, see [its dedicated page i
 _RQ-01: Reception of a request_
 
 * The client sends a request (step 1).
-* connectionTreat is the brokers callback function for incoming connections from MHD (microhttpd). This callback is setup in the call to `MHD_start_daemon()` in `restStart()` in `rest.cpp` and invoked upon client request arrival (step 2 and 3).
+* `connectionTreat()` is the brokers callback function for incoming connections from MHD (microhttpd). This callback is setup in the call to `MHD_start_daemon()` in `restStart()` in `rest.cpp` and invoked upon client request arrival (step 2 and 3).
 * As long as MHD receives payload from the client, the callback function (`connectionTreat()`) is called with a new chunk of payload (steps 4 and 5)
-* The last call to `connectionTreat()` is to inform the client callback that the entire request has been sent. This is done by setting the data length to zero in this last callback (step 6).
-* The entire request is read so serveFunction() takes care of serving the request, all the way until responding to the request (step 7). See diagrfam RQ-02.
+* The last call to `connectionTreat()` is to inform the client callback that the entire request has been received. This is done by sending the data length as zero in this last callback (step 6).
+* The entire request is read so `serveFunction()` is invoked to take care of serving the request, all the way until responding to the request (step 7). See diagram RQ-02.
 * Control is returned to MHD (step 8).
 
-### Treating an Incoming Request
+### Treating an incoming request
 
 <a name='flow-rq-02'></a>
 ![Treatment of a request](images/Flow-RQ-02.png)
@@ -228,14 +226,14 @@ _RQ-01: Reception of a request_
 _RQ-02: Treatment of a request_
 
 * `serveFunction()` calls `restService()` (step 1). Actually, `serveFunction()` is not a function but a pointer to one. By default it points to the function `serve()` from `rest.cpp`, but this can be configured by setting some function as parameter `_serveFunction` in the call to `restInit()`.
-* Also, if payload is present, `restService()` calls `payloadParse()` to parse the payload (step 2). Details are provided in PP diagrams.
-* The service function of the request takes over (step 3). Service function is choosen based on the URL path used in the request. To determine which of all the service functions (found in lib/serviceFunctions and lib/serviceFunctionV2, please see the `RestService` vector in [`contextBroker.cpp`](#srcappcontextbroker)).
-* The service function could invoke a lower level service function. See [the service routines mapping document](ServiceRoutines.txt) for detail (step 4).
+* Also, if payload is present, `restService()` calls `payloadParse()` to parse the payload (step 2). Details are provided in diagrams [PP-01](#flow-pp-01).
+* The service function of the request takes over (step 3). The service function is choosen based on the **URL path** and **HTTP Method** used in the request. To determine which of all the service functions (found in lib/serviceFunctions and lib/serviceFunctionV2, please see the `RestService` vector in [`contextBroker.cpp`](#srcappcontextbroker)).
+* The service function may invoke a lower level service function. See [the service routines mapping document](ServiceRoutines.txt) for details (step 4).
 * Finally, a function in [the **mongoBackend** library](#srclibmongobackend) is invoked (step 5). The MB diagrams provide detailed descriptions for the different cases.
-* Response string created by Service Routine and returned to `restService()` (step 6).
-* After database processing of the request, the response is returned to the client (step 7). Note that on error, e.g. parse error, or non-supported URL, etc, the flow would end long before reaching mongoBackend as the error-response would be returned from a higher layer. The response is done by the function `restReply()`, with the help of MHD functions, especially `MHD_queue_response()`.
+* A response string is created by the Service Routine and returned to `restService()` (step 6).
+* After database processing of the request, the response is returned to the client (step 7). Note that on error, e.g. parse error, or non-supported URL, etc, the flow would end long before reaching mongoBackend as the error-response would be returned from a higher layer. The response is sent by the function `restReply()`, with the help of MHD functions, especially `MHD_queue_response()`.
 * `restReply()` calls `MHD_queue_response()` (step 8) which in sequence responds to client (step 9).
-* Once mongoBackend is ready and the response is sent, the service routine returns, to restService, that returns all the way back to MHD (step 10).
+* Once mongoBackend is ready and the response is sent, the service routine returns, to `restService()`, that returns all the way back to MHD (step 10).
 
 ### `payloadParse()`
 
@@ -245,7 +243,7 @@ The payload to Orion can be of three different types:
 * V2 JSON,
 * Plain Text
 
-The function `payloadParse()`, that resides in the rest library, in `lib/rest/RestService.cpp`, serves as a fork and calls the appropriate parse function, as shown in the picture below:
+The function `payloadParse()`, that resides in the rest library, in `lib/rest/RestService.cpp`, serves as a fork and calls the appropriate parse function, as shown in the diagram below:
 
 ![Parsing alternatives](images/parsing-alternatives.png)
 
@@ -257,17 +255,17 @@ The JSON parse implementations reside in dedicated libraries while the text pars
 ## src/lib/ngsi/
 The **ngsi** library contains a collection of classes for the different payloads that constitutes the common part of the ngsi9 and ngsi10 protocols. Here you find basic classes like:
 
-* EntityId
-* EntityIdVector
-* ContextAttribute
-* ContextAttributeVector
-* Metadata
-* MetadataVector
-* ContextElementVector
+* `EntityId`
+* `EntityIdVector`
+* `ContextAttribute`
+* `ContextAttributeVector`
+* `Metadata`
+* `MetadataVector`
+* `ContextElementVector`
 
 ### Methods and hierarchy
 
-These classes (as well as the classes in the libraries ngsi9, ngsi10, convenience) all have a standard set of methods:
+These classes (as well as the classes in the libraries `ngsi9`, `ngsi10`, `convenience`) all have a standard set of methods:
 
 * `render()`, to render the object to a JSON string (mainly for NGSIv1)
 * `toJson()`, to render the object to a JSON string (for NGSIv2)
@@ -275,15 +273,15 @@ These classes (as well as the classes in the libraries ngsi9, ngsi10, convenienc
 * `release()`, to release all allocated resources of the object
 * `check()`, to make sure the object follows the rules, i.e. about no forbidden characters, or mandatory fields missing, etc.
 
-The classes follow a hierarchy, e.g. UpdateContextRequest (top hierarchy class found in the ngsi10 library) contains a ContextElementVector. ContextElementVector is of course a vector of ContextElement.
-ContextElement in its turn contains:
+The classes follow a hierarchy, e.g. `UpdateContextRequest` (top hierarchy class found in the ngsi10 library) contains a `ContextElementVector`. `ContextElementVector` is of course a vector of `ContextElement`.
+`ContextElement` in its turn contains:
 
-* EntityId
-* AttributeDomainName
-* ContextAttributeVector
-* MetadataVector (this field is part of NGSIv1 but Orion doesn't make use of it)
+* `EntityId`
+* `AttributeDomainName`
+* `ContextAttributeVector`
+* `MetadataVector` (this field `MetadataVector domainMetadataVector` is part of NGSIv1 but Orion doesn't make use of it)
 
-Now, the methods `render()`, `check()`, `release()`, etc. are called in a tree-like fashion, starting from the top hierarchy class, e.g. UpdateContextRequest:
+The methods `render()`, `check()`, `release()`, etc. are called in a tree-like fashion, starting from the top hierarchy class, e.g. `UpdateContextRequest`:
 
 * `UpdateContextRequest::check()` calls:
   * `ContextElementVector::check()` calls (for each item in the vector):
@@ -303,12 +301,18 @@ Each class invokes the method for its underlying classes. The example above was 
 ## src/lib/ngsi10/
 The **ngsi10** library contains the top hierarchy classes for NGSI10 (NGSIv1) requests (and responses):
 
-* UpdateContextRequest/Response
-* QueryContextRequest/Response
-* SubscribeContextRequest/Response
-* UpdateContextSubscriptionRequest/Response
-* UnsubscribeContextResponse/Response
-* NotifyContextRequest/Response (outgoing request, sent by Orion, to notify subscribers)
+* `UpdateContextRequest`
+* `UpdateContextResponse`
+* `QueryContextRequest`
+* `QueryContextResponse`
+* `SubscribeContextRequest`
+* `SubscribeContextResponse`
+* `UpdateContextSubscriptionRequest`
+* `UpdateContextSubscriptionResponse`
+* `UnsubscribeContextRequest`
+* `UnsubscribeContextResponse`
+* `NotifyContextRequest` (outgoing request, sent by Orion, to notify subscribers)
+* `NotifyContextResponse` (incoming response from subscriber)
 
 See the explanation of methods and hierarchy of the [**ngsi** library](#methods-and-hierarchy).
 
@@ -318,12 +322,18 @@ See the explanation of methods and hierarchy of the [**ngsi** library](#methods-
 ## src/lib/ngsi9/
 Just like the ngsi10 library, the **ngsi9** library contains the top hierarchy classes for NGSI9 (NGSIv1) requests:
 
-* RegisterContextRequest/Response
-* DiscoverContextAvailabilityRequest/Response
-* SubscribeContextAvailabilityRequest/Response
-* UnsubscribeContextAvailabilityRequest/Response
-* UpdateContextAvailabilitySubscriptionRequest/Response
-* NotifyContextAvailabilityRequest/Response (outgoing request, sent by Orion, to notify subscribers)
+* `RegisterContextRequest`
+* `RegisterContextResponse`
+* `DiscoverContextAvailabilityRequest`
+* `DiscoverContextAvailabilityResponse`
+* `SubscribeContextAvailabilityRequest`
+* `SubscribeContextAvailabilityResponse`
+* `UnsubscribeContextAvailabilityRequest`
+* `UnsubscribeContextAvailabilityResponse`
+* `UpdateContextAvailabilitySubscriptionRequest`
+* `UpdateContextAvailabilitySubscriptionResponse`
+* `NotifyContextAvailabilityRequest` (outgoing request, sent by Orion, to notify subscribers)
+* `NotifyContextAvailabilityResponse` (incoming response from subscriber)
 
 See the explanation of methods and hierarchy of the [**ngsi** library](#methods-and-hierarchy).
 
@@ -331,7 +341,7 @@ See the explanation of methods and hierarchy of the [**ngsi** library](#methods-
 
 
 ## src/lib/apiTypesV2/
-The **apiTypesV2**, just like the ngsi* libraries, contains classes, both basic classes (like the library **ngsi**) and top hierarchy classes (like the libraries **ngsi9** and **ngsi10**), for NGSIv2, the improved NGSI protocol.
+The **apiTypesV2** library, just like the ngsi* libraries, contains classes; both basic classes (like the library **ngsi**) and top hierarchy classes (like the libraries **ngsi9** and **ngsi10**), for NGSIv2, the improved NGSI protocol.
 
 The hierarchical methods `release()`, `toJson()`, `check()`, etc. are found in these classes as well.
 
@@ -339,10 +349,10 @@ The hierarchical methods `release()`, `toJson()`, `check()`, etc. are found in t
 
 
 ## src/lib/parse/
-The **parse** library contains types and functions that are common to all types of parsing.
-It is really a reminiscent from when the broker supported XML (nowadays removed) apart from JSON and its contents could be moved to other libraries and this library thus be eliminated.
+The **parse** library contains types and functions that are common to all types of payload parsing.
+This library is really a reminiscent from the days when the broker supported XML (nowadays removed) apart from JSON and its contents could be moved to some other library and this library thus be eliminated.
 
-However, as parsing of text is a very simple task, this never got its own directory/library but resides here in the common part.
+However, as parsing of text is a very simple task, test parsing never got its own directory/library and resides here in the common part.
 
 <a name='flow-pp-02'></a>
 ![Parsing a text payload](images/Flow-PP-02.png)
@@ -356,9 +366,9 @@ _PP-02: Parsing a text payload_
 
 
 ## src/lib/jsonParse/
-This library takes care of the JSON parsing of payload for NGSIv1 requests. It depends on the [boost library property_tree](https://theboostcpplibraries.com/boost.propertytree) and uses SAX to translate the incoming JSON text into the ngsi classes.
+This library takes care of the JSON parsing of payload for NGSIv1 requests. It depends on the [Boost library property_tree](https://theboostcpplibraries.com/boost.propertytree) and uses SAX to translate the incoming JSON text into the ngsi classes.
 
-This library contains a vector of the type `JsonRequest`, that defines how to parse the different requests. The function `jsonTreat()` picks the parsing method and `jsonParse()` takes care of the parsing, with the help from
+This library contains a vector of the type `JsonRequest`, that defines how to parse the different requests. The function `jsonTreat()` picks the parsing method and `jsonParse()` takes care of the parsing, with help from the Boost property_tree library.
 
 See detailed explanation of the V2 JSON parse implementation in its [dedicated document](jsonParse.md).
 
@@ -366,9 +376,9 @@ See detailed explanation of the V2 JSON parse implementation in its [dedicated d
 
 
 ## src/lib/jsonParseV2/
-This is where the newer NGSIv2 request payloads are parsed, using DOM but apart from that similar to **jsonParse**. The [library rapidjson](http://rapidjson.org/) is used the parse the JSON payload, while the purpose of **jsonParseV2** is to build a tree of objects representing the JSON payload.
+This is where the newer NGSIv2 request payloads are parsed, using DOM. The [library rapidjson](http://rapidjson.org/) is used to parse the JSON payload, while the purpose of **jsonParseV2** (apart from invoking rapidjson) is to build a tree of objects representing the JSON payload.
 
-Especially important is the function `jsonRequestTreat()` that basically is a switch that calls the different parsing routines according to the type of the payload.
+Especially important is the function `jsonRequestTreat()` that basically is a switch that calls the different parsing routines depending on the type of the payload.
 
 See detailed explanation of the V2 JSON parse implementation in its [dedicated document](jsonParseV2.md).
 
@@ -376,7 +386,7 @@ See detailed explanation of the V2 JSON parse implementation in its [dedicated d
 
 
 ## src/lib/serviceRoutines/
-The **serviceRoutines** is especially important, as this is where the requests are treated and sent to [**mongoBackend** library](#srclibmongobackend) for final processing.
+The **serviceRoutines** library is where the incoming requests are treated and sent to [**mongoBackend** library](#srclibmongobackend) for final processing.
 
 Two service routines are especially important as many other service routines end up calling them (see [the service routines mapping document](ServiceRoutines.txt) for details]):
 
@@ -429,7 +439,7 @@ So, for the rest library to find the service routine of an incoming request, it 
 ## src/lib/serviceRoutinesV2/
 Similar to the **serviceRoutines** library described above, the **serviceRoutinesV2** library contains the service routines for NGSIv2 requests.
 
-Some NGSIv2 service routines invoke [**mongoBackend**](#srclibmongobackend) directly. Others rely in a lower level service routine. See [the service routines mapping document](ServiceRoutines.txt) for details.
+Some NGSIv2 service routines invoke [**mongoBackend**](#srclibmongobackend) directly. Others rely on a lower level service routine. See [the service routines mapping document](ServiceRoutines.txt) for details.
 
 [Top](#top)
 
@@ -452,14 +462,15 @@ The most important of all libraries of the broker, the **mongoBackend** library 
 
 ## src/lib/ngsiNotify/
 The **ngsiNotify** library is where notifications to subscriptions are implemented.
-When an entity is created or modified or when a subscription is created or modified, in case there is an active subscription/entity, the subscriber will be sent a notification, and it is the task of this library to make sure that happens. [**mongoBackend**](#srclibmongobackend) decides when to notify and **ngsiNotify** executes the notification, with the help of the external library [libcurl](https://curl.haxx.se/libcurl/).
-Actually, a function from the [**rest** library](#srclibrest) is used: `httpRequestSend()`. Another important aspect of this library is that the notifications are sent by separete threads, using a thread pool if desired.
+When an entity is created or modified or when a subscription is created or modified, in case there is an active subscription/entity, the subscriber will be sent a notification, and it is the task of this library to make sure that that happens.
+[**mongoBackend**](#srclibmongobackend) decides when to notify and **ngsiNotify** executes the notification, with the help of the external library [libcurl](https://curl.haxx.se/libcurl/).
+Actually, a function from the [**rest** library](#srclibrest) is used: `httpRequestSend()`. Another important aspect of this library is that the notifications are sent by separate threads, using a thread pool if desired.
 
 We have subscriptions both for *context entities* and for *availability registrations* and thus, there are two types of notifications. Context entity subscriptions are by far more important (registration subscriptions are barely used at all) and the threadpool for notifications is used for context entity subscriptions only.
 
 ### Context entities notifications
 
-Using the [CLI parameter](../admin/cli.md) `-notificationMode`, Orion can be started with a thread pool for sending of notifications (`-notificationMode threadpool`). If so, during Orion startup, a pool of threads is created and these threads awaits new items in the notification queue and when an item is present, it is taken from the queue and processed, sending the notification in question. If not used, then a thread will be created for each notification to be sent (default value of `-notificationMode` is "transient"). More information on notifications modes can be found in [this section of the Orion administration manual](../admin/perf_tuning.md#notification-modes-and-performance).
+Using the [CLI parameter](../admin/cli.md) `-notificationMode`, Orion can be started with a thread pool for sending of notifications (`-notificationMode threadpool`). If so, during Orion startup, a pool of threads is created and these threads await new items in the notification queue and when an item becomes present, it is taken from the queue and processed, sending the notification in question. If the thread pool is not used, then a thread will be created for each notification to be sent (default value of `-notificationMode` is "transient", which gives this behaviour). More information on notifications modes can be found in [this section of the Orion administration manual](../admin/perf_tuning.md#notification-modes-and-performance).
 
 The invoking function in the case of notification due to attribute update/creation is `processOnChangeConditionForUpdateContext()` (see [MD-01 diagram](mongoBackend.md#flow-md-01)) and the invoking function in the case of notification due to subscription creation/update (what is called "initial notification" is `processOnChangeConditionForUpdateContext()` (see [MD-03 diagram](mongoBackend.md#flow-md-03)).
 
@@ -471,9 +482,9 @@ The following two images demonstrate the program flow for context entity notific
 _NF-01: Notification on entity-attribute Update/Creation without thread pool_
 
 * A vector of `SenderThreadParams` is built, each item of this vector corresponding to one notification (step 1).
-* `pthread_create()` is called to create a new thread for sending of the notifications and without waiting any results, the control is returned to mongoBackend (step 2).
-* `pthread_create()` spawns the new thread which has `startSenderThread()` an starting point (step 3).
-* `startSenderThread()` loops over the SenderThreadParams vector and sends a notification per item (steps 4, 5 and 6). The response from the receiver of the notification is awaited on (with a timeout), and all notifications are done in a serialized manner.
+* `pthread_create()` is called to create a new thread for sending of the notifications and without awaiting any result, the control is returned to mongoBackend (step 2).
+* `pthread_create()` spawns the new thread which has `startSenderThread()` as starting point (step 3).
+* `startSenderThread()` loops over the `SenderThreadParams` vector and sends a notification per item (steps 4, 5 and 6). The response from the receiver of the notification is waited on (with a timeout), and all notifications are done in a serialized manner.
 
 <a name='flow-nf-03'></a>
 ![Notification on entity-attribute Update/Creation with thread pool](images/Flow-NF-03.png)
@@ -481,9 +492,9 @@ _NF-01: Notification on entity-attribute Update/Creation without thread pool_
 _NF-03: Notification on entity-attribute Update/Creation with thread pool_
 
 * A vector of `SenderThreadParams` is built, each item of this vector corresponding to one notification (step 1).
-* The vector is pushed onto the Notification Message Queue and control is returned to mongoBackend (step 2). This is done using `SyncQOverflow::try_push()` function, which uses the notification queue semaphore to synchronize access to the queue (see [this document for more detail](semaphores.md#notification-queue-semaphore)). The threads that receives from the queue will take care of the notification when it can.
+* The vector is pushed onto the Notification Message Queue and control is returned to mongoBackend (step 2). This is done using `SyncQOverflow::try_push()`, which uses the notification queue semaphore to synchronize access to the queue (see [this document for more detail](semaphores.md#notification-queue-semaphore)). The threads that receive from the queue takes care of the notification as soon as possible.
 * One of the worker threads in the thread pool pops an item from the message queue (step 3). This is done using the `SyncQOverflow::pop()` function, which uses the notification queue semaphore to synchronize access to the queue.
-* The worker thread loops over the `SenderThreadParam` vector of the popped queue item and sends one notification per `SenderThreadParams` item in the vector (steps 4, 5 and 6). The response from the receiver of the notification is awaited on (with a timeout), and all notifications are done in a serialized manner.
+* The worker thread loops over the `SenderThreadParam` vector of the popped queue item and sends one notification per `SenderThreadParams` item in the vector (steps 4, 5 and 6). The response from the receiver of the notification is waited on (with a timeout), and all notifications are done in a serialized manner.
 * After that, the worker thread sleeps, waiting to wake up when a new item in the queue needs to be processed.
 
 ### Context availability notifications
@@ -494,10 +505,10 @@ _NF-03: Notification on entity-attribute Update/Creation with thread pool_
 _NF-02: Notification on entity-attribute availability Registration/Update_
 
 * Extract IP, port and path from the value of the second parameter (url) to the method `sendNotifyContextAvailabilityRequest()` (step 1).
-* Create an instance of `SenderThreadParams` and fill it in with the data for the notification (step 2). Then create a vector of `SenderThreadParams` and push the instance to the vector. This is the input that is expected by `startSenderThread()` that is shared between `sendNotifyContextAvailabilityRequest()` and `sendNotifyContextRequest()`. In the case of sendNotifyContextAvailabilityRequest, the vector will always contain only one item.
+* Create an instance of `SenderThreadParams` and fill it in with the data for the notification (step 2). Then create a vector of `SenderThreadParams` and push the instance to the vector. This is the input that is expected by `startSenderThread()` that is shared between `sendNotifyContextAvailabilityRequest()` and `sendNotifyContextRequest()`. In the case of `sendNotifyContextAvailabilityRequest()`, the vector will always contain only one item.
 * `pthread_create()` is called to create a new thread for sending of the notifications and without waiting any results (step 3). The control is returned to mongoBackend.
-* `pthread_create()` spawns the new thread which has `startSenderThread()` an starting point (step 4).
-* `startSenderThread()` sends the notification described by the `SenderThreadParams` item in the vector (step 5, 6 and 7). The response from the receiver of the notification is awaited on (with a timeout).
+* `pthread_create()` spawns the new thread which has `startSenderThread()` as starting point (step 4).
+* `startSenderThread()` sends the notification described by the `SenderThreadParams` item in the vector (step 5, 6 and 7). The response from the receiver of the notification is waited on (with a timeout).
 
 [Top](#top)
 
@@ -509,17 +520,17 @@ _NF-02: Notification on entity-attribute availability Registration/Update_
 
 
 ## src/lib/cache/
-To gain efficiency, Orion keeps its subscriptions in RAM, and a Subscription Cache Manager has been implemented for this purpose (more detail on the subscription cache on [this section of the Orion administration manual](../admin/perf_tuning.md#subscription-cache)).
+To gain efficiency, Orion keeps its subscriptions in RAM, and a Subscription Cache Manager has been implemented for this purpose (more detail on the subscription cache in [this section of the Orion administration manual](../admin/perf_tuning.md#subscription-cache)).
 
-One of the main reasons for this cache is that doing matching subscriptions at DB uses `$where` which is not recommended in MongoDB (it involves JavaScript execution at DB server, which has performance and security problems).
+One of the main reasons for this cache is that when performing subscription matching at DB level, the operator `$where` must be used in MongoDB, and this
+is not at all recommended (it involves JavaScript execution at DB server, which has both performance and security problems).
 
 When the broker starts, the contents of the [csubs collection](../admin/database_model.md#csubs-collection) is extracted from the database and the subscription cache is populated.
-When a subscription is updated/created, only the subscription cache is modified.
-The database is updated first after a period of time, called the sub-cache-interval, which is configurable as a [CLI parameter](../admin/cli.md) called `-subCacheIval` and defaults to 60 seconds.
+When a subscription is updated/created, the subscription cache is modified, but also the database. In this sense, the subscription cache is "write-through".
 
 Note that the NGSIv2 GET subscription requests do not take the subcription information from the subscription cache, but directly from the database. In other words, there isn't a cache for availability subscriptions.
 
-See full documentation on the subscription cache in its [dedicated document](subscriptionCache.md).
+See the full documentation on the subscription cache in its [dedicated document](subscriptionCache.md).
 
 [Top](#top)
 
@@ -535,7 +546,8 @@ What it does is basically to compile a summary of the current state of the Alara
 [Top](#top)
 
 ## src/lib/metricsMgr/
-For similar metrics throughout the platform a common set of metrics were invented and in the case of Orion, a manager was implemented. This Metrics Manager resides in the library **metricsMgr**.
+To have similar metrics throughout the platform, a common set of metrics were invented and in the case of Orion, a manager was implemented.
+This Metrics Manager resides in the library **metricsMgr**.
 For information about the metrics, see [this document](../admin/metrics_api.md).
 
 [Top](#top)

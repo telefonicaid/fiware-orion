@@ -91,7 +91,7 @@ A note about environment variables as options:
 [Top](#top)
 
 ## Adding a REST service
-The REST services that the Orion context broker supports are items in the `RestService` vector `restServiceV`, found in [the main program](README.md#srcappcontextbroker) in `contextBroker.cpp`. This vector is a reminiscent from back when Orion also implemented the FIWARE Configuration Manager and thus had to be able to assume different roles. The set of services that are supported pretty much defines the role and by starting the REST interface with one `RestService` vector or another took care of the role selection. Now Orion has only one role, to work as context broker, but the `RestService` vector remains.
+The REST services that the Orion Context Broker supports are items in the `RestService` vector `restServiceV`, found in [the main program](README.md#srcappcontextbroker) in `contextBroker.cpp`. This vector is a reminiscent from back when Orion also implemented the FIWARE Configuration Manager and thus had to be able to assume different roles. The set of services that are supported pretty much defines the role and by starting the REST interface with one `RestService` vector or another took care of the role selection. Now Orion has only one role, to work as context broker, but the `RestService` vector remains.
 
 To add a REST service to Orion, a new item in `RestService restServiceV[]` is needed. Just like with CLI parameters, the easiest way is to copy an old service and then modify the copy to suit your needs.
 
