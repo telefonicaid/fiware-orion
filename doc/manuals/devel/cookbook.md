@@ -7,7 +7,7 @@
 * [Fixing a memory leak](#fixing-a-memory-leak)
 
 ## Adding a command line parameter
-It's fairly easy to add a new [CLI parameter](../admin/cli.md) to Orion, as there is a library in charge of parsing and checking the CLI parameters. This library ([**parseArgs**](README.md#srclibparseargs)) is called by [the main program](README.md#srcappcontextbroker) in `contextBroker.cpp` as one of its first actions. The function to parse CLI arguments is called parseArgs, and it has three parameters:
+It's fairly easy to add a new [CLI parameter](../admin/cli.md) to Orion, as there is a library in charge of parsing and checking the CLI parameters. This library ([**parseArgs**](README.md#srclibparseargs)) is called by [the main program](README.md#srcappcontextbroker) in `contextBroker.cpp` as one of its first actions. The function to parse CLI arguments is called `parseArgs()`, and it has three parameters:
 
 * `argC`, the number of arguments for the main program
 * `argV`, the argument vector for for the main program
@@ -27,7 +27,7 @@ The item in the `PaArgument` vector `paArgs` contains nine different pieces of i
 
 * the name of the CLI option
 * a pointer to the variable that will hold its value after parse
-* the name of the environment variable (yes, options can be passed an env vars also)
+* the name of the environment variable (yes, options can be passed as env vars also)
 * the type of the CLI parameter variable:
     * `PaBool`
     * `PaString`
@@ -74,7 +74,7 @@ Edit `src/app/contextBroker/contextBroker.cpp`, and look for an already existing
 4. If xyz is a *required option*, change `PaOpt` for `PaReq`, or `PaHid` if it is to be hidden.
 5. Change the `1026` for the default value for xyz, e.g. `47`
 6. Set the minimum and maximum values of xyz (items 7 and 8 in the `PaArgument` line).
-7. Compile the broker (`make debug`)
+7. Compile the broker (`make debug install`)
 8. Run: `contextBroker -u` and you should see (unless `PaHid` was used):  
     `[option '-xyz <description of xyz>]`
 9. Run: `contextBroker -U` and you will see more information about the CLI parameters,
@@ -87,6 +87,12 @@ Edit `src/app/contextBroker/contextBroker.cpp`, and look for an already existing
 A note about environment variables as options:
 
 * All environment variables are prefixed `ORION_` (see the call to `paConfig("builtin prefix", ...)`), so if you supply an environment variable name name of `XYZ` as the third item in the `PaArgument` vector-item, then the complete name of the environment variable is `ORION_XYZ`.
+To try env vars, try this:
+```
+% export FOREGROUND=1
+% contextBroker -U  # UPPERCASE U !
+```
+Note the right-most column saying `(environment variable)` for the `-fg` option. This indicates that the value for `-fg` has been taken from its environment variable (`FOREGROUND`) and as long as FOREGROUND exists (is not unset), Orion will start in the foreground.
 
 [Top](#top)
 
