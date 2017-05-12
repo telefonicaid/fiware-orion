@@ -246,3 +246,7 @@ usage:  populateDB_v1.0.sh <http://hostname:port> <tenant> <100000> <10>
 		* 2 attributes that are updated every 2 seconds 
 
 **ngsiv1_vs_ngsi2.jmx**: this is an earlier version of orion_soak_test_ngsiv1_ngsiv2.jmx. Although it has not been mantained since time ago, it could be useful to inject entities with/without subscriptions in NGSIv1 and NGSIv2 using the same script (and avoiding the randomness using the the soak version).
+
+## `perf` directory
+
+It contains some Python scripts that may be useful to set up CB in order to perform performance tests on it (entity population, subscription creation, etc.).
