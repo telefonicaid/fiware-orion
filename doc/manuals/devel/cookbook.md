@@ -95,9 +95,9 @@ To try setting a CLI option via env vars, execute this as a test:
 ```
 % export FOREGROUND=1
 % contextBroker -U  # UPPERCASE U !
-Extended Usage: contextBroker  [option '-U' (extended usage)]                                                                             TRUE /FALSE/                                       (command line argument)
+Extended Usage: contextBroker  [option '-U' (extended usage)]                       TRUE /FALSE/  (command line argument)
 ...
-                               [option '-fg' (don't start as daemon)]                                              FOREGROUND             TRUE /FALSE/                                       (environment variable)
+                               [option '-fg' (don't start as daemon)]  FOREGROUND   TRUE /FALSE/  (environment variable)
 ...
 % unset FOREGROUND
 ```
