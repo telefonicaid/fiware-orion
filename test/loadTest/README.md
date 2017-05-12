@@ -244,3 +244,8 @@ usage:  populateDB_v1.0.sh <http://hostname:port> <tenant> <100000> <10>
 
 		I have 17 entities of type "Vehicle" with  
 		* 2 attributes that are updated every 2 seconds 
+
+## `perf` directory
+
+It contains some Python scripts that may be useful to set up CB in order to perform performance tests on it (entity population, subscription creation, etc.).
+
