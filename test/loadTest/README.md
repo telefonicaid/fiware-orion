@@ -207,6 +207,5 @@ usage:  populateDB_v1.0.sh <http://hostname:port> <tenant> <100000> <10>
 
 ## `perf` directory
 
-It constains some Python scripts that can be useful to set up CB in order to perform performance tests on it (entity population, subscription
-creation, etc.).
+It contains some Python scripts that may be useful to set up CB in order to perform performance tests on it (entity population, subscription creation, etc.).
 
