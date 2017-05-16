@@ -1,8 +1,8 @@
 # Flows index
 
-This document provides an index of the different diagrams used along the development documentation.
+This document provides an index of the different diagrams used in the development documentation.
 
-Related with request management (RQ management):
+Related to request management (RQ management):
 
 * [RQ-01: Reception of a request](README.md#flow-rq-01)
 	* Continues in RQ-02
@@ -11,7 +11,7 @@ Related with request management (RQ management):
 	* Continues in PP-*
 	* Continues in MB-*
 
-Related with parsing (PP prefix):
+Related to parsing (PP prefix):
 
 * [PP-01: Parsing an NGSIv1 payload](jsonParse.md#flow-pp-01)
     * Continues from RQ-02, FW-02 or FW-04 
@@ -20,7 +20,7 @@ Related with parsing (PP prefix):
 * [PP-03: Parsing a NGSIv2 payload](jsonParseV2.md#flow-pp-03)
 	* Continues from RQ-02
 
-Related with forwarding (FW prefix):
+Related to forwarding (FW prefix):
 
 * [FW-01: Forward an update to Context Providers](cprs.md#flow-fw-01)
 	* Continues in MB-01 or MB-02
@@ -35,7 +35,7 @@ Related with forwarding (FW prefix):
 	* Continues from FW-03
 	* Continues in PP-01
 	
-Related with mongoBackend logic (MB and MD prefixes):
+Related to mongoBackend logic (MB and MD prefixes):
 
 * [MB-01: mongoUpdate - UPDATE/REPLACE - entity found](mongoBackend.md#flow-mb-01)
     * Continues from RQ-02 or FW-01
@@ -108,7 +108,7 @@ Related with mongoBackend logic (MB and MD prefixes):
 	* Continues from MB-18, MB-20 or MB-21
 	* Continues in NF-02
 
-Related with notifications (NF prefix):
+Related to notifications (NF prefix):
 
 * [NF-01: Notification on entity-attribute update/creation without thread pool](README.md#flow-nf-01)
 	* Continues from MD-01 or MD-03
@@ -117,7 +117,7 @@ Related with notifications (NF prefix):
 * [NF-03: Notification on entity-attribute update/creation with thread pool](README.md#flow-nf-03)
 	* Continues from MD-01 or MD-03
 
-Related with subscription cache (SC prefix):
+Related to the subscription cache (SC prefix):
 
 * [SC-01: Subscription cache refresh](subscriptionCache.md#flow-sc-01)
 * [SC-02: Subscription propagation in active-active configuration](subscriptionCache.md#flow-sc-02) 
