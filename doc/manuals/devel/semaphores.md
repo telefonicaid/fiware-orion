@@ -1,31 +1,18 @@
 # <a name="top"></a>Semaphores
 Orion manages a number of semaphores for protection of delicate data and resources such as
 
-* Mongo Requests
-* Transaction ID
-* Subscription Cache
-* Timing Statistics
-* Mongo Connection Pool
-* Metrics Manager
-* Alarm Manager
-* Log File
-* Notification Queue
-* Notification Queue Statistics
+* [Mongo requests](#mongo-request-semaphore)
+* [Transaction ID](#transaction-id-semaphore)
+* [Subscription cache](#subscription-cache-semaphore)
+* [Timing statistics](#timing-statistics-semaphore)
+* [Mongo connection pool](#mongo-connection-pool-semaphores)
+* [Metrics Manager](#metrics-manager-semaphore)
+* [Alarm Manager](#alarm-manager-semaphore)
+* [Log file](#log-file-semaphore)
+* [Notification queue](#notification-queue-semaphore)
+* [Notification queue statistics](#notification-queue-statistics-semaphore)
 
 Of these semaphores, the first four use helper functions in `lib/common/sem.[cpp|h]`, while the others are part of their respective structure/class.
-
-Let's analyze them in detail.
-
-* [Mongo request semaphore](#mongo-request-semaphore)
-* [Transaction ID semaphore](#transaction-id-semaphore)
-* [Subscription cache semaphore](#subscription-cache-semaphore)
-* [Timing statistics semaphore](#timing-statistics-semaphore)
-* [Mongo connection pool semaphores](#mongo-connection-pool-semaphores)
-* [Metrics Manager semaphore](#metrics-manager-semaphore)
-* [Alarm Manager semaphore](#alarm-manager-semaphore)
-* [Log file semaphore](#log-file-semaphore)
-* [Notification queue semaphore](#notification-queue-semaphore)
-* [Notification queue statistics Semaphore](#notification-queue-statistics-semaphore)
 
 ## Mongo request semaphore
 The *Mongo request semaphore* resides in `lib/common/sem.cpp` and its semaphore variable is `reqSem`. The functions to take/give the semaphore are `reqSemTake()` and `reqSemGive()`.
