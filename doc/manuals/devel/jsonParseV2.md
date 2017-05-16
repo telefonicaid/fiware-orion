@@ -7,7 +7,7 @@ The advantage of this approach is that the code is much easier to understand and
 The development team prefers this second approach however.  
 
 ## Parsing process
-To describe the flow of NGSIv2 parse, we need an example payload as the code is not generic but individual per request type.
+To describe the flow of NGSIv2 parse, we need an example payload as the code is not generic but individual per type of request.
 
 The request `POST /v2/entities` is used in this example flow:
 
@@ -24,7 +24,7 @@ _PP-03: Parsing an NGSIv2 payload_
 * `parseMetadataVector()` calls `parseMetadata()` once for each metadata found in the vector (step 6).
 * After the parse is ready, the NGSI object is verified to be correct by calling the `check()` method for the object (step 7).
 
-Lets dive into the source code of one important function `parseEntity()`. To make the example shorter, a fictive function/macro `ERROR` is used here, but the full function can be viewed in `src/lib/jsonParseV2/parseEntity.cpp`.
+Lets dive into the source code of one important function: `parseEntity()`. To make the example shorter, a fictive function/macro `ERROR` is used here, but the full function can be viewed in `src/lib/jsonParseV2/parseEntity.cpp`.
 
 Comments have been inserted to explain each step in the function.
 
@@ -96,7 +96,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 }
 ```
 
-`parseEntity()` is a toplevel parse function so it must call **rapidjson** to create the tree in RAM. *Lowlevel* parse functions (`parseContextAttribute()`, `parseMetadataVector()`, etc.) don't actually parse anything as that is done by the toplevel parse function. Instead the lowlevel functions just examine their part of the tree, which is passed to the functions as a parameter. This parameter (that references the part of the tree) is normally of the type `rapidjson::Value`, but sometines an iterator for it is sent as parfameter (of the type `rapidjson::Value::ConstMemberIterator` or `rapidjson::Value::ConstValueIterator`).
+`parseEntity()` is a toplevel parse function so it must call **rapidjson** to create the tree in RAM. *Lowlevel* parse functions (`parseContextAttribute()`, `parseMetadataVector()`, etc.) don't actually parse anything as that is done by the toplevel parse function. Instead, the lowlevel functions just examine their part of the tree, which is passed to the functions as a parameter. This parameter (that references the part of the tree) is normally of the type `rapidjson::Value`, but sometines an iterator for it is sent as parameter (of the type `rapidjson::Value::ConstMemberIterator` or `rapidjson::Value::ConstValueIterator`).
 
 Under `src/lib/jsonParseV2` there are a number (16 as of the time of writing this document) of modules that each take care of a part of the parsing of an entire request, such as `parseAttributeList.h/cpp` that parses a vector of strings.
 
