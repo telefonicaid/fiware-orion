@@ -39,11 +39,11 @@ Note that there are a number of service routines that end up calling `postUpdate
     * Found in Local Broker
     * Found in Remote Context Provider
 
-* The attributes that are found in a remote context provider need to be forwarded. The local attributes are simply updates while those not found are marked as such in the response.
-* A new vector of `ContextElementResponse` is created and filled with all those attributes that are to be forwarded (step 3). These responses are then added to the response vector that was output from **mongoBackend**. If no attribute is "found", then the `ContextElementResponse` is prepared with a 404 Not Found.
+* The attributes that are found in a remote context provider need to be forwarded. The local attributes are simply updates non-found attributes are marked as such in the response.
+* A new vector of `ContextElementResponse` is created and filled in with all those attributes that are to be forwarded (step 3). These responses are then added to the response vector that was output from **mongoBackend**. If no attribute is "found", then the `ContextElementResponse` is prepared with a 404 Not Found.
 * Internal loop (step 4): `mongoUpdateContext()` doesn't fill in the values of the attributes, as this is not part of the normal response but, to forward an update request, the value of the attributes must be present. This loop fills in the values of all attributes that are to be forwarded.
 * Internal Loop (step 5): Create `UpdateContextRequest` objects, one per context provider, and fill in these objects with the attributes that are to be forwarded.
-* Each request is sent to its corresponding Context Provider, containing all attributes (step 3). See details in [FW-02 diagram](#flow-fw-02).
+* Each request is sent to its corresponding Context Provider, containing all attributes (step 3). See details in diagram [FW-02](#flow-fw-02).
 * The responses from the context providers are merged into the total response to the client issuing the request that provoked the forwarding (step 7). Note that the forwards are serialized, each forward awaiting its response before continuing.
 
 <a name='flow-fw-02'></a>
@@ -60,7 +60,7 @@ _FW-02: `updateForward()` function detail_
 
 ## Forwarding of query requests
 
-Just like updates, queries are also forwarded to Context Providers.
+Just like updates, also queries are forwarded to Context Providers.
 All attributes in a query request that are not found locally are searched in the list of registration and if found, a request is forwarded to the corresponding context provider. As for forwarding of update requests, the query request can be split into N forwards and the response to the initial request isn't sent until all responses to the forwarded requests have been received and merged into the final response.
 
 <a name='flow-fw-03'></a>
@@ -74,7 +74,7 @@ Note that there are a number of service routines that end up calling `postQueryC
 The `QueryContextRequest` items are filled in based on the output of the [**mongoBackend**](README.md#srclibmongobackend) function `mongoQueryContext()`.
 
 * `mongoQueryContext()` is invoked to get the "map" of where to find attributes matching the query (see diagram [MB-07](mongoBackend.md#flow-mb-07)) (step 1). Note that Matching local attributes are already filled in in the response from `mongoQueryContext()`.
-* `forwardPending()` function is called (step 2). If it returns `true`, the response from `mongoQueryContext()` includes forwarding. If it returns `false`, then we are done and `postQueryContext()` can return to the caller. Let's assume that `forwardsPending()` returns `true` in the diagram.
+* `forwardPending()` function is called (step 2). It returns `true` if the response from `mongoQueryContext()` includes forwarding. If not, it returns `false`, and if so, we are done and `postQueryContext()` can return to the caller. Let's assume that `forwardsPending()` returns `true` in the diagram.
 * Create a vector of `QueryContextRequest` (each item to be forwarded to a Context Provider) and for each `Attribute` of each `ContextElementResponse` (returned by `mongoQueryContext()`), put the attribute in the correct item of the vector of `QueryContextRequest` (step 3). If no item is found, create one and add it to the vector.
 * Internal Loop: actual forwarding to the Context Provider:
     * For each item of the vector of `QueryContextRequest`, call `queryForward()`, that takes care of sending the query to the Context Provider in turn
@@ -91,5 +91,17 @@ _FW-04: `queryForward()` function detail_
 * As forwards are done as REST requests, we need to render the object to text to be able to send the REST request to the Context Provider (step 2).
 * The request to forward is sent with the help of `httpRequestSend()` (step 3) which uses [libcurl](https://curl.haxx.se/libcurl/) to forward the request (step 4). libcurl sends in sequence the request to the Context Provider (step 5).
 * The textual response from the Context Provider is parsed and an `QueryContextResponse` object is created (step 6). Parsing details are provided in diagram [PP-01](jsonParse.md#flow-pp-01).
+
+## Caveat
+The Context Provider mechanism is implemented using standard NGSI9 requests and this might lead to unwanted situations.
+We feel it is important to at least be aware of this potential "shadowing" problem.  
+
+Imagine the following scenario:
+
+* We have a Context Provider CP1 that supplies an Entity E1 with attribute A1.
+  A NGSI9 registration about E1/A1 of CP1 is sent to the Context Broker
+* A client queries the Context Broker about E1/A1 and this provokes a forward to CP1 (as E1/A1 is not found locally but in a registration) and the client gets the expected result
+* A request enters the Context Broker to create (APPEND) an Entity E1 with attribute A1.
+* A client queries the Context Broker about E1/A1 and as the attribute is now found locally it is simply returned. No forward is being done. 
 
 [Top](#top)
