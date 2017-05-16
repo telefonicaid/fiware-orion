@@ -100,7 +100,7 @@ We feel it is important to at least be aware of this potential "shadowing" probl
 Imagine the following scenario:
 
 * We have a Context Provider CP1 that supplies an Entity E1 with attribute A1.
-  A NGSI9 registration about E1/A1 of CP1 is sent to the Context Broker
+  An NGSI9 registration about E1/A1 of CP1 is sent to the Context Broker
 * A client queries the Context Broker about E1/A1 and this provokes a forward to CP1 (as E1/A1 is not found locally but in a registration) and the client gets the expected result
 * A request enters the Context Broker to create (APPEND) an Entity E1 with attribute A1.
 * A client queries the Context Broker about E1/A1 and as the attribute is now found locally it is simply returned. No forward is being done. 

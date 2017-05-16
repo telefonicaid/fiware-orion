@@ -17,7 +17,7 @@ Related to parsing (PP prefix):
     * Continues from RQ-02, FW-02 or FW-04 
 * [PP-02: Parsing a text payload](README.md#flow-pp-02)
 	* Continues from RQ-02
-* [PP-03: Parsing a NGSIv2 payload](jsonParseV2.md#flow-pp-03)
+* [PP-03: Parsing an NGSIv2 payload](jsonParseV2.md#flow-pp-03)
 	* Continues from RQ-02
 
 Related to forwarding (FW prefix):
