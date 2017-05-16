@@ -12,9 +12,11 @@ Orion Context Broker contains not one but **two** libraries for JSON parsing. Th
 
 This document describes NGSIv1 parsing details. NGSIv2 parsing details are described in a [separate document](jsonParseV2.md).
 
-In general, the NGSIv1 parsing logic is more complex than NGSIv2 logic. Good news are that you will probably don't need to change anything in NGSIv1 parsing as this is the old version of the Orion API and the work should now concentrate in evolving NGSIv2, not NGSIv1.
+In general, the NGSIv1 parsing logic is more complex than NGSIv2 logic. The good news is that you will probably not need to change anything in NGSIv1 parsing as this is the old version of the Orion API and the work should now concentrate in evolving NGSIv2, not NGSIv1.
 
-The purpose of the parse step is to transform a text buffer, JSON is this case, to an instance of a class/struct in C++. A very simple but illustrative example:
+The purpose of the parse step is to transform a text buffer, JSON in this case, to an instance of a class/struct in C++. The external library takes care of parsing the JSON string while the Orion librfary extracts the information and populates the approipriate instance of the class/struct in C++.  
+
+A very simple but illustrative example:
 
 The following payload (for `POST /v1/queryContext`):
 ```
@@ -29,7 +31,7 @@ The following payload (for `POST /v1/queryContext`):
 }
 ```
 
-Would be transformed into a C++ instance of the class `QueryContextRequest` something like this:
+... would be transformed into a C++ instance of the class `QueryContextRequest` something like this:
 ```
 QueryContextRequest* qprP = new QueryContextRequest();
 EntityId*            eP   = new EntityId();
@@ -49,7 +51,7 @@ This instance of `QueryContextRequest` is created by the **jsonParse** library a
 The library **jsonParse** contains two overloaded functions with the name `jsonParse()`:
 
 * The first one is the toplevel function that is called only once per request. See [dedicated section on top-level jsonParse()](#top-level-jsonparse).
-* The second `jsonParse()` (invoked by the first) on the other hand is invoked recursively once per node in the parsed tree that is output from [boost property_tree](https://theboostcpplibraries.com/boost.propertytree) (we will use `jsonParse()*` from now on to distinguish this second, lower level `jsonParse()` from the top level `jsonParse()` function). In other words, `jsonParse()*` will call `jsonParse()*` as it processes the node tree. See full explanation in the [dedicated section on low level jsonParse()](#low-level-jsonparse).
+* The second `jsonParse()` is invoked by the **toplevel** `jsonParse()` once per node in the parsed tree that is output from [boost property_tree](https://theboostcpplibraries.com/boost.propertytree) and it *calls itself recursively* following the output tree (we will use `jsonParse()*` from now on to distinguish this second, lower level `jsonParse()` from the top level `jsonParse()` function). See its full explanation in the [dedicated section on low level jsonParse()](#low-level-jsonparse).
 
 The concrete example used for the following image is the parsing of payload for `POST /v1/updateContextRequest`.
 
@@ -66,8 +68,7 @@ _PP-01: Parsing an NGSIv1 payload_
 	* Example: for `{ "a": ..., "b": ..., "c:"... }`, `jsonParse()*` will be invoked three times (once for `"a"`, once for `"b"` and once for `"c"`).
 * `jsonParse()*` calls the `treat()` function on each node (step 5) and if the node is not a leaf, it does an recursive call to itself for each child of the node.
 * The `treat()` function checks for forbidden characters in the payload and then calls the specific Parse-Function for the node in question  (step 6). A pointer to this specific Parse-Function is found in the struct `JsonRequest`, as well as the path to each node, which is how the struct is found. 
-* The Parse-Function simply extracts the information from the tree node and adds it to the resulting Orion struct that is the result of the entire parse. Note that each node in the tree has its own Parse-Function and that in this image just a few selected Parse-Functions are shown.
-	* In fact, to parse this `UpdateContextRequest` payload, there are no less than 19 Parse-Functions (see `jsonParse/jsonUpdateContextRequest.cpp`).     
+* The Parse-Function simply extracts the information from the tree node and adds it to the resulting Orion struct that is the result of the entire parse. Note that each node in the tree has its own Parse-Function and that in this image just a few selected Parse-Functions are shown. In fact, to parse this `UpdateContextRequest` payload, there are no less than 19 Parse-Functions (see `jsonParse/jsonUpdateContextRequest.cpp`).     
 
 [Top](#top)
 
@@ -123,8 +124,8 @@ std::string jsonParse
   ConnectionInfo*     ciP,          // Connection Info valid for the life span of the request
   const char*         content,      // Payload as a string
   const std::string&  requestType,  // The type of request (URL PATH)
-  JsonNode*           parseVector,  // 
-  ParseData*          parseDataP    //
+  JsonNode*           parseVector,  // Function pointers etc for treatment of the nodes
+  ParseData*          parseDataP    // Output pointer to C++ classes for the result of the the parse
 )
 ```
 
@@ -135,14 +136,14 @@ The purpose of the function is to initiate the parsing of the content (JSON stri
 * Get start-time for timing statistics, if requested
 * Fix *escaped chars*, i.e remove backslash preceding a slash: `"\/"` => `"/"` 
 * Load the `content` in the `ptree` variable `tree`
-* Call the low-level `jsonParse()` for each node of the tree (nodes on the first level of the tree).  The low-level `jsonTreat()` dives deeper.
+* Call the low-level `jsonParse()` for each first level node of the tree. The low-level `jsonTreat()` dives deeper.
 * Return **Error** if low-level `jsonTreat()` fails
 * Get end-time for timing statistics,	if requested, and save diff-time for later use
 
 [Top](#top)
 
 ## Low-level `jsonParse()`
-The low-level `jsonParse`is static in `src/lib/jsonParse/jsonParse.cpp` and **only** called by the high-level `jsonParse()`.
+The low-level `jsonParse` is static in `src/lib/jsonParse/jsonParse.cpp` and **only** called by the high-level `jsonParse()` (except for the recursive calls it makes itself).
 
 Its signature:
 
@@ -160,7 +161,7 @@ static std::string jsonParse
 Let's describe the different parameters one by one.
 
 ### `ConnectionInfo* ciP`
-This pointer to `ConnectionInfo` is created by the function that MHD (libmicrohttpd) uses for the callbacks while reading the request. ciP contains information about the request such as:
+This pointer to `ConnectionInfo` is created by the function that MHD (libmicrohttpd) uses for the callbacks while reading the request (`connectionTreat` in `src/lib/rest/rest.cpp`). `ciP` contains information about the request such as:
 
 * HTTP Method/Verb
 * HTTP Headers
@@ -168,11 +169,11 @@ This pointer to `ConnectionInfo` is created by the function that MHD (libmicroht
 * URI Path (E.g. `/v1/queryRequest`) ...
 * ... and much more. See `src/lib/rest/ConnectionInfo.h`
 
-The pointer to `ConnectionInfo` is passed to many many functions in the libraries **jsonParse**, **jsonParseV2**, **rest**, **serviceRoutines** and **serviceRoutinesV2**.
+The pointer to `ConnectionInfo` is passed to many functions in the libraries **jsonParse**, **jsonParseV2**, **rest**, **serviceRoutines** and **serviceRoutinesV2**.
 
 ### `boost::property_tree::ptree::value_type& v`
 
-This is a reference to the currently treated node in the tree. Not much more to say about it.
+This is a reference to the currently treated node in the tree. Not much more to say about it.  See the [boost boost property_tree documentation](https://theboostcpplibraries.com/boost.propertytree) for more information on this.
 
 ### `const std::string& _path`
 
@@ -190,7 +191,7 @@ This is a reference to the currently treated node in the tree. Not much more to 
 }
 ```
 
-The node `type` would have the path `/entities/type`.
+The node `type` would have the path `/entities/entity/type`. The middle name `entity` is because `entities` is a vector. More on this later.
 
 ### `JsonNode* parseVector`
 `JsonNode` is a struct defined in `src/lib/jsonParse/JsonNode.h`:
@@ -205,7 +206,7 @@ typedef struct JsonNode
 } JsonNode;
 ```
 
-Instances of `JsonNode` contain the path of a node (e.g. `/entities/type`) and a reference to the corresponding treat-function for a node with that very path. This is how `jsonTreat` knows which treat-function to call for each node in the tree. As illustration, see `src/lib/jsonParse/jsonQueryContextRequest.cpp`, variable `jsonQcrParseVector`:
+Instances of `JsonNode` contain the path of a node (e.g. `/entities/entity/type`) and a reference to the corresponding treat-function for a node with that very path. This is how `jsonTreat` knows which treat-function to call for each node in the tree. As illustration, see `src/lib/jsonParse/jsonQueryContextRequest.cpp`, variable `jsonQcrParseVector`:
 
 ```
 JsonNode jsonQcrParseVector[] =
@@ -257,7 +258,7 @@ static JsonRequest jsonRequest[] =
 };
 ```
 
-The macro `FUNCS()` is to make the lines a bit shortar and it looks like this:
+The macro `FUNCS()` is to make the lines a bit shorter and it looks like this:
 
 ```
 #define FUNCS(prefix) json##prefix##ParseVector, json##prefix##Init,    \
@@ -297,11 +298,8 @@ Now some example of treat-methods, they are all pretty simple:
 */
 static std::string entityId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
-
   reqDataP->qcr.entityIdP = new EntityId();
 
-  LM_T(LmtNew, ("New entityId at %p", reqDataP->qcr.entityIdP));
   reqDataP->qcr.entityIdP->id        = "";
   reqDataP->qcr.entityIdP->type      = "";
   reqDataP->qcr.entityIdP->isPattern = "false";
@@ -320,7 +318,6 @@ static std::string entityId(const std::string& path, const std::string& value, P
 static std::string entityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   reqDataP->qcr.entityIdP->id = value;
-  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->qcr.entityIdP->id.c_str()));
 
   return "OK";
 }
@@ -341,7 +338,7 @@ JsonNode jsonQcrParseVector[] =
   ...
 ```
 
-The treat-function `entityId` is called when the node `/entities/entity` is found. `entities` is a vector inside the payload for `QueryContextRequest`:
+The treat-function `entityId` is called when a node `/entities/entity` is found. `entities` is a vector inside the payload for `QueryContextRequest`:
 ```
 {
   "entities": [
@@ -353,13 +350,13 @@ The treat-function `entityId` is called when the node `/entities/entity` is foun
 }
 ```
 
-As vectors items have no key-name in JSON, we decided to use the singular word of the name of the vector (that is in plural), i.e. an instance of **entities** is called **entity**. So, when the node `/entities/entity` is found (an item of the entities vector), the treat-function `entityId()` is called and it allocates room for an `EntityId` (`class EntityId` resides in the module `src/lib/ngsi/EntityId.h/cpp`) and pushes the `EntityId` pointer to the vector `reqDataP->qcr.res.entityIdVector`.
+As vectors items have no key-name in JSON, we decided to use the singular word of the name of the vector (which is always in plural), i.e. an instance of **entities** is called **entity**. So, when the node `/entities/entity` is found (an item of the entities vector), the treat-function `entityId()` is called and it allocates room for an `EntityId` (`class EntityId` resides in the module `src/lib/ngsi/EntityId.h/cpp`) and pushes the `EntityId` pointer to the vector `reqDataP->qcr.res.entityIdVector`.
 
-The treat-function `entityId()` also sets `reqDataP->qcr.entityIdP` to reference this latest instance of `EntityId` so that consequent treat-functions can reach it. For example, `entityIdId()` needs it, to set the `id` field of the entity, which is all `entityIdId()` does.
+The treat-function `entityId()` also sets `reqDataP->qcr.entityIdP` to reference this latest instance of `EntityId` so that consequent treat-functions can reach it. For example, `entityIdId()` needs it, to set the `id` field of the entity, which is all `entityIdId()` does. Pointers of this type are needed during the parse/extraction and is the reason for the ParseData structs (see `src/lib/ngsi/ParseData.h` - one "XxxData" struct per payload type, with an output class instance and these help pointers).
 
 ### `ParseData* parseDataP`
 
-As the parsing of NGSI v1 payload is strongly centralized, and function pointers is used, there is a need for a unique type for **all** types of payload. The types for storing the result of the parse (the C++ class instances is different for all types of payload) are all collected into a huge struct contaning all types of payload. Then each treat-function selects which field to operate on.
+As the parsing of NGSI v1 payload is strongly centralized, and function pointers are needed, there is a need for a unique type for **all** types of payload. The types for storing the result of the parse (the C++ class instances are different for each type of payload) are all collected into a big struct contaning all types of payload. Then each treat-function picks which field to operate on.
 
 A pointer to this structure is passed as parameter to low-level `jsonParse()`.
 
@@ -380,7 +377,7 @@ typedef struct ParseData
 } ParseData;
 ```
 
-For example, parsing of an NGSI10 query operates on `ParseData::qcr` which is of the type `QueryContextData`. `QueryContextData` is its turn contains an instance of `QueryContextRequest` which is where the result of the parse is stored. But, as help variables are needed during their parse, these "XxxData structs" are used and they contain the output instance (`QueryContextRequest` in the case of `QueryContextData`) **and** the help variables needed for the parsing of a `QueryContextRequest`:
+For example, parsing of an NGSI10 query operates on `ParseData::qcr` which is of the type `QueryContextData`. `QueryContextData` in its turn contains an instance of `QueryContextRequest` which is where the result of the parse is stored. But, as help variables are needed during the parse, these "XxxData structs" are used and they contain the output instance (`QueryContextRequest` in the case of `QueryContextData`) **and** the help variables needed for the parsing of a `QueryContextRequest`:
 
 ```
 struct QueryContextData
