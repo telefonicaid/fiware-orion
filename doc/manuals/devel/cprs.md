@@ -3,7 +3,7 @@
 * [Forwarding of update requests](#forwarding-of-update-requests)
 * [Forwarding of query requests](#forwarding-of-query-requests)
 
-The Orion Context Broker, as explained in [the User & Programmers Manual](../user/context_providers.md), supports the concept of Context Providers. In short, when for an update/query, an entity/attribute is not found, Orion checks its list of registrations (NGSI9) and if found there, a request is forwarded to a Context Provider. The IP, port and path of the Context Provider is found in the field `providingApplication` of the `struct ContextRegistration` that is part of the registration request `RegisterContextRequest`.
+The Orion Context Broker, as explained in [the User & Programmers Manual](../user/context_providers.md), supports the concept of Context Providers. In short, when for an update/query, an entity/attribute is not found, Orion checks its list of registrations (NGSI9) and if found in that list it means that the entity is registered to a Context Provider. So, a request is forwarded to that Context Provider. The IP, port and path of the Context Provider is found in the field `providingApplication` of the `struct ContextRegistration` that is part of the registration request `RegisterContextRequest`.
 
 ## Forwarding of update requests
 
@@ -19,9 +19,9 @@ In NGSIv1, the request `POST /v1/updateContext` has a field called `updateAction
 
 * Requests with `UPDATE` or `REPLACE` may provoke forwarding of the request.
   Only if **not found locally but found in a registration**.
-* If `APPEND` is used, the action will always be local. If the entity/attribute already exists it will be updated. If not, it is created.
-* `APPEND_STRICT` fails if the entity/attribute already exists.
-* `DELETE`. It is always local.
+* If `APPEND` is used, the action will always be local. If the entity/attribute already exists it will be updated. If not, it is created. Locally.
+* `APPEND_STRICT` fails if the entity/attribute already exists (locally) and if not, the entity/attribute is created locally.
+* `DELETE` is always local.
 
 Note that an update request with multiple context elements (and with `updateActionType` as `UPDATE` or `REPLACE`) may be split into a number of forwards to different context providers plus local updates for entity/attributes that are found locally. The response to the initial request is not sent until each and every response from context providers have arrived.
 
@@ -34,9 +34,11 @@ Note that there are a number of service routines that end up calling `postUpdate
 
 * All attributes in the incoming payload are marked as **Not Found** (step 1).
 * [**mongoBackend** library](README.md#srclibmongobackend) processes the request (see diagrams [MB-01](mongoBackend.md#flow-mb-01) or [MB-02](mongoBackend.md#flow-mb-02)) and marks all attributes in the requests in one of three possible ways (step 2):
-       * Not Found
-       * Found in Local Broker
-       * Found in Remote Context Provider
+
+    * Not Found
+    * Found in Local Broker
+    * Found in Remote Context Provider
+
 * The attributes that are found in a remote context provider need to be forwarded. The local attributes are simply updates while those not found are marked as such in the response.
 * A new vector of `ContextElementResponse` is created and filled with all those attributes that are to be forwarded (step 3). These responses are then added to the response vector that was output from **mongoBackend**. If no attribute is "found", then the `ContextElementResponse` is prepared with a 404 Not Found.
 * Internal loop (step 4): `mongoUpdateContext()` doesn't fill in the values of the attributes, as this is not part of the normal response but, to forward an update request, the value of the attributes must be present. This loop fills in the values of all attributes that are to be forwarded.
