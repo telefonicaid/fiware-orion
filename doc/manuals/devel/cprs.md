@@ -2,6 +2,7 @@
 
 * [Forwarding of update requests](#forwarding-of-update-requests)
 * [Forwarding of query requests](#forwarding-of-query-requests)
+* [A Caveat about shadowing entities](#a-caveat-about-shadowing-entities)
 
 The Orion Context Broker, as explained in [the User & Programmers Manual](../user/context_providers.md), supports the concept of Context Providers. In short, when for an update/query, an entity/attribute is not found, Orion checks its list of registrations (NGSI9) and if found in that list it means that the entity is registered to a Context Provider. So, a request is forwarded to that Context Provider. The IP, port and path of the Context Provider is found in the field `providingApplication` of the `struct ContextRegistration` that is part of the registration request `RegisterContextRequest`.
 
@@ -92,7 +93,7 @@ _FW-04: `queryForward()` function detail_
 * The request to forward is sent with the help of `httpRequestSend()` (step 3) which uses [libcurl](https://curl.haxx.se/libcurl/) to forward the request (step 4). libcurl sends in sequence the request to the Context Provider (step 5).
 * The textual response from the Context Provider is parsed and an `QueryContextResponse` object is created (step 6). Parsing details are provided in diagram [PP-01](jsonParse.md#flow-pp-01).
 
-## Caveat
+## A Caveat about shadowing entities
 The Context Provider mechanism is implemented using standard NGSI9 requests and this might lead to unwanted situations.
 We feel it is important to at least be aware of this potential "shadowing" problem.  
 
