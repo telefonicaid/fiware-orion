@@ -218,7 +218,7 @@ Finally, in the case of action type "UPDATE/REPLACE", the context update logic i
 <a name="flow-md-02"></a>
 ![`searchContextProviders()` function detail](images/Flow-MD-02.png)
 
-_MD-02: `searchContextProviders()` function detail_-
+_MD-02: `searchContextProviders()` function detail_
 
 * `searchContextProviders()` is invoked (step 1) from one of four possible flows. See diagrams [MB-01](#flow-mb-01), [MB-02](#flow-mb-02), [MB-03](#flow-mb-03) and [MB-05](#flow-mb-05). Apart from these entry points, note that `searchContextProviders()` can also be called from `updateEntity()`, in case `processContextAttributeVector()` fails (which means that the entity wasn't actually modified locally, so it makes sense to search for Context Providers).
 * If at least one attribute has the `found` flag set to `false`, a lookup for matching registrations based on specific attributes (i.e. in the form "E-A") is done, calling `registrationsQuery()` in the `MongoGlobal` module (step 2). This function searches the database using `collectionRangedQuery()` in the `connectionOperations` module (steps 3 and 4).
@@ -230,7 +230,7 @@ _MD-02: `searchContextProviders()` function detail_-
 
 #### `mongoQueryContext` (SR)
 
-`mongoQueryContext()` encapsulates the logic for the query context operation.
+`mongoQueryContext` encapsulates the logic for the query context operation.
 
 The header file contains only a function named `mongoQueryContext()` which uses a `QueryContextRequest` object as input parameter and a `QueryContextResponse` as output parameter. Its purpose is to build a response object based on a request object and entities (for locally retrieved information) and registrations (for "pointers" to Context Providers to be used in the forwarding logic in the calling **serviceRoutine**) existing in the database.
 

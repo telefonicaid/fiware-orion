@@ -14,7 +14,7 @@ This document describes NGSIv1 parsing details. NGSIv2 parsing details are descr
 
 In general, the NGSIv1 parsing logic is more complex than NGSIv2 logic. The good news is that you will probably not need to change anything in NGSIv1 parsing as this is the old version of the Orion API and the work should now concentrate in evolving NGSIv2, not NGSIv1.
 
-The purpose of the parse step is to transform a text buffer, JSON in this case, to an instance of a class/struct in C++. The external library takes care of parsing the JSON string while the Orion librfary extracts the information and populates the approipriate instance of the class/struct in C++.  
+The purpose of the parse step is to transform a text buffer, JSON in this case, to an instance of a class/struct in C++. The external library takes care of parsing the JSON string while the Orion library extracts the information and populates the approipriate instance of the class/struct in C++.  
 
 A very simple but illustrative example:
 
