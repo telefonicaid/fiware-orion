@@ -290,7 +290,7 @@ _MB-08: mongoEntityTypes_
 
 * `mongoEntityTypes()` is invoked from a service routine (step 1). This can be from either `getEntityTypes()` (which resides in `lib/serviceRoutines/getEntityTypes.cpp`) or `getEntityAllTypes()` (which resides in `lib/serviceRoutinesV2/getEntityAllTypes.cpp`).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (read mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
-* A list of entity types and attributes ?belonging to? each type is retrieved from the database, using `runCollectionCommand()` in the `connectionOperations` module, to run an aggregation command (steps 3 and 4).
+* A list of entity types and of attributes belonging to each type of those entity types is retrieved from the database, using `runCollectionCommand()` in the `connectionOperations` module, to run an aggregation command (steps 3 and 4).
 * If attribute detail is enabled (i.e. `noAttrDetail` set to `false`) a loop iterates on every attribute of every entity type, in order to:
    * Invoke `getAttributeTypes()` to get the different types of the attributes (along with the entities of the same entity type) (step 5).
    * The information is retrieved from the database using `collectionQuery()` in the `connectionsOperation` module (steps 6 and 7).
@@ -403,7 +403,7 @@ _MB-13: mongoGetSubscription_
 * `mongoGetSubscription()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (read mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
 * The subscription is retrieved from the database using `collectionQuery()` in the `connectionOperations` module (steps 3 and 4).
-* Several `set*()` functions are used in order to fill the `Subscription` object to return. Among them (details in source code) we highly ?VERB? `setNotification()` (step 5), due to the fact that it uses the subscription cache semaphore internally (see [this document for details](semaphores.md#subscription-cache-semaphore)).
+* Several `set*()` functions are used in order to fill the `Subscription` object to return. Among them (details in source code) we would like to highlight `setNotification()` (step 5), as it uses the subscription cache semaphore internally (see [this document for details](semaphores.md#subscription-cache-semaphore)).
 * If the request semaphore was taken in step 2, then it is released before returning (step 6). 
 
 Regarding `mongoListSubscriptions()`:
@@ -416,7 +416,7 @@ _MB-14: mongoListSubscriptions_
 * `mongoListSubscriptions()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (read mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
 * The subscription is retrieved from the database using `collectionRangedQuery()` in the `connectionOperations` module (steps 3 and 4).
-* For each subscription to return, several `set*()` functions are used in order to fill the `Subscription` objects. Among them (details in source code) we highly ?VERB? `setNotification()` (step 5), due to the fact that it uses the subscription cache semaphore internally (see [this document for details](semaphores.md#subscription-cache-semaphore)). 
+* For each subscription to return, several `set*()` functions are used in order to fill the `Subscription` objects. Among them (details in source code) we would like to highlight `setNotification()` (step 5), as it uses the subscription cache semaphore internally (see [this document for details](semaphores.md#subscription-cache-semaphore)). 
 * If the request semaphore was taken in step 2, then it is released before returning (step 6). 
 
 [Top](#top)
