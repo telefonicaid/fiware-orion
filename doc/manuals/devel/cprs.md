@@ -26,7 +26,7 @@ In NGSIv1, the request `POST /v1/updateContext` has a field called `updateAction
 
 Note that an update request with multiple context elements (and with `updateActionType` as `UPDATE` or `REPLACE`) may be split into a number of forwards to different context providers plus local updates for entity/attributes that are found locally. The response to the initial request is not sent until each and every response from context providers have arrived.
 
-<a name='flow-fw-01'></a>
+<a name="flow-fw-01"></a>
 ![Forward an update to Context Providers](images/Flow-FW-01.png)
 
 _FW-01: Forward an update to Context Providers_
@@ -47,7 +47,7 @@ Note that there are a number of service routines that end up calling `postUpdate
 * Each request is sent to its corresponding Context Provider, containing all attributes (step 3). See details in diagram [FW-02](#flow-fw-02).
 * The responses from the context providers are merged into the total response to the client issuing the request that provoked the forwarding (step 7). Note that the forwards are serialized, each forward awaiting its response before continuing.
 
-<a name='flow-fw-02'></a>
+<a name="flow-fw-02"></a>
 ![`updateForward()` function detail](images/Flow-FW-02.png)
 
 _FW-02: `updateForward()` function detail_
@@ -64,7 +64,7 @@ _FW-02: `updateForward()` function detail_
 Just like updates, also queries are forwarded to Context Providers.
 All attributes in a query request that are not found locally are searched in the list of registration and if found, a request is forwarded to the corresponding context provider. As for forwarding of update requests, the query request can be split into N forwards and the response to the initial request isn't sent until all responses to the forwarded requests have been received and merged into the final response.
 
-<a name='flow-fw-03'></a>
+<a name="flow-fw-03"></a>
 ![Forward a query to Context Providers](images/Flow-FW-03.png)
 
 _FW-03: Forward a query to Context Providers_
@@ -83,7 +83,7 @@ The `QueryContextRequest` items are filled in based on the output of the [**mong
     * Merge this response to the total response of the function (step 5).
 * Respond to the initiating client with a merge of all the responses from the Context Providers and the local response part (attributes found locally).
 
-<a name='flow-fw-04'></a>
+<a name="flow-fw-04"></a>
 ![`queryForward()` function detail](images/Flow-FW-04.png)
 
 _FW-04: `queryForward()` function detail_

@@ -76,7 +76,7 @@ Note that `mongoUpdateContext()` applies to all 6 cases, while `mongoNotifyConte
 
 Case 1: action type is "UPDATE" or "REPLACE" and the entity is found.
 
-<a name='flow-mb-01'></a>
+<a name="flow-mb-01"></a>
 ![mongoUpdate UPDATE/REPLACE case with entity found](images/Flow-MB-01.png)
 
 _MB-01: mongoUpdate UPDATE/REPLACE case with entity found_  
@@ -95,7 +95,7 @@ _MB-01: mongoUpdate UPDATE/REPLACE case with entity found_
 
 Case 2: action type is "UPDATE" or "REPLACE" and the entity is not found.
 
-<a name='flow-mb-02'></a>
+<a name="flow-mb-02"></a>
 ![mongoUpdate UPDATE/REPLACE case with entity not found](images/Flow-MB-02.png)
 
 _MB-02: mongoUpdate UPDATE/REPLACE case with entity not found_
@@ -109,7 +109,7 @@ _MB-02: mongoUpdate UPDATE/REPLACE case with entity not found_
 
 Case 3: action type is "APPEND" or "APPEND_STRICT" and the entity is found.
 
-<a name='flow-mb-03'></a>
+<a name="flow-mb-03"></a>
 ![mongoUpdate APPEND/APPEND_STRICT case with existing entity](images/Flow-MB-03.png)
 
 _MB-03: mongoUpdate APPEND/APPEND_STRICT case with existing entity_
@@ -129,7 +129,7 @@ _MB-03: mongoUpdate APPEND/APPEND_STRICT case with existing entity_
 
 Case 4: action type is "APPEND" or "APPEND_STRICT" and the entity is not found.
 
-<a name='flow-mb-04'></a>
+<a name="flow-mb-04"></a>
 ![mongoUpdate APPEND/APPEND_STRICT case with new entity](images/Flow-MB-04.png)
 
 _MB-04: mongoUpdate APPEND/APPEND_STRICT case with new entity_
@@ -145,7 +145,7 @@ _MB-04: mongoUpdate APPEND/APPEND_STRICT case with new entity_
 
 Case 5: action type is "DELETE" to partially delete some attributes of an entity.
 
-<a name='flow-mb-05'></a>
+<a name="flow-mb-05"></a>
 ![mongoUpdate DELETE not remove entity](images/Flow-MB-05.png)
 
 _MB-05: mongoUpdate DELETE not remove entity_
@@ -164,7 +164,7 @@ _MB-05: mongoUpdate DELETE not remove entity_
 
 Case 6: action type is "DELETE" to remove an entity
 
-<a name='flow-mb-06'></a>
+<a name="flow-mb-06"></a>
 ![mongoUpdate DELETE remove entity](images/Flow-MB-06.png)
 
 _MB-06: mongoUpdate DELETE remove entity_
@@ -202,7 +202,7 @@ During the update process, either in the case of creating new entities or updati
 * `addTriggeredSubscriptions()`. Actually, there are two versions of this function (`addTriggeredSubscriptions()` itself is just a dispatcher): the `_withCache()` version (which uses the subscription cache to check whether a particular entity modification triggers any subscriptions) and `_noCache()` (which checks the `csubs` collection in the database in order to do the checking). Obviously, the version to be used depends on whether the subscription cache is enabled or not, i.e. the value of the global `noCache` bool variable. The `_withCache()` version needs to take/give the subscription cache semaphore (see [this document for details](semaphores.md#subscription-cache-semaphore)).
 * `processSubscriptions()`. Apart from the `subsToNotify` map, another important parameter in this function is `notifyCerP`, which is a reference to the context element response (CER) that will be used to fill in the notifications to be sent. In the case of new entities, this CER is built from the contents of the incoming CE in the update request. In the case of updating an existing entity, the logic starts with CER and updates it at the same time the `toSet`, `toUnset`, etc. fields are built. In other words, the logic keeps always an updated CER while the CE attributes are being processed. `updateAttrInNotifyCer()` (used in `updateContextAttributeItem()` and `updateContextAttributeItem()`) and `deleteAttrInNotifyCer()` (used in `deleteContextAttributeItem()`) are helper functions used to do this task. Details on this are shown in the sequence diagram below.
 
-<a name='flow-md-01'></a>
+<a name="flow-md-01"></a>
 ![`processSubscriptions()` function detail](images/Flow-MD-01.png)
 
 _MD-01: `processSubscriptions()` function detail_
@@ -215,7 +215,7 @@ _MD-01: `processSubscriptions()` function detail_
 
 Finally, in the case of action type "UPDATE/REPLACE", the context update logic is able to "fill the gaps" for missing entities/attributes in the local database with Context Provider information. This is done in `searchContextProviders()`. The detail is shown in the sequence diagram below.
 
-<a name='flow-md-02'></a>
+<a name="flow-md-02"></a>
 ![`searchContextProviders()` function detail](images/Flow-MD-02.png)
 
 _MD-02: `searchContextProviders()` function detail_-
@@ -236,7 +236,7 @@ The header file contains only a function named `mongoQueryContext()` which uses 
 
 The details are shown in the sequence diagram below.
 
-<a name='flow-mb-07'></a>
+<a name="flow-mb-07"></a>
 ![mongoQueryContext](images/Flow-MB-07.png)
 
 _MB-07: mongoQueryContext_
@@ -283,7 +283,7 @@ The header file contains three functions:
 
 The detail for `mongoEntityTypes()` is as shown in the following diagram.
 
-<a name='flow-mb-08'></a>
+<a name="flow-mb-08"></a>
 ![mongoEntityTypes](images/Flow-MB-08.png)
 
 _MB-08: mongoEntityTypes_
@@ -298,7 +298,7 @@ _MB-08: mongoEntityTypes_
 
 The detail for `mongoEntityTypesValues()` is as shown in the following diagram.
 
-<a name='flow-mb-09'></a>
+<a name="flow-mb-09"></a>
 ![mongoEntityTypesValues](images/Flow-MB-09.png)
 
 _MB-09: mongoEntityTypesValues_
@@ -310,7 +310,7 @@ _MB-09: mongoEntityTypesValues_
 
 The detail for `mongoAttributesForEntityType()` is as shown in the following diagram.
 
-<a name='flow-mb-10'></a>
+<a name="flow-mb-10"></a>
 ![mongoAttributesForEntityType](images/Flow-MB-10.png)
 
 _MB-10: mongoAttributesForEntityType_
@@ -337,7 +337,7 @@ All the above functions heavily rely on the MongoDB aggregation framework. You s
 
 The header file contains only the function `mongoCreateSubscription()` whose work is basically to get the information from a `Subscription` object and insert the corresponding document in the `csubs` collection in the database ([described as part of the database model in the administration documentation](../admin/database_model.md#csubs-collection)). The new subscription is also inserted in the subscription cache (if the cache is enabled).
 
-<a name='flow-mb-11'></a>
+<a name="flow-mb-11"></a>
 ![mongoCreateSubscription](images/Flow-MB-11.png)
 
 _MB-11: mongoCreateSubscription_
@@ -360,7 +360,7 @@ Note that potential notifications are sent before inserting the subscription in 
 
 The header file contains only a function named `mongoUpdateSubscription()` whose work is basically to get the information from a `mongoUpdateSubscription` object and use it to update the corresponding document of the `csubs` collection in the database ([described as part of the database model in the administration documentation](../admin/database_model.md#csubs-collection)). The subscription is also updated in the subscription cache (if the subscription cache is enabled).
 
-<a name='flow-mb-12'></a>
+<a name="flow-mb-12"></a>
 ![mongoUpdateSubscription](images/Flow-MB-12.png)
 
 _MB-12: mongoUpdateSubscription_
@@ -395,7 +395,7 @@ In both cases, the implementation is based on a query on the `csubs` collection,
 
 Regarding `mongoGetSubscription()`:
 
-<a name='flow-mb-13'></a>
+<a name="flow-mb-13"></a>
 ![mongoGetSubscription](images/Flow-MB-13.png)
 
 _MB-13: mongoGetSubscription_
@@ -408,7 +408,7 @@ _MB-13: mongoGetSubscription_
 
 Regarding `mongoListSubscriptions()`:
 
-<a name='flow-mb-14'></a>
+<a name="flow-mb-14"></a>
 ![mongoListSubscriptions](images/Flow-MB-14.png)
 
 _MB-14: mongoListSubscriptions_
@@ -429,7 +429,7 @@ The header file contains only the function `mongoUnsubscribeContext()` which use
 
 Its work is to remove from the database the document associated to the subscription in the `csubs` collection. The subscription is also removed from the cache (if cache is enabled).
 
-<a name='flow-mb-15'></a>
+<a name="flow-mb-15"></a>
 ![mongoUnsubscribeContext](images/Flow-MB-15.png)
 
 _MB-15: mongoUnsubscribeContext_
@@ -453,7 +453,7 @@ The header file contains only a function named `mongoSubscribeContext()` which u
 
 Actually, this function is a wrapper of the NGSIv2 version of this operation, i.e. `mongoCreateSubscription()` in the [mongoCreateSubscription module](#mongocreatesubscription-sr2).
 
-<a name='flow-mb-16'></a>
+<a name="flow-mb-16"></a>
 ![mongoSubscribeContext](images/Flow-MB-16.png)
 
 _MB-16: mongoSubscribeContext_
@@ -471,7 +471,7 @@ The header file contains only a function named `mongoUpdateContextSubscription()
 
 Actually, this function is a wrapper of the NGSIv2 version of this operation, i.e. `mongoUpdateSubscription()` in the [mongoUpdateSubscription module](#mongoupdatesubscription-sr2).
 
-<a name='flow-mb-17'></a>
+<a name="flow-mb-17"></a>
 ![mongoSubscribeContext](images/Flow-MB-17.png)
 
 _MB-17: mongoUpdateContextSubscription_
@@ -485,7 +485,7 @@ _MB-17: mongoUpdateContextSubscription_
 
 The `mongoRegisterContext` module provides the entry point for the register context operation processing logic (by means of `mongoRegisterContext()` defined in its header file) while the `mongoNotifyContextAvailability` module provides the entry point for the context availability notification processing logic (by means of `mongoNotifyContextAvailability()` in its header file). However, given that a context availability notification is processed in the same way as a register context, both `mongoRegisterContext()` and `mongoNotifyContextAvailability()` are at the end basically wrappers for `processRegisterContext()` (single external function in the `MongoCommonRegister` module), which does the work consisting in creating a new registration or updating an existing one in the `registrations` collection in the database ([described as part of the database model in the administration documentation](../admin/database_model.md#registrations-collection)).
 
-<a name='flow-mb-18'></a>
+<a name="flow-mb-18"></a>
 ![mongoRegisterContext](images/Flow-MB-18.png)
 
 _MB-18: mongoRegisterContext_
@@ -507,7 +507,7 @@ _MB-18: mongoRegisterContext_
 
 The header file contains only a function named `mongoDiscoverContextAvailability()` which uses a `DiscoverContextAvailabilityRequest` object as input parameter and a `DiscoverContextAvailabilityResponse` as output parameter. Its work is to build a response object based on the input request object and the registration existing in the database.
 
-<a name='flow-mb-19'></a>
+<a name="flow-mb-19"></a>
 ![mongoDiscoverContextAvailability](images/Flow-MB-19.png)
 
 _MB-19: mongoDiscoverContextAvailability_
@@ -526,7 +526,7 @@ _MB-19: mongoDiscoverContextAvailability_
 
 The header file contains only a function named `mongoSubscribeContextAvailability()` which uses a `SubscribeContextAvailabilityRequest` object as input parameter and a `SubscribeContextAvailabilityResponse` as output parameter. Its work is to create a new context availability subscription in the `casubs` collection in the database ([described as part of the database model in the administration documentation](../admin/database_model.md#casubs-collection)).
 
-<a name='flow-mb-20'></a>
+<a name="flow-mb-20"></a>
 ![mongoSubscribeContextAvailability](images/Flow-MB-20.png)
 
 _MB-20: mongoSubscribeContextAvailability_
@@ -545,7 +545,7 @@ _MB-20: mongoSubscribeContextAvailability_
 
 The header file contains only a function named `mongoUpdateContextAvailabilitySubscription()` which uses an `UpdateContextAvailabilitySubscriptionRequest` object as input parameter and an `UpdateContextAvailabilitySubscriptionResponse` as output parameter. Its work is to update the corresponding context availability subscription in the `casubs` collection in the database ([described as part of the database model in the administration documentation](../admin/database_model.md#casubs-collection)).
 
-<a name='flow-mb-21'></a>
+<a name="flow-mb-21"></a>
 ![mongoUpdateContextAvailabilitySubscription](images/Flow-MB-21.png)
 
 _MB-21: mongoUpdateContextAvailabilitySubscription_
@@ -567,7 +567,7 @@ The header file contains only a function named `mongoUnsubscribeContextAvailabil
 
 Its work is to remove from the database the document associated to the subscription in the `casubs` collection.
 
-<a name='flow-mb-22'></a>
+<a name="flow-mb-22"></a>
 ![mongoUnsubscribeContextAvailability](images/Flow-MB-22.png)
 
 _MB-21: mongoUnsubscribeContextAvailability_
@@ -666,7 +666,7 @@ It is used by several functions:
 
 This function is called during context subscription creation/update and possibly sends an initial notification associated to the subscription.
 
-<a name='flow-md-03'></a>
+<a name="flow-md-03"></a>
 ![`processConditionVector()` function detail](images/Flow-MD-03.png)
 
 _MD-03: `processConditionVector()` function detail_
@@ -692,7 +692,7 @@ It is called from:
 * Context availability creation/update logic, so an initial notification for all matching context registrations is sent.
 * Register operation logic, when a new (or updated) context registration matches an availability subscription.
 
-<a name='flow-md-04'></a>
+<a name="flow-md-04"></a>
 ![`processAvailabilitySubscription()` function detail](images/Flow-MD-04.png)
 
 _MD-04: `processAvailabilitySubscription()` function detail_

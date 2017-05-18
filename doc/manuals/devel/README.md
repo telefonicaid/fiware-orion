@@ -1,4 +1,4 @@
-# <a name='top'></a>Design details of the Orion Context Broker
+# <a name="top"></a>Design details of the Orion Context Broker
 
 *Note: This document describes Orion Context Broker as of release 1.7.x.*
 
@@ -210,7 +210,7 @@ For detailed information about the microhttpd library, see [its dedicated page i
 
 ### Request flow
 
-<a name='flow-rq-01'></a>
+<a name="flow-rq-01"></a>
 ![Reception of a request](images/Flow-RQ-01.png)
 
 _RQ-01: Reception of a request_
@@ -224,7 +224,7 @@ _RQ-01: Reception of a request_
 
 ### Treating an incoming request
 
-<a name='flow-rq-02'></a>
+<a name="flow-rq-02"></a>
 ![Treatment of a request](images/Flow-RQ-02.png)
 
 _RQ-02: Treatment of a request_
@@ -358,7 +358,7 @@ This library is really a reminiscent from the days when the broker supported XML
 
 However, as parsing of text is a very simple task, text parsing never got its own directory/library and resides here in the common part.
 
-<a name='flow-pp-02'></a>
+<a name="flow-pp-02"></a>
 ![Parsing a text payload](images/Flow-PP-02.png)
 
 _PP-02: Parsing a text payload_
@@ -480,7 +480,7 @@ The invoking function in the case of notification due to attribute update/creati
 
 The following two images demonstrate the program flow for context entity notifications without and with thread pool.
 
-<a name='flow-nf-01'></a>
+<a name="flow-nf-01"></a>
 ![Notification on entity-attribute Update/Creation without thread pool](images/Flow-NF-01.png)
 
 _NF-01: Notification on entity-attribute Update/Creation without thread pool_
@@ -490,7 +490,7 @@ _NF-01: Notification on entity-attribute Update/Creation without thread pool_
 * `pthread_create()` spawns the new thread which has `startSenderThread()` as starting point (step 3).
 * `startSenderThread()` loops over the `SenderThreadParams` vector and sends a notification per item (steps 4, 5 and 6). The response from the receiver of the notification is waited on (with a timeout), and all notifications are done in a serialized manner.
 
-<a name='flow-nf-03'></a>
+<a name="flow-nf-03"></a>
 ![Notification on entity-attribute Update/Creation with thread pool](images/Flow-NF-03.png)
 
 _NF-03: Notification on entity-attribute Update/Creation with thread pool_
@@ -503,7 +503,7 @@ _NF-03: Notification on entity-attribute Update/Creation with thread pool_
 
 ### Context availability notifications
 
-<a name='flow-nf-02'></a>
+<a name="flow-nf-02"></a>
 ![Notification on entity-attribute availability Registration/Update](images/Flow-NF-02.png)
 
 _NF-02: Notification on entity-attribute availability Registration/Update_

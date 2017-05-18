@@ -122,7 +122,7 @@ The start function calls `subCacheRefresh()` to initially populate the subscript
 ## Subscription cache refresh
 The following figure shows the program flow during a refresh of the subscription cache.
 
-<a name='flow-sc-01'></a>
+<a name="flow-sc-01"></a>
 ![Subscription cache refresh](images/Flow-SC-01.png)
 
 _SC-01: Subscription cache refresh_  
@@ -208,7 +208,7 @@ The subscription cache is made up by a simple single linked list, written in pur
 ## Propagation of subscriptions in active-active configurations
 A subscription is created/updated in **one** instance of Orion (*Orion 1* in figure [SC-02](#flow-sc-02) below), the one that receives the subscription request. This subscription in inserted/modified in the subscription cache and in the database. The second instance of Orion (*Orion 2* in figure [SC-02](#flow-sc-02) below) knows nothing of the new/modified subscription until its `subCacheRefresh()` executes and merges the database content with its subscription cache contents.
 
-<a name='flow-sc-02'></a>
+<a name="flow-sc-02"></a>
 ![Subscription propagation in active-active configuration](images/Flow-SC-02.png)
 
 _SC-02: Subscription propagation in active-active configuration_  

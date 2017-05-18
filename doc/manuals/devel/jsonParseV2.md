@@ -11,7 +11,7 @@ To describe the flow of NGSIv2 parse, we need an example payload as the code is 
 
 The request `POST /v2/entities` is used in this example flow:
 
-<a name='flow-pp-03'></a>
+<a name="flow-pp-03"></a>
 ![Parsing an NGSIv2 payload](images/Flow-PP-03.png)
 
 _PP-03: Parsing an NGSIv2 payload_

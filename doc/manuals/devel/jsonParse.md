@@ -55,7 +55,7 @@ The library **jsonParse** contains two overloaded functions with the name `jsonP
 
 The concrete example used for the following image is the parsing of payload for `POST /v1/updateContextRequest`.
 
-<a name='flow-pp-01'></a>
+<a name="flow-pp-01"></a>
 ![Parsing an NGSIv1 payload](images/Flow-PP-01.png)
 
 _PP-01: Parsing an NGSIv1 payload_  
