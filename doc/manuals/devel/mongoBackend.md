@@ -290,7 +290,7 @@ _MB-08: mongoEntityTypes_
 
 * `mongoEntityTypes()` is invoked from a service routine (step 1). This can be from either `getEntityTypes()` (which resides in `lib/serviceRoutines/getEntityTypes.cpp`) or `getEntityAllTypes()` (which resides in `lib/serviceRoutinesV2/getEntityAllTypes.cpp`).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (read mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
-* A list of entity types and of attributes belonging to each type of those entity types is retrieved from the database, using `runCollectionCommand()` in the `connectionOperations` module, to run an aggregation command (steps 3 and 4).
+* A list of entity types and of attributes belonging to each of those entity types is retrieved from the database, using `runCollectionCommand()` in the `connectionOperations` module, to run an aggregation command (steps 3 and 4).
 * If attribute detail is enabled (i.e. `noAttrDetail` set to `false`) a loop iterates on every attribute of every entity type, in order to:
    * Invoke `getAttributeTypes()` to get the different types of the attributes (along with the entities of the same entity type) (step 5).
    * The information is retrieved from the database using `collectionQuery()` in the `connectionsOperation` module (steps 6 and 7).
