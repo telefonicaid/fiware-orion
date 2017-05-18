@@ -7,7 +7,7 @@
 * [Fixing a memory leak](#fixing-a-memory-leak)
 
 ## Adding a command line parameter
-It's fairly easy to add a new [CLI parameter](../admin/cli.md) to Orion, as there is a library in charge of parsing and checking the CLI parameters. This library ([**parseArgs**](README.md#srclibparseargs)) is called by [the main program](README.md#srcappcontextbroker) in `contextBroker.cpp` as one of its first actions. The function to parse CLI arguments is called parseArgs, and it has three parameters:
+It's fairly easy to add a new [CLI parameter](../admin/cli.md) to Orion, as there is a library in charge of parsing and checking the CLI parameters. This library ([**parseArgs**](README.md#srclibparseargs)) is called by [the main program](README.md#srcappcontextbroker) in `contextBroker.cpp` as one of its first actions. The function to parse CLI arguments is called `parseArgs()`, and it has three parameters:
 
 * `argC`, the number of arguments for the main program
 * `argV`, the argument vector for for the main program
@@ -27,7 +27,7 @@ The item in the `PaArgument` vector `paArgs` contains nine different pieces of i
 
 * the name of the CLI option
 * a pointer to the variable that will hold its value after parse
-* the name of the environment variable (yes, options can be passed an env vars also)
+* the name of the environment variable (yes, options can be passed as env vars also)
 * the type of the CLI parameter variable:
     * `PaBool`
     * `PaString`
@@ -74,7 +74,7 @@ Edit `src/app/contextBroker/contextBroker.cpp`, and look for an already existing
 4. If xyz is a *required option*, change `PaOpt` for `PaReq`, or `PaHid` if it is to be hidden.
 5. Change the `1026` for the default value for xyz, e.g. `47`
 6. Set the minimum and maximum values of xyz (items 7 and 8 in the `PaArgument` line).
-7. Compile the broker (`make debug`)
+7. Compile the broker (`make debug install`)
 8. Run: `contextBroker -u` and you should see (unless `PaHid` was used):  
     `[option '-xyz <description of xyz>]`
 9. Run: `contextBroker -U` and you will see more information about the CLI parameters,
@@ -86,16 +86,31 @@ Edit `src/app/contextBroker/contextBroker.cpp`, and look for an already existing
 
 A note about environment variables as options:
 
-* All environment variables are prefixed `ORION_` (see the call to `paConfig("builtin prefix", ...)`), so if you supply an environment variable name name of `XYZ` as the third item in the `PaArgument` vector-item, then the complete name of the environment variable is `ORION_XYZ`.
+* The builtin environment variables are prefixed `ORION_` (see the call to `paConfig("builtin prefix", ...)`), so builtin CLI options such as `-t, `-logDir`, etc get that prefix for their env vars.
+if you supply an environment variable name of `XYZ` as the third item in the `PaArgument` vector-item, then please respect the prefix and call it `ORION_XYZ`.
+That said, we've never really used env vars for the options and the `ORION_` prefix is not respected by the current implementation. This is a bit unfortunate but really easy to fix (not counting breaking backward-compatibility, of course ;-)).
+However, try the `-U` CLI option to see the env vars and more info for each of the CLI options.
+
+To try setting a CLI option via env vars, execute this as a test:
+```
+% export FOREGROUND=1
+% contextBroker -U  # UPPERCASE U !
+Extended Usage: contextBroker  [option '-U' (extended usage)]                       TRUE /FALSE/  (command line argument)
+...
+                               [option '-fg' (don't start as daemon)]  FOREGROUND   TRUE /FALSE/  (environment variable)
+...
+% unset FOREGROUND
+```
+Note the right-most column saying `(environment variable)` for the `-fg` option. This indicates that the value for `-fg` has been taken from its environment variable (`FOREGROUND`) and as long as `FOREGROUND` exists (is not unset), Orion will start in foreground.
 
 [Top](#top)
 
 ## Adding a REST service
-The REST services that the Orion context broker supports are items in the `RestService` vector `restServiceV`, found in [the main program](README.md#srcappcontextbroker) in `contextBroker.cpp`. This vector is a reminiscent from back when Orion also implemented the FIWARE Configuration Manager and thus had to be able to assume different roles. The set of services that are supported pretty much defines the role and by starting the REST interface with one `RestService` vector or another took care of the role selection. Now Orion has only one role, to work as context broker, but the `RestService` vector remains.
+The REST services that the Orion Context Broker supports are items in the `RestService` vector `restServiceV`, found in [the main program](README.md#srcappcontextbroker) in `contextBroker.cpp`. This vector is a reminiscent from back when Orion also implemented the FIWARE Configuration Manager and thus had to be able to assume different roles. The set of services that are supported pretty much defines the role and by starting the REST interface with one `RestService` vector or another took care of the role selection. Now Orion has only one role, to work as context broker, but the `RestService` vector remains.
 
-To add a REST service to Orion, a new item in `RestService restServiceV[]` is needed. Just like with CLI parameters, the easiest way is to copy an old service and then modify the copy to suit your needs.
+To add a REST service to Orion, a new item in `RestService restServiceV[]` is needed. Just like with CLI parameters, the easiest way is to copy an old service (item in `restServiceV`) and then modify the copy to suit your needs.
 
-To understand this new item in the RestService vector, take a look at the struct `RestService`, in `src/lib/rest/RestService.h`:
+To understand this new item in the `RestService` vector, take a look at the struct `RestService`, in `src/lib/rest/RestService.h`:
 
 ```
 typedef struct RestService  
@@ -119,7 +134,7 @@ NOTE:
 
 * Item 2: `Metadata` would have to be added as an enum constant in the `enum RequestType` in `src/lib/ngsi/Request.h`
 * Item 4: `"*"`. An asterisc in the component vector `RestService::compV` matches ANY string, and whenever a path including entity id, attribute name, etc is defined, `"*"` must be used.
-* Item 6: `putMetadata` is the service routine for `PUT /v2/entities/*/attrs/*/metadata/*` and the function must be implemented. The directory of the library for NGSIv2 service routines is `src/lib/serviceRoutinesV2` (see [library description](README.md#srclibserviceroutinesv2)).
+* Item 6: `putMetadata()` is the service routine for `PUT /v2/entities/*/attrs/*/metadata/*` and the function must be implemented. The directory of the library for NGSIv2 service routines is `src/lib/serviceRoutinesV2` (see [library description](README.md#srclibserviceroutinesv2)).
 
 Note also that in `contextBroker.cpp`, these `RestService` vector lines have been grouped and as the lines got really long, defines for the component vector have been created.    
 
@@ -145,18 +160,18 @@ The `entity id`, `attribute name`, and `metadata name` (all part of the URL path
   std::string metadataName  = compV[6];  
 ```
 
-All service routines that modify/create entities/attributes/metadata rely on the NGSIv1 service routine `postUpdateContext()`. `putMetadata()` is no exception. So, what needs to be done in `putMetadata()` is to build a `UpdateContextRequest` object using the parameters of `putMetadata()` and call `postUpdateContext()`. Something like this:
+All service routines that modify/create entities/attributes/metadata rely on the NGSIv1 service routine `postUpdateContext()`, and `putMetadata()` is no exception. So, what needs to be done in `putMetadata()` is to build a `UpdateContextRequest` object using the parameters of `putMetadata()` and call `postUpdateContext()`. Something like this:
 
 ```
   parseDataP->upcr.res.fill(entityId, attributeName, metadataName, "APPEND");  
   postUpdateContext(ciP, components, compV, parseDataP, NGSIV2_FLAVOUR_ONAPPEND);    
 ```
 
-`UpdateContextRequest` has a bunch of fill methods (seven fill methods as of March 2017) and if there is no fill method suited for your demands in `putMetadata()`, then another fill method must be implemented for `UpdateContextRequest`.
+`UpdateContextRequest` has a bunch of `fill()` methods (seven `fill()` methods as of March 2017) and if there is no fill-method suited for your demands in `putMetadata()`, then another fill-method must be implemented for `UpdateContextRequest`.
 
-It is easy enough, just copy from an older, similar, fill method.
+It is easy enough, just copy from an older, similar, fill-method.
 
-Now just add `putMetadata.cpp` to the CMake file `src/lib/serviceRoutinesV2/CMakeLists.txt` and compile the broker. To test that `putMetadata` works correctly, a new functional test case should be implemented. [The following recipe](#adding-a-functional-test-case) explains how to do that.
+Now just add `putMetadata.cpp` to the CMake file `src/lib/serviceRoutinesV2/CMakeLists.txt` and compile the broker. To test that `putMetadata()` works correctly, a new functional test case should be implemented. [The following recipe](#adding-a-functional-test-case) explains how to do that.
 
 To capture "POST/PATCH/XXX /v2/entities/*/attrs/*/metadata/*" and respond with a `405 Method Not Allowed`, please have a look at [the recipe about bad method](#catching-a-405-method-not-allowed).
 
@@ -176,7 +191,7 @@ A functional test file contains six sections:
 5. EXPECT/REGEXPECT section
 6. TEARDOWN section
 
-Each section (except the Copyright preamble, that starts from the beginning of the file) must have a header, that tells the functional test harness where every section starts/ends:
+Each section (except the Copyright preamble, that starts at the beginning of the file) must have a header, that tells the functional test harness where every section starts/ends:
 
 * `--NAME--`
 * `--SHELL-INIT--`
@@ -184,7 +199,7 @@ Each section (except the Copyright preamble, that starts from the beginning of t
 * `--REGEXPECT--` / `--EXPECT--`
 * `--TEARDOWN--`
 
-If `--REGEXPECT--` is used (and not `--EXPECT--`), then the expected section permits regular expressions. That is the only different between both.
+If `--REGEXPECT--` is used (and not `--EXPECT--`), then the expected section permits regular expressions. That is the only different between these two.
 
 ### Copyright section
 This section is simply for the Copyright header. Copy an old one. Try to remember to change the year, if necessary.
@@ -210,11 +225,12 @@ Example (normal case):
 
 ```
 --SHELL-INIT--  
-dbInit CB  
-brokerStart CB  
+dbInit CB
+brokerStart CB
+accumulatorStart
 ```
 
-Example with broker and five context providers (`fwd_query_limited.test`):
+Example with broker and five context providers ("stolen" from the existing test case `test/functionalTest/cases/1016_cpr_forward_limit/fwd_query_limited.test`):
 
 ```
 --SHELL-INIT--  
@@ -233,9 +249,9 @@ brokerStart CP5
 ```
 
 ### SHELL Section
-The broker was started in the SHELL-INIT section and this section is where curl commands (and other commands) are executed to send request to Orion and perform the functional test.  
+The broker is started in the SHELL-INIT section and this section is where curl commands (and other commands) are executed to send requests to Orion and perform the functional test.  
 
-A shell function called `orionCurl` is implemented for the shell section to be easier to read and implement. The implementation of `orionCurl` can be found in `test/functionalTest/harnessFunctions.sh`.
+A shell function called `orionCurl` is implemented for the shell section to be easier to read and implement. The implementation of `orionCurl`, and many other help functions is found in `test/functionalTest/harnessFunctions.sh`.
 
 Note that each step in the Shell section starts with a short descriptive header, like this:
 
@@ -244,7 +260,7 @@ echo "0x. description of test step 0x"
 echo "==============================="  
 ```
 
-and the steps end with two calls to `echo`, to separate the current step from the next in the output. This is pretty important as it makes it so much easier to read the output, which must match what is in the following section, the EXPECT/REGEXPECT section.
+and the steps end with two calls to `echo`, to separate the current step from the next in the output. This is pretty important as it makes it **so much** easier to read the output, which must match what is in the section that follows, the **EXPECT/REGEXPECT** section.
 
 A typical step (e.g. to create an entity) looks like this:  
 
@@ -282,7 +298,7 @@ or
 --REG-EXPECT--
 ```
 
-You have to **pick one**. The broker pretty much always uses the `--REG-EXPECT--` type. The advantage with --REG-EXPECT-- is that is permits to add regular expressions using the `REGEX()` syntax, which is very important for the comparison of dates, or ids created by Orion and returned in the response, like a registration id or a correlator or a simple timestamp.   An important limitation is that there can only be **one REGEX** per line in the REG-EXPECT section.
+You have to **pick one**. Pretty much **all** current functests use the `--REG-EXPECT--` type. The advantage with --REG-EXPECT-- is that it permits to add regular expressions using the `REGEX()` syntax, which is very important for the comparison of dates, or IDs created by Orion and returned in the response, like a registration id or a correlator or a simple timestamp. An important limitation is that there can only be **one REGEX** per line in the REG-EXPECT section.
 
 That said, in the REG-EXPECT section, just add what is the expected output from the test step in question. For example, the example "01. Create entity E1 with attribute A1" from the above sub-chapter about the SHELL section would
 have this corresponding piece in the --REGEXPECT-- section:  
@@ -302,14 +318,14 @@ Date: REGEX(.*)
 
 Note that after two first lines, what comes out from `orionCurl` is first the HTTP headers, and after that eventual payload. In this example there is no payload.
 
-Note the two calls to `REGEX()`, for the correlator and the date:
+Note the two occurrences of `REGEX()`, for the correlator and the date:
 
 * The correlator is a string of 36 characters, that is a hex number with hyphens. This regex could be made better, now that we know exactly
 where each hyphen must come, however, it's not really necesary.  
 * The second REGEX, for the `Date` HTTP header could also be more elaborated. Also not necessary.
 
 ### TEARDOWN Section
-This is where processes are killed and databases are removed, so that the next test case will start with a clean slate. The most typical commands used are:
+This is where processes are killed and databases are removed, so that the following test case will start with a clean slate. The most typical commands used are:
 
 ```
 --TEARDOWN--  
@@ -351,10 +367,14 @@ Note that `t1` is used and not `T1`. This is because Orion converts tenants to a
 [Top](#top)
 
 ## Catching a '405 Method Not Allowed'
-Orion supports the request `GET /v2/entities/{EntityId}` AND `DELETE /v2/entities/{EntityId}`, but, what happens
-if a `POST /v2/entities/{EntityId}` is issued to the broker?
+Orion supports the requests
 
-Well, normally (as `POST /v2/entities/{EntityId}` is not supported), a `404 Not Found` would be the result. However, as Orion catches ANY method for the URL `/v2/entities/{EntityId}` with the service routine `badVerbGetDeleteOnly`, Orion is able to respond with a `405 Method Not Allowed`.
+* `GET /v2/entities/{EntityId}` AND
+* `DELETE /v2/entities/{EntityId}`,
+
+but, what happens if a `POST /v2/entities/{EntityId}` is issued to the broker?
+
+Well, normally (as `POST /v2/entities/{EntityId}` is not supported), a `404 Not Found` would be the result. However, as Orion catches ANY method for the URL `/v2/entities/{EntityId}` with the service routine `badVerbGetDeleteOnly()`, Orion is able to respond with a `405 Method Not Allowed` - the URL is OK, but the verb/method is not supported.
 
 Please enter `contextBroker.cpp` and search for this section:
 
@@ -384,9 +404,9 @@ Before this section, these definitions are made:
 
 So, as you can see:
 
-* Iif a request with the URL path `/v2/entities/{EntityId}`, and the method `GET` enters the broker, then the service routine `getEntity()` takes care of the request. 
+* If a request with the URL path `/v2/entities/{EntityId}`, and the method `GET` enters the broker, then the service routine `getEntity()` takes care of the request. 
 * If the method is instead "DELETE", then `deleteEntity()` takes care of the request.
-* In the case of any other verb (POST, PUT, etc), `badVerbGetDeleteOnly()` takes care of the request. When `badVerbGetDeleteOnly()` takes care of the request, the response comes as `405 Method Not Allowed` and the HTTP header `Allow: GET, DELETE` is included.
+* In the case of any other verb (POST, PUT, etc), `badVerbGetDeleteOnly()` takes care of the request. When `badVerbGetDeleteOnly()` takes care of the request, the response comes as `405 Method Not Allowed` and the HTTP header `Allow: GET, DELETE` is included in the response.
 
 [Top](#top)
 
@@ -395,9 +415,9 @@ Memory leaks are detected using [valgrind memcheck](http://valgrind.org/docs/man
 
 If `valgrindTestSuite.sh` is run by hand, remember that Orion must be compiled in DEBUG mode for it to work (`make debug install`).  
 
-The output of the valgrind run is saved to a file with the same name of the test case, but with the suffix `valgrind.out`.  
+The output of the valgrind run is saved to a file with the same name as the test case, but with the suffix `valgrind.out`.  
 
-Normally, the broker has no memory leaks, so to make an exercise, we'll add one:
+Normally, the broker has no memory leaks, so to make an exercise **with** a memory leak, we'll have to temporarily add one:
 
 * Open the file `src/lib/ngsi10/UpdateContextRequest.cpp` in your favorite editor
 * Find the method `UpdateContextRequest::release()` and comment the call to `contextElementVector.release()`:
@@ -440,6 +460,6 @@ Normally, the broker has no memory leaks, so to make an exercise, we'll add one:
 
 Now, looking at stack frame #2, the leak seems to come from a call to `contextElement()` in `jsonUpdateContextRequest.cpp`, line 50 (the exact line could be slightly different in your case). We already know why we have this leak, as we've commented a call to `ContextElementVector::release()` in `UpdateContextRequest::release()`, but  one thing is where the allocation is done, and another thing (sometimes a very different thing), is where the allocted object should be freed.
 
-That is the tricky part of fixing leaks, knowing where the call to free/delete should be made. It is often obvious, but far from always. It is not rare, when trying to fix a leak, to release an allocated buffer too soon, i.e. before it is used for the last time, so it is very important to make sure that all functional tests are fully working once all leaks are fixed. Imagine this leak found in `jsonUpdateContextRequest.cpp`, if we release the buffer right after it is allocated, then somewhere  between there and `ContextElementVector::release()`, the buffer will be used and we will most probably experience a SIGSEGV.
+That is the tricky part of fixing leaks, knowing where the call to free/delete should be made. It is often obvious, but not always. It is not rare, when trying to fix a leak, to release an allocated buffer too soon, i.e. before it is used for the last time, so it is very important to make sure that all functional tests are fully working once all leaks are fixed. Imagine this leak found in `jsonUpdateContextRequest.cpp`, if we release the buffer right after it is allocated, then somewhere  between there and `ContextElementVector::release()`, the buffer will be used and we will most probably experience a SIGSEGV.
 
 [Top](#top)

@@ -1,31 +1,18 @@
 # <a name="top"></a>Semaphores
 Orion manages a number of semaphores for protection of delicate data and resources such as
 
-* Mongo Requests
-* Transaction ID
-* Subscription Cache
-* Timing Statistics
-* Mongo Connection Pool
-* Metrics Manager
-* Alarm Manager
-* Log File
-* Notification Queue
-* Notification Queue Statistics
+* [Mongo requests](#mongo-request-semaphore)
+* [Transaction ID](#transaction-id-semaphore)
+* [Subscription cache](#subscription-cache-semaphore)
+* [Timing statistics](#timing-statistics-semaphore)
+* [Mongo connection pool](#mongo-connection-pool-semaphores)
+* [Metrics Manager](#metrics-manager-semaphore)
+* [Alarm Manager](#alarm-manager-semaphore)
+* [Log file](#log-file-semaphore)
+* [Notification queue](#notification-queue-semaphore)
+* [Notification queue statistics](#notification-queue-statistics-semaphore)
 
 Of these semaphores, the first four use helper functions in `lib/common/sem.[cpp|h]`, while the others are part of their respective structure/class.
-
-Let's analyze them in detail.
-
-* [Mongo request semaphore](#mongo-request-semaphore)
-* [Transaction ID semaphore](#transaction-id-semaphore)
-* [Subscription cache semaphore](#subscription-cache-semaphore)
-* [Timing statistics semaphore](#timing-statistics-semaphore)
-* [Mongo connection pool semaphores](#mongo-connection-pool-semaphores)
-* [Metrics Manager semaphore](#metrics-manager-semaphore)
-* [Alarm Manager semaphore](#alarm-manager-semaphore)
-* [Log file semaphore](#log-file-semaphore)
-* [Notification queue semaphore](#notification-queue-semaphore)
-* [Notification queue statistics Semaphore](#notification-queue-statistics-semaphore)
 
 ## Mongo request semaphore
 The *Mongo request semaphore* resides in `lib/common/sem.cpp` and its semaphore variable is `reqSem`. The functions to take/give the semaphore are `reqSemTake()` and `reqSemGive()`.
@@ -48,9 +35,9 @@ This semaphore is used for each and every request to the database **only** by to
 ## Transaction ID semaphore
 The *transaction ID semaphore* resides in `lib/common/sem.cpp` and its semaphore variable is `transSem`. The functions to take/give the semaphore are  `transSemTake()` and `transSemGive()`.
 
-Each REST request that Orion receives is given a unique **transaction ID**:  
+Each REST request that Orion receives is given a unique **transaction ID**.  
 
-To ensure a unique identifier of the transaction, the `startTime` down to milliseconds of the broker is used as prefix (to almost guarantee its uniqueness among brokers) Furthermore, a running number is appended for the transaction. 
+To ensure a unique identifier of the transaction, the `startTime` of the broker (down to milliseconds) is used as prefix (to almost guarantee its uniqueness among brokers). Also, a running number for the transaction is appended to the identifier.
 
 A 32 bit signed number is used, so its max value is 0x7FFFFFFF (2,147,483,647). If the running number overflows, a millisecond is added to the start time of the broker. As the running number starts from 1 again after overflow, we need this to distinguish the first transaction after a running number overflow from the VERY first transaction (as both will have running number 1).
 Imagine that the start time of the broker is XXXXXXXXX.123:
@@ -58,21 +45,21 @@ Imagine that the start time of the broker is XXXXXXXXX.123:
 * XXXXXXXXX.123.1 -> the VERY first transaction
 * XXXXXXXXX.124.1 -> the first transaction after running number overflow
 
-The whole thing is stored in the thread variable `transactionId`, supported by the [**logMsg** library](README.md#srcliblogmsg) logging library.
+The whole thing is stored in the thread variable `transactionId`, supplied by the [**logMsg** library](README.md#srcliblogmsg) logging library.
 
-Now, the **running number** needs to be protected when incremented and this semaphore is used for that purpose.
+Now, The **running number** needs to be protected when incremented and this semaphore is used for that purpose.
 
-See the function `transactionIdSet` in the file `lib/common/globals.cpp`.
+See the function `transactionIdSet()` in the file `lib/common/globals.cpp`.
 
 [Top](#top)
 
 ## Subscription cache semaphore
 The *subscription cache semaphore* resides in `lib/common/sem.cpp` and its semaphore variable is `cacheSem`. The functions to take/give the semaphore are `cacheSemTake()` and `cacheSemGive()` and they are used by functions in two different libraries:
 
-* [**mongoBackend**](README.md#srclibmongobackend) and
-* [**cache**](README.md#srclibcache)
+* [**lib/mongoBackend**](README.md#srclibmongobackend) and
+* [**lib/cache**](README.md#srclibcache)
 
-Due to the implementation of the subscription cache, especially how it is refreshed, this semaphore cannot be used in low level functions of the cache library, as one would suspect, but rather in higher level functions, which makes the implementation a little bit tricky.
+Due to the implementation of the subscription cache, *especially how it is refreshed*, this semaphore cannot be taken/given in low level functions of the cache library, as one would normally do this, but rather in higher level functions, which makes the implementation a little bit tricky.
 Any changes in where this semaphore is taken/given needs careful consideration.
 
 Details on this semaphore is already present in the [dedicated document of the subscription cache](subscriptionCache.md). Pay special attention to the semaphore considerations explained in the [section devoted to `subCacheSync()` function](subscriptionCache.md#subcachesync).
@@ -80,18 +67,18 @@ Details on this semaphore is already present in the [dedicated document of the s
 [Top](#top)
 
 ## Timing Statistics Semaphore
-The *timing statistics semaphore* resides in `lib/common/sem.cpp` and its semaphore variable is called `timeStatSem`. The functions to take/give the semaphore are `timeStatSemTake()` and `timeStatSemGive()`.
+The *timing statistics semaphore* resides in `lib/common/sem.cpp` and its semaphore variable is `timeStatSem`. The functions to take/give the semaphore are `timeStatSemTake()` and `timeStatSemGive()`.
 
-Timing Statistics were invented as a tool to detect bottlenecks in run-time and as system-calls are used to measure time, this impacts the performance of Orion so it has been made optional, by default OFF but can be turned ON using the [CLI parameter](../admin/cli.md) `-statTiming`.
+Timing Statistics were invented as a tool to detect bottlenecks in run-time but as system-calls are used to measure time, this impacts the performance of Orion so it has been made optional, by default OFF but can be turned ON using the [CLI parameter](../admin/cli.md) `-statTiming`.
 
-The statistics measurements are collected by the function `requestCompleted()` in `lib/rest/rest.cpp` and put together in `lib/common/statistics.cpp`, function `renderTimingStatistics()`. These both functions use the semaphore, obviously. It is not used anywhere else.
+The statistics measurements are collected by the function `requestCompleted()` in `lib/rest/rest.cpp` and put together in `lib/common/statistics.cpp`, function `renderTimingStatistics()`. Both these functions use the semaphore, obviously. It is not used anywhere else.
 
 [Top](#top)
 
 ## Mongo connection pool semaphores
 Orion implements a [pool for connections to the database](mongoBackend.md#connection-pool-management), and this pool needs protection by a semaphore to obtain/release connections.
 
-Actually, two semaphores are used. The variables holding these two semaphores are called:
+Actually, two semaphores are used. The variables holding these two semaphores are:
 
 * `connectionPoolSem`
 * `connectionSem`
@@ -101,16 +88,16 @@ and they are initialized in `mongoConnectionPoolInit()` in `lib/mongoBackend/mon
 * `mongoPoolConnectionGet()`
 * `mongoPoolConnectionRelease()`
 
-The variables holding the semaphores are static and thus cannot be accessed outside this file (`mongoConnectionPool.cpp`).
+The variables holding the semaphores are static and thus cannot be accessed outside this file (`lib/mongoBackend/mongoConnectionPool.cpp`).
 
 This is how the Mongo Connection Pool is protected:
 
-* One binary semaphore that protects the pool itself. That is a connection-vector (`connectionPoolSem`).
-* One counting semaphore that makes the caller wait until there is at least one free connection (`connectionSem`).
+* A binary semaphore protects the pool itself (`connectionPoolSem`).
+* A counting semaphore makes the caller wait until there is a free connection (`connectionSem`).
 
-There is a limited number of connections and the first thing to do is to wait for a connection to become available (any of the N connections in the pool). This is done waiting on the counting semaphore that is initialized with "POOL SIZE", meaning the semaphore can be taken N times if the pool size is N.
+There is a limited number of connections and the first thing to do is to wait for a connection to become available (any of the N connections in the pool). This is done by waiting on the counting semaphore that is initialized with "POOL SIZE", meaning the semaphore can be taken N times if the pool size is N.
 
-Once a connection is free, `sem_wait(&connectionSem)` returns and we now have to take the semaphore that protects for pool itself (we *are* going to modify the vector of the pool, can only do it in one thread at a time)
+Once a connection is available, `sem_wait(&connectionSem)` returns and we now have to take the semaphore that protects the pool itself (we *are* going to modify the vector of the pool, can only do it in one thread at a time)
 
 After taking a connection, the semaphore `connectionPoolSem` is given, as all modifications to the connection pool have finished. The other semaphore however, `connectionSem`, is kept and it is not given until we finish using the connection.
 
@@ -127,7 +114,7 @@ The Metrics Manager needs a semaphore to protect its list of metrics and this se
 
 As the methods are private, they can only be accessed by the instance of `MetricsManager` class, which is a singleton in Orion.
 
-The semaphore is used when ever the metrics list is read or updated, which is done by just four of the methods of `MetricsManager`:
+The semaphore is used whenever the metrics list is read or updated, which is done by four of the methods of `MetricsManager` and nowhere else:
 
 * `MetricsManager::add()`
 * `MetricsManager::release()`
@@ -163,15 +150,15 @@ Orion keeps a log file and a semaphore is needed to protect the log file from tw
 
 The semaphore is initialized in the function `lmSemInit()` and used in the two static functions `semTake()` and `semGive()`, which in their turn are used in:
 
-* `lmOut()` and
+* `lmOut()`
 * `lmClear()`
 
 [Top](#top)
 
 ## Notification queue semaphore
-When a thread pool is selected (using the [CLI parameter](../admin/cli.md) `-notificationMode`), for sending of notifications, a queue is used to feed the notifications to the workers in the thread pool. This queue is protected by a semaphore. 
+When a thread pool is used (using the [CLI parameter](../admin/cli.md) `-notificationMode`), for sending of notifications, a queue is used to feed the notifications to the workers in the thread pool. This queue is protected by a semaphore. 
 
-The semaphore, of type `boost::mutex` is called `mtx` and is a private member of the class `SyncQOverflow`, found in `src/lib/common/SyncQOverflow.h`:
+The semaphore, of type `boost::mutex`, is called `mtx` and it is a private member of the class `SyncQOverflow`, found in `src/lib/common/SyncQOverflow.h`:
 
 ```
 template <typename Data> class SyncQOverflow
