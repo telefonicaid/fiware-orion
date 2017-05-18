@@ -298,7 +298,7 @@ or
 --REG-EXPECT--
 ```
 
-You have to **pick one**. The broker pretty much always uses the `--REG-EXPECT--` type. The advantage with --REG-EXPECT-- is that it permits to add regular expressions using the `REGEX()` syntax, which is very important for the comparison of dates, or IDs created by Orion and returned in the response, like a registration id or a correlator or a simple timestamp. An important limitation is that there can only be **one REGEX** per line in the REG-EXPECT section.
+You have to **pick one**. Pretty much **all** current functests use the `--REG-EXPECT--` type. The advantage with --REG-EXPECT-- is that it permits to add regular expressions using the `REGEX()` syntax, which is very important for the comparison of dates, or IDs created by Orion and returned in the response, like a registration id or a correlator or a simple timestamp. An important limitation is that there can only be **one REGEX** per line in the REG-EXPECT section.
 
 That said, in the REG-EXPECT section, just add what is the expected output from the test step in question. For example, the example "01. Create entity E1 with attribute A1" from the above sub-chapter about the SHELL section would
 have this corresponding piece in the --REGEXPECT-- section:  
@@ -404,7 +404,7 @@ Before this section, these definitions are made:
 
 So, as you can see:
 
-* Iif a request with the URL path `/v2/entities/{EntityId}`, and the method `GET` enters the broker, then the service routine `getEntity()` takes care of the request. 
+* If a request with the URL path `/v2/entities/{EntityId}`, and the method `GET` enters the broker, then the service routine `getEntity()` takes care of the request. 
 * If the method is instead "DELETE", then `deleteEntity()` takes care of the request.
 * In the case of any other verb (POST, PUT, etc), `badVerbGetDeleteOnly()` takes care of the request. When `badVerbGetDeleteOnly()` takes care of the request, the response comes as `405 Method Not Allowed` and the HTTP header `Allow: GET, DELETE` is included in the response.
 

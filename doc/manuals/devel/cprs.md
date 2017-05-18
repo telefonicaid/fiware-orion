@@ -2,7 +2,7 @@
 
 * [Forwarding of update requests](#forwarding-of-update-requests)
 * [Forwarding of query requests](#forwarding-of-query-requests)
-* [A Caveat about shadowing entities](#a-caveat-about-shadowing-entities)
+* [A Caveat about shadowing of entities](#a-caveat-about-shadowing-entities)
 
 The Orion Context Broker, as explained in [the User & Programmers Manual](../user/context_providers.md), supports the concept of Context Providers. In short, when for an update/query, an entity/attribute is not found, Orion checks its list of registrations (NGSI9) and if found in that list it means that the entity is registered to a Context Provider. So, a request is forwarded to that Context Provider. The IP, port and path of the Context Provider is found in the field `providingApplication` of the `struct ContextRegistration` that is part of the registration request `RegisterContextRequest`.
 
@@ -20,7 +20,7 @@ In NGSIv1, the request `POST /v1/updateContext` has a field called `updateAction
 
 * Requests with `UPDATE` or `REPLACE` may provoke forwarding of the request.
   Only if **not found locally but found in a registration**.
-* If `APPEND` is used, the action will always be local. If the entity/attribute already exists it will be updated. If not, it is created. Locally.
+* If `APPEND` is used, the action will always be local. If the entity/attribute already exists it will be updated. If not, it is created (locally).
 * `APPEND_STRICT` fails if the entity/attribute already exists (locally) and if not, the entity/attribute is created locally.
 * `DELETE` is always local.
 
@@ -37,7 +37,7 @@ Note that there are a number of service routines that end up calling `postUpdate
 * [**mongoBackend** library](README.md#srclibmongobackend) processes the request (see diagrams [MB-01](mongoBackend.md#flow-mb-01) or [MB-02](mongoBackend.md#flow-mb-02)) and marks all attributes in the requests in one of three possible ways (step 2):
 
     * Not Found
-    * Found in Local Broker
+    * Found in Local Context Broker
     * Found in Remote Context Provider
 
 * The attributes that are found in a remote context provider need to be forwarded. The local attributes are simply updates non-found attributes are marked as such in the response.
@@ -93,16 +93,18 @@ _FW-04: `queryForward()` function detail_
 * The request to forward is sent with the help of `httpRequestSend()` (step 3) which uses [libcurl](https://curl.haxx.se/libcurl/) to forward the request (step 4). libcurl sends in sequence the request to the Context Provider (step 5).
 * The textual response from the Context Provider is parsed and an `QueryContextResponse` object is created (step 6). Parsing details are provided in diagram [PP-01](jsonParse.md#flow-pp-01).
 
-## A Caveat about shadowing entities
+## A Caveat about shadowing of entities
 The Context Provider mechanism is implemented using standard NGSI9 requests and this might lead to unwanted situations.
 We feel it is important to at least be aware of this potential "shadowing" problem.  
 
 Imagine the following scenario:
 
 * We have a Context Provider CP1 that supplies an Entity E1 with attribute A1.
-  An NGSI9 registration about E1/A1 of CP1 is sent to the Context Broker
-* A client queries the Context Broker about E1/A1 and this provokes a forward to CP1 (as E1/A1 is not found locally but in a registration) and the client gets the expected result
-* A request enters the Context Broker to create (APPEND) an Entity E1 with attribute A1.
-* A client queries the Context Broker about E1/A1 and as the attribute is now found locally it is simply returned. No forward is being done. 
+  An NGSI9 registration about E1/A1 of CP1 is sent to the Context Broker.
+* A client queries the Context Broker about E1/A1 and this provokes a forward to CP1 (as E1/A1 is not found locally but in a registration) and the client gets the expected result.
+* Now, a request enters the Context Broker to create (APPEND) an Entity E1 with attribute A1.
+* And the3 problems: a client queries the Context Broker about E1/A1 and as the attribute is now found locally it is simply returned. No forward is being done.
+
+E1/A1 on Context Provider CP1 can no longer be seen via the Context Broker as it has been shadowed.
 
 [Top](#top)

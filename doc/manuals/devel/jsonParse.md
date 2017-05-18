@@ -18,7 +18,7 @@ The purpose of the parse step is to transform a text buffer, JSON in this case, 
 
 A very simple but illustrative example:
 
-The following payload (for `POST /v1/queryContext`):
+The following payload (for `POST /v1/queryContext`) ... :
 ```
 {
   "entities": [
@@ -173,7 +173,7 @@ The pointer to `ConnectionInfo` is passed to many functions in the libraries **j
 
 ### `boost::property_tree::ptree::value_type& v`
 
-This is a reference to the currently treated node in the tree. Not much more to say about it.  See the [boost boost property_tree documentation](https://theboostcpplibraries.com/boost.propertytree) for more information on this.
+This is a reference to the currently treated node in the tree. Not much more to say about it.  See the [boost property_tree documentation](https://theboostcpplibraries.com/boost.propertytree) for more information on this.
 
 ### `const std::string& _path`
 
@@ -352,7 +352,7 @@ The treat-function `entityId` is called when a node `/entities/entity` is found.
 
 As vectors items have no key-name in JSON, we decided to use the singular word of the name of the vector (which is always in plural), i.e. an instance of **entities** is called **entity**. So, when the node `/entities/entity` is found (an item of the entities vector), the treat-function `entityId()` is called and it allocates room for an `EntityId` (`class EntityId` resides in the module `src/lib/ngsi/EntityId.h/cpp`) and pushes the `EntityId` pointer to the vector `reqDataP->qcr.res.entityIdVector`.
 
-The treat-function `entityId()` also sets `reqDataP->qcr.entityIdP` to reference this latest instance of `EntityId` so that consequent treat-functions can reach it. For example, `entityIdId()` needs it, to set the `id` field of the entity, which is all `entityIdId()` does. Pointers of this type are needed during the parse/extraction and is the reason for the ParseData structs (see `src/lib/ngsi/ParseData.h` - one "XxxData" struct per payload type, with an output class instance and these help pointers).
+The treat-function `entityId()` also sets `reqDataP->qcr.entityIdP` to reference this latest instance of `EntityId` so that consequent treat-functions can reach it. For example, `entityIdId()` needs it, to set the `id` field of the entity, which is all `entityIdId()` does. Pointers of this type are needed during the parse/extraction and these pointers are the reason for the ParseData structs (see `src/lib/ngsi/ParseData.h` - one "XxxData" struct per payload type, with an output class instance and these help pointers).
 
 ### `ParseData* parseDataP`
 
