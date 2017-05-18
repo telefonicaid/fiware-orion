@@ -110,7 +110,7 @@ See `lmTransactionStart()` et al in `logMsg.cpp/h`.
 About debugging the broker, see especially the trace levels (that are set using the `-t` CLI param), in `traceLevels.h`.
 And. to turn on traces, remember that it is not enough to set the trace levels. The option `-logLevel DEBUG` must be used as well.  
 
-[Topl](#top)
+[Top](#top)
 
 
 ## src/lib/parseArgs/
