@@ -240,6 +240,11 @@ sev[48]=NONE;  cat[48]="LAST"
 #
 # Exceptions per library
 #
+# o Rule 6 for mongoBackend
+#     Unfortunately, overloaded functions in the mongodb client library wont work if we use int64
+#     instead of long long (complaints about ambibuity), so, this rule cannot be a stopper for
+#     the mongoBackend library
+#
 if [ "$dir" == "mongoBackend" ]
 then
   sev[6]=MINOR
