@@ -235,6 +235,24 @@ sev[47]=MAYOR; cat[47]='Extra space before )'
 sev[48]=NONE;  cat[48]="LAST"
 
 
+
+# -----------------------------------------------------------------------------
+#
+# Exceptions per library
+#
+# o Rule "Use int16/int64/etc" for mongoBackend
+#     Unfortunately, overloaded functions in the mongodb client library wont work if we use int64
+#     instead of long long (complaints about ambibuity), so, this rule cannot be a stopper for
+#     the mongoBackend library
+#
+if [ "$dir" == "mongoBackend" ]
+then
+  sev[6]=MINOR
+  cat[6]='Use int16/int64/etc (MINOR)'
+fi
+
+
+
 # -----------------------------------------------------------------------------
 #
 # Counting occurrences of the line error categories

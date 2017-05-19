@@ -405,6 +405,14 @@ directly or indirectly are forced to have that construct as well.
 
 *How to check*: using an intelligent ```grep```.
 
+#### M12bis (`using namespace` in source files)
+
+*Rule*: the construct `using namespace XXX` must not be used in source files (i.e. `.cpp`). The construct `using XXX::YYY` may be used in source files.
+
+*Rationale*: Much clearer where functions/variables/types come from when `using namespace XXX` is not used.
+
+*How to check*: checked using the internal script `scripts/style_check.sh`
+
 ### ‘SHOULD follow’ rules:
 
 #### S1 (Statements):
