@@ -55,7 +55,7 @@
 * For each one of the subscriptions in the map, send notification
 *
 * FIXME: this function is pretty similar to the one with the same name in
-* mongoUpdateContext.cpp, so maybe it makes sence to factorize it.
+* mongoUpdateContext.cpp, so maybe it makes sense to factorize it.
 */
 static bool processSubscriptions
 (

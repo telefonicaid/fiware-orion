@@ -408,13 +408,10 @@ directly or indirectly are forced to have that construct as well.
 #### M12bis (`using namespace` in source code files)
 
 *Rule 1*: the construct ```using namespace XXX``` must not be used in source code files.
-*Rule 2*: the construct ```using XXX::YYY" **may** be used in source code files, but even better is to **not** use `using` but to write out the namespace (call it prefix if you want) wherever needed.
 
 *Rationale 1*: Much clearer where functions/variables/types come from when `using namespace XXX` is not used
-*Rationale 2*: Even clearer if each function/variable/type contains the namespace everywgere in the code
 
 *How to check 1*: **Rule 1** is checked using the internal script ```scripts/style_check.sh```
-*How to check 2*: **Rule 2**: simply remove all "using" constructs and compile
 
 ### ‘SHOULD follow’ rules:
 
