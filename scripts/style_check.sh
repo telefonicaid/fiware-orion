@@ -235,6 +235,19 @@ sev[47]=MAYOR; cat[47]='Extra space before )'
 sev[48]=NONE;  cat[48]="LAST"
 
 
+
+# -----------------------------------------------------------------------------
+#
+# Exceptions per library
+#
+if [ "$dir" == "mongoBackend" ]
+then
+  sev[6]=MINOR
+  cat[6]='Use int16/int64/etc (MINOR)'
+fi
+
+
+
 # -----------------------------------------------------------------------------
 #
 # Counting occurrences of the line error categories
