@@ -44,7 +44,7 @@ inline static bool commonForbidden(char c)
   case '>':
   case '"':
   case '\'':
-  case '=':
+//  case '=':
   case ';':
   case '(':
   case ')':
