@@ -23,8 +23,8 @@ Also, as NGSI is used for the payload of the requests, some previous knowledge o
 
 ## Contents
 
+* [High level internal architecture](architecture.md). A high level description of the Orion Context Broker internal architecture. We recommend to read this document before any other.
 * [Directory structure](directoryStructure.md). A description of the directory structure used by Orion Context Broker repository.
-* [High level internal architecture](architecture.md)
 * [Source code main program and libraries](sourceCode.md). A description of the different libraries (and main program) in which the source code is structured.
 * [Flow index](flowsIndex.md). An index for all the flow diagrams described in the development documentation. A very useful "map" to have at hand.
 * [Cookbook](cookbook.md). This document describes some useful development related recipes.
