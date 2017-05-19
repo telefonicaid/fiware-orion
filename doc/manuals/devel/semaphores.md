@@ -28,7 +28,7 @@ The function `reqSemTake()` is somewhat special as there are four different work
 
 The operation mode of this semaphore is set using the [CLI option](../admin/cli.md) `-reqMutexPolicy`. Default value is "Both Read and Write operations". More information on mutex policy in [this section of the Orion administration manual](../admin/perf_tuning.md#mutex-policy-impact-on-performance).
 
-This semaphore is used for each and every request to the database **only** by top level functions of [**mongoBackend**](README.md#srclibmongobackend), i.e. those functions that are external and called by service routines.
+This semaphore is used for each and every request to the database **only** by top level functions of [**mongoBackend**](sourceCode.md#srclibmongobackend), i.e. those functions that are external and called by service routines.
 
 [Top](#top)
 
@@ -45,7 +45,7 @@ Imagine that the start time of the broker is XXXXXXXXX.123:
 * XXXXXXXXX.123.1 -> the VERY first transaction
 * XXXXXXXXX.124.1 -> the first transaction after running number overflow
 
-The whole thing is stored in the thread variable `transactionId`, supplied by the [**logMsg** library](README.md#srcliblogmsg) logging library.
+The whole thing is stored in the thread variable `transactionId`, supplied by the [**logMsg** library](sourceCode.md#srcliblogmsg) logging library.
 
 Now, The **running number** needs to be protected when incremented and this semaphore is used for that purpose.
 
@@ -56,8 +56,8 @@ See the function `transactionIdSet()` in the file `lib/common/globals.cpp`.
 ## Subscription cache semaphore
 The *subscription cache semaphore* resides in `lib/common/sem.cpp` and its semaphore variable is `cacheSem`. The functions to take/give the semaphore are `cacheSemTake()` and `cacheSemGive()` and they are used by functions in two different libraries:
 
-* [**lib/mongoBackend**](README.md#srclibmongobackend) and
-* [**lib/cache**](README.md#srclibcache)
+* [**lib/mongoBackend**](sourceCode.md#srclibmongobackend) and
+* [**lib/cache**](sourceCode.md#srclibcache)
 
 Due to the implementation of the subscription cache, *especially how it is refreshed*, this semaphore cannot be taken/given in low level functions of the cache library, as one would normally do this, but rather in higher level functions, which makes the implementation a little bit tricky.
 Any changes in where this semaphore is taken/given needs careful consideration.

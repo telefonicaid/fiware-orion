@@ -4,9 +4,9 @@ This document provides an index of the different diagrams used in the developmen
 
 Related to request management (RQ management):
 
-* [RQ-01: Reception of a request](README.md#flow-rq-01)
+* [RQ-01: Reception of a request](sourceCode.md#flow-rq-01)
 	* Continues in RQ-02
-* [RQ-02: Treatment of a request](README.md#flow-rq-02)
+* [RQ-02: Treatment of a request](sourceCode.md#flow-rq-02)
 	* Continues from RQ-01
 	* Continues in PP-*
 	* Continues in MB-*
@@ -15,7 +15,7 @@ Related to parsing (PP prefix):
 
 * [PP-01: Parsing an NGSIv1 payload](jsonParse.md#flow-pp-01)
     * Continues from RQ-02, FW-02 or FW-04 
-* [PP-02: Parsing a text payload](README.md#flow-pp-02)
+* [PP-02: Parsing a text payload](sourceCode.md#flow-pp-02)
 	* Continues from RQ-02
 * [PP-03: Parsing an NGSIv2 payload](jsonParseV2.md#flow-pp-03)
 	* Continues from RQ-02
@@ -110,11 +110,11 @@ Related to mongoBackend logic (MB and MD prefixes):
 
 Related to notifications (NF prefix):
 
-* [NF-01: Notification on entity-attribute update/creation without thread pool](README.md#flow-nf-01)
+* [NF-01: Notification on entity-attribute update/creation without thread pool](sourceCode.md#flow-nf-01)
 	* Continues from MD-01 or MD-03
-* [NF-02: Notification on entity-attribute registration/update](README.md#flow-nf-02)
+* [NF-02: Notification on entity-attribute registration/update](sourceCode.md#flow-nf-02)
 	* Continues from MD-04
-* [NF-03: Notification on entity-attribute update/creation with thread pool](README.md#flow-nf-03)
+* [NF-03: Notification on entity-attribute update/creation with thread pool](sourceCode.md#flow-nf-03)
 	* Continues from MD-01 or MD-03
 
 Related to the subscription cache (SC prefix):

@@ -34,7 +34,7 @@ _FW-01: Forward an update to Context Providers_
 Note that there are a number of service routines that end up calling `postUpdateContext()` (see detail in [the service routines mapping document](ServiceRoutines.txt)).
 
 * All attributes in the incoming payload are marked as **Not Found** (step 1).
-* [**mongoBackend** library](README.md#srclibmongobackend) processes the request (see diagrams [MB-01](mongoBackend.md#flow-mb-01) or [MB-02](mongoBackend.md#flow-mb-02)) and marks all attributes in the requests in one of three possible ways (step 2):
+* [**mongoBackend** library](sourceCode.md#srclibmongobackend) processes the request (see diagrams [MB-01](mongoBackend.md#flow-mb-01) or [MB-02](mongoBackend.md#flow-mb-02)) and marks all attributes in the requests in one of three possible ways (step 2):
 
     * Not Found
     * Found in Local Context Broker
@@ -72,7 +72,7 @@ _FW-03: Forward a query to Context Providers_
 Note that there are a number of service routines that end up calling `postQueryContext()` (see detail in [the service routines mapping document](ServiceRoutines.txt)).
 
 `postQueryContext()` creates a vector of `QueryContextRequest` (called `requestV`) whose items are each to be rendered and sent to a Context Provider.
-The `QueryContextRequest` items are filled in based on the output of the [**mongoBackend**](README.md#srclibmongobackend) function `mongoQueryContext()`.
+The `QueryContextRequest` items are filled in based on the output of the [**mongoBackend**](sourceCode.md#srclibmongobackend) function `mongoQueryContext()`.
 
 * `mongoQueryContext()` is invoked to get the "map" of where to find attributes matching the query (see diagram [MB-07](mongoBackend.md#flow-mb-07)) (step 1). Note that Matching local attributes are already filled in in the response from `mongoQueryContext()`.
 * `forwardPending()` function is called (step 2). It returns `true` if the response from `mongoQueryContext()` includes forwarding. If not, it returns `false`, and if so, we are done and `postQueryContext()` can return to the caller. Let's assume that `forwardsPending()` returns `true` in the diagram.

@@ -32,12 +32,12 @@ The **mongoBackend** library is where all the database interaction takes place. 
 
 The entry points of this library are:
 
-* From [serviceRoutines](README.md#srclibserviceroutines) and [serviceRoutinesV2](README.md#srclibserviceroutinesv2). Those are the most important entry points.
+* From [serviceRoutines](sourceCode.md#srclibserviceroutines) and [serviceRoutinesV2](sourceCode.md#srclibserviceroutinesv2). Those are the most important entry points.
 * Other entry points from other places as initialization routines and helpers methods.
 
 This library makes an extensive use of [MongoDB C++ driver](http://mongodb.github.io/mongo-cxx-driver/), for sending operations to database and dealing with BSON data (which is the basic structure datatype used by these operations). You should be familiar with this driver in order to understand how the library works.
 
-This library is also related to the [cache](README.md#srclibcache) library (if subscription cache is enabled, i.e. the global `noCache` bool variable is set to `false`), in two different ways: 
+This library is also related to the [cache](sourceCode.md#srclibcache) library (if subscription cache is enabled, i.e. the global `noCache` bool variable is set to `false`), in two different ways: 
 
 * context creation/modificacion/removal modules modifying the subscription cache content
 * entity creation/update logic checking the subscription cache in order to look for triggering subscriptions
@@ -208,7 +208,7 @@ During the update process, either in the case of creating new entities or updati
 _MD-01: `processSubscriptions()` function detail_
 
 * `processSubscriptions()` is invoked (step 1) from a number of places. See diagrams [MB-01](#flow-mb-01), [MB-03](#flow-mb-03), [MB-04](#flow-mb-04) and [MB-05](#flow-mb-05). Each individual triggered subscription is handled in a loop by calling `processOnChangeConditionForUpdateContext()`.
-* `processOnChangeConditionForUpdateContext()` is called (step 2), which in its turn uses the `Notifier` object (from [ngsiNotify](README.md#srclibngsinotify) library) in order to send the notification (step 3). The detail is described in diagrams [NF-01](README.md#flow-nf-01) and [NF-03](README.md#flow-nf-03).
+* `processOnChangeConditionForUpdateContext()` is called (step 2), which in its turn uses the `Notifier` object (from [ngsiNotify](sourceCode.md#srclibngsinotify) library) in order to send the notification (step 3). The detail is described in diagrams [NF-01](sourceCode.md#flow-nf-01) and [NF-03](sourceCode.md#flow-nf-03).
 * The next steps are done only in case a notification was actually sent. Depending on cache usage:
     * If subscription cache is not being used, then the last notification time and count in the database are updated in the database, using `collectionUpdate()` in the `connectionOperations` module (steps 4 and 5).
     * If subscription cache is being used, then the subscription is retrieved from the subscription cache calling `subCacheItemLookup()` (step 7). Next, last notification time and count are modified in the subscription cache (they will be consolidated in the database in the next subscription cache refresh, see details in [this document](subscriptionCache.md#subscription-cache-refresh)). The access to the subscription cache is protected by the subscription cache semaphore (see [this document for details](semaphores.md#subscription-cache-semaphore)), which is taken and released in steps 6 and 8 respectively.
@@ -534,7 +534,7 @@ _MB-20: mongoSubscribeContextAvailability_
 * `mongoSubscribeContextAvailability()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
 * The context availability subscription document is created in the database. In order to do so, `collectionInsert()` in the `connectionOperations` module is used (steps 3 and 4).
-* Notifications may be triggered as a result of this creation. This is done by `processAvailabilitySubscription()` (step 5), which is described in diagram [MD-04](README.md#flow-md-04).
+* Notifications may be triggered as a result of this creation. This is done by `processAvailabilitySubscription()` (step 5), which is described in diagram [MD-04](sourceCode.md#flow-md-04).
 * If the request semaphore was taken in step 2, then it is released before returning (step 6). 
 
 [Top](#top)
@@ -618,8 +618,8 @@ A semaphore system is used to protect connection usage. Have a look at [this sep
 
 * `MongoCommonSubscription`: common functions used by several other modules related to the subscription logic. Most of the functions of this module are set-functions to fill fields in `Subscriptions` objects.
 * `location`: functions related to location management in the database.
-* `mongoSubCache`: functions used by the [cache](README.md#srclibcache) library to interact with the database.
-* `compoundResponses` and `compoundValueBson`: modules that help in the conversion between BSON data and internal types (mainly in the [ngsi](README.md#srclibngsi) library) and viceversa.
+* `mongoSubCache`: functions used by the [cache](sourceCode.md#srclibcache) library to interact with the database.
+* `compoundResponses` and `compoundValueBson`: modules that help in the conversion between BSON data and internal types (mainly in the [ngsi](sourceCode.md#srclibngsi) library) and viceversa.
 * `TriggeredSubscription`: helper class used by subscription logic (both context and context availability subscriptions) in order to encapsulate the information related to triggered subscriptions on context or registration creation/update.
  
 [Top](#top)
@@ -632,7 +632,7 @@ Finally we have the `MongoGlobal` module, which contains a set of helper functio
 
 #### `mongoInit()`
 
-`mongoInit()` is used by CB initialization logic (in [`contextBroker.cpp` `main()`](README.md#srcappcontextbroker)) to initialize the database connection pool.
+`mongoInit()` is used by CB initialization logic (in [`contextBroker.cpp` `main()`](sourceCode.md#srcappcontextbroker)) to initialize the database connection pool.
 
 [Top](#top)
 
@@ -678,7 +678,7 @@ _MD-03: `processConditionVector()` function detail_
    * `pruneContextElements()` is called in order to remove not found elements, as it makes no sense including them in the notification (step 6).
    * If, after pruning, there is any entity to send, steps 7 to 11 are executed.
 	   * In the case of conditions for particular attributes (i.e. not empty condition), a second lookup is done using `entitiesQuery()` (steps 7, 8 and 9, plus pruning in step 10).
-	   * Notifications are sent (step 11) using the `Notifier` object (from [ngsiNotify](README.md#srclibngsinotify) library) in order to actually send the notification (step 3). The detail is provided in diagrams [NF-01](README.md#flow-nf-01) or [NF-03](README.md#flow-nf-03). In the case of conditions for particular attributes, notifications are sent only if the previous check was ok. In the case of all-attributes notifications (i.e. empty condition) notifications are always sent.
+	   * Notifications are sent (step 11) using the `Notifier` object (from [ngsiNotify](sourceCode.md#srclibngsinotify) library) in order to actually send the notification (step 3). The detail is provided in diagrams [NF-01](sourceCode.md#flow-nf-01) or [NF-03](sourceCode.md#flow-nf-03). In the case of conditions for particular attributes, notifications are sent only if the previous check was ok. In the case of all-attributes notifications (i.e. empty condition) notifications are always sent.
 
 Note that `processOnChangeConditionForSubscription()` has a "sibling" function named `processOnChangeConditionForUpdateContext()` for non-initial notifications (see diagram [MD-01](#flow-md-01)).
 
@@ -699,7 +699,7 @@ _MD-04: `processAvailabilitySubscription()` function detail_
 
 * `processAvailabilitySubscription()` is invoked (step 1). See diagrams [MB-18](#flow-mb-18), [MB-20](#flow-mb-20) and [MB-21](#flow-mb-21).
 * Check if any registration matches the subscription, using `registrationsQuery()` (step 2). This function uses `collectionRangeQuery()` in the `connectionOperations` module to check in the database (steps 3 and 4).
-* In case any registration matches, the process continues. Availability notifications are sent (step 5) using a `Notifier` object (from [ngsiNotify](README.md#srclibngsinotify) library). Details on this are found in diagram [NF-02](README.md#flow-nf-02).
+* In case any registration matches, the process continues. Availability notifications are sent (step 5) using a `Notifier` object (from [ngsiNotify](sourceCode.md#srclibngsinotify) library). Details on this are found in diagram [NF-02](sourceCode.md#flow-nf-02).
 * Finally, last notification and count statistics are updated, by calling `mongoUpdateCasubNewNotification()` (step 6). This function uses `collectionUpdate()` in the `connectionOperations` module to update the corresponding context availability subscription document in the database (steps 7 and 8).
 
 [Top](#top)

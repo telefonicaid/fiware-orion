@@ -43,7 +43,7 @@ qprP->entityIdVector.push_back(eP);
 qprP->attributeList.push_back("temperature");
 ```
 
-This instance of `QueryContextRequest` is created by the **jsonParse** library and the service routine `postQueryContext()` passes it to the [**mongoBackend**](README.md#srclibmongobackend) function `mongoQueryContext()`.
+This instance of `QueryContextRequest` is created by the **jsonParse** library and the service routine `postQueryContext()` passes it to the [**mongoBackend**](sourceCode.md#srclibmongobackend) function `mongoQueryContext()`.
 
 [Top](#top)
 

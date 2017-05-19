@@ -7,7 +7,7 @@
 * [Fixing a memory leak](#fixing-a-memory-leak)
 
 ## Adding a command line parameter
-It's fairly easy to add a new [CLI parameter](../admin/cli.md) to Orion, as there is a library in charge of parsing and checking the CLI parameters. This library ([**parseArgs**](README.md#srclibparseargs)) is called by [the main program](README.md#srcappcontextbroker) in `contextBroker.cpp` as one of its first actions. The function to parse CLI arguments is called `parseArgs()`, and it has three parameters:
+It's fairly easy to add a new [CLI parameter](../admin/cli.md) to Orion, as there is a library in charge of parsing and checking the CLI parameters. This library ([**parseArgs**](sourceCode.md#srclibparseargs)) is called by [the main program](sourceCode.md#srcappcontextbroker) in `contextBroker.cpp` as one of its first actions. The function to parse CLI arguments is called `parseArgs()`, and it has three parameters:
 
 * `argC`, the number of arguments for the main program
 * `argV`, the argument vector for for the main program
@@ -106,7 +106,7 @@ Note the right-most column saying `(environment variable)` for the `-fg` option.
 [Top](#top)
 
 ## Adding a REST service
-The REST services that the Orion Context Broker supports are items in the `RestService` vector `restServiceV`, found in [the main program](README.md#srcappcontextbroker) in `contextBroker.cpp`. This vector is a reminiscent from back when Orion also implemented the FIWARE Configuration Manager and thus had to be able to assume different roles. The set of services that are supported pretty much defines the role and by starting the REST interface with one `RestService` vector or another took care of the role selection. Now Orion has only one role, to work as context broker, but the `RestService` vector remains.
+The REST services that the Orion Context Broker supports are items in the `RestService` vector `restServiceV`, found in [the main program](sourceCode.md#srcappcontextbroker) in `contextBroker.cpp`. This vector is a reminiscent from back when Orion also implemented the FIWARE Configuration Manager and thus had to be able to assume different roles. The set of services that are supported pretty much defines the role and by starting the REST interface with one `RestService` vector or another took care of the role selection. Now Orion has only one role, to work as context broker, but the `RestService` vector remains.
 
 To add a REST service to Orion, a new item in `RestService restServiceV[]` is needed. Just like with CLI parameters, the easiest way is to copy an old service (item in `restServiceV`) and then modify the copy to suit your needs.
 
@@ -134,7 +134,7 @@ NOTE:
 
 * Item 2: `Metadata` would have to be added as an enum constant in the `enum RequestType` in `src/lib/ngsi/Request.h`
 * Item 4: `"*"`. An asterisc in the component vector `RestService::compV` matches ANY string, and whenever a path including entity id, attribute name, etc is defined, `"*"` must be used.
-* Item 6: `putMetadata()` is the service routine for `PUT /v2/entities/*/attrs/*/metadata/*` and the function must be implemented. The directory of the library for NGSIv2 service routines is `src/lib/serviceRoutinesV2` (see [library description](README.md#srclibserviceroutinesv2)).
+* Item 6: `putMetadata()` is the service routine for `PUT /v2/entities/*/attrs/*/metadata/*` and the function must be implemented. The directory of the library for NGSIv2 service routines is `src/lib/serviceRoutinesV2` (see [library description](sourceCode.md#srclibserviceroutinesv2)).
 
 Note also that in `contextBroker.cpp`, these `RestService` vector lines have been grouped and as the lines got really long, defines for the component vector have been created.    
 

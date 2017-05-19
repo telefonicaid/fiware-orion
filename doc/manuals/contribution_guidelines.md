@@ -23,7 +23,7 @@ Note that contribution workflows themselves (e.g. pull requests, etc.) are descr
 
 ### Directory layout
 
-For a detailed explanation of the directory structure, see [this link](devel/index.md#directory_structure).
+For a detailed explanation of the directory structure, see [this section in the Development Manual](devel/directoryStructure.md).
 
 ### File layout for source code files 
 

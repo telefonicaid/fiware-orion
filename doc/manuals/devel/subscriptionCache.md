@@ -104,7 +104,7 @@ So, when populating and refreshing the subscription cache, we need to go over al
 
 If the CLI option **-noCache** is set, then nothing at all is done about the subscription cache.  
 
-The [main program](README.md#srcappcontextbroker) calls `subCacheInit()` and then, if sub-cache-refresh is *turned off* (the interval is zero), `subCacheRefresh()` is called, just to populate the cache with the entire collection of subscriptions from the database.
+The [main program](sourceCode.md#srcappcontextbroker) calls `subCacheInit()` and then, if sub-cache-refresh is *turned off* (the interval is zero), `subCacheRefresh()` is called, just to populate the cache with the entire collection of subscriptions from the database.
 
 Remember, only **context subscriptions** (NGSI10), not registration subscriptions (NGSI9).
 The corresponding collection in MongoDB database is [`csub`](../admin/database_model.md#csubs-collection).  
