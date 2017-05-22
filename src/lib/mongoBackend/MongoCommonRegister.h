@@ -1,5 +1,5 @@
-#ifndef MONGO_COMMON_REGISTER_H
-#define MONGO_COMMON_REGISTER_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOCOMMONREGISTER_H_
+#define SRC_LIB_MONGOBACKEND_MONGOCOMMONREGISTER_H_
 
 /*
 *
@@ -25,6 +25,8 @@
 *
 * Author: Fermín Galán
 */
+#include <string>
+
 #include "mongo/client/dbclient.h"
 
 #include "ngsi9/RegisterContextRequest.h"
@@ -47,4 +49,4 @@ extern HttpStatusCode processRegisterContext
   const std::string&        fiwareCorrelator
 );
 
-#endif
+#endif  // SRC_LIB_MONGOBACKEND_MONGOCOMMONREGISTER_H_
