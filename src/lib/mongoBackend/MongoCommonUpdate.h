@@ -25,11 +25,10 @@
 *
 * Author: Fermín Galán
 */
-
-#include "ngsi10/UpdateContextResponse.h"
 #include "mongo/client/dbclient.h"
+#include "ngsi10/UpdateContextResponse.h"
 
-using namespace mongo;
+
 
 /* ****************************************************************************
 *

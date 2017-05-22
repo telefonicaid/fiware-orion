@@ -42,6 +42,16 @@
 
 /* ****************************************************************************
 *
+* USING
+*/
+using mongo::BSONArrayBuilder;
+using mongo::BSONObjBuilder;
+using mongo::OID;
+
+
+
+/* ****************************************************************************
+*
 * mongoSubscribeContextAvailability - 
 */
 HttpStatusCode mongoSubscribeContextAvailability

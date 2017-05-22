@@ -40,7 +40,20 @@
 #include "mongoBackend/dbConstants.h"
 #include "cache/subCache.h"
 
-using namespace ngsiv2;
+
+
+/* ****************************************************************************
+*
+* USING - 
+*/
+using mongo::BSONObj;
+using mongo::BSONElement;
+using mongo::DBClientCursor;
+using mongo::DBClientBase;
+using mongo::Query;
+using mongo::OID;
+using ngsiv2::Subscription;
+using ngsiv2::EntID;
 
 
 

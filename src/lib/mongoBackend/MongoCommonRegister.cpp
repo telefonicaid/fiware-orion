@@ -50,6 +50,20 @@
 
 /* ****************************************************************************
 *
+* USING
+*/
+using mongo::BSONArrayBuilder;
+using mongo::BSONObjBuilder;
+using mongo::BSONObj;
+using mongo::BSONElement;
+using mongo::DBClientBase;
+using mongo::DBClientCursor;
+using mongo::OID;
+
+
+
+/* ****************************************************************************
+*
 * processSubscriptions -
 *
 * For each one of the subscriptions in the map, send notification
@@ -217,8 +231,8 @@ static bool addTriggeredSubscriptions
   queryPattern.append(CASUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
   queryPattern.appendCode("$where", function);
 
-  auto_ptr<DBClientCursor> cursor;
-  BSONObj                  query = BSON("$or" << BSON_ARRAY(queryNoPattern.obj() << queryPattern.obj()));
+  std::auto_ptr<DBClientCursor>  cursor;
+  BSONObj                        query = BSON("$or" << BSON_ARRAY(queryNoPattern.obj() << queryPattern.obj()));
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
