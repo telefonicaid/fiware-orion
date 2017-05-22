@@ -25,28 +25,26 @@
 *
 * Author: Fermín Galán
 */
+#include "mongo/client/dbclient.h"
 
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
-#include "mongo/client/dbclient.h"
 
-using namespace mongo;
+
 
 /* ****************************************************************************
 *
 * processRegisterContext -
-*
 */
 extern HttpStatusCode processRegisterContext
 (
   RegisterContextRequest*   requestP,
   RegisterContextResponse*  responseP,
-  OID*                      id,
+  mongo::OID*               id,
   const std::string&        tenant,
   const std::string&        servicePath,
   const std::string&        format,
   const std::string&        fiwareCorrelator
 );
-
 
 #endif

@@ -133,7 +133,7 @@ extern void setCondsAndInitialNotify
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
-  BSONObjBuilder*                  b,
+  mongo::BSONObjBuilder*           b,
   bool*                            notificationDone
 );
 
@@ -144,7 +144,7 @@ extern void setCondsAndInitialNotify
 * setLastNotification -
 *
 */
-extern void setLastNotification(long long lastNotification, BSONObjBuilder* b);
+extern void setLastNotification(long long lastNotification, mongo::BSONObjBuilder* b);
 
 
 
@@ -153,7 +153,7 @@ extern void setLastNotification(long long lastNotification, BSONObjBuilder* b);
 * setCount -
 *
 */
-extern void setCount(long long count, BSONObjBuilder* b);
+extern void setCount(long long count, mongo::BSONObjBuilder* b);
 
 
 
@@ -161,7 +161,7 @@ extern void setCount(long long count, BSONObjBuilder* b);
 *
 * setLastFailure -
 */
-extern void setLastFailure(long long lastFailure, BSONObjBuilder* b);
+extern void setLastFailure(long long lastFailure, mongo::BSONObjBuilder* b);
 
 
 
@@ -169,7 +169,7 @@ extern void setLastFailure(long long lastFailure, BSONObjBuilder* b);
 *
 * setLastSuccess -
 */
-extern void setLastSuccess(long long lastSuccess, BSONObjBuilder* b);
+extern void setLastSuccess(long long lastSuccess, mongo::BSONObjBuilder* b);
 
 
 

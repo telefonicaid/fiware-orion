@@ -128,7 +128,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   if (sub.hasField(CSUB_EXPR))
   {
-    mongo::BSONObj expression = getObjectFieldF(sub, CSUB_EXPR);
+    BSONObj expression = getObjectFieldF(sub, CSUB_EXPR);
 
     if (expression.hasField(CSUB_EXPR_Q))
     {
@@ -440,12 +440,12 @@ void mongoSubCacheRefresh(const std::string& database)
 {
   LM_T(LmtSubCache, ("Refreshing subscription cache for DB '%s'", database.c_str()));
 
-  BSONObj                   query;      // empty query (all subscriptions)
-  std::string               db          = database;
-  std::string               tenant      = tenantFromDb(db);
-  std::string               collection  = getSubscribeContextCollectionName(tenant);
-  auto_ptr<DBClientCursor>  cursor;
-  std::string               errorString;
+  BSONObj                               query;      // empty query (all subscriptions)
+  std::string                           db          = database;
+  std::string                           tenant      = tenantFromDb(db);
+  std::string                           collection  = getSubscribeContextCollectionName(tenant);
+  std::auto_ptr<mongo::DBClientCursor>  cursor;
+  std::string                           errorString;
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();

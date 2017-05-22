@@ -53,6 +53,18 @@
 
 /* ****************************************************************************
 *
+* USING - 
+*/
+using mongo::HostAndPort;
+using mongo::BSONObj;
+using mongo::DBClientBase;
+using mongo::DBClientConnection;
+using mongo::DBClientReplicaSet;
+
+
+
+/* ****************************************************************************
+*
 * MongoConnection - 
 */
 typedef struct MongoConnection

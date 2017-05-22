@@ -31,8 +31,20 @@
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/MongoGlobal.h"
 
-using namespace ngsiv2;
-using namespace mongo;
+
+
+/* ****************************************************************************
+*
+* USING - 
+*/
+using mongo::BSONObjBuilder;
+using mongo::BSONArrayBuilder;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::OID;
+using ngsiv2::Subscription;
+using ngsiv2::HttpInfo;
+using ngsiv2::EntID;
 
 
 

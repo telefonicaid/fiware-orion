@@ -1290,7 +1290,7 @@ void daemonize(void)
   }
 
   // We have to call this after a fork, see: http://api.mongodb.org/cplusplus/2.2.2/classmongo_1_1_o_i_d.html
-  OID::justForked();
+  mongo::OID::justForked();
 }
 
 

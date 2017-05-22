@@ -38,6 +38,19 @@
 #include "mongoBackend/mongoQueryTypes.h"
 
 
+
+/* ****************************************************************************
+*
+* USING - 
+*/
+using mongo::BSONArrayBuilder;
+using mongo::BSONObj;
+using mongo::BSONElement;
+using mongo::DBClientCursor;
+using mongo::DBClientBase;
+
+
+
 /* ****************************************************************************
 *
 * getAttributeTypes -

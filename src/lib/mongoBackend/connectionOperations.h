@@ -25,169 +25,179 @@
 *
 * Author: Fermín Galán
 */
-
 #include "mongo/client/dbclient.h"
 
-using namespace mongo;
-using std::auto_ptr;
+
 
 /* ****************************************************************************
 *
 * collectionQuery -
-*
 */
 extern bool collectionQuery
 (
-  DBClientBase*                   connection,
-  const std::string&              col,
-  const BSONObj&                  q,
-  std::auto_ptr<DBClientCursor>*  cursor,
-  std::string*                    err
+  mongo::DBClientBase*                   connection,
+  const std::string&                     col,
+  const mongo::BSONObj&                  q,
+  std::auto_ptr<mongo::DBClientCursor>*  cursor,
+  std::string*                           err
 );
+
+
 
 /* ****************************************************************************
 *
 * collectionRangedQuery -
-*
 */
 extern bool collectionRangedQuery
 (
-  DBClientBase*                   connection,
-  const std::string&              col,
-  const Query&                    q,
-  int                             limit,
-  int                             offset,
-  std::auto_ptr<DBClientCursor>*  cursor,
-  long long*                      count,
-  std::string*                    err
+  mongo::DBClientBase*                   connection,
+  const std::string&                     col,
+  const mongo::Query&                    q,
+  int                                    limit,
+  int                                    offset,
+  std::auto_ptr<mongo::DBClientCursor>*  cursor,
+  long long*                             count,
+  std::string*                           err
 );
+
+
 
 /* ****************************************************************************
 *
 * collectionCount -
-*
 */
 extern bool collectionCount
 (
-  const std::string&   col,
-  const BSONObj&       q,
-  unsigned long long*  c,
-  std::string*         err
+  const std::string&     col,
+  const mongo::BSONObj&  q,
+  unsigned long long*    c,
+  std::string*           err
 );
+
+
 
 /* ****************************************************************************
 *
 * collectionFindOne -
-*
 */
 extern bool collectionFindOne
 (
-  const std::string&  col,
-  const BSONObj&      q,
-  BSONObj*            doc,
-  std::string*        err
+  const std::string&     col,
+  const mongo::BSONObj&  q,
+  mongo::BSONObj*        doc,
+  std::string*           err
 );
+
+
 
 /* ****************************************************************************
 *
 * collectionInsert -
-*
 */
 extern bool collectionInsert
 (
-  const std::string&  col,
-  const BSONObj&      doc,
-  std::string*        err
+  const std::string&     col,
+  const mongo::BSONObj&  doc,
+  std::string*           err
 );
+
+
 
 /* ****************************************************************************
 *
 * collectionUpdate -
-*
 */
 extern bool collectionUpdate
 (
-  const std::string&  col,
-  const BSONObj&      q,
-  const BSONObj&      doc,
-  bool                upsert,
-  std::string*        err
+  const std::string&     col,
+  const mongo::BSONObj&  q,
+  const mongo::BSONObj&  doc,
+  bool                   upsert,
+  std::string*           err
 );
+
+
 
 /* ****************************************************************************
 *
 * collectionRemove -
-*
 */
 extern bool collectionRemove
 (
-  const std::string&  col,
-  const BSONObj&      q,
-  std::string*        err
+  const std::string&     col,
+  const mongo::BSONObj&  q,
+  std::string*           err
 );
+
+
 
 /* ****************************************************************************
 *
 * collectionCreateIndex -
-*
 */
 extern bool collectionCreateIndex
 (
-  const std::string&  col,
-  const BSONObj&      indexes,
-  std::string*        err
+  const std::string&     col,
+  const mongo::BSONObj&  indexes,
+  std::string*           err
 );
+
+
 
 /* ****************************************************************************
 *
 * runCollectionCommand -
-*
 */
 extern bool runCollectionCommand
 (
-  const std::string&  col,
-  const BSONObj&      command,
-  BSONObj*            result,
-  std::string*        err
+  const std::string&     col,
+  const mongo::BSONObj&  command,
+  mongo::BSONObj*        result,
+  std::string*           err
 );
+
+
 
 /* ****************************************************************************
 *
 * runCollectionCommand -
-*
 */
 extern bool runCollectionCommand
 (
-  DBClientBase*       connection,
-  const std::string&  col,
-  const BSONObj&      command,
-  BSONObj*            result,
-  std::string*        err
+  mongo::DBClientBase*   connection,
+  const std::string&     col,
+  const mongo::BSONObj&  command,
+  mongo::BSONObj*        result,
+  std::string*           err
 );
+
+
 
 /* ****************************************************************************
 *
 * setWriteConcern -
-*
 */
 extern bool setWriteConcern
 (
-  DBClientBase*        connection,
-  const WriteConcern&  wc,
-  std::string*         err
+  mongo::DBClientBase*        connection,
+  const mongo::WriteConcern&  wc,
+  std::string*                err
 );
+
+
 
 /* ****************************************************************************
 *
 * getWriteConcern -
-*
 */
 extern bool getWriteConcern
 (
-  DBClientBase*  connection,
-  WriteConcern*  wc,
-  std::string*   err
+  mongo::DBClientBase*  connection,
+  mongo::WriteConcern*  wc,
+  std::string*          err
 );
+
+
 
 /* ****************************************************************************
 *
@@ -196,11 +206,11 @@ extern bool getWriteConcern
 */
 extern bool connectionAuth
 (
-  DBClientBase*       connection,
-  const std::string&  db,
-  const std::string&  user,
-  const std::string&  password,
-  std::string*        err
+  mongo::DBClientBase*  connection,
+  const std::string&    db,
+  const std::string&    user,
+  const std::string&    password,
+  std::string*          err
 );
 
 #endif // SRC_LIB_MONGOBACKEND_CONNECTIONOPERATIONS_H_
