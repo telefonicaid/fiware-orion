@@ -232,7 +232,7 @@ static bool addTriggeredSubscriptions
   queryPattern.appendCode("$where", function);
 
   std::auto_ptr<DBClientCursor>  cursor;
-  mongo::BSONObj                 query = BSON("$or" << BSON_ARRAY(queryNoPattern.obj() << queryPattern.obj()));
+  BSONObj                        query = BSON("$or" << BSON_ARRAY(queryNoPattern.obj() << queryPattern.obj()));
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();

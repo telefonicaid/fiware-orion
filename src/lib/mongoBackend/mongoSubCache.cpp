@@ -44,7 +44,17 @@
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
 
-using namespace mongo;
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::BSONObj;
+using mongo::BSONElement;
+using mongo::DBClientCursor;
+using mongo::DBClientBase;
+using mongo::OID;
 
 
 
@@ -440,12 +450,12 @@ void mongoSubCacheRefresh(const std::string& database)
 {
   LM_T(LmtSubCache, ("Refreshing subscription cache for DB '%s'", database.c_str()));
 
-  BSONObj                               query;      // empty query (all subscriptions)
-  std::string                           db          = database;
-  std::string                           tenant      = tenantFromDb(db);
-  std::string                           collection  = getSubscribeContextCollectionName(tenant);
-  std::auto_ptr<mongo::DBClientCursor>  cursor;
-  std::string                           errorString;
+  BSONObj                        query;      // empty query (all subscriptions)
+  std::string                    db          = database;
+  std::string                    tenant      = tenantFromDb(db);
+  std::string                    collection  = getSubscribeContextCollectionName(tenant);
+  std::auto_ptr<DBClientCursor>  cursor;
+  std::string                    errorString;
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
