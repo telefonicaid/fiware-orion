@@ -39,8 +39,8 @@
 *
 * namespaces - 
 */
-using namespace mongo;
-using namespace orion;
+using mongo::BSONArrayBuilder;
+using mongo::BSONObjBuilder;
 
 
 
@@ -48,36 +48,36 @@ using namespace orion;
 *
 * compoundValueBson (for arrays) -
 */
-void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONArrayBuilder& b)
+void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, BSONArrayBuilder& b)
 {
   for (unsigned int ix = 0; ix < children.size(); ++ix)
   {
     orion::CompoundValueNode* child = children[ix];
 
-    if (child->valueType == ValueTypeString)
+    if (child->valueType == orion::ValueTypeString)
     {
       b.append(child->stringValue);
     }
-    else if (child->valueType == ValueTypeNumber)
+    else if (child->valueType == orion::ValueTypeNumber)
     {
       b.append(child->numberValue);
     }
-    else if (child->valueType == ValueTypeBoolean)
+    else if (child->valueType == orion::ValueTypeBoolean)
     {
       b.append(child->boolValue);
     }
-    else if (child->valueType == ValueTypeNone)
+    else if (child->valueType == orion::ValueTypeNone)
     {
       b.appendNull();
     }
-    else if (child->valueType == ValueTypeVector)
+    else if (child->valueType == orion::ValueTypeVector)
     {
       BSONArrayBuilder ba;
 
       compoundValueBson(child->childV, ba);
       b.append(ba.arr());
     }
-    else if (child->valueType == ValueTypeObject)
+    else if (child->valueType == orion::ValueTypeObject)
     {
       BSONObjBuilder bo;
 
@@ -97,38 +97,37 @@ void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONArra
 *
 * compoundValueBson (for objects) -
 */
-void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjBuilder& b)
+void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, BSONObjBuilder& b)
 {
   for (unsigned int ix = 0; ix < children.size(); ++ix)
   {
-    orion::CompoundValueNode* child = children[ix];
+    orion::CompoundValueNode*  child         = children[ix];
+    std::string                effectiveName = dbDotEncode(child->name);
 
-    std::string effectiveName = dbDotEncode(child->name);
-
-    if (child->valueType == ValueTypeString)
+    if (child->valueType == orion::ValueTypeString)
     {
       b.append(effectiveName, child->stringValue);
     }
-    else if (child->valueType == ValueTypeNumber)
+    else if (child->valueType == orion::ValueTypeNumber)
     {
       b.append(effectiveName, child->numberValue);
     }
-    else if (child->valueType == ValueTypeBoolean)
+    else if (child->valueType == orion::ValueTypeBoolean)
     {
       b.append(effectiveName, child->boolValue);
     }
-    else if (child->valueType == ValueTypeNone)
+    else if (child->valueType == orion::ValueTypeNone)
     {
       b.appendNull(effectiveName);
     }
-    else if (child->valueType == ValueTypeVector)
+    else if (child->valueType == orion::ValueTypeVector)
     {
       BSONArrayBuilder ba;
 
       compoundValueBson(child->childV, ba);
       b.append(effectiveName, ba.arr());
     }
-    else if (child->valueType == ValueTypeObject)
+    else if (child->valueType == orion::ValueTypeObject)
     {
       BSONObjBuilder bo;
 

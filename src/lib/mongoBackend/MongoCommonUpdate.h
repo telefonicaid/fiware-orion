@@ -1,5 +1,5 @@
-#ifndef MONGO_COMMON_UPDATE_H
-#define MONGO_COMMON_UPDATE_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOCOMMONUPDATE_H_
+#define SRC_LIB_MONGOBACKEND_MONGOCOMMONUPDATE_H_
 
 /*
 *
@@ -25,7 +25,12 @@
 *
 * Author: Fermín Galán
 */
+#include <map>
+#include <string>
+#include <vector>
+
 #include "mongo/client/dbclient.h"
+
 #include "ngsi10/UpdateContextResponse.h"
 
 
@@ -33,17 +38,19 @@
 /* ****************************************************************************
 *
 * processContextElement -
-*
 */
-extern void processContextElement(ContextElement*                      ceP,
-                                  UpdateContextResponse*               responseP,
-                                  const std::string&                   action,
-                                  const std::string&                   tenant,
-                                  const std::vector<std::string>&      servicePath,
-                                  std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
-                                  const std::string&                   xauthToken,
-                                  const std::string&                   fiwareCorrelator,
-                                  ApiVersion                           apiVersion       = V1,
-                                  Ngsiv2Flavour                        ngsiV2Flavour    = NGSIV2_NO_FLAVOUR);
+extern void processContextElement
+(
+  ContextElement*                      ceP,
+  UpdateContextResponse*               responseP,
+  const std::string&                   action,
+  const std::string&                   tenant,
+  const std::vector<std::string>&      servicePath,
+  std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
+  const std::string&                   xauthToken,
+  const std::string&                   fiwareCorrelator,
+  ApiVersion                           apiVersion       = V1,
+  Ngsiv2Flavour                        ngsiV2Flavour    = NGSIV2_NO_FLAVOUR
+);
 
-#endif
+#endif  // SRC_LIB_MONGOBACKEND_MONGOCOMMONUPDATE_H_
