@@ -431,7 +431,7 @@ HttpStatusCode processRegisterContext
   if (!collectionUpdate(getRegistrationsCollectionName(tenant), BSON("_id" << oid), reg.obj(), true, &err))
   {
     responseP->errorCode.fill(SccReceiverInternalError, err);
-    releaseTriggeredSubscriptions(subsToNotify);
+    releaseTriggeredSubscriptions(&subsToNotify);
     return SccOk;
   }
 

@@ -2015,7 +2015,7 @@ static bool processSubscriptions
       }
 
       BSONObj areaFilter;
-      if (!processAreaScopeV2(&geoScope, areaFilter))
+      if (!processAreaScopeV2(&geoScope, &areaFilter))
       {
         // Error in processAreaScopeV2 is interpreted as no-match (conservative approach)
         continue;
@@ -2142,7 +2142,7 @@ static bool processSubscriptions
     }
   }
 
-  releaseTriggeredSubscriptions(subs);
+  releaseTriggeredSubscriptions(&subs);
 
   return ret;
 }
@@ -3289,7 +3289,7 @@ static void updateEntity
       delete cerP;
     }
 
-    releaseTriggeredSubscriptions(subsToNotify);
+    releaseTriggeredSubscriptions(&subsToNotify);
 
     notifyCerP->release();
     delete notifyCerP;
@@ -3395,7 +3395,7 @@ static void updateEntity
 
     responseP->contextElementResponseVector.push_back(cerP);
 
-    releaseTriggeredSubscriptions(subsToNotify);
+    releaseTriggeredSubscriptions(&subsToNotify);
 
     notifyCerP->release();
     delete notifyCerP;
@@ -3416,7 +3416,7 @@ static void updateEntity
   // ONE function.
   // The memory to free is allocated in the function addTriggeredSubscriptions.
   //
-  releaseTriggeredSubscriptions(subsToNotify);
+  releaseTriggeredSubscriptions(&subsToNotify);
 
 
   /* To finish with this entity processing, search for CPrs in not found attributes and
@@ -3806,7 +3806,7 @@ void processContextElement
                                        tenant,
                                        servicePathV))
         {
-          releaseTriggeredSubscriptions(subsToNotify);
+          releaseTriggeredSubscriptions(&subsToNotify);
           cerP->statusCode.fill(SccReceiverInternalError, err);
           responseP->oe.fill(SccReceiverInternalError, err, "InternalError");
 
@@ -3839,7 +3839,7 @@ void processContextElement
 
         notifyCerP->release();
         delete notifyCerP;
-        releaseTriggeredSubscriptions(subsToNotify);
+        releaseTriggeredSubscriptions(&subsToNotify);
       }
 
       responseP->contextElementResponseVector.push_back(cerP);

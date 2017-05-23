@@ -1,5 +1,5 @@
-#ifndef MONGO_GLOBAL_H
-#define MONGO_GLOBAL_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOGLOBAL_H_
+#define SRC_LIB_MONGOBACKEND_MONGOGLOBAL_H_
 
 /*
 *
@@ -25,6 +25,12 @@
 *
 * Author: Fermín Galán
 */
+#include <stdint.h>   // int64_t et al
+
+#include <string>
+#include <vector>
+#include <map>
+
 #include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
@@ -52,14 +58,6 @@
 
 /* ****************************************************************************
 *
-* MongoTreatFunction - callback signature for Mongo callback functions
-*/
-typedef void (*MongoTreatFunction)(std::string tenant, mongo::BSONObj& bobj);
-
-
-
-/* ****************************************************************************
-*
 * mongoMultitenant -
 */
 extern bool mongoMultitenant(void);
@@ -78,7 +76,7 @@ void mongoInit
   const char*  user,
   const char*  pwd,
   bool         mtenant,
-  long         timeout,
+  int64_t      timeout,
   int          writeConcern,
   int          dbPoolSize,
   bool         mutexTimeStat
@@ -173,9 +171,8 @@ extern const std::string& getDbPrefix(void);
 *
 * Function return value is false in the case of problems accessing database,
 * true otherwise.
-*
 */
-extern bool getOrionDatabases(std::vector<std::string>& dbs);
+extern bool getOrionDatabases(std::vector<std::string>* dbs);
 
 
 
@@ -305,14 +302,13 @@ extern bool includedAttribute(const ContextRegistrationAttribute& attr, const At
 * processAreaScopeV2 -
 *
 */
-extern bool processAreaScopeV2(const Scope* scoP, mongo::BSONObj &areaQuery);
+extern bool processAreaScopeV2(const Scope* scoP, mongo::BSONObj* areaQueryP);
 
 
 
 /* ****************************************************************************
 *
 * entitiesQuery -
-*
 */
 extern bool entitiesQuery
 (
@@ -338,16 +334,14 @@ extern bool entitiesQuery
 /* ****************************************************************************
 *
 * pruneContextElements -
-*
 */
-extern void pruneContextElements(ContextElementResponseVector& oldCerV, ContextElementResponseVector* newCerVP);
+extern void pruneContextElements(const ContextElementResponseVector& oldCerV, ContextElementResponseVector* newCerVP);
 
 
 
 /* ****************************************************************************
 *
 * registrationsQuery -
-*
 */
 extern bool registrationsQuery
 (
@@ -387,6 +381,7 @@ extern EntityIdVector subToEntityIdVector(const mongo::BSONObj& sub);
 /* ****************************************************************************
 *
 * subToAttributeList -
+*
 * Extract the attribute list from a BSON document (in the format of the csubs collection)
 */
 extern AttributeList subToAttributeList(const mongo::BSONObj& attrL);
@@ -398,7 +393,6 @@ extern AttributeList subToAttributeList(const mongo::BSONObj& attrL);
 * processConditionVector -
 *
 * NGSIv2 wrapper
-*
 */
 extern mongo::BSONArray processConditionVector
 (
@@ -425,7 +419,6 @@ extern mongo::BSONArray processConditionVector
 /* ****************************************************************************
 *
 * processAvailabilitySubscriptions -
-*
 */
 extern bool processAvailabilitySubscription(
     const EntityIdVector& enV,
@@ -454,16 +447,14 @@ extern void slashEscape(const char* from, char* to, unsigned int toLen);
 /* ****************************************************************************
 *
 * releaseTriggeredSubscriptions -
-*
 */
-extern void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>& subs);
+extern void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>* subsP);
 
 
 
 /* ****************************************************************************
 *
 * fillQueryServicePath -
-*
 */
 extern mongo::BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath);
 
@@ -472,35 +463,32 @@ extern mongo::BSONObj fillQueryServicePath(const std::vector<std::string>& servi
 /* ****************************************************************************
 *
 * fillContextProviders -
-*
 */
-extern void fillContextProviders(ContextElementResponse* cer, ContextRegistrationResponseVector& crrV);
+extern void fillContextProviders(ContextElementResponse* cer, const ContextRegistrationResponseVector& crrV);
 
 
 
 /* ****************************************************************************
 *
 * someContextElementNotFound -
-*
 */
-extern bool someContextElementNotFound(ContextElementResponse& cer);
+extern bool someContextElementNotFound(const ContextElementResponse& cer);
 
 
 
 /* ****************************************************************************
 *
 * cprLookupByAttribute -
-*
 */
 extern void cprLookupByAttribute
 (
-  EntityId&                          en,
-  const std::string&                 attrName,
-  ContextRegistrationResponseVector& crrV,
-  std::string*                       perEntPa,
-  MimeType*                          perEntPaMimeType,
-  std::string*                       perAttrPa,
-  MimeType*                          perAttrPaMimeType
+  EntityId&                                en,
+  const std::string&                       attrName,
+  const ContextRegistrationResponseVector& crrV,
+  std::string*                             perEntPa,
+  MimeType*                                perEntPaMimeType,
+  std::string*                             perAttrPa,
+  MimeType*                                perAttrPaMimeType
 );
 
-#endif
+#endif  // SRC_LIB_MONGOBACKEND_MONGOGLOBAL_H_
