@@ -22,10 +22,11 @@
 *
 * Author: Fermín Galán
 */
-#include <mongo/client/dbclient.h>
+#include <string>
+
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/traceLevels.h"
-
 #include "common/string.h"
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
@@ -34,6 +35,12 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 
+
+
+/* ****************************************************************************
+*
+* USING - FIXME P4: this "using namespace" to be replaced by "using mongo::XXX" lines
+*/
 using namespace mongo;
 
 
@@ -59,6 +66,7 @@ bool collectionQuery
   {
     LM_E(("Fatal Error (null DB connection)"));
     *err = "null DB connection";
+
     return false;
   }
 
@@ -83,8 +91,10 @@ bool collectionQuery
     std::string msg = std::string("collection: ") + col +
       " - query(): " + q.toString() +
       " - exception: " + e.what();
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
   catch (...)
@@ -92,12 +102,14 @@ bool collectionQuery
     std::string msg = std::string("collection: ") + col +
       " - query(): " + q.toString() +
       " - exception: generic";
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
-  alarmMgr.dbErrorReset();
 
+  alarmMgr.dbErrorReset();
   return true;
 }
 
@@ -110,7 +122,6 @@ bool collectionQuery
 * Different from others, this function doesn't use getMongoConnection() and
 * releaseMongoConnection(). It is assumed that the caller will do, as the
 * connection cannot be released before the cursor has been used.
-*
 */
 bool collectionRangedQuery
 (
@@ -128,10 +139,15 @@ bool collectionRangedQuery
   {
     LM_E(("Fatal Error (null DB connection)"));
     *err = "null DB connection";
+
     return false;
   }
 
-  LM_T(LmtMongo, ("query() in '%s' collection limit=%d, offset=%d: '%s'", col.c_str(), limit, offset, q.toString().c_str()));
+  LM_T(LmtMongo, ("query() in '%s' collection limit=%d, offset=%d: '%s'",
+                  col.c_str(),
+                  limit,
+                  offset,
+                  q.toString().c_str()));
 
   try
   {
@@ -142,6 +158,7 @@ bool collectionRangedQuery
 
     *cursor = connection->query(col.c_str(), q, limit, offset);
 
+    //
     // We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
     // raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
     // exception ourselves
@@ -157,8 +174,10 @@ bool collectionRangedQuery
     std::string msg = std::string("collection: ") + col.c_str() +
       " - query(): " + q.toString() +
       " - exception: " + e.what();
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
   catch (...)
@@ -166,8 +185,10 @@ bool collectionRangedQuery
     std::string msg = std::string("collection: ") + col.c_str() +
       " - query(): " + q.toString() +
       " - exception: generic";
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
 
@@ -197,6 +218,7 @@ bool collectionCount
     TIME_STAT_MONGO_READ_WAIT_STOP();
     LM_E(("Fatal Error (null DB connection)"));
     *err = "null DB connection";
+
     return false;
   }
 
@@ -217,8 +239,10 @@ bool collectionCount
     std::string msg = std::string("collection: ") + col.c_str() +
       " - count(): " + q.toString() +
       " - exception: " + e.what();
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
   catch (...)
@@ -229,12 +253,14 @@ bool collectionCount
     std::string msg = std::string("collection: ") + col.c_str() +
       " - query(): " + q.toString() +
       " - exception: generic";
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
-  alarmMgr.dbErrorReset();
 
+  alarmMgr.dbErrorReset();
   return true;
 }
 
@@ -261,6 +287,7 @@ extern bool collectionFindOne
 
     LM_E(("Fatal Error (null DB connection)"));
     *err = "null DB connection";
+
     return false;
   }
 
@@ -280,8 +307,10 @@ extern bool collectionFindOne
     std::string msg = std::string("collection: ") + col.c_str() +
         " - findOne(): " + q.toString() +
         " - exception: " + e.what();
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
   catch (...)
@@ -292,12 +321,14 @@ extern bool collectionFindOne
     std::string msg = std::string("collection: ") + col.c_str() +
         " - findOne(): " + q.toString() +
         " - exception: generic";
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
-  alarmMgr.dbErrorReset();
 
+  alarmMgr.dbErrorReset();
   return true;
 }
 
@@ -323,6 +354,7 @@ bool collectionInsert
 
     LM_E(("Fatal Error (null DB connection)"));
     *err = "null DB connection";
+
     return false;
   }
 
@@ -343,8 +375,10 @@ bool collectionInsert
     std::string msg = std::string("collection: ") + col.c_str() +
       " - insert(): " + doc.toString() +
       " - exception: " + e.what();
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
   catch (...)
@@ -355,12 +389,14 @@ bool collectionInsert
     std::string msg = std::string("collection: ") + col.c_str() +
       " - insert(): " + doc.toString() +
       " - exception: generic";
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
-  alarmMgr.dbErrorReset();
 
+  alarmMgr.dbErrorReset();
   return true;
 }
 
@@ -388,10 +424,15 @@ bool collectionUpdate
 
     LM_E(("Fatal Error (null DB connection)"));
     *err = "null DB connection";
+
     return false;
   }
 
-  LM_T(LmtMongo, ("update() in '%s' collection: query='%s' doc='%s', upsert=%s", col.c_str(), q.toString().c_str(), doc.toString().c_str(), FT(upsert)));
+  LM_T(LmtMongo, ("update() in '%s' collection: query='%s' doc='%s', upsert=%s",
+                  col.c_str(),
+                  q.toString().c_str(),
+                  doc.toString().c_str(),
+                  FT(upsert)));
 
   try
   {
@@ -408,8 +449,10 @@ bool collectionUpdate
     std::string msg = std::string("collection: ") + col.c_str() +
       " - update(): <" + q.toString() + "," + doc.toString() + ">" +
       " - exception: " + e.what();
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
   catch (...)
@@ -420,8 +463,10 @@ bool collectionUpdate
     std::string msg = std::string("collection: ") + col.c_str() +
       " - update(): <" + q.toString() + "," + doc.toString() + ">" +
       " - exception: generic";
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
   alarmMgr.dbErrorReset();
@@ -451,6 +496,7 @@ bool collectionRemove
 
     LM_E(("Fatal Error (null DB connection)"));
     *err = "null DB connection";
+
     return false;
   }
 
@@ -471,8 +517,10 @@ bool collectionRemove
     std::string msg = std::string("collection: ") + col.c_str() +
       " - remove(): " + q.toString() +
       " - exception: " + e.what();
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
   catch (...)
@@ -483,12 +531,14 @@ bool collectionRemove
     std::string msg = std::string("collection: ") + col.c_str() +
       " - remove(): " + q.toString() +
       " - exception: generic";
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
-  alarmMgr.dbErrorReset();
 
+  alarmMgr.dbErrorReset();
   return true;
 }
 
@@ -511,8 +561,8 @@ bool collectionCreateIndex
   if (connection == NULL)
   {
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
-
     LM_E(("Fatal Error (null DB connection)"));
+
     return false;
   }
 
@@ -533,8 +583,10 @@ bool collectionCreateIndex
     std::string msg = std::string("collection: ") + col.c_str() +
       " - createIndex(): " + indexes.toString() +
       " - exception: " + e.what();
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
   catch (...)
@@ -545,8 +597,10 @@ bool collectionCreateIndex
     std::string msg = std::string("collection: ") + col.c_str() +
       " - createIndex(): " + indexes.toString() +
       " - exception: generic";
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
   alarmMgr.dbErrorReset();
@@ -581,7 +635,6 @@ bool runCollectionCommand
 *   Different from other functions in this module, this function can get the connection
 *   in the params, instead of using getMongoConnection().
 *   This is only done from DB connection bootstrapping code .
-*
 */
 bool runCollectionCommand
 (
@@ -609,6 +662,7 @@ bool runCollectionCommand
     {
       TIME_STAT_MONGO_COMMAND_WAIT_STOP();
       LM_E(("Fatal Error (null DB connection)"));
+
       return false;
     }
   }
@@ -636,8 +690,10 @@ bool runCollectionCommand
     std::string msg = std::string("collection: ") + col.c_str() +
       " - runCommand(): " + command.toString() +
       " - exception: " + e.what();
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
   catch (...)
@@ -651,12 +707,14 @@ bool runCollectionCommand
     std::string msg = std::string("collection: ") + col.c_str() +
       " - runCommand(): " + command.toString() +
       " - exception: generic";
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
-  alarmMgr.dbErrorReset();
 
+  alarmMgr.dbErrorReset();
   return true;
 }
 
@@ -685,8 +743,10 @@ bool setWriteConcern
     // FIXME: include wc.nodes() in the output message, + operator doesn't work with integers
     std::string msg = std::string("setWritteConcern(): ") + /*wc.nodes() +*/
       " - exception: " + e.what();
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
   catch (...)
@@ -694,12 +754,14 @@ bool setWriteConcern
     // FIXME: include wc.nodes() in the output message, + operator doesn't work with integers
     std::string msg = std::string("setWritteConcern(): ") + /*wc.nodes() + */
       " - exception: generic";
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
-  alarmMgr.dbErrorReset();
 
+  alarmMgr.dbErrorReset();
   return true;
 }
 
@@ -727,20 +789,24 @@ bool getWriteConcern
   {
     std::string msg = std::string("getWritteConern()") +
       " - exception: " + e.what();
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
   catch (...)
   {
     std::string msg = std::string("getWritteConern()") +
       " - exception: generic";
+
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
     return false;
   }
-  alarmMgr.dbErrorReset();
 
+  alarmMgr.dbErrorReset();
   return true;
 }
 

@@ -22,13 +22,24 @@
 *
 * Author: Fermín Galán
 */
+#include <string>
+#include <vector>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "mongoBackend/compoundResponses.h"
 #include "mongoBackend/dbFieldEncoding.h"
 
-using namespace mongo;
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::BSONElement;
+using mongo::BSONObj;
+
+
 
 /* ****************************************************************************
 *
@@ -37,7 +48,12 @@ using namespace mongo;
 */
 static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
 {
-  if ((e.type() != String) && (e.type() != Bool) && (e.type() != NumberDouble) && (e.type() != jstNULL) && (e.type() != Object) && (e.type() != Array))
+  if ((e.type() != mongo::String)       &&
+      (e.type() != mongo::Bool)         &&
+      (e.type() != mongo::NumberDouble) &&
+      (e.type() != mongo::jstNULL)      &&
+      (e.type() != mongo::Object)       &&
+      (e.type() != mongo::Array))
   {
     LM_E(("Runtime Error (unknown BSON type: %d)", e.type()));
     return;
@@ -48,30 +64,30 @@ static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
 
   switch (e.type())
   {
-  case String:
+  case mongo::String:
     child->valueType  = orion::ValueTypeString;
     child->stringValue = e.String();
     break;
 
-  case Bool:
+  case mongo::Bool:
     child->valueType  = orion::ValueTypeBoolean;
     child->boolValue = e.Bool();
     break;
 
-  case NumberDouble:
+  case mongo::NumberDouble:
     child->valueType  = orion::ValueTypeNumber;
     child->numberValue = e.Number();
     break;
 
-  case jstNULL:
+  case mongo::jstNULL:
     child->valueType  = orion::ValueTypeNone;
     break;
 
-  case Object:
+  case mongo::Object:
     compoundObjectResponse(child, e);
     break;
 
-  case Array:
+  case mongo::Array:
     compoundVectorResponse(child, e);
     break;
 
