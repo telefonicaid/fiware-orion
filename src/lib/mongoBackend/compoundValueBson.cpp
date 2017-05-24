@@ -22,6 +22,7 @@
 *
 * Author: Fermín Galán
 */
+#include <string>
 #include <vector>
 
 #include "mongo/client/dbclient.h"
