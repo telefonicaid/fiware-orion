@@ -39,6 +39,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonSubscription.h"
 #include "mongoBackend/dbConstants.h"
+#include "mongoBackend/mongoCreateSubscription.h"
 
 
 
