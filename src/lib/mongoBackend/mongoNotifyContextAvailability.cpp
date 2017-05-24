@@ -22,19 +22,27 @@
 *
 * Author: Fermín Galán
 */
+#include <string>
+#include <map>
 
 #include "common/sem.h"
 #include "logMsg/traceLevels.h"
 
-#include "mongoBackend/mongoNotifyContextAvailability.h"
-#include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/MongoCommonRegister.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
+
+#include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/MongoCommonRegister.h"
+#include "mongoBackend/mongoNotifyContextAvailability.h"
+
+
 
 /* ****************************************************************************
 *
 * mongoNotifyContextAvailability -
+*
+* The fields "subscriptionId" and "originator" of the request are ignored,
+* as we don't have anything interesting to do with them.
 */
 HttpStatusCode mongoNotifyContextAvailability
 (
@@ -46,32 +54,32 @@ HttpStatusCode mongoNotifyContextAvailability
   const std::string&                   servicePath
 )
 {
-    bool              reqSemTaken;
+  bool                    reqSemTaken;
+  RegisterContextRequest  rcr;
 
-    reqSemTake(__FUNCTION__, "mongo ngsi9 notification", SemWriteOp, &reqSemTaken);
+  reqSemTake(__FUNCTION__, "mongo ngsi9 notification", SemWriteOp, &reqSemTaken);
 
-    /* We ignore "subscriptionId" and "originator" in the request, as we don't have anything interesting
-     * to do with them */
+  /* Process each ContextRegistrationElement to create a "fake" RegisterContextRequest */
+  for (unsigned int ix= 0; ix < requestP->contextRegistrationResponseVector.size(); ++ix)
+  {
+    ContextRegistration* crP = &requestP->contextRegistrationResponseVector[ix]->contextRegistration;
+    rcr.contextRegistrationVector.push_back(crP);
+  }
 
-    /* Process each ContextRegistrationElement to create a "fake" RegisterContextRequest */
-    RegisterContextRequest rcr;
-    for (unsigned int ix= 0; ix < requestP->contextRegistrationResponseVector.size(); ++ix) {
-        ContextRegistration* crP = &requestP->contextRegistrationResponseVector[ix]->contextRegistration;
-        rcr.contextRegistrationVector.push_back(crP);
-    }
+  /* notifyContextAvailability doesn't include duration information, so we will use the default */
+  rcr.duration.set(DEFAULT_DURATION);
 
-    /* notifyContextAvailability doesn't include duration information, so we will use the default */
-    rcr.duration.set(DEFAULT_DURATION);
+  /* We use processRegisterContext() function. Note that in this case the response is not needed, so we will
+   * only use it to conform to function signature. In addition, take into account that from a registerContext
+   * point of view, notifyContextAvailability is considered as a new registration (as no registratinId is
+   * received in the notification message)
+   */
+  RegisterContextResponse rcRes;
+  processRegisterContext(&rcr, &rcRes, NULL, tenant, servicePath, "JSON", fiwareCorrelator);
 
-    /* We use processRegisterContext() function. Note that in this case the response is not needed, so we will
-     * only use it to conform to function signature. In addition, take into account that from a registerContext
-     * point of view, notifyContextAvailability is considered as a new registration (as no registratinId is
-     * received in the notification message) */
-    RegisterContextResponse rcres;
-    processRegisterContext(&rcr, &rcres, NULL, tenant, servicePath, "JSON", fiwareCorrelator);
+  responseP->responseCode.fill(SccOk);
 
-    responseP->responseCode.fill(SccOk);
+  reqSemGive(__FUNCTION__, "mongo ngsi9 notification", reqSemTaken);
 
-    reqSemGive(__FUNCTION__, "mongo ngsi9 notification", reqSemTaken);
-    return SccOk;
+  return SccOk;
 }
