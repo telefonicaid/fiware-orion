@@ -39,9 +39,14 @@
 
 /* ****************************************************************************
 *
-* USING - FIXME P4: this "using namespace" to be replaced by "using mongo::XXX" lines
+* USING
 */
-using namespace mongo;
+using mongo::DBClientBase;
+using mongo::DBClientCursor;
+using mongo::BSONObj;
+using mongo::DBException;
+using mongo::Query;
+using mongo::WriteConcern;
 
 
 
