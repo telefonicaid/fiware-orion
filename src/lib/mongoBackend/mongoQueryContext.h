@@ -1,5 +1,5 @@
-#ifndef MONGO_QUERY_CONTEXT_H
-#define MONGO_QUERY_CONTEXT_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOQUERYCONTEXT_H_
+#define SRC_LIB_MONGOBACKEND_MONGOQUERYCONTEXT_H_
 
 /*
 *
@@ -26,6 +26,7 @@
 * Author: Fermin Galan Marquez
 */
 #include <string>
+#include <vector>
 #include <map>
 
 #include "common/globals.h"
@@ -51,4 +52,4 @@ extern HttpStatusCode mongoQueryContext
   ApiVersion                            apiVersion    = V1
 );
 
-#endif
+#endif  // SRC_LIB_MONGOBACKEND_MONGOQUERYCONTEXT_H_
