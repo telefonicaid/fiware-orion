@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_MONGOBACKEND_MONGOCREATESUBSCRIPION_H
-#define SRC_LIB_MONGOBACKEND_MONGOCREATESUBSCRIPION_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOCREATESUBSCRIPTION_H_
+#define SRC_LIB_MONGOBACKEND_MONGOCREATESUBSCRIPTION_H_
 
 /*
 *
@@ -25,7 +25,6 @@
 *
 * Author: Fermin Galan
 */
-
 #include <map>
 #include <string>
 #include <vector>
@@ -46,12 +45,12 @@
 */
 extern std::string mongoCreateSubscription
 (
-  const ngsiv2::Subscription&          sub,
-  OrionError*                          oe,
-  const std::string&                   tenant,
-  const std::vector<std::string>&      servicePathV,
-  const std::string&                   xauthToken,
-  const std::string&                   fiwareCorrelator
+  const ngsiv2::Subscription&      sub,
+  OrionError*                      oe,
+  const std::string&               tenant,
+  const std::vector<std::string>&  servicePathV,
+  const std::string&               xauthToken,
+  const std::string&               fiwareCorrelator
 );
 
-#endif // SRC_LIB_MONGOBACKEND_MONGOCREATESUBSCRIPION_H
+#endif  // SRC_LIB_MONGOBACKEND_MONGOCREATESUBSCRIPTION_H_
