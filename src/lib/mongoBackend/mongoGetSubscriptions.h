@@ -1,5 +1,5 @@
-#ifndef MONGOLISTSUBSCRIPTIONS_H
-#define MONGOLISTSUBSCRIPTIONS_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOGETSUBSCRIPTIONS_H_
+#define SRC_LIB_MONGOBACKEND_MONGOGETSUBSCRIPTIONS_H_
 
 /*
 *
@@ -25,10 +25,9 @@
 *
 * Author: Orion dev team
 */
-
-#include <map>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "rest/OrionError.h"
 #include "apiTypesV2/Subscription.h"
@@ -66,4 +65,4 @@ extern void mongoGetSubscription
   const std::string&                   tenant
 );
 
-#endif  // MONGOLISTSUBSCRIPTIONS_H
+#endif  // SRC_LIB_MONGOBACKEND_MONGOGETSUBSCRIPTIONS_H_

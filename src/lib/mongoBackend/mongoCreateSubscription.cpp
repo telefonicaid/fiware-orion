@@ -22,32 +22,39 @@
 *
 * Author: Fermin Galan
 */
-
-#include <map>
 #include <string>
 #include <vector>
+#include <map>
+
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-#include "rest/OrionError.h"
+#include "common/defaultValues.h"
 #include "apiTypesV2/Subscription.h"
+#include "cache/subCache.h"
+#include "rest/OrionError.h"
+
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonSubscription.h"
 #include "mongoBackend/dbConstants.h"
-#include "common/defaultValues.h"
-#include "cache/subCache.h"
-
-#include "mongo/client/dbclient.h"
-
-using namespace mongo;
-using namespace ngsiv2;
 
 
 
 /* ****************************************************************************
 *
-* insertInCache -
+* USING
+*/
+using mongo::BSONObj;
+using mongo::BSONObjBuilder;
+using ngsiv2::Subscription;
+
+
+
+/* ****************************************************************************
+*
+* insertInCache - insert in csub cache
 */
 static void insertInCache
 (
@@ -61,8 +68,6 @@ static void insertInCache
   long long            lastSuccess
 )
 {
-  // Insert in csub cache
-
   //
   // StringFilter in Scope?
   //
@@ -114,6 +119,7 @@ static void insertInCache
 }
 
 
+
 /* ****************************************************************************
 *
 * mongoCreateSubscription -
@@ -121,31 +127,31 @@ static void insertInCache
 * Returns:
 * - subId: subscription susscessfully created ('oe' must be ignored), the subId
 *   must be used to fill Location header
-* - "": subscription creation fail (look to 'oe')
+* - "": subscription creation fail (look at 'oe')
 */
 std::string mongoCreateSubscription
 (
-  const Subscription&                  sub,
-  OrionError*                          oe,
-  const std::string&                   tenant,
-  const std::vector<std::string>&      servicePathV,
-  const std::string&                   xauthToken,
-  const std::string&                   fiwareCorrelator
+  const Subscription&              sub,
+  OrionError*                      oe,
+  const std::string&               tenant,
+  const std::vector<std::string>&  servicePathV,
+  const std::string&               xauthToken,
+  const std::string&               fiwareCorrelator
 )
 {
   bool reqSemTaken = false;
 
   reqSemTake(__FUNCTION__, "ngsiv2 create subscription request", SemWriteOp, &reqSemTaken);
 
-  // Build the BSON object to insert
-  BSONObjBuilder b;
-  std::string    servicePath = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
-  bool           notificationDone = false;
-  long long      lastNotification = 0;
-  long long      lastFailure      = 0;
-  long long      lastSuccess      = 0;
+  BSONObjBuilder     b;
+  std::string        servicePath      = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
+  bool               notificationDone = false;
+  long long          lastNotification = 0;
+  long long          lastFailure      = 0;
+  long long          lastSuccess      = 0;
+  const std::string  subId            = setNewSubscriptionId(&b);
 
-  const std::string subId = setNewSubscriptionId(&b);
+  // Build the BSON object to insert
   setExpiration(sub, &b);
   setHttpInfo(sub, &b);
   setThrottling(sub, &b);
@@ -158,12 +164,26 @@ std::string mongoCreateSubscription
   setBlacklist(sub, &b);
 
   std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
-  setCondsAndInitialNotify(sub, subId, status, sub.notification.attributes, sub.notification.metadata,
-                           sub.notification.httpInfo, sub.notification.blacklist, sub.attrsFormat,
-                           tenant, servicePathV, xauthToken, fiwareCorrelator, &b, &notificationDone);
+
+  setCondsAndInitialNotify(sub,
+                           subId,
+                           status,
+                           sub.notification.attributes,
+                           sub.notification.metadata,
+                           sub.notification.httpInfo,
+                           sub.notification.blacklist,
+                           sub.attrsFormat,
+                           tenant,
+                           servicePathV,
+                           xauthToken,
+                           fiwareCorrelator,
+                           &b,
+                           &notificationDone);
+
   if (notificationDone)
   {
-    long long lastNotification = (long long) getCurrentTime();
+    long long  lastNotification = (long long) getCurrentTime();
+
     setLastNotification(lastNotification, &b);
     setCount(1, &b);
   }
@@ -175,10 +195,12 @@ std::string mongoCreateSubscription
 
   // Insert in DB
   std::string err;
+
   if (!collectionInsert(getSubscribeContextCollectionName(tenant), doc, &err))
   {
     reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);
     oe->fill(SccReceiverInternalError, err);
+
     return "";
   }
 

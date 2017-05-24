@@ -34,10 +34,10 @@
 #include "common/string.h"
 #include "alarmMgr/alarmMgr.h"
 
-#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
+#include "mongoBackend/mongoConnectionPool.h"
 
 
 
@@ -53,7 +53,7 @@
 
 /* ****************************************************************************
 *
-* USING - 
+* USING
 */
 using mongo::HostAndPort;
 using mongo::BSONObj;
@@ -65,7 +65,7 @@ using mongo::DBClientReplicaSet;
 
 /* ****************************************************************************
 *
-* MongoConnection - 
+* MongoConnection -
 */
 typedef struct MongoConnection
 {
@@ -77,7 +77,7 @@ typedef struct MongoConnection
 
 /* ****************************************************************************
 *
-* globals - 
+* globals -
 */
 static MongoConnection* connectionPool     = NULL;
 static int              connectionPoolSize = 0;
@@ -85,14 +85,14 @@ static sem_t            connectionPoolSem;
 static sem_t            connectionSem;
 static struct timespec  semWaitingTime     = { 0, 0 };
 static bool             semStatistics      = false;
-static int              mongoVersionMayor = -1;
-static int              mongoVersionMinor = -1;
+static int              mongoVersionMayor  = -1;
+static int              mongoVersionMinor  = -1;
 
 
 
 /* ****************************************************************************
 *
-* mongoVersionGet - 
+* mongoVersionGet -
 */
 void mongoVersionGet(int* mayor, int* minor)
 {
@@ -104,7 +104,7 @@ void mongoVersionGet(int* mayor, int* minor)
 
 /* ****************************************************************************
 *
-* mongoConnect - 
+* mongoConnect -
 *
 * Default value for writeConcern == 1 (0: unacknowledged, 1: acknowledged)
 */
@@ -208,7 +208,7 @@ static DBClientBase* mongoConnect
     char cV[64];
     snprintf(cV, sizeof(cV), "connection failed, after %d retries", retries);
     std::string details = std::string(cV) + ": " + err;
-    
+
     alarmMgr.dbError(details);
     return NULL;
   }
@@ -288,7 +288,7 @@ static DBClientBase* mongoConnect
 
 /* ****************************************************************************
 *
-* mongoConnectionPoolInit - 
+* mongoConnectionPoolInit -
 */
 int mongoConnectionPoolInit
 (
@@ -364,7 +364,7 @@ int mongoConnectionPoolInit
 
 /* ****************************************************************************
 *
-* mongoPoolConnectionGet - 
+* mongoPoolConnectionGet -
 *
 * There are two semaphores to get a connection.
 * - One binary semaphore that protects the connection-vector itself (connectionPoolSem)
@@ -428,7 +428,7 @@ DBClientBase* mongoPoolConnectionGet(void)
 
 /* ****************************************************************************
 *
-* mongoPoolConnectionRelease - 
+* mongoPoolConnectionRelease -
 */
 void mongoPoolConnectionRelease(DBClientBase* connection)
 {
@@ -451,7 +451,7 @@ void mongoPoolConnectionRelease(DBClientBase* connection)
 
 /* ****************************************************************************
 *
-* mongoPoolConnectionSemWaitingTimeGet - 
+* mongoPoolConnectionSemWaitingTimeGet -
 */
 float mongoPoolConnectionSemWaitingTimeGet(void)
 {
@@ -462,7 +462,7 @@ float mongoPoolConnectionSemWaitingTimeGet(void)
 
 /* ****************************************************************************
 *
-* mongoPoolConnectionSemWaitingTimeReset - 
+* mongoPoolConnectionSemWaitingTimeReset -
 */
 void mongoPoolConnectionSemWaitingTimeReset(void)
 {
@@ -474,7 +474,7 @@ void mongoPoolConnectionSemWaitingTimeReset(void)
 
 /* ****************************************************************************
 *
-* mongoConnectionPoolSemGet - 
+* mongoConnectionPoolSemGet -
 */
 const char* mongoConnectionPoolSemGet(void)
 {
@@ -489,15 +489,15 @@ const char* mongoConnectionPoolSemGet(void)
   {
     return "taken";
   }
-  
-  return "free";  
+
+  return "free";
 }
 
 
 
 /* ****************************************************************************
 *
-* mongoConnectionSemGet - 
+* mongoConnectionSemGet -
 */
 const char* mongoConnectionSemGet(void)
 {
@@ -512,6 +512,6 @@ const char* mongoConnectionSemGet(void)
   {
     return "taken";
   }
-  
-  return "free";  
+
+  return "free";
 }
