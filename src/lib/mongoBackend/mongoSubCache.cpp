@@ -22,8 +22,9 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
 #include <regex.h>
+#include <string>
+#include <vector>
 
 #include "mongo/client/dbclient.h"
 
@@ -36,13 +37,13 @@
 #include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/StringFilter.h"
-
 #include "cache/subCache.h"
+
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/mongoSubCache.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
+#include "mongoBackend/mongoSubCache.h"
 
 
 
@@ -60,7 +61,7 @@ using mongo::OID;
 
 /* ****************************************************************************
 *
-* mongoSubCacheItemInsert - 
+* mongoSubCacheItemInsert -
 *
 * RETURN VALUES
 *   0:  all OK
@@ -76,7 +77,7 @@ using mongo::OID;
 int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 {
   //
-  // 01. Check validity of subP parameter 
+  // 01. Check validity of subP parameter
   //
   BSONElement  idField = getFieldF(sub, "_id");
 
@@ -107,8 +108,8 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // NOTE: NGSIv1 JSON is 'default' (for old db-content)
   //
-  std::string               renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
-  RenderFormat              renderFormat       = stringToRenderFormat(renderFormatString);
+  std::string    renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
+  RenderFormat   renderFormat       = stringToRenderFormat(renderFormatString);
 
   cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);
   cSubP->subscriptionId        = strdup(idField.OID().toString().c_str());
@@ -244,7 +245,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
 /* ****************************************************************************
 *
-* mongoSubCacheItemInsert - 
+* mongoSubCacheItemInsert -
 *
 * RETURN VALUE
 *   0: OK - patterned subscription has been inserted
@@ -390,7 +391,7 @@ int mongoSubCacheItemInsert
     //
     // NOTE (for both 'q' and 'mq' string filters)
     //   Here, the subscription should have a String Filter but if fill() fails, it won't.
-    //   The subscription is already in mongo and hopefully this erroneous situation is fixed 
+    //   The subscription is already in mongo and hopefully this erroneous situation is fixed
     //   once the sub-cache is refreshed.
     //
     //   This 'but' should be minimized once the issue 2082 gets implemented.
@@ -437,7 +438,7 @@ int mongoSubCacheItemInsert
 * mongoSubCacheRefresh -
 *
 * 1. Empty cache
-* 2. Lookup all subscriptions in the database 
+* 2. Lookup all subscriptions in the database
 * 3. Insert them again in the cache (with fresh data from database)
 *
 * NOTE
@@ -494,7 +495,7 @@ void mongoSubCacheRefresh(const std::string& database)
 
 /* ****************************************************************************
 *
-* mongoSubCountersUpdateCount - 
+* mongoSubCountersUpdateCount -
 */
 static void mongoSubCountersUpdateCount
 (
@@ -520,7 +521,7 @@ static void mongoSubCountersUpdateCount
 
 /* ****************************************************************************
 *
-* mongoSubCountersUpdateLastNotificationTime - 
+* mongoSubCountersUpdateLastNotificationTime -
 */
 static void mongoSubCountersUpdateLastNotificationTime
 (
@@ -548,7 +549,7 @@ static void mongoSubCountersUpdateLastNotificationTime
 
 /* ****************************************************************************
 *
-* mongoSubCountersUpdateLastFailure - 
+* mongoSubCountersUpdateLastFailure -
 */
 static void mongoSubCountersUpdateLastFailure
 (
@@ -576,7 +577,7 @@ static void mongoSubCountersUpdateLastFailure
 
 /* ****************************************************************************
 *
-* mongoSubCountersUpdateLastSuccess - 
+* mongoSubCountersUpdateLastSuccess -
 */
 static void mongoSubCountersUpdateLastSuccess
 (
