@@ -22,18 +22,18 @@
 *
 * Author: Fermin Galan Marquez
 */
-
 #include <string>
 #include <vector>
+
 #include "rest/OrionError.h"
 #include "ngsi/Duration.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "apiTypesV2/Subscription.h"
+
 #include "mongoBackend/mongoCreateSubscription.h"
 #include "mongoBackend/mongoSubscribeContext.h"
 
-using namespace ngsiv2;
 
 
 /* ****************************************************************************
@@ -50,30 +50,30 @@ HttpStatusCode mongoSubscribeContext
   const std::string&                   fiwareCorrelator
 )
 {
-    OrionError   oe;
-    Subscription sub;
+  OrionError            oe;
+  ngsiv2::Subscription  sub;
 
-    requestP->toNgsiv2Subscription(&sub);
-    std::string subId = mongoCreateSubscription(sub, &oe, tenant, servicePathV, xauthToken, fiwareCorrelator);
+  requestP->toNgsiv2Subscription(&sub);
+  std::string subId = mongoCreateSubscription(sub, &oe, tenant, servicePathV, xauthToken, fiwareCorrelator);
 
-    if (subId != "")
+  if (subId != "")
+  {
+    if (requestP->duration.isEmpty())
     {
-      if (requestP->duration.isEmpty())
-      {
-        responseP->subscribeResponse.duration.set(DEFAULT_DURATION);
-      }
-      else
-      {
-        responseP->subscribeResponse.duration = requestP->duration;
-      }
-      responseP->subscribeResponse.subscriptionId.set(subId);
-      responseP->subscribeResponse.throttling = requestP->throttling;
+      responseP->subscribeResponse.duration.set(DEFAULT_DURATION);
     }
     else
     {
-      // Check OrionError
-      responseP->subscribeError.errorCode.fill(oe.code, oe.details);
+      responseP->subscribeResponse.duration = requestP->duration;
     }
+    responseP->subscribeResponse.subscriptionId.set(subId);
+    responseP->subscribeResponse.throttling = requestP->throttling;
+  }
+  else
+  {
+    // Check OrionError
+    responseP->subscribeError.errorCode.fill(oe.code, oe.details);
+  }
 
-    return SccOk;
+  return SccOk;
 }
