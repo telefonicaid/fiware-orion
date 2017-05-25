@@ -23,10 +23,12 @@
 * Author: Fermin Galan Marquez
 */
 #include <string>
+#include <vector>
+#include <map>
+#include <set>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
 #include "common/sem.h"
 #include "common/statistics.h"
 #include "alarmMgr/alarmMgr.h"
@@ -41,7 +43,7 @@
 
 /* ****************************************************************************
 *
-* USING - 
+* USING
 */
 using mongo::BSONArrayBuilder;
 using mongo::BSONObj;
@@ -58,11 +60,11 @@ using mongo::DBClientBase;
 */
 static void getAttributeTypes
 (
-  const std::string&                    tenant,
-  const std::vector<std::string>&       servicePathV,
-  const std::string&                    entityType,
-  const std::string&                    attrName,
-  std::vector<std::string>*             attrTypes
+  const std::string&               tenant,
+  const std::vector<std::string>&  servicePathV,
+  const std::string&               entityType,
+  const std::string&               attrName,
+  std::vector<std::string>*        attrTypes
 )
 {
   std::string  idType         = std::string("_id.")    + ENT_ENTITY_TYPE;
@@ -82,11 +84,12 @@ static void getAttributeTypes
                  ENT_ATTRNAMES << attrName);
   }
 
-  std::auto_ptr<DBClientCursor> cursor;
-  std::string                   err;
+  std::auto_ptr<DBClientCursor>  cursor;
+  std::string                    err;
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
+
   if (!collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err))
   {
     releaseMongoConnection(connection);
@@ -96,14 +99,17 @@ static void getAttributeTypes
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   unsigned int  docs = 0;
+
   while (moreSafe(cursor))
   {
     BSONObj r;
+
     if (!nextSafeOrErrorF(cursor, &r, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
+
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
@@ -121,19 +127,22 @@ static void getAttributeTypes
     std::set<std::string>  attrsSet;
 
     attrs.getFieldNames(attrsSet);
+
     for (std::set<std::string>::iterator i = attrsSet.begin(); i != attrsSet.end(); ++i)
     {
       std::string currentAttr = *i;
+
       if (basePart(currentAttr) == attrName)
       {
         BSONObj attr = getObjectFieldF(attrs, currentAttr);
         attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
       }
     }
-
   }
+
   releaseMongoConnection(connection);
 }
+
 
 
 /* ****************************************************************************
@@ -141,23 +150,30 @@ static void getAttributeTypes
 * countEntities -
 *
 */
-static long long countEntities(const std::string& tenant, const std::vector<std::string>& servicePathV,std::string entityType)
-{  
+static long long countEntities
+(
+  const std::string&               tenant,
+  const std::vector<std::string>&  servicePathV,
+  const std::string&               entityType
+)
+{
   std::string    idType        = std::string("_id.") + ENT_ENTITY_TYPE;
   std::string    idServicePath = std::string("_id.") + ENT_SERVICE_PATH;
 
   BSONObj query = BSON(idType        << entityType <<
                        idServicePath << fillQueryServicePath(servicePathV));
 
-  std::string        err;
-  unsigned long long c;
+  std::string         err;
+  unsigned long long  c;
+
   if (!collectionCount(getEntitiesCollectionName(tenant), query, &c, &err))
   {
     return -1;
   }
-  return c;
 
+  return c;
 }
+
 
 
 /* ****************************************************************************
@@ -199,19 +215,19 @@ HttpStatusCode mongoEntityTypesValues
 
   BSONObj result;
   BSONObj spQuery = fillQueryServicePath(servicePathV);
-  BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
-                     "pipeline" << BSON_ARRAY(
-                                              BSON("$match" << BSON(C_ID_SERVICEPATH << spQuery)) <<
-                                              BSON("$group" << BSON("_id" << CS_ID_ENTITY)) <<
-                                              BSON("$sort" << BSON("_id" << 1))
-                                             )
-                     );
+  BSONObj cmd     = BSON("aggregate" << COL_ENTITIES <<
+                         "pipeline"  << BSON_ARRAY(
+                           BSON("$match" << BSON(C_ID_SERVICEPATH << spQuery)) <<
+                           BSON("$group" << BSON("_id" << CS_ID_ENTITY)) <<
+                           BSON("$sort"  << BSON("_id" << 1))));
 
   std::string err;
+
   if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
   {
     responseP->statusCode.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
+
     return SccOk;
   }
 
@@ -224,12 +240,13 @@ HttpStatusCode mongoEntityTypesValues
   {
     responseP->statusCode.fill(SccOk);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
+
     return SccOk;
   }
 
   /* Null and "" (which can appear only in the case of creating entities using NGSIv1) are
-   * collapsed to the same type "". Due to sorting, they appear at the begining. In the case
-   * both appear, one have to be removed or the pagination logic would break
+   * collapsed to the same type "". Due to sorting, they appear at the beginning. In case
+   * both of them appear, one has to be removed or the pagination logic would break.
    */
   if ((resultsArray.size() > 1) &&
       (getFieldF(resultsArray[0].embeddedObject(), "_id").isNull()) &&
@@ -247,7 +264,6 @@ HttpStatusCode mongoEntityTypesValues
    *
    * However, considering that the number of types will be small compared with the number of entities,
    * the current approach seems to be ok
-   *
    */
   if (totalTypesP != NULL)
   {
@@ -280,6 +296,7 @@ HttpStatusCode mongoEntityTypesValues
 }
 
 
+
 /* ****************************************************************************
 *
 * mongoEntityTypes -
@@ -296,7 +313,7 @@ HttpStatusCode mongoEntityTypes
 )
 {
   unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
-  unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());  
+  unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
   bool           reqSemTaken    = false;
 
   LM_T(LmtMongo, ("Query Entity Types"));
@@ -304,7 +321,7 @@ HttpStatusCode mongoEntityTypes
 
   reqSemTake(__FUNCTION__, "query types request", SemReadOp, &reqSemTaken);
 
-  /* Compose query based on this aggregation command:  
+  /* Compose query based on this aggregation command:
    *
    * db.runCommand({aggregate: "entities",
    *                pipeline: [ {$match: { "_id.servicePath": /.../ } },
@@ -317,18 +334,19 @@ HttpStatusCode mongoEntityTypes
    *                            {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrNames"}} },
    *                            {$sort: {_id: 1} }
    *                          ]
-   *                })   
+   *                })
    *
-   * The $cond part is hard... more information at http://stackoverflow.com/questions/27510143/empty-array-prevents-document-to-appear-in-query
-   * As a consequence, some "null" values may appear in the resulting attrs vector, which are pruned by the result processing logic.
+   * The $cond part is hard... more information at
+   *   http://stackoverflow.com/questions/27510143/empty-array-prevents-document-to-appear-in-query
    *
-   * FIXME P6: in the future, we can interpret the collapse parameter at this layer. If collapse=true so we don't need attributes, the
-   * following command can be used:
+   * As a consequence, some "null" values may appear in the resulting attrs vector,
+   * which are pruned by the result processing logic.
    *
-   * db.runCommand({aggregate: "entities", pipeline: [ {$group: {_id: "$_id.type"} }]})
+   * FIXME P6: in the future, we can interpret the collapse parameter at this layer.
+   *           If collapse=true so we don't need attributes, the
+   *           following command can be used:
    *
-   *
-   *
+   *           db.runCommand({aggregate: "entities", pipeline: [ {$group: {_id: "$_id.type"} }]})
    */
 
   BSONObj result;
@@ -349,28 +367,24 @@ HttpStatusCode mongoEntityTypes
         "$cond" << BSON_ARRAY(
           BSON("$eq" << BSON_ARRAY(S_ATTRNAMES << emptyArrayBuilder.arr()) ) <<
           nulledArrayBuilder.arr() <<
-          S_ATTRNAMES
-        )
-      )
-    )
-  );
+          S_ATTRNAMES))));
 
   BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
                      "pipeline" << BSON_ARRAY(
                                               BSON("$match" << BSON(C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
                                               BSON("$project" << BSON("_id" << 1 << ENT_ATTRNAMES << 1)) <<
-                                              projection <<
-                                              BSON("$unwind" << S_ATTRNAMES) <<
-                                              BSON("$group" << BSON("_id" << CS_ID_ENTITY << "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
-                                              BSON("$sort" << BSON("_id" << 1))
-                                             )
-                     );
+                                              projection << BSON("$unwind" << S_ATTRNAMES) <<
+                                              BSON("$group" << BSON("_id"   << CS_ID_ENTITY <<
+                                                                    "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
+                                              BSON("$sort" << BSON("_id" << 1))));
 
   std::string err;
+
   if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
   {
     responseP->statusCode.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
+
     return SccOk;
   }
 
@@ -412,17 +426,18 @@ HttpStatusCode mongoEntityTypes
 
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
-    BSONObj                   resultItem  = resultsArray[ix].embeddedObject();    
+    BSONObj                   resultItem  = resultsArray[ix].embeddedObject();
     std::vector<BSONElement>  attrsArray  = getFieldF(resultItem, "attrs").Array();
-
-
     EntityType*               entityType;
 
-
+    //
     // nullId true means that the "cumulative" entityType for both no-type and type "" has to be used. This happens
     // when the results item has the field "" and at the same time the value of that field is JSON null or when
     // the value of the field "_id" is ""
-    bool nullId = ((resultItem.hasField("")) && (getFieldF(resultItem, "").isNull())) || getFieldF(resultItem, "_id").isNull() || (getStringFieldF(resultItem, "_id") == "");
+    //
+    bool nullId = ((resultItem.hasField("")) && (getFieldF(resultItem, "").isNull())) ||
+                  getFieldF(resultItem, "_id").isNull()                               ||
+                  (getStringFieldF(resultItem, "_id") == "");
 
     if (nullId)
     {
@@ -441,22 +456,24 @@ HttpStatusCode mongoEntityTypes
     {
       for (unsigned int jx = 0; jx < attrsArray.size(); ++jx)
       {
-        /* This is where NULL elements in the resulting attrs vector are pruned */
+        /* This is where NULL-elements in the resulting attrs vector are pruned */
         if (attrsArray[jx].isNull())
         {
           continue;
         }
 
-        /* Note that we need and extra query() to the database (inside attributeType() function) to get each attribute type.
+        /* Note that we need and extra query() in the database (inside attributeType() function) to get each attribute type.
          * This could be inefficient, especially if the number of attributes is large */
         if (!noAttrDetail)
         {
           std::vector<std::string> attrTypes;
+
           getAttributeTypes(tenant, servicePathV, entityType->type , attrsArray[jx].str(), &attrTypes);
 
           for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
           {
             ContextAttribute* ca = new ContextAttribute(attrsArray[jx].str(), attrTypes[kx], "");
+
             entityType->contextAttributeVector.push_back(ca);
 
             // For backward compability, NGSIv1 only accepts one element
@@ -494,6 +511,7 @@ HttpStatusCode mongoEntityTypes
   }
 
   char detailsMsg[256];
+
   if (responseP->entityTypeVector.size() > 0)
   {
     if (totalTypesP != NULL)
@@ -522,8 +540,8 @@ HttpStatusCode mongoEntityTypes
   reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
   return SccOk;
-
 }
+
 
 
 /* ****************************************************************************
@@ -540,7 +558,7 @@ HttpStatusCode mongoAttributesForEntityType
   bool                                  noAttrDetail,
   ApiVersion                            apiVersion
 )
-{  
+{
   unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
   unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
   bool           reqSemTaken    = false;
@@ -549,7 +567,8 @@ HttpStatusCode mongoAttributesForEntityType
   // Count only makes sense for this operation in the case of NGSIv1
   if (apiVersion == V1)
   {
-    std::string    detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
+    std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
+
     count = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
   }
 
@@ -562,7 +581,7 @@ HttpStatusCode mongoAttributesForEntityType
   reqSemTake(__FUNCTION__, "query types attributes request", SemReadOp, &reqSemTaken);
 
 
-  /* Compose query based on this aggregation command:   
+  /* Compose query based on this aggregation command:
    *
    * db.runCommand({aggregate: "entities",
    *                pipeline: [ {$match: { "_id.type": "TYPE" , "_id.servicePath": /.../ } },
@@ -578,23 +597,24 @@ HttpStatusCode mongoAttributesForEntityType
    */
 
   BSONObj result;
-  BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
-                     "pipeline" << BSON_ARRAY(
-                                              BSON("$match" << BSON(C_ID_ENTITY << entityType << C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
-                                              BSON("$project" << BSON("_id" << 1 << ENT_ATTRNAMES << 1)) <<
-                                              BSON("$unwind" << S_ATTRNAMES) <<
-                                              BSON("$group" << BSON("_id" << CS_ID_ENTITY << "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
-                                              BSON("$unwind" << "$attrs") <<
-                                              BSON("$group" << BSON("_id" << "$attrs")) <<
-                                              BSON("$sort" << BSON("_id" << 1))
-                                             )
-                    );
+  BSONObj cmd =
+    BSON("aggregate" << COL_ENTITIES <<
+         "pipeline" << BSON_ARRAY(
+           BSON("$match" << BSON(C_ID_ENTITY << entityType <<
+                                 C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
+           BSON("$project" << BSON("_id" << 1 << ENT_ATTRNAMES << 1)) <<
+           BSON("$unwind" << S_ATTRNAMES) <<
+           BSON("$group" << BSON("_id" << CS_ID_ENTITY << "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
+           BSON("$unwind" << "$attrs") <<
+           BSON("$group" << BSON("_id" << "$attrs")) <<
+           BSON("$sort" << BSON("_id" << 1))));
 
   std::string err;
   if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
   {
     responseP->statusCode.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
+
     return SccOk;
   }
 
@@ -609,13 +629,14 @@ HttpStatusCode mongoAttributesForEntityType
   {
     responseP->statusCode.fill(SccContextElementNotFound);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
+
     return SccOk;
   }
 
   /* See comment above in the other method regarding this strategy to implement pagination */
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
-    BSONElement  idField    = getFieldF(resultsArray[ix].embeddedObject(), "_id");
+    BSONElement idField = getFieldF(resultsArray[ix].embeddedObject(), "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
@@ -625,10 +646,13 @@ HttpStatusCode mongoAttributesForEntityType
     //
     if (idField.eoo() == true)
     {
-      std::string details = std::string("error retrieving _id field in doc: '") + resultsArray[ix].embeddedObject().toString() + "'";
+      std::string details = std::string("error retrieving _id field in doc: '") +
+                            resultsArray[ix].embeddedObject().toString() + "'";
+
       alarmMgr.dbError(details);
       continue;
     }
+
     alarmMgr.dbErrorReset();
 
     /* Note that we need and extra query() to the database (inside attributeType() function) to get each attribute type.
@@ -636,11 +660,13 @@ HttpStatusCode mongoAttributesForEntityType
     if (!noAttrDetail)
     {
       std::vector<std::string> attrTypes;
+
       getAttributeTypes(tenant, servicePathV, entityType , idField.str(), &attrTypes);
 
       for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
       {
         ContextAttribute*  ca = new ContextAttribute(idField.str(), attrTypes[kx], "");
+
         responseP->entityType.contextAttributeVector.push_back(ca);
 
         // For backward compability, NGSIv1 only accepts one element
@@ -657,11 +683,12 @@ HttpStatusCode mongoAttributesForEntityType
       //       this special condition of 'No Attribute Detail'
       //
       ContextAttribute* caP = new ContextAttribute(idField.str(), "", "");
-      responseP->entityType.contextAttributeVector.push_back(caP);      
+      responseP->entityType.contextAttributeVector.push_back(caP);
     }
   }
 
   char detailsMsg[256];
+
   if (responseP->entityType.contextAttributeVector.size() > 0)
   {
     if (count)

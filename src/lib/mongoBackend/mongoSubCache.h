@@ -25,9 +25,10 @@
 *
 * Author: Ken Zangelin
 */
+#include <regex.h>
+
 #include <string>
 #include <vector>
-#include <regex.h>
 
 #include "mongo/client/dbclient.h"
 #include "common/RenderFormat.h"
