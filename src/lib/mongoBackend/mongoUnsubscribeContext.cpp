@@ -43,6 +43,15 @@
 
 /* ****************************************************************************
 *
+* USING
+*/
+using mongo::BSONObj;
+using mongo::OID;
+
+
+
+/* ****************************************************************************
+*
 * mongoUnsubscribeContext - 
 */
 HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, UnsubscribeContextResponse* responseP, const std::string& tenant)

@@ -39,17 +39,27 @@
 #include "common/defaultValues.h"
 #include "alarmMgr/alarmMgr.h"
 
-#include "mongoBackend/MongoCommonRegister.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
-
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
+#include "mongoBackend/MongoCommonRegister.h"
 
-using std::string;
-using std::map;
-using std::auto_ptr;
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::BSONArrayBuilder;
+using mongo::BSONObjBuilder;
+using mongo::BSONObj;
+using mongo::BSONElement;
+using mongo::DBClientBase;
+using mongo::DBClientCursor;
+using mongo::OID;
+
 
 
 /* ****************************************************************************
@@ -59,24 +69,23 @@ using std::auto_ptr;
 * For each one of the subscriptions in the map, send notification
 *
 * FIXME: this function is pretty similar to the one with the same name in
-* mongoUpdateContext.cpp, so maybe it makes to factorize it.
-*
+* mongoUpdateContext.cpp, so maybe it makes sense to factorize it.
 */
 static bool processSubscriptions
 (
-  const EntityIdVector&                 triggerEntitiesV,
-  map<string, TriggeredSubscription*>&  subs,
-  std::string&                          err,
-  const std::string&                    tenant,
-  const std::string&                    fiwareCorrelator
+  const EntityIdVector&                           triggerEntitiesV,
+  std::map<std::string, TriggeredSubscription*>&  subs,
+  std::string&                                    err,
+  const std::string&                              tenant,
+  const std::string&                              fiwareCorrelator
 )
 {
   bool ret = true;
 
-  for (std::map<string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
+  for (std::map<std::string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
   {
-    std::string mapSubId         = it->first;
-    TriggeredSubscription* trigs = it->second;
+    std::string             mapSubId = it->first;
+    TriggeredSubscription*  trigs    = it->second;
 
     /* Send notification */
     if (!processAvailabilitySubscription(triggerEntitiesV,
@@ -104,19 +113,19 @@ static bool processSubscriptions
 }
 
 
+
 /* ****************************************************************************
 *
 * addTriggeredSubscriptions -
 */
 static bool addTriggeredSubscriptions
 (
-  ContextRegistration                   cr,
-  map<string, TriggeredSubscription*>&  subs,
-  std::string&                          err,
-  std::string                           tenant
+  ContextRegistration                             cr,
+  std::map<std::string, TriggeredSubscription*>&  subs,
+  std::string&                                    err,
+  std::string                                     tenant
 )
 {
-
   BSONArrayBuilder          entitiesNoPatternA;
   std::vector<std::string>  idJsV;
   std::vector<std::string>  typeJsV;
@@ -173,31 +182,25 @@ static bool addTriggeredSubscriptions
   // sub document could include both isPattern=true and isPattern=false documents
   //
   std::string idJsString = "[ ";
-
   for (unsigned int ix = 0; ix < idJsV.size(); ++ix)
   {
+    idJsString += "\"" + idJsV[ix] + "\"";
+
     if (ix != idJsV.size() - 1)
     {
-      idJsString += "\""+idJsV[ix]+ "\" ,";
-    }
-    else
-    {
-      idJsString += "\"" +idJsV[ix]+ "\"";
+      idJsString += " ,";
     }
   }
   idJsString += " ]";
 
   std::string typeJsString = "[ ";
-
   for (unsigned int ix = 0; ix < typeJsV.size(); ++ix)
   {
+    typeJsString += "\"" + typeJsV[ix] + "\"";
+
     if (ix != typeJsV.size() - 1)
     {
-      typeJsString += "\"" +typeJsV[ix] + "\" ,";
-    }
-    else
-    {
-      typeJsString += "\"" + typeJsV[ix] + "\"";
+      typeJsString += " ,";
     }
   }
   typeJsString += " ]";
@@ -228,8 +231,8 @@ static bool addTriggeredSubscriptions
   queryPattern.append(CASUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
   queryPattern.appendCode("$where", function);
 
-  auto_ptr<DBClientCursor> cursor;
-  BSONObj                  query = BSON("$or" << BSON_ARRAY(queryNoPattern.obj() << queryPattern.obj()));
+  std::auto_ptr<DBClientCursor>  cursor;
+  BSONObj                        query = BSON("$or" << BSON_ARRAY(queryNoPattern.obj() << queryPattern.obj()));
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
@@ -246,6 +249,7 @@ static bool addTriggeredSubscriptions
   {
     BSONObj     sub;
     std::string err;
+
     if (!nextSafeOrErrorF(cursor, &sub, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
@@ -262,6 +266,7 @@ static bool addTriggeredSubscriptions
     if (idField.eoo() == true)
     {
       std::string details = std::string("error retrieving _id field in doc: '") + sub.toString() + "'";
+
       alarmMgr.dbError(details);
       continue;
     }
@@ -281,18 +286,17 @@ static bool addTriggeredSubscriptions
       // FIXME P4: Once ctx availability notification formats get defined for NGSIv2,
       //           the first parameter for TriggeredSubscription will have "normalized" as default value
       //
-      TriggeredSubscription* trigs = new TriggeredSubscription(
-        sub.hasField(CASUB_FORMAT)? stringToRenderFormat(getStringFieldF(sub, CASUB_FORMAT)) : NGSI_V1_LEGACY,
-        httpInfo,
-        subToAttributeList(sub));
+      RenderFormat           renderFormat = sub.hasField(CASUB_FORMAT)? stringToRenderFormat(getStringFieldF(sub, CASUB_FORMAT)) : NGSI_V1_LEGACY;
+      TriggeredSubscription* trigs        = new TriggeredSubscription(renderFormat, httpInfo, subToAttributeList(sub));
 
-      subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
+      subs.insert(std::pair<std::string, TriggeredSubscription*>(subIdStr, trigs));
     }
   }
   releaseMongoConnection(connection);
 
   return true;
 }
+
 
 
 /* ****************************************************************************
@@ -307,7 +311,6 @@ static bool addTriggeredSubscriptions
 *   put the document in the DB.
 * - In the update case, the _id is set according to the argument 'id' and update() is
 *   used to put the document in the DB.
-*
 */
 HttpStatusCode processRegisterContext
 (
@@ -330,11 +333,13 @@ HttpStatusCode processRegisterContext
 
   /* Calculate expiration (using the current time and the duration field in the request) */
   long long expiration = getCurrentTime() + requestP->duration.parse();
+
   LM_T(LmtMongo, ("Registration expiration: %lu", expiration));
 
   /* Create the mongoDB registration document */
   BSONObjBuilder reg;
   OID oid;
+
   if (id == NULL)
   {
     oid.init();
@@ -343,6 +348,7 @@ HttpStatusCode processRegisterContext
   {
     oid = *id;
   }
+
   reg.append("_id", oid);
   reg.append(REG_EXPIRATION, expiration);
   reg.append(REG_SERVICE_PATH, servicePath == "" ? DEFAULT_SERVICE_PATH_UPDATES : servicePath);
@@ -350,23 +356,22 @@ HttpStatusCode processRegisterContext
 
 
   //
-  // We accumulate the subscriptions in a map. The key of the map is the string representing
-  // subscription id
+  // We accumulate the subscriptions in a map. The key of the map is the string representing subscription id
+  // 'triggerEntitiesV' is used to define which entities to include in notifications
   //
-  std::map<string, TriggeredSubscription*> subsToNotify;
+  std::map<std::string, TriggeredSubscription*>  subsToNotify;
+  EntityIdVector                                 triggerEntitiesV;
+  BSONArrayBuilder                               contextRegistration;
 
-  // This vector is used to define which entities to include in notifications
-  EntityIdVector triggerEntitiesV;
-
-  BSONArrayBuilder contextRegistration;
   for (unsigned int ix = 0; ix < requestP->contextRegistrationVector.size(); ++ix)
   {
-    ContextRegistration* cr = requestP->contextRegistrationVector[ix];
+    ContextRegistration*  cr = requestP->contextRegistrationVector[ix];
+    BSONArrayBuilder      entities;
 
-    BSONArrayBuilder entities;
     for (unsigned int jx = 0; jx < cr->entityIdVector.size(); ++jx)
     {
       EntityId* en = cr->entityIdVector[jx];
+
       triggerEntitiesV.push_back(en);
 
       if (en->type == "")
@@ -382,18 +387,19 @@ HttpStatusCode processRegisterContext
     }
 
     BSONArrayBuilder attrs;
+
     for (unsigned int jx = 0; jx < cr->contextRegistrationAttributeVector.size(); ++jx)
     {
       ContextRegistrationAttribute* cra = cr->contextRegistrationAttributeVector[jx];
+
       attrs.append(BSON(REG_ATTRS_NAME << cra->name << REG_ATTRS_TYPE << cra->type << "isDomain" << cra->isDomain));
       LM_T(LmtMongo, ("Attribute registration: {name: %s, type: %s, isDomain: %s}",
                       cra->name.c_str(),
                       cra->type.c_str(),
                       cra->isDomain.c_str()));
 
-      for (unsigned int kx = 0;
-           kx < requestP->contextRegistrationVector[ix]->contextRegistrationAttributeVector[jx]->metadataVector.size();
-           ++kx)
+      unsigned int size = requestP->contextRegistrationVector[ix]->contextRegistrationAttributeVector[jx]->metadataVector.size();
+      for (unsigned int kx = 0; kx < size; ++kx)
       {
         // FIXME: metadata not supported at the moment
       }
@@ -418,13 +424,14 @@ HttpStatusCode processRegisterContext
   }
   reg.append(REG_CONTEXT_REGISTRATION, contextRegistration.arr());
 
-  /* Note we are using upsert = "true". This means that if the document doesn't previously
+  /* Note that we are using upsert = "true". This means that if the document doesn't previously
    * exist in the collection, it is created. Thus, this way both uses of registerContext are OK
-   * (either new registration or updating an existing one) */
+   * (either new registration or updating an existing one)
+   */
   if (!collectionUpdate(getRegistrationsCollectionName(tenant), BSON("_id" << oid), reg.obj(), true, &err))
   {
     responseP->errorCode.fill(SccReceiverInternalError, err);
-    releaseTriggeredSubscriptions(subsToNotify);
+    releaseTriggeredSubscriptions(&subsToNotify);
     return SccOk;
   }
 

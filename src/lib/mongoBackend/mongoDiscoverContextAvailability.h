@@ -1,5 +1,5 @@
-#ifndef MONGO_DISCOVER_CONTEXTAVAILABILITY_H
-#define MONGO_DISCOVER_CONTEXTAVAILABILITY_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGODISCOVERCONTEXTAVAILABILITY_H_
+#define SRC_LIB_MONGOBACKEND_MONGODISCOVERCONTEXTAVAILABILITY_H_
 
 /*
 *
@@ -26,6 +26,7 @@
 * Author: Fermin Galan Marquez
 */
 #include <string>
+#include <vector>
 #include <map>
 
 #include "rest/HttpStatusCode.h"
@@ -47,4 +48,4 @@ extern HttpStatusCode mongoDiscoverContextAvailability
   const std::vector<std::string>&            servicePathV
 );
 
-#endif
+#endif  // SRC_LIB_MONGOBACKEND_MONGODISCOVERCONTEXTAVAILABILITY_H_
