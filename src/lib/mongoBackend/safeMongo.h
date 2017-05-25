@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_MONGOBACKEND_SAFEBSONGET_H_
-#define SRC_LIB_MONGOBACKEND_SAFEBSONGET_H_
+#ifndef SRC_LIB_MONGOBACKEND_SAFEMONGO_H_
+#define SRC_LIB_MONGOBACKEND_SAFEMONGO_H_
 
 /*
 *
@@ -25,6 +25,8 @@
 *
 * Author: Fermin Galan Marquez
 */
+#include <string>
+#include <vector>
 
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/RegistrationId.h"
@@ -32,7 +34,12 @@
 
 #include "mongo/client/dbclient.h"
 
-/* Some macros to make the usage of these function prettier */
+
+
+/* ****************************************************************************
+*
+* Some macros to make the usage of these functions prettier
+*/
 #define getObjectFieldF(b, field)           getObjectField(b, field, __FUNCTION__, __LINE__)
 #define getArrayFieldF(b, field)            getArrayField(b, field, __FUNCTION__, __LINE__)
 #define getStringFieldF(b, field)           getStringField(b, field, __FUNCTION__, __LINE__)
@@ -45,23 +52,47 @@
 #define setStringVectorF(b, field, v)       setStringVector(b, field, v, __FUNCTION__,  __LINE__)
 #define nextSafeOrErrorF(c, r, err)         nextSafeOrError(c, r, err, __FUNCTION__,  __LINE__)
 
+
+
 /* ****************************************************************************
 *
 * getObjectField -
 */
-extern mongo::BSONObj getObjectField(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>", int line = 0);
+extern mongo::BSONObj getObjectField
+(
+  const mongo::BSONObj&  b,
+  const std::string&     field,
+  const std::string&     caller = "<none>",
+  int                    line   = 0
+);
+
+
 
 /* ****************************************************************************
 *
 * getArrayField -
 */
-extern mongo::BSONArray getArrayField(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>", int line = 0);
+extern mongo::BSONArray getArrayField
+(
+  const mongo::BSONObj&  b,
+  const std::string&     field,
+  const std::string&     caller = "<none>",
+  int                    line   = 0
+);
+
+
 
 /* ****************************************************************************
 *
 * getStringField -
 */
-extern std::string getStringField(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>", int line = 0);
+extern std::string getStringField
+(
+  const mongo::BSONObj&  b,
+  const std::string&     field,
+  const std::string&     caller = "<none>",
+  int                    line   = 0
+);
 
 
 
@@ -69,7 +100,13 @@ extern std::string getStringField(const mongo::BSONObj& b, const std::string& fi
 *
 * getNumberField -
 */
-extern double getNumberField(const mongo::BSONObj& b, const std::string& field, const std::string& caller, int line);
+extern double getNumberField
+(
+  const mongo::BSONObj&  b,
+  const std::string&     field,
+  const std::string&     caller,
+  int                    line
+);
 
 
 
@@ -77,31 +114,71 @@ extern double getNumberField(const mongo::BSONObj& b, const std::string& field, 
 *
 * getIntField -
 */
-extern int getIntField(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>", int line = 0);
+extern int getIntField
+(
+  const mongo::BSONObj&  b,
+  const std::string&     field,
+  const std::string&     caller = "<none>",
+  int                    line   = 0
+);
+
+
 
 /* ****************************************************************************
 *
 * getLongField -
 */
-extern long long getLongField(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>", int line = 0);
+extern long long getLongField
+(
+  const mongo::BSONObj&  b,
+  const std::string&     field,
+  const std::string&     caller = "<none>",
+  int                    line = 0
+);
+
+
 
 /* ****************************************************************************
 *
 * getIntOrLongFieldAsLong -
 */
-extern long long getIntOrLongFieldAsLong(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>", int line = 0);
+extern long long getIntOrLongFieldAsLong
+(
+  const mongo::BSONObj&  b,
+  const std::string&     field,
+  const std::string&     caller = "<none>",
+  int                    line   = 0
+);
+
+
 
 /* ****************************************************************************
 *
 * getBoolField -
 */
-extern bool getBoolField(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>", int line = 0);
+extern bool getBoolField
+(
+  const mongo::BSONObj&  b,
+  const std::string&     field,
+  const std::string&     caller = "<none>",
+  int                    line   = 0
+);
+
+
 
 /* ****************************************************************************
 *
 * getField -
 */
-extern mongo::BSONElement getField(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>", int line = 0);
+extern mongo::BSONElement getField
+(
+  const mongo::BSONObj&  b,
+  const std::string&     field,
+  const std::string&     caller = "<none>",
+  int                    line   = 0
+);
+
+
 
 /* ****************************************************************************
 *
@@ -116,31 +193,43 @@ extern void setStringVector
   int                        line
 );
 
+
+
 /* ****************************************************************************
 *
 * moreSafe -
 */
 extern bool moreSafe(const std::auto_ptr<mongo::DBClientCursor>& cursor);
 
+
+
 /* ****************************************************************************
 *
 * nextSafeOrError -
-*
 */
-extern bool nextSafeOrError(const std::auto_ptr<mongo::DBClientCursor>& cursor, mongo::BSONObj* r, std::string* err, const std::string& caller = "<none>", int line = 0);
+extern bool nextSafeOrError
+(
+  const std::auto_ptr<mongo::DBClientCursor>&  cursor,
+  mongo::BSONObj*                              r,
+  std::string*                                 err,
+  const std::string&                           caller = "<none>",
+  int                                          line   = 0
+);
+
+
 
 /* ****************************************************************************
 *
 * safeGetSubId -
-*
 */
 extern bool safeGetSubId(const SubscriptionId& subId, mongo::OID* id, StatusCode* sc);
+
+
 
 /* ****************************************************************************
 *
 * safeGetRegId -
-*
 */
 extern bool safeGetRegId(const RegistrationId& regId, mongo::OID* id, StatusCode* sc);
 
-#endif // SRC_LIB_MONGOBACKEND_SAFEBSONGET_H_
+#endif  // SRC_LIB_MONGOBACKEND_SAFEMONGO_H_

@@ -1,5 +1,5 @@
-#ifndef MONGO_UPDATE_CONTEXT_H
-#define MONGO_UPDATE_CONTEXT_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOUPDATECONTEXT_H_
+#define SRC_LIB_MONGOBACKEND_MONGOUPDATECONTEXT_H_
 
 /*
 *
@@ -25,8 +25,9 @@
 *
 * Author: Fermin Galan Marquez
 */
-#include <map>
 #include <string>
+#include <vector>
+#include <map>
 
 #include "rest/HttpStatusCode.h"
 #include "ngsi10/UpdateContextRequest.h"
@@ -51,4 +52,4 @@ extern HttpStatusCode mongoUpdateContext
   Ngsiv2Flavour                         ngsiv2Flavour    = NGSIV2_NO_FLAVOUR
 );
 
-#endif
+#endif  // SRC_LIB_MONGOBACKEND_MONGOUPDATECONTEXT_H_
