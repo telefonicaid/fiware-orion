@@ -109,9 +109,10 @@ HttpStatusCode mongoRegisterContext
     return SccOk;
   }
 
-  const char* colName = getRegistrationsCollectionName(tenant).c_str();
+  const std::string    colName  = getRegistrationsCollectionName(tenant);
+  const mongo::BSONObj bson     = BSON("_id" << id << REG_SERVICE_PATH << sPath);
 
-  if (!collectionFindOne(colName, BSON("_id" << id << REG_SERVICE_PATH << sPath), &reg, &err))
+  if (!collectionFindOne(colName, bson, &reg, &err))
   {
     reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
     responseP->errorCode.fill(SccReceiverInternalError, err);
