@@ -26,30 +26,37 @@
 * Author: Fermín Galán
 */
 
-/*****************************************************************************
-* Constant string for collections names */
+
+
+/* ***************************************************************************
+*
+* Constant strings for collections names
+*/
 #define COL_ENTITIES       "entities"
 #define COL_REGISTRATIONS  "registrations"
 #define COL_CSUBS          "csubs"
 #define COL_CASUBS         "casubs"
 
-/*****************************************************************************
-* Constant string for field names in collection (first characters
-* are the code name: REG_, ENT_, CSUB_ and CASUB_) */
 
-#define REG_FWS_REGID               "fwdRegId"
-#define REG_CONTEXT_REGISTRATION    "contextRegistration"
-#define REG_PROVIDING_APPLICATION   "providingApplication"
-#define REG_ENTITIES                "entities"
-#define REG_ATTRS                   "attrs"
-#define REG_EXPIRATION              "expiration"
-#define REG_ENTITY_ID               "id"
-#define REG_ENTITY_TYPE             "type"
-#define REG_ATTRS_NAME              "name"
-#define REG_ATTRS_TYPE              "type"
-#define REG_ATTRS_ISDOMAIN          "isDomain"
-#define REG_SERVICE_PATH            "servicePath"
-#define REG_FORMAT                  "format"
+
+/* ***************************************************************************
+*
+* Constant strings for field names in collection (first characters
+* are the code name: REG_, ENT_, CSUB_ and CASUB_)
+*/
+#define REG_FWS_REGID                "fwdRegId"
+#define REG_CONTEXT_REGISTRATION     "contextRegistration"
+#define REG_PROVIDING_APPLICATION    "providingApplication"
+#define REG_ENTITIES                 "entities"
+#define REG_ATTRS                    "attrs"
+#define REG_EXPIRATION               "expiration"
+#define REG_ENTITY_ID                "id"
+#define REG_ENTITY_TYPE              "type"
+#define REG_ATTRS_NAME               "name"
+#define REG_ATTRS_TYPE               "type"
+#define REG_ATTRS_ISDOMAIN           "isDomain"
+#define REG_SERVICE_PATH             "servicePath"
+#define REG_FORMAT                   "format"
 
 #define ENT_ATTRS                    "attrs"
 #define ENT_ATTRNAMES                "attrNames"
@@ -70,49 +77,49 @@
 #define ENT_LOCATION_ATTRNAME        "attrName"
 #define ENT_LOCATION_COORDS          "coords"
 
-#define CSUB_DESCRIPTION        "description"
-#define CSUB_EXPIRATION         "expiration"
-#define CSUB_LASTNOTIFICATION   "lastNotification"
-#define CSUB_REFERENCE          "reference"
-#define CSUB_CONDITIONS         "conditions"
-#define CSUB_EXPR               "expression"
-#define CSUB_EXPR_Q             "q"
-#define CSUB_EXPR_MQ            "mq"
-#define CSUB_EXPR_GEOM          "geometry"
-#define CSUB_EXPR_COORDS        "coords"
-#define CSUB_EXPR_GEOREL        "georel"
+#define CSUB_DESCRIPTION             "description"
+#define CSUB_EXPIRATION              "expiration"
+#define CSUB_LASTNOTIFICATION        "lastNotification"
+#define CSUB_REFERENCE               "reference"
+#define CSUB_CONDITIONS              "conditions"
+#define CSUB_EXPR                    "expression"
+#define CSUB_EXPR_Q                  "q"
+#define CSUB_EXPR_MQ                 "mq"
+#define CSUB_EXPR_GEOM               "geometry"
+#define CSUB_EXPR_COORDS             "coords"
+#define CSUB_EXPR_GEOREL             "georel"
 
-#define CSUB_THROTTLING            "throttling"
-#define CSUB_ENTITIES              "entities"
-#define CSUB_ATTRS                 "attrs"
-#define CSUB_METADATA              "metadata"
-#define CSUB_ENTITY_ID             "id"
-#define CSUB_ENTITY_TYPE           "type"
-#define CSUB_ENTITY_ISPATTERN      "isPattern"
-#define CSUB_ENTITY_ISTYPEPATTERN  "isTypePattern"
-#define CSUB_COUNT                 "count"
-#define CSUB_FORMAT                "format"
-#define CSUB_STATUS                "status"
-#define CSUB_SERVICE_PATH          "servicePath"
-#define CSUB_CUSTOM                "custom"
-#define CSUB_METHOD                "method"
-#define CSUB_HEADERS               "headers"
-#define CSUB_QS                    "qs"
-#define CSUB_PAYLOAD               "payload"
-#define CSUB_BLACKLIST             "blacklist"
-#define CSUB_LASTFAILURE           "lastFailure"
-#define CSUB_LASTSUCCESS           "lastSuccess"
+#define CSUB_THROTTLING              "throttling"
+#define CSUB_ENTITIES                "entities"
+#define CSUB_ATTRS                   "attrs"
+#define CSUB_METADATA                "metadata"
+#define CSUB_ENTITY_ID               "id"
+#define CSUB_ENTITY_TYPE             "type"
+#define CSUB_ENTITY_ISPATTERN        "isPattern"
+#define CSUB_ENTITY_ISTYPEPATTERN    "isTypePattern"
+#define CSUB_COUNT                   "count"
+#define CSUB_FORMAT                  "format"
+#define CSUB_STATUS                  "status"
+#define CSUB_SERVICE_PATH            "servicePath"
+#define CSUB_CUSTOM                  "custom"
+#define CSUB_METHOD                  "method"
+#define CSUB_HEADERS                 "headers"
+#define CSUB_QS                      "qs"
+#define CSUB_PAYLOAD                 "payload"
+#define CSUB_BLACKLIST               "blacklist"
+#define CSUB_LASTFAILURE             "lastFailure"
+#define CSUB_LASTSUCCESS             "lastSuccess"
 
-#define CASUB_EXPIRATION        "expiration"
-#define CASUB_REFERENCE         "reference"
-#define CASUB_ENTITIES          "entities"
-#define CASUB_ATTRS             "attrs"
-#define CASUB_ENTITY_ID         "id"
-#define CASUB_ENTITY_TYPE       "type"
-#define CASUB_ENTITY_ISPATTERN  "isPattern"
-#define CASUB_LASTNOTIFICATION  "lastNotification"
-#define CASUB_COUNT             "count"
-#define CASUB_FORMAT            "format"
+#define CASUB_EXPIRATION             "expiration"
+#define CASUB_REFERENCE              "reference"
+#define CASUB_ENTITIES               "entities"
+#define CASUB_ATTRS                  "attrs"
+#define CASUB_ENTITY_ID              "id"
+#define CASUB_ENTITY_TYPE            "type"
+#define CASUB_ENTITY_ISPATTERN       "isPattern"
+#define CASUB_LASTNOTIFICATION       "lastNotification"
+#define CASUB_COUNT                  "count"
+#define CASUB_FORMAT                 "format"
 
 
 
@@ -123,6 +130,4 @@
 #define STATUS_ACTIVE        "active"
 #define STATUS_INACTIVE      "inactive"
 
-
-#endif // SRC_LIB_MONGOBACKEND_DBCONSTANTS_H_
-
+#endif  // SRC_LIB_MONGOBACKEND_DBCONSTANTS_H_
