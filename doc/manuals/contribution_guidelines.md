@@ -707,7 +707,7 @@ See example:
 
 *Rationale*: It's simply weird to pass a value for a referenced parameter. If `const` is not used you get a compiler error,
 which makes a lot of sense: how can the function modify the variable when there is no variable?
-In "C", it's more straightforward, as in order to send the reference to the variable using the `&' operator, you need a variable.
+In "C", it's more straightforward, as in order to send the reference to the variable using the `&` operator, you need a variable.
 In C++ it gets a a bit weird and it is better to avoid this by adding a helper variable (`bo` in the example above).
 
 ContextElement* ceP;
