@@ -710,11 +710,6 @@ which makes a lot of sense: how can the function modify the variable when there 
 In "C", it's more straightforward, as in order to send the reference to the variable using the `&` operator, you need a variable.
 In C++ it gets a a bit weird and it is better to avoid this by adding a helper variable (`bo` in the example above).
 
-ContextElement* ceP;
-```
-
-*Rationale*: pointer variables can be easily identified at a glanze, which makes the code clearer.
-
 *How to check*: manually
 
 ## Programming patterns
