@@ -29,8 +29,10 @@
 #include <vector>
 #include <map>
 
+#include "rest/HttpStatusCode.h"
 #include "orionTypes/EntityTypeVectorResponse.h"
 #include "orionTypes/EntityTypeResponse.h"
+
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/dbConstants.h"
 
