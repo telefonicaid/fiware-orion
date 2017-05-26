@@ -198,12 +198,9 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   //           used for the PR #XXX (to be filled in after the PR is created and before it is merged)
   //
   std::string  colName = getSubscribeContextAvailabilityCollectionName(tenant).c_str();
-  bool         updated = collectionUpdate(colName,
-                                          BSON("_id" << OID(requestP->subscriptionId.get())),
-                                          newSub.obj(),
-                                          false,
-                                          &err);
-  if (!updated)
+  BSONObj      bson    = BSON("_id" << OID(requestP->subscriptionId.get()));
+
+  if (!collectionUpdate(colName, bson, newSub.obj(), false, &err))
   {
     reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo db exception)", reqSemTaken);
     responseP->errorCode.fill(SccReceiverInternalError, err);
