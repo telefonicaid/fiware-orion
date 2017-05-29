@@ -67,7 +67,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
 {
   bool reqSemTaken;
 
-  reqSemTake(__FUNCTION__, "ngsi9 update subscription request", SemWriteOp, &reqSemTaken);  
+  reqSemTake(__FUNCTION__, "ngsi9 update subscription request", SemWriteOp, &reqSemTaken);
 
   /* Look for document */
   BSONObj     sub;
@@ -77,15 +77,17 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   if (!safeGetSubId(requestP->subscriptionId, &id, &(responseP->errorCode)))
   {
     reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo assertion exception)", reqSemTaken);
+
     if (responseP->errorCode.code == SccContextElementNotFound)
     {
-      std::string details = std::string("invalid OID mimeType: '") + requestP->subscriptionId.get() + "'"; 
+      std::string details = std::string("invalid OID mimeType: '") + requestP->subscriptionId.get() + "'";
       alarmMgr.badInput(clientIp, details);
     }
-    else // SccReceiverInternalError
+    else  // SccReceiverInternalError
     {
       LM_E(("Runtime Error (exception getting OID: %s)", responseP->errorCode.details.c_str()));
     }
+
     return SccOk;
   }
 
@@ -93,14 +95,16 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   {
     reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo db exception)", reqSemTaken);
     responseP->errorCode.fill(SccReceiverInternalError, err);
+
     return SccOk;
   }
 
   if (sub.isEmpty())
   {
-     responseP->errorCode.fill(SccContextElementNotFound);
-     reqSemGive(__FUNCTION__, "ngsi9 update subscription request (no subscriptions found)", reqSemTaken);
-     return SccOk;
+    responseP->errorCode.fill(SccContextElementNotFound);
+    reqSemGive(__FUNCTION__, "ngsi9 update subscription request (no subscriptions found)", reqSemTaken);
+
+    return SccOk;
   }
 
   /* We start with an empty BSONObjBuilder and process requestP for all the fields that can
@@ -116,24 +120,30 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
 
   /* Entities (mandatory) */
   BSONArrayBuilder entities;
-  for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix) {
-      EntityId* en = requestP->entityIdVector[ix];
-      if (en->type == "") {
-          entities.append(BSON(CASUB_ENTITY_ID << en->id <<
-                               CASUB_ENTITY_ISPATTERN << en->isPattern));
-      }
-      else {
-          entities.append(BSON(CASUB_ENTITY_ID << en->id <<
-                               CASUB_ENTITY_TYPE << en->type <<
-                               CASUB_ENTITY_ISPATTERN << en->isPattern));
-      }
+  for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix)
+  {
+    EntityId* en = requestP->entityIdVector[ix];
 
+    if (en->type == "")
+    {
+      entities.append(BSON(CASUB_ENTITY_ID << en->id <<
+                           CASUB_ENTITY_ISPATTERN << en->isPattern));
+    }
+    else
+    {
+      entities.append(BSON(CASUB_ENTITY_ID << en->id <<
+                           CASUB_ENTITY_TYPE << en->type <<
+                           CASUB_ENTITY_ISPATTERN << en->isPattern));
+    }
   }
+
   newSub.append(CASUB_ENTITIES, entities.arr());
 
   /* Attributes (always taken into account) */
   BSONArrayBuilder attrs;
-  for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix) {
+
+  for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix)
+  {
       attrs.append(requestP->attributeList[ix]);
   }
   newSub.append(CASUB_ATTRS, attrs.arr());
@@ -143,10 +153,12 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   {
     newSub.append(CASUB_EXPIRATION, getIntOrLongFieldAsLongF(sub, CASUB_EXPIRATION));
   }
-  else {
-      long long expiration = getCurrentTime() + requestP->duration.parse();
-      newSub.append(CASUB_EXPIRATION, expiration);
-      LM_T(LmtMongo, ("New subscription expiration: %l", expiration));
+  else
+  {
+    int64_t expiration = getCurrentTime() + requestP->duration.parse();
+
+    newSub.append(CASUB_EXPIRATION, (long long) expiration);
+    LM_T(LmtMongo, ("New subscription expiration: %l", expiration));
   }
 
   /* Reference is not updatable, so it is appended directly */
@@ -155,38 +167,59 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   int count = sub.hasField(CASUB_COUNT) ? getIntFieldF(sub, CASUB_COUNT) : 0;
 
   /* The hasField check is needed due to lastNotification/count could not be present in the original doc */
-  if (sub.hasField(CASUB_LASTNOTIFICATION)) {
-      newSub.append(CASUB_LASTNOTIFICATION, getIntFieldF(sub, CASUB_LASTNOTIFICATION));
-  }
-  if (sub.hasField(CASUB_COUNT)) {
-      newSub.append(CASUB_COUNT, count);
+  if (sub.hasField(CASUB_LASTNOTIFICATION))
+  {
+    newSub.append(CASUB_LASTNOTIFICATION, getIntFieldF(sub, CASUB_LASTNOTIFICATION));
   }
 
-  // FIXME P5: RenderFormat right now hardcoded to "JSON" (NGSI_V1_LEGACY), in the future the RenderFormat will be taken from the payload
+  if (sub.hasField(CASUB_COUNT))
+  {
+    newSub.append(CASUB_COUNT, count);
+  }
+
+  //
+  // FIXME P5: RenderFormat right now hardcoded to "JSON" (NGSI_V1_LEGACY),
+  //           in the future the RenderFormat will be taken from the payload
+  //
+
   /* Adding format to use in notifications */
   newSub.append(CASUB_FORMAT, "JSON");
 
   /* Update document in MongoDB */
-  if (!collectionUpdate(getSubscribeContextAvailabilityCollectionName(tenant), BSON("_id" << OID(requestP->subscriptionId.get())), newSub.obj(), false, &err))
+
+  std::string  colName = getSubscribeContextAvailabilityCollectionName(tenant);
+  BSONObj      bson    = BSON("_id" << OID(requestP->subscriptionId.get()));
+
+  if (!collectionUpdate(colName, bson, newSub.obj(), false, &err))
   {
     reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo db exception)", reqSemTaken);
     responseP->errorCode.fill(SccReceiverInternalError, err);
+
     return SccOk;
   }
 
-  // FIXME P5: RenderFormat right now hardcoded to NGSI_V1_LEGACY, in the future the RenderFormat will be taken from the payload
+  //
+  // FIXME P5: RenderFormat right now hardcoded to NGSI_V1_LEGACY,
+  //           in the future the RenderFormat will be taken from the payload
+  //
+
   /* Send notifications for matching context registrations */
-  processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, requestP->subscriptionId.get(), getStringFieldF(sub, CASUB_REFERENCE), NGSI_V1_LEGACY, tenant, fiwareCorrelator);
+  processAvailabilitySubscription(requestP->entityIdVector,
+                                  requestP->attributeList,
+                                  requestP->subscriptionId.get(),
+                                  getStringFieldF(sub, CASUB_REFERENCE),
+                                  NGSI_V1_LEGACY,
+                                  tenant,
+                                  fiwareCorrelator);
 
   /* Duration is an optional parameter, it is only added in the case they
    * was used for update */
   if (!requestP->duration.isEmpty())
   {
-      responseP->duration = requestP->duration;
+    responseP->duration = requestP->duration;
   }
 
   responseP->subscriptionId = requestP->subscriptionId;
-
   reqSemGive(__FUNCTION__, "ngsi9 update subscription request", reqSemTaken);
 
   return SccOk;

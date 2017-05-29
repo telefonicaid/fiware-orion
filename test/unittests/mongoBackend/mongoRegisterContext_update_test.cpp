@@ -76,11 +76,8 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * registrations collection.
 *
 */
-static void prepareDatabase(void) {
-
-  /* Set database */
-  setupDatabase();
-
+static void prepareDatabase(void)
+{
   DBClientBase* connection = getMongoConnection();
 
   /* We create the following registrations:
@@ -182,6 +179,7 @@ TEST(mongoRegisterContext_update, updateCase1)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoRegisterContext(&req, &res, uriParams, "", "/");
+  EXPECT_EQ(200, ms);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -892,12 +890,16 @@ TEST(mongoRegisterContext_update, NotifyContextAvailability1)
   RegisterContextRequest   req;
   RegisterContextResponse  res;
 
+  utInit(false, true);  // TimerMock only - NOT NotifierMock
+
   /* Prepare mock */
-  NotifyContextAvailabilityRequest expectedNcar;
-  EntityId mockEn1("E5", "T5", "false");
-  ContextRegistrationResponse crr;
+  NotifyContextAvailabilityRequest  expectedNcar;
+  EntityId                          mockEn1("E5", "T5", "false");
+  ContextRegistrationResponse       crr;
+
   crr.contextRegistration.entityIdVector.push_back(&mockEn1);
   crr.contextRegistration.providingApplication.set("http://dummy.com");
+
   expectedNcar.contextRegistrationResponseVector.push_back(&crr);
   expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
@@ -907,11 +909,6 @@ TEST(mongoRegisterContext_update, NotifyContextAvailability1)
   EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", "no correlator", NGSI_V1_LEGACY))
           .Times(0);
   setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E5", "T5", "false");
@@ -940,9 +937,12 @@ TEST(mongoRegisterContext_update, NotifyContextAvailability1)
    * testbed by other unit tests, so we don't include checking in the present unit test */
 
   /* Delete mock */
-  delete timerMock;
   delete notifierMock;
+
+  utExit();
 }
+
+
 
 /* ****************************************************************************
 *
@@ -953,6 +953,8 @@ TEST(mongoRegisterContext_update, NotifyContextAvailability2)
   HttpStatusCode           ms;
   RegisterContextRequest   req;
   RegisterContextResponse  res;
+
+  utInit(false, true);  // TimerMock only - NOT NotifierMock
 
   /* Prepare mock */
   NotifyContextAvailabilityRequest expectedNcar1, expectedNcar2;
@@ -974,11 +976,6 @@ TEST(mongoRegisterContext_update, NotifyContextAvailability2)
   EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar2),"http://notify2.me", "", "no correlator", NGSI_V1_LEGACY))
           .Times(1);
   setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E5", "T5", "false");
@@ -1009,8 +1006,9 @@ TEST(mongoRegisterContext_update, NotifyContextAvailability2)
    * testbed by other unit tests, so we don't include checking in the present unit test */
 
   /* Delete mock */
-  delete timerMock;
   delete notifierMock;
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -1023,6 +1021,8 @@ TEST(mongoRegisterContext_update, NotifyContextAvailability3)
   RegisterContextRequest   req;
   RegisterContextResponse  res;
 
+  utInit(false, true);  // TimerMock only - NOT NotifierMock
+  
   /* Prepare mock */
   NotifyContextAvailabilityRequest expectedNcar;
   EntityId mockEn1("E5", "T5", "false");
@@ -1040,11 +1040,6 @@ TEST(mongoRegisterContext_update, NotifyContextAvailability3)
   EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", "no correlator", NGSI_V1_LEGACY))
           .Times(0);
   setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E5", "T5", "false");
@@ -1075,6 +1070,7 @@ TEST(mongoRegisterContext_update, NotifyContextAvailability3)
    * testbed by other unit tests, so we don't include checking in the present unit test */
 
   /* Delete mock */
-  delete timerMock;
   delete notifierMock;
+
+  utExit();
 }

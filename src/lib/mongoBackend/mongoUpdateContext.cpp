@@ -23,24 +23,24 @@
 * Author: Fermin Galan Marquez
 */
 #include <string.h>
-#include <map>
 #include <string>
+#include <vector>
+#include <map>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
 #include "common/globals.h"
 #include "common/sem.h"
 #include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
-
-#include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/MongoCommonUpdate.h"
-#include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
 #include "ngsi/NotifyCondition.h"
 #include "rest/HttpStatusCode.h"
+
+#include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/MongoCommonUpdate.h"
+#include "mongoBackend/mongoUpdateContext.h"
 
 
 
@@ -61,44 +61,46 @@ HttpStatusCode mongoUpdateContext
   Ngsiv2Flavour                         ngsiv2Flavour
 )
 {
-    bool reqSemTaken;
+  bool reqSemTaken;
 
-    reqSemTake(__FUNCTION__, "ngsi10 update request", SemWriteOp, &reqSemTaken);
+  reqSemTake(__FUNCTION__, "ngsi10 update request", SemWriteOp, &reqSemTaken);
 
-    /* Check that the service path vector has only one element, returning error otherwise */
-    if (servicePathV.size() > 1)
+  /* Check that the service path vector has only one element, returning error otherwise */
+  if (servicePathV.size() > 1)
+  {
+    char lenV[STRING_SIZE_FOR_INT];
+
+    snprintf(lenV, sizeof(lenV), "%lu", servicePathV.size());
+
+    std::string details = std::string("service path length ") + lenV + " is greater than the one in update";
+    alarmMgr.badInput(clientIp, details);
+    responseP->errorCode.fill(SccBadRequest, "service path length greater than the one in update");
+    responseP->oe.fill(SccBadRequest, "service path length greater than the one in update", "BadRequest");
+  }
+  else
+  {
+    /* Process each ContextElement */
+    for (unsigned int ix = 0; ix < requestP->contextElementVector.size(); ++ix)
     {
-      char lenV[STRING_SIZE_FOR_INT];
-      snprintf(lenV, sizeof(lenV), "%lu", servicePathV.size());
-
-      std::string details = std::string("service path length ") + lenV + " is greater than the one in update";
-      alarmMgr.badInput(clientIp, details);
-      responseP->errorCode.fill(SccBadRequest, "service path length greater than the one in update");
-      responseP->oe.fill(SccBadRequest, "service path length greater than the one in update", "BadRequest");
+      processContextElement(requestP->contextElementVector[ix],
+                            responseP,
+                            requestP->updateActionType.get(),
+                            tenant,
+                            servicePathV,
+                            uriParams,
+                            xauthToken,
+                            fiwareCorrelator,
+                            apiVersion,
+                            ngsiv2Flavour);
     }
-    else
-    {
-        /* Process each ContextElement */
-        for (unsigned int ix = 0; ix < requestP->contextElementVector.size(); ++ix)
-        {
-          processContextElement(requestP->contextElementVector[ix],
-                                responseP,
-                                requestP->updateActionType.get(),
-                                tenant,
-                                servicePathV,
-                                uriParams,
-                                xauthToken,
-                                fiwareCorrelator,
-                                apiVersion,
-                                ngsiv2Flavour);
-        }
 
-        /* Note that although individual processContextElements() invocations return ConnectionError, this
-           error gets "encapsulated" in the StatusCode of the corresponding ContextElementResponse and we
-           consider the overall mongoUpdateContext() as OK. */
-        responseP->errorCode.fill(SccOk);
-    }    
-    reqSemGive(__FUNCTION__, "ngsi10 update request", reqSemTaken);
-    
-    return SccOk;
+    /* Note that although individual processContextElements() invocations return ConnectionError, this
+       error gets "encapsulated" in the StatusCode of the corresponding ContextElementResponse and we
+       consider the overall mongoUpdateContext() as OK.
+    */
+    responseP->errorCode.fill(SccOk);
+  }
+
+  reqSemGive(__FUNCTION__, "ngsi10 update request", reqSemTaken);
+  return SccOk;
 }
