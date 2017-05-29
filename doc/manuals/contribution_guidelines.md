@@ -709,6 +709,8 @@ See example:
 which makes a lot of sense: how can the function modify the variable when there is no variable?
 In "C", it's more straightforward, as in order to send the reference to the variable using the `&` operator, you need a variable.
 In C++ it gets a a bit weird and it is better to avoid this by adding a helper variable (`bo` in the example above).
+The difference between "C pointers" and "C++ references" is minimal, but really, it depends on the implementation of the compiler.
+See [this question](https://github.com/telefonicaid/fiware-orion/pull/2909) in stackoverflow, for a discussion on this. 
 
 *How to check*: manually
 
