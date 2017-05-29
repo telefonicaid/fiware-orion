@@ -29,8 +29,6 @@
 
 #include "mongo/client/dbclient.h"
 
-using namespace mongo;
-
 
 
 /* ****************************************************************************
@@ -65,7 +63,7 @@ extern int mongoConnectionPoolInit
 *
 * mongoPoolConnectionGet - 
 */
-extern DBClientBase* mongoPoolConnectionGet(void);
+extern mongo::DBClientBase* mongoPoolConnectionGet(void);
 
 
 
@@ -73,7 +71,7 @@ extern DBClientBase* mongoPoolConnectionGet(void);
 *
 * mongoPoolConnectionRelease - 
 */
-extern void mongoPoolConnectionRelease(DBClientBase* connection);
+extern void mongoPoolConnectionRelease(mongo::DBClientBase* connection);
 
 
 

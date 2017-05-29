@@ -51,6 +51,59 @@ Thanks to Alejandro Villamarin (published around October 2013):
           System.err.println("Failed. Reason is " + e.getMessage());
        }
 
+## JavaScript and NodeJS
+SmartSDK team developed and [SDK Client](https://github.com/smartsdk/ngsi-sdk-javascript) compatible with NSGIv2. 
+It allows to develop both NodeJS applicaitions and JavaScript applications (published March 2017).
+
+NodeJS:
+```javascript
+var NgsiV2 = require('ngsi_v2');
+
+var defaultClient = NgsiV2.ApiClient.instance;
+
+// Configure API key authorization: fiware_token
+var fiware_token = defaultClient.authentications['fiware_token'];
+fiware_token.apiKey = "YOUR API KEY";
+// Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+//fiware_token.apiKeyPrefix['X-Auth-Token'] = "Token";
+var api = new NgsiV2.APIEntryPointApi();
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.retrieveAPIResources(callback);
+
+```
+
+JavaScript:
+```html
+<script src="https://smartsdk.github.io/ngsi-sdk-javascript/js/ngsi.js"></script>
+<script>
+  var NgsiV2 = FIWARE.NgsiV2;
+  var defaultClient = NgsiV2.ApiClient.instance;
+  // Configure API key authorization: fiware_token
+  var fiware_token = defaultClient.authentications['fiware_token'];
+  fiware_token.apiKey = "My Token";
+  // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+  //fiware_token.apiKeyPrefix['X-Auth-Token'] = "Token";
+  var api = new NgsiV2.APIEntryPointApi();
+  var callback = function(error, data, response) {
+    if (error) {
+      console.error(error);
+      $("#results").html(JSON.stringify(error, null, '\t'));
+    } else {
+      console.log('API called successfully. Returned data: ' + JSON.stringify(data, null, '\t'));
+      $("#results").html(JSON.stringify(data, null, '\t'));
+    }
+  };
+  api.retrieveAPIResources(callback);
+</script>
+```
+
 ## JavaScript
 
 Using JQuery AJAX, thanks to Marco Vereda Manchego ([original

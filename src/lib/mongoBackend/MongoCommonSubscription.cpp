@@ -22,28 +22,44 @@
 * Author: Fermín Galán
 *
 */
+#include <string>
+#include <vector>
+#include <map>
 
-#include "mongoBackend/MongoCommonSubscription.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/defaultValues.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/MongoCommonSubscription.h"
 
-using namespace ngsiv2;
-using namespace mongo;
+
+
+/* ****************************************************************************
+*
+* USING - 
+*/
+using mongo::BSONObjBuilder;
+using mongo::BSONArrayBuilder;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::OID;
+using ngsiv2::Subscription;
+using ngsiv2::HttpInfo;
+using ngsiv2::EntID;
 
 
 
 /* ****************************************************************************
 *
 * setNewSubscriptionId -
-*
 */
 std::string setNewSubscriptionId(BSONObjBuilder* b)
 {
   OID  oid;
+
   oid.init();
   b->append("_id", oid);
 
@@ -56,7 +72,6 @@ std::string setNewSubscriptionId(BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setExpiration -
-*
 */
 void setExpiration(const Subscription& sub, BSONObjBuilder* b)
 {
@@ -69,13 +84,13 @@ void setExpiration(const Subscription& sub, BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setCustomHttpInfo -
-*
 */
 static void setCustomHttpInfo(const HttpInfo& httpInfo, BSONObjBuilder* b)
 {
   if (httpInfo.verb != NOVERB)
   {
     std::string method = verbName(httpInfo.verb);
+
     b->append(CSUB_METHOD, method);
     LM_T(LmtMongo, ("Subscription method: %s", method.c_str()));
   }
@@ -83,6 +98,7 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, BSONObjBuilder* b)
   if (httpInfo.headers.size() > 0)
   {
     BSONObjBuilder headersBuilder;
+
     for (std::map<std::string, std::string>::const_iterator it = httpInfo.headers.begin(); it != httpInfo.headers.end(); ++it)
     {
       headersBuilder.append(it->first, it->second);
@@ -96,10 +112,12 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, BSONObjBuilder* b)
   if (httpInfo.qs.size() > 0)
   {
     BSONObjBuilder qsBuilder;
+
     for (std::map<std::string, std::string>::const_iterator it = httpInfo.qs.begin(); it != httpInfo.qs.end(); ++it)
     {
       qsBuilder.append(it->first, it->second);
     }
+
     BSONObj qsObj = qsBuilder.obj();
 
     b->append(CSUB_QS, qsObj);
@@ -118,7 +136,6 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setHttpInfo -
-*
 */
 void setHttpInfo(const Subscription& sub, BSONObjBuilder* b)
 {
@@ -139,7 +156,6 @@ void setHttpInfo(const Subscription& sub, BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setThrottling -
-*
 */
 void setThrottling(const Subscription& sub, BSONObjBuilder* b)
 {
@@ -152,7 +168,6 @@ void setThrottling(const Subscription& sub, BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setServicePath -
-*
 */
 void setServicePath(const std::string servicePath, BSONObjBuilder* b)
 {
@@ -165,7 +180,6 @@ void setServicePath(const std::string servicePath, BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setDescription -
-*
 */
 void setDescription(const Subscription& sub, BSONObjBuilder* b)
 {
@@ -181,11 +195,11 @@ void setDescription(const Subscription& sub, BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setStatus -
-*
 */
 void setStatus(const Subscription& sub, BSONObjBuilder* b)
 {
-  std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
+  std::string  status = (sub.status == "")? STATUS_ACTIVE : sub.status;
+
   b->append(CSUB_STATUS, status);
   LM_T(LmtMongo, ("Subscription status: %s", status.c_str()));
 }
@@ -195,56 +209,58 @@ void setStatus(const Subscription& sub, BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setEntities -
-*
 */
 void setEntities(const Subscription& sub, BSONObjBuilder* b)
 {
   BSONArrayBuilder entities;
+
   for (unsigned int ix = 0; ix < sub.subject.entities.size(); ++ix)
   {
-    EntID       en        = sub.subject.entities[ix];
+    EntID       en            = sub.subject.entities[ix];
     std::string finalId;
     std::string finalType;
     std::string isIdPattern;
     bool        isTypePattern = false;
 
+    //
     // Note that, due to legacy reasons, isPattern may be "true" or "false" (text)
     // while isTypePattern may be true or false (boolean).
-
+    //
     if (en.idPattern != "")
     {
-      finalId = en.idPattern;
+      finalId     = en.idPattern;
       isIdPattern = "true";
     }
     else if (en.id != "")
     {
-      finalId = en.id;
+      finalId     = en.id;
       isIdPattern = "false";
     }
 
     if (en.typePattern != "")
     {
-      finalType = en.typePattern;
+      finalType     = en.typePattern;
       isTypePattern = true;
     }
     else if (en.type != "")
     {
-      finalType = en.type;
+      finalType     = en.type;
       isTypePattern = false;
     }
 
-    if (finalType.empty()) // no type provided
+    if (finalType.empty())  // no type provided
     {
       entities.append(BSON(CSUB_ENTITY_ID << finalId << CSUB_ENTITY_ISPATTERN << isIdPattern));
     }
-    else // type provided
+    else  // type provided
     {
-      entities.append(BSON(   CSUB_ENTITY_ID   << finalId   << CSUB_ENTITY_ISPATTERN << isIdPattern
-                           << CSUB_ENTITY_TYPE << finalType << CSUB_ENTITY_ISTYPEPATTERN << isTypePattern
-                           ));
+      entities.append(BSON(CSUB_ENTITY_ID   << finalId   << CSUB_ENTITY_ISPATTERN     << isIdPattern
+                        << CSUB_ENTITY_TYPE << finalType << CSUB_ENTITY_ISTYPEPATTERN << isTypePattern));
     }
   }
+
   BSONArray entitiesArr = entities.arr();
+
   b->append(CSUB_ENTITIES, entitiesArr);
   LM_T(LmtMongo, ("Subscription entities: %s", entitiesArr.toString().c_str()));
 }
@@ -254,15 +270,16 @@ void setEntities(const Subscription& sub, BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setAttrs -
-*
 */
 void setAttrs(const Subscription& sub, BSONObjBuilder* b)
 {
   BSONArrayBuilder attrs;
+
   for (unsigned int ix = 0; ix < sub.notification.attributes.size(); ++ix)
   {
     attrs.append(sub.notification.attributes[ix]);
   }
+
   BSONArray attrsArr = attrs.arr();
   b->append(CSUB_ATTRS, attrsArr);
   LM_T(LmtMongo, ("Subscription attributes: %s", attrsArr.toString().c_str()));
@@ -273,7 +290,6 @@ void setAttrs(const Subscription& sub, BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setCondsAndInitialNotify -
-*
 */
 void setCondsAndInitialNotify
 (
@@ -288,14 +304,16 @@ void setCondsAndInitialNotify
   const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator,  
+  const std::string&               fiwareCorrelator,
   BSONObjBuilder*                  b,
   bool*                            notificationDone
 )
 {
+  //
   // Note that we cannot use status, url and attrsFormat from sub.status, as sub object
   // could correspond to an update and the fields be missing (in which case the one from
   // the original subscription has to be taken; the caller deal with that)
+  //
 
   /* Conds vector (and maybe an initial notification) */
   *notificationDone = false;
@@ -326,7 +344,6 @@ void setCondsAndInitialNotify
 /* ****************************************************************************
 *
 * setLastNotification -
-*
 */
 void setLastNotification(long long lastNotification, BSONObjBuilder* b)
 {
@@ -375,7 +392,6 @@ void setLastSuccess(long long lastSuccess, BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setExpression -
-*
 */
 void setExpression(const Subscription& sub, BSONObjBuilder* b)
 {
@@ -383,8 +399,8 @@ void setExpression(const Subscription& sub, BSONObjBuilder* b)
                             CSUB_EXPR_MQ     << sub.subject.condition.expression.mq       <<
                             CSUB_EXPR_GEOM   << sub.subject.condition.expression.geometry <<
                             CSUB_EXPR_COORDS << sub.subject.condition.expression.coords   <<
-                            CSUB_EXPR_GEOREL << sub.subject.condition.expression.georel
-                           );
+                            CSUB_EXPR_GEOREL << sub.subject.condition.expression.georel);
+
   b->append(CSUB_EXPR, expression);
   LM_T(LmtMongo, ("Subscription expression: %s", expression.toString().c_str()));
 }
@@ -394,11 +410,11 @@ void setExpression(const Subscription& sub, BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setFormat -
-*
 */
 void setFormat(const Subscription& sub, BSONObjBuilder* b)
 {
   std::string format = renderFormatToString(sub.attrsFormat);
+
   b->append(CSUB_FORMAT, format);
   LM_T(LmtMongo, ("Subscription format: %s", format.c_str()));
 }
@@ -408,11 +424,11 @@ void setFormat(const Subscription& sub, BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setBlacklist -
-*
 */
 void setBlacklist(const Subscription& sub, BSONObjBuilder* b)
 {
   bool bl = sub.notification.blacklist;
+
   b->append(CSUB_BLACKLIST, bl);
   LM_T(LmtMongo, ("Subscription blacklist: %s", bl ? "true" : "false"));
 }
@@ -422,16 +438,18 @@ void setBlacklist(const Subscription& sub, BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setMetadata -
-*
 */
 void setMetadata(const Subscription& sub, BSONObjBuilder* b)
 {
   BSONArrayBuilder metadata;
+
   for (unsigned int ix = 0; ix < sub.notification.metadata.size(); ++ix)
   {
     metadata.append(sub.notification.metadata[ix]);
   }
+
   BSONArray metadataArr = metadata.arr();
+
   b->append(CSUB_METADATA, metadataArr);
   LM_T(LmtMongo, ("Subscription metadata: %s", metadataArr.toString().c_str()));
 }

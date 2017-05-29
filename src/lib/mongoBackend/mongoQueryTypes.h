@@ -1,5 +1,5 @@
-#ifndef MONGO_QUERY_TYPES_H
-#define MONGO_QUERY_TYPES_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOQUERYTYPES_H_
+#define SRC_LIB_MONGOBACKEND_MONGOQUERYTYPES_H_
 
 /*
 *
@@ -26,10 +26,13 @@
 * Author: Fermin Galan Marquez
 */
 #include <string>
+#include <vector>
 #include <map>
 
+#include "rest/HttpStatusCode.h"
 #include "orionTypes/EntityTypeVectorResponse.h"
 #include "orionTypes/EntityTypeResponse.h"
+
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/dbConstants.h"
 
@@ -95,4 +98,4 @@ extern HttpStatusCode mongoAttributesForEntityType
   ApiVersion                           apiVersion
 );
 
-#endif
+#endif  // SRC_LIB_MONGOBACKEND_MONGOQUERYTYPES_H_

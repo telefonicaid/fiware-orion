@@ -987,7 +987,7 @@ void subCacheRefresh(void)
   // Get list of database
   if (mongoMultitenant())
   {
-    getOrionDatabases(databases);
+    getOrionDatabases(&databases);
   }
 
   // Add the 'default tenant'

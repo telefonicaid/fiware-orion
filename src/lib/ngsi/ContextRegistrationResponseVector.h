@@ -41,7 +41,7 @@ typedef struct ContextRegistrationResponseVector
   std::vector<ContextRegistrationResponse*>  vec;
 
   void                          push_back(ContextRegistrationResponse* item);
-  unsigned int                  size(void);
+  unsigned int                  size(void) const;
   std::string                   render(const std::string& indent, bool comma = false);
   void                          present(const std::string& indent);
   void                          release(void);

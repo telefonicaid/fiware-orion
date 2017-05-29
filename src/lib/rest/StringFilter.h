@@ -35,10 +35,6 @@
 
 
 
-using namespace mongo;
-
-
-
 /* ****************************************************************************
 *
 * Declaring structs for pointer-usage, to avoid include the headers
@@ -228,7 +224,7 @@ class StringFilter
 {
 public:
   std::vector<StringFilterItem*>  filters;
-  std::vector<BSONObj>            mongoFilters;
+  std::vector<mongo::BSONObj>     mongoFilters;
   StringFilterType                type;
 
   StringFilter(StringFilterType _type);

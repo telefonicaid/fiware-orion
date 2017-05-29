@@ -7,3 +7,5 @@ A quick recipe on how to use apiary client to render HTML from .apib in your loc
 ```
 apiary preview --path=doc/apiary/v2/fiware-ngsiv2-reference.apib --output=/tmp/render.html
 ```
+
+See also the scripts in the scripts/apib_renders/ directory.
