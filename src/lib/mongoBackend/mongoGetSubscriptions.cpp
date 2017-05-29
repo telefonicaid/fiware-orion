@@ -180,7 +180,7 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
   // NOTE: only 'lastNotificationTime' and 'count'
   //
   cacheSemTake(__FUNCTION__, "get lastNotification and count");
-  CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), subP->id.c_str());
+  CachedSubscription* cSubP = subCacheItemLookup(tenant, subP->id);
   if (cSubP)
   {
     if (cSubP->lastNotificationTime > subP->notification.lastNotification)

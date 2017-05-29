@@ -282,15 +282,22 @@ int mongoSubCacheItemInsert
   //
   // 01. Check incoming parameters
   //
-  if ((subscriptionId == NULL) || (subscriptionId[0] == 0))
+  // FIXME PR: check the commented lines. They correspond to conflict solving
+  //
+  //if ((subscriptionId == NULL) || (subscriptionId[0] == 0))
+  if (subscriptionId.empty())
   {
     return -1;
   }
 
-  if ((servicePath == NULL) || (servicePath[0] == 0))
-  {
-    return -2;
-  }
+  // FIXME PR: empty servicepath is legal, in means "default".
+  // Thuss this checking is not meaninfull anymore and -2 removed
+  // from the list (and probably offset -3, -4, etc. a step)
+  //if ((servicePath == NULL) || (servicePath[0] == 0))
+  //if (servicePath.empty())
+  //{
+  //  return -2;
+  //}
 
 
   //

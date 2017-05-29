@@ -1133,10 +1133,14 @@ void subCacheSync(void)
 
     if (cssP != NULL)
     {
-      std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
+      // FIXME PR: the original line before conflict solving was the one commented.
+      // I leave this mark here, so we can think about this at merge time
+      //
+      //std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
+      std::string tenant = cSubP->tenant;
 
       mongoSubCountersUpdate(tenant,
-                             cSubP->subscriptionId.c_str(),
+                             cSubP->subscriptionId,
                              cssP->count,
                              cssP->lastNotificationTime,
                              cssP->lastFailure,
