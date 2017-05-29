@@ -139,7 +139,7 @@ static DBClientBase* mongoConnect
     //
     for (int tryNo = 0; tryNo < retries; ++tryNo)
     {
-      if ( ((DBClientConnection*)connection)->connect(host, err))
+      if (((DBClientConnection*) connection)->connect(std::string(host), err))
       {
         connected = true;
         break;
