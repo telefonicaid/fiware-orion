@@ -115,7 +115,6 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
    * FIXME: a better implementation strategy could be doing an findAndModify() query to do the
    * update, so detecting if the document was not found, instead of using findOne() + update()
    * with $set operation. One operations to MongoDb. vs two operations.
-  std::string collectionName = colName;
    */
   BSONObjBuilder newSub;
 
