@@ -115,7 +115,6 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
    * FIXME: a better implementation strategy could be doing an findAndModify() query to do the
    * update, so detecting if the document was not found, instead of using findOne() + update()
    * with $set operation. One operations to MongoDb. vs two operations.
-  std::string collectionName = colName;
    */
   BSONObjBuilder newSub;
 
@@ -188,16 +187,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
 
   /* Update document in MongoDB */
 
-  //
-  // FIXME P4: Strange errors in two unit tests:
-  //             * mongoRegisterContext_update.MongoDbFindOneFail
-  //             * mongoRegisterContext_update.NotifyContextAvailability1
-  //           occur if the '.c_str()' on the following line (colName = ...) is removed.
-  //
-  //           This has been observed in CentOS 6.5 on the branch "hardening/1368_style_in_mongoBackend_12"
-  //           used for the PR #XXX (to be filled in after the PR is created and before it is merged)
-  //
-  std::string  colName = getSubscribeContextAvailabilityCollectionName(tenant).c_str();
+  std::string  colName = getSubscribeContextAvailabilityCollectionName(tenant);
   BSONObj      bson    = BSON("_id" << OID(requestP->subscriptionId.get()));
 
   if (!collectionUpdate(colName, bson, newSub.obj(), false, &err))

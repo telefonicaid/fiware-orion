@@ -688,6 +688,32 @@ ContextElement* ceP;
 
 *How to check*: manually
 
+#### S14 (Referenced variables in function calls)
+
+*Rule*: parameters that are passed by "C++ reference", either `const` or not, should be a variable, not a result of a computation.
+See example:
+
+```
+  extern void f(const BSONObj& bobj);
+
+  // NOT like this:
+  f(BSON("a" << 12));
+
+  // BUT, like this:
+  BSONObj bo = BSON("a" << 12);
+  f(bo);
+
+```
+
+*Rationale*: It's simply weird to pass a value for a referenced parameter. If `const` is not used you get a compiler error,
+which makes a lot of sense: how can the function modify the variable when there is no variable?
+In "C", it's more straightforward, as in order to send the reference to the variable using the `&` operator, you need a variable.
+In C++ it gets a a bit weird and it is better to avoid this by adding a helper variable (`bo` in the example above).
+The difference between "C pointers" and "C++ references" is minimal, but really, it depends on the implementation of the compiler.
+See [this question](https://stackoverflow.com/questions/2936805/how-do-c-compilers-actually-pass-reference-parameters) in stackoverflow, for a discussion on this. 
+
+*How to check*: manually
+
 ## Programming patterns
 
 Some patterns are not allowed in Orion Context Broker code, except if some strong reason justifies the use of it. 
