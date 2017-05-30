@@ -821,7 +821,7 @@ void subCacheStatisticsGet
 
       if (*listP != "")
       {
-        *listP += ", ";  // FIXME PR: This SPACE is here for historical reasons. Do we want it?
+        *listP += ", ";
       }
 
       *listP += cSubP->subscriptionId;
@@ -1133,13 +1133,7 @@ void subCacheSync(void)
 
     if (cssP != NULL)
     {
-      // FIXME PR: the original line before conflict solving was the one commented.
-      // I leave this mark here, so we can think about this at merge time
-      //
-      //std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
-      std::string tenant = cSubP->tenant;
-
-      mongoSubCountersUpdate(tenant,
+      mongoSubCountersUpdate(cSubP->tenant,
                              cSubP->subscriptionId,
                              cssP->count,
                              cssP->lastNotificationTime,

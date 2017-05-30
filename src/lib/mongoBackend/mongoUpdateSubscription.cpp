@@ -721,32 +721,6 @@ void updateInCache
     }
   }
 
-  //
-  // Modification of the subscription cache
-  //
-  // The subscription "before this update" is looked up in cache and referenced by 'cSubP'.
-  // The "updated subscription information" is in 'newSubObject' (mongo BSON object format).
-  //
-  // All we need to do now for the cache is to:
-  //   1. Remove 'cSubP' from sub-cache (if present)
-  //   2. Create 'newSubObject' in sub-cache (if applicable)
-  //
-  // The subscription is already updated in mongo.
-  //
-  //
-  // There are four different scenarios here:
-  //   1. Old sub was in cache, new sub enters cache
-  //   2. Old sub was NOT in cache, new sub enters cache
-  //   3. Old subwas in cache, new sub DOES NOT enter cache
-  //   4. Old sub was NOT in cache, new sub DOES NOT enter cache
-  //
-  // This is resolved by two separate functions, one that removes the old one,
-  // if found (subCacheItemLookup+subCacheItemRemove), and the other one that inserts the sub,
-  // IF it should be inserted (subCacheItemInsert).
-  // If inserted, subCacheUpdateStatisticsIncrement is called to update the statistics counter of insertions.
-  //
-
-
   // 0. Lookup matching subscription in subscription-cache
 
   cacheSemTake(__FUNCTION__, "Updating cached subscription");
@@ -782,6 +756,10 @@ void updateInCache
     georel = expr.hasField(CSUB_EXPR_GEOREL)? getStringFieldF(expr, CSUB_EXPR_GEOREL) : "";
   }
 
+  //
+  // In case of a previously non-existing subscription (in the cache), the cache item is created.
+  // In case of updating an existing subscription, the cache item is overwritten.
+  //
   int mscInsert = mongoSubCacheItemInsert(tenant,
                                           doc,
                                           subUp.id,
@@ -803,15 +781,8 @@ void updateInCache
   if (mscInsert == 0)  // 0: Insertion was really made
   {
     subCacheStatisticsIncrementUpdates();
-  // FIXME PR: I understand this block is not needed with std::map based
-  // logic
-  /*  if (subCacheP != NULL)
-    {
-      LM_T(LmtSubCache, ("Calling subCacheItemRemove"));
-      subCacheItemRemove(subCacheP);
-    }
-   */
   }
+
   cacheSemGive(__FUNCTION__, "Updating cached subscription");
 }
 

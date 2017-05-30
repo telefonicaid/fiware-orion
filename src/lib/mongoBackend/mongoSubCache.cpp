@@ -249,7 +249,6 @@ int mongoSubCacheItemInsert(const std::string& tenant, const BSONObj& sub)
 * RETURN VALUE
 *   0: OK - patterned subscription has been inserted
 *  -1: Empty subscriptionId
-*  -2: Empty servicePath
 *  -3: Out of memory (either this or EXIT)
 *  -4: Subscription not valid for sub-cache (no entity ids)
 *
@@ -282,22 +281,10 @@ int mongoSubCacheItemInsert
   //
   // 01. Check incoming parameters
   //
-  // FIXME PR: check the commented lines. They correspond to conflict solving
-  //
-  //if ((subscriptionId == NULL) || (subscriptionId[0] == 0))
   if (subscriptionId.empty())
   {
     return -1;
   }
-
-  // FIXME PR: empty servicepath is legal, in means "default".
-  // Thuss this checking is not meaninfull anymore and -2 removed
-  // from the list (and probably offset -3, -4, etc. a step)
-  //if ((servicePath == NULL) || (servicePath[0] == 0))
-  //if (servicePath.empty())
-  //{
-  //  return -2;
-  //}
 
 
   //
