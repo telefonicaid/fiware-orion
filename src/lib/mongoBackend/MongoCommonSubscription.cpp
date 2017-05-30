@@ -56,7 +56,7 @@ using ngsiv2::EntID;
 *
 * setNewSubscriptionId -
 */
-std::string setNewSubscriptionId(BSONObjBuilder* b)
+void setNewSubscriptionId(BSONObjBuilder* b, std::string* subIdP)
 {
   OID  oid;
 
@@ -64,7 +64,7 @@ std::string setNewSubscriptionId(BSONObjBuilder* b)
   b->append("_id", oid);
 
   LM_T(LmtMongo, ("Subscription _id: %s", oid.toString().c_str()));
-  return oid.toString();
+  *subIdP = oid.toString();
 }
 
 
