@@ -43,97 +43,129 @@
 
 /* ****************************************************************************
 *
+* USING
+*/
+using mongo::BSONObj;
+using mongo::OID;
+
+
+
+/* ****************************************************************************
+*
 * mongoUnsubscribeContext - 
 */
-HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, UnsubscribeContextResponse* responseP, const std::string& tenant)
+HttpStatusCode mongoUnsubscribeContext
+(
+  UnsubscribeContextRequest*   requestP,
+  UnsubscribeContextResponse*  responseP,
+  const std::string&           tenant
+)
 {
-    bool         reqSemTaken;
-    std::string  err;
+  bool         reqSemTaken;
+  std::string  err;
 
-    reqSemTake(__FUNCTION__, "ngsi10 unsubscribe request", SemWriteOp, &reqSemTaken);
+  reqSemTake(__FUNCTION__, "ngsi10 unsubscribe request", SemWriteOp, &reqSemTaken);
 
-    LM_T(LmtMongo, ("Unsubscribe Context"));
+  LM_T(LmtMongo, ("Unsubscribe Context"));
 
-    /* No matter if success or failure, the subscriptionId in the response is always the one
-     * in the request */
-    responseP->subscriptionId = requestP->subscriptionId;
+  /* No matter if success or failure, the subscriptionId in the response is always the one
+   * in the request
+   */
+  responseP->subscriptionId = requestP->subscriptionId;
 
-    if (responseP->subscriptionId.get() == "")
-    {
-        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
-        responseP->statusCode.fill(SccContextElementNotFound);
-        responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
-        alarmMgr.badInput(clientIp, "no subscriptionId");
-        return SccOk;
-    }
+  if (responseP->subscriptionId.get() == "")
+  {
+    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
+    responseP->statusCode.fill(SccContextElementNotFound);
+    responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
+    alarmMgr.badInput(clientIp, "no subscriptionId");
 
-    /* Look for document */
-    BSONObj sub;
-    OID     id;
-
-    if (!safeGetSubId(requestP->subscriptionId, &id, &(responseP->statusCode)))
-    {
-      reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (safeGetSubId fail)", reqSemTaken);
-      if (responseP->statusCode.code == SccContextElementNotFound)
-      {
-        // FIXME: Doubt - invalid OID format?  Or, just a subscription that was not found?
-        std::string details = std::string("invalid OID format: '") + requestP->subscriptionId.get() + "'";
-        responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
-        alarmMgr.badInput(clientIp, details);
-      }
-      else // SccReceiverInternalError
-      {
-        responseP->oe.fill(SccReceiverInternalError, responseP->statusCode.details, "InternalError");
-        LM_E(("Runtime Error (exception getting OID: %s)", responseP->statusCode.details.c_str()));
-      }
-      return SccOk;
-    }
-
-    if (!collectionFindOne(getSubscribeContextCollectionName(tenant), BSON("_id" << id), &sub, &err))
-    {
-      reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
-      responseP->statusCode.fill(SccReceiverInternalError, err);
-      responseP->oe.fill(SccReceiverInternalError, err, "InternalError");
-      return SccOk;
-    }
-
-    if (sub.isEmpty())
-    {
-       reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
-       responseP->statusCode.fill(SccContextElementNotFound, std::string("subscriptionId: /") + requestP->subscriptionId.get() + "/");
-       responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
-       return SccOk;
-    }
-
-    /* Remove document in MongoDB */
-    // FIXME: I would prefer to do the find and remove in a single operation. Is there something similar
-    // to findAndModify for this?    
-    if (!collectionRemove(getSubscribeContextCollectionName(tenant), BSON("_id" << OID(requestP->subscriptionId.get())), &err))
-    {
-      reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
-      responseP->statusCode.fill(SccReceiverInternalError, err);
-      responseP->oe.fill(SccReceiverInternalError, err, "InternalError");
-      return SccOk;
-    }
-
-    //
-    // Removing subscription from mongo subscription cache
-    //
-    LM_T(LmtSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache", requestP->subscriptionId.get().c_str(), tenant.c_str()));
-
-    cacheSemTake(__FUNCTION__, "Removing subscription from cache");
-
-    CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
-
-    if (cSubP != NULL)
-    {
-      subCacheItemRemove(cSubP);
-    }
-
-    cacheSemGive(__FUNCTION__, "Removing subscription from cache");
-
-    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
-
-    responseP->statusCode.fill(SccOk);
     return SccOk;
+  }
+
+  /* Look for document */
+  BSONObj sub;
+  OID     id;
+
+  if (!safeGetSubId(requestP->subscriptionId, &id, &(responseP->statusCode)))
+  {
+    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (safeGetSubId fail)", reqSemTaken);
+
+    if (responseP->statusCode.code == SccContextElementNotFound)
+    {
+      // FIXME: Doubt - invalid OID format?  Or, just a subscription that was not found?
+      std::string details = std::string("invalid OID format: '") + requestP->subscriptionId.get() + "'";
+
+      responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
+      alarmMgr.badInput(clientIp, details);
+    }
+    else  // SccReceiverInternalError
+    {
+      responseP->oe.fill(SccReceiverInternalError, responseP->statusCode.details, "InternalError");
+      LM_E(("Runtime Error (exception getting OID: %s)", responseP->statusCode.details.c_str()));
+    }
+
+    return SccOk;
+  }
+
+  if (!collectionFindOne(getSubscribeContextCollectionName(tenant), BSON("_id" << id), &sub, &err))
+  {
+    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
+
+    responseP->statusCode.fill(SccReceiverInternalError, err);
+    responseP->oe.fill(SccReceiverInternalError, err, "InternalError");
+
+    return SccOk;
+  }
+
+  if (sub.isEmpty())
+  {
+    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
+
+    responseP->statusCode.fill(SccContextElementNotFound,
+                               std::string("subscriptionId: /") + requestP->subscriptionId.get() + "/");
+    responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
+
+    return SccOk;
+  }
+
+  /* Remove document in MongoDB */
+
+  //
+  // FIXME: I would prefer to do the find and remove in a single operation. Is there something similar
+  // to findAndModify for this?
+  //
+  std::string colName = getSubscribeContextCollectionName(tenant);
+
+  if (!collectionRemove(colName, BSON("_id" << OID(requestP->subscriptionId.get())), &err))
+  {
+    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
+
+    responseP->statusCode.fill(SccReceiverInternalError, err);
+    responseP->oe.fill(SccReceiverInternalError, err, "InternalError");
+
+    return SccOk;
+  }
+
+  //
+  // Removing subscription from mongo subscription cache
+  //
+  LM_T(LmtSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache",
+                     requestP->subscriptionId.get().c_str(),
+                     tenant.c_str()));
+
+  cacheSemTake(__FUNCTION__, "Removing subscription from cache");
+
+  CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
+
+  if (cSubP != NULL)
+  {
+    subCacheItemRemove(cSubP);
+  }
+
+  cacheSemGive(__FUNCTION__, "Removing subscription from cache");
+  reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
+  responseP->statusCode.fill(SccOk);
+
+  return SccOk;
 }

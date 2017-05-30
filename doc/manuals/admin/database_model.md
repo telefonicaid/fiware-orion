@@ -381,7 +381,7 @@ Example document:
  {
    "_id": ObjectId("51756c2220be8dc1b5f415ff"),
    "expiration": 1360236300,
-   "reference": "`[`http://notify.me`](http://notify.me)`",
+   "reference": "http://notify.me",
    "entities": [
        {
            "id": "E5",

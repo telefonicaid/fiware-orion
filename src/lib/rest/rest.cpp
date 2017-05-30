@@ -257,7 +257,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     containsForbiddenChars = forbiddenChars(val, ";");
   }
-  else if ((key != URI_PARAM_Q) && (key != URI_PARAM_MQ) && (key != "idPattern"))
+  else if ((key != URI_PARAM_Q) && (key != URI_PARAM_MQ) && (key != "idPattern") && (key != "typePattern"))
   {
     containsForbiddenChars = forbiddenChars(ckey) || forbiddenChars(val);
   }
@@ -281,21 +281,16 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 *
 * mimeTypeSelect - 
 */
-static MimeType mimeTypeSelect(ConnectionInfo* ciP, const std::string& what)
+static MimeType mimeTypeSelect(ConnectionInfo* ciP)
 {
-  if ((what == "Error") ||   // JSON Error to be returned
-      (what == "Normal"))    // Normal handling - same as Error
+  if (ciP->httpHeaders.accepted("application/json"))
   {
-    if (ciP->httpHeaders.accepted("application/json"))
-    {
-      return JSON;
-    }
-    if (ciP->httpHeaders.accepted("text/plain"))
-    {
-      return TEXT;
-    }
-
     return JSON;
+  }
+
+  if (ciP->httpHeaders.accepted("text/plain"))
+  {
+    return TEXT;
   }
 
   return JSON;
@@ -416,7 +411,7 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
   {
     ciP->acceptHeaderError = "qvalue in accept header is not a number";
     ciP->httpStatusCode    = SccBadRequest;
-    ciP->outMimeType       = mimeTypeSelect(ciP, "Error");
+    ciP->outMimeType       = mimeTypeSelect(ciP);
     delete acceptHeaderP;
     return false;
   }
@@ -1241,6 +1236,7 @@ static int connectionTreat
       clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);
     }
 
+    // LM_TMP(("--------------------- Serving request %s %s -----------------", method, url));
     LM_T(LmtRequest, (""));
     // WARNING: This log message below is crucial for the correct function of the Behave tests - CANNOT BE REMOVED
     LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", method, url));
@@ -1302,7 +1298,7 @@ static int connectionTreat
     //
     // Transaction starts here
     //
-    lmTransactionStart("from", ip, port, url);  // Incoming REST request starts
+    lmTransactionStart("from", "", ip, port, url);  // Incoming REST request starts
 
     /* X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides ip.
        X-Real-IP takes preference over X-Forwarded-For, if both appear */
@@ -1319,10 +1315,11 @@ static int connectionTreat
       lmTransactionSetFrom(ip);
     }
 
-    char tenant[SERVICE_NAME_MAX_LEN + 1];
-    ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
+    char tenant[DB_AND_SERVICE_NAME_MAX_LEN];
 
-    ciP->outMimeType = mimeTypeSelect(ciP, "Normal");
+    ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
+    ciP->outMimeType          = mimeTypeSelect(ciP);
+
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
 
     return MHD_YES;
@@ -1596,7 +1593,10 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     // while in MHD 0.9.51, the name of the define has changed to MHD_USE_EPOLL.
     // So, to support both names, we need a ifdef/else cpp directive here.
     //
-#ifdef MHD_USE_EPOLL
+    // And, in some newer versions of microhttpd, MHD_USE_EPOLL is an enum and not a define,
+    // so, an additional check in needed
+    //
+#if defined(MHD_USE_EPOLL) || MHD_VERSION >= 0x00095100
     serverMode = MHD_USE_SELECT_INTERNALLY | MHD_USE_EPOLL;
 #else
     serverMode = MHD_USE_SELECT_INTERNALLY | MHD_USE_EPOLL_LINUX_ONLY;

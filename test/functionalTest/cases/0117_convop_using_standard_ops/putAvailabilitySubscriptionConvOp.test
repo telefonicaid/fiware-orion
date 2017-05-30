@@ -321,6 +321,7 @@ Date: REGEX(.*)
 07. See notification of E1/A2 in accumulator
 ============================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 505
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
@@ -372,6 +373,7 @@ Date: REGEX(.*)
 09. See no notification of E1/A1 in accumulator
 ===============================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 505
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_MONGO_BACKEND_MONGOCOMMONSUBSCRIPTION_H
-#define SRC_LIB_MONGO_BACKEND_MONGOCOMMONSUBSCRIPTION_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOCOMMONSUBSCRIPTION_H_
+#define SRC_LIB_MONGOBACKEND_MONGOCOMMONSUBSCRIPTION_H_
 
 /*
 * Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,9 +25,9 @@
 * Author: Fermín Galán
 *
 */
-
 #include <string>
 #include <vector>
+
 #include "mongo/client/dbclient.h"
 #include "apiTypesV2/Subscription.h"
 
@@ -36,7 +36,6 @@
 /* ****************************************************************************
 *
 * setNewSubscriptionId -
-*
 */
 extern std::string setNewSubscriptionId(mongo::BSONObjBuilder* b);
 
@@ -45,7 +44,6 @@ extern std::string setNewSubscriptionId(mongo::BSONObjBuilder* b);
 /* ****************************************************************************
 *
 * setExpiration -
-*
 */
 extern void setExpiration(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
 
@@ -54,7 +52,6 @@ extern void setExpiration(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder
 /* ****************************************************************************
 *
 * setHttpInfo -
-*
 */
 extern void setHttpInfo(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
 
@@ -63,7 +60,6 @@ extern void setHttpInfo(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* 
 /* ****************************************************************************
 *
 * setThrottling -
-*
 */
 extern void setThrottling(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
 
@@ -72,7 +68,6 @@ extern void setThrottling(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder
 /* ****************************************************************************
 *
 * setServicePath -
-*
 */
 extern void setServicePath(std::string servicePath, mongo::BSONObjBuilder* b);
 
@@ -81,7 +76,6 @@ extern void setServicePath(std::string servicePath, mongo::BSONObjBuilder* b);
 /* ****************************************************************************
 *
 * setDescription -
-*
 */
 extern void setDescription(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
 
@@ -90,7 +84,6 @@ extern void setDescription(const ngsiv2::Subscription& sub, mongo::BSONObjBuilde
 /* ****************************************************************************
 *
 * setStatus -
-*
 */
 extern void setStatus(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
 
@@ -99,7 +92,6 @@ extern void setStatus(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setEntities -
-*
 */
 extern void setEntities(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
 
@@ -108,7 +100,6 @@ extern void setEntities(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* 
 /* ****************************************************************************
 *
 * setAttrs -
-*
 */
 extern void setAttrs(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
 
@@ -117,7 +108,6 @@ extern void setAttrs(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
 /* ****************************************************************************
 *
 * setCondsAndInitialNotify -
-*
 */
 extern void setCondsAndInitialNotify
 (
@@ -127,13 +117,13 @@ extern void setCondsAndInitialNotify
   const std::vector<std::string>&  notifAttributesV,
   const std::vector<std::string>&  metadataV,
   const ngsiv2::HttpInfo&          httpInfo,
-  bool                             blacklist, 
+  bool                             blacklist,
   RenderFormat                     attrsFormat,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
-  BSONObjBuilder*                  b,
+  mongo::BSONObjBuilder*           b,
   bool*                            notificationDone
 );
 
@@ -142,18 +132,16 @@ extern void setCondsAndInitialNotify
 /* ****************************************************************************
 *
 * setLastNotification -
-*
 */
-extern void setLastNotification(long long lastNotification, BSONObjBuilder* b);
+extern void setLastNotification(long long lastNotification, mongo::BSONObjBuilder* b);
 
 
 
 /* ****************************************************************************
 *
 * setCount -
-*
 */
-extern void setCount(long long count, BSONObjBuilder* b);
+extern void setCount(long long count, mongo::BSONObjBuilder* b);
 
 
 
@@ -161,7 +149,7 @@ extern void setCount(long long count, BSONObjBuilder* b);
 *
 * setLastFailure -
 */
-extern void setLastFailure(long long lastFailure, BSONObjBuilder* b);
+extern void setLastFailure(long long lastFailure, mongo::BSONObjBuilder* b);
 
 
 
@@ -169,14 +157,13 @@ extern void setLastFailure(long long lastFailure, BSONObjBuilder* b);
 *
 * setLastSuccess -
 */
-extern void setLastSuccess(long long lastSuccess, BSONObjBuilder* b);
+extern void setLastSuccess(long long lastSuccess, mongo::BSONObjBuilder* b);
 
 
 
 /* ****************************************************************************
 *
 * setExpression -
-*
 */
 extern void setExpression(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
 
@@ -185,7 +172,6 @@ extern void setExpression(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder
 /* ****************************************************************************
 *
 * setFormat -
-*
 */
 extern void setFormat(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
 
@@ -194,7 +180,6 @@ extern void setFormat(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b)
 /* ****************************************************************************
 *
 * setBlacklist -
-*
 */
 extern void setBlacklist(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
 
@@ -203,10 +188,7 @@ extern void setBlacklist(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder*
 /* ****************************************************************************
 *
 * setMetadata -
-*
 */
 extern void setMetadata(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
 
-
-
-#endif // SRC_LIB_MONGO_BACKEND_MONGOCOMMONSUBSCRIPTION_H
+#endif  // SRC_LIB_MONGOBACKEND_MONGOCOMMONSUBSCRIPTION_H_

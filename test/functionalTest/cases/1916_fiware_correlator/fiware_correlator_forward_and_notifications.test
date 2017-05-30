@@ -267,6 +267,7 @@ Date: REGEX(.*)
 07. Dump accumulator, see E1/A1 with CORRELATOR1, and E2/A2 with CORRELATOR3 (for the update), and in between, E2/A2 with CORRELATOR2 (for the creation of the subscription in step 05)
 =======================================================================================================================================================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 141
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -291,6 +292,7 @@ Fiware-Correlator: CORRELATOR1
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 143
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -315,6 +317,7 @@ Fiware-Correlator: CORRELATOR2
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 141
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized

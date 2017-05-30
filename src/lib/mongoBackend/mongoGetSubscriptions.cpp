@@ -23,24 +23,40 @@
 * Author: Orion dev team
 */
 #include <string>
+#include <vector>
+#include <map>
 
 #include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
 #include "common/sem.h"
 #include "common/statistics.h"
 #include "common/idCheck.h"
 #include "common/errorMessages.h"
-#include "mongoBackend/mongoGetSubscriptions.h"
+#include "cache/subCache.h"
+#include "apiTypesV2/Subscription.h"
+
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
-#include "cache/subCache.h"
+#include "mongoBackend/mongoGetSubscriptions.h"
 
-using namespace ngsiv2;
+
+
+/* ****************************************************************************
+*
+* USING - 
+*/
+using mongo::BSONObj;
+using mongo::BSONElement;
+using mongo::DBClientCursor;
+using mongo::DBClientBase;
+using mongo::Query;
+using mongo::OID;
+using ngsiv2::Subscription;
+using ngsiv2::EntID;
 
 
 
@@ -97,7 +113,7 @@ static void setSubject(Subscription* s, const BSONObj& r)
     {
       en.type = type;
     }
-    else // isTypePattern
+    else  // isTypePattern
     {
       en.typePattern = type;
     }
@@ -113,11 +129,11 @@ static void setSubject(Subscription* s, const BSONObj& r)
   {
     mongo::BSONObj expression = getObjectFieldF(r, CSUB_EXPR);
 
-    std::string    q          = expression.hasField(CSUB_EXPR_Q)      ? getStringFieldF(expression, CSUB_EXPR_Q)      : "";
-    std::string    mq         = expression.hasField(CSUB_EXPR_MQ)     ? getStringFieldF(expression, CSUB_EXPR_MQ)     : "";
-    std::string    geo        = expression.hasField(CSUB_EXPR_GEOM)   ? getStringFieldF(expression, CSUB_EXPR_GEOM)   : "";
-    std::string    coords     = expression.hasField(CSUB_EXPR_COORDS) ? getStringFieldF(expression, CSUB_EXPR_COORDS) : "";
-    std::string    georel     = expression.hasField(CSUB_EXPR_GEOREL) ? getStringFieldF(expression, CSUB_EXPR_GEOREL) : "";
+    std::string  q      = expression.hasField(CSUB_EXPR_Q)      ? getStringFieldF(expression, CSUB_EXPR_Q)      : "";
+    std::string  mq     = expression.hasField(CSUB_EXPR_MQ)     ? getStringFieldF(expression, CSUB_EXPR_MQ)     : "";
+    std::string  geo    = expression.hasField(CSUB_EXPR_GEOM)   ? getStringFieldF(expression, CSUB_EXPR_GEOM)   : "";
+    std::string  coords = expression.hasField(CSUB_EXPR_COORDS) ? getStringFieldF(expression, CSUB_EXPR_COORDS) : "";
+    std::string  georel = expression.hasField(CSUB_EXPR_GEOREL) ? getStringFieldF(expression, CSUB_EXPR_GEOREL) : "";
 
     s->subject.condition.expression.q        = q;
     s->subject.condition.expression.mq       = mq;
@@ -125,7 +141,6 @@ static void setSubject(Subscription* s, const BSONObj& r)
     s->subject.condition.expression.coords   = coords;
     s->subject.condition.expression.georel   = georel;
   }
-
 }
 
 
@@ -146,12 +161,14 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
 
   subP->notification.httpInfo.fill(r);
 
-  subP->throttling                    = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(r, CSUB_THROTTLING)       : -1;
-  subP->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(r, CSUB_LASTNOTIFICATION) : -1;
-  subP->notification.timesSent        = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : -1;
-  subP->notification.blacklist        = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(r, CSUB_BLACKLIST)                   : false;
-  subP->notification.lastFailure      = r.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(r, CSUB_LASTFAILURE)      : -1;
-  subP->notification.lastSuccess      = r.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongF(r, CSUB_LASTSUCCESS)      : -1;
+  ngsiv2::Notification* nP = &subP->notification;
+
+  subP->throttling      = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(r, CSUB_THROTTLING)       : -1;
+  nP->lastNotification  = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(r, CSUB_LASTNOTIFICATION) : -1;
+  nP->timesSent         = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : -1;
+  nP->blacklist         = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(r, CSUB_BLACKLIST)                   : false;
+  nP->lastFailure       = r.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(r, CSUB_LASTFAILURE)      : -1;
+  nP->lastSuccess       = r.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongF(r, CSUB_LASTSUCCESS)      : -1;
 
   // Attributes format
   subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(r, CSUB_FORMAT)) : NGSI_V1_LEGACY;
@@ -249,11 +266,12 @@ void mongoListSubscriptions
 
   LM_T(LmtMongo, ("Mongo List Subscriptions"));
 
-  /* ONTIMEINTERVAL subscription are not part of NGSIv2, so they are excluded.
+  /* ONTIMEINTERVAL subscriptions are not part of NGSIv2, so they are excluded.
    * Note that expiration is not taken into account (in the future, a q= query
-   * could be added to the operation in order to filter results) */
+   * could be added to the operation in order to filter results)
+   */
   std::auto_ptr<DBClientCursor>  cursor;
-  std::string                    err; 
+  std::string                    err;
   Query                          q;
 
   if (!servicePath.empty() && servicePath != "/#")
@@ -269,7 +287,14 @@ void mongoListSubscriptions
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
-  if (!collectionRangedQuery(connection, getSubscribeContextCollectionName(tenant), q, limit, offset, &cursor, count, &err))
+  if (!collectionRangedQuery(connection,
+                             getSubscribeContextCollectionName(tenant),
+                             q,
+                             limit,
+                             offset,
+                             &cursor,
+                             count,
+                             &err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -281,15 +306,17 @@ void mongoListSubscriptions
 
   /* Process query result */
   unsigned int docs = 0;
+
   while (moreSafe(cursor))
   {
-    BSONObj r;    
+    BSONObj  r;
 
     if (!nextSafeOrErrorF(cursor, &r, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
       continue;
     }
+
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
@@ -303,11 +330,11 @@ void mongoListSubscriptions
 
     subs->push_back(s);
   }
-  releaseMongoConnection(connection);
 
+  releaseMongoConnection(connection);
   reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
+
   *oe = OrionError(SccOk);
-  return;
 }
 
 
@@ -359,7 +386,8 @@ void mongoGetSubscription
   unsigned int n = 0;
   if (moreSafe(cursor))
   {
-    BSONObj r;    
+    BSONObj r;
+
     if (!nextSafeOrErrorF(cursor, &r, &err))
     {
       releaseMongoConnection(connection);
@@ -383,6 +411,7 @@ void mongoGetSubscription
       LM_T(LmtMongo, ("more than one subscription: '%s'", idSub.c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
       *oe = OrionError(SccConflict);
+
       return;
     }
   }
@@ -392,11 +421,12 @@ void mongoGetSubscription
     LM_T(LmtMongo, ("subscription not found: '%s'", idSub.c_str()));
     reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
     *oe = OrionError(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
+
     return;
   }
-  releaseMongoConnection(connection);
 
+  releaseMongoConnection(connection);
   reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
+
   *oe = OrionError(SccOk);
-  return;
 }

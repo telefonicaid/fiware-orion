@@ -268,6 +268,7 @@ Date: REGEX(.*)
 03. Dump and reset: see notification with metadata M1+M2+M3
 ===========================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 439
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -352,6 +353,7 @@ Date: REGEX(.*)
 06. Dump and reset: see notification with metadata M1+M2
 ========================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 367
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -427,6 +429,7 @@ Date: REGEX(.*)
 09. Dump and reset: see notification with metadata actionType(on A)+M3
 ======================================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 377
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -502,6 +505,7 @@ Date: REGEX(.*)
 12. Dump and reset: see notification with metadata M1+M2+M3+actionType(on A)
 ============================================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 485
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized

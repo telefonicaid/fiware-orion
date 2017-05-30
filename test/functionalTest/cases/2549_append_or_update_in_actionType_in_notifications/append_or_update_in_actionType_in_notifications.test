@@ -183,6 +183,7 @@ Date: REGEX(.*)
 03. See 'append' in notification and reset
 ==========================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 169
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -225,6 +226,7 @@ Date: REGEX(.*)
 05. See 'update' in notification and reset
 ==========================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 169
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -267,6 +269,7 @@ Date: REGEX(.*)
 07. See 'update' in notification and reset
 ==========================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 173
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -309,6 +312,7 @@ Date: REGEX(.*)
 09. See 'append' in notification and reset
 ==========================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 220
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -356,6 +360,7 @@ Date: REGEX(.*)
 11. See 'append' for A3 and 'update' for A2
 ===========================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 314
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized

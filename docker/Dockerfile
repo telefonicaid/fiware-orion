@@ -19,6 +19,7 @@ RUN \
       gnutls-devel \
       libgcrypt-devel \
       libcurl-devel \
+      openssl-devel \
       libuuid-devel \
       make \
       nc \
@@ -36,9 +37,9 @@ RUN \
     make install && \
     ldconfig && \
     # Install mongodb driver from source
-    curl -kOL https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.0.7.tar.gz && \
-    tar xfz legacy-1.0.7.tar.gz && \
-    cd mongo-cxx-driver-legacy-1.0.7 && \
+    curl -kOL https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz && \
+    tar xfz legacy-1.1.2.tar.gz && \
+    cd mongo-cxx-driver-legacy-1.1.2 && \
     scons install --prefix=/usr/local && \
     # Install rapidjson from source
     curl -kOL https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz && \
@@ -64,8 +65,8 @@ RUN \
            /usr/local/include/microhttpd.h \
            /usr/local/lib/libmicrohttpd.* \
            /opt/libmicrohttpd-0.9.48 \
-           /opt/legacy-1.0.7.tar.gz \
-           /opt/mongo-cxx-driver-legacy-1.0.7 \
+           /opt/legacy-1.1.2.tar.gz \
+           /opt/mongo-cxx-driver-legacy-1.1.2 \
            /usr/local/include/mongo \
            /usr/local/lib/libmongoclient.a \
            /opt/rapidjson-1.0.2 \

@@ -175,6 +175,7 @@ Date: REGEX(.*)
 04. Dump accumulater - see ONE notification
 ===========================================
 POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 521
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)

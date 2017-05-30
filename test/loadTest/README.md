@@ -114,7 +114,7 @@ Example:
 ```
  ./jmeter.sh -n -t orion_soak_test_ngsiv1.jmx -JHOST=localhost -JTEST_TIME=259200 -JTHREADS=100 -JSERVICE="soak_test" -JATTRIBUTES=5 -JSUBSC_DURATION=8000
  ./jmeter.sh -n -t orion_soak_test_ngsiv1_ngsiv2.jmx -JHOST=localhost -JTEST_TIME=172800 -JTHREADS=100 -JSERVICE="soak_test" -JATTRIBUTES=15 -JSUBSC_REFERENCE="http://localhost:8090/notify" -JSUBSC_DURATION=8000 -JVERSION_PERCENTAGE=100`
-``
+```
 
 
 
@@ -141,7 +141,7 @@ Example:
 ./jmeter.sh -n -t orionPerformanceTest_v1.0.jmx -JPROJECT="XXX" -JTEST_NAME="XXXX" -JHOST=X.X.X.X -JNODE_1=X.X.X.X -JPORT=1026 -JTHREADS=XXXX -JRAMPUP=XXX -JRUNTIME=XXXX >> /<path>/jmeter_report__`date +%Y%m%d%H`.log
 ```
   		 
-2. **orionPerformanceOnlyQueries_v2.0.jmx**   (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It is used for generate only queries.
+**orionPerformanceOnlyQueries_v2.0.jmx**   (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It is used for generate only queries.
 	 
         Properties:
 
@@ -164,7 +164,7 @@ Example:
 ./jmeter.sh -n -t orionPerformanceOnlyQueries_v2.0.jmx -JPROJECT="XXX" -JTEST_NAME="XXXX" -JHOST=X.X.X.X -JNODE_1=X.X.X.X -JPORT=1026 -JTHREADS=XXXX -JRAMPUP=XXX -JRUNTIME=XXXX >> /<path>/jmeter_report__`date +%Y%m%d%H`.log
 ```
  
-3. **orionPerformanceOnlyAppends_v2.0.jmx**   (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It is used for generate only appends.
+**orionPerformanceOnlyAppends_v2.0.jmx**   (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It is used for generate only appends.
 	 
         Properties:
 
@@ -187,7 +187,7 @@ Example:
 ./jmeter.sh -n -t orionPerformanceOnlyAppends_v2.0.jmx -JPROJECT="XXX" -JTEST_NAME="XXXX" -JHOST=X.X.X.X -JNODE_1=X.X.X.X -JPORT=1026 -JTHREADS=XXXX -JRAMPUP=XXX -JRUNTIME=XXXX >> /<path>/jmeter_report__`date +%Y%m%d%H`.log
 ```
 
-4. **orionPerformanceOnlyAppendsAndUpdates_v2.0.jmx**   (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It is used for generate appends and updates.
+**orionPerformanceOnlyAppendsAndUpdates_v2.0.jmx**   (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It is used for generate appends and updates.
 	 
         Properties:
 
@@ -210,14 +210,14 @@ Example:
 ./jmeter.sh -n -t orionPerformanceAppendsAndUpdates_v2.0.jmx -JPROJECT="XXX" -JTEST_NAME="XXXX" -JHOST=X.X.X.X -JNODE_1=X.X.X.X -JPORT=1026 -JTHREADS=XXXX -JRAMPUP=XXX -JRUNTIME=XXXX >> /<path>/jmeter_report__`date +%Y%m%d%H`.log
 ```
 
-5. **populateDB_v1.0.sh** (used by populate a mongoDB wint N context and with a step)
+**populateDB_v1.0.sh** (used by populate a mongoDB wint N context and with a step)
    
 ```
 It is necesary to define url, tenant, elements_number and step
 usage:  populateDB_v1.0.sh <http://hostname:port> <tenant> <100000> <10>
 ```
 	
-6. **multiplesAttributes_bug_memory_leak.jmx** (used by simulate some problems reported by users, see http://stackoverflow.com/questions/23386094/orion-context-broker-possible-memory-leak)
+**multiplesAttributes_bug_memory_leak.jmx** (used by simulate some problems reported by users, see http://stackoverflow.com/questions/23386094/orion-context-broker-possible-memory-leak)
 
 	    Properties:
 	
@@ -244,3 +244,9 @@ usage:  populateDB_v1.0.sh <http://hostname:port> <tenant> <100000> <10>
 
 		I have 17 entities of type "Vehicle" with  
 		* 2 attributes that are updated every 2 seconds 
+
+**ngsiv1_vs_ngsi2.jmx**: this is an earlier version of orion_soak_test_ngsiv1_ngsiv2.jmx. Although it has not been mantained since time ago, it could be useful to inject entities with/without subscriptions in NGSIv1 and NGSIv2 using the same script (and avoiding the randomness using the the soak version).
+
+## `perf` directory
+
+It contains some Python scripts that may be useful to set up CB in order to perform performance tests on it (entity population, subscription creation, etc.).

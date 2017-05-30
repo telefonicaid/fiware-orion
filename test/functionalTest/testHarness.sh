@@ -74,8 +74,18 @@ export LC_ALL=C
 export NAME="testFile"
 declare -A testErrorV
 typeset -i testError
+declare -A okOnSecondV
+typeset -i okOnSecond
+declare -A okOnThirdV
+typeset -i okOnThird
+declare -A okOnPlus3V
+typeset -i okOnPlus3
 export DIFF=$SCRIPT_HOME/testDiff.py
 testError=0
+okOnSecond=0
+okOnThird=0
+okOnPlus3=0
+
 
 
 # -----------------------------------------------------------------------------
@@ -848,6 +858,18 @@ do
       then
         if [ $tryNo != 1 ]
         then
+          if [ $tryNo == 2 ]
+          then
+            okOnSecondV[$okOnSecond]=$testFile
+            okOnSecond=$okOnSecond+1
+          elif [ $tryNo == 3 ]
+          then
+            okOnThirdV[$okOnThird]=$testFile
+            okOnThird=$okOnThird+1
+          else
+            okOnPlus3V[$okOnPlus3]=$testFile
+            okOnPlus3=$okOnPlus3+1
+          fi
           echo "OK"
         fi
         break
@@ -895,6 +917,8 @@ testDiffTime=$(echo $testEndTime - $testStartTime | bc)" seconds"
 echo Total test time: $testDiffTime
 
 
+typeset -i ix
+exitCode=0
 # ------------------------------------------------------------------------------
 #
 # Check for errors - if any, print to stdout
@@ -908,15 +932,58 @@ then
   echo "================================================================================"
   echo
   echo "----------- Failing tests ------------------"
-  typeset -i ix
+
   ix=0
-  while [ "$ix" != "$testError" ]
+  while [ $ix -lt $testError ]
   do
     echo "  o " ${testErrorV[$ix]}
     ix=$ix+1
   done
-
-  exit 1
+  exitCode=1
 fi
 
-exit 0
+
+
+# ------------------------------------------------------------------------------
+#
+# Check for reintents
+#
+if [ "$okOnSecond" != "0" ]
+then
+  echo
+  echo "$okOnSecond test cases OK in the second attempt:"
+
+  ix=0
+  while [ $ix -lt $okOnSecond ]
+  do
+    echo "  o " ${okOnSecondV[$ix]}
+    ix=$ix+1
+  done
+fi
+
+if [ "$okOnThird" != "0" ]
+then
+  echo
+  echo "$okOnThird test cases OK in the third attempt:"
+
+  ix=0
+  while [ $ix -lt $okOnThird ]
+  do
+    echo "  o " ${okOnThirdV[$ix]}
+    ix=$ix+1
+  done
+fi
+
+if [ "$okOnPlus3" != "0" ]
+then
+  echo
+  echo "$okOnPlus3 test cases OK after three or more failed attempts:"
+
+  ix=0
+  while [ $ix -lt $okOnPlus3 ]
+  do
+    echo "  o " ${okOnPlus3V[$ix]}
+    ix=$ix+1
+  done
+fi
+exit $exitCode

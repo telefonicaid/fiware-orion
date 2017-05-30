@@ -31,6 +31,7 @@ brokerStart CB
 
 #
 # 01. Create subscription with invalid regex in idPattern
+# 02. Make sure the subscription was not created
 #
 
 echo "01. Create subscription with invalid regex in idPattern"
@@ -58,19 +59,37 @@ echo
 echo
 
 
+echo "02. Make sure the subscription was not created"
+echo "=============================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
 --REGEXPECT--
 01. Create subscription with invalid regex in idPattern
 =======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 74
+Content-Length: 73
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Invalid regex for entity id pattern",
+    "description": "Invalid regex for entity idPattern",
     "error": "BadRequest"
 }
+
+
+02. Make sure the subscription was not created
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
 
 
 --TEARDOWN--

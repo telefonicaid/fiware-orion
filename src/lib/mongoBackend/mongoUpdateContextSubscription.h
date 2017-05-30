@@ -1,5 +1,5 @@
-#ifndef MONGO_UPDATE_CONTEXT_SUBSCRIPTION_H
-#define MONGO_UPDATE_CONTEXT_SUBSCRIPTION_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOUPDATECONTEXTSUBSCRIPTION_H_
+#define SRC_LIB_MONGOBACKEND_MONGOUPDATECONTEXTSUBSCRIPTION_H_
 
 /*
 *
@@ -26,7 +26,9 @@
 * Author: Fermin Galan Marquez
 */
 #include <string>
+#include <vector>
 
+#include "rest/HttpStatusCode.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 
@@ -39,11 +41,11 @@
 extern HttpStatusCode mongoUpdateContextSubscription
 (
   UpdateContextSubscriptionRequest*   requestP,
-  UpdateContextSubscriptionResponse*  responseP,  
+  UpdateContextSubscriptionResponse*  responseP,
   const std::string&                  tenant,
   const std::string&                  xauthToken,
   const std::vector<std::string>&     servicePathV,
   const std::string&                  fiwareCorrelator = "no correlator"
 );
 
-#endif
+#endif  // SRC_LIB_MONGOBACKEND_MONGOUPDATECONTEXTSUBSCRIPTION_H_

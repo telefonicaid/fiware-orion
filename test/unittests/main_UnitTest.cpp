@@ -55,6 +55,7 @@ int           fwdPort               = -1;
 int           subCacheInterval      = 10;
 unsigned int  cprForwardLimit       = 1000;
 bool          noCache               = false;
+bool          insecureNotif         = false;
 char          fwdHost[64];
 char          notificationMode[64];
 bool          simulatedNotification;

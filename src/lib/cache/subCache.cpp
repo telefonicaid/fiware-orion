@@ -192,13 +192,13 @@ void EntityInfo::release(void)
 {
   if (entityIdPatternToBeFreed)
   {
-    regfree(&entityIdPattern);
+    regfree(&entityIdPattern);  // If regcomp fails it frees up itself (see glibc sources for details)
     entityIdPatternToBeFreed = false;
   }
 
   if (entityTypePatternToBeFreed)
   {
-    regfree(&entityTypePattern);
+    regfree(&entityTypePattern);  // If regcomp fails it frees up itself (see glibc sources for details)
     entityTypePatternToBeFreed = false;
   }
 }
@@ -1108,7 +1108,7 @@ void subCacheRefresh(void)
   // Get list of database
   if (mongoMultitenant())
   {
-    getOrionDatabases(databases);
+    getOrionDatabases(&databases);
   }
 
   // Add the 'default tenant'

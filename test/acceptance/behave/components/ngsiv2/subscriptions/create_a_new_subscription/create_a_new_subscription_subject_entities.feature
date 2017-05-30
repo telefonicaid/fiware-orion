@@ -303,7 +303,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | españa     |
       | barça      |
 
-  @type_length_minimum @BUG_1985 @skip
+  @type_length_minimum @BUG_1985
   Scenario:  try to create subscription using NGSI v2 with entities type length minimum allowed (1)
     Given  a definition of headers
       | parameter          | value                             |
@@ -322,9 +322,9 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     When create a new subscription
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value           |
-      | error       | BadRequest      |
-      | description | not defined yet |
+      | parameter   | value                                          |
+      | error       | BadRequest                                     |
+      | description | entity type length: 0, min length supported: 1 |
 
   @type_length_exceed @BUG_1965
   Scenario:  try to create subscriptions using NGSI v2 with type length that exceeds the maximum allowed (256)
@@ -1013,11 +1013,6 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | house'flat' |
       | house;flat  |
       | house(flat) |
-      | house_?     |
-      | house_&     |
-      | house_/     |
-      | house_#     |
-      | my house    |
 
   @id_pattern_invalid_raw
   Scenario Outline:  try to create an subscription using NGSI v2 with several invalid entities idPattern (integer, boolean, no-string, etc)

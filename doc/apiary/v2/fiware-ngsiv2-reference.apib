@@ -713,13 +713,13 @@ In the case of equal or unequal, if s string to match includes a `,`, you can us
 (`'`) to disable the special meaning of the comma,  e.g: `color=='light,green','deep,blue'`.
 The first example would match a color with the exact value 'light,green' OR 'deep,blue'. The
 simple quote syntax can be also used to force string interpretation in filters, e.g.
-`q=tittle=='20'` will match string "20" but not number 20.
+`q=title=='20'` will match string "20" but not number 20.
 
 Unary negatory statements use the unary operator `!`, while affirmative unary statements use no
 operator at all.
 The unary statements are used to check for the existence of the *target property*.
 E.g. `temperature` matches entities that have an attribute called 'temperature' (no matter its
-value), while `!temperature` matches entities that do not have a temperature called 'attribute'.
+value), while `!temperature` matches entities that do not have an attribute called 'temperature'.
  
 ## Geographical Queries
 
@@ -1444,7 +1444,7 @@ representation for attributes (described in "JSON Attribute Representation" sect
 
 Response:
 
-* Successful operation uses 20O OK.
+* Successful operation uses 200 OK.
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
@@ -1535,7 +1535,7 @@ This operation returns the `value` property with the value of the attribute.
 
 Response:
 
-* Successful operation uses 20O OK.
+* Successful operation uses 200 OK.
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
@@ -1948,7 +1948,7 @@ Response:
           },
           "expires": "2016-04-05T14:00:00.00Z",
           "status": "active",
-          "throttling": 5,
+          "throttling": 5
         }
 
 

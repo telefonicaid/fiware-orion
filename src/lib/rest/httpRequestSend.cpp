@@ -46,6 +46,7 @@
 #include "common/string.h"
 #include "common/sem.h"
 #include "common/limits.h"
+#include "common/defaultValues.h"
 #include "alarmMgr/alarmMgr.h"
 #include "metricsMgr/metricsMgr.h"
 #include "rest/ConnectionInfo.h"
@@ -271,7 +272,7 @@ int httpRequestSendWithCurl
    CURL*                                      curl,
    const std::string&                         _ip,
    unsigned short                             port,
-   const std::string&                         protocol,
+   const std::string&                         _protocol,
    const std::string&                         verb,
    const std::string&                         tenant,
    const std::string&                         servicePath,
@@ -290,14 +291,13 @@ int httpRequestSendWithCurl
 )
 {
   // FIXME PoC: this is a kind of "interpection hack". It should be done in a clearner way
-  if (protocol == "mqtt:")
+  if (_protocol == "mqtt:")
   {
     return sendMqttNotification(content);
   }
 
   char                            portAsString[STRING_SIZE_FOR_INT];
   static unsigned long long       callNo             = 0;
-  std::string                     result;
   std::string                     ip                 = _ip;
   struct curl_slist*              headers            = NULL;
   MemoryStruct*                   httpResponse       = NULL;
@@ -324,7 +324,8 @@ int httpRequestSendWithCurl
     timeoutInMilliseconds = defaultTimeout;
   }
 
-  lmTransactionStart("to", ip.c_str(), port, resource.c_str());
+  std::string protocol = _protocol + "//";
+  lmTransactionStart("to", protocol.c_str(), + ip.c_str(), port, resource.c_str());
 
   // Preconditions check
   if (port == 0)
@@ -430,8 +431,10 @@ int httpRequestSendWithCurl
                   extraHeaders,
                   usedExtraHeaders);
 
-    if (protocol == "https:")
+    if (protocol == "https://")
     {
+      // "Switching" protocol https -> http is needed in this case, as CB->Rush request will use HTTP
+      protocol = "http://";
       headerRushHttp = "X-relayer-protocol: https";
       LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerRushHttp.c_str()));
       httpHeaderAdd(&headers, "X-relayer-protocol", headerRushHttp, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
@@ -463,11 +466,8 @@ int httpRequestSendWithCurl
   }
 
   // ----- Service-Path
-  if (servicePath != "")
-  {
-    std::string fiwareServicePath = std::string("Fiware-ServicePath: ") + servicePath;
-    httpHeaderAdd(&headers, "Fiware-ServicePath", fiwareServicePath, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
-  }
+  std::string fiwareServicePath = std::string("Fiware-ServicePath: ") + ((servicePath.empty())? "/" : servicePath);
+  httpHeaderAdd(&headers, "Fiware-ServicePath", fiwareServicePath, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- X-Auth-Token
   if (xauthToken != "")
@@ -562,10 +562,20 @@ int httpRequestSendWithCurl
   // Set up URL
   std::string url;
   if (isIPv6(ip))
+  {
     url = "[" + ip + "]";
+  }
   else
+  {
     url = ip;
-  url = url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
+  }
+  url = protocol + url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
+
+  if (insecureNotif)
+  {
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); // ignore self-signed certificates for SSL end-points
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+  }
 
   // Prepare CURL handle with obtained options
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());

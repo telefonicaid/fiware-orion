@@ -32,8 +32,27 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "apiTypesV2/HttpInfo.h"
 
+
+
+/* ****************************************************************************
+*
+* USING 
+*/
 using ::testing::_;
 using ::testing::Invoke;
+
+
+
+//
+// FIXME P4: All use of "using" in header files is banned according to the style guide.
+//           This line is added here temporarily, until the main source code is fixed to follow
+//           the style guide and MUST BE REMOVED asap.
+//
+//           The accepted usage of "using" is "using lib::item" in source files (*.cpp) only.
+//
+using namespace mongo;
+
+
 
 /* ****************************************************************************
 *

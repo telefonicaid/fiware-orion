@@ -364,6 +364,7 @@ Date: REGEX(.*)
 08. Dump accumulator, see E2, then reset accumulator
 ====================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 160
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -406,6 +407,7 @@ Date: REGEX(.*)
 10. Dump accumulator, see E1 and E2, then reset accumulator
 ===========================================================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 266
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -510,6 +512,7 @@ Date: REGEX(.*)
 12. Dump accumulator, see E3
 ============================
 POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 191
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized

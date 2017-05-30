@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Restict chars in id (old set)
+Forbidden chars in id (old set)
 
 --SHELL-INIT--
 dbInit CB

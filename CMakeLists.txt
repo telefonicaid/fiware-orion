@@ -177,6 +177,7 @@ SET (DYNAMIC_LIBS
     gnutls
     pthread
     gcrypt
+    ssl
     uuid
     mosquitto
 )

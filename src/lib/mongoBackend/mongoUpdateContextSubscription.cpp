@@ -22,37 +22,38 @@
 *
 * Author: Fermin Galan Marquez
 */
-
 #include <string>
 #include <vector>
+
 #include "rest/OrionError.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 #include "apiTypesV2/SubscriptionUpdate.h"
+
 #include "mongoBackend/mongoUpdateSubscription.h"
 #include "mongoBackend/mongoUpdateContextSubscription.h"
 
-using namespace ngsiv2;
 
 
 /* ****************************************************************************
 *
-* mongoUpdateContextSubscription - 
+* mongoUpdateContextSubscription -
 */
 HttpStatusCode mongoUpdateContextSubscription
 (
-    UpdateContextSubscriptionRequest*   requestP,
-    UpdateContextSubscriptionResponse*  responseP,
-    const std::string&                  tenant,
-    const std::string&                  xauthToken,
-    const std::vector<std::string>&     servicePathV,
-    const std::string&                  fiwareCorrelator
+  UpdateContextSubscriptionRequest*   requestP,
+  UpdateContextSubscriptionResponse*  responseP,
+  const std::string&                  tenant,
+  const std::string&                  xauthToken,
+  const std::vector<std::string>&     servicePathV,
+  const std::string&                  fiwareCorrelator
 )
-{ 
-  OrionError         oe;
-  SubscriptionUpdate sub;
+{
+  OrionError                  oe;
+  ngsiv2::SubscriptionUpdate  sub;
 
   requestP->toNgsiv2Subscription(&sub);
+
   std::string subId = mongoUpdateSubscription(sub, &oe, tenant, servicePathV, xauthToken, fiwareCorrelator);
 
   if (subId != "")
@@ -67,13 +68,17 @@ HttpStatusCode mongoUpdateContextSubscription
     {
       responseP->subscribeResponse.throttling = requestP->throttling;
     }
+
     responseP->subscribeResponse.subscriptionId = subId;
   }
   else
   {
-    // Check OrionError. Depending the error kind, details are included or not in order
-    // to have a better backward compatiblity
-    // FIXME: should we? or it is better modify .test and provide more accurate errors with 'details'?
+    //
+    // Check OrionError. Depending on the kind of error, details are included or not
+    // in order to have a better backward compatiblity
+    //
+    // FIXME: should we? or it is better to modify .test and provide more accurate errors with 'details'?
+    //
     if (oe.code == SccContextElementNotFound)
     {
       responseP->subscribeError.errorCode.fill(oe.code);

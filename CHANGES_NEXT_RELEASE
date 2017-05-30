@@ -1,16 +1,3 @@
-- Fix: libmicrohttpd now uses poll()/epoll() and not select() so fds greater than 1023 can be used for incoming connections (#2724, #2166)
-- Add: new option to set the timeout for REST request: -reqTimeout (#2762)
-- Fix: modified the upper limit for CLI '-maxConnections', from 1020 to UNLIMITED
-- Fix: proper 500 Internal Server Error response with descriptive text when "sort fail" at DB occur (#2752)
-- Fix: giving a descriptive response with payload, without reading the request for too big payloads (#2761)
-- Add: the string "ISO6801" can now be used as an alias for "DateTime" as type for attributes and metadata (#2654)
-- Add: metrics REST API (#2750)
-- Add: new CLI '-disableMetrics' to disable metrics (#2750)
-- Fix: timeout of 6 seconds (hardcoded for now) for all incoming REST requests (temporal fix, see #2762)
-- Fix: NGSIv1 updateContext APPEND on existing geo:point attributes (and probably other geo: attributes) failing to update location (#2770)
-- Fix: wrongly overlogging metadata abscense in csub docs as Runtime Error (#2796)
-- Fix: if HTTP header Content-Length contains a value above the maximum payload size, an error is returned and the message is not read (#2761)
-- Add: one more semaphore (the metrics semaphore) to the semWait block in GET /statistics and to the list in GET /admin/sem (#2750)
-- Fix: no longer accepting a service path with an empty component (e.g. /comp1//comp3) (#2772)
-- Fix: bug in notification queue statistics, "in" value (#2744)
-- Fix: Accept header errors in NGSIv2 requests were incorrectly being rendered using "OrionError" element (#2765)
+- Hardening: Mongo driver migrated to legacy-1.1.2 (several bugfixes in the legacy-1.0.7 to legacy-1.1.2 delta)
+- Hardening: Several changes in argument passing in mongoBackend library to avoid passing entire objects on the stack, from "X x" to "const X& x"
+- Hardening: Several changes in argument passing in mongoBackend library to add 'const' in references to objects that are not altered by the function

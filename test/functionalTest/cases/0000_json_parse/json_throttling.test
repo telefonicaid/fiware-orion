@@ -38,7 +38,7 @@ payload='{
       "id" : "OfficeRoom"
     }
   ],
-  "reference" : "http://localhost:${LISTENER_PORT}/notify",
+  "reference" : "http://localhost:'${LISTENER_PORT}'/notify",
   "throttling" : "PT5H"
 }'
 orionCurl --url ${url} --payload "${payload}"

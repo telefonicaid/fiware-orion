@@ -39,8 +39,6 @@
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 #include "mongo/client/dbclient.h"
 
-using namespace mongo;
-using std::auto_ptr;
 
 
 /* ****************************************************************************
@@ -62,6 +60,7 @@ static HttpStatusCode processDiscoverContextAvailability
   long long    count = -1;
 
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
+
   if (!registrationsQuery(requestP->entityIdVector,
                           requestP->attributeList,
                           &responseP->responseVector,
@@ -94,6 +93,7 @@ static HttpStatusCode processDiscoverContextAvailability
 
         snprintf(details, sizeof(details), "Number of matching registrations: %lld. Offset is %d", count, offset);
         responseP->errorCode.fill(SccContextElementNotFound, details);
+
         return SccOk;
       }
     }
@@ -104,8 +104,8 @@ static HttpStatusCode processDiscoverContextAvailability
   else if (details == true)
   {
     //
-    // If all was OK, but the details URI param was set to 'on', then the responses error code details
-    // 'must' contain the total count of hits.
+    // If all is OK, but the details URI param has been set to 'on', then the response error code details
+    // MUST contain the total count of hits.
     //
 
     char details[64];
@@ -116,6 +116,7 @@ static HttpStatusCode processDiscoverContextAvailability
 
   return SccOk;
 }
+
 
 
 /* ****************************************************************************
@@ -142,12 +143,12 @@ HttpStatusCode mongoDiscoverContextAvailability
   LM_T(LmtMongo, ("DiscoverContextAvailability Request"));
 
   HttpStatusCode hsCode = processDiscoverContextAvailability(requestP,
-                                                                  responseP,
-                                                                  tenant,
-                                                                  offset,
-                                                                  limit,
-                                                                  details,
-                                                                  servicePathV);
+                                                             responseP,
+                                                             tenant,
+                                                             offset,
+                                                             limit,
+                                                             details,
+                                                             servicePathV);
   if (hsCode != SccOk)
   {
     ++noOfDiscoveryErrors;

@@ -1,5 +1,5 @@
-#ifndef MONGO_GLOBAL_H
-#define MONGO_GLOBAL_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOGLOBAL_H_
+#define SRC_LIB_MONGOBACKEND_MONGOGLOBAL_H_
 
 /*
 *
@@ -25,9 +25,15 @@
 *
 * Author: Fermín Galán
 */
-#include "logMsg/logMsg.h"
+#include <stdint.h>   // int64_t et al
+
+#include <string>
+#include <vector>
+#include <map>
 
 #include "mongo/client/dbclient.h"
+
+#include "logMsg/logMsg.h"
 
 #include "common/RenderFormat.h"
 #include "ngsi/EntityId.h"
@@ -46,17 +52,7 @@
 #include "rest/uriParamNames.h"
 #include "apiTypesV2/Subscription.h"
 #include "apiTypesV2/HttpInfo.h"
-
 #include "mongoBackend/TriggeredSubscription.h"
-
-using namespace mongo;
-
-
-/* ****************************************************************************
-*
-* MongoTreatFunction - callback signature for Mongo callback functions
-*/
-typedef void (*MongoTreatFunction)(std::string tenant, BSONObj& bobj);
 
 
 
@@ -80,7 +76,7 @@ void mongoInit
   const char*  user,
   const char*  pwd,
   bool         mtenant,
-  long         timeout,
+  int64_t      timeout,
   int          writeConcern,
   int          dbPoolSize,
   bool         mutexTimeStat
@@ -109,50 +105,63 @@ extern bool mongoStart
 
 
 #ifdef UNIT_TEST
-extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+extern void setMongoConnectionForUnitTest(mongo::DBClientBase* _connection);
 #endif
 
-/*****************************************************************************
+
+
+/* ****************************************************************************
 *
 * getNotifier -
 */
-extern Notifier* getNotifier();
+extern Notifier* getNotifier(void);
 
-/*****************************************************************************
+
+
+/* ****************************************************************************
 *
 * setNotifier -
 */
 extern void setNotifier(Notifier* n);
 
 
-/*****************************************************************************
+
+/* ****************************************************************************
 *
 * getMongoConnection -
 *
 * I would prefer to have per-collection methods, to have a better encapsulation, but
 * the Mongo C++ API seems not to work that way
 */
-extern DBClientBase* getMongoConnection(void);
+extern mongo::DBClientBase* getMongoConnection(void);
+
+
 
 /* ****************************************************************************
 *
 * releaseMongoConnection - 
 */
-extern void releaseMongoConnection(DBClientBase* connection);
+extern void releaseMongoConnection(mongo::DBClientBase* connection);
 
-/*****************************************************************************
+
+
+/* ****************************************************************************
 *
 * setDbPrefix -
 */
 extern void setDbPrefix(const std::string& dbPrefix);
 
-/*****************************************************************************
+
+
+/* ****************************************************************************
 *
 * getDbPrefix -
 */
 extern const std::string& getDbPrefix(void);
 
-/*****************************************************************************
+
+
+/* ****************************************************************************
 *
 * getOrionDatabases -
 *
@@ -162,82 +171,107 @@ extern const std::string& getDbPrefix(void);
 *
 * Function return value is false in the case of problems accessing database,
 * true otherwise.
-*
 */
-extern bool getOrionDatabases(std::vector<std::string>& dbs);
+extern bool getOrionDatabases(std::vector<std::string>* dbs);
 
-/*****************************************************************************
+
+
+/* ****************************************************************************
 *
 * tenantFromDb -
 */
 extern std::string tenantFromDb(const std::string& database);
 
-/*****************************************************************************
+
+
+/* ****************************************************************************
 *
 * setEntitiesCollectionName -
 */
 extern void setEntitiesCollectionName(const std::string& name);
 
-/*****************************************************************************
+
+
+/* ****************************************************************************
 *
 * setRegistrationsCollectionName -
 */
 extern void setRegistrationsCollectionName(const std::string& name);
 
-/*****************************************************************************
+
+
+/* ****************************************************************************
 *
 * setSubscribeContextCollectionName -
 */
 extern void setSubscribeContextCollectionName(const std::string& name);
 
-/*****************************************************************************
+
+
+/* ****************************************************************************
 *
 * setSubscribeContextAvailabilityCollectionName -
 */
 extern void setSubscribeContextAvailabilityCollectionName(const std::string& name);
 
-/*****************************************************************************
+
+
+/* ****************************************************************************
 *
 * composeDatabaseName -
 *
 */
 extern std::string composeDatabaseName(const std::string& tenant);
 
-/*****************************************************************************
+
+
+/* ****************************************************************************
 *
 * getEntitiesCollectionName -
 */
 extern std::string getEntitiesCollectionName(const std::string& tenant);
 
-/*****************************************************************************
+
+
+/* ****************************************************************************
 *
 * getRegistrationsCollectionName -
 */
 extern std::string getRegistrationsCollectionName(const std::string& tenant);
 
-/*****************************************************************************
+
+
+/* ****************************************************************************
 *
 * getSubscribeContextCollectionName -
 */
 extern std::string getSubscribeContextCollectionName(const std::string& tenant);
 
-/*****************************************************************************
+
+
+/* ****************************************************************************
 *
 * getSubscribeContextAvailabilityCollectionName -
 */
 extern std::string getSubscribeContextAvailabilityCollectionName(const std::string& tenant);
 
-/*****************************************************************************
+
+
+/* ****************************************************************************
 *
 * mongoLocationCapable -
 */
 extern bool mongoLocationCapable(void);
 
-/*****************************************************************************
+
+
+/* ****************************************************************************
 *
 * ensureLocationIndex -
 */
 extern void ensureLocationIndex(const std::string& tenant);
+
+
 
 /* ****************************************************************************
 *
@@ -245,11 +279,15 @@ extern void ensureLocationIndex(const std::string& tenant);
 */
 extern bool matchEntity(const EntityId* en1, const EntityId* en2);
 
+
+
 /* ****************************************************************************
 *
 * includedEntity -
 */
 extern bool includedEntity(EntityId en, const EntityIdVector& entityIdV);
+
+
 
 /* ****************************************************************************
 *
@@ -264,14 +302,13 @@ extern bool includedAttribute(const ContextRegistrationAttribute& attr, const At
 * processAreaScopeV2 -
 *
 */
-extern bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery);
+extern bool processAreaScopeV2(const Scope* scoP, mongo::BSONObj* areaQueryP);
 
 
 
 /* ****************************************************************************
 *
 * entitiesQuery -
-*
 */
 extern bool entitiesQuery
 (
@@ -292,17 +329,19 @@ extern bool entitiesQuery
   ApiVersion                       apiVersion     = V1
 );
 
+
+
 /* ****************************************************************************
 *
 * pruneContextElements -
-*
 */
-extern void pruneContextElements(ContextElementResponseVector& oldCerV, ContextElementResponseVector* newCerVP);
+extern void pruneContextElements(const ContextElementResponseVector& oldCerV, ContextElementResponseVector* newCerVP);
+
+
 
 /* ****************************************************************************
 *
 * registrationsQuery -
-*
 */
 extern bool registrationsQuery
 (
@@ -323,9 +362,10 @@ extern bool registrationsQuery
 /* ****************************************************************************
 *
 * condValueAttrMatch -
-*
 */
-extern bool condValueAttrMatch(const BSONObj& sub, const std::vector<std::string>& modifiedAttrs);
+extern bool condValueAttrMatch(const mongo::BSONObj& sub, const std::vector<std::string>& modifiedAttrs);
+
+
 
 /* ****************************************************************************
 *
@@ -333,19 +373,18 @@ extern bool condValueAttrMatch(const BSONObj& sub, const std::vector<std::string
 *
 * Extract the entity ID vector from a BSON document (in the format of the csubs
 * collection)
-*
 */
-extern EntityIdVector subToEntityIdVector(const BSONObj& sub);
+extern EntityIdVector subToEntityIdVector(const mongo::BSONObj& sub);
+
+
 
 /* ****************************************************************************
 *
 * subToAttributeList -
 *
-* Extract the attribute list from a BSON document (in the format of the csubs
-* collection)
-*
+* Extract the attribute list from a BSON document (in the format of the csubs collection)
 */
-extern AttributeList subToAttributeList(const BSONObj& attrL);
+extern AttributeList subToAttributeList(const mongo::BSONObj& attrL);
 
 
 
@@ -354,9 +393,8 @@ extern AttributeList subToAttributeList(const BSONObj& attrL);
 * processConditionVector -
 *
 * NGSIv2 wrapper
-*
 */
-extern BSONArray processConditionVector
+extern mongo::BSONArray processConditionVector
 (
   const std::vector<std::string>&    condAttributesV,
   const std::vector<ngsiv2::EntID>&  entitiesV,
@@ -381,7 +419,6 @@ extern BSONArray processConditionVector
 /* ****************************************************************************
 *
 * processAvailabilitySubscriptions -
-*
 */
 extern bool processAvailabilitySubscription(
     const EntityIdVector& enV,
@@ -393,6 +430,8 @@ extern bool processAvailabilitySubscription(
     const std::string&    fiwareCorrelator
 );
 
+
+
 /* ****************************************************************************
 *
 * slashEscape - 
@@ -403,46 +442,53 @@ extern bool processAvailabilitySubscription(
 */
 extern void slashEscape(const char* from, char* to, unsigned int toLen);
 
+
+
 /* ****************************************************************************
 *
 * releaseTriggeredSubscriptions -
-*
 */
-extern void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>& subs);
+extern void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>* subsP);
+
 
 
 /* ****************************************************************************
 *
 * fillQueryServicePath -
-*
 */
-extern BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath);
+extern mongo::BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath);
+
+
 
 /* ****************************************************************************
 *
 * fillContextProviders -
-*
 */
-extern void fillContextProviders(ContextElementResponse* cer, ContextRegistrationResponseVector& crrV);
+extern void fillContextProviders(ContextElementResponse* cer, const ContextRegistrationResponseVector& crrV);
+
+
 
 /* ****************************************************************************
 *
 * someContextElementNotFound -
-*
 */
-extern bool someContextElementNotFound(ContextElementResponse& cer);
+extern bool someContextElementNotFound(const ContextElementResponse& cer);
+
+
 
 /* ****************************************************************************
 *
 * cprLookupByAttribute -
-*
 */
-extern void cprLookupByAttribute(EntityId&                          en,
-                                 const std::string&                 attrName,
-                                 ContextRegistrationResponseVector& crrV,
-                                 std::string*                       perEntPa,
-                                 MimeType*                          perEntPaMimeType,
-                                 std::string*                       perAttrPa,
-                                 MimeType*                          perAttrPaMimeType);
+extern void cprLookupByAttribute
+(
+  EntityId&                                en,
+  const std::string&                       attrName,
+  const ContextRegistrationResponseVector& crrV,
+  std::string*                             perEntPa,
+  MimeType*                                perEntPaMimeType,
+  std::string*                             perAttrPa,
+  MimeType*                                perAttrPaMimeType
+);
 
-#endif
+#endif  // SRC_LIB_MONGOBACKEND_MONGOGLOBAL_H_

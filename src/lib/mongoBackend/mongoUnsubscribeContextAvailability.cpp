@@ -26,21 +26,30 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
 #include "alarmMgr/alarmMgr.h"
-#include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/mongoUnsubscribeContextAvailability.h"
-#include "mongoBackend/safeMongo.h"
+#include "common/sem.h"
 #include "ngsi9/UnsubscribeContextAvailabilityRequest.h"
 #include "ngsi9/UnsubscribeContextAvailabilityResponse.h"
-#include "common/sem.h"
+
+#include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/safeMongo.h"
+#include "mongoBackend/mongoUnsubscribeContextAvailability.h"
 
 
 
 /* ****************************************************************************
 *
-* mongoUnsubscribeContextAvailability - 
+* USING
+*/
+using mongo::BSONObj;
+using mongo::OID;
+
+
+
+/* ****************************************************************************
+*
+* mongoUnsubscribeContextAvailability -
 */
 HttpStatusCode mongoUnsubscribeContextAvailability
 (
@@ -67,16 +76,18 @@ HttpStatusCode mongoUnsubscribeContextAvailability
   if (!safeGetSubId(requestP->subscriptionId, &id, &(responseP->statusCode)))
   {
     reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (safeGetSubId fail)", reqSemTaken);
+
     if (responseP->statusCode.code == SccContextElementNotFound)
     {
       // FIXME: doubt: invalid OID format? Or, subscription not found?
       std::string details = std::string("invalid OID format: '") + requestP->subscriptionId.get() + "'";
       alarmMgr.badInput(clientIp, details);
     }
-    else // SccReceiverInternalError
+    else  // SccReceiverInternalError
     {
       LM_E(("Runtime Error (exception getting OID: %s)", responseP->statusCode.details.c_str()));
     }
+
     return SccOk;
   }
 
@@ -84,28 +95,38 @@ HttpStatusCode mongoUnsubscribeContextAvailability
   {
     reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo db exception)", reqSemTaken);
     responseP->statusCode.fill(SccReceiverInternalError, err);
+
     return SccOk;
   }
+
   alarmMgr.dbErrorReset();
 
   if (sub.isEmpty())
   {
     responseP->statusCode.fill(SccContextElementNotFound);
     reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (no subscriptions)", reqSemTaken);
+
     return SccOk;
   }
 
   /* Remove document in MongoDB */
+
+  //
   // FIXME: I would prefer to do the find and remove in a single operation. Is the some similar
-  // to findAndModify for this?  
-  if (!collectionRemove(getSubscribeContextAvailabilityCollectionName(tenant), BSON("_id" << OID(requestP->subscriptionId.get())), &err))
+  // to findAndModify for this?
+  //
+
+  std::string colName = getSubscribeContextAvailabilityCollectionName(tenant);
+  if (!collectionRemove(colName, BSON("_id" << OID(requestP->subscriptionId.get())), &err))
   {
     reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo db exception)", reqSemTaken);
     responseP->statusCode.fill(SccReceiverInternalError, err);
+
     return SccOk;
   }
 
   reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request", reqSemTaken);
   responseP->statusCode.fill(SccOk);
+
   return SccOk;
 }
