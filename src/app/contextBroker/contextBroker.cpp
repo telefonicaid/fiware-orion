@@ -1778,8 +1778,6 @@ int main(int argC, char* argV[])
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
   mongoInit(dbHost, rplSet, dbName, user, pwd, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   mqttInit();
-  contextBrokerInit(dbName, mtenant);
-  curl_global_init(CURL_GLOBAL_NOTHING);
   alarmMgr.init(relogAlarms);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
