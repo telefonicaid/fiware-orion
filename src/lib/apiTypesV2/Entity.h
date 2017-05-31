@@ -27,11 +27,20 @@
 */
 #include <string>
 #include <vector>
+#include <map>
 
 #include "ngsi/ContextAttributeVector.h"
 #include "rest/OrionError.h"
 
+
+
+/* ****************************************************************************
+*
+* To avoid a problematic and not necessary include
+*/
 struct QueryContextResponse;
+
+
 
 /* ****************************************************************************
 *
@@ -39,7 +48,7 @@ struct QueryContextResponse;
 */
 class Entity
 {
-public:
+ public:
   std::string             id;               // Mandatory
   std::string             type;             // Optional
   std::string             isPattern;        // Optional
@@ -60,15 +69,18 @@ public:
   std::string  render(std::map<std::string, bool>&         uriParamOptions,
                       std::map<std::string, std::string>&  uriParam,
                       bool                                 comma = false);
+
   std::string  check(ApiVersion apiVersion, RequestType requestType);
   void         present(const std::string& indent);
   void         release(void);
+
   void         fill(const std::string&       id,
                     const std::string&       type,
                     const std::string&       isPattern,
                     ContextAttributeVector*  aVec,
                     double                   creDate,
                     double                   modDate);
+
   void         fill(QueryContextResponse* qcrsP);
   void         hideIdAndType(bool hide = true);
 };

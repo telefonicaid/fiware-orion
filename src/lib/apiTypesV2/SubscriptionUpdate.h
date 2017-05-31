@@ -27,34 +27,39 @@
 */
 #include "apiTypesV2/Subscription.h"
 
+
+
 namespace ngsiv2
 {
-  class SubscriptionUpdate : public Subscription
+/* ****************************************************************************
+*
+* SubscriptionUpdate - 
+*/
+class SubscriptionUpdate : public Subscription
+{
+ public:
+  bool  subjectProvided;
+  bool  expiresProvided;
+  bool  statusProvided;
+  bool  notificationProvided;
+  bool  attrsFormatProvided;
+  bool  throttlingProvided;
+  bool  blacklistProvided;
+  bool  fromNgsiv1;          // to support a special case when the SubscriptionUpdate comes from NGSIv1
+
+  SubscriptionUpdate():
+    subjectProvided(false),
+    expiresProvided(false),
+    statusProvided(false),
+    notificationProvided(false),
+    attrsFormatProvided(false),
+    throttlingProvided(false),
+    blacklistProvided(false),
+    fromNgsiv1(false)
   {
-  public:
-    bool  subjectProvided;
-    bool  expiresProvided;
-    bool  statusProvided;
-    bool  notificationProvided;
-    bool  attrsFormatProvided;
-    bool  throttlingProvided;
-    bool  blacklistProvided;
-
-    bool  fromNgsiv1;          // to support a special case when the SubscriptionUpdate comes from NGSIv1
-
-    SubscriptionUpdate():
-      subjectProvided      (false),
-      expiresProvided      (false),
-      statusProvided       (false),
-      notificationProvided (false),
-      attrsFormatProvided  (false),
-      throttlingProvided   (false),
-      blacklistProvided    (false),
-      fromNgsiv1           (false)
-      {
-        descriptionProvided = false;
-      }
-  };
+    descriptionProvided = false;
+  }
+};
 }
 
-#endif // SRC_LIB_APITYPESV2_SUBSCRIPTIONUPDATE_H_
+#endif  // SRC_LIB_APITYPESV2_SUBSCRIPTIONUPDATE_H_
