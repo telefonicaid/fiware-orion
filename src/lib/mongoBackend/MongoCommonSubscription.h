@@ -37,7 +37,7 @@
 *
 * setNewSubscriptionId -
 */
-extern void setNewSubscriptionId(mongo::BSONObjBuilder* b, std::string* subIdP);
+extern std::string setNewSubscriptionId(mongo::BSONObjBuilder* b);
 
 
 
