@@ -32,8 +32,6 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ScopeVector.h"
 
-using namespace rapidjson;
-
 
 
 /* ****************************************************************************
@@ -42,9 +40,9 @@ using namespace rapidjson;
 */
 extern std::string parseScopeVector
 (
-  ConnectionInfo*                    ciP,
-  const Value::ConstMemberIterator&  iter,
-  ScopeVector*                       svP
+  ConnectionInfo*                               ciP,
+  const rapidjson::Value::ConstMemberIterator&  iter,
+  ScopeVector*                                  svP
 );
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSESCOPEVECTOR_H_

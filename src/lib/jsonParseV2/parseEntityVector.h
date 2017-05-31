@@ -25,12 +25,12 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "rapidjson/document.h"
 
 #include "apiTypesV2/Entities.h"
 #include "rest/ConnectionInfo.h"
-
-using namespace rapidjson;
 
 
 
@@ -40,10 +40,10 @@ using namespace rapidjson;
 */
 extern std::string parseEntityVector
 (
-  ConnectionInfo*                    ciP,
-  const Value::ConstMemberIterator&  iter,
-  Entities*                          evP,
-  bool                               attributesAllowed
+  ConnectionInfo*                               ciP,
+  const rapidjson::Value::ConstMemberIterator&  iter,
+  Entities*                                     evP,
+  bool                                          attributesAllowed
 );
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSEENTITYVECTOR_H_
