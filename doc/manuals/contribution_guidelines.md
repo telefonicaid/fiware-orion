@@ -734,7 +734,7 @@ If you plan to use some of them, please consult before with the core developers.
   * If the function must be able to modify the object (i.e. "read/write" or "write"), then a pointer type should be used, e.g: `BigFish* bf`. Note that in this case a C++ reference could be used as well, but we prefer pointers to clearly illustrate that the object might be be modified by the function.
 
 ```
-void myFunction(const& BigFish in, BigFish* out)
+void myFunction(const BigFish& in, BigFish* out)
 ```
 
 * Strings return. In order to avoid inefficient object copies when returning strings, the  `const std::string&` return type is preferred. In the case this pattern cannot be used (e.g. when literal string such as "black", "red", etc. are used in the call of the function) then `const char*` should be used as return type.
