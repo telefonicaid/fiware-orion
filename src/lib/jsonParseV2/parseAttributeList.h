@@ -32,8 +32,6 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/AttributeList.h"
 
-using namespace rapidjson;
-
 
 
 /* ****************************************************************************
@@ -42,9 +40,9 @@ using namespace rapidjson;
 */
 extern std::string parseAttributeList
 (
-  ConnectionInfo*                    ciP,
-  const Value::ConstMemberIterator&  iter,
-  AttributeList*                     aP
+  ConnectionInfo*                               ciP,
+  const rapidjson::Value::ConstMemberIterator&  iter,
+  AttributeList*                                aP
 );
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSEATTRIBUTELIST_H_

@@ -29,6 +29,7 @@
 #include "logMsg/logMsg.h"
 #include "ngsi/Metadata.h"
 #include "parse/CompoundValueNode.h"
+
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseMetadataCompoundValue.h"
 
@@ -36,7 +37,7 @@
 
 /* ****************************************************************************
 *
-* stringToCompoundType - 
+* stringToCompoundType -
 */
 static orion::ValueType stringToCompoundType(std::string nodeType)
 {
@@ -55,20 +56,20 @@ static orion::ValueType stringToCompoundType(std::string nodeType)
 
 /* ****************************************************************************
 *
-* parseMetadataCompoundValue - 
+* parseMetadataCompoundValue -
 */
 std::string parseMetadataCompoundValue
 (
-  const Value::ConstValueIterator&   node,
-  Metadata*                          mdP,
-  orion::CompoundValueNode*          parent
-)  
+  const rapidjson::Value::ConstValueIterator&   node,
+  Metadata*                                     mdP,
+  orion::CompoundValueNode*                     parent
+)
 {
   if (node->IsObject())
   {
     int counter  = 0;
 
-    for (Value::ConstMemberIterator iter = node->MemberBegin(); iter != node->MemberEnd(); ++iter)
+    for (rapidjson::Value::ConstMemberIterator iter = node->MemberBegin(); iter != node->MemberEnd(); ++iter)
     {
       std::string                nodeType = jsonParseTypeNames[iter->value.GetType()];
       orion::CompoundValueNode*  cvnP     = new orion::CompoundValueNode();
@@ -110,7 +111,7 @@ std::string parseMetadataCompoundValue
       }
 
       parent->childV.push_back(cvnP);
-        
+
       //
       // Recursive call if Object or Array
       //
@@ -126,7 +127,7 @@ std::string parseMetadataCompoundValue
   {
     int counter  = 0;
 
-    for (Value::ConstValueIterator iter = node->Begin(); iter != node->End(); ++iter)
+    for (rapidjson::Value::ConstValueIterator iter = node->Begin(); iter != node->End(); ++iter)
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
@@ -143,7 +144,7 @@ std::string parseMetadataCompoundValue
 
       if (nodeType == "String")
       {
-        cvnP->stringValue       = iter->GetString();
+        cvnP->stringValue = iter->GetString();
       }
       else if (nodeType == "Number")
       {
@@ -151,7 +152,7 @@ std::string parseMetadataCompoundValue
       }
       else if ((nodeType == "True") || (nodeType == "False"))
       {
-        cvnP->boolValue   = (nodeType == "True")? true : false;
+        cvnP->boolValue = (nodeType == "True")? true : false;
       }
       else if (nodeType == "Null")
       {
@@ -189,13 +190,13 @@ std::string parseMetadataCompoundValue
 
 /* ****************************************************************************
 *
-* parseMetadataCompoundValue - 
+* parseMetadataCompoundValue -
 */
 std::string parseMetadataCompoundValue
 (
-  const Value::ConstMemberIterator&  node,
-  Metadata*                          mdP,
-  orion::CompoundValueNode*          parent
+  const rapidjson::Value::ConstMemberIterator&  node,
+  Metadata*                                     mdP,
+  orion::CompoundValueNode*                     parent
 )
 {
   std::string type   = jsonParseTypeNames[node->value.GetType()];
@@ -222,7 +223,7 @@ std::string parseMetadataCompoundValue
   {
     int counter  = 0;
 
-    for (Value::ConstValueIterator iter = node->value.Begin(); iter != node->value.End(); ++iter)
+    for (rapidjson::Value::ConstValueIterator iter = node->value.Begin(); iter != node->value.End(); ++iter)
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
@@ -239,7 +240,7 @@ std::string parseMetadataCompoundValue
 
       if (nodeType == "String")
       {
-        cvnP->stringValue       = iter->GetString();
+        cvnP->stringValue = iter->GetString();
       }
       else if (nodeType == "Number")
       {
@@ -247,7 +248,7 @@ std::string parseMetadataCompoundValue
       }
       else if ((nodeType == "True") || (nodeType == "False"))
       {
-        cvnP->boolValue   = (nodeType == "True")? true : false;
+        cvnP->boolValue = (nodeType == "True")? true : false;
       }
       else if (nodeType == "Object")
       {
@@ -275,9 +276,10 @@ std::string parseMetadataCompoundValue
   }
   else if (type == "Object")
   {
-    int counter  = 0;
+    int                                    counter  = 0;
+    rapidjson::Value::ConstMemberIterator  iter;
 
-    for (Value::ConstMemberIterator iter = node->value.MemberBegin(); iter != node->value.MemberEnd(); ++iter)
+    for (iter = node->value.MemberBegin(); iter != node->value.MemberEnd(); ++iter)
     {
       std::string                nodeType = jsonParseTypeNames[iter->value.GetType()];
       orion::CompoundValueNode*  cvnP     = new orion::CompoundValueNode();
@@ -314,7 +316,7 @@ std::string parseMetadataCompoundValue
       }
 
       parent->childV.push_back(cvnP);
-        
+
       //
       // Recursive call if Object or Array
       //

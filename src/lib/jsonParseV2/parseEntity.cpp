@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "rapidjson/document.h"
 
 #include "common/globals.h"
@@ -29,25 +31,24 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
-#include "jsonParseV2/jsonParseTypeNames.h"
-#include "jsonParseV2/parseEntity.h"
-#include "jsonParseV2/parseContextAttribute.h"
 #include "parse/forbiddenChars.h"
 #include "alarmMgr/alarmMgr.h"
 
-using namespace rapidjson;
+#include "jsonParseV2/jsonParseTypeNames.h"
+#include "jsonParseV2/parseContextAttribute.h"
+#include "jsonParseV2/parseEntity.h"
 
 
 
 /* ****************************************************************************
 *
-* parseEntity - 
+* parseEntity -
 *
 * This function is used to parse two slightly different payloads:
 * - POST /v2/entities
 * - POST /v2/entities/<eid>
 *
-* In the latter case, "id" CANNOT be in the payload, while in the former case, 
+* In the latter case, "id" CANNOT be in the payload, while in the former case,
 * "id" MUST be in the payload.
 *
 * In the case of /v2/entities/<eid>, the entityId of 'Entity* eP' is set in
@@ -57,28 +58,31 @@ using namespace rapidjson;
 * parse changes for compound values of attributes. If the value is a JSON object
 * then there is no looking inside to find the 'value' field, but the attribute is
 * always treated as a compound attribute.
-* 
 */
 std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 {
-  Document document;
+  rapidjson::Document document;
 
   document.Parse(ciP->payload);
 
   if (document.HasParseError())
   {
+    OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
+
     alarmMgr.badInput(clientIp, "JSON parse error");
     ciP->httpStatusCode = SccBadRequest;
-    OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
+
     return oe.toJson();
   }
 
 
   if (!document.IsObject())
   {
+    OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
+
     alarmMgr.badInput(clientIp, "JSON Parse Error");
     ciP->httpStatusCode = SccBadRequest;
-    OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
+
     return oe.toJson();
   }
 
@@ -87,9 +91,11 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
   {
     if (!document.HasMember("id"))
     {
+      OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID, ERROR_BAD_REQUEST);
+
       alarmMgr.badInput(clientIp, "No entity id specified");
       ciP->httpStatusCode = SccBadRequest;
-      OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID, ERROR_BAD_REQUEST);
+
       return oe.toJson();
     }
   }
@@ -99,35 +105,41 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
   {
     if (document.HasMember("id"))
     {
+      OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_ENTID_IN_PAYLOAD, "BadRequest");
+
       alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_ENTID_IN_PAYLOAD);
       ciP->httpStatusCode = SccBadRequest;
-      OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_ENTID_IN_PAYLOAD, "BadRequest");
+
       return oe.toJson();
     }
 
     if (document.HasMember("type"))
     {
+      OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_ENTTYPE_IN_PAYLOAD, "BadRequest");
+
       alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_ENTTYPE_IN_PAYLOAD);
       ciP->httpStatusCode = SccBadRequest;
-      OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_ENTTYPE_IN_PAYLOAD, "BadRequest");
+
       return oe.toJson();
     }
   }
-  else if (document.ObjectEmpty()) 
+  else if (document.ObjectEmpty())
   {
     //
     // Initially we used the method "Empty". As the broker crashed inside that method, some
     // research was made and "ObjectEmpty" was found. As the broker stopped crashing and complaints
     // about crashes with small docs and "Empty()" were found on the internet, we opted to use ObjectEmpty
     //
+    OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
+
     alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD);
     ciP->httpStatusCode = SccBadRequest;
-    OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
+
     return oe.toJson();
   }
 
   int membersFound = 0;
-  for (Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
+  for (rapidjson::Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
   {
     std::string name   = iter->name.GetString();
     std::string type   = jsonParseTypeNames[iter->value.GetType()];
@@ -140,9 +152,10 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       {
         if (type != "String")
         {
+          OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID, "BadRequest");
+
           alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID);
           ciP->httpStatusCode = SccBadRequest;
-          OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID, "BadRequest");
 
           return oe.toJson();
         }
@@ -151,18 +164,20 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 
         if (forbiddenIdChars(ciP->apiVersion, eP->id.c_str(), ""))
         {
+          OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, "BadRequest");
+
           alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID);
           ciP->httpStatusCode = SccBadRequest;
-          OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, "BadRequest");
 
           return oe.toJson();
         }
       }
       else  // "id" is present in payload for /v2/entities/<eid> - not a valid payload
       {
+        OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_ID_AS_ATTR, "BadRequest");
+
         alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_ID_AS_ATTR);
         ciP->httpStatusCode = SccBadRequest;
-        OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_ID_AS_ATTR, "BadRequest");
 
         return oe.toJson();
       }
@@ -171,9 +186,10 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     {
       if (type != "String")
       {
+        OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE, "BadRequest");
+
         alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE);
         ciP->httpStatusCode = SccBadRequest;
-        OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE, "BadRequest");
 
         return oe.toJson();
       }
@@ -184,19 +200,20 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       if (eP->type.empty())
       {
         const char* errorText = ERROR_DESC_BAD_REQUEST_EMPTY_ENTTYPE;
+        OrionError  oe(SccBadRequest, errorText, "BadRequest");
 
         alarmMgr.badInput(clientIp, errorText);
         ciP->httpStatusCode = SccBadRequest;
-        OrionError oe(SccBadRequest, errorText, "BadRequest");
 
         return oe.toJson();
       }
 
       if (forbiddenIdChars(ciP->apiVersion, eP->type.c_str(), ""))
       {
+        OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, "BadRequest");
+
         alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE);
         ciP->httpStatusCode = SccBadRequest;
-        OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, "BadRequest");
 
         return oe.toJson();
       }
@@ -204,15 +221,17 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     else  // attribute
     {
       ContextAttribute* caP = new ContextAttribute();
-      
+
       eP->attributeVector.push_back(caP);
 
       std::string r = parseContextAttribute(ciP, iter, caP);
       if (r != "OK")
       {
+        OrionError oe(SccBadRequest, r, "BadRequest");
+
         alarmMgr.badInput(clientIp, "parse error in context attribute");
         ciP->httpStatusCode = SccBadRequest;
-        OrionError oe(SccBadRequest, r, "BadRequest");
+
         return oe.toJson();
       }
     }
@@ -220,9 +239,11 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 
   if (membersFound == 0)
   {
+    OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
+
     alarmMgr.badInput(clientIp, "empty payload");
     ciP->httpStatusCode = SccBadRequest;
-    OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
+
     return oe.toJson();
   }
 
@@ -230,9 +251,11 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
   {
     if (eP->id == "")
     {
+      OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID, ERROR_BAD_REQUEST);
+
       alarmMgr.badInput(clientIp, "empty entity id");
       ciP->httpStatusCode = SccBadRequest;
-      OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID, ERROR_BAD_REQUEST);
+
       return oe.toJson();
     }
   }
