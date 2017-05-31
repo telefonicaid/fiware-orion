@@ -41,7 +41,7 @@
 */
 class BatchQuery
 {
-public:
+ public:
   Entities       entities;
   AttributeList  attributeV;
   ScopeVector    scopeV;

@@ -331,7 +331,7 @@ static void setCondsAndInitialNotifyNgsiv1
                                             attributes,
                                             metadata,
                                             subId,
-                                            url,
+                                            ngsiv2::HttpInfo(url),
                                             notificationDone,
                                             attrsFormat,
                                             tenant,
