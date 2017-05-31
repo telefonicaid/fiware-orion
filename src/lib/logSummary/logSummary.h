@@ -34,4 +34,4 @@
 */
 extern int logSummaryInit(int* periodP);
 
-#endif
+#endif  // SRC_LIB_LOGSUMMARY_LOGSUMMARY_H_
