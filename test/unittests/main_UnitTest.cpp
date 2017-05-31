@@ -42,7 +42,8 @@
 #include "alarmMgr/alarmMgr.h"
 #include "logSummary/logSummary.h"
 
-#include "unittest.h"
+#include "unittests/unittest.h"
+
 
 
 /* ****************************************************************************
@@ -67,7 +68,7 @@ char          rplSet[64];
 char          dbName[64];
 char          user[64];
 char          pwd[64];
-long          dbTimeout;
+int64_t       dbTimeout;
 int           dbPoolSize;
 int           writeConcern;
 char          gtest_filter[1024];
@@ -87,7 +88,7 @@ PaArgument paArgs[] =
   { "-dbuser",         user,          "DB_USER",        PaString, PaOpt, (int64_t) "",           PaNL,   PaNL,  NULL_DESC },
   { "-dbpwd",          pwd,           "DB_PASSWORD",    PaString, PaOpt, (int64_t) "",           PaNL,   PaNL,  NULL_DESC },
   { "-db",             dbName,        "DB",             PaString, PaOpt, (int64_t) "orion",      PaNL,   PaNL,  NULL_DESC },
-  { "-dbTimeout",      &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,                  PaNL,   PaNL,  NULL_DESC },
+  { "-dbTimeout",      &dbTimeout,    "DB_TIMEOUT",     PaInt64,  PaOpt, 10000,                  PaNL,   PaNL,  NULL_DESC },
   { "-dbPoolSize",     &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,                     1,      10000, NULL_DESC },
   { "-writeConcern",   &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,                      0,      1,     NULL_DESC },
   { "--gtest_filter=", gtest_filter,  "",               PaString, PaOpt, (int64_t) "",           PaNL,   PaNL,  NULL_DESC },
