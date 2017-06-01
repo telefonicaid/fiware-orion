@@ -1,5 +1,5 @@
-#ifndef TEST_DATA_FROM_FILE_H
-#define TEST_DATA_FROM_FILE_H
+#ifndef TEST_UNITTESTS_TESTDATAFROMFILE_H_
+#define TEST_UNITTESTS_TESTDATAFROMFILE_H_
 
 /*
 *
@@ -67,4 +67,4 @@ extern std::string toString(int i);
 */
 extern std::string testDataFromFile(char* buffer, int bufSize, const char* fileName);
 
-#endif
+#endif  // TEST_UNITTESTS_TESTDATAFROMFILE_H_

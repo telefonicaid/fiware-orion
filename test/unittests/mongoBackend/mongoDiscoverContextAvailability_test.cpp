@@ -22,11 +22,10 @@
 *
 * Author: Fermin Galan
 */
-#include "unittest.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoDiscoverContextAvailability.h"
@@ -36,7 +35,23 @@
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/unittest.h"
+
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::OID;
+using mongo::DBException;
+using ::testing::Return;
+using ::testing::Throw;
+
+
 
 extern void setMongoConnectionForUnitTest(DBClientBase*);
 

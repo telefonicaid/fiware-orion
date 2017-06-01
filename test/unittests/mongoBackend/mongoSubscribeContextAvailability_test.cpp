@@ -23,25 +23,40 @@
 * Author: Fermin Galan
 */
 #include "gtest/gtest.h"
-#include "testInit.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
 #include "common/globals.h"
-
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubscribeContextAvailability.h"
 #include "ngsi9/SubscribeContextAvailabilityRequest.h"
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
-
 #include "ngsi/EntityId.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/unittest.h"
+#include "unittests/testInit.h"
 
-#include "unittest.h"
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::BSONElement;
+using mongo::OID;
+using mongo::DBException;
+using mongo::BSONObjBuilder;
+using ::testing::Return;
+using ::testing::Throw;
+
 
 extern void setMongoConnectionForUnitTest(DBClientBase*);
+
+
 
 /* ****************************************************************************
 *

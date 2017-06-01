@@ -23,7 +23,7 @@
 * Author: Fermin Galan
 */
 #include "gtest/gtest.h"
-#include "unittest.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -38,7 +38,23 @@
 #include "ngsi10/UpdateContextResponse.h"
 #include "parse/CompoundValueNode.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/unittest.h"
+
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::BSONElement;
+using mongo::OID;
+using mongo::DBException;
+using mongo::BSONObjBuilder;
+using mongo::BSONNULL;
+
 
 
 /* ****************************************************************************

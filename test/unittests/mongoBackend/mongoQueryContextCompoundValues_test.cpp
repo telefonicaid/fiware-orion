@@ -22,8 +22,8 @@
 *
 * Author: Fermin Galan
 */
+#include "mongo/client/dbclient.h"
 #include "gtest/gtest.h"
-#include "unittest.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -36,7 +36,20 @@
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/unittest.h"
+
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONNULL;
+using mongo::OID;
+
+
 
 /* ****************************************************************************
 *
