@@ -55,6 +55,7 @@ using mongo::DBException;
 using mongo::BSONObjBuilder;
 using ::testing::Return;
 using ::testing::Throw;
+using ::testing::_;
 
 
 extern void setMongoConnectionForUnitTest(DBClientBase* _connection);

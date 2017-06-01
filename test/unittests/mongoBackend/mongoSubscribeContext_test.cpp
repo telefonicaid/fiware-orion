@@ -55,6 +55,7 @@ using mongo::OID;
 using mongo::DBException;
 using mongo::BSONObjBuilder;
 using ::testing::Throw;
+using ::testing::_;
 
 
 

@@ -62,6 +62,7 @@ using mongo::BSONNULL;
 using ::testing::Invoke;
 using ::testing::Return;
 using ::testing::Throw;
+using ::testing::_;
 
 
 

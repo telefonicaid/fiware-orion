@@ -40,9 +40,14 @@
 
 /* ****************************************************************************
 *
-* USING
+* Temporary define for ::testing::_, only for this file
+* Note that _ is undeffed after usage
+*
+* Our style guide forbids the use of "using" in header files and we don't want to
+* write out the entire string "::testing::_", as the code gets difficult to read.
+* Thanks to this temporary macro, we can use "_" but without using "using ::testing::_"
 */
-using ::testing::_;
+#define _ ::testing::_
 
 
 
@@ -92,7 +97,7 @@ class DBClientConnectionMock : public mongo::DBClientConnection
                                                        int                    nToSkip,
                                                        const mongo::BSONObj*  fieldsToReturn,
                                                        int                    queryOptions,
-                                                       int                     batchSize)
+                                                       int                    batchSize)
     {
         return std::auto_ptr<mongo::DBClientCursor>(_query(ns, query, nToReturn, nToSkip, fieldsToReturn, queryOptions, batchSize));
     }
@@ -156,6 +161,7 @@ class DBClientConnectionMock : public mongo::DBClientConnection
       return mongo::DBClientConnection::runCommand(dbname, cmd, info, options);
     }
 };
+#undef _
 
 
 

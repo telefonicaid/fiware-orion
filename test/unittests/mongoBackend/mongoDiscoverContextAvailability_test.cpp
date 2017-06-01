@@ -50,6 +50,7 @@ using mongo::OID;
 using mongo::DBException;
 using ::testing::Return;
 using ::testing::Throw;
+using ::testing::_;
 
 
 
