@@ -43,9 +43,10 @@
 * Temporary define for ::testing::_, only for this file
 * Note that _ is undeffed after usage
 *
-* Our style guide forbids the use of "using" in header files and we don't want to
-* write out the entire string "::testing::_", as the code gets difficult to read.
-* Thanks to this temporary macro, we can use "_" but without using "using ::testing::_"
+* Our style guide forbids the use of "using" in header (see 
+* doc/manuals/contribution_guidelines.md files and we don't want to write out 
+* the entire string "::testing::_", as the code gets difficult to read. Thanks 
+* to this temporary macro, we can use "_" but without using "using ::testing::_"
 */
 #define _ ::testing::_
 
