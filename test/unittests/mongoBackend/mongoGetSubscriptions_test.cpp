@@ -23,27 +23,39 @@
 * Author: Fermin Galan
 */
 #include "gtest/gtest.h"
-#include "testInit.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoGetSubscriptions.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/testInit.h"
+#include "unittests/commonMocks.h"
+#include "unittests/unittest.h"
 
-#include "commonMocks.h"
-#include "unittest.h"
 
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::OID;
 using ::testing::_;
 using ::testing::Throw;
 using ::testing::Return;
+using ngsiv2::Subscription;
+using ngsiv2::EntID;
 
-using namespace ngsiv2;
+
 
 extern void setMongoConnectionForUnitTest(DBClientBase*);
+
+
 
 /* ****************************************************************************
 *

@@ -22,7 +22,7 @@
 *
 * Author: Fermin Galan
 */
-#include "unittest.h"
+#include "unittests/unittest.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -36,6 +36,17 @@
 #include "ngsi10/QueryContextResponse.h"
 
 #include "mongo/client/dbclient.h"
+
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+
+
 
 extern void setMongoConnectionForUnitTest(DBClientBase*);
 

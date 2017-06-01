@@ -23,7 +23,7 @@
 * Author: Fermin Galan
 */
 #include "gtest/gtest.h"
-#include "unittest.h"
+#include "unittests/unittest.h"
 
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -38,7 +38,26 @@
 #include "mongo/client/dbclient.h"
 #include "rest/uriParamNames.h"
 
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::BSONElement;
+using mongo::OID;
+using mongo::DBException;
+using mongo::BSONObjBuilder;
+using ::testing::Throw;
+using ::testing::_;
+
+
+
 extern void setMongoConnectionForUnitTest(DBClientBase*);
+
 
 
 /* ****************************************************************************

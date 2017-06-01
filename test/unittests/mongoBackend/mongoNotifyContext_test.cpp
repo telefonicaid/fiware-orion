@@ -22,24 +22,35 @@
 *
 * Author: Fermín Galán
 */
-
 #include "gtest/gtest.h"
-#include "testInit.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
 #include "common/globals.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoNotifyContext.h"
 #include "ngsi10/NotifyContextRequest.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/testInit.h"
+#include "unittests/commonMocks.h"
+#include "unittests/unittest.h"
 
-#include "commonMocks.h"
-#include "unittest.h"
 
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::BSONElement;
+using mongo::OID;
+using mongo::DBException;
+using mongo::BSONObjBuilder;
+using mongo::BSONNULL;
 using ::testing::_;
 using ::testing::Throw;
 using ::testing::Return;

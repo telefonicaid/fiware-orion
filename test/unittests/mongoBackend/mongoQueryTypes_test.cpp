@@ -22,7 +22,7 @@
 *
 * Author: Fermin Galan
 */
-#include "unittest.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -33,9 +33,29 @@
 #include "orionTypes/EntityTypeVectorResponse.h"
 #include "orionTypes/EntityTypeResponse.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/unittest.h"
+
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::BSONElement;
+using mongo::OID;
+using mongo::DBException;
+using mongo::BSONObjBuilder;
+using mongo::BSONNULL;
+using ::testing::Throw;
+using ::testing::_;
+
+
 
 extern void setMongoConnectionForUnitTest(DBClientBase*);
+
 
 
 /* ****************************************************************************
