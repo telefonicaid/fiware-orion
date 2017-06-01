@@ -40,14 +40,6 @@
 
 /* ****************************************************************************
 *
-* USING
-*/
-using ::testing::_;
-
-
-
-/* ****************************************************************************
-*
 * DBClientConnectionMock -
 *
 * Mock class for mongo::DBClientConnection
@@ -60,19 +52,19 @@ class DBClientConnectionMock : public mongo::DBClientConnection
         /* By default, all methods are redirected to the parent ones. We use the
          * technique described at
          * https://github.com/google/googletest/blob/master/googlemock/docs/CookBook.md#delegating-calls-to-a-parent-class */
-        ON_CALL(*this, count(_, _, _, _, _))
+        ON_CALL(*this, count(::testing::_, ::testing::_, ::testing::_, ::testing::_, ::testing::_))
                 .WillByDefault(::testing::Invoke(this, &DBClientConnectionMock::parent_count));
-        ON_CALL(*this, findOne(_, _, _, _))
+        ON_CALL(*this, findOne(::testing::_, ::testing::_, ::testing::_, ::testing::_))
                 .WillByDefault(::testing::Invoke(this, &DBClientConnectionMock::parent_findOne));
-        ON_CALL(*this, insert(_, _, _, _))
+        ON_CALL(*this, insert(::testing::_, ::testing::_, ::testing::_, ::testing::_))
                 .WillByDefault(::testing::Invoke(this, &DBClientConnectionMock::parent_insert));
-        ON_CALL(*this, remove(_, _, _, _))
+        ON_CALL(*this, remove(::testing::_, ::testing::_, ::testing::_, ::testing::_))
                 .WillByDefault(::testing::Invoke(this, &DBClientConnectionMock::parent_remove));
-        ON_CALL(*this, update(_, _, _, _, _, _))
+        ON_CALL(*this, update(::testing::_, ::testing::_, ::testing::_, ::testing::_, ::testing::_, ::testing::_))
                 .WillByDefault(::testing::Invoke(this, &DBClientConnectionMock::parent_update));
-        ON_CALL(*this, _query(_, _, _, _, _, _, _))
+        ON_CALL(*this, _query(::testing::_, ::testing::_, ::testing::_, ::testing::_, ::testing::_, ::testing::_, ::testing::_))
                 .WillByDefault(::testing::Invoke(this, &DBClientConnectionMock::parent_query));
-        ON_CALL(*this, runCommand(_, _, _, _))
+        ON_CALL(*this, runCommand(::testing::_, ::testing::_, ::testing::_, ::testing::_))
                 .WillByDefault(::testing::Invoke(this, &DBClientConnectionMock::parent_runCommand));
     }
 
@@ -92,7 +84,7 @@ class DBClientConnectionMock : public mongo::DBClientConnection
                                                        int                    nToSkip,
                                                        const mongo::BSONObj*  fieldsToReturn,
                                                        int                    queryOptions,
-                                                       int                     batchSize)
+                                                       int                    batchSize)
     {
         return std::auto_ptr<mongo::DBClientCursor>(_query(ns, query, nToReturn, nToSkip, fieldsToReturn, queryOptions, batchSize));
     }

@@ -50,6 +50,7 @@ using mongo::DBException;
 using mongo::BSONObjBuilder;
 using mongo::BSONNULL;
 using ::testing::Throw;
+using ::testing::_;
 
 
 
