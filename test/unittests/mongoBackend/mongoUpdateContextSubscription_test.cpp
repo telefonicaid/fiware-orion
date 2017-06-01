@@ -22,6 +22,9 @@
 *
 * Author: Fermin Galan
 */
+#include <string>
+#include <vector>
+
 #include "mongo/client/dbclient.h"
 #include "gtest/gtest.h"
 
@@ -57,7 +60,7 @@ using ::testing::Return;
 
 
 
-extern void setMongoConnectionForUnitTest(DBClientBase*);
+extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
 
 
 

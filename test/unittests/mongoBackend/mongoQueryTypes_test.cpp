@@ -22,6 +22,8 @@
 *
 * Author: Fermin Galan
 */
+#include <string>
+
 #include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
@@ -53,7 +55,7 @@ using ::testing::Throw;
 
 
 
-extern void setMongoConnectionForUnitTest(DBClientBase*);
+extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
 
 
 

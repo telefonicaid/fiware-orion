@@ -22,6 +22,8 @@
 *
 * Author: Fermin Galan
 */
+#include <string>
+
 #include "unittests/unittest.h"
 
 #include "logMsg/logMsg.h"
@@ -48,7 +50,9 @@ using mongo::BSONObj;
 
 
 
-extern void setMongoConnectionForUnitTest(DBClientBase*);
+extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+
+
 
 /* ****************************************************************************
 *
