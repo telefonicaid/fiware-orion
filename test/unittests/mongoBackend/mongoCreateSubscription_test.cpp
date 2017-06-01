@@ -22,6 +22,10 @@
 *
 * Author: Fermin Galan
 */
+#include <string>
+#include <vector>
+#include <utility>
+
 #include "gtest/gtest.h"
 #include "mongo/client/dbclient.h"
 

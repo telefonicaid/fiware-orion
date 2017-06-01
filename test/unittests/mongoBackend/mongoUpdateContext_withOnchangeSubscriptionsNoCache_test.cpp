@@ -22,8 +22,10 @@
 *
 * Author: Fermin Galan
 */
-#include "mongo/client/dbclient.h"
+#include <string>
+#include <vector>
 
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -57,7 +59,7 @@ using ::testing::_;
 
 
 
-extern void setMongoConnectionForUnitTest(DBClientBase*);
+extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
 
 
 
@@ -219,9 +221,7 @@ static void prepareDatabase(void)
                         "A1" << BSON("type" << "TA1" << "value" << "X") <<
                         "A2" << BSON("type" << "TA2" << "value" << "Z") <<
                         "A3" << BSON("type" << "TA3" << "value" << "W") <<
-                        "A7" << BSON("type" << "TA7" << "value" << "W")
-                        )
-                    );
+                        "A7" << BSON("type" << "TA7" << "value" << "W")));
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2") <<
                      "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A7") <<
@@ -229,9 +229,7 @@ static void prepareDatabase(void)
                         "A1" << BSON("type" << "TA1" << "value" << "X") <<
                         "A2" << BSON("type" << "TA2" << "value" << "Z") <<
                         "A3" << BSON("type" << "TA3" << "value" << "W") <<
-                        "A7" << BSON("type" << "TA7" << "value" << "W")
-                        )
-                    );
+                        "A7" << BSON("type" << "TA7" << "value" << "W")));
 
   BSONObj en3 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A7") <<
@@ -239,9 +237,7 @@ static void prepareDatabase(void)
                         "A1" << BSON("type" << "TA1" << "value" << "X") <<
                         "A2" << BSON("type" << "TA2" << "value" << "Z") <<
                         "A3" << BSON("type" << "TA3" << "value" << "W") <<
-                        "A7" << BSON("type" << "TA7" << "value" << "W")
-                        )
-                    );
+                        "A7" << BSON("type" << "TA7" << "value" << "W")));
 
   BSONObj en4 = BSON("_id" << BSON("id" << "E2" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A7") <<
@@ -249,9 +245,7 @@ static void prepareDatabase(void)
                         "A1" << BSON("type" << "TA1" << "value" << "X") <<
                         "A2" << BSON("type" << "TA2" << "value" << "Z") <<
                         "A3" << BSON("type" << "TA3" << "value" << "W") <<
-                        "A7" << BSON("type" << "TA7" << "value" << "W")
-                        )
-                    );
+                        "A7" << BSON("type" << "TA7" << "value" << "W")));
 
   BSONObj en5 = BSON("_id" << BSON("id" << "E1") <<
                      "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A7") <<
@@ -259,9 +253,7 @@ static void prepareDatabase(void)
                         "A1" << BSON("type" << "TA1" << "value" << "X") <<
                         "A2" << BSON("type" << "TA2" << "value" << "Z") <<
                         "A3" << BSON("type" << "TA3" << "value" << "W") <<
-                        "A7" << BSON("type" << "TA7" << "value" << "W")
-                        )
-                    );
+                        "A7" << BSON("type" << "TA7" << "value" << "W")));
 
   BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
                       "expiration" << 1500000000 <<
@@ -269,8 +261,7 @@ static void prepareDatabase(void)
                       "reference" << "http://notify1.me" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                       "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
-                      "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
-                      );
+                      "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5"));
 
   // After the changes to simplify "condition" field (issue #1851) sub2 has become equal to sub1 and sub3
   BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
@@ -279,8 +270,7 @@ static void prepareDatabase(void)
                       "reference" << "http://notify2.me" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E2" << "type" << "T2" << "isPattern" << "false")) <<
                       "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
-                      "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
-                      );
+                      "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5"));
 
   BSONObj sub3 = BSON("_id" << OID("51307b66f481db11bf860003") <<
                       "expiration" << 1500000000 <<
@@ -288,26 +278,29 @@ static void prepareDatabase(void)
                       "reference" << "http://notify3.me" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E[1-2]" << "type" << "T" << "isPattern" << "true")) <<
                       "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
-                      "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
-                      );
+                      "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5"));
 
   BSONObj sub10 = BSON("_id" << OID("51307b66f481db11bf860010") <<
-                      "expiration" << 1500000000 <<
-                      "lastNotification" << 20000000 <<
-                      "reference" << "http://notify10.me" <<
-                      "entities" << BSON_ARRAY(BSON("id" << "E7" << "type" << "T[1-2]$" << "isPattern" << "false" << "isTypePattern" << true)) <<
-                      "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
-                      "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
-                      );
+                       "expiration" << 1500000000 <<
+                       "lastNotification" << 20000000 <<
+                       "reference" << "http://notify10.me" <<
+                       "entities" << BSON_ARRAY(BSON("id"            << "E7"      <<
+                                                     "type"          << "T[1-2]$" <<
+                                                     "isPattern"     << "false"   <<
+                                                     "isTypePattern" << true)) <<
+                       "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
+                       "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5"));
 
   BSONObj sub11 = BSON("_id" << OID("51307b66f481db11bf860011") <<
-                      "expiration" << 1500000000 <<
-                      "lastNotification" << 20000000 <<
-                      "reference" << "http://notify11.me" <<
-                      "entities" << BSON_ARRAY(BSON("id" << "E[8-9]" << "type" << "T[1-2]$" << "isPattern" << "true" << "isTypePattern" << true)) <<
-                      "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
-                      "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
-                      );
+                       "expiration" << 1500000000 <<
+                       "lastNotification" << 20000000 <<
+                       "reference" << "http://notify11.me" <<
+                       "entities" << BSON_ARRAY(BSON("id"            << "E[8-9]"  <<
+                                                     "type"          << "T[1-2]$" <<
+                                                     "isPattern"     << "true"    <<
+                                                     "isTypePattern" << true)) <<
+                       "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
+                       "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5"));
 
   connection->insert(ENTITIES_COLL, en1);
   connection->insert(ENTITIES_COLL, en2);
@@ -369,9 +362,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void)
                           "A1" << BSON("type" << "TA1" << "value" << "X") <<
                           "A2" << BSON("type" << "TA2" << "value" << "Z") <<
                           "A3" << BSON("type" << "TA3" << "value" << "W") <<
-                          "A7" << BSON("type" << "TA7" << "value" << "W")
-                          )
-                      );
+                          "A7" << BSON("type" << "TA7" << "value" << "W")));
 
     BSONObj sub4 = BSON("_id" << OID("51307b66f481db11bf860004") <<
                         "expiration" << 1500000000 <<
@@ -379,8 +370,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void)
                         "reference" << "http://notify4.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
-                        "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
-                        );
+                        "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5"));
 
     BSONObj sub5 = BSON("_id" << OID("51307b66f481db11bf860005") <<
                         "expiration" << 1500000000 <<
@@ -388,9 +378,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void)
                         "reference" << "http://notify5.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E[2-3]" << "isPattern" << "true")) <<
                         "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
-                        "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
-                        );
-
+                        "conditions" << BSON_ARRAY("A1" << "A2" << "A4" << "A5"));
 
     connection->insert(ENTITIES_COLL, en);
     connection->insert(SUBSCRIBECONTEXT_COLL, sub4);
@@ -401,7 +389,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void)
 
 /* ****************************************************************************
 *
-* CHECK_LAST_NOTIFICATION - 
+* CHECK_LAST_NOTIFICATION -
 */
 #define CHECK_LAST_NOTIFICATION(subId, timestamp)                                      \
 {                                                                                      \
@@ -425,7 +413,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch)
     utInit(false);
 
     /* Prepare mock */
-    NotifyContextRequest expectedNcr;      
+    NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse* cerP = new ContextElementResponse();
     cerP->contextElement.entityId.fill("E1", "T1", "false");
@@ -444,8 +432,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch)
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -488,7 +483,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch)
     utInit();
 
     /* Prepare mock */
-    NotifyContextRequest expectedNcr;    
+    NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse* cerP = new ContextElementResponse();
     cerP->contextElement.entityId.fill("E1", "T1", "false");
@@ -509,8 +504,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch)
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -569,8 +571,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_type
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -629,8 +638,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_idAn
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -689,8 +705,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch)
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -704,7 +727,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch)
     /* Prepare database */
     prepareDatabase();
 
-    /* Invoke the function in mongoBackend library */    
+    /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -757,10 +780,25 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_noTy
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1), MatchHttpInfo(&httpInfo1), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2), MatchHttpInfo(&httpInfo4), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1),
+                                                        MatchHttpInfo(&httpInfo1),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2),
+                                                        MatchHttpInfo(&httpInfo4),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -828,10 +866,25 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_noTy
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1), MatchHttpInfo(&httpInfo1), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2), MatchHttpInfo(&httpInfo4), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1),
+                                                        MatchHttpInfo(&httpInfo1),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2),
+                                                        MatchHttpInfo(&httpInfo4),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -852,7 +905,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_noTy
     EXPECT_EQ(SccOk, ms);
 
     CHECK_LAST_NOTIFICATION("51307b66f481db11bf860001", 1360232700);
-    CHECK_LAST_NOTIFICATION("51307b66f481db11bf860004",1360232700);
+    CHECK_LAST_NOTIFICATION("51307b66f481db11bf860004", 1360232700);
 
     /* Release mock */
     delete notifierMock;
@@ -894,10 +947,25 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_noTy
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1), MatchHttpInfo(&httpInfo1), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2), MatchHttpInfo(&httpInfo4), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1),
+                                                        MatchHttpInfo(&httpInfo1),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2),
+                                                        MatchHttpInfo(&httpInfo4),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -958,8 +1026,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_patt
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1021,8 +1096,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_patt
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1080,8 +1162,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_patt
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1141,8 +1230,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_patt
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1204,8 +1300,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_patt
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1263,8 +1366,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_patt
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1324,8 +1434,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatchDisjo
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1385,8 +1502,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatchDisjo
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1446,8 +1570,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatchDisjo
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1489,8 +1620,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateNoMatch)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
-            .Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1532,8 +1662,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendNoMatch)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
-            .Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1575,11 +1704,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteNoMatch)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
-            .Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
-    /* Forge the request (from "inside" to "outside") */    
+    /* Forge the request (from "inside" to "outside") */
     ContextElement* ceP = new ContextElement();
     ceP->entityId.fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A3", "TA3", "");
@@ -1618,8 +1746,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatchWitho
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
-            .Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1679,8 +1806,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMixMatchNo
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1723,7 +1857,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMixMatchNo
     utInit();
 
     /* Prepare mock */
-    NotifyContextRequest expectedNcr;    
+    NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse* cerP = new ContextElementResponse();
     cerP->contextElement.entityId.fill("E1", "T1", "false");
@@ -1744,11 +1878,18 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMixMatchNo
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
-    /* Forge the request (from "inside" to "outside") */    
+    /* Forge the request (from "inside" to "outside") */
     ContextElement* ceP = new ContextElement();
     ceP->entityId.fill("E1", "T1", "false");
     ContextAttribute* caa1P = new ContextAttribute("A4", "TA4", "new_val4");   // match
@@ -1805,8 +1946,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMixMatchNo
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1868,8 +2016,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_update2Matches1N
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1912,7 +2067,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_append2Matches1N
     utInit();
 
     /* Prepare mock */
-    NotifyContextRequest expectedNcr;   
+    NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse* cerP = new ContextElementResponse();
     cerP->contextElement.entityId.fill("E1", "T1", "false");
@@ -1933,11 +2088,18 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_append2Matches1N
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
-    /* Forge the request (from "inside" to "outside") */    
+    /* Forge the request (from "inside" to "outside") */
     ContextElement* ceP = new ContextElement();
     ceP->entityId.fill("E1", "T1", "false");
     ContextAttribute* caa1P = new ContextAttribute("A4", "TA4", "new_val4");
@@ -1994,8 +2156,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_delete2Matches1N
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2055,11 +2224,18 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMatch)
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
-    /* Forge the request (from "inside" to "outside") */    
+    /* Forge the request (from "inside" to "outside") */
     ContextElement* ceP = new ContextElement();
     ceP->entityId.fill("E2", "T2", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
@@ -2098,7 +2274,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMatch)
     utInit();
 
     /* Prepare mock */
-    NotifyContextRequest expectedNcr;    
+    NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse* cerP = new ContextElementResponse();
     cerP->contextElement.entityId.fill("E2", "T2", "false");
@@ -2119,8 +2295,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMatch)
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2178,11 +2361,18 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMatch)
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
-    /* Forge the request (from "inside" to "outside") */    
+    /* Forge the request (from "inside" to "outside") */
     ContextElement* ceP = new ContextElement();
     ceP->entityId.fill("E2", "T2", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
@@ -2220,7 +2410,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMatchDisjo
     utInit();
 
     /* Prepare mock */
-    NotifyContextRequest expectedNcr;    
+    NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse* cerP = new ContextElementResponse();
     cerP->contextElement.entityId.fill("E2", "T2", "false");
@@ -2239,8 +2429,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMatchDisjo
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2281,7 +2478,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMatchDisjo
     utInit();
 
     /* Prepare mock */
-    NotifyContextRequest expectedNcr;    
+    NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse* cerP = new ContextElementResponse();
     cerP->contextElement.entityId.fill("E2", "T2", "false");
@@ -2300,8 +2497,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMatchDisjo
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2342,7 +2546,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMatchDisjo
     utInit();
 
     /* Prepare mock */
-    NotifyContextRequest expectedNcr;    
+    NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse* cerP = new ContextElementResponse();
     cerP->contextElement.entityId.fill("E2", "T2", "false");
@@ -2361,8 +2565,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMatchDisjo
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2404,8 +2615,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateNoMatch)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
-            .Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2447,8 +2657,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendNoMatch)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
-            .Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2490,11 +2699,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteNoMatch)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
-            .Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
-    /* Forge the request (from "inside" to "outside") */    
+    /* Forge the request (from "inside" to "outside") */
     ContextElement* ceP = new ContextElement();
     ceP->entityId.fill("E2", "T2", "false");
     ContextAttribute* caP = new ContextAttribute("A3", "TA3", "");
@@ -2533,8 +2741,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMatchWitho
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
-            .Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2575,7 +2782,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMixMatchNo
     utInit();
 
     /* Prepare mock */
-    NotifyContextRequest expectedNcr; 
+    NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse* cerP = new ContextElementResponse();
     cerP->contextElement.entityId.fill("E2", "T2", "false");
@@ -2594,11 +2801,18 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMixMatchNo
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
-    /* Forge the request (from "inside" to "outside") */    
+    /* Forge the request (from "inside" to "outside") */
     ContextElement* ceP = new ContextElement();
     ceP->entityId.fill("E2", "T2", "false");
     ContextAttribute* caa1P = new ContextAttribute("A1", "TA1", "new_val1");   // match
@@ -2638,7 +2852,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMixMatchNo
     utInit();
 
     /* Prepare mock */
-    NotifyContextRequest expectedNcr;   
+    NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse* cerP = new ContextElementResponse();
     cerP->contextElement.entityId.fill("E2", "T2", "false");
@@ -2659,11 +2873,18 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMixMatchNo
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
-    /* Forge the request (from "inside" to "outside") */    
+    /* Forge the request (from "inside" to "outside") */
     ContextElement* ceP = new ContextElement();
     ceP->entityId.fill("E2", "T2", "false");
     ContextAttribute* caa1P = new ContextAttribute("A4", "TA4", "new_val4");   // match
@@ -2720,8 +2941,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMixMatchNo
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2783,8 +3011,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_update2Matches1N
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2848,11 +3083,18 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_append2Matches1N
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
-    /* Forge the request (from "inside" to "outside") */    
+    /* Forge the request (from "inside" to "outside") */
     ContextElement* ceP = new ContextElement();
     ceP->entityId.fill("E2", "T2", "false");
     ContextAttribute* caa1P = new ContextAttribute("A4", "TA4", "new_val4");
@@ -2909,8 +3151,15 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_delete2Matches1N
     attrsFilter.push_back("A4");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2962,12 +3211,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, DISABLED_MongoDbQueryF
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, _query("utest.csubs",_,_,_,_,_,_))
+    ON_CALL(*connectionMock, _query("utest.csubs", _, _, _, _, _, _))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
-            .Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     /* Set MongoDB connection */
@@ -3021,7 +3269,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, DISABLED_MongoDbQueryF
 */
 TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, DISABLED_MongoDbUpdateFail)
 {
-
 }
 
 /* ****************************************************************************
@@ -3036,5 +3283,4 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, DISABLED_MongoDbUpdate
 */
 TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, DISABLED_MongoDbFindOneFail)
 {
-
 }

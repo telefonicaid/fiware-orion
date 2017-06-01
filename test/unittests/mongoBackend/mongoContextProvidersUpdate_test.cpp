@@ -22,6 +22,9 @@
 *
 * Author: Fermin Galan
 */
+#include <string>
+#include <vector>
+
 #include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
@@ -54,7 +57,7 @@ using mongo::BSONNULL;
 
 
 
-extern void setMongoConnectionForUnitTest(DBClientBase*);
+extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
 
 
 
