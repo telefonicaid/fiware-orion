@@ -87,8 +87,8 @@ extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
 * This function is called before every test, to populate some information in the
 * entities collection.
 */
-static void prepareDatabase(void) {
-
+static void prepareDatabase(void)
+{
   /* Set database */
   setupDatabase();
 
@@ -99,24 +99,20 @@ static void prepareDatabase(void) {
                      "attrNames" << BSON_ARRAY("A1" << "A2") <<
                      "attrs" << BSON(
                         "A1" << BSON("type" << "TA1" << "value" << "-5, 2") <<
-                        "A2" << BSON("type" << "TA2" << "value" << "noloc")
-                        ) <<
+                        "A2" << BSON("type" << "TA2" << "value" << "noloc")) <<
                      "location" << BSON("attrName" << "A1" <<
                                         "coords" << BSON("type" << "Point" <<
-                                                         "coordinates" << BSON_ARRAY(2.0 << -5.0)))
-                    );
+                                                         "coordinates" << BSON_ARRAY(2.0 << -5.0))));
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2") <<
                      "attrNames" << BSON_ARRAY("A2") <<
                      "attrs" << BSON(
-                        "A2" << BSON("type" << "TA2" << "value" << "Y")
-                        )
-                    );
+                       "A2" << BSON("type" << "TA2" << "value" << "Y")));
 
   connection->insert(ENTITIES_COLL, en1);
   connection->insert(ENTITIES_COLL, en2);
-
 }
+
 
 #define coordX(e) e.getObjectField("location").getObjectField("coords").getField("coordinates").Array()[0].Double()
 #define coordY(e) e.getObjectField("location").getObjectField("coords").getField("coordinates").Array()[1].Double()
@@ -130,7 +126,6 @@ static void prepareDatabase(void) {
 */
 static bool findAttr(std::vector<BSONElement> attrs, std::string name)
 {
-
   for (unsigned int ix = 0; ix < attrs.size(); ++ix)
   {
     if (attrs[ix].str() == name)
@@ -139,8 +134,9 @@ static bool findAttr(std::vector<BSONElement> attrs, std::string name)
     }
   }
   return false;
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -169,7 +165,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
+    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -299,7 +295,7 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
+    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -416,7 +412,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();   
+    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -521,7 +517,7 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();   
+    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -626,7 +622,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
+    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -658,7 +654,9 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     EXPECT_EQ("WGS84", RES_CER_ATTR(0, 1)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("You cannot use more than one geo location attribute when creating an entity [see Orion user manual]", RES_CER_STATUS(0).details);
+    EXPECT_EQ("You cannot use more than one geo location attribute when creating an entity "
+              "[see Orion user manual]",
+              RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -743,7 +741,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();   
+    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -853,7 +851,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
+    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -964,7 +962,7 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
+    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -989,7 +987,10 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: APPEND - entity: [E1, T1] - offending attribute: A5 - attempt to define a geo location attribute [A5] when another one has been previously defined [A1]", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: APPEND - entity: [E1, T1] - offending attribute: A5 - "
+              "attempt to define a geo location attribute [A5] "
+              "when another one has been previously defined [A1]",
+              RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1074,7 +1075,7 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();   
+    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1099,7 +1100,10 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: APPEND - entity: [E2, T2] - offending attribute: A5 - error parsing location attribute for new attribute: geo coordinates format error [see Orion user manual]: erroneous", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: APPEND - entity: [E2, T2] - offending attribute: A5 "
+              "- error parsing location attribute for new attribute: "
+              "geo coordinates format error [see Orion user manual]: erroneous",
+              RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1184,7 +1188,7 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
+    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1209,7 +1213,9 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     EXPECT_EQ("gurugu", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: APPEND - entity: [E2, T2] - offending attribute: A5 - only WGS84 is supported for location, found: [gurugu]", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: APPEND - entity: [E2, T2] - offending attribute: A5 - "
+              "only WGS84 is supported for location, found: [gurugu]",
+              RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1292,7 +1298,7 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
+    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1314,7 +1320,10 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     ASSERT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: UPDATE - entity: [E1, T1] - offending attribute: A1 - error parsing location attribute: geo coordinates format error [see Orion user manual]: invalid", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: UPDATE - entity: [E1, T1] - offending attribute: A1 - "
+              "error parsing location attribute: "
+              "geo coordinates format error [see Orion user manual]: invalid",
+              RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1399,7 +1408,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();   
+    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1424,7 +1433,9 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: UPDATE - entity: [E1, T1] - offending attribute: A2 - attempt to define a geo location attribute [A2] when another one has been previously defined [A1]", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: UPDATE - entity: [E1, T1] - offending attribute: A2 - "
+              "attempt to define a geo location attribute [A2] when another one has been previously defined [A1]",
+              RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1489,7 +1500,6 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
 */
 TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
 {
-
     utInit();
 
     HttpStatusCode         ms;
@@ -1510,7 +1520,7 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
+    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1535,7 +1545,9 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: DELETE - entity: [E1, T1] - offending attribute: A1 - location attribute has to be defined at creation time, with APPEND", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: DELETE - entity: [E1, T1] - offending attribute: A1 - "
+              "location attribute has to be defined at creation time, with APPEND",
+              RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
