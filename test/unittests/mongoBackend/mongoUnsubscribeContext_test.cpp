@@ -77,8 +77,8 @@ extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
 *
 * prepareDatabase -
 */
-static void prepareDatabase(void) {
-
+static void prepareDatabase(void)
+{
     /* Set database */
     setupDatabase();
 
@@ -90,8 +90,7 @@ static void prepareDatabase(void) {
                         "reference" << "http://notify1.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
-                        "conditions" << BSON_ARRAY("AX1" << "AY1")
-                        );
+                        "conditions" << BSON_ARRAY("AX1" << "AY1"));
 
     BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
                         "expiration" << 20000000 <<
@@ -99,12 +98,10 @@ static void prepareDatabase(void) {
                         "reference" << "http://notify2.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
-                        "conditions" << BSON_ARRAY("AX2" << "AY2")
-                        );
+                        "conditions" << BSON_ARRAY("AX2" << "AY2"));
 
     connection->insert(SUBSCRIBECONTEXT_COLL, sub1);
     connection->insert(SUBSCRIBECONTEXT_COLL, sub2);
-
 }
 
 /* ****************************************************************************
@@ -119,7 +116,7 @@ TEST(mongoUnsubscribeContext, subscriptionNotFound)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -159,7 +156,7 @@ TEST(mongoUnsubscribeContext, unsubscribe)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -204,11 +201,11 @@ TEST(mongoUnsubscribeContext, MongoDbFindOneFail)
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, findOne("utest.csubs",_,_,_))
+    ON_CALL(*connectionMock, findOne("utest.csubs", _, _, _))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -262,22 +259,26 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
 
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
-    BSONObj fakeSub = BSON("_id" << OID("51307b66f481db11bf860001") <<
-                                       "expiration" << 10000000 <<
-                                       "lastNotification" << 15000000 <<
-                                       "reference" << "http://notify1.me" <<
-                                       "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
-                                       "attrs" << BSONArray() <<
-                                       "conditions" << BSONArray());
+
+    BSONObj fakeSub = BSON("_id"              << OID("51307b66f481db11bf860001")            <<
+                           "expiration"       << 10000000                                   <<
+                           "lastNotification" << 15000000                                   <<
+                           "reference"        << "http://notify1.me"                        <<
+                           "entities"         << BSON_ARRAY(BSON("id"          << "E1" <<
+                                                                 "type"        << "T1" <<
+                                                                 "isPattern"   << "false")) <<
+                           "attrs" << BSONArray()                                           <<
+                           "conditions" << BSONArray());
+
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, findOne("utest.csubs",_,_,_))
+    ON_CALL(*connectionMock, findOne("utest.csubs", _, _, _))
             .WillByDefault(Return(fakeSub));
-    ON_CALL(*connectionMock, remove("utest.csubs",_,_,_))
+    ON_CALL(*connectionMock, remove("utest.csubs", _, _, _))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
-            .Times(0);   
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
+            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -309,7 +310,7 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
     /* Restore real DB connection */
     setMongoConnectionForUnitTest(connectionDb);
 
-    /* Release mocks */    
+    /* Release mocks */
     delete notifierMock;
     delete connectionMock;
 }
