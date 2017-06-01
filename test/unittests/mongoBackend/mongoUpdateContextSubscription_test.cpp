@@ -156,8 +156,8 @@ extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
 *
 * prepareDatabase -
 */
-static void prepareDatabase(void) {
-
+static void prepareDatabase(void)
+{
     /* Set database */
     setupDatabase();
 
@@ -188,32 +188,24 @@ static void prepareDatabase(void) {
                        "attrs" << BSON(
                           "A1" << BSON("type" << "TA1" << "value" << "X") <<
                           "A2" << BSON("type" << "TA2" << "value" << "Z") <<
-                          "A3" << BSON("type" << "TA3" << "value" << "W")
-                          )
-                      );
+                          "A3" << BSON("type" << "TA3" << "value" << "W")));
 
     BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2") <<
                        "attrNames" << BSON_ARRAY("A2" << "A3") <<
                        "attrs" << BSON(
                           "A2" << BSON("type" << "TA2" << "value" << "R") <<
-                          "A3" << BSON("type" << "TA3" << "value" << "S")
-                          )
-                      );
+                          "A3" << BSON("type" << "TA3" << "value" << "S")));
 
     BSONObj en3 = BSON("_id" << BSON("id" << "E1" << "type" << "T1bis") <<
                        "attrNames" << BSON_ARRAY("A1") <<
                        "attrs" << BSON(
-                          "A1" << BSON("type" << "TA1" << "value" << "T")
-                          )
-                      );
+                         "A1" << BSON("type" << "TA1" << "value" << "T")));
 
     BSONObj en4 = BSON("_id" << BSON("id" << "E1") <<
                        "attrNames" << BSON_ARRAY("A1" << "A2") <<
                        "attrs" << BSON(
                           "A1" << BSON("type" << "TA1" << "value" << "P") <<
-                          "A2" << BSON("type" << "TA2" << "value" << "Q")
-                          )
-                      );
+                          "A2" << BSON("type" << "TA2" << "value" << "Q")));
 
     BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
                         "expiration" << 10000000 <<
@@ -223,8 +215,7 @@ static void prepareDatabase(void) {
                         "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
-                        "conditions" << BSON_ARRAY("AX1" << "AY1")
-                        );
+                        "conditions" << BSON_ARRAY("AX1" << "AY1"));
 
     BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
                         "expiration" << 20000000 <<
@@ -233,19 +224,17 @@ static void prepareDatabase(void) {
                         "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
-                        "conditions" << BSON_ARRAY("AX2" << "AY2")
-                        );
+                        "conditions" << BSON_ARRAY("AX2" << "AY2"));
 
     /* No type variant of sub2 */
     BSONObj sub2nt = BSON("_id" << OID("51307b66f481db11bf860022") <<
-                        "expiration" << 20000000 <<
-                        "lastNotification" << 25000000 <<
-                        "reference" << "http://notify2.me" <<
-                        "format" << "JSON" <<
-                        "entities" << BSON_ARRAY(BSON("id" << "E1" << "isPattern" << "false")) <<
-                        "attrs" << BSON_ARRAY("A1" << "A2") <<
-                        "conditions" << BSON_ARRAY("AX2" << "AY2")
-                        );
+                          "expiration" << 20000000 <<
+                          "lastNotification" << 25000000 <<
+                          "reference" << "http://notify2.me" <<
+                          "format" << "JSON" <<
+                          "entities" << BSON_ARRAY(BSON("id" << "E1" << "isPattern" << "false")) <<
+                          "attrs" << BSON_ARRAY("A1" << "A2") <<
+                          "conditions" << BSON_ARRAY("AX2" << "AY2"));
 
     BSONObj sub3 = BSON("_id" << OID("51307b66f481db11bf860003") <<
                         "expiration" << 30000000 <<
@@ -255,8 +244,7 @@ static void prepareDatabase(void) {
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false") <<
                                                  BSON("id" << "E2" << "type" << "T2" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
-                        "conditions" << BSON_ARRAY("AX3" << "AY3")
-                        );
+                        "conditions" << BSON_ARRAY("AX3" << "AY3"));
 
     BSONObj sub4 = BSON("_id" << OID("51307b66f481db11bf860004") <<
                         "expiration" << 40000000 <<
@@ -266,8 +254,8 @@ static void prepareDatabase(void) {
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false") <<
                                                  BSON("id" << "E2" << "type" << "T2" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
-                        "conditions" << BSON_ARRAY("AX4" << "AY4")
-                        );
+                        "conditions" << BSON_ARRAY("AX4" << "AY4"));
+
     BSONObj sub5 = BSON("_id" << OID("51307b66f481db11bf860005") <<
                         "expiration" << 50000000 <<
                         "lastNotification" << 55000000 <<
@@ -276,8 +264,7 @@ static void prepareDatabase(void) {
                         "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
-                        "conditions" << BSON_ARRAY("AX5" << "AY5")
-                        );
+                        "conditions" << BSON_ARRAY("AX5" << "AY5"));
 
     connection->insert(ENTITIES_COLL, en1);
     connection->insert(ENTITIES_COLL, en2);
@@ -290,8 +277,9 @@ static void prepareDatabase(void) {
     connection->insert(SUBSCRIBECONTEXT_COLL, sub3);
     connection->insert(SUBSCRIBECONTEXT_COLL, sub4);
     connection->insert(SUBSCRIBECONTEXT_COLL, sub5);
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -301,8 +289,8 @@ static void prepareDatabase(void) {
 * to ease test for isPattern=true cases
 *
 */
-static void prepareDatabasePatternTrue(void) {
-
+static void prepareDatabasePatternTrue(void)
+{
     /* Set database */
     setupDatabase();
 
@@ -311,14 +299,14 @@ static void prepareDatabasePatternTrue(void) {
     /* We create the following entities:
      *
      * - E1:
-     *     A1: X     
+     *     A1: X
      *     A2: Z
      *     A3: W
      * - E2
      *     A2: R
      *     A3: S
      * - E2*
-     *     A1: T     
+     *     A1: T
      * - E1**
      *     A1: P
      *     A2: Q
@@ -336,40 +324,30 @@ static void prepareDatabasePatternTrue(void) {
                        "attrs" << BSON(
                           "A1" << BSON("type" << "TA1" << "value" << "X") <<
                           "A2" << BSON("type" << "TA2" << "value" << "Z") <<
-                          "A3" << BSON("type" << "TA3" << "value" << "W")
-                          )
-                      );
+                          "A3" << BSON("type" << "TA3" << "value" << "W")));
 
     BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T") <<
                        "attrNames" << BSON_ARRAY("A2" << "A3") <<
                        "attrs" << BSON(
                           "A2" << BSON("type" << "TA2" << "value" << "R") <<
-                          "A3" << BSON("type" << "TA3" << "value" << "S")
-                          )
-                      );
+                          "A3" << BSON("type" << "TA3" << "value" << "S")));
 
     BSONObj en3 = BSON("_id" << BSON("id" << "E2" << "type" << "Tbis") <<
                        "attrNames" << BSON_ARRAY("A1") <<
                        "attrs" << BSON(
-                          "A1" << BSON("type" << "TA1" << "value" << "T")
-                          )
-                      );
+                         "A1" << BSON("type" << "TA1" << "value" << "T")));
 
     BSONObj en4 = BSON("_id" << BSON("id" << "E1") <<
                        "attrNames" << BSON_ARRAY("A1" << "A2") <<
                        "attrs" << BSON(
                           "A1" << BSON("type" << "TA1" << "value" << "P") <<
-                          "A2" << BSON("type" << "TA2" << "value" << "Q")
-                          )
-                      );
+                          "A2" << BSON("type" << "TA2" << "value" << "Q")));
 
     BSONObj en5 = BSON("_id" << BSON("id" << "E3") <<
                        "attrNames" << BSON_ARRAY("A1" << "A2") <<
                        "attrs" << BSON(
                           "A1" << BSON("type" << "TA1" << "value" << "noise") <<
-                          "A2" << BSON("type" << "TA2" << "value" << "noise")
-                          )
-                      );
+                          "A2" << BSON("type" << "TA2" << "value" << "noise")));
 
     BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
                         "expiration" << 10000000 <<
@@ -378,8 +356,7 @@ static void prepareDatabasePatternTrue(void) {
                         "reference" << "http://notify1.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
-                        "conditions" << BSON_ARRAY("AX1" << "AY1")
-                        );
+                        "conditions" << BSON_ARRAY("AX1" << "AY1"));
 
     BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
                         "expiration" << 20000000 <<
@@ -387,18 +364,16 @@ static void prepareDatabasePatternTrue(void) {
                         "reference" << "http://notify2.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E[1-2]" << "type" << "T" << "isPattern" << "true")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
-                        "conditions" << BSON_ARRAY("AX2" << "AY2")
-                        );
+                        "conditions" << BSON_ARRAY("AX2" << "AY2"));
 
     /* No type variant of sub2 */
     BSONObj sub2nt = BSON("_id" << OID("51307b66f481db11bf860022") <<
-                        "expiration" << 20000000 <<
-                        "lastNotification" << 25000000 <<
-                        "reference" << "http://notify2.me" <<
-                        "entities" << BSON_ARRAY(BSON("id" << "E[1-2]" << "isPattern" << "true")) <<
-                        "attrs" << BSON_ARRAY("A1" << "A2") <<
-                        "conditions" << BSON_ARRAY("AX2" << "AY2")
-                        );
+                          "expiration" << 20000000 <<
+                          "lastNotification" << 25000000 <<
+                          "reference" << "http://notify2.me" <<
+                          "entities" << BSON_ARRAY(BSON("id" << "E[1-2]" << "isPattern" << "true")) <<
+                          "attrs" << BSON_ARRAY("A1" << "A2") <<
+                          "conditions" << BSON_ARRAY("AX2" << "AY2"));
 
     BSONObj sub3 = BSON("_id" << OID("51307b66f481db11bf860003") <<
                         "expiration" << 30000000 <<
@@ -407,8 +382,7 @@ static void prepareDatabasePatternTrue(void) {
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false") <<
                                                  BSON("id" << "E2" << "type" << "T2" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
-                        "conditions" << BSON_ARRAY("AX3" << "AY3")
-                        );
+                        "conditions" << BSON_ARRAY("AX3" << "AY3"));
 
     BSONObj sub4 = BSON("_id" << OID("51307b66f481db11bf860004") <<
                         "expiration" << 40000000 <<
@@ -417,8 +391,8 @@ static void prepareDatabasePatternTrue(void) {
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false") <<
                                                  BSON("id" << "E2" << "type" << "T2" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
-                        "conditions" << BSON_ARRAY("AX4" << "AY4")
-                        );
+                        "conditions" << BSON_ARRAY("AX4" << "AY4"));
+
     BSONObj sub5 = BSON("_id" << OID("51307b66f481db11bf860005") <<
                         "expiration" << 50000000 <<
                         "lastNotification" << 55000000 <<
@@ -426,8 +400,7 @@ static void prepareDatabasePatternTrue(void) {
                         "reference" << "http://notify5.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
-                        "conditions" << BSON_ARRAY("AX5" << "AY5")
-                        );
+                        "conditions" << BSON_ARRAY("AX5" << "AY5"));
 
     connection->insert(ENTITIES_COLL, en1);
     connection->insert(ENTITIES_COLL, en2);
@@ -441,8 +414,9 @@ static void prepareDatabasePatternTrue(void) {
     connection->insert(SUBSCRIBECONTEXT_COLL, sub3);
     connection->insert(SUBSCRIBECONTEXT_COLL, sub4);
     connection->insert(SUBSCRIBECONTEXT_COLL, sub5);
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -458,7 +432,7 @@ TEST(mongoUpdateContextSubscription, subscriptionNotFound)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -501,7 +475,7 @@ TEST(mongoUpdateContextSubscription, updateDuration)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -522,7 +496,7 @@ TEST(mongoUpdateContextSubscription, updateDuration)
     ms = mongoUpdateContextSubscription(&req, &res, tenant, servicePath, servicePathVector);
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
-    EXPECT_EQ("PT5H",res.subscribeResponse.duration.get());
+    EXPECT_EQ("PT5H", res.subscribeResponse.duration.get());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
     EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
@@ -547,7 +521,7 @@ TEST(mongoUpdateContextSubscription, updateDuration)
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
-    std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -593,9 +567,9 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
-    setNotifier(notifierMock);    
+    setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860005");
@@ -610,7 +584,7 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_EQ("PT4S",res.subscribeResponse.throttling.get());
+    EXPECT_EQ("PT4S", res.subscribeResponse.throttling.get());
     EXPECT_EQ("51307b66f481db11bf860005", res.subscribeResponse.subscriptionId.get());
     EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
@@ -632,7 +606,7 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
     EXPECT_STREQ("http://notify5.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
-    std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -667,7 +641,7 @@ TEST(mongoUpdateContextSubscription, clearThrottling)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -684,7 +658,7 @@ TEST(mongoUpdateContextSubscription, clearThrottling)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_EQ("PT0S",res.subscribeResponse.throttling.get());
+    EXPECT_EQ("PT0S", res.subscribeResponse.throttling.get());
     EXPECT_EQ("51307b66f481db11bf860005", res.subscribeResponse.subscriptionId.get());
     EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
@@ -743,7 +717,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -756,7 +730,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_C1)
     NotifyCondition nc;
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A10");
-    req.notifyConditionVector.push_back(&nc);    
+    req.notifyConditionVector.push_back(&nc);
 
     /* Prepare database */
     prepareDatabase();
@@ -816,14 +790,13 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_C1)
 */
 TEST(mongoUpdateContextSubscription, Ent1_AttrN_C1)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -837,7 +810,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_C1)
     NotifyCondition nc;
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A10");
-    req.notifyConditionVector.push_back(&nc);    
+    req.notifyConditionVector.push_back(&nc);
 
     /* Prepare database */
     prepareDatabase();
@@ -903,7 +876,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -920,7 +893,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_CN)
     nc2.type = "ONCHANGE";
     nc2.condValueList.push_back("A20");
     req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);    
+    req.notifyConditionVector.push_back(&nc2);
 
     /* Prepare database */
     prepareDatabase();
@@ -979,14 +952,13 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_CN)
 */
 TEST(mongoUpdateContextSubscription, Ent1_Attr0_CNbis)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1001,7 +973,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_CNbis)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A10");
     nc.condValueList.push_back("A20");
-    req.notifyConditionVector.push_back(&nc);   
+    req.notifyConditionVector.push_back(&nc);
 
     /* Prepare database */
     prepareDatabase();
@@ -1060,14 +1032,13 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_CNbis)
 */
 TEST(mongoUpdateContextSubscription, Ent1_AttrN_CN)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1085,7 +1056,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_CN)
     nc2.type = "ONCHANGE";
     nc2.condValueList.push_back("A20");
     req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);    
+    req.notifyConditionVector.push_back(&nc2);
 
     /* Prepare database */
     prepareDatabase();
@@ -1130,7 +1101,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_CN)
     EXPECT_EQ("A1", attrs[0].String());
     EXPECT_EQ("A2", attrs[1].String());
 
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();    
+    std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(2, conds.size());
     EXPECT_EQ("A10", conds[0].String());
     EXPECT_EQ("A20", conds[1].String());
@@ -1146,14 +1117,13 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_CN)
 */
 TEST(mongoUpdateContextSubscription, Ent1_AttrN_CNbis)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1231,14 +1201,13 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_CNbis)
 */
 TEST(mongoUpdateContextSubscription, EntN_Attr0_C1)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1252,7 +1221,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_C1)
     NotifyCondition nc;
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A10");
-    req.notifyConditionVector.push_back(&nc);    
+    req.notifyConditionVector.push_back(&nc);
 
     /* Prepare database */
     prepareDatabase();
@@ -1314,14 +1283,13 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_C1)
 */
 TEST(mongoUpdateContextSubscription, EntN_AttrN_C1)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1335,7 +1303,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_C1)
     NotifyCondition nc;
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A10");
-    req.notifyConditionVector.push_back(&nc);    
+    req.notifyConditionVector.push_back(&nc);
 
     /* Prepare database */
     prepareDatabase();
@@ -1399,14 +1367,13 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_C1)
 */
 TEST(mongoUpdateContextSubscription, EntN_Attr0_CN)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1423,7 +1390,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_CN)
     nc2.type = "ONCHANGE";
     nc2.condValueList.push_back("A20");
     req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);    
+    req.notifyConditionVector.push_back(&nc2);
 
     /* Prepare database */
     prepareDatabase();
@@ -1470,7 +1437,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_CN)
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     EXPECT_EQ(0, attrs.size());
 
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();    
+    std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(2, conds.size());
     EXPECT_EQ("A10", conds[0].String());
     EXPECT_EQ("A20", conds[1].String());
@@ -1494,7 +1461,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1504,7 +1471,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_CNbis)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A10");
     nc.condValueList.push_back("A20");
-    req.notifyConditionVector.push_back(&nc);    
+    req.notifyConditionVector.push_back(&nc);
 
     /* Prepare database */
     prepareDatabase();
@@ -1568,7 +1535,6 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_CNbis)
 */
 TEST(mongoUpdateContextSubscription, EntN_AttrN_CN)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -1577,7 +1543,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1589,7 +1555,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_CN)
     nc2.type = "ONCHANGE";
     nc2.condValueList.push_back("A20");
     req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);    
+    req.notifyConditionVector.push_back(&nc2);
 
     /* Prepare database */
     prepareDatabase();
@@ -1638,7 +1604,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_CN)
     EXPECT_EQ("A1", attrs[0].String());
     EXPECT_EQ("A2", attrs[1].String());
 
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();    
+    std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(2, conds.size());
     EXPECT_EQ("A10", conds[0].String());
     EXPECT_EQ("A20", conds[1].String());
@@ -1663,7 +1629,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1673,7 +1639,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_CNbis)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A10");
     nc.condValueList.push_back("A20");
-    req.notifyConditionVector.push_back(&nc);    
+    req.notifyConditionVector.push_back(&nc);
 
     /* Prepare database */
     prepareDatabase();
@@ -1740,7 +1706,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_CNbis)
 * matchEnt1_Attr0_C1 -
 */
 TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
-{  
+{
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -1752,7 +1718,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
     expectedNcr.originator.set("localhost");
     ContextElementResponse* cerP = new ContextElementResponse();
     cerP->contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");    
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
     ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
     cerP->contextElement.contextAttributeVector.push_back(ca1P);
@@ -1765,8 +1731,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1774,7 +1747,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
     NotifyCondition nc;
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
-    req.notifyConditionVector.push_back(&nc);    
+    req.notifyConditionVector.push_back(&nc);
 
     /* Prepare database */
     prepareDatabase();
@@ -1825,7 +1798,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
     delete notifierMock;
 
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1834,7 +1806,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
 */
 TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1_JSON)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -1859,8 +1830,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1_JSON)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1927,7 +1905,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1_JSON)
 */
 TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -1939,7 +1916,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1)
     expectedNcr.originator.set("localhost");
     ContextElementResponse* cerP = new ContextElementResponse();
     cerP->contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");    
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
     cerP->contextElement.contextAttributeVector.push_back(ca1P);
     cerP->contextElement.contextAttributeVector.push_back(ca2P);
@@ -1950,8 +1927,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -1959,7 +1943,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1)
     NotifyCondition nc;
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
-    req.notifyConditionVector.push_back(&nc);    
+    req.notifyConditionVector.push_back(&nc);
 
     /* Prepare database */
     prepareDatabase();
@@ -2043,8 +2027,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1_disjoint)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2052,7 +2043,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1_disjoint)
     NotifyCondition nc;
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A3");
-    req.notifyConditionVector.push_back(&nc);    
+    req.notifyConditionVector.push_back(&nc);
 
     /* Prepare database */
     prepareDatabase();
@@ -2113,7 +2104,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1_disjoint)
 */
 TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -2128,7 +2118,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1)
     ContextElementResponse* cer3P = new ContextElementResponse();
 
     cer1P->contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");    
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
     cer1P->contextElement.contextAttributeVector.push_back(ca1P);
     cer1P->contextElement.contextAttributeVector.push_back(ca2P);
@@ -2152,8 +2142,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2236,7 +2233,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1_disjoint)
     ContextElementResponse* cer3P = new ContextElementResponse();
 
     cer1P->contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");   
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
     cer1P->contextElement.contextAttributeVector.push_back(ca1P);
     cer1P->contextElement.contextAttributeVector.push_back(ca2P);
@@ -2260,8 +2257,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1_disjoint)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2330,7 +2334,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1_disjoint)
 */
 TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -2361,8 +2364,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2431,7 +2441,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1)
 */
 TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1_disjoint)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -2462,8 +2471,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1_disjoint)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2532,7 +2548,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1_disjoint)
 */
 TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -2577,8 +2592,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2647,7 +2669,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1)
 */
 TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1_disjoint)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -2663,10 +2684,10 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1_disjoint)
     ContextElementResponse* cer4P = new ContextElementResponse();
 
     cer1P->contextElement.entityId.fill("E1", "T", "false");
-    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");    
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
     cer1P->contextElement.contextAttributeVector.push_back(ca1P);
-    cer1P->contextElement.contextAttributeVector.push_back(ca2P);    
+    cer1P->contextElement.contextAttributeVector.push_back(ca2P);
 
     cer2P->contextElement.entityId.fill("E2", "T", "false");
     ContextAttribute* ca3P = new ContextAttribute("A2", "TA2", "R");
@@ -2692,8 +2713,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1_disjoint)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2762,7 +2790,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1_disjoint)
 */
 TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -2788,8 +2815,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2860,7 +2894,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN)
 */
 TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -2873,7 +2906,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
     ContextElementResponse* cerP = new ContextElementResponse();
 
     cerP->contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");    
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
     ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
     cerP->contextElement.contextAttributeVector.push_back(ca1P);
@@ -2886,8 +2919,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2898,7 +2938,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
     nc2.type = "ONCHANGE";
     nc2.condValueList.push_back("A5");
     req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);    
+    req.notifyConditionVector.push_back(&nc2);
 
     /* Prepare database */
     prepareDatabase();
@@ -2959,7 +2999,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
 */
 TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CNbis)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -2977,7 +3016,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CNbis)
     ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
     cerP->contextElement.contextAttributeVector.push_back(ca1P);
     cerP->contextElement.contextAttributeVector.push_back(ca2P);
-    cerP->contextElement.contextAttributeVector.push_back(ca3P);    
+    cerP->contextElement.contextAttributeVector.push_back(ca3P);
     expectedNcr.contextElementResponseVector.push_back(cerP);
 
     NotifierMock*                notifierMock = new NotifierMock();
@@ -2985,8 +3024,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CNbis)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify1.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -2995,7 +3041,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CNbis)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
     nc.condValueList.push_back("A2");
-    req.notifyConditionVector.push_back(&nc);    
+    req.notifyConditionVector.push_back(&nc);
 
     /* Prepare database */
     prepareDatabase();
@@ -3055,7 +3101,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CNbis)
 */
 TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_disjoint)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -3079,8 +3124,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_disjoint)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3153,7 +3205,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_disjoint)
 */
 TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -3177,8 +3228,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3251,7 +3309,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial)
 */
 TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial_disjoint)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -3275,8 +3332,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial_disjoint)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3349,7 +3413,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial_disjoint)
 */
 TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CNbis)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -3373,8 +3436,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CNbis)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3447,7 +3517,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CNbis)
 */
 TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -3471,8 +3540,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify2.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     attrsFilter.push_back("A1");
@@ -3519,7 +3595,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
-    std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -3550,7 +3626,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
 */
 TEST(mongoUpdateContextSubscription, matchEntN_Attr0_C1)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -3564,12 +3639,12 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_C1)
     ContextElementResponse* cer2P = new ContextElementResponse();
 
     cer1P->contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");    
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
     ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
     cer1P->contextElement.contextAttributeVector.push_back(ca1P);
     cer1P->contextElement.contextAttributeVector.push_back(ca2P);
-    cer1P->contextElement.contextAttributeVector.push_back(ca3P);    
+    cer1P->contextElement.contextAttributeVector.push_back(ca3P);
     expectedNcr.contextElementResponseVector.push_back(cer1P);
     cer2P->contextElement.entityId.id = "E2";
     cer2P->contextElement.entityId.type = "T2";
@@ -3585,8 +3660,15 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_C1)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify3.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3657,7 +3739,6 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_C1)
 */
 TEST(mongoUpdateContextSubscription, matchEntN_AttrN_C1)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -3688,8 +3769,15 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_C1)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify4.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3747,7 +3835,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_C1)
     EXPECT_EQ("A2", attrs[1].String());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(1, conds.size());    
+    ASSERT_EQ(1, conds.size());
     EXPECT_EQ("A1", conds[0].String());
 
     /* Release mock */
@@ -3762,7 +3850,6 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_C1)
 */
 TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CN)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -3797,8 +3884,15 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CN)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify3.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3873,7 +3967,6 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CN)
 */
 TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CNbis)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -3886,7 +3979,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CNbis)
     ContextElementResponse* cer1P = new ContextElementResponse();
     ContextElementResponse* cer2P = new ContextElementResponse();
 
-    cer1P->contextElement.entityId.fill ("E1", "T1", "false");
+    cer1P->contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
     ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "W");
@@ -3908,8 +4001,15 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CNbis)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify3.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3982,7 +4082,6 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CNbis)
 */
 TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -3996,7 +4095,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
     ContextElementResponse* cer2P = new ContextElementResponse();
 
     cer1P->contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");    
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "X");
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "Z");
     cer1P->contextElement.contextAttributeVector.push_back(ca1P);
     cer1P->contextElement.contextAttributeVector.push_back(ca2P);
@@ -4013,8 +4112,15 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify4.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -4091,7 +4197,6 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
 */
 TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CNbis)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -4120,8 +4225,15 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CNbis)
     std::vector<std::string>     metadataFilter;
     ngsiv2::HttpInfo             httpInfo("http://notify4.me");
 
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr), MatchHttpInfo(&httpInfo), "", "", "no correlator", NGSI_V1_LEGACY, attrsFilter, metadataFilter, false))
-            .Times(1);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),
+                                                        MatchHttpInfo(&httpInfo),
+                                                        "",
+                                                        "",
+                                                        "no correlator",
+                                                        NGSI_V1_LEGACY,
+                                                        attrsFilter,
+                                                        metadataFilter,
+                                                        false)).Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -4206,7 +4318,7 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4226,7 +4338,7 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
-    EXPECT_EQ("PT5H",res.subscribeResponse.duration.get());
+    EXPECT_EQ("PT5H", res.subscribeResponse.duration.get());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
     EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
@@ -4283,11 +4395,11 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, findOne("utest.csubs",_,_,_))
+    ON_CALL(*connectionMock, findOne("utest.csubs", _, _, _))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4315,7 +4427,7 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
     /* Restore real DB connection */
     setMongoConnectionForUnitTest(connectionDb);
 
-    /* Release mocks */    
+    /* Release mocks */
     delete notifierMock;
     delete connectionMock;
 }
@@ -4339,19 +4451,21 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
                                        "expiration" << 10000000 <<
                                        "lastNotification" << 15000000 <<
                                        "reference" << "http://notify1.me" <<
-                                       "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
+                                       "entities" << BSON_ARRAY(BSON("id"        << "E1" <<
+                                                                     "type"      << "T1" <<
+                                                                     "isPattern" << "false")) <<
                                        "attrs" << BSONArray() <<
                                        "blacklist" << false <<
                                        "conditions" << BSONArray());
 
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, update("utest.csubs",_,_,_,_,_))
+    ON_CALL(*connectionMock, update("utest.csubs", _, _, _, _, _))
             .WillByDefault(Throw(e));
-    ON_CALL(*connectionMock, findOne("utest.csubs",_,_,_))
+    ON_CALL(*connectionMock, findOne("utest.csubs", _, _, _))
             .WillByDefault(Return(fakeSub));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4378,13 +4492,20 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
     EXPECT_EQ(SccReceiverInternalError, res.subscribeError.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.subscribeError.errorCode.reasonPhrase);
     EXPECT_EQ("Database Error (collection: utest.csubs "
-              "- update(): <{ _id: ObjectId('51307b66f481db11bf860001') },{ expiration: 1360250700, reference: \"http://notify1.me\", custom: false, servicePath: \"/#\", entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], metadata: [], blacklist: false, conditions: [], lastNotification: 15000000, lastFailure: -1, lastSuccess: -1, expression: { q: \"\", mq: \"\", geometry: \"\", coords: \"\", georel: \"\" }, format: \"JSON\" }> "
+              "- update(): <{ _id: ObjectId('51307b66f481db11bf860001') },"
+              "{ expiration: 1360250700, reference: \"http://notify1.me\", custom: false, "
+              "servicePath: \"/#\", "
+              "entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ],"
+              " attrs: [], metadata: [], blacklist: false, "
+              "conditions: [], lastNotification: 15000000, "
+              "lastFailure: -1, lastSuccess: -1, "
+              "expression: { q: \"\", mq: \"\", geometry: \"\", coords: \"\", georel: \"\" }, format: \"JSON\" }> "
               "- exception: boom!!)", res.subscribeError.errorCode.details);
 
     /* Restore real DB connection */
     setMongoConnectionForUnitTest(connectionDb);
 
-    /* Release mocks */    
+    /* Release mocks */
     delete notifierMock;
     delete connectionMock;
     delete timerMock;
