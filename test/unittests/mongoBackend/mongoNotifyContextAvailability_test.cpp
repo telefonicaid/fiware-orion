@@ -541,8 +541,9 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtNnt_Ok)
   EXPECT_EQ(0, res.responseCode.details.size());
 
   utExit();
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -550,7 +551,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtNnt_Ok)
 */
 TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_At0_Ok)
 {
-    HttpStatusCode           ms;
+    HttpStatusCode                     ms;
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
