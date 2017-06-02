@@ -109,12 +109,14 @@ extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
 *
 */
 
+
+
 /* ****************************************************************************
 *
 * prepareDatabase -
 */
-static void prepareDatabase(void) {
-
+static void prepareDatabase(void)
+{
     /* Clean database */
     setupDatabase();
 
@@ -136,6 +138,8 @@ static void prepareDatabase(void) {
     connection->insert(SUBSCRIBECONTEXTAVAIL_COLL, sub1);
     connection->insert(SUBSCRIBECONTEXTAVAIL_COLL, sub2);
 }
+
+
 
 /* ****************************************************************************
 *
@@ -180,11 +184,11 @@ TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok)
   BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
 
   EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();    
+  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();
   ASSERT_EQ(1, entities.size());
   BSONObj ent0 = entities[0].embeddedObject();
   EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));  
+  EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
 
   std::vector<BSONElement> attrs = contextRegistration.getField("attrs").Array();
   EXPECT_EQ(0, attrs.size());
@@ -309,7 +313,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_At0_Ok)
   BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
 
   EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();  
+  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();
   ASSERT_EQ(1, entities.size());
   BSONObj ent0 = entities[0].embeddedObject();
   EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -334,10 +338,10 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_At0_Ok)
 * ce1_En1_AtN_Ok -
 */
 TEST(mongoRegisterContextRequest, ce1_En1_AtN_Ok)
-{   
+{
   HttpStatusCode           ms;
   RegisterContextRequest   req;
-  RegisterContextResponse  res; 
+  RegisterContextResponse  res;
 
   utInit();
 
@@ -376,7 +380,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtN_Ok)
   BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
 
   EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();  
+  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();
   ASSERT_EQ(1, entities.size());
   BSONObj ent0 = entities[0].embeddedObject();
   EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -455,7 +459,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtNnt_Ok)
   ASSERT_EQ(1, entities.size());
   BSONObj ent0 = entities[0].embeddedObject();
   EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type")); 
+  EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
 
   std::vector<BSONElement> regAttrs = contextRegistration.getField("attrs").Array();
   ASSERT_EQ(2, regAttrs.size());
@@ -477,8 +481,9 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtNnt_Ok)
   EXPECT_EQ(0, res.errorCode.details.size());
 
   utExit();
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -526,7 +531,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtN_Ok)
   BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
 
   EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();  
+  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();
   ASSERT_EQ(1, entities.size());
   BSONObj ent0 = entities[0].embeddedObject();
   EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -597,7 +602,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtNnt_Ok)
   ASSERT_EQ(1, entities.size());
   BSONObj ent0 = entities[0].embeddedObject();
   EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-  EXPECT_FALSE(ent0.hasField("type"));  
+  EXPECT_FALSE(ent0.hasField("type"));
 
   std::vector<BSONElement> regAttrs = contextRegistration.getField("attrs").Array();
   ASSERT_EQ(2, regAttrs.size());
@@ -673,9 +678,9 @@ TEST(mongoRegisterContextRequest, ce1_EnN_At0_Ok)
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
     EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent1, "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent1, "type"));    
+    EXPECT_STREQ("T2", C_STR_FIELD(ent1, "type"));
 
-    std::vector<BSONElement> regAttrs = contextRegistration.getField("attrs").Array();    
+    std::vector<BSONElement> regAttrs = contextRegistration.getField("attrs").Array();
     EXPECT_EQ(0, regAttrs.size());
 
     /* Check response is as expected */
@@ -741,7 +746,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_At0_Ok)
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
     EXPECT_FALSE(ent0.hasField("type"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent1, "id"));
-    EXPECT_FALSE(ent1.hasField("type"));   
+    EXPECT_FALSE(ent1.hasField("type"));
 
     std::vector<BSONElement> regAttrs = contextRegistration.getField("attrs").Array();
     EXPECT_EQ(0, regAttrs.size());
@@ -765,7 +770,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtN_Ok)
 {
     HttpStatusCode           ms;
     RegisterContextRequest   req;
-    RegisterContextResponse  res;    
+    RegisterContextResponse  res;
 
     utInit();
 
@@ -1089,7 +1094,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_At0_Ok)
 {
     HttpStatusCode           ms;
     RegisterContextRequest   req;
-    RegisterContextResponse  res;    
+    RegisterContextResponse  res;
 
     utInit();
 
@@ -1130,7 +1135,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_At0_Ok)
     std::vector<BSONElement> entities, attrs;
     contextRegistration = contextRegistrationV[0].embeddedObject();
     EXPECT_STREQ("http://dummy1.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -1139,7 +1144,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_At0_Ok)
     EXPECT_EQ(0, attrs.size());
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E2", C_STR_FIELD(ent0, "id"));
@@ -1207,7 +1212,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_At0_Ok)
     std::vector<BSONElement> entities, attrs;
     contextRegistration = contextRegistrationV[0].embeddedObject();
     EXPECT_STREQ("http://dummy1.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -1216,7 +1221,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_At0_Ok)
     EXPECT_EQ(0, attrs.size());
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E2", C_STR_FIELD(ent0, "id"));
@@ -1292,7 +1297,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtN_Ok)
     std::vector<BSONElement> entities, regAttrs;
     contextRegistration = contextRegistrationV[0].embeddedObject();
     EXPECT_STREQ("http://dummy1.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -1310,7 +1315,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtN_Ok)
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E2", C_STR_FIELD(ent0, "id"));
@@ -1496,7 +1501,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtN_Ok)
     std::vector<BSONElement> entities, regAttrs;
     contextRegistration = contextRegistrationV[0].embeddedObject();
     EXPECT_STREQ("http://dummy1.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -1514,12 +1519,12 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtN_Ok)
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E2", C_STR_FIELD(ent0, "id"));
     EXPECT_FALSE(ent0.hasField("type"));
-    regAttrs = contextRegistration.getField("attrs").Array();    
+    regAttrs = contextRegistration.getField("attrs").Array();
     ASSERT_EQ(2, regAttrs.size());
     rattr0 = regAttrs[0].embeddedObject();
     rattr1 = regAttrs[1].embeddedObject();
@@ -1528,7 +1533,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtN_Ok)
     EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA4", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));;
+    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2285,15 +2290,23 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability1)
   EntityId mockEn1("E5", "T5", "false");
   ContextRegistrationResponse crr;
   crr.contextRegistration.entityIdVector.push_back(&mockEn1);
-  crr.contextRegistration.providingApplication.set("http://dummy.com");  
+  crr.contextRegistration.providingApplication.set("http://dummy.com");
   expectedNcar.contextRegistrationResponseVector.push_back(&crr);
   expectedNcar.subscriptionId.set("51307b66f481db11bf860001");
 
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", "no correlator", NGSI_V1_LEGACY))
-          .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", "no correlator", NGSI_V1_LEGACY))
-          .Times(0);
+
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                  "http://notify1.me",
+                                                                  "",
+                                                                  "no correlator",
+                                                                  NGSI_V1_LEGACY)).Times(1);
+
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,
+                                                                  "http://notify2.me",
+                                                                  "",
+                                                                  "no correlator",
+                                                                  NGSI_V1_LEGACY)).Times(0);
   setNotifier(notifierMock);
 
   TimerMock* timerMock = new TimerMock();
@@ -2359,10 +2372,18 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability2)
   expectedNcar2.subscriptionId.set("51307b66f481db11bf860002");
 
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar1),"http://notify1.me", "", "no correlator", NGSI_V1_LEGACY))
-          .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar2),"http://notify2.me", "", "no correlator", NGSI_V1_LEGACY))
-          .Times(1);
+
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar1),
+                                                                  "http://notify1.me",
+                                                                  "",
+                                                                  "no correlator",
+                                                                  NGSI_V1_LEGACY)).Times(1);
+
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar2),
+                                                                  "http://notify2.me",
+                                                                  "",
+                                                                  "no correlator",
+                                                                  NGSI_V1_LEGACY)).Times(1);
   setNotifier(notifierMock);
 
   TimerMock* timerMock = new TimerMock();
@@ -2427,10 +2448,19 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability3)
   expectedNcar.subscriptionId.set("51307b66f481db11bf860001");
 
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", "no correlator", NGSI_V1_LEGACY))
-          .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", "no correlator", NGSI_V1_LEGACY))
-          .Times(0);
+
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
+                                                                  "http://notify1.me",
+                                                                  "",
+                                                                  "no correlator",
+                                                                  NGSI_V1_LEGACY)).Times(1);
+
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,
+                                                                  "http://notify2.me",
+                                                                  "",
+                                                                  "no correlator",
+                                                                  NGSI_V1_LEGACY)).Times(0);
+
   setNotifier(notifierMock);
 
   TimerMock* timerMock = new TimerMock();
@@ -2513,7 +2543,7 @@ TEST(mongoRegisterContextRequest, defaultDuration)
   BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
 
   EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();  
+  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();
   ASSERT_EQ(1, entities.size());
   BSONObj ent0 = entities[0].embeddedObject();
   EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -2542,7 +2572,7 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
 {
     HttpStatusCode           ms;
     RegisterContextRequest   req;
-    RegisterContextResponse  res;   
+    RegisterContextResponse  res;
 
     utInit();
 
@@ -2551,15 +2581,15 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     BSONObj fakeEntity = BSON("_id" << BSON("id" << "E1" << "type" << "T1"));
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
     DBClientCursorMock* cursorMockCAsub = new DBClientCursorMock(connectionMock, "", 0, 0, 0);
-    ON_CALL(*connectionMock, count(_,_,_,_,_))
+    ON_CALL(*connectionMock, count(_, _, _, _, _))
             .WillByDefault(Return(1));
-    ON_CALL(*connectionMock, findOne(_,_,_,_))
+    ON_CALL(*connectionMock, findOne(_, _, _, _))
             .WillByDefault(Return(fakeEntity));
-    ON_CALL(*connectionMock, update("utest.registrations",_,_,_,_,_))
-            .WillByDefault(Throw(e));    
+    ON_CALL(*connectionMock, update("utest.registrations", _, _, _, _, _))
+            .WillByDefault(Throw(e));
     ON_CALL(*cursorMockCAsub, more())
             .WillByDefault(Return(false));
-    ON_CALL(*connectionMock, _query("utest.casubs",_,_,_,_,_,_))
+    ON_CALL(*connectionMock, _query("utest.casubs", _, _, _, _, _, _))
             .WillByDefault(Return(cursorMockCAsub));
 
     /* Forge the request (from "inside" to "outside") */
@@ -2592,9 +2622,16 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     std::string s2 = res.errorCode.details.substr(78+24, 22);
     std::string s3 = res.errorCode.details.substr(78+24+22+24, res.errorCode.details.size()-78-24-22-24);
     EXPECT_EQ("Database Error (collection: utest.registrations "
-              "- update(): <{ _id: ObjectId('",s1);
+              "- update(): <{ _id: ObjectId('", s1);
     EXPECT_EQ("') },{ _id: ObjectId('", s2);
-    EXPECT_EQ("'), expiration: 1360232760, servicePath: \"/\", format: \"JSON\", contextRegistration: [ { entities: [ { id: \"E1\", type: \"T1\" } ], attrs: [], providingApplication: \"http://dummy.com\" } ] }> "
+
+    EXPECT_EQ("'), expiration: 1360232760, "
+              "servicePath: \"/\", "
+              "format: \"JSON\", "
+              "contextRegistration: [ "
+              "{ entities: [ { id: \"E1\", type: \"T1\" } ], "
+              "attrs: [], "
+              "providingApplication: \"http://dummy.com\" } ] }> "
               "- exception: boom!!)", s3);
 
     /* Restore real DB connection */
@@ -2603,13 +2640,14 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     /* Release mock */
     delete connectionMock;
 
-    /* check collection has not been touched */    
+    /* check collection has not been touched */
     EXPECT_EQ(0, connectionDb->count(REGISTRATIONS_COLL, BSONObj()));
     EXPECT_EQ(0, connectionDb->count(ENTITIES_COLL, BSONObj()));
 
     utExit();
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -2620,6 +2658,6 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
 */
 TEST(mongoRegisterContextRequest, DISABLED_MongoDbCAsubsFindFail)
 {
-    //FIXME
-    EXPECT_EQ(1, 2);
+  // FIXME
+  EXPECT_EQ(1, 2);
 }
