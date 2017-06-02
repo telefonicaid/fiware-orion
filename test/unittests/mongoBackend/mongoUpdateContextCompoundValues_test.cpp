@@ -119,7 +119,7 @@ using mongo::BSONNULL;
                                                                          \
     cv->shortShow("shortShow1: ");                                       \
     cv->show("show1: ");
-    
+
 
 // Compound2: { x: { x1: a, x2: b }, y: [ y1, y2 ] }
 #define CREATE_COMPOUND2(cv)                                             \
@@ -190,6 +190,7 @@ using mongo::BSONNULL;
     cv->show("show2: ");
 
 
+
 /* ****************************************************************************
 *
 * prepareDatabaseSimple -
@@ -197,8 +198,8 @@ using mongo::BSONNULL;
 * This function is called before every test, to populate some information in the
 * entities collection.
 */
-static void prepareDatabaseSimple(void) {
-
+static void prepareDatabaseSimple(void)
+{
   /* Set database */
   setupDatabase();
 
@@ -207,14 +208,12 @@ static void prepareDatabaseSimple(void) {
   BSONObj en = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
                      "attrNames" << BSON_ARRAY("AX") <<
                      "attrs" << BSON(
-                        "AX" << BSON("type" << "TAX" << "value" << "valX")
-                        )
-                    );
-
+                       "AX" << BSON("type" << "TAX" << "value" << "valX")));
 
   connection->insert(ENTITIES_COLL, en);
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -223,23 +222,22 @@ static void prepareDatabaseSimple(void) {
 * This function is called before every test, to populate some information in the
 * entities collection.
 */
-static void prepareDatabaseCompoundVector(void) {
-
+static void prepareDatabaseCompoundVector(void)
+{
   /* Set database */
   setupDatabase();
 
   DBClientBase* connection = getMongoConnection();
 
   BSONObj en = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
-                     "attrNames" << BSON_ARRAY("AX") <<
-                     "attrs" << BSON(
-                        "AX" << BSON("type" << "TAX" << "value" << BSON_ARRAY("A" << "B"))
-                        )
-                    );
+                    "attrNames" << BSON_ARRAY("AX") <<
+                    "attrs" << BSON(
+                      "AX" << BSON("type" << "TAX" << "value" << BSON_ARRAY("A" << "B"))));
 
   connection->insert(ENTITIES_COLL, en);
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -248,35 +246,32 @@ static void prepareDatabaseCompoundVector(void) {
 * This function is called before every test, to populate some information in the
 * entities collection.
 */
-static void prepareDatabaseCompoundObject(void) {
-
+static void prepareDatabaseCompoundObject(void)
+{
   /* Set database */
   setupDatabase();
 
   DBClientBase* connection = getMongoConnection();
 
   BSONObj en = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
-                     "attrNames" << BSON_ARRAY("AX") <<
-                     "attrs" << BSON(
-                        "AX" << BSON("type" << "TAX" << "value" << BSON("x" << "A" << "y" << "B"))
-                        )
-                    );
+                    "attrNames" << BSON_ARRAY("AX") <<
+                    "attrs" << BSON(
+                      "AX" << BSON("type" << "TAX" << "value" << BSON("x" << "A" << "y" << "B"))));
 
 
   connection->insert(ENTITIES_COLL, en);
-
 }
+
+
 
 /* ****************************************************************************
 *
 * findAttr -
 *
 * FIXME P4: this functions is repeated in several places (e.g. mongoUpdateContext_test.cpp). Factorice in a common place.
-*
 */
 static bool findAttr(std::vector<BSONElement> attrs, std::string name)
 {
-
   for (unsigned int ix = 0; ix < attrs.size(); ++ix)
   {
     if (attrs[ix].str() == name)
@@ -284,9 +279,11 @@ static bool findAttr(std::vector<BSONElement> attrs, std::string name)
       return true;
     }
   }
-  return false;
 
+  return false;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -357,7 +354,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1)
     ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ("22", a1.getField("value").Array()[0].str());
     EXPECT_EQ("x1", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
     EXPECT_EQ("x2", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
@@ -440,7 +437,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2)
     ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ("a", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
     EXPECT_EQ("b", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").str());
     EXPECT_EQ("y1", a1.getField("value").embeddedObject().getField("y").Array()[0].str());
@@ -529,7 +526,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ("22", a1.getField("value").Array()[0].str());
     EXPECT_EQ("x1", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
     EXPECT_EQ("x2", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
@@ -538,8 +535,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
     EXPECT_EQ("z2", a1.getField("value").Array()[2].Array()[1].str());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
-    EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
-    EXPECT_STREQ("simple2",C_STR_FIELD(a2, "value"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("simple2", C_STR_FIELD(a2, "value"));
     EXPECT_EQ(1360232700, a2.getIntField("modDate"));
     EXPECT_EQ(1360232700, a2.getIntField("creDate"));
 
@@ -624,15 +621,15 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValu
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ("a", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
     EXPECT_EQ("b", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").str());
     EXPECT_EQ("y1", a1.getField("value").embeddedObject().getField("y").Array()[0].str());
     EXPECT_EQ("y2", a1.getField("value").embeddedObject().getField("y").Array()[1].str());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
-    EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
-    EXPECT_STREQ("simple2",C_STR_FIELD(a2, "value"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("simple2", C_STR_FIELD(a2, "value"));
     EXPECT_EQ(1360232700, a2.getIntField("modDate"));
     EXPECT_EQ(1360232700, a2.getIntField("creDate"));
 
@@ -709,7 +706,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1Native)
     ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ(22.0, a1.getField("value").Array()[0].Number());
     EXPECT_EQ("x1", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
     EXPECT_EQ("x2", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
@@ -794,7 +791,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2Native)
     ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ("a", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
     EXPECT_TRUE(a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").Bool());
     EXPECT_EQ("y1", a1.getField("value").embeddedObject().getField("y").Array()[0].str());
@@ -884,7 +881,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ(22.0, a1.getField("value").Array()[0].Number());
     EXPECT_EQ("x1", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
     EXPECT_EQ("x2", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
@@ -895,8 +892,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
     EXPECT_TRUE(a1.getField("value").Array()[2].Array()[2].isNull());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
-    EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
-    EXPECT_STREQ("simple2",C_STR_FIELD(a2, "value"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("simple2", C_STR_FIELD(a2, "value"));
     EXPECT_EQ(1360232700, a2.getIntField("modDate"));
     EXPECT_EQ(1360232700, a2.getIntField("creDate"));
 
@@ -981,7 +978,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValu
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ("a", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
     EXPECT_TRUE(a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").Bool());
     EXPECT_EQ("y1", a1.getField("value").embeddedObject().getField("y").Array()[0].str());
@@ -989,8 +986,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValu
     EXPECT_TRUE(a1.getField("value").embeddedObject().getField("z").isNull());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
-    EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
-    EXPECT_STREQ("simple2",C_STR_FIELD(a2, "value"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("simple2", C_STR_FIELD(a2, "value"));
     EXPECT_EQ(1360232700, a2.getIntField("modDate"));
     EXPECT_EQ(1360232700, a2.getIntField("creDate"));
 
@@ -1070,7 +1067,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1)
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ("22", a1.getField("value").Array()[0].str());
     EXPECT_EQ("x1", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
     EXPECT_EQ("x2", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
@@ -1079,8 +1076,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1)
     EXPECT_EQ("z2", a1.getField("value").Array()[2].Array()[1].str());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
-    EXPECT_STREQ("valX",C_STR_FIELD(aX, "value"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("valX", C_STR_FIELD(aX, "value"));
     EXPECT_FALSE(aX.hasField("modDate"));
     EXPECT_FALSE(aX.hasField("creDate"));
 
@@ -1112,7 +1109,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
+    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1160,15 +1157,15 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2)
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ("a", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
     EXPECT_EQ("b", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").str());
     EXPECT_EQ("y1", a1.getField("value").embeddedObject().getField("y").Array()[0].str());
     EXPECT_EQ("y2", a1.getField("value").embeddedObject().getField("y").Array()[1].str());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
-    EXPECT_STREQ("valX",C_STR_FIELD(aX, "value"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("valX", C_STR_FIELD(aX, "value"));
     EXPECT_FALSE(aX.hasField("modDate"));
     EXPECT_FALSE(aX.hasField("creDate"));
 
@@ -1256,7 +1253,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1PlusSimpleValu
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ("22", a1.getField("value").Array()[0].str());
     EXPECT_EQ("x1", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
     EXPECT_EQ("x2", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
@@ -1265,12 +1262,12 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1PlusSimpleValu
     EXPECT_EQ("z2", a1.getField("value").Array()[2].Array()[1].str());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
-    EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
-    EXPECT_STREQ("simple2",C_STR_FIELD(a2, "value"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("simple2", C_STR_FIELD(a2, "value"));
     EXPECT_EQ(1360232700, a2.getIntField("modDate"));
     EXPECT_EQ(1360232700, a2.getIntField("creDate"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
-    EXPECT_STREQ("valX",C_STR_FIELD(aX, "value"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("valX", C_STR_FIELD(aX, "value"));
     EXPECT_FALSE(aX.hasField("modDate"));
     EXPECT_FALSE(aX.hasField("creDate"));
 
@@ -1304,7 +1301,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2PlusSimpleValu
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
+    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1358,19 +1355,19 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2PlusSimpleValu
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ("a", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
     EXPECT_EQ("b", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").str());
     EXPECT_EQ("y1", a1.getField("value").embeddedObject().getField("y").Array()[0].str());
     EXPECT_EQ("y2", a1.getField("value").embeddedObject().getField("y").Array()[1].str());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
-    EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
-    EXPECT_STREQ("simple2",C_STR_FIELD(a2, "value"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("simple2", C_STR_FIELD(a2, "value"));
     EXPECT_EQ(1360232700, a2.getIntField("modDate"));
     EXPECT_EQ(1360232700, a2.getIntField("creDate"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
-    EXPECT_STREQ("valX",C_STR_FIELD(aX, "value"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("valX", C_STR_FIELD(aX, "value"));
     EXPECT_FALSE(aX.hasField("modDate"));
     EXPECT_FALSE(aX.hasField("creDate"));
 
@@ -1441,14 +1438,14 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundObject)
     EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("creDate"));
-    EXPECT_EQ(1360232700, ent.getIntField("modDate"));    
+    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
     attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
     ASSERT_EQ(1, attrNames.size());
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
     EXPECT_EQ("a", aX.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
     EXPECT_EQ("b", aX.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").str());
     EXPECT_EQ("y1", aX.getField("value").embeddedObject().getField("y").Array()[0].str());
@@ -1482,7 +1479,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundObjectToSimple)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
+    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1528,8 +1525,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundObjectToSimple)
     ASSERT_EQ(1, attrNames.size());
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
-    EXPECT_STREQ("new_value",C_STR_FIELD(aX, "value"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("new_value", C_STR_FIELD(aX, "value"));
     EXPECT_EQ(1360232700, aX.getIntField("modDate"));
     EXPECT_FALSE(aX.hasField("creDate"));
 
@@ -1607,7 +1604,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundObje
     ASSERT_EQ(1, attrNames.size());
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
     EXPECT_EQ("a", aX.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
     EXPECT_EQ("b", aX.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").str());
     EXPECT_EQ("y1", aX.getField("value").embeddedObject().getField("y").Array()[0].str());
@@ -1641,7 +1638,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundObjectToSimp
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
+    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1687,8 +1684,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundObjectToSimp
     ASSERT_EQ(1, attrNames.size());
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
-    EXPECT_STREQ("new_value",C_STR_FIELD(aX, "value"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("new_value", C_STR_FIELD(aX, "value"));
     EXPECT_EQ(1360232700, aX.getIntField("modDate"));
     EXPECT_FALSE(aX.hasField("creDate"));
 
@@ -1767,7 +1764,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundVector)
     ASSERT_EQ(1, attrNames.size());
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
     EXPECT_EQ("22", aX.getField("value").Array()[0].str());
     EXPECT_EQ("x1", aX.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
     EXPECT_EQ("x2", aX.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
@@ -1849,8 +1846,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundVectorToSimple)
     ASSERT_EQ(1, attrNames.size());
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
-    EXPECT_STREQ("new_value",C_STR_FIELD(aX, "value"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("new_value", C_STR_FIELD(aX, "value"));
     EXPECT_EQ(1360232700, aX.getIntField("modDate"));
     EXPECT_FALSE(aX.hasField("creDate"));
 
@@ -1928,7 +1925,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundVect
     ASSERT_EQ(1, attrNames.size());
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
     EXPECT_EQ("22", aX.getField("value").Array()[0].str());
     EXPECT_EQ("x1", aX.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
     EXPECT_EQ("x2", aX.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
@@ -2010,8 +2007,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundVectorToSimp
     ASSERT_EQ(1, attrNames.size());
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
-    EXPECT_STREQ("new_value",C_STR_FIELD(aX, "value"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("new_value", C_STR_FIELD(aX, "value"));
     EXPECT_EQ(1360232700, aX.getIntField("modDate"));
     EXPECT_FALSE(aX.hasField("creDate"));
 

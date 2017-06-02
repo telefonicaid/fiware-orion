@@ -77,8 +77,8 @@ extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
 *
 * prepareDatabase -
 */
-static void prepareDatabase(void) {
-
+static void prepareDatabase(void)
+{
     /* Set database */
     setupDatabase();
 
@@ -98,7 +98,6 @@ static void prepareDatabase(void) {
 
     connection->insert(SUBSCRIBECONTEXTAVAIL_COLL, sub1);
     connection->insert(SUBSCRIBECONTEXTAVAIL_COLL, sub2);
-
 }
 
 /* ****************************************************************************
@@ -113,7 +112,7 @@ TEST(mongoUnsubscribeContextAvailability, subscriptionNotFound)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -153,7 +152,7 @@ TEST(mongoUnsubscribeContextAvailability, unsubscribe)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -198,11 +197,11 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbFindOneFail)
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, findOne("utest.casubs",_,_,_))
+    ON_CALL(*connectionMock, findOne("utest.casubs", _, _, _))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -226,7 +225,7 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbFindOneFail)
     EXPECT_EQ("Database Error (collection: utest.casubs "
               "- findOne(): { _id: ObjectId('51307b66f481db11bf860001') } "
               "- exception: boom!!)", res.statusCode.details);
-    
+
     // Sleeping a little to "give mongod time to process its input".
     // Without this sleep, this tests fails around 50% of the times (in Ubuntu 13.04)
     usleep(1000);
@@ -256,19 +255,23 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbRemoveFail)
 
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
-    BSONObj fakeSub = BSON("_id" << OID("51307b66f481db11bf860001") <<
-                                       "expiration" << 10000000 <<
-                                       "reference" << "http://notify1.me" <<
-                                       "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
-                                       "attrs" << BSONArray());
+
+    BSONObj fakeSub = BSON("_id"        << OID("51307b66f481db11bf860001") <<
+                           "expiration" << 10000000 <<
+                           "reference"  << "http://notify1.me" <<
+                           "entities"   << BSON_ARRAY(BSON("id"        << "E1" <<
+                                                           "type"      << "T1" <<
+                                                           "isPattern" << "false")) <<
+                           "attrs"      << BSONArray());
+
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, findOne("utest.casubs",_,_,_))
+    ON_CALL(*connectionMock, findOne("utest.casubs", _, _, _))
             .WillByDefault(Return(fakeSub));
-    ON_CALL(*connectionMock, remove("utest.casubs",_,_,_))
+    ON_CALL(*connectionMock, remove("utest.casubs", _, _, _))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -302,7 +305,7 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbRemoveFail)
     /* Restore real DB connection */
     setMongoConnectionForUnitTest(connectionDb);
 
-    /* Release mocks */    
+    /* Release mocks */
     delete notifierMock;
     delete connectionMock;
 }
