@@ -147,6 +147,7 @@ then
   verbose=on
 fi
 
+typeset -i lines
 
 if [ "$dir" == "" ]
 then
@@ -158,9 +159,33 @@ then
 else
   vMsg "Running TID/google style-guide check on $dir"
   scripts/cpplint.py $dir/*.cpp $dir/*.h 2> LINT
-  lines=$(wc -l $dir/*.cpp $dir/*.h | grep -v src/ | awk '{ print $1 }')
-  filesCpp=$(find $dir -name "*.cpp" | wc -l)
-  filesH=$(find $dir -name "*.h" | wc -l)
+
+  typeset -i lines1
+  typeset -i lines2
+
+  lines1=0
+  lines2=0
+
+  filesCpp=$(ls $dir/*.cpp 2> /dev/null | wc -l)
+  filesH=$(ls $dir/*.h 2> /dev/null | wc -l)
+
+  if [ "$filesCpp" == "1" ]
+  then
+    lines1=$(wc -l $dir/*.cpp 2> /dev/null | awk '{ print $1 }')
+  elif [ "$filesCpp" != "0" ]
+  then
+    lines1=$(wc -l $dir/*.cpp 2> /dev/null | grep ' total' | awk '{ print $1 }')
+  fi
+
+  if [ "$filesH" == "1" ]
+  then
+    lines2=$(wc -l $dir/*.h 2> /dev/null | awk '{ print $1 }')
+  elif [ "$filesH" != "0" ]
+  then
+    lines2=$(wc -l $dir/*.h 2> /dev/null | grep ' total' | awk '{ print $1 }')
+  fi
+
+  lines=$lines1+$lines2
 fi
 
 totalErrors=$(grep "Total errors found" LINT | awk -F:\  '{ print $2 }')
@@ -168,7 +193,14 @@ totalErrors=$(grep "Total errors found" LINT | awk -F:\  '{ print $2 }')
 typeset -i files
 
 files=$filesCpp+$filesH
-percentage=$(echo "scale=2; $totalErrors*100/$lines" | bc)
+vMsg $lines lines in $files files in dir $dir
+
+if [ "$files" != 0 ]
+then
+  percentage=$(echo "scale=2; $totalErrors*100/$lines" | bc)
+else
+  percentage=0
+fi
 
 
 
