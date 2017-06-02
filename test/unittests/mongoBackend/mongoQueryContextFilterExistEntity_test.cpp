@@ -76,8 +76,8 @@ extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
 * This function is called before every test, to populate some information in the
 * entities collection.
 */
-static void prepareDatabase(void) {
-
+static void prepareDatabase(void)
+{
   /* Set database */
   setupDatabase();
 
@@ -86,23 +86,18 @@ static void prepareDatabase(void) {
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
                      "attrNames" << BSON_ARRAY("A1") <<
                      "attrs" << BSON(
-                        "A1" << BSON("type" << "TA1" << "value" << "val1")
-                        )
-                    );
+                       "A1" << BSON("type" << "TA1" << "value" << "val1")));
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E1") <<
                      "attrNames" << BSON_ARRAY("A1") <<
                      "attrs" << BSON(
-                        "A1" << BSON("type" << "TA1" << "value" << "val1b")
-                        )
-                    );
+                       "A1" << BSON("type" << "TA1" << "value" << "val1b")));
 
 
   connection->insert(ENTITIES_COLL, en1);
   connection->insert(ENTITIES_COLL, en2);
-
-
 }
+
 
 
 /* ****************************************************************************
@@ -159,7 +154,7 @@ TEST(mongoQueryContextExistEntity, entityTypeWithoutFilter)
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
- 
+
     utExit();
 }
 
