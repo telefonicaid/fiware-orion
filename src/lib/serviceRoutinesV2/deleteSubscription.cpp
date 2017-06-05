@@ -23,10 +23,10 @@
 * Author: Orion dev team
 */
 #include <string>
+#include <vector>
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
-
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "rest/OrionError.h"
@@ -34,6 +34,7 @@
 #include "ngsi10/UnsubscribeContextResponse.h"
 
 #include "serviceRoutinesV2/deleteSubscription.h"
+
 
 
 /* ****************************************************************************
@@ -48,14 +49,12 @@
 * URI parameters:
 *   -
 */
-
-
 std::string deleteSubscription
 (
-    ConnectionInfo*            ciP,
-    int                        components,
-    std::vector<std::string>&  compV,
-    ParseData*                 parseDataP
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
 )
 {
   std::string                 subscriptionId =  compV[2];
@@ -71,7 +70,7 @@ std::string deleteSubscription
   if (uncr.oe.code != SccNone )
   {
     TIMED_RENDER(answer = uncr.oe.toJson());
-    ciP->httpStatusCode = uncr.oe.code;    
+    ciP->httpStatusCode = uncr.oe.code;
   }
   else
   {

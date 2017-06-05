@@ -79,7 +79,7 @@ std::string putEntity
 
   // 01. Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, "REPLACE");
-  
+
 
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);

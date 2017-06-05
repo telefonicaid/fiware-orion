@@ -45,12 +45,7 @@ function style_check
   fi
 }
 
-style_check test/unittests/orionTypes
-style_check test/unittests/jsonParse
-style_check test/unittests/apiTypesV2
-style_check test/unittests/cache
-style_check test/unittests/mongoBackend
-style_check test/unittests
+style_check src/lib/serviceRoutinesV2
 style_check src/lib/logSummary
 style_check src/lib/jsonParseV2
 style_check src/lib/apiTypesV2
@@ -60,6 +55,12 @@ style_check src/lib/parseArgs
 style_check src/lib/cache
 style_check src/lib/alarmMgr
 style_check src/lib/metricsMgr
+style_check test/unittests
+style_check test/unittests/orionTypes
+style_check test/unittests/jsonParse
+style_check test/unittests/apiTypesV2
+style_check test/unittests/cache
+style_check test/unittests/mongoBackend
 
 # FIXME: Just keep adding directories here until all of them are included:
 
@@ -74,7 +75,6 @@ style_check src/lib/metricsMgr
 # style_check src/lib/parse
 # style_check src/lib/rest
 # style_check src/lib/serviceRoutines
-# style_check src/lib/serviceRoutinesV2
 # style_check src/app/contextBroker
 
 # style_check test/unittests/common
