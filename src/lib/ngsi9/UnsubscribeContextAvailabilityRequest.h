@@ -1,5 +1,5 @@
-#ifndef UNSUBSCRIBE_CONTEXT_AVAILABILITY_REQUEST_H
-#define UNSUBSCRIBE_CONTEXT_AVAILABILITY_REQUEST_H
+#ifndef SRC_LIB_NGSI9_UNSUBSCRIBECONTEXTAVAILABILITYREQUEST_H_
+#define SRC_LIB_NGSI9_UNSUBSCRIBECONTEXTAVAILABILITYREQUEST_H_
 
 /*
 *
@@ -48,4 +48,4 @@ typedef struct UnsubscribeContextAvailabilityRequest
   void            fill(const std::string& _subscriptionId);
 } UnsubscribeContextAvailabilityRequest;
 
-#endif
+#endif  // SRC_LIB_NGSI9_UNSUBSCRIBECONTEXTAVAILABILITYREQUEST_H_

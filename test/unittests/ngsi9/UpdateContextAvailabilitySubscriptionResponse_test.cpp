@@ -34,7 +34,7 @@
 
 /* ****************************************************************************
 *
-* jsonRender - 
+* jsonRender -
 *
 * subscriptionId: MANDATORY
 * duration:       Optional
@@ -61,7 +61,7 @@ TEST(UpdateContextAvailabilitySubscriptionResponse, jsonRender)
   rendered = ucasP->render("", 1);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
-  
+
   // 2. +subscriptionId -duration +errorCode
   ucasP->errorCode.fill(SccBadRequest);
 

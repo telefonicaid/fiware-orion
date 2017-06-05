@@ -31,7 +31,7 @@
 
 /* ****************************************************************************
 *
-* renderAndRelease - 
+* renderAndRelease -
 *
 */
 TEST(ScopeVector, renderAndRelease)
@@ -60,7 +60,7 @@ TEST(ScopeVector, renderAndRelease)
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 */
 TEST(ScopeVector, check)
 {
@@ -70,7 +70,7 @@ TEST(ScopeVector, check)
   std::string    expected1 = "OK";
   std::string    expected2 = "Empty type in restriction scope";
   std::string    rendered;
-  
+
   utInit();
 
   sV.push_back(s1);
@@ -79,7 +79,7 @@ TEST(ScopeVector, check)
 
   sV.push_back(s2);
   rendered = sV.check(RegisterContext, "", "", 0);
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());  
+  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
 
   utExit();
 }
@@ -107,7 +107,7 @@ TEST(ScopeVector, present)
 
 /* ****************************************************************************
 *
-* getAndSize - 
+* getAndSize -
 */
 TEST(ScopeVector, getAndSize)
 {

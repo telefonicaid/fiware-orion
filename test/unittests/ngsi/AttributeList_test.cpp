@@ -33,14 +33,14 @@
 
 /* ****************************************************************************
 *
-* ok - 
+* ok -
 */
 TEST(AttributeList, ok)
 {
   AttributeList  al;
   std::string    out;
   const char*    outfile1 = "ngsi.attributeList.ok.middle.json";
-  
+
   utInit();
 
   out = al.render("");
@@ -48,7 +48,7 @@ TEST(AttributeList, ok)
 
   al.push_back("a1");
   al.push_back("a2");
-  
+
   out = al.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());

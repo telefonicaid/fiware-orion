@@ -37,7 +37,7 @@
 
 /* ****************************************************************************
 *
-* render_json - 
+* render_json -
 */
 TEST(AppendContextElementResponse, render_json)
 {
@@ -61,13 +61,13 @@ TEST(AppendContextElementResponse, render_json)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
-}   
+}
 
 
 
 /* ****************************************************************************
 *
-* check_json - 
+* check_json -
 */
 TEST(AppendContextElementResponse, check_json)
 {
@@ -98,13 +98,13 @@ TEST(AppendContextElementResponse, check_json)
   EXPECT_EQ("OK", out);
 
   utExit();
-}  
+}
 
 
 
 /* ****************************************************************************
 *
-* release - 
+* release -
 */
 TEST(AppendContextElementResponse, release)
 {

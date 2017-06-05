@@ -73,7 +73,7 @@ std::string postRegisterContext
       {
         std::string  details = "isPattern set to true for registrations is currently not supported";
         OrionError   oe(SccBadRequest, details);
-        
+
         alarmMgr.badInput(clientIp, details);
         ciP->httpStatusCode = SccBadRequest;
         return oe.render();

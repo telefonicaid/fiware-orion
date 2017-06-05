@@ -42,7 +42,7 @@
 
 /* ****************************************************************************
 *
-* exitTreat - 
+* exitTreat -
 */
 std::string exitTreat
 (
@@ -85,7 +85,7 @@ std::string exitTreat
   {
     if (subCacheState == ScsSynchronizing)
     {
-      // 
+      //
       // Subscription Cache is busy doing a synchronization.
       // Two secs should be enough for it to finish.
       //

@@ -31,7 +31,7 @@
 
 /* ****************************************************************************
 *
-* constructorsAndRender - 
+* constructorsAndRender -
 *
 */
 TEST(UnsubscribeContextResponse, constructorsAndRender)
@@ -58,7 +58,7 @@ TEST(UnsubscribeContextResponse, constructorsAndRender)
 
 /* ****************************************************************************
 *
-* jsonRender - 
+* jsonRender -
 */
 TEST(UnsubscribeContextResponse, jsonRender)
 {

@@ -1,5 +1,5 @@
-#ifndef ONINTERVAL_THREAD_PARAMS_H
-#define ONINTERVAL_THREAD_PARAMS_H
+#ifndef SRC_LIB_NGSINOTIFY_ONINTERVALTHREADPARAMS_H_
+#define SRC_LIB_NGSINOTIFY_ONINTERVALTHREADPARAMS_H_
 
 /*
 *
@@ -35,4 +35,4 @@ typedef struct OnIntervalThreadParams {
     Notifier*       notifier;
 } OnIntervalThreadParams;
 
-#endif
+#endif  // SRC_LIB_NGSINOTIFY_ONINTERVALTHREADPARAMS_H_

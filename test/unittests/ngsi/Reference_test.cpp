@@ -40,7 +40,7 @@ TEST(Reference, check)
   Reference    reference;
   std::string  checked;
   std::string  expected = "OK";
-  
+
   utInit();
 
   reference.string = "http://ip:12";
@@ -54,7 +54,7 @@ TEST(Reference, check)
 
 /* ****************************************************************************
 *
-* isEmptySetAndGet - 
+* isEmptySetAndGet -
 */
 TEST(Reference, isEmptySetAndGet)
 {
@@ -97,7 +97,7 @@ TEST(Reference, present)
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 TEST(Reference, render)
 {
@@ -124,7 +124,7 @@ TEST(Reference, render)
 
 /* ****************************************************************************
 *
-* c_str - 
+* c_str -
 */
 TEST(Reference, c_str)
 {

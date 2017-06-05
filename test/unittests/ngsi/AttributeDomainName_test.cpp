@@ -33,7 +33,7 @@
 
 /* ****************************************************************************
 *
-* ok - 
+* ok -
 */
 TEST(AttributeDomainName, ok)
 {
@@ -44,7 +44,7 @@ TEST(AttributeDomainName, ok)
   utInit();
 
   EXPECT_TRUE(adn.isEmpty());
-  
+
   adn.set("ADN");
   EXPECT_FALSE(adn.isEmpty());
   EXPECT_STREQ("ADN", adn.get().c_str());

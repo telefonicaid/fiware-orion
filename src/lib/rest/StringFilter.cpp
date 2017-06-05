@@ -79,7 +79,7 @@ bool StringFilterItem::fill(StringFilterItem* sfiP, std::string* errorStringP)
   {
     //
     // FIXME P4: not very optimized to recalculate the regex.
-    // 
+    //
     // We don't know of a better way to copy the regex from sfiP, and have a question out on SOF:
     // http://stackoverflow.com/questions/36846426/best-way-of-cloning-compiled-regex-t-struct-in-c
     //
@@ -88,7 +88,7 @@ bool StringFilterItem::fill(StringFilterItem* sfiP, std::string* errorStringP)
       *errorStringP = std::string("error compiling filter regex: '") + stringValue + "'";
       return false;
     }
-  }    
+  }
 
   return true;
 }
@@ -97,7 +97,7 @@ bool StringFilterItem::fill(StringFilterItem* sfiP, std::string* errorStringP)
 
 /* ****************************************************************************
 *
-* StringFilterItem::~StringFilterItem - 
+* StringFilterItem::~StringFilterItem -
 */
 StringFilterItem::~StringFilterItem()
 {
@@ -115,7 +115,7 @@ StringFilterItem::~StringFilterItem()
 
 /* ****************************************************************************
 *
-* StringFilterItem::valueParse - 
+* StringFilterItem::valueParse -
 */
 bool StringFilterItem::valueParse(char* s, std::string* errorStringP)
 {
@@ -161,7 +161,7 @@ bool StringFilterItem::valueParse(char* s, std::string* errorStringP)
 
 /* ****************************************************************************
 *
-* StringFilterItem::rangeParse - 
+* StringFilterItem::rangeParse -
 */
 bool StringFilterItem::rangeParse(char* s, std::string* errorStringP)
 {
@@ -192,7 +192,7 @@ bool StringFilterItem::rangeParse(char* s, std::string* errorStringP)
     *errorStringP = "empty item in range";
     return false;
   }
-  
+
   StringFilterValueType vtFrom;
   StringFilterValueType vtTo;
   bool                  b;
@@ -247,7 +247,7 @@ bool StringFilterItem::rangeParse(char* s, std::string* errorStringP)
 
 /* ****************************************************************************
 *
-* StringFilterItem::listItemAdd - 
+* StringFilterItem::listItemAdd -
 */
 bool StringFilterItem::listItemAdd(char* s, std::string* errorStringP)
 {
@@ -322,7 +322,7 @@ bool StringFilterItem::listItemAdd(char* s, std::string* errorStringP)
 
 /* ****************************************************************************
 *
-* StringFilterItem::listParse - 
+* StringFilterItem::listParse -
 */
 bool StringFilterItem::listParse(char* s, std::string* errorStringP)
 {
@@ -382,7 +382,7 @@ bool StringFilterItem::listParse(char* s, std::string* errorStringP)
 
 /* ****************************************************************************
 *
-* StringFilterItem::valueGet - 
+* StringFilterItem::valueGet -
 */
 bool StringFilterItem::valueGet
 (
@@ -507,28 +507,28 @@ static StringFilterOp opFind(char* expression, char** lhsP, char** rhsP)
 
       if (op != SfopExists)  // operator found, RHS already set
       {
-        // Mark the end of LHS - but not if op is Exists, where expression == LHS == RHS 
+        // Mark the end of LHS - but not if op is Exists, where expression == LHS == RHS
         *eP = 0;
 
         return op;
       }
     }
-    
+
     ++eP;
   }
 
   *rhsP = expression;
-  return SfopExists; 
+  return SfopExists;
 }
 
 
 
 /* ****************************************************************************
 *
-* StringFilterItem::parse - 
+* StringFilterItem::parse -
 *
 * A StringFilterItem is a string of the form:
-* 
+*
 *   key OPERATOR value
 *
 * - The key can only contain alphanumeric chars
@@ -711,7 +711,7 @@ static char* lhsDotToEqualIfInsideQuote(char* s)
   char* scopyP        = strdup(s);
   char* dotP          = scopyP;
   bool  insideQuotes  = false;
-  
+
   //
   // Replace '.' for '=' if inside quotes
   //
@@ -756,7 +756,7 @@ static char* lhsDotToEqualIfInsideQuote(char* s)
 
 /* ****************************************************************************
 *
-* StringFilterItem::lhsParse - 
+* StringFilterItem::lhsParse -
 */
 void StringFilterItem::lhsParse(void)
 {
@@ -777,10 +777,10 @@ void StringFilterItem::lhsParse(void)
     compoundPath  = "";
     return;
   }
-  
+
   *dotP = 0;
   ++dotP;  // Step over the dot
-  
+
   attributeName = start;
 
   // If MQ, a second dot must be found in order for LHS to be about compounds
@@ -814,7 +814,7 @@ void StringFilterItem::lhsParse(void)
 
 /* ****************************************************************************
 *
-* StringFilterItem::opName - 
+* StringFilterItem::opName -
 */
 const char* StringFilterItem::opName(void)
 {
@@ -838,7 +838,7 @@ const char* StringFilterItem::opName(void)
 
 /* ****************************************************************************
 *
-* StringFilterItem::valueTypeName - 
+* StringFilterItem::valueTypeName -
 */
 const char* StringFilterItem::valueTypeName(void)
 {
@@ -864,7 +864,7 @@ const char* StringFilterItem::valueTypeName(void)
 
 /* ****************************************************************************
 *
-* StringFilterItem::matchEquals(Metadata*) - 
+* StringFilterItem::matchEquals(Metadata*) -
 */
 bool StringFilterItem::matchEquals(Metadata* mdP)
 {
@@ -973,10 +973,10 @@ bool StringFilterItem::matchEquals(Metadata* mdP)
 
 /* ****************************************************************************
 *
-* StringFilterItem::matchEquals - 
+* StringFilterItem::matchEquals -
 *
 * FIXME P2: Note that the Date type doesn't exist in compound values, but as
-*           this *might* be implemented some day, I leave the Data types just as for 
+*           this *might* be implemented some day, I leave the Data types just as for
 *           non-compound comparisons. Doesn't really hurt.
 *           Right now, 'Date' in compounds are treated as strings.
 */
@@ -1069,7 +1069,7 @@ bool StringFilterItem::matchEquals(orion::CompoundValueNode* cvP)
 
 /* ****************************************************************************
 *
-* StringFilterItem::matchEquals - 
+* StringFilterItem::matchEquals -
 */
 bool StringFilterItem::matchEquals(ContextAttribute* caP)
 {
@@ -1338,7 +1338,7 @@ bool StringFilterItem::compatibleType(orion::CompoundValueNode* cvP)
 
 /* ****************************************************************************
 *
-* StringFilterItem::matchGreaterThan - 
+* StringFilterItem::matchGreaterThan -
 */
 bool StringFilterItem::matchGreaterThan(ContextAttribute* caP)
 {
@@ -1385,7 +1385,7 @@ bool StringFilterItem::matchGreaterThan(ContextAttribute* caP)
 
 /* ****************************************************************************
 *
-* StringFilterItem::matchGreaterThan - 
+* StringFilterItem::matchGreaterThan -
 */
 bool StringFilterItem::matchGreaterThan(orion::CompoundValueNode* cvP)
 {
@@ -1416,7 +1416,7 @@ bool StringFilterItem::matchGreaterThan(orion::CompoundValueNode* cvP)
 
 /* ****************************************************************************
 *
-* StringFilterItem::matchGreaterThan - 
+* StringFilterItem::matchGreaterThan -
 */
 bool StringFilterItem::matchGreaterThan(Metadata* mdP)
 {
@@ -1463,7 +1463,7 @@ bool StringFilterItem::matchGreaterThan(Metadata* mdP)
 
 /* ****************************************************************************
 *
-* StringFilterItem::matchLessThan - 
+* StringFilterItem::matchLessThan -
 */
 bool StringFilterItem::matchLessThan(ContextAttribute* caP)
 {
@@ -1510,7 +1510,7 @@ bool StringFilterItem::matchLessThan(ContextAttribute* caP)
 
 /* ****************************************************************************
 *
-* StringFilterItem::matchLessThan - 
+* StringFilterItem::matchLessThan -
 */
 bool StringFilterItem::matchLessThan(orion::CompoundValueNode* cvP)
 {
@@ -1541,7 +1541,7 @@ bool StringFilterItem::matchLessThan(orion::CompoundValueNode* cvP)
 
 /* ****************************************************************************
 *
-* StringFilterItem::matchLessThan - 
+* StringFilterItem::matchLessThan -
 */
 bool StringFilterItem::matchLessThan(Metadata* mdP)
 {
@@ -1588,7 +1588,7 @@ bool StringFilterItem::matchLessThan(Metadata* mdP)
 
 /* ****************************************************************************
 *
-* StringFilter::StringFilter - 
+* StringFilter::StringFilter -
 */
 StringFilter::StringFilter(StringFilterType _type):
   type(_type)
@@ -1599,7 +1599,7 @@ StringFilter::StringFilter(StringFilterType _type):
 
 /* ****************************************************************************
 *
-* StringFilter::~StringFilter - 
+* StringFilter::~StringFilter -
 */
 StringFilter::~StringFilter()
 {
@@ -1617,7 +1617,7 @@ StringFilter::~StringFilter()
 
 /* ****************************************************************************
 *
-* StringFilter::parse - 
+* StringFilter::parse -
 */
 bool StringFilter::parse(const char* q, std::string* errorStringP)
 {
@@ -1705,7 +1705,7 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
 
 /* ****************************************************************************
 *
-* StringFilter::mongoFilterPopulate - 
+* StringFilter::mongoFilterPopulate -
 */
 bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
 {
@@ -1762,9 +1762,9 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       else if (itemP->type == SftMq)
       {
         left = std::string(ENT_ATTRS) + "." +
-               itemP->attributeName   + "." + 
-               ENT_ATTRS_MD           + "." + 
-               itemP->metadataName    + "." + 
+               itemP->attributeName   + "." +
+               ENT_ATTRS_MD           + "." +
+               itemP->metadataName    + "." +
                ENT_ATTRS_MD_VALUE     + "." +
                itemP->compoundPath;
         k = left;
@@ -1994,7 +1994,7 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       bob.append(k, bb.obj());
       f = bob.obj();
       break;
-    }             
+    }
 
     mongoFilters.push_back(f);
   }
@@ -2006,7 +2006,7 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
 
 /* ****************************************************************************
 *
-* StringFilter::match - 
+* StringFilter::match -
 *
 * This method is used in mongoBackend/MongoCommonUpdate.cpp, processSubscriptions()
 * to help decide whether a Notification is to be sent after updating an entity
@@ -2031,7 +2031,7 @@ bool StringFilter::match(ContextElementResponse* cerP)
 
 /* ****************************************************************************
 *
-* StringFilter::mqMatch - 
+* StringFilter::mqMatch -
 *
 * NOTE
 *   The filters are ANDed together, so, if a 'no match' is encountered, we can safely
@@ -2140,7 +2140,7 @@ bool StringFilter::mqMatch(ContextElementResponse* cerP)
 
 /* ****************************************************************************
 *
-* StringFilter::qMatch - 
+* StringFilter::qMatch -
 *
 * NOTE
 *   The filters are ANDed together, so, if a 'no match' is encountered, we can safely
@@ -2277,7 +2277,7 @@ bool StringFilter::qMatch(ContextElementResponse* cerP)
 
 /* ****************************************************************************
 *
-* StringFilter::clone - 
+* StringFilter::clone -
 */
 StringFilter* StringFilter::clone(std::string* errorStringP)
 {
@@ -2307,7 +2307,7 @@ StringFilter* StringFilter::clone(std::string* errorStringP)
 
 /* ****************************************************************************
 *
-* StringFilter::fill - 
+* StringFilter::fill -
 */
 bool StringFilter::fill(StringFilter* sfP, std::string* errorStringP)
 {
@@ -2321,7 +2321,7 @@ bool StringFilter::fill(StringFilter* sfP, std::string* errorStringP)
       LM_E(("Runtime Error (error filling StringFilterItem: %s)", errorStringP->c_str()));
       return false;
     }
-    
+
     filters.push_back(sfi);
   }
 

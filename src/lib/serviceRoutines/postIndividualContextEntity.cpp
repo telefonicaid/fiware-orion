@@ -114,7 +114,7 @@ std::string postIndividualContextEntity
 
     TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity, ""));
     return out;
-  }  
+  }
   entityId = (entityIdFromPayload != "")? entityIdFromPayload : entityIdFromURL;
 
   // 01.02. entityId::type

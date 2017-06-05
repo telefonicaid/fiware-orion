@@ -35,7 +35,7 @@
 
 /* ****************************************************************************
 *
-* MAX_LEN_IP - 
+* MAX_LEN_IP -
 */
 #define MAX_LEN_IP  64
 
@@ -43,8 +43,8 @@
 
 /* ****************************************************************************
 *
-* CONSTANTS RESTINIT - 
-*/ 
+* CONSTANTS RESTINIT -
+*/
 #define   NO_PORT 0
 
 
@@ -53,7 +53,7 @@
 *
 *  IpVersion -
 */
-typedef enum IpVersion 
+typedef enum IpVersion
 {
   IPV4     = 1,
   IPV6     = 2,
@@ -64,9 +64,9 @@ typedef enum IpVersion
 
 /* ****************************************************************************
 *
-* Global vars - 
+* Global vars -
 */
-extern IpVersion               ipVersionUsed;  
+extern IpVersion               ipVersionUsed;
 extern std::string             rushHost;
 extern unsigned short          rushPort;
 extern bool                    multitenant;
@@ -76,7 +76,7 @@ extern char                    restAllowedOrigin[64];
 
 /* ****************************************************************************
 *
-* RestServeFunction - 
+* RestServeFunction -
 */
 typedef void (*RestServeFunction)(ConnectionInfo* ciP);
 
@@ -84,13 +84,13 @@ typedef void (*RestServeFunction)(ConnectionInfo* ciP);
 
 /* ****************************************************************************
 *
-* restInit - 
+* restInit -
 */
 extern void restInit
 (
    RestService*        _restServiceV,
    IpVersion           _ipVersion,
-   const char*         _bindAddress, 
+   const char*         _bindAddress,
    unsigned short      _port,
    bool                _multitenant,
    unsigned int        _connectionMemory,
@@ -109,7 +109,7 @@ extern void restInit
 
 /* ****************************************************************************
 *
-* servicePathCheck - 
+* servicePathCheck -
 */
 extern int servicePathCheck(ConnectionInfo* ciP, const char* servicePath);
 
