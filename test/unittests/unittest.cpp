@@ -22,25 +22,36 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+#include <vector>
+#include <map>
+
+#include "cache/subCache.h"
 #include "rest/uriParamNames.h"
 
-#include "unittest.h"
-#include "testInit.h"
-#include "cache/subCache.h"
+#include "unittests/unittest.h"
+#include "unittests/testInit.h"
 
 
 
 /* ****************************************************************************
 *
-* debugging - 
+* USING
+*/
+using ::testing::Return;
+
+
+
+/* ****************************************************************************
+*
+* debugging -
 *
 * FIXME P4 - these counters are useful (only visible if UT_DEBUG is defined)
 *            to detect calls to utInit without respective call to utExit.
 *            All of it should be removed as soon as we implement the new
 *            more complete TRST macro (I_TEST?)
-* 
 */
-//#define UT_DEBUG
+// #define UT_DEBUG
 #ifdef UT_DEBUG
 static int noOfInits = 0;
 static int noOfExits = 0;
@@ -61,7 +72,7 @@ static TimerMock*    timerMock    = NULL;
 
 /* ****************************************************************************
 *
-* uriParams - 
+* uriParams -
 */
 std::map<std::string, std::string> uriParams;
 
@@ -73,11 +84,11 @@ std::map<std::string, std::string> uriParams;
 */
 std::map<std::string, bool> options;
 
- 
+
 
 /* ****************************************************************************
 *
-* servicePathVector - 
+* servicePathVector -
 */
 std::vector<std::string> servicePathVector;
 
@@ -134,7 +145,7 @@ void utInit(bool notifierMocked, bool timerMocked)
   uriParams[URI_PARAM_PAGINATION_OFFSET]   = DEFAULT_PAGINATION_OFFSET;
   uriParams[URI_PARAM_PAGINATION_LIMIT]    = DEFAULT_PAGINATION_LIMIT;
   uriParams[URI_PARAM_PAGINATION_DETAILS]  = DEFAULT_PAGINATION_DETAILS;
-  uriParams[URI_PARAM_NOT_EXIST]           = ""; // FIXME P7: we need this to implement "restriction-based" filters
+  uriParams[URI_PARAM_NOT_EXIST]           = "";  // FIXME P7: we need this to implement "restriction-based" filters
 
   //
   // Resetting servicePathVector

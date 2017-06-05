@@ -275,7 +275,7 @@ bool collectionCount
 *
 * collectionFindOne -
 */
-extern bool collectionFindOne
+bool collectionFindOne
 (
   const std::string&  col,
   const BSONObj&      q,

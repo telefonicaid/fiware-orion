@@ -1,5 +1,5 @@
-#ifndef MONGO_UNSUBSCRIBE_CONTEXT_AVAILABILITY_H
-#define MONGO_UNSUBSCRIBE_CONTEXT_AVAILABILITY_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOUNSUBSCRIBECONTEXTAVAILABILITY_H_
+#define SRC_LIB_MONGOBACKEND_MONGOUNSUBSCRIBECONTEXTAVAILABILITY_H_
 
 /*
 *
@@ -27,6 +27,7 @@
 */
 #include <string>
 
+#include "rest/HttpStatusCode.h"
 #include "ngsi9/UnsubscribeContextAvailabilityRequest.h"
 #include "ngsi9/UnsubscribeContextAvailabilityResponse.h"
 
@@ -36,6 +37,11 @@
 *
 * mongoUnsubscribeContextAvailability - 
 */
-extern HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilityRequest* requestP, UnsubscribeContextAvailabilityResponse* responseP, const std::string& tenant = "");
+extern HttpStatusCode mongoUnsubscribeContextAvailability
+(
+  UnsubscribeContextAvailabilityRequest*   requestP,
+  UnsubscribeContextAvailabilityResponse*  responseP,
+  const std::string&                       tenant = ""
+);
 
-#endif
+#endif  // SRC_LIB_MONGOBACKEND_MONGOUNSUBSCRIBECONTEXTAVAILABILITY_H_

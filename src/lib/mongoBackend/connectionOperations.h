@@ -25,6 +25,8 @@
 *
 * Author: Fermín Galán
 */
+#include <string>
+
 #include "mongo/client/dbclient.h"
 
 
@@ -202,7 +204,6 @@ extern bool getWriteConcern
 /* ****************************************************************************
 *
 * connectionAuth -
-*
 */
 extern bool connectionAuth
 (
@@ -213,4 +214,4 @@ extern bool connectionAuth
   std::string*          err
 );
 
-#endif // SRC_LIB_MONGOBACKEND_CONNECTIONOPERATIONS_H_
+#endif  // SRC_LIB_MONGOBACKEND_CONNECTIONOPERATIONS_H_

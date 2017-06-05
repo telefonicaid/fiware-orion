@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "rapidjson/document.h"
 
 #include "logMsg/logMsg.h"
@@ -31,6 +33,7 @@
 #include "ngsi/Metadata.h"
 #include "parse/CompoundValueNode.h"
 #include "rest/OrionError.h"
+
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseMetadataCompoundValue.h"
 #include "jsonParseV2/parseMetadata.h"
@@ -39,13 +42,13 @@
 
 /* ****************************************************************************
 *
-* parseMetadataObject - 
+* parseMetadataObject -
 */
-static std::string parseMetadataObject(const Value& start, Metadata* mdP)
+static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* mdP)
 {
   bool  compoundVector = false;
 
-  for (Value::ConstMemberIterator iter = start.MemberBegin(); iter != start.MemberEnd(); ++iter)
+  for (rapidjson::Value::ConstMemberIterator iter = start.MemberBegin(); iter != start.MemberEnd(); ++iter)
   {
     std::string name   = iter->name.GetString();
     std::string type   = jsonParseTypeNames[iter->value.GetType()];
@@ -141,12 +144,12 @@ static std::string parseMetadataObject(const Value& start, Metadata* mdP)
 
 /* ****************************************************************************
 *
-* parseMetadata - 
+* parseMetadata -
 */
-std::string parseMetadata(const Value& val, Metadata* mdP)
+std::string parseMetadata(const rapidjson::Value& val, Metadata* mdP)
 {
-  std::string type   = jsonParseTypeNames[val.GetType()];
-  std::string s;
+  std::string  type = jsonParseTypeNames[val.GetType()];
+  std::string  s;
 
   if (type != "Object")
   {

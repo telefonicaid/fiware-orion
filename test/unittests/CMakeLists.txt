@@ -228,6 +228,7 @@ include_directories("${PROJECT_SOURCE_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 include_directories("${PROJECT_SOURCE_DIR}/src/app")
 include_directories("${PROJECT_SOURCE_DIR}/test/unittests")
+include_directories("${PROJECT_SOURCE_DIR}/test")
 
 # Lib directories
 # ------------------------------------------------------------

@@ -25,9 +25,11 @@
 *
 * Author: Fermín Galán
 */
+#include "mongo/client/dbclient.h"
 
 #include "parse/CompoundValueNode.h"
-#include "mongo/client/dbclient.h"
+
+
 
 /* ****************************************************************************
 *
@@ -36,6 +38,8 @@
 */
 extern void compoundVectorResponse(orion::CompoundValueNode* cvP, const mongo::BSONElement& be);
 
+
+
 /* ****************************************************************************
 *
 * compoundObjectResponse -
@@ -43,5 +47,4 @@ extern void compoundVectorResponse(orion::CompoundValueNode* cvP, const mongo::B
 */
 extern void compoundObjectResponse(orion::CompoundValueNode* cvP, const mongo::BSONElement& be);
 
-#endif // SRC_LIB_MONGOBACKEND_COMPOUNDRESPONSES_H_
-
+#endif  // SRC_LIB_MONGOBACKEND_COMPOUNDRESPONSES_H_

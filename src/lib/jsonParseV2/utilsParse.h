@@ -25,59 +25,74 @@
 *
 * Author: Orion dev team
 */
-
 #include <string>
+
 #include "rapidjson/document.h"
 
+
+
+/* ****************************************************************************
+*
+* Opt -
+*/
 template <typename T>
 struct Opt {
   T           value;
   bool        given;
   std::string error;
-  Opt(T v, bool g): value(v), given(g), error() {}
-  Opt(std::string err): value(), given(true), error(err) {}
+
+  Opt(T v, bool g):     value(v), given(g),    error()    {}
+  explicit Opt(std::string err): value(),  given(true), error(err) {}
+
   bool ok() { return error.empty(); }
 };
 
 
 
-/*
- * getBoolMust -  get a mandatory bool from the rapidjson node
- */
-Opt<bool> getBoolMust(const rapidjson::Value& parent, const char* field,const std::string& description = "");
+/* *****************************************************************************
+*
+* getBoolMust - get a mandatory bool from the rapidjson node
+*/
+Opt<bool> getBoolMust(const rapidjson::Value& parent, const char* field, const std::string& description = "");
 
 
 
-/*
- * getBoolOpt - get an optional bool from the rapidjson node
- */
+/* *****************************************************************************
+*
+* getBoolOpt - get an optional bool from the rapidjson node
+*/
 Opt<bool> getBoolOpt(const rapidjson::Value& parent, const char* field, const std::string& description = "");
 
 
 
-/*
- * getStringMust -  get a mandatory string from the rapidjson node
- */
-Opt<std::string> getStringMust(const rapidjson::Value& parent, const char* field,const std::string& description = "");
+/* *****************************************************************************
+*
+* getStringMust - get a mandatory string from the rapidjson node
+*/
+Opt<std::string> getStringMust(const rapidjson::Value& parent, const char* field, const std::string& description = "");
 
 
-/*
- * getStringOpt - get an optional string from the rapidjson node
- */
+
+/* *****************************************************************************
+*
+* getStringOpt - get an optional string from the rapidjson node
+*/
 Opt<std::string> getStringOpt(const rapidjson::Value& parent, const char* field, const std::string& description = "");
 
 
 
-/*
- * getInt64Must - get a mandatory int64_t from the rapidjson node
- */
+/* *****************************************************************************
+*
+* getInt64Must - get a mandatory int64_t from the rapidjson node
+*/
 Opt<int64_t> getInt64Must(const rapidjson::Value& parent, const char* field, const std::string& description = "");
 
 
 
-/*
- * getInt64Opt - get an optional int64_t from the rapidjson node
- */
+/* *****************************************************************************
+*
+* getInt64Opt - get an optional int64_t from the rapidjson node
+*/
 Opt<int64_t> getInt64Opt(const rapidjson::Value& parent, const char* field, const std::string& description = "");
 
-#endif // SRC_LIB_JSONPARSEV2_UTILSPARSE_H
+#endif  // SRC_LIB_JSONPARSEV2_UTILSPARSE_H_

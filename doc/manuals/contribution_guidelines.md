@@ -688,6 +688,33 @@ ContextElement* ceP;
 
 *How to check*: manually
 
+#### S14 (Referenced variables in function calls)
+
+*Rule*: parameters that are passed by "C++ reference", either `const` or not, should be a variable, not a result of a computation.
+See example:
+
+```
+  extern void f(const BSONObj& bobj);
+
+  // NOT like this:
+  f(BSON("a" << 12));
+
+  // BUT, like this:
+  BSONObj bo = BSON("a" << 12);
+  f(bo);
+
+```
+
+*Rationale*: It's simply weird to pass a value for a referenced parameter. If `const` is not used you get a compiler error,
+which makes a lot of sense: how can the function modify the variable when there is no variable?
+In "C", it's more straightforward, as in order to send the reference to the variable using the `&` operator, you need a variable.
+In C++ it gets a a bit weird and it is better to avoid this by adding a helper variable (`bo` in the example above).
+The difference between "C pointers" and "C++ references" is minimal, but really, it depends on the implementation of the compiler.
+See [this question](https://stackoverflow.com/questions/44239212/how-do-c-compilers-actually-pass-literal-constant-in-reference-parameters) and 
+[this one](https://stackoverflow.com/questions/2936805/how-do-c-compilers-actually-pass-reference-parameters) in stackoverflow, for discussions on this. 
+
+*How to check*: manually
+
 ## Programming patterns
 
 Some patterns are not allowed in Orion Context Broker code, except if some strong reason justifies the use of it. 
@@ -707,7 +734,7 @@ If you plan to use some of them, please consult before with the core developers.
   * If the function must be able to modify the object (i.e. "read/write" or "write"), then a pointer type should be used, e.g: `BigFish* bf`. Note that in this case a C++ reference could be used as well, but we prefer pointers to clearly illustrate that the object might be be modified by the function.
 
 ```
-void myFunction(const& BigFish in, BigFish* out)
+void myFunction(const BigFish& in, BigFish* out)
 ```
 
 * Strings return. In order to avoid inefficient object copies when returning strings, the  `const std::string&` return type is preferred. In the case this pattern cannot be used (e.g. when literal string such as "black", "red", etc. are used in the call of the function) then `const char*` should be used as return type.

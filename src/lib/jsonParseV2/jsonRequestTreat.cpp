@@ -160,7 +160,7 @@ std::string jsonRequestTreat
     ciP->httpStatusCode = SccNotImplemented;
     break;
   }
-  
+
   if (timingStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &end);

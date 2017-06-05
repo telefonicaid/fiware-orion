@@ -26,16 +26,19 @@
 * Author: Fermin Galan
 *
 */
+#include <string>
 
-#include "ngsi/ContextAttributeVector.h"
 #include "mongo/client/dbclient.h"
 
+#include "common/globals.h"
 #include "rest/OrionError.h"
+#include "ngsi/ContextAttributeVector.h"
+
+
 
 /* ****************************************************************************
 *
 * processLocationAtEntityCreation -
-*
 */
 extern bool processLocationAtEntityCreation
 (
@@ -47,36 +50,37 @@ extern bool processLocationAtEntityCreation
   OrionError*                    oe
 );
 
+
+
 /* ****************************************************************************
 *
 * processLocationAtUpdateAttribute -
-*
 */
 extern bool processLocationAtUpdateAttribute
 (
-  std::string*                   currentLocAttrName,
-  const ContextAttribute*        targetAttr,
-  mongo::BSONObjBuilder*         geoJson,
-  std::string*                   errDetail,
-  ApiVersion                     apiVersion,
-  OrionError*                    oe
+  std::string*             currentLocAttrName,
+  const ContextAttribute*  targetAttr,
+  mongo::BSONObjBuilder*   geoJson,
+  std::string*             errDetail,
+  ApiVersion               apiVersion,
+  OrionError*              oe
 );
+
+
 
 /* ****************************************************************************
 *
 * processLocationAtAppendAttribute -
-*
 */
 extern bool processLocationAtAppendAttribute
 (
-  std::string*                   currentLocAttrName,
-  const ContextAttribute*        targetAttr,
-  bool                           actualAppend,
-  mongo::BSONObjBuilder*         geoJson,
-  std::string*                   errDetail,
-  ApiVersion                     apiVersion,
-  OrionError*                    oe
+  std::string*             currentLocAttrName,
+  const ContextAttribute*  targetAttr,
+  bool                     actualAppend,
+  mongo::BSONObjBuilder*   geoJson,
+  std::string*             errDetail,
+  ApiVersion               apiVersion,
+  OrionError*              oe
 );
 
-#endif // SRC_LIB_MONGOBACKEND_LOCATION_H_
-
+#endif  // SRC_LIB_MONGOBACKEND_LOCATION_H_

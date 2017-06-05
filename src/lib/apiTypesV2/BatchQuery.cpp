@@ -74,4 +74,3 @@ void BatchQuery::release(void)
   attributeV.release();
   scopeV.release();
 }
- 

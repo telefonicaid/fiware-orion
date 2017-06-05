@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"

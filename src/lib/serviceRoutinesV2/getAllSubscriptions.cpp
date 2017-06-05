@@ -63,7 +63,14 @@ std::string getAllSubscriptions
   int                               offset = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
   int                               limit  = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
 
-  TIMED_MONGO(mongoListSubscriptions(&subs, &oe, ciP->uriParam, ciP->tenant, ciP->servicePathV[0], limit, offset, &count));
+  TIMED_MONGO(mongoListSubscriptions(&subs,
+                                     &oe,
+                                     ciP->uriParam,
+                                     ciP->tenant,
+                                     ciP->servicePathV[0],
+                                     limit,
+                                     offset,
+                                     &count));
 
   if (oe.code != SccOk)
   {

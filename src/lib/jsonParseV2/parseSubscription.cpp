@@ -23,6 +23,10 @@
 * Author: Orion dev team
 */
 #include <regex.h>
+
+#include <string>
+#include <vector>
+#include <map>
 #include <algorithm>
 
 #include "rapidjson/document.h"
@@ -42,46 +46,62 @@
 #include "jsonParseV2/utilsParse.h"
 #include "jsonParseV2/parseSubscription.h"
 
-using namespace rapidjson;
 
+
+/* ****************************************************************************
+*
+* USING
+*/
 using ngsiv2::SubscriptionUpdate;
 using ngsiv2::EntID;
+using rapidjson::Value;
 
-/* Prototypes */
+
+
+/* ****************************************************************************
+*
+* Prototypes
+*/
 static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::string>* vec, const Value& attributes);
 static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& notification);
 static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& subject);
 static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* eivP, const Value& entities);
 static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& condition);
 static std::string badInput(ConnectionInfo* ciP, const std::string& msg);
-static std::string parseDictionary(ConnectionInfo* ciP, std::map<std::string, std::string>& dict, const Value& object, const std::string& name);
+static std::string parseDictionary(ConnectionInfo*                      ciP,
+                                   std::map<std::string, std::string>&  dict,
+                                   const Value&                         object,
+                                   const std::string&                   name);
 
 
 
 /* ****************************************************************************
 *
 * parseSubscription -
-*
 */
 std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bool update)
 {
-  Document document;
+  rapidjson::Document document;
 
   document.Parse(ciP->payload);
 
   if (document.HasParseError())
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
+
     alarmMgr.badInput(clientIp, "JSON parse error");
     ciP->httpStatusCode = SccBadRequest;
+
     return oe.toJson();
   }
 
   if (!document.IsObject())
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
+
     alarmMgr.badInput(clientIp, "JSON parse error");
     ciP->httpStatusCode = SccBadRequest;
+
     return oe.toJson();
   }
 
@@ -162,9 +182,8 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   }
   else if (expiresOpt.given)
   {
-    std::string expires = expiresOpt.value;
-
-    int64_t eT = -1;
+    std::string  expires = expiresOpt.value;
+    int64_t      eT      = -1;
 
     if (expires.empty())
     {
@@ -188,7 +207,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   }
 
   // Status field
-  Opt<std::string> statusOpt =  getStringOpt(document, "status");
+  Opt<std::string> statusOpt = getStringOpt(document, "status");
   if (!statusOpt.ok())
   {
     return badInput(ciP, statusOpt.error);
@@ -216,9 +235,9 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     subsP->throttlingProvided = true;
     subsP->throttling = throttlingOpt.value;
   }
-  else if (!update) // throttling was not set and it is not update
+  else if (!update)  // throttling was not set and it is not update
   {
-    subsP->throttling = 0; // Default value if not provided at creation => no throttling
+    subsP->throttling = 0;  // Default value if not provided at creation => no throttling
   }
 
   return "OK";
@@ -248,7 +267,7 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
     return badInput(ciP, "no subject entities specified");
   }
 
-  r = parseEntitiesVector(ciP, &subsP->subject.entities, subject["entities"] );
+  r = parseEntitiesVector(ciP, &subsP->subject.entities, subject["entities"]);
   if (r != "")
   {
     return r;
@@ -258,10 +277,12 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
   if (subject.HasMember("condition"))
   {
     const Value& condition = subject["condition"];
+
     if (!condition.IsObject())
     {
       return badInput(ciP, "condition is not an object");
     }
+
     if (condition.ObjectEmpty())
     {
       return badInput(ciP, "condition is empty");
@@ -321,6 +342,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
 
     {
       Opt<std::string> idOpt = getStringOpt(*iter, "id", "subject entities element id");
+
       if (!idOpt.ok())
       {
         return badInput(ciP, idOpt.error);
@@ -345,6 +367,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
 
     {
       Opt<std::string> idPatOpt = getStringOpt(*iter, "idPattern", "subject entities element idPattern");
+
       if (!idPatOpt.ok())
       {
         return badInput(ciP, idPatOpt.error);
@@ -370,6 +393,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
 
     {
       Opt<std::string> typeOpt = getStringOpt(*iter, "type", "subject entities element type");
+
       if (!typeOpt.ok())
       {
         return badInput(ciP, typeOpt.error);
@@ -394,6 +418,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
 
     {
       Opt<std::string> typePatOpt = getStringOpt(*iter, "typePattern", "subject entities element typePattern");
+
       if (!typePatOpt.ok())
       {
         return badInput(ciP, typePatOpt.error);
@@ -420,7 +445,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
 
     EntID  eid(id, idPattern, type, typePattern);
 
-    if (std::find(eivP->begin(), eivP->end(), eid) == eivP->end()) // if not already included
+    if (std::find(eivP->begin(), eivP->end(), eid) == eivP->end())  // if not already included
     {
       eivP->push_back(eid);
     }
@@ -434,7 +459,6 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, std::vector<EntID>* 
 /* ****************************************************************************
 *
 * parseNotification -
-*
 */
 static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& notification)
 {
@@ -524,14 +548,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // method -> verb
     {
-      Opt<std::string> methodOpt = getStringOpt(httpCustom, "method", "method httpCustom notification");
+      Opt<std::string>  methodOpt = getStringOpt(httpCustom, "method", "method httpCustom notification");
+      Verb              verb;
 
       if (!methodOpt.ok())
       {
         return badInput(ciP, methodOpt.error);
       }
-
-      Verb  verb;
 
       if (methodOpt.given)
       {
@@ -542,7 +565,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
           return badInput(ciP, "unknown method httpCustom notification");
         }
       }
-      else // not given by user, the default one will be used
+      else  // not given by user, the default one will be used
       {
         verb = NOVERB;
       }
@@ -553,6 +576,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     // payload
     {
       Opt<std::string> payloadOpt = getStringOpt(httpCustom, "payload", "payload httpCustom notification");
+
       if (!payloadOpt.ok())
       {
         return badInput(ciP, payloadOpt.error);
@@ -570,10 +594,12 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     if (httpCustom.HasMember("qs"))
     {
       const Value& qs = httpCustom["qs"];
+
       if (!qs.IsObject())
       {
         return badInput(ciP, "notification httpCustom qs is not an object");
       }
+
       if (qs.ObjectEmpty())
       {
         return badInput(ciP, "notification httpCustom qs is empty");
@@ -591,16 +617,21 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     if (httpCustom.HasMember("headers"))
     {
       const Value& headers = httpCustom["headers"];
+
       if (!headers.IsObject())
       {
         return badInput(ciP, "notification httpCustom headers is not an object");
       }
+
       if (headers.ObjectEmpty())
       {
         return badInput(ciP, "notification httpCustom headers is empty");
       }
 
-      std::string r = parseDictionary(ciP, subsP->notification.httpInfo.headers, headers, "notification httpCustom headers");
+      std::string r = parseDictionary(ciP,
+                                      subsP->notification.httpInfo.headers,
+                                      headers,
+                                      "notification httpCustom headers");
 
       if (r != "")
       {
@@ -620,6 +651,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   {
     return badInput(ciP, "http notification has attrs and exceptAttrs");
   }
+
   if (notification.HasMember("attrs"))
   {
     std::string r = parseAttributeList(ciP, &subsP->notification.attributes, notification["attrs"]);
@@ -663,6 +695,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
   // attrsFormat field
   Opt<std::string>  attrsFormatOpt = getStringOpt(notification, "attrsFormat");
+
   if (!attrsFormatOpt.ok())
   {
     return badInput(ciP, attrsFormatOpt.error);
@@ -679,7 +712,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     subsP->attrsFormatProvided = true;
     subsP->attrsFormat = nFormat;
   }
-  else // Default value for creation
+  else  // Default value for creation
   {
     subsP->attrsFormatProvided = true;
     subsP->attrsFormat = DEFAULT_RENDER_FORMAT;  // Default format for NGSIv2: normalized
@@ -693,13 +726,17 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 /* ****************************************************************************
 *
 * parseNotifyConditionVector -
-*
 */
-static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::SubscriptionUpdate* subsP, const Value& condition)
+static std::string parseNotifyConditionVector
+(
+  ConnectionInfo*              ciP,
+  ngsiv2::SubscriptionUpdate*  subsP,
+  const Value&                 condition
+)
 {
   if (!condition.IsObject())
   {
-   return badInput(ciP, "condition is not an object");
+    return badInput(ciP, "condition is not an object");
   }
 
   // Attributes
@@ -721,6 +758,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
     {
       return badInput(ciP, "expression is not an object");
     }
+
     if (expression.ObjectEmpty())
     {
       return badInput(ciP, "expression is empty");
@@ -809,6 +847,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
         {
           return badInput(ciP, "geometry is empty");
         }
+
         subsP->subject.condition.expression.geometry = geometryOpt.value;
         nGeoItems++;
       }
@@ -828,6 +867,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
         {
           return badInput(ciP, "coords is empty");
         }
+
         subsP->subject.condition.expression.coords = coordsOpt.value;
         nGeoItems++;
       }
@@ -836,16 +876,19 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
     // georel
     {
       Opt<std::string> georelOpt = getStringOpt(expression, "georel");
+
       if (!georelOpt.ok())
       {
         return badInput(ciP, georelOpt.error);
       }
+
       if (georelOpt.given)
       {
         if (georelOpt.value.empty())
         {
           return badInput(ciP, "georel is empty");
         }
+
         subsP->subject.condition.expression.georel = georelOpt.value;
         nGeoItems++;
       }
@@ -856,13 +899,17 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
       return badInput(ciP, "partial geo expression; geometry, georel and coords have to be provided together");
     }
 
+    //
     // If geometry, coords and georel are filled, then attempt to create a filter scope
     // with them
+    //
     SubscriptionExpression subExpr = subsP->subject.condition.expression;
+
     if ((subExpr.georel != "") && (subExpr.geometry != "") && (subExpr.coords != ""))
     {
       Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
       std::string  err;
+
       if (scopeP->fill(V2, subExpr.geometry, subExpr.coords, subExpr.georel, &err) != 0)
       {
         delete scopeP;
@@ -880,7 +927,6 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, ngsiv2::Subsc
 /* ****************************************************************************
 *
 * parseAttributeList -
-*
 */
 static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::string>* vec, const Value& attributes)
 {
@@ -925,7 +971,13 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
 *
 * parseDictionary -
 */
-static std::string parseDictionary(ConnectionInfo* ciP, std::map<std::string, std::string>& dict, const Value& object, const std::string& name)
+static std::string parseDictionary
+(
+  ConnectionInfo*                      ciP,
+  std::map<std::string, std::string>&  dict,
+  const Value&                         object,
+  const std::string&                   name
+)
 {
   if (!object.IsObject())
   {

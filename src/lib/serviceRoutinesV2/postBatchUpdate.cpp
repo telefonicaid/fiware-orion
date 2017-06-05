@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
 #include "logMsg/logMsg.h"
 

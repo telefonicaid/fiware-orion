@@ -76,17 +76,17 @@ std::string postEntity
     return oe.toJson();
   }
 
-  if (ciP->uriParamOptions["append"] == true) // pure-append
+  if (ciP->uriParamOptions["append"] == true)  // pure-append
   {
     op     = "APPEND_STRICT";
     flavor = NGSIV2_FLAVOUR_ONUPDATE;
   }
   else
   {
-    op     = "APPEND";   // append or update
+    op     = "APPEND";  // append or update
     flavor = NGSIV2_FLAVOUR_ONAPPEND;
   }
-  
+
   // Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, op);
 
