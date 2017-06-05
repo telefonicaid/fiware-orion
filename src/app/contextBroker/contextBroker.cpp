@@ -1670,6 +1670,8 @@ int main(int argC, char* argV[])
     exit(1);
   }
 
+  paCleanup();
+
 #ifdef DEBUG_develenv
   //
   // FIXME P9: Temporary setting trace level 250 in jenkins only, until the ftest-ftest-ftest bug is solved

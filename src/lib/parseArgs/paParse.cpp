@@ -625,11 +625,24 @@ int paParse
     }
   }
 
-  free(paiList);
-  free(paRcFileName);
-  free(paUsageProgName);
-
   return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* paCleanup - free allocated variables
+*/
+void paCleanup(void)
+{
+  free(paUsageProgName);
+  free(paRcFileName);
+  free(paiList);
+
+  paUsageProgName = NULL;
+  paRcFileName    = NULL;
+  paiList         = NULL;
 }
 
 
