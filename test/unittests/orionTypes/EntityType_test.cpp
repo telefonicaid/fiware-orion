@@ -22,9 +22,10 @@
 *
 * Author: Fermin Galan
 */
-
 #include "orionTypes/EntityType.h"
-#include "unittest.h"
+#include "unittests/unittest.h"
+
+
 
 /* ****************************************************************************
 *
@@ -40,6 +41,7 @@ TEST(EntityType, present)
 
   utExit();
 }
+
 
 
 /* ****************************************************************************
