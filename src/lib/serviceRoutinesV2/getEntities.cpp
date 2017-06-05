@@ -80,7 +80,7 @@ std::string getEntities
 {
   Entities     entities;
   std::string  answer;
-  std::string  pattern     = ".*"; // all entities, default value
+  std::string  pattern     = ".*";  // all entities, default value
   std::string  id          = ciP->uriParam["id"];
   std::string  idPattern   = ciP->uriParam["idPattern"];
   std::string  type        = ciP->uriParam["type"];
@@ -268,7 +268,6 @@ std::string getEntities
 
   if (!typePattern.empty())
   {
-
     bool      isIdPattern = (idPattern != "" || pattern == ".*");
     EntityId* entityId    = new EntityId(pattern, typePattern, isIdPattern ? "true" : "false", true);
 

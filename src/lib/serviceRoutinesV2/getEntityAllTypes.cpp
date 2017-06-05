@@ -75,7 +75,13 @@ std::string getEntityAllTypes
   }
   else  // default
   {
-    TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP, noAttrDetail));
+    TIMED_MONGO(mongoEntityTypes(&response,
+                                 ciP->tenant,
+                                 ciP->servicePathV,
+                                 ciP->uriParam,
+                                 ciP->apiVersion,
+                                 totalTypesP,
+                                 noAttrDetail));
   }
   TIMED_RENDER(answer = response.toJson(ciP->uriParamOptions[OPT_VALUES]));
 
