@@ -31,7 +31,7 @@
 
 /* ****************************************************************************
 *
-* constructorsAndRender - 
+* constructorsAndRender -
 *
 */
 TEST(UnsubscribeContextAvailabilityResponse, constructorsAndRender)
@@ -59,7 +59,7 @@ TEST(UnsubscribeContextAvailabilityResponse, constructorsAndRender)
 
 /* ****************************************************************************
 *
-* jsonRender - 
+* jsonRender -
 *
 */
 TEST(UnsubscribeContextAvailabilityResponse, jsonRender)
@@ -82,7 +82,7 @@ TEST(UnsubscribeContextAvailabilityResponse, jsonRender)
   out = ucasP->render("");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  
+
   // 2. Long and !OK statusCode
   ucasP->statusCode.fill(SccBadRequest, "no details");
 

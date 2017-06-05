@@ -64,7 +64,7 @@
 
 /* ****************************************************************************
 *
-* ok_json - 
+* ok_json -
 */
 TEST(DiscoverContextAvailabilityRequest, ok_json)
 {
@@ -87,11 +87,11 @@ TEST(DiscoverContextAvailabilityRequest, ok_json)
 
 /* ****************************************************************************
 *
-* okNoRestrictions_json - 
+* okNoRestrictions_json -
 */
 TEST(DiscoverContextAvailabilityRequest, okNoRestrictions_json)
 {
-  ParseData       reqData; 
+  ParseData       reqData;
   const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.noRestrictions.ok.valid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -108,7 +108,7 @@ TEST(DiscoverContextAvailabilityRequest, okNoRestrictions_json)
 
 /* ****************************************************************************
 *
-* noEntityIdList_json - 
+* noEntityIdList_json -
 */
 TEST(DiscoverContextAvailabilityRequest, noEntityIdList_json)
 {
@@ -132,7 +132,7 @@ TEST(DiscoverContextAvailabilityRequest, noEntityIdList_json)
 
 /* ****************************************************************************
 *
-* emptyEntityIdList_json - 
+* emptyEntityIdList_json -
 */
 TEST(DiscoverContextAvailabilityRequest, emptyEntityIdList_json)
 {
@@ -156,7 +156,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyEntityIdList_json)
 
 /* ****************************************************************************
 *
-* invalidIsPatternValue_json - 
+* invalidIsPatternValue_json -
 */
 TEST(DiscoverContextAvailabilityRequest, invalidIsPatternValue_json)
 {
@@ -180,7 +180,7 @@ TEST(DiscoverContextAvailabilityRequest, invalidIsPatternValue_json)
 
 /* ****************************************************************************
 *
-* unsupportedAttributeForEntityId_json - 
+* unsupportedAttributeForEntityId_json -
 */
 TEST(DiscoverContextAvailabilityRequest, unsupportedAttributeForEntityId_json)
 {
@@ -204,7 +204,7 @@ TEST(DiscoverContextAvailabilityRequest, unsupportedAttributeForEntityId_json)
 
 /* ****************************************************************************
 *
-* twoEntityIdIds_json - 
+* twoEntityIdIds_json -
 */
 TEST(DiscoverContextAvailabilityRequest, twoEntityIdIds_json)
 {
@@ -226,7 +226,7 @@ TEST(DiscoverContextAvailabilityRequest, twoEntityIdIds_json)
 
 /* ****************************************************************************
 *
-* entityIdTwoTypes_json - 
+* entityIdTwoTypes_json -
 */
 TEST(DiscoverContextAvailabilityRequest, entityIdTwoTypes_json)
 {
@@ -248,7 +248,7 @@ TEST(DiscoverContextAvailabilityRequest, entityIdTwoTypes_json)
 
 /* ****************************************************************************
 *
-* entityIdTwoIsPatterns_json - 
+* entityIdTwoIsPatterns_json -
 */
 TEST(DiscoverContextAvailabilityRequest, entityIdTwoIsPatterns_json)
 {
@@ -270,7 +270,7 @@ TEST(DiscoverContextAvailabilityRequest, entityIdTwoIsPatterns_json)
 
 /* ****************************************************************************
 *
-* twoEntityIdTypes_json - 
+* twoEntityIdTypes_json -
 */
 TEST(DiscoverContextAvailabilityRequest, twoEntityIdTypes_json)
 {
@@ -292,7 +292,7 @@ TEST(DiscoverContextAvailabilityRequest, twoEntityIdTypes_json)
 
 /* ****************************************************************************
 *
-* overrideEntityIdIsPattern_json - 
+* overrideEntityIdIsPattern_json -
 */
 TEST(DiscoverContextAvailabilityRequest, overrideEntityIdIsPattern_json)
 {
@@ -315,7 +315,7 @@ TEST(DiscoverContextAvailabilityRequest, overrideEntityIdIsPattern_json)
 
 /* ****************************************************************************
 *
-* emptyEntityIdId_json - 
+* emptyEntityIdId_json -
 */
 TEST(DiscoverContextAvailabilityRequest, emptyEntityIdId_json)
 {
@@ -338,7 +338,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyEntityIdId_json)
 
 /* ****************************************************************************
 *
-* noEntityIdId_json - 
+* noEntityIdId_json -
 */
 TEST(DiscoverContextAvailabilityRequest, noEntityIdId_json)
 {
@@ -361,7 +361,7 @@ TEST(DiscoverContextAvailabilityRequest, noEntityIdId_json)
 
 /* ****************************************************************************
 *
-* noAttributeExpression_json - 
+* noAttributeExpression_json -
 */
 TEST(DiscoverContextAvailabilityRequest, noAttributeExpression_json)
 {
@@ -384,7 +384,7 @@ TEST(DiscoverContextAvailabilityRequest, noAttributeExpression_json)
 
 /* ****************************************************************************
 *
-* emptyAttributeExpression_json - 
+* emptyAttributeExpression_json -
 */
 TEST(DiscoverContextAvailabilityRequest, emptyAttributeExpression_json)
 {
@@ -407,7 +407,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyAttributeExpression_json)
 
 /* ****************************************************************************
 *
-* noScopeType_json - 
+* noScopeType_json -
 */
 TEST(DiscoverContextAvailabilityRequest, noScopeType_json)
 {
@@ -430,7 +430,7 @@ TEST(DiscoverContextAvailabilityRequest, noScopeType_json)
 
 /* ****************************************************************************
 *
-* noScopeValue_json - 
+* noScopeValue_json -
 */
 TEST(DiscoverContextAvailabilityRequest, noScopeValue_json)
 {
@@ -453,7 +453,7 @@ TEST(DiscoverContextAvailabilityRequest, noScopeValue_json)
 
 /* ****************************************************************************
 *
-* emptyScopeType_json - 
+* emptyScopeType_json -
 */
 TEST(DiscoverContextAvailabilityRequest, emptyScopeType_json)
 {
@@ -476,7 +476,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyScopeType_json)
 
 /* ****************************************************************************
 *
-* emptyScopeValue_json - 
+* emptyScopeValue_json -
 */
 TEST(DiscoverContextAvailabilityRequest, emptyScopeValue_json)
 {
@@ -499,7 +499,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyScopeValue_json)
 
 /* ****************************************************************************
 *
-* parseError_json - 
+* parseError_json -
 */
 TEST(DiscoverContextAvailabilityRequest, parseError_json)
 {
@@ -520,7 +520,7 @@ TEST(DiscoverContextAvailabilityRequest, parseError_json)
 
 /* ****************************************************************************
 *
-* emptyAttributeName_json - 
+* emptyAttributeName_json -
 */
 TEST(DiscoverContextAvailabilityRequest, emptyAttributeName_json)
 {

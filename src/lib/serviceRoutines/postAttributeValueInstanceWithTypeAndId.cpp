@@ -42,7 +42,7 @@
 
 /* ****************************************************************************
 *
-* postAttributeValueInstanceWithTypeAndId - 
+* postAttributeValueInstanceWithTypeAndId -
 *
 * POST /v1/contextEntities/type/{entity::type}/id/{entity::id}/attributes/{attribute::name}/{metaID}
 * POST /ngsi10/contextEntities/type/{entity::type}/id/{entity::id}/attributes/{attribute::name}/{metaID}
@@ -56,7 +56,7 @@
 *   - entity::type=TYPE
 *   - note that '!exist=entity::type' and 'exist=entity::type' are not supported by convenience operations
 *     that use the standard operation UpdateContext as there is no restriction within UpdateContext.
-* 
+*
 * 00. Get values from URI path
 * 01. Get values URI parameters
 * 02. Check validity of URI params VS URI path components
@@ -108,7 +108,7 @@ std::string postAttributeValueInstanceWithTypeAndId
   if ((mP != NULL) && (mP->stringValue != metaID))
   {
     std::string details = "unmatching metadata ID value URI/payload: /" + metaID + "/ vs /" + mP->stringValue + "/";
-    
+
     response.fill(SccBadRequest, details);
 
     TIMED_RENDER(answer = response.render("", false, false));

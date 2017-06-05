@@ -33,7 +33,7 @@ namespace orion
 
 /* ****************************************************************************
 *
-* valueTypeName - 
+* valueTypeName -
 */
 const char* valueTypeName(const orion::ValueType _type)
 {
@@ -55,7 +55,7 @@ const char* valueTypeName(const orion::ValueType _type)
 
 /* ****************************************************************************
 *
-* defaultType - 
+* defaultType -
 */
 const char* defaultType(ValueType valueType)
 {
@@ -67,7 +67,7 @@ const char* defaultType(ValueType valueType)
   case ValueTypeBoolean:    return DEFAULT_ATTR_BOOL_TYPE;
   case ValueTypeVector:     return DEFAULT_ATTR_ARRAY_TYPE;
   case ValueTypeObject:     return DEFAULT_ATTR_OBJECT_TYPE;
-  case ValueTypeNone:       return DEFAULT_ATTR_NULL_TYPE; 
+  case ValueTypeNone:       return DEFAULT_ATTR_NULL_TYPE;
   }
 
   return "Unknown";

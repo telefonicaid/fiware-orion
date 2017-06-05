@@ -30,7 +30,7 @@
 
 /* ****************************************************************************
 *
-* constructorsAndRender - 
+* constructorsAndRender -
 *
 */
 TEST(SubscribeContextResponse, constructorsAndRender)
@@ -53,7 +53,7 @@ TEST(SubscribeContextResponse, constructorsAndRender)
 
 /* ****************************************************************************
 *
-* jsonRender - 
+* jsonRender -
 */
 TEST(SubscribeContextResponse, json_render)
 {
@@ -120,7 +120,7 @@ TEST(SubscribeContextResponse, json_render)
   // 5.
   scrP->subscribeResponse.throttling.set("");
   scrP->subscribeResponse.duration.set("PT1H");
-  
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename5)) << "Error getting test data from '" << filename5 << "'";
   out = scrP->render("");
   EXPECT_STREQ(expectedBuf, out.c_str());

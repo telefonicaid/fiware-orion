@@ -31,7 +31,7 @@
 
 /* ****************************************************************************
 *
-* startTag - 
+* startTag -
 */
 TEST(commonTag, startTag)
 {
@@ -53,7 +53,7 @@ TEST(commonTag, startTag)
 
 /* ****************************************************************************
 *
-* endTag - 
+* endTag -
 */
 TEST(commonTag, endTag)
 {
@@ -69,7 +69,7 @@ TEST(commonTag, endTag)
 
 /* ****************************************************************************
 *
-* valueTag - 
+* valueTag -
 */
 TEST(commonTag, valueTag)
 {
@@ -87,10 +87,10 @@ TEST(commonTag, valueTag)
    EXPECT_EQ(jsonNoComma, out);
 
    out = valueTag(indent, tag, value, true);
-   EXPECT_EQ(jsonComma, out);   
+   EXPECT_EQ(jsonComma, out);
 
    out = valueTag(indent, tag, value);
-   EXPECT_EQ(jsonNoComma, out);   
+   EXPECT_EQ(jsonNoComma, out);
 
    out = valueTag(indent, tag, 8, false);
    EXPECT_EQ(integerJsonNoComma, out);

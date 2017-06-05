@@ -30,7 +30,7 @@
 
 /* ****************************************************************************
 *
-* constructor - 
+* constructor -
 */
 TEST(Metadata, constructor)
 {
@@ -51,7 +51,7 @@ TEST(Metadata, constructor)
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 *
 * FIXME P4 - extra newline at the end of expected3json
 */
@@ -81,7 +81,7 @@ TEST(Metadata, render)
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 */
 TEST(Metadata, check)
 {
@@ -97,7 +97,7 @@ TEST(Metadata, check)
 
   checked = m2.check(V1);
   EXPECT_STREQ("missing metadata value", checked.c_str());
-  
+
   checked = m3.check(V1);
   EXPECT_STREQ("OK", checked.c_str());
 

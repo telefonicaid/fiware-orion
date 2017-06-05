@@ -1,5 +1,5 @@
-#ifndef UPDATE_CONTEXT_RESPONSE_H
-#define UPDATE_CONTEXT_RESPONSE_H
+#ifndef SRC_LIB_NGSI10_UPDATECONTEXTRESPONSE_H_
+#define SRC_LIB_NGSI10_UPDATECONTEXTRESPONSE_H_
 
 /*
 *
@@ -60,4 +60,4 @@ typedef struct UpdateContextResponse
   void          merge(UpdateContextResponse* upcrsP);
 } UpdateContextResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI10_UPDATECONTEXTRESPONSE_H_

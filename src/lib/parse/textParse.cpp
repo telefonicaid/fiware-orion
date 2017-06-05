@@ -36,7 +36,7 @@
 
 /* ****************************************************************************
 *
-* textParseAttributeValue - 
+* textParseAttributeValue -
 */
 static std::string textParseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 {
@@ -98,7 +98,7 @@ static std::string textParseAttributeValue(ConnectionInfo* ciP, ContextAttribute
 
 /* ****************************************************************************
 *
-* textRequestTreat - 
+* textRequestTreat -
 */
 std::string textRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType)
 {
@@ -128,7 +128,7 @@ std::string textRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     alarmMgr.badInput(clientIp, "not supported content type: text/plain");
     break;
   }
-  
+
   return answer;
 }
 

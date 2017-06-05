@@ -33,7 +33,7 @@
 
 /* ****************************************************************************
 *
-* all - 
+* all -
 */
 TEST(nullTreat, all)
 {
@@ -42,6 +42,6 @@ TEST(nullTreat, all)
   utInit();
   s = jsonNullTreat("/1/2/3", "27", NULL);
   EXPECT_EQ("OK", s);
-  
+
   utExit();
 }

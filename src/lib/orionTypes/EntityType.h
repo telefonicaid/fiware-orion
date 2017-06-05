@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_UTILITY_ENTITYTYPE_H_
-#define SRC_LIB_UTILITY_ENTITYTYPE_H_
+#ifndef SRC_LIB_ORIONTYPES_ENTITYTYPE_H_
+#define SRC_LIB_ORIONTYPES_ENTITYTYPE_H_
 
 /*
 *
@@ -58,4 +58,4 @@ class EntityType
   std::string   toJson(bool includeType = false);
 };
 
-#endif  // SRC_LIB_UTILITY_ENTITYTYPE_H_
+#endif  // SRC_LIB_ORIONTYPES_ENTITYTYPE_H_

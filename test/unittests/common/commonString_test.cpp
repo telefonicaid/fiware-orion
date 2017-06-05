@@ -31,7 +31,7 @@
 
 /* ****************************************************************************
 *
-* stringSplit - 
+* stringSplit -
 */
 TEST(commonString, stringSplit)
 {
@@ -43,7 +43,7 @@ TEST(commonString, stringSplit)
    components = stringSplit(s1, ':', out);
    EXPECT_EQ(0, components);
    EXPECT_EQ(0, out.size());
-   
+
    components = stringSplit(s2, ':', out);
    EXPECT_EQ(4, components);
    EXPECT_EQ(4, out.size());
@@ -53,7 +53,7 @@ TEST(commonString, stringSplit)
 
 /* ****************************************************************************
 *
-* parseUrl - 
+* parseUrl -
 */
 TEST(commonString, parseUrl)
 {
@@ -112,13 +112,13 @@ TEST(commonString, parseUrl)
    r = parseUrl(urlv63, host, port, path, protocol);
    EXPECT_TRUE(r);
    EXPECT_STREQ("2001:DB8:2de::e13", host.c_str());
-   EXPECT_EQ(80, port); 
+   EXPECT_EQ(80, port);
    EXPECT_STREQ("/path", path.c_str());
 
    r = parseUrl(urlv64, host, port, path, protocol);
    EXPECT_TRUE(r);
    EXPECT_STREQ("::", host.c_str());
-   EXPECT_EQ(80, port); 
+   EXPECT_EQ(80, port);
    EXPECT_STREQ("/path", path.c_str());
 }
 
@@ -309,13 +309,13 @@ TEST(string, parseEmptyUrl)
 
 /* ****************************************************************************
 *
-* i2s - 
+* i2s -
 */
 TEST(commonString, i2s)
 {
   char  ph[32];
   char* p;
-  
+
   p = i2s(19, ph, sizeof(ph));
   EXPECT_STREQ("19", p);
 }
@@ -366,7 +366,7 @@ TEST(string, string2coords)
 
 /* ****************************************************************************
 *
-* atoF - 
+* atoF -
 */
 TEST(string, atoF)
 {
@@ -376,7 +376,7 @@ TEST(string, atoF)
   d = atoF("", &e);
   EXPECT_EQ(0.0, d);
   EXPECT_EQ("empty string", e);
-  
+
   d = atoF(" ", &e);
   EXPECT_EQ(0.0, d);
   EXPECT_EQ("invalid characters in string to convert", e);
@@ -458,7 +458,7 @@ TEST(string, atoF)
 
 /* ****************************************************************************
 *
-* str2double - 
+* str2double -
 */
 TEST(string, str2double)
 {
@@ -470,7 +470,7 @@ TEST(string, str2double)
 
   b = str2double("99e99999999999999999999999999", &d);
   EXPECT_FALSE(b);
-  
+
   b = str2double("12.0a", &d);
   EXPECT_FALSE(b);
 

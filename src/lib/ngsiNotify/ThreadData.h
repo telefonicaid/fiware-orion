@@ -1,5 +1,5 @@
-#ifndef THREAD_DATA_H
-#define THREAD_DATA_H
+#ifndef SRC_LIB_NGSINOTIFY_THREADDATA_H_
+#define SRC_LIB_NGSINOTIFY_THREADDATA_H_
 
 /*
 *
@@ -33,4 +33,4 @@ typedef struct ThreadData {
     OnIntervalThreadParams* params;
 } ThreadData;
 
-#endif
+#endif  // SRC_LIB_NGSINOTIFY_THREADDATA_H_

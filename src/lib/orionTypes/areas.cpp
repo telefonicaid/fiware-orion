@@ -40,7 +40,7 @@ namespace orion
 
 /* ****************************************************************************
 *
-* Point::Point - 
+* Point::Point -
 */
 Point::Point(): valid(true), lat(0), lon(0)
 {
@@ -50,7 +50,7 @@ Point::Point(): valid(true), lat(0), lon(0)
 
 /* ****************************************************************************
 *
-* Point::Point - 
+* Point::Point -
 */
 Point::Point(::std::string latitude, ::std::string longitude): valid(true)
 {
@@ -64,7 +64,7 @@ Point::Point(::std::string latitude, ::std::string longitude): valid(true)
 
 /* ****************************************************************************
 *
-* Point::Point - 
+* Point::Point -
 */
 Point::Point(double _lat, double _lon): valid(true)
 {
@@ -76,7 +76,7 @@ Point::Point(double _lat, double _lon): valid(true)
 
 /* ****************************************************************************
 *
-* Point::fill - 
+* Point::fill -
 */
 void Point::fill(Point* p)
 {
@@ -172,7 +172,7 @@ bool Point::equals(Point* p)
 */
 ::std::string Point::latitudeString(void)
 {
-  char cV[STRING_SIZE_FOR_DOUBLE]; 
+  char cV[STRING_SIZE_FOR_DOUBLE];
 
   snprintf(cV, sizeof(cV), "%f", lat);
   return cV;
@@ -185,7 +185,7 @@ bool Point::equals(Point* p)
 */
 ::std::string Point::longitudeString(void)
 {
-  char cV[STRING_SIZE_FOR_DOUBLE]; 
+  char cV[STRING_SIZE_FOR_DOUBLE];
 
   snprintf(cV, sizeof(cV), "%f", lon);
   return cV;
@@ -195,7 +195,7 @@ bool Point::equals(Point* p)
 
 /* ****************************************************************************
 *
-* Line::Line - 
+* Line::Line -
 */
 Line::Line()
 {
@@ -232,7 +232,7 @@ void Line::release(void)
 
 /* ****************************************************************************
 *
-* Box::Box - 
+* Box::Box -
 */
 Box::Box()
 {
@@ -242,7 +242,7 @@ Box::Box()
 
 /* ****************************************************************************
 *
-* Box::Box - 
+* Box::Box -
 */
 Box::Box(Point* lowerLeftP, Point* upperRightP)
 {
@@ -254,7 +254,7 @@ Box::Box(Point* lowerLeftP, Point* upperRightP)
 
 /* ****************************************************************************
 *
-* Box::fill - 
+* Box::fill -
 */
 void Box::fill(Point* lowerLeftP, Point* upperRightP)
 {
@@ -377,7 +377,7 @@ void Circle::centerSet(Point* centerP)
 
 /* ****************************************************************************
 *
-* Polygon::inverted - 
+* Polygon::inverted -
 */
 bool Polygon::inverted(void) const
 {
@@ -393,7 +393,7 @@ bool Polygon::inverted(void) const
 
 /* ****************************************************************************
 *
-* Polygon::invertedSet - 
+* Polygon::invertedSet -
 */
 void Polygon::invertedSet(::std::string inverted)
 {
@@ -408,7 +408,6 @@ void Polygon::invertedSet(::std::string inverted)
 */
 void Polygon::invertedSet(bool inverted)
 {
-  
   _inverted = (inverted == true)? "true" : "false";
 }
 
@@ -416,7 +415,7 @@ void Polygon::invertedSet(bool inverted)
 
 /* ****************************************************************************
 *
-* Polygon::invertedString - 
+* Polygon::invertedString -
 */
 ::std::string Polygon::invertedString(void) const
 {
@@ -427,7 +426,7 @@ void Polygon::invertedSet(bool inverted)
 
 /* ****************************************************************************
 *
-* Polygon::vertexAdd - 
+* Polygon::vertexAdd -
 */
 void Polygon::vertexAdd(Point* p)
 {
@@ -438,7 +437,7 @@ void Polygon::vertexAdd(Point* p)
 
 /* ****************************************************************************
 *
-* Polygon::release - 
+* Polygon::release -
 */
 void Polygon::release(void)
 {
@@ -454,7 +453,7 @@ void Polygon::release(void)
 
 /* ****************************************************************************
 *
-* Georel::Georel - 
+* Georel::Georel -
 */
 Georel::Georel(): maxDistance(0), minDistance(0)
 {
@@ -464,7 +463,7 @@ Georel::Georel(): maxDistance(0), minDistance(0)
 
 /* ****************************************************************************
 *
-* Georel::parse - 
+* Georel::parse -
 */
 int Georel::parse(const char* in, std::string* errorString)
 {
@@ -559,7 +558,7 @@ int Georel::parse(const char* in, std::string* errorString)
 
 /* ****************************************************************************
 *
-* Georel::fill - 
+* Georel::fill -
 */
 void Georel::fill(Georel* georelP)
 {
@@ -572,18 +571,17 @@ void Georel::fill(Georel* georelP)
 
 /* ****************************************************************************
 *
-* Geometry::Geometry - 
+* Geometry::Geometry -
 */
 Geometry::Geometry(): areaType(""), radius(-1), external(false)
 {
-
 }
 
 
 
 /* ****************************************************************************
 *
-* Geometry::parse - 
+* Geometry::parse -
 */
 int Geometry::parse(ApiVersion apiVersion, const char* in, std::string* errorString)
 {

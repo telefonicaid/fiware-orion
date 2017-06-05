@@ -1,5 +1,5 @@
-#ifndef NOTIFY_CONTEXT_AVAILABILITY_REQUEST_H
-#define NOTIFY_CONTEXT_AVAILABILITY_REQUEST_H
+#ifndef SRC_LIB_NGSI9_NOTIFYCONTEXTAVAILABILITYREQUEST_H_
+#define SRC_LIB_NGSI9_NOTIFYCONTEXTAVAILABILITYREQUEST_H_
 
 /*
 *
@@ -49,4 +49,4 @@ typedef struct NotifyContextAvailabilityRequest
   void          release(void);
 } NotifyContextAvailabilityRequest;
 
-#endif
+#endif  // SRC_LIB_NGSI9_NOTIFYCONTEXTAVAILABILITYREQUEST_H_

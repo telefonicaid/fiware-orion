@@ -32,11 +32,11 @@
 
 /* ****************************************************************************
 *
-* statisticsUpdate - 
+* statisticsUpdate -
 *
 */
 TEST(commonStatistics, statisticsUpdate)
-{  
+{
   noOfDiscoveries                            = 0;
   noOfAvailabilitySubscriptionUpdates        = 0;
   noOfAvailabilityNotificationsReceived      = 0;
@@ -45,7 +45,7 @@ TEST(commonStatistics, statisticsUpdate)
   noOfUnsubscriptions                        = 0;
 
   noOfContextEntityAttributes                = 0;
-  noOfIndividualContextEntity                = 0;  
+  noOfIndividualContextEntity                = 0;
   noOfIndividualContextEntityAttribute       = 0;
   noOfUpdateContextElement                   = 0;
   noOfUpdateContextAttribute                 = 0;
@@ -53,7 +53,7 @@ TEST(commonStatistics, statisticsUpdate)
   noOfNgsi10SubscriptionsConvOp              = 0;
   noOfVersionRequests                        = 0;
   noOfLeakRequests                           = 0;
-  noOfInvalidRequests                        = 0;  
+  noOfInvalidRequests                        = 0;
   noOfJsonRequests                           = 0;
 
   noOfRtSubscribeContextAvailabilityResponse          = 0;
@@ -89,7 +89,7 @@ TEST(commonStatistics, statisticsUpdate)
   EXPECT_EQ(1, noOfUpdates);
   EXPECT_EQ(1, noOfSubscriptions);
   EXPECT_EQ(1, noOfUnsubscriptions);
-  
+
   EXPECT_EQ(1, noOfContextEntityAttributes);
   EXPECT_EQ(1, noOfIndividualContextEntity);
   EXPECT_EQ(1, noOfIndividualContextEntityAttribute);

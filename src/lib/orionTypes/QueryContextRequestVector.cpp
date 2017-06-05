@@ -38,7 +38,7 @@
 
 /* ****************************************************************************
 *
-* QueryContextRequestVector::QueryContextRequestVector - 
+* QueryContextRequestVector::QueryContextRequestVector -
 */
 QueryContextRequestVector::QueryContextRequestVector()
 {
@@ -83,7 +83,7 @@ void QueryContextRequestVector::push_back(QueryContextRequest* item)
 
 /* ****************************************************************************
 *
-* entityIdMatch - 
+* entityIdMatch -
 */
 static bool entityIdMatch(EntityId* e1, EntityId* e2)
 {
@@ -153,17 +153,17 @@ void QueryContextRequestVector::present(void)
     {
       EntityId* eP = vec[qcrIx]->entityIdVector[eIx];
 
-      LM_T(LmtPresent, ("  entity %0d: { '%s', '%s', '%s' }", 
-			eIx, eP->id.c_str(),  
-			eP->type.c_str(),  
-			eP->isPattern.c_str()));
+      LM_T(LmtPresent, ("  entity %0d: { '%s', '%s', '%s' }",
+                        eIx, eP->id.c_str(),
+                        eP->type.c_str(),
+                        eP->isPattern.c_str()));
     }
 
     for (unsigned int aIx = 0; aIx < vec[qcrIx]->attributeList.size(); ++aIx)
     {
-      LM_T(LmtPresent, ("  attribute %02d: %s", 
-			aIx, 
-			vec[qcrIx]->attributeList[aIx].c_str()));
+      LM_T(LmtPresent, ("  attribute %02d: %s",
+                        aIx,
+                        vec[qcrIx]->attributeList[aIx].c_str()));
     }
   }
 }

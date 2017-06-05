@@ -1,5 +1,5 @@
-#ifndef CONTEXT_SUBSCRIPTION_INFO_H
-#define CONTEXT_SUBSCRIPTION_INFO_H
+#ifndef SRC_LIB_NGSINOTIFY_CONTEXTSUBSCRIPTIONINFO_H_
+#define SRC_LIB_NGSINOTIFY_CONTEXTSUBSCRIPTIONINFO_H_
 
 /*
 *
@@ -48,4 +48,4 @@ typedef struct ContextSubscriptionInfo
   void            release(void);
 } ContextSubscriptionInfo;
 
-#endif
+#endif  // SRC_LIB_NGSINOTIFY_CONTEXTSUBSCRIPTIONINFO_H_

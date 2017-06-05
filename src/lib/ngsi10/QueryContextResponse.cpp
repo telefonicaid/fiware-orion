@@ -38,7 +38,7 @@
 
 /* ****************************************************************************
 *
-* QueryContextResponse::QueryContextResponse - 
+* QueryContextResponse::QueryContextResponse -
 */
 QueryContextResponse::QueryContextResponse()
 {
@@ -49,7 +49,7 @@ QueryContextResponse::QueryContextResponse()
 
 /* ****************************************************************************
 *
-* QueryContextResponse::QueryContextResponse - 
+* QueryContextResponse::QueryContextResponse -
 */
 QueryContextResponse::QueryContextResponse(StatusCode& _errorCode)
 {
@@ -61,7 +61,7 @@ QueryContextResponse::QueryContextResponse(StatusCode& _errorCode)
 
 /* ****************************************************************************
 *
-* QueryContextResponse::QueryContextResponse - 
+* QueryContextResponse::QueryContextResponse -
 */
 QueryContextResponse::QueryContextResponse(EntityId* eP, ContextAttribute* aP)
 {
@@ -69,7 +69,7 @@ QueryContextResponse::QueryContextResponse(EntityId* eP, ContextAttribute* aP)
   ContextAttribute*       caP  = new ContextAttribute(aP);
 
   cerP->contextElement.entityId.fill(eP);
-  cerP->contextElement.contextAttributeVector.push_back(caP);  
+  cerP->contextElement.contextAttributeVector.push_back(caP);
   cerP->statusCode.fill(SccOk);
 
   contextElementResponseVector.push_back(cerP);
@@ -92,13 +92,13 @@ QueryContextResponse::~QueryContextResponse()
 
 /* ****************************************************************************
 *
-* QueryContextResponse::render - 
+* QueryContextResponse::render -
 */
 std::string QueryContextResponse::render(ApiVersion apiVersion, bool asJsonObject, const std::string& indent)
 {
   std::string  out               = "";
   bool         errorCodeRendered = false;
-  
+
   //
   // 01. Decide whether errorCode should be rendered
   //
@@ -122,7 +122,7 @@ std::string QueryContextResponse::render(ApiVersion apiVersion, bool asJsonObjec
 
 
   //
-  // 02. render 
+  // 02. render
   //
   out += startTag(indent);
 
@@ -211,7 +211,7 @@ void QueryContextResponse::release(void)
 
 /* ****************************************************************************
 *
-* QueryContextResponse::fill - 
+* QueryContextResponse::fill -
 */
 void QueryContextResponse::fill(QueryContextResponse* qcrsP)
 {
@@ -231,7 +231,7 @@ void QueryContextResponse::fill(QueryContextResponse* qcrsP)
 
 /* ****************************************************************************
 *
-* QueryContextResponse::clone - 
+* QueryContextResponse::clone -
 */
 QueryContextResponse* QueryContextResponse::clone(void)
 {

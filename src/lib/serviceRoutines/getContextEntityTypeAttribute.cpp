@@ -76,7 +76,7 @@ std::string getContextEntityTypeAttribute
 
 
   //
-  // 2. Call the standard operation 
+  // 2. Call the standard operation
   //
   answer = postDiscoverContextAvailability(ciP, components, compV, parseDataP);
 

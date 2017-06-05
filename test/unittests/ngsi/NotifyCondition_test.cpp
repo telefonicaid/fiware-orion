@@ -33,7 +33,7 @@
 
 /* ****************************************************************************
 *
-* Creation - 
+* Creation -
 */
 TEST(NotifyCondition, Creation)
 {
@@ -51,7 +51,7 @@ TEST(NotifyCondition, Creation)
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 TEST(NotifyCondition, render)
 {
@@ -90,7 +90,7 @@ TEST(NotifyCondition, present)
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 */
 TEST(NotifyCondition, check)
 {
@@ -101,7 +101,7 @@ TEST(NotifyCondition, check)
 
   checked = nc.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("empty type for NotifyCondition", checked.c_str());
-  
+
   nc.type = "XXX";
   checked = nc.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("invalid notify condition type: /XXX/", checked.c_str());
