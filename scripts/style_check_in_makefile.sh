@@ -45,6 +45,7 @@ function style_check
   fi
 }
 
+style_check test/unittests/orionTypes
 style_check test/unittests/jsonParse
 style_check test/unittests/apiTypesV2
 style_check test/unittests/cache
@@ -81,7 +82,6 @@ style_check src/lib/metricsMgr
 # style_check test/unittests/ngsi
 # style_check test/unittests/ngsi10
 # style_check test/unittests/ngsi9
-# style_check test/unittests/orionTypes
 # style_check test/unittests/parse
 # style_check test/unittests/rest
 # style_check test/unittest/serviceRoutines
