@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "gtest/gtest.h"
 
 #include "serviceRoutines/badVerbGetOnly.h"
@@ -32,25 +34,25 @@
 
 /* ****************************************************************************
 *
-* rs - 
+* rs -
 */
-static RestService rs[] = 
+static RestService rs[] =
 {
-   { "GET",    VersionRequest,                        1, { "version"                                                }, "", versionTreat                              },
-   { "*",      VersionRequest,                        1, { "version"                                                }, "", badVerbGetOnly                            },
-   { "",       InvalidRequest,                        0, {                                                          }, "", NULL                                      }
+  { "GET", VersionRequest, 1, { "version" }, "", versionTreat   },
+  { "*",   VersionRequest, 1, { "version" }, "", badVerbGetOnly },
+  { "",    InvalidRequest, 0, {           }, "", NULL           }
 };
 
 
 
 /* ****************************************************************************
 *
-* ok - 
+* ok -
 */
 TEST(badVerbGetOnly, ok)
 {
   ConnectionInfo  ci("/version",  "PUT", "1.1");
-  std::string     expected = ""; // Bad verb gives no payload, only HTTP headers
+  std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
   std::string     out;
 
   out = restService(&ci, rs);

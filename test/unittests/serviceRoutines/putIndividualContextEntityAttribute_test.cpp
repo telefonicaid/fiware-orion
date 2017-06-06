@@ -22,52 +22,62 @@
 *
 * Author: TID Developer
 */
+#include <string>
+
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/putIndividualContextEntityAttribute.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
-#include "unittest.h"
+#include "unittests/unittest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs - 
+* rs -
 */
-static RestService rs[] = 
+#define ICEA IndividualContextEntityAttribute
+#define IR   InvalidRequest
+static RestService rs[] =
 {
-  { "PUT",    IndividualContextEntityAttribute,      5, { "ngsi10", "contextEntities", "*", "attributes", "*"  }, "", putIndividualContextEntityAttribute      },
-  { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
-  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "PUT", ICEA, 5, { "ngsi10", "contextEntities", "*", "attributes", "*" }, "", putIndividualContextEntityAttribute },
+  { "*",   IR,   0, { "*", "*", "*", "*", "*", "*"                        }, "", badRequest                          },
+  { "",    IR,   0, {                                                     }, "", NULL                                }
 };
 
 
 
 /* ****************************************************************************
- * 
- * json - 
- */
+*
+* json -
+*/
 TEST(putIndividualContextEntityAttribute, json)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity11/attributes/temperature",  "PUT", "1.1");
+
   ci.servicePathV.push_back("");
 
   const char*    infile      = "ngsi10.updateContextAttributeRequest.putAttribute.valid.json";
   const char*    outfile     = "ngsi10.updateContextAttributeResponse.notFound.valid.json";
   std::string    out;
-  
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf,
+                                   sizeof(testBuf),
+                                   infile)) << "Error getting test data from '" << infile << "'";
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf,
+                                   sizeof(expectedBuf),
+                                   outfile)) << "Error getting test data from '" << outfile << "'";
+
   ci.outMimeType    = JSON;
   ci.inMimeType     = JSON;
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
   out               = restService(&ci, rs);
-  
+
   EXPECT_STREQ(expectedBuf, out.c_str());
-  
+
   utExit();
 }

@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "gtest/gtest.h"
 
 #include "serviceRoutines/logTreat.h"
@@ -31,33 +33,33 @@
 
 /* ****************************************************************************
 *
-* rs - 
+* rs -
 */
-static RestService rs[] = 
+static RestService rs[] =
 {
-   { "GET",    LogTraceRequest,                       2, { "log", "verbose"                                         }, logVerboseTreat                           },
-   { "PUT",    LogTraceRequest,                       3, { "log", "verbose", "*"                                    }, logVerboseTreat                           },
-   { "POST",   LogTraceRequest,                       3, { "log", "verbose", "*"                                    }, logVerboseTreat                           },
-   { "DELETE", LogTraceRequest,                       2, { "log", "verbose"                                         }, logVerboseTreat                           },
+  { "GET",    LogTraceRequest, 2, { "log", "verbose"             }, logVerboseTreat },
+  { "PUT",    LogTraceRequest, 3, { "log", "verbose", "*"        }, logVerboseTreat },
+  { "POST",   LogTraceRequest, 3, { "log", "verbose", "*"        }, logVerboseTreat },
+  { "DELETE", LogTraceRequest, 2, { "log", "verbose"             }, logVerboseTreat },
 
-   { "GET",    LogTraceRequest,                       2, { "log", "traceLevel"                                      }, logTraceTreat                             },
-   { "PUT",    LogTraceRequest,                       3, { "log", "traceLevel", "*"                                 }, logTraceTreat                             },
-   { "POST",   LogTraceRequest,                       3, { "log", "traceLevel", "*"                                 }, logTraceTreat                             },
-   { "DELETE", LogTraceRequest,                       2, { "log", "traceLevel"                                      }, logTraceTreat                             },
+  { "GET",    LogTraceRequest, 2, { "log", "traceLevel"          }, logTraceTreat   },
+  { "PUT",    LogTraceRequest, 3, { "log", "traceLevel", "*"     }, logTraceTreat   },
+  { "POST",   LogTraceRequest, 3, { "log", "traceLevel", "*"     }, logTraceTreat   },
+  { "DELETE", LogTraceRequest, 2, { "log", "traceLevel"          }, logTraceTreat   },
 
-   { "*",      LogTraceRequest,                       2, { "log", "*"                                               }, logErrorTreat                             },
-   { "*",      LogTraceRequest,                       3, { "log", "*", "*"                                          }, logErrorTreat                             },
+  { "*",      LogTraceRequest, 2, { "log", "*"                   }, logErrorTreat   },
+  { "*",      LogTraceRequest, 3, { "log", "*", "*"              }, logErrorTreat   },
 
-   { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                             }, badRequest                                },
+  { "*",      InvalidRequest,  0, { "*", "*", "*", "*", "*", "*" }, badRequest      },
 
-   { "",       InvalidRequest,                        0, {                                                          }, NULL                                      }
+  { "",       InvalidRequest,  0, {                              }, NULL            }
 };
 
 
 
 /* ****************************************************************************
 *
-* get_verbose - 
+* get_verbose -
 */
 TEST(versionTreat, get_verbose)
 {
@@ -72,7 +74,7 @@ TEST(versionTreat, get_verbose)
 
 /* ****************************************************************************
 *
-* put_verbose - 
+* put_verbose -
 */
 TEST(versionTreat, put_verbose)
 {
@@ -87,7 +89,7 @@ TEST(versionTreat, put_verbose)
 
 /* ****************************************************************************
 *
-* post_verbose - 
+* post_verbose -
 */
 TEST(versionTreat, post_verbose)
 {
@@ -102,7 +104,7 @@ TEST(versionTreat, post_verbose)
 
 /* ****************************************************************************
 *
-* delete_verbose - 
+* delete_verbose -
 */
 TEST(versionTreat, delete_verbose)
 {
@@ -112,6 +114,3 @@ TEST(versionTreat, delete_verbose)
   out = restService(&ci, rs);
   EXPECT_STREQ("OK", out.c_str());
 }
-
-
-

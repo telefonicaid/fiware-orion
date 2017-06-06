@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "gtest/gtest.h"
 
 #include "serviceRoutines/versionTreat.h"
@@ -31,20 +33,19 @@
 
 /* ****************************************************************************
 *
-* rs - 
+* rs -
 */
-static RestService rs[] = 
+static RestService rs[] =
 {
-   { "GET",    VersionRequest,                        1, { "version"                                                }, "", versionTreat                              },
-   { "",       InvalidRequest,                        0, {                                                          }, "", NULL                                      }
+  { "GET", VersionRequest, 1, { "version" }, "", versionTreat  },
+  { "",    InvalidRequest, 0, {           }, "", NULL          }
 };
 
 
 
 /* ****************************************************************************
 *
-* ok - 
-*
+* ok -
 */
 TEST(versionTreat, ok)
 {

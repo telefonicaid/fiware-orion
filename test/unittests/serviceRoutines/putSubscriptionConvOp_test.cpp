@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/postSubscribeContext.h"
@@ -31,31 +33,34 @@
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
-#include "unittest.h"
+#include "unittests/unittest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs - 
+* rs -
 */
-static RestService rs[] = 
+#define UCSR   "updateContextSubscriptionRequest"
+#define N10SCO Ngsi10SubscriptionsConvOp
+#define SC     SubscribeContext
+#define IR     InvalidRequest
+static RestService rs[] =
 {
-  { "POST",   SubscribeContext,           2, { "ngsi10", "subscribeContext"           }, "",                                 postSubscribeContext     },
-  { "PUT",    Ngsi10SubscriptionsConvOp,  3, { "ngsi10", "contextSubscriptions", "*"  }, "updateContextSubscriptionRequest", putSubscriptionConvOp    },
-  { "DELETE", Ngsi10SubscriptionsConvOp,  3, { "ngsi10", "contextSubscriptions", "*"  }, "",                                 deleteSubscriptionConvOp },
-  { "*",      Ngsi10SubscriptionsConvOp,  3, { "ngsi10", "contextSubscriptions", "*"  }, "",                                 badVerbPutDeleteOnly     },
-  { "*",      InvalidRequest,             0, { "*", "*", "*", "*", "*", "*"           }, "",                                 badRequest               },
-  { "",       InvalidRequest,             0, {                                        }, "",                                 NULL                     }
+  { "POST",   SC,     2, { "ngsi10", "subscribeContext"          }, "",   postSubscribeContext     },
+  { "PUT",    N10SCO, 3, { "ngsi10", "contextSubscriptions", "*" }, UCSR, putSubscriptionConvOp    },
+  { "DELETE", N10SCO, 3, { "ngsi10", "contextSubscriptions", "*" }, "",   deleteSubscriptionConvOp },
+  { "*",      N10SCO, 3, { "ngsi10", "contextSubscriptions", "*" }, "",   badVerbPutDeleteOnly     },
+  { "*",      IR,     0, { "*", "*", "*", "*", "*", "*"          }, "",   badRequest               },
+  { "",       IR,     0, {                                       }, "",   NULL                     }
 };
-     
+
 
 
 
 /* ****************************************************************************
 *
-* put - 
-*
+* put -
 */
 TEST(putSubscriptionConvOp, put)
 {

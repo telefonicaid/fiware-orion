@@ -22,36 +22,37 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "serviceRoutines/badVerbAllFour.h"
 #include "rest/RestService.h"
 
-#include "unittest.h"
+#include "unittests/unittest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs - 
+* rs -
 */
-static RestService rs[] = 
+static RestService rs[] =
 {
-   { "*",      IndividualContextEntity,               3, { "ngsi10", "contextEntities", "*"                         }, "", badVerbAllFour                            },
-   { "*",      IndividualContextEntity,               2, { "ngsi10", "contextEntities"                              }, "", badVerbAllFour                            },
-   { "*",      IndividualContextEntity,               1, { "ngsi10"                                                 }, "", badVerbAllFour                            },
-   { "",       InvalidRequest,                        0, {                                                          }, "", NULL                                      }
+  { "*", IndividualContextEntity, 3, { "ngsi10", "contextEntities", "*" }, "", badVerbAllFour },
+  { "*", IndividualContextEntity, 2, { "ngsi10", "contextEntities"      }, "", badVerbAllFour },
+  { "*", IndividualContextEntity, 1, { "ngsi10"                         }, "", badVerbAllFour },
+  { "",  InvalidRequest,          0, {                                  }, "", NULL           }
 };
 
 
 
 /* ****************************************************************************
 *
-* error - 
-*
+* error -
 */
 TEST(badVerbAllFour, error)
 {
   ConnectionInfo ci1("/ngsi10/contextEntities/123",  "PUST", "1.1");
-  ConnectionInfo ci2("/ngsi10/contextEntities",      "PUST", "1.1");  
+  ConnectionInfo ci2("/ngsi10/contextEntities",      "PUST", "1.1");
   std::string    out;
 
   utInit();

@@ -62,6 +62,7 @@ style_check test/unittests/apiTypesV2
 style_check test/unittests/cache
 style_check test/unittests/mongoBackend
 style_check test/unittests/rest
+style_check test/unittests/serviceRoutines
 
 # FIXME: Just keep adding directories here until all of them are included:
 
@@ -78,7 +79,6 @@ style_check test/unittests/rest
 # style_check src/lib/serviceRoutines
 # style_check src/app/contextBroker
 
-# style_check test/unittest/serviceRoutines
 # style_check test/unittests/common      (blocked by haderding/remove_ngsiv1_indent)
 # style_check test/unittests/convenience (blocked by haderding/remove_ngsiv1_indent)
 # style_check test/unittests/ngsi        (blocked by haderding/remove_ngsiv1_indent)

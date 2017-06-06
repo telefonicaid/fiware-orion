@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "gtest/gtest.h"
 
 #include "serviceRoutines/badVerbPostOnly.h"
@@ -31,24 +33,24 @@
 
 /* ****************************************************************************
 *
-* rs - 
+* rs -
 */
-static RestService rs[] = 
+static RestService rs[] =
 {
-  { "*",      RegisterContext,                       2, { "ngsi9",  "registerContext"                          }, "", badVerbPostOnly                           },
-  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "*", RegisterContext, 2, { "ngsi9",  "registerContext" }, "", badVerbPostOnly },
+  { "",  InvalidRequest,  0, {                             }, "", NULL            }
 };
 
 
 
 /* ****************************************************************************
 *
-* ok - 
+* ok -
 */
 TEST(badVerbPostOnly, ok)
 {
   ConnectionInfo ci("/ngsi9/registerContext",  "PUT", "1.1");
-  std::string     expected = ""; // Bad verb gives no payload, only HTTP headers
+  std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
   std::string     out;
 
   out = restService(&ci, rs);
