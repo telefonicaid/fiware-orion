@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+#include <vector>
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -35,38 +38,52 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/RestService.h"
 
-#include "unittest.h"
+#include "unittests/unittest.h"
 
 
 
+/* ****************************************************************************
+*
+* rs -
+*/
 RestService rs[] =
 {
   // NGSI-9 Requests
-  { "POST",   RegisterContext,                       2, { "ngsi9",  "registerContext"                          }, "registerContextRequest",                       postRegisterContext                       },
-  { "*",      RegisterContext,                       2, { "ngsi9",  "registerContext"                          }, "registerContextRequest",                       badVerbPostOnly                           },
+  { "POST", RegisterContext, 2, { "ngsi9", "registerContext" }, "registerContextRequest", postRegisterContext },
+  { "*",    RegisterContext, 2, { "ngsi9", "registerContext" }, "registerContextRequest", badVerbPostOnly     },
 
   // End marker for the array
-  { "",       InvalidRequest,                        0, {                                                      }, "",                                             NULL                                      }
-};
-
-
-RestService rs2[] =
-{
-  // NGSI-9 Requests
-  { "POST",   RegisterContext,                       2, { "ngsi9",  "registerContext"                          }, "registerContextRequest",                       postRegisterContext                       },
-  { "*",      RegisterContext,                       2, { "ngsi9",  "registerContext"                          }, "registerContextRequest",                       badVerbPostOnly                           },
-  { "POST",   DiscoverContextAvailability,           2, { "ngsi9",  "discoverContextAvailability"              }, "discoverContextAvailabilityRequest",           postDiscoverContextAvailability           },
-  { "*",      DiscoverContextAvailability,           2, { "ngsi9",  "discoverContextAvailability"              }, "discoverContextAvailabilityRequest",           badVerbPostOnly                           },
-
-  // End marker for the array
-  { "",       InvalidRequest,                        0, {                                                      }, "",                                             NULL                                      }
+  { "", InvalidRequest, 0, {}, "", NULL }
 };
 
 
 
 /* ****************************************************************************
 *
-* payloadParse - 
+* rs2 -
+*/
+#define RC   RegisterContext
+#define DCA  DiscoverContextAvailability
+#define RCR  "registerContextRequest"
+#define DCAR "discoverContextAvailabilityRequest"
+
+RestService rs2[] =
+{
+  // NGSI-9 Requests
+  { "POST", RC,  2, { "ngsi9",  "registerContext"             }, RCR,  postRegisterContext             },
+  { "*",    RC,  2, { "ngsi9",  "registerContext"             }, RCR,  badVerbPostOnly                 },
+  { "POST", DCA, 2, { "ngsi9",  "discoverContextAvailability" }, DCAR, postDiscoverContextAvailability },
+  { "*",    DCA, 2, { "ngsi9",  "discoverContextAvailability" }, DCAR, badVerbPostOnly                 },
+
+  // End marker for the array
+  { "", InvalidRequest, 0, {}, "", NULL }
+};
+
+
+
+/* ****************************************************************************
+*
+* payloadParse -
 */
 TEST(RestService, payloadParse)
 {
@@ -85,7 +102,9 @@ TEST(RestService, payloadParse)
   //
   // 1. JSON
   //
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf,
+                                   sizeof(testBuf),
+                                   infile1)) << "Error getting test data from '" << infile1 << "'";
 
   ci.inMimeType     = JSON;
   ci.outMimeType    = JSON;
@@ -99,7 +118,9 @@ TEST(RestService, payloadParse)
   //
   // 2. NOMIMETYPE
   //
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf,
+                                   sizeof(testBuf),
+                                   infile1)) << "Error getting test data from '" << infile1 << "'";
 
   ci.inMimeType     = NOMIMETYPE;
   ci.outMimeType    = JSON;
@@ -116,7 +137,7 @@ TEST(RestService, payloadParse)
 
 /* ****************************************************************************
 *
-* noSuchService - 
+* noSuchService -
 */
 TEST(RestService, noSuchServiceAndNotFound)
 {
@@ -131,8 +152,13 @@ TEST(RestService, noSuchServiceAndNotFound)
   utInit();
 
   // No such service
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf,
+                                   sizeof(testBuf),
+                                   infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf,
+                                   sizeof(expectedBuf),
+                                   outfile1)) << "Error getting test data from '" << outfile1 << "'";
+
   ci.outMimeType    = JSON;
   ci.inMimeType     = JSON;
   ci.payload        = testBuf;
@@ -141,8 +167,13 @@ TEST(RestService, noSuchServiceAndNotFound)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Not found
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf,
+                                   sizeof(testBuf),
+                                   infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf,
+                                   sizeof(expectedBuf),
+                                   outfile2)) << "Error getting test data from '" << outfile2 << "'";
+
   ci.outMimeType    = JSON;
   ci.inMimeType     = JSON;
   ci.payload        = testBuf;
