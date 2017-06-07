@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "gtest/gtest.h"
 
 #include "serviceRoutines/badVerbGetPostDeleteOnly.h"
@@ -31,24 +33,26 @@
 
 /* ****************************************************************************
 *
-* rs - 
+* rs -
 */
-static RestService rs[] = 
+#define ICEA IndividualContextEntityAttribute
+#define IR   InvalidRequest
+static RestService rs[] =
 {
-  { "*",      IndividualContextEntityAttribute,      5, { "ngsi10", "contextEntities", "*", "attributes", "*"  }, "", badVerbGetPostDeleteOnly                  },
-  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "*", ICEA, 5, { "ngsi10", "contextEntities", "*", "attributes", "*" }, "", badVerbGetPostDeleteOnly },
+  { "",  IR,   0, {                                                     }, "", NULL                     }
 };
 
 
 
 /* ****************************************************************************
 *
-* ok - 
+* ok -
 */
 TEST(badVerbGetPostDeleteOnly, ok)
 {
   ConnectionInfo  ci("/ngsi10/contextEntities/entityId01/attributes/temperature",  "PUT", "1.1");
-  std::string     expected = ""; // Bad verb gives no payload, only HTTP headers
+  std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
   std::string     out;
 
   out = restService(&ci, rs);

@@ -22,37 +22,38 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "common/Timer.h"
 #include "common/globals.h"
 #include "serviceRoutines/statisticsTreat.h"
 #include "serviceRoutines/badVerbGetDeleteOnly.h"
 #include "rest/RestService.h"
 
-#include "unittest.h"
+#include "unittests/unittest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs - 
+* rs -
 */
-static RestService rs[] = 
+static RestService rs[] =
 {
-  { "GET",    StatisticsRequest, 1, { "statistics" }, "", statisticsTreat      },
-  { "DELETE", StatisticsRequest, 1, { "statistics" }, "", statisticsTreat      },
-  { "GET",    StatisticsRequest, 2, { "cache", "statistics" }, "", statisticsCacheTreat      },
-  { "DELETE", StatisticsRequest, 2, { "cache", "statistics" }, "", statisticsCacheTreat      },
-  { "*",      StatisticsRequest, 1, { "statistics" }, "", badVerbGetDeleteOnly },
+  { "GET",    StatisticsRequest, 1, { "statistics"          }, "", statisticsTreat      },
+  { "DELETE", StatisticsRequest, 1, { "statistics"          }, "", statisticsTreat      },
+  { "GET",    StatisticsRequest, 2, { "cache", "statistics" }, "", statisticsCacheTreat },
+  { "DELETE", StatisticsRequest, 2, { "cache", "statistics" }, "", statisticsCacheTreat },
+  { "*",      StatisticsRequest, 1, { "statistics"          }, "", badVerbGetDeleteOnly },
 
-  { "",       InvalidRequest,    0, {              }, "", NULL                 }
+  { "",       InvalidRequest,    0, {                       }, "", NULL                 }
 };
 
 
 
 /* ****************************************************************************
 *
-* delete - 
-*
+* delete -
 */
 TEST(statisticsTreat, delete)
 {
@@ -73,8 +74,7 @@ TEST(statisticsTreat, delete)
 
 /* ****************************************************************************
 *
-* get - 
-*
+* get -
 */
 TEST(statisticsTreat, get)
 {
@@ -91,10 +91,11 @@ TEST(statisticsTreat, get)
   utExit();
 }
 
+
+
 /* ****************************************************************************
 *
 * delete (cache) -
-*
 */
 TEST(statisticsTreat, deleteCache)
 {
@@ -116,7 +117,6 @@ TEST(statisticsTreat, deleteCache)
 /* ****************************************************************************
 *
 * get (cache) -
-*
 */
 TEST(statisticsTreat, getCache)
 {
@@ -134,9 +134,10 @@ TEST(statisticsTreat, getCache)
 }
 
 
+
 /* ****************************************************************************
 *
-* badVerb - 
+* badVerb -
 */
 TEST(statisticsTreat, badVerb)
 {

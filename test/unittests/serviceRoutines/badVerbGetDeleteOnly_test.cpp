@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "gtest/gtest.h"
 
 #include "serviceRoutines/badVerbGetDeleteOnly.h"
@@ -32,9 +34,9 @@
 
 /* ****************************************************************************
 *
-* rs - 
+* rs -
 */
-static RestService rs[] = 
+static RestService rs[] =
 {
   { "GET",    StatisticsRequest, 1, { "statistics" }, "", statisticsTreat      },
   { "DELETE", StatisticsRequest, 1, { "statistics" }, "", statisticsTreat      },
@@ -47,12 +49,12 @@ static RestService rs[] =
 
 /* ****************************************************************************
 *
-* ok - 
+* ok -
 */
 TEST(badVerbGetDeleteOnly, ok)
 {
   ConnectionInfo  ci("/statistics",  "PUT", "1.1");
-  std::string     expected = ""; // Bad verb gives no payload, only HTTP headers
+  std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
   std::string     out;
 
   out = restService(&ci, rs);

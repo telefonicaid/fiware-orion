@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "gtest/gtest.h"
 
 #include "serviceRoutines/badVerbGetPutDeleteOnly.h"
@@ -31,24 +33,26 @@
 
 /* ****************************************************************************
 *
-* rs - 
+* rs -
 */
-static RestService rs[] = 
+#define AVI AttributeValueInstance
+#define IR  InvalidRequest
+static RestService rs[] =
 {
-  { "*",      AttributeValueInstance, 6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              badVerbGetPutDeleteOnly      },
-  { "",       InvalidRequest,         0, {                                                          }, "",                              NULL                         }
+  { "*", AVI, 6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "", badVerbGetPutDeleteOnly },
+  { "",  IR,  0, {                                                          }, "", NULL                    }
 };
 
 
 
 /* ****************************************************************************
 *
-* ok - 
+* ok -
 */
 TEST(badVerbGetPutDeleteOnly, ok)
 {
   ConnectionInfo  ci("/ngsi10/contextEntities/entityId01/attributes/temperature/14",  "POST", "1.1");
-  std::string     expected = ""; // Bad verb gives no payload, only HTTP headers
+  std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
   std::string     out;
 
   out = restService(&ci, rs);
