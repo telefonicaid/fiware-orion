@@ -31,7 +31,6 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
-#include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseEntityVector.h"
 #include "jsonParseV2/parseAttributeList.h"
 #include "jsonParseV2/parseScopeVector.h"
@@ -99,7 +98,6 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
   for (rapidjson::Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
   {
     std::string name   = iter->name.GetString();
-    std::string type   = jsonParseTypeNames[iter->value.GetType()];
 
     if (name == "entities")
     {

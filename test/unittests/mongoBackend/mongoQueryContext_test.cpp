@@ -416,7 +416,7 @@ static void prepareDatabaseWithCustomMetadataNative(void)
 * prepareDatabaseWithServicePath -
 *
 */
-static void prepareDatabaseWithServicePath(const std::string modifier)
+static void prepareDatabaseWithServicePath(const std::string& modifier)
 {
   /* Set database */
   setupDatabase();

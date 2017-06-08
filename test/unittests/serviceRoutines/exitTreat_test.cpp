@@ -22,16 +22,18 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "serviceRoutines/exitTreat.h"
 #include "rest/RestService.h"
 
-#include "unittest.h"
+#include "unittests/unittest.h"
 
 
 
 /* ****************************************************************************
 *
-* harakiri - 
+* harakiri -
 */
 extern bool harakiri;
 
@@ -39,21 +41,20 @@ extern bool harakiri;
 
 /* ****************************************************************************
 *
-* rs - 
+* rs -
 */
-static RestService rs[] = 
+static RestService rs[] =
 {
-  { "GET",    ExitRequest,                           2, { "exit", "*"                                              }, "", exitTreat                                 },
-  { "GET",    ExitRequest,                           1, { "exit"                                                   }, "", exitTreat                                 },
-  { "",       InvalidRequest,                        0, {                                                          }, "", NULL                                      }
+  { "GET", ExitRequest,    2, { "exit", "*" }, "", exitTreat },
+  { "GET", ExitRequest,    1, { "exit"      }, "", exitTreat },
+  { "",    InvalidRequest, 0, {             }, "", NULL      }
 };
 
 
 
 /* ****************************************************************************
 *
-* error - 
-*
+* error -
 */
 TEST(exitTreat, error)
 {

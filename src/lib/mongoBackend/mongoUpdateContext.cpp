@@ -70,7 +70,7 @@ HttpStatusCode mongoUpdateContext
   {
     char lenV[STRING_SIZE_FOR_INT];
 
-    snprintf(lenV, sizeof(lenV), "%lu", servicePathV.size());
+    snprintf(lenV, sizeof(lenV), "%lu", (unsigned long) servicePathV.size());
 
     std::string details = std::string("service path length ") + lenV + " is greater than the one in update";
     alarmMgr.badInput(clientIp, details);

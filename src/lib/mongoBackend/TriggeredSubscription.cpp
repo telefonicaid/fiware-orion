@@ -56,7 +56,8 @@ TriggeredSubscription::TriggeredSubscription
   cacheSubId(_cacheSubId),
   tenant((_tenant == NULL)? "" : _tenant),
   stringFilterP(NULL),
-  mdStringFilterP(NULL)
+  mdStringFilterP(NULL),
+  blacklist(false)
 {
 }
 
@@ -83,7 +84,8 @@ TriggeredSubscription::TriggeredSubscription
   cacheSubId(""),
   tenant(""),
   stringFilterP(NULL),
-  mdStringFilterP(NULL)
+  mdStringFilterP(NULL),
+  blacklist(false)
 {
 }
 

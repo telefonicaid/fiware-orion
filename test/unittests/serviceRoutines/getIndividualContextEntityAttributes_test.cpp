@@ -22,32 +22,36 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/getIndividualContextEntityAttributes.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
-#include "unittest.h"
+#include "unittests/unittest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs - 
+* rs -
 */
-static RestService rs[] = 
+#define ICEA IndividualContextEntityAttributes
+#define IR   InvalidRequest
+static RestService rs[] =
 {
-  { "GET",    IndividualContextEntityAttributes,     4, { "ngsi10", "contextEntities", "*", "attributes"       }, "", getIndividualContextEntityAttributes      },
-  { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
-  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "GET", ICEA, 4, { "ngsi10", "contextEntities", "*", "attributes" }, "", getIndividualContextEntityAttributes },
+  { "*",   IR,   0, { "*", "*", "*", "*", "*", "*"                   }, "", badRequest                           },
+  { "",    IR,   0, {                                                }, "", NULL                                 }
 };
 
 
 
 /* ****************************************************************************
 *
-* notFound - 
+* notFound -
 */
 TEST(getIndividualContextEntityAttributes, notFound)
 {
@@ -60,7 +64,9 @@ TEST(getIndividualContextEntityAttributes, notFound)
   ci.outMimeType = JSON;
   out            = restService(&ci, rs);
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf,
+                                   sizeof(expectedBuf),
+                                   outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

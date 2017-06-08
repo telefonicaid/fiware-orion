@@ -2047,9 +2047,6 @@ LmStatus lmFdRegister
   int*         indexP
 )
 {
-  char       startMsg[256];
-  char       dt[256];
-  int        sz;
   int        index;
   time_t     secsNow;
   struct tm tmP;
@@ -2087,6 +2084,10 @@ LmStatus lmFdRegister
   {
     if (lmPreamble == true)
     {
+      char  startMsg[256];
+      char  dt[256];
+      int   sz;
+
       strftime(dt, 256, "%A %d %h %H:%M:%S %Y", &tmP);
       snprintf(startMsg, sizeof(startMsg),
                "%s log\n-----------------\nStarted %s\nCleared at ...\n",
@@ -2603,7 +2604,6 @@ int lmBufferPresent
   int   start      = 0;
   char  line[160];
   char  tmp[80];
-  char  msg[160];
 
   if (size > 0x800)
   {
@@ -2629,6 +2629,8 @@ int lmBufferPresent
 
   if (to != NULL)
   {
+    char  msg[160];
+
     snprintf(msg, sizeof(msg), "%s %s %s (%d bytes) %s %s", progName,
              (type == 'r')? "reading" : "writing", description, size,
              (type == 'r')? "from"    : "to", to);
@@ -2765,7 +2767,6 @@ LmStatus lmReopen(int index)
   {
     char* line = (char*) calloc(1, LINE_MAX);
     int   len;
-    int   nb;
 
     if (fgets(line, LINE_MAX, fP) == NULL)
     {
@@ -2799,7 +2800,7 @@ LmStatus lmReopen(int index)
       break;
     }
 
-    if ((nb = write(fd, line, len)) != len)
+    if (write(fd, line, len) != len)
     {
       s = LmsWrite;
       free(line);
@@ -2873,7 +2874,6 @@ int64_t lmLogLineGet
   char*         lineP  = line;
   char*         delimiter;
   int64_t       ret;
-  char*         nada;
 
   if (allP != NULL)
   {
@@ -2902,13 +2902,11 @@ int64_t lmLogLineGet
       return -1;
     }
 
-    nada = fgets(line, 1024, fP);
-    nada = fgets(line, 1024, fP);
-    nada = fgets(line, 1024, fP);
-    nada = fgets(line, 1024, fP);
-    if (nada == NULL)
-    {
-    }
+    // Set file pointer to the beginning of the fifth line
+    fgets(line, 1024, fP);
+    fgets(line, 1024, fP);
+    fgets(line, 1024, fP);
+    fgets(line, 1024, fP);
   }
   else
   {
@@ -3336,8 +3334,7 @@ LmStatus lmOnlyErrors(int index)
 */
 const char* lmTraceLevel(int level)
 {
-  static char name[32];
-  char*       userName = NULL;
+  char* userName = NULL;
 
   switch (level)
   {
@@ -3359,6 +3356,7 @@ const char* lmTraceLevel(int level)
 
   if (userName == NULL)
   {
+    static char name[32];
     snprintf(name, sizeof(name), "trace level %d", level);
     return name;
   }
@@ -3413,7 +3411,8 @@ void lmAddMsgBuf
   const char*  stre
 )
 {
-  struct logMsg *newMsg, *logP, *lastlogP;
+  struct logMsg* newMsg;
+  struct logMsg* logP;
 
   newMsg = (logMsg*) malloc(sizeof(struct logMsg));
   if (newMsg == NULL)
@@ -3453,6 +3452,8 @@ void lmAddMsgBuf
 
   if (logMsgs)
   {
+    struct logMsg* lastlogP;
+
     logP = logMsgs;
     while (logP)
     {

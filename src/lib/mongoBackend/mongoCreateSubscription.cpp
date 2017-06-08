@@ -147,9 +147,6 @@ std::string mongoCreateSubscription
   BSONObjBuilder     b;
   std::string        servicePath      = servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
   bool               notificationDone = false;
-  long long          lastNotification = 0;
-  long long          lastFailure      = 0;
-  long long          lastSuccess      = 0;
   const std::string  subId            = setNewSubscriptionId(&b);
 
   // Build the BSON object to insert
@@ -207,7 +204,7 @@ std::string mongoCreateSubscription
 
   if (!noCache)
   {
-    insertInCache(sub, subId, tenant, servicePath, false, lastNotification, lastFailure, lastSuccess);
+    insertInCache(sub, subId, tenant, servicePath, false, 0, 0, 0);
   }
 
   reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);

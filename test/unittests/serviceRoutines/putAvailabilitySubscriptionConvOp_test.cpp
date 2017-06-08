@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/badVerbPutDeleteOnly.h"
@@ -32,37 +34,41 @@
 #include "serviceRoutines/deleteAvailabilitySubscriptionConvOp.h"
 #include "rest/RestService.h"
 
-#include "unittest.h"
+#include "unittests/unittest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs - 
+* rs -
 */
-static RestService rs[] = 
+#define SCA   SubscribeContextAvailability
+#define SCO   Ngsi9SubscriptionsConvOp
+#define IR    InvalidRequest
+#define SCAR  "subscribeContextAvailabilityRequest"
+#define UCASR "updateContextAvailabilitySubscriptionRequest"
+static RestService rs[] =
 {
-  { "POST",   SubscribeContextAvailability, 2, { "ngsi9", "contextAvailabilitySubscriptions"      }, "subscribeContextAvailabilityRequest",          postSubscribeContextAvailability         },
-  { "*",      SubscribeContextAvailability, 2, { "ngsi9", "contextAvailabilitySubscriptions"      }, "",                                             badVerbPostOnly                          },
+  { "POST",   SCA, 2, { "ngsi9", "contextAvailabilitySubscriptions"      }, SCAR,  postSubscribeContextAvailability  },
+  { "*",      SCA, 2, { "ngsi9", "contextAvailabilitySubscriptions"      }, "",    badVerbPostOnly                   },
 
-  { "PUT",    Ngsi9SubscriptionsConvOp,     3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "updateContextAvailabilitySubscriptionRequest", putAvailabilitySubscriptionConvOp        },
-  { "DELETE", Ngsi9SubscriptionsConvOp,     3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "",                                             deleteAvailabilitySubscriptionConvOp     },
-  { "*",      Ngsi9SubscriptionsConvOp,     3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "",                                             badVerbPutDeleteOnly                     },
+  { "PUT",    SCO, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, UCASR, putAvailabilitySubscriptionConvOp },
+  { "DELETE", SCO, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "", deleteAvailabilitySubscriptionConvOp },
+  { "*",      SCO, 3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "",    badVerbPutDeleteOnly              },
 
-  { "*",     InvalidRequest,                0, { "*", "*", "*", "*", "*", "*"                     }, "",                                 badRequest                                           },
-  { "",      InvalidRequest,                0, {                                                  }, "",                                 NULL                                                 }
+  { "*",     IR,   0, { "*", "*", "*", "*", "*", "*"                     }, "",    badRequest                        },
+  { "",      IR,   0, {                                                  }, "",    NULL                              }
 };
-     
 
 
 
 /* ****************************************************************************
 *
-* put - 
+* put -
 *
 */
 TEST(putAvailabilitySubscriptionConvOp, put)
-{  
+{
   ConnectionInfo ci1("/ngsi9/contextAvailabilitySubscriptions",  "GET",  "1.1");
   ConnectionInfo ci2("/ngsi9/contextAvailabilitySubscriptions/012345678901234567890123",  "XVERB",   "1.1");
   std::string    out;

@@ -28,7 +28,7 @@ contextBroker -t 0-255
 
 --REGEXPECT--
 incompatible options: traceLevels cannot be used without setting -logLevel to DEBUG
-Usage:                [option '-U' (extended usage)]
+Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-u' (usage)]
                       [option '--version' (show version)]
                       [option '-logDir' <log file directory>]

@@ -51,7 +51,6 @@ std::string parseAttributeList
 
   for (rapidjson::Value::ConstValueIterator iter2 = iter->value.Begin(); iter2 != iter->value.End(); ++iter2)
   {
-    std::string  r;
     std::string  val;
 
     type = jsonParseTypeNames[iter2->GetType()];
