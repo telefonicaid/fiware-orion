@@ -89,7 +89,7 @@ std::string getEntityAllTypes
   {
     char cVec[64];
 
-    snprintf(cVec, sizeof(cVec), "%ud", totalTypes);
+    snprintf(cVec, sizeof(cVec), "%u", totalTypes);
     ciP->httpHeader.push_back("Fiware-Total-Count");
     ciP->httpHeaderValue.push_back(cVec);
   }
